@@ -3,7 +3,8 @@ Title: Simplify access to data from the Amazon Region
 Version: 0.1.0.9000
 Authors@R: c(
     person("Francisco", "de Lima Cavalcanti", role = c("cre"), email = "francisco.lima.cavalcanti@gmail.com"),
-    person("Victor", "Aliende da Matta", role = c("aut"), email = "victor.matta@aluno.puc-rio.br")
+    person("Victor", "Aliende da Matta", role = c("aut"), email = "victor.al.matta@gmail.com"),
+    person("Maria", "Mittelbach", role = c("aut"), email = "mariamittelbach@gmail.com")
     )
 Description: This package offers functions to download and treat data regarding
              the Brazilian Amazon region from a variety of official sources.
