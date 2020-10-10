@@ -1,16 +1,25 @@
 Package: dz.amazonia
-Title: What the Package Does (One Line, Title Case)
+Title: Simplify access to data from the Amazon Region
 Version: 0.0.0.9000
-Authors@R: 
-    person(given = "First",
-           family = "Last",
-           role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to
-    pick a license
+Authors@R: c(
+    person("Francisco", "de Lima Cavalcanti", role = c("cre"), email = "francisco.lima.cavalcanti@gmail.com"),
+    person("Victor", "Aliende da Matta", role = c("aut"), email = "victor.matta@aluno.puc-rio.br")
+    )
+Description: This package offers functions to download and treat data regarding
+             the Brazilian Amazon region from a variety of official sources.
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
+Imports:
+    magrittr,
+    rlang,
+    dplyr,
+    purrr,
+    readr
+URL: http://www.econ.puc-rio.br/datazoom
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
