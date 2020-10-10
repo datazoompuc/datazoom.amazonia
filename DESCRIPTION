@@ -1,6 +1,6 @@
 Package: dz.amazonia
 Title: Simplify access to data from the Amazon Region
-Version: 0.0.0.9000
+Version: 0.1.0.9000
 Authors@R: c(
     person("Francisco", "de Lima Cavalcanti", role = c("cre"), email = "francisco.lima.cavalcanti@gmail.com"),
     person("Victor", "Aliende da Matta", role = c("aut"), email = "victor.matta@aluno.puc-rio.br")
