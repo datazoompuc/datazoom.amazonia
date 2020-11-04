@@ -45,9 +45,9 @@ datazoom_cobertura_mapbiomas<-function(aggregation_level = c('municipality', 'st
     download.file(url1, p1f, mode="wb")
   }else{
     if(aggregation_level=='state' | aggregation_level=='estado'){
-      p1f<-paste0(Path,'/Dados_Cobertura_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx')
+      p1f<-paste0(path,'/Dados_Cobertura_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx')
     }else if(aggregation_level=='municipality' | aggregation_level=='municipio'){
-      p1f<-paste0(Path,'/Dados_Cobertura_MapBiomas_5.0_UF-MUN_SITE.xlsx')
+      p1f<-paste0(path,'/Dados_Cobertura_MapBiomas_5.0_UF-MUN_SITE.xlsx')
     }
   }
   if(is.null(year_begin)){
