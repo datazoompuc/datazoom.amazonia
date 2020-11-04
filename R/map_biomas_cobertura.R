@@ -26,37 +26,37 @@
 #' @export
 #'
 #' @examples
-#' datazoom_cobertura_mapbiomas(Aggregation_level = 'Municipality', Path = '/Desktop',
-#'                              Code_State = "PA", Code_Mun = NULL, Covering = 3,
-#'                              Type = 'Stacked', Year_Begin = 2000, Year_End = 2010)
+#' datazoom_cobertura_mapbiomas(aggregation_level = 'municipality', path = '/Desktop',
+#'                              code_state = "PA", code_mun = NULL, covering = 3,
+#'                              type = 'stacked', year_begin = 2000, year_end = 2010)
 
 
 
-datazoom_cobertura_mapbiomas<-function(Aggregation_level = c('Municipality', 'State','Municipio','Estado'),Path = NULL,
-                                       Code_State = NULL, Code_Mun = NULL, Covering = NULL,
-                                       Type = c('Stacked','Normal','Empilhado'), Year_Begin = NULL, Year_End = NULL){
-  if(is.null(Path)){
-    if(Aggregation_level=='State' | Aggregation_level=='Estado'){
+datazoom_cobertura_mapbiomas<-function(aggregation_level = c('municipality', 'state','municipio','estado'),path = NULL,
+                                       code_state = NULL, code_mun = NULL, covering = NULL,
+                                       type = c('stacked','normal','empilhado'), year_begin = NULL, year_end = NULL){
+  if(is.null(path)){
+    if(aggregation_level=='state' | aggregation_level=='estado'){
       url1<-'https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Dados_Cobertura_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx'
-    }else if(Aggregation_level=='Municipality' | Aggregation_level=='Municipio'){
+    }else if(aggregation_level=='municipality' | aggregation_level=='municipio'){
       url1<-'https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Dados_Cobertura_MapBiomas_5.0_UF-MUN_SITE.xlsx'
     }
     p1f <- tempfile()
     download.file(url1, p1f, mode="wb")
   }else{
-    if(Aggregation_level=='State' | Aggregation_level=='Estado'){
+    if(aggregation_level=='state' | aggregation_level=='estado'){
       p1f<-paste0(Path,'/Dados_Cobertura_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx')
-    }else if(Aggregation_level=='Municipality' | Aggregation_level=='Municipio'){
+    }else if(aggregation_level=='municipality' | aggregation_level=='municipio'){
       p1f<-paste0(Path,'/Dados_Cobertura_MapBiomas_5.0_UF-MUN_SITE.xlsx')
     }
   }
-  if(is.null(Year_Begin)){
-    Year_Begin<-1985
+  if(is.null(year_begin)){
+    year_begin<-1985
   }
-  if(is.null(Year_End)){
-    Year_End<-2018
+  if(is.null(year_end)){
+    year_end<-2019
   }
-  if(Aggregation_level=='State' | Aggregation_level=='Estado'){
+  if(aggregation_level=='state' | aggregation_level=='estado'){
     a<-read_excel(path = p1f, sheet = 3)
     a<-a[!(substring(a$biome,1,4)!="Amaz"),]
     a$state[a$state == "Acre"] <- "AC"
@@ -70,14 +70,14 @@ datazoom_cobertura_mapbiomas<-function(Aggregation_level = c('Municipality', 'St
     a$state[substring(a$state,1,3) == "Par"] <- "PA"
     retorno<-data.frame()
     tab<-a
-    if(!is.null(Code_State)){
-      tab<-tab[!(tab$state!=Code_State),]
+    if(!is.null(code_state)){
+      tab<-tab[!(tab$state!=code_state),]
     }
-    if(!is.null(Covering)){
-      tab<-tab[!(substring(tab$level_1,1,1)!=Covering),]
+    if(!is.null(covering)){
+      tab<-tab[!(substring(tab$level_1,1,1)!=covering),]
     }
-    if(Type=='Stacked' | Type=='Empilhado'){
-      for(i in Year_Begin:Year_End){
+    if(type=='stacked' | type=='empilhado'){
+      for(i in year_begin:year_end){
         ret<-c()
         ret<-tab[,1:7]
         ano<-as.character(i)
@@ -89,32 +89,32 @@ datazoom_cobertura_mapbiomas<-function(Aggregation_level = c('Municipality', 'St
         retorno<-rbind(retorno,ret)
       }
     }
-    if(Type=='Normal'){
+    if(Type=='normal'){
       ret<-tab[,1:7]
-      for(i in Year_Begin:Year_End){
+      for(i in year_begin:year_end){
         ano<-as.character(i)
         ret<-cbind(ret,tab[,ano])
       }
       retorno<-ret
     }
-  }else if(Aggregation_level=='Municipality' | Aggregation_level=='Municipio'){
+  }else if(aggregation_level=='municipality' | aggregation_level=='municipio'){
     b<-read_excel(path = p1f, sheet = 3)
     tipos<-c('RR','RO','AC','AM','MA','TO','PA','AP','MT')
     `%notin%` <- Negate(`%in%`)
     b<-b[!(b$state %notin% as.vector(tipos)),]
     retorno<-data.frame()
     tab<-b
-    if(!is.null(Code_State)){
-      tab<-tab[!(tab$state!=Code_State),]
+    if(!is.null(code_state)){
+      tab<-tab[!(tab$state!=code_state),]
     }
-    if(!is.null(Code_Mun)){
-      tab<-tab[!(tab$municipality!=Code_Mun),]
+    if(!is.null(code_mun)){
+      tab<-tab[!(tab$municipality!=code_mun),]
     }
-    if(!is.null(Covering)){
-      tab<-tab[!(substring(tab$level_1,1,1)!=Covering),]
+    if(!is.null(covering)){
+      tab<-tab[!(substring(tab$level_1,1,1)!=covering),]
     }
-    if(Type=='Stacked' | Type=='Empilhado'){
-      for(i in Year_Begin:Year_End){
+    if(type=='stacked' | type=='empilhado'){
+      for(i in year_begin:year_end){
         ret<-c()
         ret<-tab[,1:7]
         ano<-as.character(i)
@@ -126,9 +126,9 @@ datazoom_cobertura_mapbiomas<-function(Aggregation_level = c('Municipality', 'St
         retorno<-rbind(retorno,ret)
       }
     }
-    if(Type=='Normal'){
+    if(type=='normal'){
       ret<-tab[,1:7]
-      for(i in Year_Begin:Year_End){
+      for(i in year_begin:year_end){
         ano<-as.character(i)
         ret<-cbind(ret,tab[,ano])
       }
