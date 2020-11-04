@@ -2,18 +2,18 @@
 #' 
 #' @description Download and filter data on type of soil covering by year
 #' 
-#' @param Aggregation_level A string that indicates the level of aggregation of the data. It can be by Municipality or State
-#' @param Path A string indicating where the raw data is in your computer. The default is NULL which means the data will be extracted directly from the website
-#' @param Code_State Output contains only data from the state selected
+#' @param aggregation_level A string that indicates the level of aggregation of the data. It can be by Municipality or State
+#' @param path A string indicating where the raw data is in your computer. The default is NULL which means the data will be extracted directly from the website
+#' @param code_state Output contains only data from the state selected
 #' Input has to be IBGE's coding for the state desired
-#' @param Code_Mun Output contains only data from the municipality selected (not available for Aggregation_level=='State')
+#' @param code_mun Output contains only data from the municipality selected (not available for Aggregation_level=='State')
 #' Input has to be IBGE's coding for the municipality desired
-#' @param Covering Output contains only data over the selected covering
+#' @param covering Output contains only data over the selected covering
 #' Input has to be the code of the desired covering
 #' ATT.: This code ranges from 1 to 5 and is different from the covering code for the others functions in this package
-#' @param Type Decide if the output should have a column for each year (Normal) or a single column for the areas of all years (Stacked | Empilhado)
-#' @param Year_Begin A numeric object containing the first year desired in the data base
-#' @param Year_End A numeric object containing the last year desired in the data base
+#' @param type Decide if the output should have a column for each year (Normal) or a single column for the areas of all years (Stacked | Empilhado)
+#' @param year_begin A numeric object containing the first year desired in the data base
+#' @param year_end A numeric object containing the last year desired in the data base
 #' 
 #' @return A data base with data containing the area of each selected type of soil covering in each selected year
 #'
