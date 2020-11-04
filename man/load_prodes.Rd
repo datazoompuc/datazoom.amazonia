@@ -39,13 +39,13 @@ load_prodes(
 )
 
 load_prodes(
-  system.file("extdata", package = "dz.amazonia"),
+  system.file("extdata", package = "datazoom.amazonia"),
   aggregation_level = "state",
   language = "en"
 )
 
 load_prodes(
-  system.file("extdata", "DesmatamentoMunicipios2015.txt", package = "dz.amazonia"),
+  system.file("extdata", "DesmatamentoMunicipios2015.txt", package = "datazoom.amazonia"),
   aggregation_level = "municipality",
   language = "pt"
 )

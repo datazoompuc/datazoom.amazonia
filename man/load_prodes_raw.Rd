@@ -28,10 +28,10 @@ load_prodes_raw(2017)
 
 load_prodes_raw(c(2016, 2017, 2018))
 
-load_prodes_raw(system.file("extdata", package = "dz.amazonia"))
+load_prodes_raw(system.file("extdata", package = "datazoom.amazonia"))
 
 load_prodes_raw(
-  system.file("extdata", "DesmatamentoMunicipios2015.txt", package = "dz.amazonia")
+  system.file("extdata", "DesmatamentoMunicipios2015.txt", package = "datazoom.amazonia")
 )
 }
 \seealso{

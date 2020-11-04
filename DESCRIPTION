@@ -1,4 +1,4 @@
-Package: dz.amazonia
+Package: datazoom.amazonia
 Title: Simplify access to data from the Amazon Region
 Version: 0.1.0.9000
 Authors@R: c(
