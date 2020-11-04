@@ -36,7 +36,7 @@ datazoom_transicao_mapbiomas<-function(path = NULL,
   if(is.null(path)){
     url1<-'https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Dados_Transicao_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx'
     p1f <- tempfile()
-    drive_download(url1, p1f)
+    download.file(url1, p1f, mode="wb")
   }else{
     p1f<-paste0(path,'/Dados_Transicao_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx')
   }
