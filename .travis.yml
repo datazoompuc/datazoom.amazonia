@@ -1,5 +1,11 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
-language: R
+language: r
+r:
+  - oldrel
+  - release
+  - devel
 warnings_are_errors: true
 cache: packages
+before_script:
+  - R -e "devtools::document()"
