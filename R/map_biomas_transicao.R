@@ -9,7 +9,7 @@
 #' Input has to be the code of the desired covering
 #' @param covering_to Output contains only data of the transition from all coverings to the covering selected
 #' Input has to be the code of the desired covering
-#' @param type Decide if the output should have a column for each year (Normal) or a single column for the areas of all years (Stacked | Empilhado)
+#' @param type Decide if the output should have a column for each year (normal) or a single column for the areas of all years (stacked | empilhado)
 #' @param year_diff A numeric object containing the year differential desired in the data base, or have all included (NULL)
 #' 
 #' @return A data base with data containing the area of each selected type of soil covering transition in each selected year
