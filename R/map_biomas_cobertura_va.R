@@ -1,4 +1,4 @@
-#' @title datazoom_cobertura_mapbiomas
+#' @title datazoom_cobertura_mapbiomas_va
 #' 
 #' @description Download and filter data on type of soil covering by year
 #' 
