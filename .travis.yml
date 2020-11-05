@@ -8,4 +8,5 @@ r:
 warnings_are_errors: true
 cache: packages
 before_script:
-  - R -e "devtools::document()"
+  - R -e 'install.packages("devtools")'
+  - R -e 'devtools::document()'
