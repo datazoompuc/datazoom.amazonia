@@ -1,4 +1,4 @@
-# dz.amazonia
+# datazoom.amazonia
 
 dz.amazonia is an R package that facilitates access to official data regarding the Amazon. The package provides functions that download and pre-process selected datasets. Currently we support:
 * INPE - PRODES: deforestation by municipality
@@ -12,7 +12,7 @@ The package can be installed using `devtools` like so:
 
 ```
 if(!require(devtools)) install.packages("devtools")
-devtools::install_github("datazoompuc/dz.amazonia")
+devtools::install_github("datazoompuc/datazoom.amazonia")
 ```
 
 ## Usage
