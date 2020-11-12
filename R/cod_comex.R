@@ -32,7 +32,7 @@ comex_data <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
   #removes invalid years from input vector
   year1 <- year[year <= 2020]
   year1 <- year1[ year1 >= 1997]
-  year2 <- year[year >= 1986]
+  year2 <- year[year >= 1989]
   year2 <- year2[year2 <= 1996]
   #creates list to store data frames
   all_dtframes <- list()
