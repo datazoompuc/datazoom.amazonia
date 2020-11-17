@@ -10,7 +10,7 @@
 #' Input has to be IBGE's coding for the municipality desired
 #' @param covering Output contains only data over the selected covering
 #' Input has to be the code of the desired covering
-#' ATT.: This code ranges from 1 to 5 and is different from the covering code for the others functions in this package
+#' ATT.: This code ranges from 1 to 5 and is different from the covering code for the other functions in this package
 #' @param type Decide if the output should have a column for each year (normal) or a single column for the areas of all years (stacked | empilhado)
 #' @param year_begin A numeric object containing the first year desired in the data base
 #' @param year_end A numeric object containing the last year desired in the data base
