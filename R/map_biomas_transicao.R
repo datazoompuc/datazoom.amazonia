@@ -16,7 +16,6 @@
 #'
 #' @importFrom writexl
 #' @importFrom readxl
-#' @importFrom googledrive
 #' 
 #' @author DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro
 #'
