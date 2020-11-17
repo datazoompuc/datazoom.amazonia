@@ -18,13 +18,13 @@ knitr::opts_chunk$set(
 
 The Comex project gathers data extracted from Siscomex (Integrated System of Foreign Trade), which is a database containing information from all products that are imported to or exported from Brazil. Using data reported from the companies which are responsible for the process of transporting the products, the system adheres to internationally standardized nomenclatures, such as the Harmonized System and the Mercosul Common Nomenclature (which pertains to members of the Mercosul organization). 
 
-The data available has a monthly frequency and is available from the year 1986. From 1986 to 1996, a different system of nomenclatures was adopted, but all conversions are available on a dictionary in the Comex website (http://www.mdic.gov.br/balanca/bd/tabelas/NBM_NCM.csv)
+The data available has a monthly frequency and is available starting from the year 1989. From 1989 to 1996, a different system of nomenclatures was adopted, but all conversions are available on a dictionary in the Comex website (http://www.mdic.gov.br/balanca/bd/tabelas/NBM_NCM.csv)
 
 ##The Function
 
-The package contains a single function \code{comex_data} which extracts data from the Comex website. It allows the user to input the years he would like the data to encompass, the nomenclature used, driscriminate between import and export data and choose the language (currently only Portuguese and English are supported). 
+The package contains a single function \code{comex_data} which extracts data from the Comex website. It allows the user to input the years he would like the data to encompass, the nomenclature used, as well as choosing between import and export data and the language (currently only Portuguese and English are supported). 
 
-The output is a list of dataframes. The order is: export before import, and nomenclatures are clustered together, with NCM first, SH4 second and NBM third. Each dataframe will contain all years selected. 
+The output is a list of dataframes. Each dataframe will contain all years selected, but there will be two for each nomenclature, one for exports and another for imports. The order is: export before import, and all years in a certain nomenclature are clustered together, with NCM first, SH4 second and NBM third.
 
 Using the function is easy enough:
 
