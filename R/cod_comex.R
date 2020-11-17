@@ -43,7 +43,7 @@ comex_data <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
       #first type in Mercosul Common Nomenclature
       if (ncm == TRUE) {
         #Generates URLs for each year to download .csv file from website
-        url <- paste0("http://www.mdic.gov.br/balanca/bd/comexstat-bd/ncm/EXP_", year1, ".csv")
+        url <- paste0("http://www.balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm/EXP_", year1, ".csv")
         #creates data frame to store
         data_exp_ncm <- data.frame()
         #for each year, concatenates data frame to all previous year
@@ -70,7 +70,7 @@ comex_data <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
       }
       #same structure used above but for another system
       if (sh4 == TRUE) {
-        url <- paste0("http://www.mdic.gov.br/balanca/bd/comexstat-bd/mun/EXP_", year1, "_MUN.csv")
+        url <- paste0("http://www.balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/EXP_", year1, "_MUN.csv")
         data_exp_sh4 <- data.frame()
         for (i in 1:length(url)) {
           df <- read.csv2(url[i])
@@ -96,7 +96,7 @@ comex_data <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
       }
       #before 1997 only one other system is supported, but structure is the same
     } else if (length(year2) != 0) {
-      url <- paste0("http://www.mdic.gov.br/balanca/bd/comexstat-bd/nbm/EXP_", year2, "_NBM.csv")
+      url <- paste0("http://www.balanca.economia.gov.br/balanca/bd/comexstat-bd/nbm/EXP_", year2, "_NBM.csv")
       data_exp_nbm <- data.frame()
       for (i in 1:length(url)) {
         df <- read.csv2(url[i])
@@ -126,7 +126,7 @@ comex_data <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
     #separate sets of data frame are generated
     if (length(year1) != 0) {
       if (ncm == TRUE) {
-        url <- paste0("http://www.mdic.gov.br/balanca/bd/comexstat-bd/ncm/IMP_", year1, ".csv")
+        url <- paste0("http://www.balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm/IMP_", year1, ".csv")
         data_imp_ncm <- data.frame()
         for (i in 1:length(url)) {
           df <- read.csv2(url[i])
@@ -150,7 +150,7 @@ comex_data <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
         all_dtframes <- list(all_dtframes, data_imp_ncm)
       }
       if (sh4 == TRUE) {
-        url <- paste0("http://www.mdic.gov.br/balanca/bd/comexstat-bd/mun/IMP_", year1, "_MUN.csv")
+        url <- paste0("http://www.balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/IMP_", year1, "_MUN.csv")
         data_imp_sh4 <- data.frame()
         for (i in 1:length(url)) {
           df <- read.csv2(url[i])
@@ -174,7 +174,7 @@ comex_data <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
         all_dtframes <- list(all_dtframes, data_imp_sh4)
       }
     } else if (length(year2) != 0) {
-      url <- paste0("http://www.mdic.gov.br/balanca/bd/comexstat-bd/nbm/IMP_", year2, "_NBM.csv")
+      url <- paste0("http://www.balanca.economia.gov.br/balanca/bd/comexstat-bd/nbm/IMP_", year2, "_NBM.csv")
       data_imp_nbm <- data.frame()
       for (i in 1:length(url)) {
         df <- read.csv2(url[i])
