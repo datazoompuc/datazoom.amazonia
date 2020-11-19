@@ -42,7 +42,7 @@ raw_data <- load_prodes_raw(2018)
 
 years <- c(2000:2009)
 
-data2 <- comex_data(years, ncm = TRUE, exp = TRUE, imp = TRUE)
+data2 <- load_comex(years, ncm = TRUE, exp = TRUE, imp = TRUE)
 
 
 ```
