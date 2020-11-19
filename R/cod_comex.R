@@ -86,7 +86,7 @@ load_comex <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
           )
         } else {
           colnames(data_2) <- c(
-            "Ano", "M\u00eas", "C\u00f3digo Sistema Harmonizado", "C\u00f3digo do país",
+            "Ano", "M\u00eas", "C\u00f3digo Sistema Harmonizado", "C\u00f3digo do pa\u00eds",
             "Sigla da Unidade da Federa\u00e7\u00e3o exportadora", "C\u00f3digo Munic\u00edpio do Domic\u00edlio Fiscal",
             "Quantidade em Kg L\u00edquidos", "Valor Free on Board"
           )
