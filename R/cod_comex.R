@@ -64,9 +64,9 @@ load_comex <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
           )
         } else {
           colnames(data_1) <- c(
-            "Ano", "Mês", "Código Nomentaclatura Comum do Mercosul", "Código da Unidade Estatística", "Código do país",
-            "Sigla da Unidade da Federação exportadora", "Código da via de Transporte", "Código da Unidade da Receita Federal",
-            "Quantidade Estatística", "Quantidade em Kg Líquidos", "Valor Free on Board"
+            "Ano", "M\u00eas", "C\u00f3digo Nomentaclatura Comum do Mercosul", "C\u00f3digo da Unidade Estat\u00edstica", "C\u00f3digo do pa\u00eds",
+            "Sigla da Unidade da Federa\u00e7\u00e3o exportadora", "C\u00f3digo da via de Transporte", "C\u00f3digo da Unidade da Receita Federal",
+            "Quantidade Estat\u00edstica", "Quantidade em Kg L\u00edquidos", "Valor Free on Board"
           )
         }
       }
@@ -86,9 +86,9 @@ load_comex <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
           )
         } else {
           colnames(data_2) <- c(
-            "Ano", "Mês", "Código Sistema Harmonizado", "Código do país",
-            "Sigla da Unidade da Federação exportadora", "Código Município do Domicílio Fiscal",
-            "Quantidade em Kg Líquidos", "Valor Free on Board"
+            "Ano", "M\u00eas", "C\u00f3digo Sistema Harmonizado", "C\u00f3digo do país",
+            "Sigla da Unidade da Federa\u00e7\u00e3o exportadora", "C\u00f3digo Munic\u00edpio do Domic\u00edlio Fiscal",
+            "Quantidade em Kg L\u00edquidos", "Valor Free on Board"
           )
         }
       } else if (sh4 == FALSE & ncm == FALSE) {
@@ -113,9 +113,9 @@ load_comex <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
         )
       } else {
         colnames(data_3) <- c(
-          "Ano", "Mês", "Código Nomentaclatura Brasileira de Mercadorias", "Código do país",
-          "Sigla da Unidade da Federação exportadora",
-          "Quantidade em Kg Líquidos", "Valor Free on Board"
+          "Ano", "M\u00eas", "C\u00f3digo Nomentaclatura Brasileira de Mercadorias", "C\u00f3digo do pa\u00eds",
+          "Sigla da Unidade da Federa\u00e7\u00e3o exportadora",
+          "Quantidade em Kg L\u00edquidos", "Valor Free on Board"
         )
       }
     } else if (length(year1)==0 && length(year2)==0) {
@@ -142,9 +142,9 @@ load_comex <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
           )
         } else {
           colnames(data_4) <- c(
-            "Ano", "Mês", "Código Nomentaclatura Comum do Mercosul", "Código da Unidade Estatística", "Código do país",
-            "Sigla da Unidade da Federação importadora", "Código da via de Transporte", "Código da Unidade da Receita Federal",
-            "Quantidade Estatística", "Quantidade em Kg Líquidos", "Valor Free on Board"
+            "Ano", "M\u00eas", "C\u00f3digo Nomentaclatura Comum do Mercosul", "C\u00f3digo da Unidade Estat\u00edstica", "C\u00f3digo do pa\u00eds",
+            "Sigla da Unidade da Federa\u00e7\u00e3o importadora", "C\u00f3digo da via de Transporte", "C\u00f3digo da Unidade da Receita Federal",
+            "Quantidade Estat\u00edstica", "Quantidade em Kg L\u00edquidos", "Valor Free on Board"
           )
         }
 
@@ -165,9 +165,9 @@ load_comex <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
           )
         } else {
           colnames(data_5) <- c(
-            "Ano", "Mês", "Código Sistema Harmonizado", "Código do país",
-            "Sigla da Unidade da Federação importadora", "Código Município do Domicílio Fiscal",
-            "Quantidade em Kg Líquidos", "Valor Free on Board"
+            "Ano", "M\u00eas", "C\u00f3digo Sistema Harmonizado", "C\u00f3digo do pa\u00eds",
+            "Sigla da Unidade da Federa\u00e7\u00e3o importadora", "C\u00f3digo Munic\u00edpio do Domic\u00edlio Fiscal",
+            "Quantidade em Kg L\u00equidos", "Valor Free on Board"
           )
         }
 
@@ -189,9 +189,9 @@ load_comex <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
         )
       } else {
         colnames(data_6) <- c(
-          "Ano", "Mês", "Código Nomentaclatura Brasileira de Mercadorias", "Código do país",
-          "Sigla da Unidade da Federação importadora",
-          "Quantidade em Kg Líquidos", "Valor Free on Board"
+          "Ano", "M\u00eas", "C\u00f3digo Nomentaclatura Brasileira de Mercadorias", "C\u00f3digo do pa\u00eds",
+          "Sigla da Unidade da Federa\u00e7\u00e3o importadora",
+          "Quantidade em Kg L\u00edquidos", "Valor Free on Board"
         )
       }
 

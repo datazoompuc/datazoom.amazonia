@@ -26,12 +26,14 @@ The package contains a single function \code{comex_data} which extracts data fro
 
 The output is a list of dataframes. Each dataframe will contain all years selected, but there will be two for each nomenclature, one for exports and another for imports. The order is: export before import, and all years in a certain nomenclature are clustered together, with NCM first, SH4 second and NBM third.
 
+It's worth noting that depending on the items chosen the size of files downloaded can be pretty big, so the function may take some time processing. 
+
 Using the function is easy enough:
 
 ```{r setup}
 library(datazoom.amazonia)
 
-years <- c(2000:2002)
+years <- c(2001,2002)
 
 data <- load_comex(years, ncm = TRUE, imp = TRUE, language = "eng")
 
