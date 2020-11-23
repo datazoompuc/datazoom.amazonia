@@ -208,29 +208,3 @@ load_comex <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
   return(all_dtframes)
 }
 
-# CO_ANO = "Ano"
-# Ano = "Year"
-# CO_MES = "Mês"
-# Mês = "Month"
-# CO_NCM = Código Nomentaclatura Comum do Mercosul
-# Código Nomenclatura Comum do Mercosul = "Code Mercosul Common Nomenclature"
-# CO_UNID = Código da Unidade Estatística
-# Código da Unidade Estatística = Statistical Unit Code
-# CO_PAIS = Código do país
-# Código do país = Country code
-# SG_UF_NCM = Sigla da Unidade da Federação importadora/exportadora
-# Sigla da Unidade da Federação importadora/exportadora = Acronym of the importing/exporting unit of the federation
-# CO_VIA = Código da via de Transporte
-# Código da via de transporte = Code of the mode of transport
-# CO_URF = Código da Unidade da Receita Federal
-# Código da Unidade da Receita Federal = Code for the customs processing unit
-# QT_ESTAT = Quantidade Estatística
-# Quantidade Estatística = Statistical Quantity
-# KG_LIQUIDO = Quantidade em Kilogramas Líquidos
-# Quantidade em Kilogramas Líquidos = Quantity in net kilograms
-# VL_FOB = Valor Free on Board
-# Valor Free on Board
-# SH4 = Código do produto no Sistema Harmonizado
-# Código do product no Sistema Harmonizado = Product code in the Harmonized System
-# CO_MUN = código do município domicílio fiscal
-# Código do município domicílio fiscal = Code of fiscal domicile municipality
