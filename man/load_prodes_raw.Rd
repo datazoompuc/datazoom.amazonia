@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{load_prodes_raw}
 \alias{load_prodes_raw}
-\title{Loads deforestation data from INPE.}
+\title{Loads and cleans the deforestation data from INPE in your computer from a specified directory.}
 \usage{
 load_prodes_raw(source)
 }
@@ -21,7 +21,7 @@ Alternatively, \code{source} may be a list of full file paths, or anything else 
 A list of \code{tibble}.
 }
 \description{
-Loads deforestation data from INPE.
+Loads and cleans the deforestation data from INPE in your computer from a specified directory.
 }
 \examples{
 load_prodes_raw(2017)
