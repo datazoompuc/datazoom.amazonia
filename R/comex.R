@@ -194,7 +194,6 @@ load_comex <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
           "Quantidade em Kg Liquidos", "Valor Free on Board"
         )
       }
-
     } else if (length(year1)==0 && length(year2)==0) {
       stop("Year selected not valid")
     }
