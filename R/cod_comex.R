@@ -25,7 +25,7 @@
 #'
 
 load_comex <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE, language = "pt") {
-  warning("Depending on amount of items selected function may take time to run")
+  message("Depending on amount of items selected function may take time to run")
   #Unless english is specified, columns will be renamed using Portuguese labels
   if (language != "pt" && language != "eng") {
     warning("Language selected not supported! Proceding with Portuguese")
@@ -64,9 +64,9 @@ load_comex <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
           )
         } else {
           colnames(data_1) <- c(
-            "Ano", "Mês", "Código Nomentaclatura Comum do Mercosul", "Código da Unidade Estatística", "Código do país",
-            "Sigla da Unidade da Federação exportadora", "Código da via de Transporte", "Código da Unidade da Receita Federal",
-            "Quantidade Estatística", "Quantidade em Kg Líquidos", "Valor Free on Board"
+            "Ano", "Mes", "Codigo Nomentaclatura Comum do Mercosul", "Codigo da Unidade Estatistica", "Codigo do pais",
+            "Sigla da Unidade da Federacao exportadora", "Codigo da via de Transporte", "Codigo da Unidade da Receita Federal",
+            "Quantidade Estatistica", "Quantidade em Kg Liquidos", "Valor Free on Board"
           )
         }
       }
@@ -86,9 +86,9 @@ load_comex <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
           )
         } else {
           colnames(data_2) <- c(
-            "Ano", "Mês", "Código Sistema Harmonizado", "Código do país",
-            "Sigla da Unidade da Federação exportadora", "Código Município do Domicílio Fiscal",
-            "Quantidade em Kg Líquidos", "Valor Free on Board"
+            "Ano", "Mes", "Codigo Sistema Harmonizado", "Codigo do pais",
+            "Sigla da Unidade da Federacao exportadora", "Codigo Municipio do Domicilio Fiscal",
+            "Quantidade em Kg Liquidos", "Valor Free on Board"
           )
         }
       } else if (sh4 == FALSE & ncm == FALSE) {
@@ -113,13 +113,13 @@ load_comex <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
         )
       } else {
         colnames(data_3) <- c(
-          "Ano", "Mês", "Código Nomentaclatura Brasileira de Mercadorias", "Código do país",
-          "Sigla da Unidade da Federação exportadora",
-          "Quantidade em Kg Líquidos", "Valor Free on Board"
+          "Ano", "Mes", "Codigo Nomentaclatura Brasileira de Mercadorias", "Codigo do pais",
+          "Sigla da Unidade da Federacao exportadora",
+          "Quantidade em Kg Liquidos", "Valor Free on Board"
         )
       }
     } else if (length(year1)==0 && length(year2)==0) {
-      warning("Year selected not valid")
+      stop("Year selected not valid")
     }
   }
   if (imp == TRUE) {
@@ -142,9 +142,9 @@ load_comex <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
           )
         } else {
           colnames(data_4) <- c(
-            "Ano", "Mês", "Código Nomentaclatura Comum do Mercosul", "Código da Unidade Estatística", "Código do país",
-            "Sigla da Unidade da Federação importadora", "Código da via de Transporte", "Código da Unidade da Receita Federal",
-            "Quantidade Estatística", "Quantidade em Kg Líquidos", "Valor Free on Board"
+            "Ano", "Mes", "Codigo Nomentaclatura Comum do Mercosul", "Codigo da Unidade Estatistica", "Codigo do pais",
+            "Sigla da Unidade da Federacao importadora", "Codigo da via de Transporte", "Codigo da Unidade da Receita Federal",
+            "Quantidade Estatistica", "Quantidade em Kg Liquidos", "Valor Free on Board"
           )
         }
 
@@ -165,9 +165,9 @@ load_comex <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
           )
         } else {
           colnames(data_5) <- c(
-            "Ano", "Mês", "Código Sistema Harmonizado", "Código do país",
-            "Sigla da Unidade da Federação importadora", "Código Município do Domicílio Fiscal",
-            "Quantidade em Kg Líquidos", "Valor Free on Board"
+            "Ano", "Mes", "Codigo Sistema Harmonizado", "Codigo do pais",
+            "Sigla da Unidade da Federacao importadora", "Codigo Municipio do Domicilio Fiscal",
+            "Quantidade em Kg Liquidos", "Valor Free on Board"
           )
         }
 
@@ -189,12 +189,14 @@ load_comex <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
         )
       } else {
         colnames(data_6) <- c(
-          "Ano", "Mês", "Código Nomentaclatura Brasileira de Mercadorias", "Código do país",
-          "Sigla da Unidade da Federação importadora",
-          "Quantidade em Kg Líquidos", "Valor Free on Board"
+          "Ano", "Mes", "Codigo Nomentaclatura Brasileira de Mercadorias", "Codigo do pais",
+          "Sigla da Unidade da Federacao importadora",
+          "Quantidade em Kg Liquidos", "Valor Free on Board"
         )
       }
 
+    } else if (length(year1)==0 && length(year2)==0) {
+      stop("Year selected not valid")
     }
   }
   if(exp == FALSE && imp == FALSE) {
