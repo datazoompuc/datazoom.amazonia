@@ -89,7 +89,7 @@ datazoom_cobertura_mapbiomas<-function(aggregation_level = c('municipality', 'st
         retorno<-rbind(retorno,ret)
       }
     }
-    if(Type=='normal'){
+    if(type=='normal'){
       ret<-tab[,1:7]
       for(i in year_begin:year_end){
         ano<-as.character(i)
