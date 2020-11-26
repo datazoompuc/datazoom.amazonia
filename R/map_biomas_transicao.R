@@ -76,8 +76,8 @@ datazoom_transicao_mapbiomas<-function(path = NULL,
           ret<-cbind(ret,tab[,i])
           colnames(ret)[which(colnames(ret) == nomecol)] <- 'Area'
           num<-nrow(tab[,i])
-          data<-rep(c(nomecol),num)
-          ret<-cbind(ret,data)
+          Period<-rep(c(nomecol),num)
+          ret<-cbind(ret,Period)
           retorno<-rbind(retorno,ret)
         }
       }
