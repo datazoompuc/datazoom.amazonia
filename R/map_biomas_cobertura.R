@@ -79,7 +79,7 @@ datazoom_cobertura_mapbiomas<-function(aggregation_level = c('municipality', 'st
     if(type=='stacked' | type=='empilhado'){
       for(i in year_begin:year_end){
         ret<-c()
-        ret<-tab[,1:7]
+        ret<-tab[,1:8]
         ano<-as.character(i)
         ret<-cbind(ret,tab[,ano])
         colnames(ret)[which(colnames(ret) == ano)] <- 'Area'
@@ -90,7 +90,7 @@ datazoom_cobertura_mapbiomas<-function(aggregation_level = c('municipality', 'st
       }
     }
     if(type=='normal'){
-      ret<-tab[,1:7]
+      ret<-tab[,1:8]
       for(i in year_begin:year_end){
         ano<-as.character(i)
         ret<-cbind(ret,tab[,ano])
@@ -116,7 +116,7 @@ datazoom_cobertura_mapbiomas<-function(aggregation_level = c('municipality', 'st
     if(type=='stacked' | type=='empilhado'){
       for(i in year_begin:year_end){
         ret<-c()
-        ret<-tab[,1:7]
+        ret<-tab[,1:8]
         ano<-as.character(i)
         ret<-cbind(ret,tab[,ano])
         colnames(ret)[which(colnames(ret) == ano)] <- 'Area'
@@ -127,7 +127,7 @@ datazoom_cobertura_mapbiomas<-function(aggregation_level = c('municipality', 'st
       }
     }
     if(type=='normal'){
-      ret<-tab[,1:7]
+      ret<-tab[,1:8]
       for(i in year_begin:year_end){
         ano<-as.character(i)
         ret<-cbind(ret,tab[,ano])
