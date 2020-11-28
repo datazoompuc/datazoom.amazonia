@@ -2,3 +2,6 @@
 
 * Added a `NEWS.md` file to track changes to the package.
 * Added functions for PRODES data
+
+# datazoom.amazonia 0.3.0.9000
+* Added `load_pib` 
