@@ -23,7 +23,7 @@
 #' @export
 #'
 #' @examples
-#' datazoom_transicao_mapbiomas(path = '/Desktop',
+#' datazoom_transicao_mapbiomas(path = NULL,
 #'                              code_state = "PA", covering_from = 3, covering_to = 19,
 #'                              type = 'normal', year_diff = 5)
 
