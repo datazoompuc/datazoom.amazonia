@@ -26,7 +26,7 @@
 #' @export
 #'
 #' @examples
-#' datazoom_cobertura_mapbiomas(aggregation_level = 'municipality', path = '/Desktop',
+#' datazoom_cobertura_mapbiomas(aggregation_level = 'municipality', path = NULL,
 #'                              code_state = "PA", code_mun = NULL, covering = 3,
 #'                              type = 'stacked', year_begin = 2000, year_end = 2010)
 
