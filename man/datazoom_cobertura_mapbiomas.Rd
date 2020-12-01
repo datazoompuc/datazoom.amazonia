@@ -44,7 +44,7 @@ A data base with data containing the area of each selected type of soil covering
 Download and filter data on type of soil covering by year
 }
 \examples{
-datazoom_cobertura_mapbiomas(aggregation_level = 'municipality', path = '/Desktop',
+datazoom_cobertura_mapbiomas(aggregation_level = 'municipality', path = NULL,
                              code_state = "PA", code_mun = NULL, covering = 3,
                              type = 'stacked', year_begin = 2000, year_end = 2010)
 }
