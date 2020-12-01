@@ -18,7 +18,8 @@ Imports:
     rlang,
     dplyr,
     purrr,
-    readr
+    readr,
+    readxl
 URL: http://www.econ.puc-rio.br/datazoom
 Suggests: 
     knitr,
