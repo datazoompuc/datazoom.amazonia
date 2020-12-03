@@ -2,12 +2,12 @@
 % Please edit documentation in R/municipios.R
 \name{load_pib}
 \alias{load_pib}
-\title{Gets GDP information for the Brazilian Legal Amazon}
+\title{Gets GDP at current prices for the Brazilian Legal Amazon}
 \usage{
 load_pib(years, aggregation_level = "City", language = "eng")
 }
 \arguments{
-\item{years}{A numeric vector with years of interest.}
+\item{years}{A numeric vector with years of interest. Supported years are 2002-2017.}
 
 \item{aggregation_level}{A string that indicates the level of aggregation of the data. It can be by "City" or
 "State"}
@@ -19,7 +19,7 @@ The other option is "pt" for Portuguese.}
 A \code{tibble}.
 }
 \description{
-Gets GDP information for the Brazilian Legal Amazon
+Gets GDP at current prices for the Brazilian Legal Amazon
 }
 \examples{
 load_pib(2017)
