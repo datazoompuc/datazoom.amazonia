@@ -31,9 +31,9 @@ load_amazon_gdp <- function(years, aggregation_level = "municipality", language 
 
   df <- df[df[["Munic\u00edpio (C\u00f3digo)"]] %in% legal_amazon$CD_MUN, ] %>%
     dplyr::rename(CD_MUN = .data[["Munic\u00edpio (C\u00f3digo)"]]) %>%
-    dplyr::mutate(CD_MUN = as.numeric(CD_MUN)) %>%
+    dplyr::mutate(CD_MUN = as.numeric(.data$CD_MUN)) %>%
     dplyr::full_join(legal_amazon, by = "CD_MUN") %>%
-    dplyr::mutate(CodIBGE = as.factor(CD_MUN))
+    dplyr::mutate(CodIBGE = as.factor(.data$CD_MUN))
 
   if (tolower(aggregation_level) == "state") {
     df <- df %>%
@@ -41,17 +41,17 @@ load_amazon_gdp <- function(years, aggregation_level = "municipality", language 
       dplyr::summarise(
         PIB = sum(.data$Valor)
       ) %>%
-      dplyr::mutate(CodIBGE = as.factor(CD_UF)) %>%
+      dplyr::mutate(CodIBGE = as.factor(.data$CD_UF)) %>%
       dplyr::ungroup() %>%
       dplyr::select(-c("CD_UF")) %>%
-      dplyr::rename(Estado = NM_UF)
+      dplyr::rename(Estado = .data$NM_UF)
 
     if (language == "eng") {
       df <- dplyr::rename(
         df,
-        State = Estado,
-        Year = Ano,
-        GDP = PIB
+        State = .data$Estado,
+        Year = .data$Ano,
+        GDP = .data$PIB
       )
     }
     else if (language != "pt") {
@@ -70,9 +70,9 @@ load_amazon_gdp <- function(years, aggregation_level = "municipality", language 
     if (language == "eng") {
       df <- dplyr::rename(
         df,
-        County = "Munic\u00edpio",
-        Year = Ano,
-        GDP = PIB
+        County = .data[["Munic\u00edpio"]],
+        Year = .data$Ano,
+        GDP = .data$PIB
       )
     }
     else if (language != "pt") {
@@ -111,16 +111,16 @@ load_gdp <- function(years, aggregation_level = "municipality", language = "eng"
       dplyr::select("Unidade da Federa\u00e7\u00e3o (C\u00f3digo)", "Unidade da Federa\u00e7\u00e3o", "Ano", "Valor") %>%
       dplyr::rename(
         PIB = .data$Valor,
-        Estado = "Unidade da Federa\u00e7\u00e3o",
-        CodIBGE = "Unidade da Federa\u00e7\u00e3o (C\u00f3digo)"
+        Estado = .data[["Unidade da Federa\u00e7\u00e3o"]],
+        CodIBGE = .data[["Unidade da Federa\u00e7\u00e3o (C\u00f3digo)"]]
       )
 
     if (language == "eng") {
       df <- dplyr::rename(
         df,
-        State = Estado,
-        Year = Ano,
-        GDP = PIB
+        State = .data$Estado,
+        Year = .data$Ano,
+        GDP = .data$PIB
       )
     }
     else if (language != "pt") {
@@ -151,9 +151,9 @@ load_gdp <- function(years, aggregation_level = "municipality", language = "eng"
     if (language == "eng") {
       df <- dplyr::rename(
         df,
-        County = "Munic\u00edpio",
-        Year = Ano,
-        GDP = PIB
+        County = .data[["Munic\u00edpio"]],
+        Year = .data$Ano,
+        GDP = .data$PIB
       )
     }
     else if (language != "pt") {
