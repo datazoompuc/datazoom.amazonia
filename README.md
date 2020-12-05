@@ -46,9 +46,9 @@ years <- c(2000:2009)
 data2 <- load_comex(years, ncm = TRUE, exp = TRUE, imp = TRUE)
 
 ##PIB-Munic
-data <- load_pib(c(2014, 2015))
+data <- load_amazon_gdp(c(2014, 2015))
 
-data <- load_pib(2017, aggregation_level = "state", language = "pt")
+data <- load_amazon_gdp(2017, aggregation_level = "state", language = "pt")
 
 
 ```
