@@ -32,18 +32,13 @@ data <- load_prodes(2017, aggregation_level = "state", language = "pt")
 # Loads data locally
 data <- load_prodes("~/Downloads")
 
-data <- load_prodes("~/Downloads/data.txt")
-
-# Loads raw data
-raw_data <- load_prodes_raw(2018)
-
 ##Comex
 
 #Downloads data
 
 years <- c(2000:2009)
 
-data2 <- load_comex(years, ncm = TRUE, exp = TRUE, imp = TRUE)
+data <- load_comex(years, ncm = TRUE, exp = TRUE, imp = TRUE)
 
 ##PIB-Munic
 data <- load_amazon_gdp(c(2014, 2015))

@@ -5,8 +5,8 @@ NULL
 #' Loads and cleans deforestation data from INPE.
 #'
 #' @inheritParams load_prodes_raw
-#' @param aggregation_level A string that indicates the level of aggregation of the data. It can be by "municipality" or
-#'   "state".
+#' @param aggregation_level A string that indicates the level of aggregation of the data. It can be by "Municipality" or
+#'   "State".
 #' @param language A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
 #'   The other option is "pt" for Portuguese.
 #' @return A \code{tibble}.
@@ -41,7 +41,7 @@ NULL
 load_prodes <- function(source, aggregation_level = "municipality", language = "eng") {
   raw_list <- load_prodes_raw(source)
 
-  list_df <- lapply(raw_list, treat_data, aggregation_level = aggregation_level, language = language)
+  list_df <- lapply(raw_list, treat_prodes_data, aggregation_level = aggregation_level, language = language)
 
   dplyr::bind_rows(list_df)
 }
@@ -96,20 +96,24 @@ load_prodes_raw <- function(source) {
   # Otherwise, we assume that source is something that can already be interpreted by read.csv()
 
   # Useful as integrity check on database
-  csv_types <- readr::cols("d", "d", "d", "c", "c", "c", "d", "c", "d", "d", "d", "d", "d", "d", "d", "d", "d")
+  csv_types <- readr::cols("d", "d", "d", "c", "c", "c", "c", "c", "d", "d", "d", "d", "d", "d", "d", "d", "d")
   lapply(source, readr::read_csv, col_types = csv_types, locale = readr::locale(encoding = "latin1"))
 }
 
-treat_data <- function(df, aggregation_level, language) {
+treat_prodes_data <- function(df, aggregation_level, language) {
   aggregation_level <- tolower(aggregation_level)
   if (aggregation_level == "state") {
     df <-
       df %>%
+      dplyr::mutate(CodIBGE = substr(.data$CodIbge, start = 1, stop = 2)) %>%
       dplyr::select(-c("Latgms", "Lat", "Long", "Longms", "Municipio", "CodIbge")) %>%
-      dplyr::group_by(.data$Estado) %>%
+      dplyr::group_by(.data$Estado, .data$CodIBGE) %>%
       dplyr::summarize_if(is.numeric, sum, na.rm = TRUE)
   }
-  else if (aggregation_level != "municipality") {
+  else if (aggregation_level == "municipality") {
+    df <- dplyr::rename(df, CodIBGE = .data$CodIbge)
+  }
+  else {
     warning("Aggregation level not supported. Proceeding with Municipality.")
   }
 
@@ -126,7 +130,7 @@ treat_data <- function(df, aggregation_level, language) {
 
   language <- tolower(language)
   if (language == "eng") {
-    df <- translate_to_english(df)
+    df <- translate_prodes_to_english(df)
   }
   else if (language != "pt") {
     warning("Selected language is not supported. Proceeding with Portuguese.")
@@ -136,12 +140,12 @@ treat_data <- function(df, aggregation_level, language) {
   dplyr::select(df, -c("Nr", "Soma"))
 }
 
-translate_to_english <- function(df) {
+translate_prodes_to_english <- function(df) {
   dplyr::rename_with(
     df,
     dplyr::recode,
     Municipio = "Municipality",
-    CodIbge = "IBGECode",
+    CodIBGE = "CodIBGE",
     Estado = "State",
     Incremento = "Increment",
     Desmatado = "Deforested",
