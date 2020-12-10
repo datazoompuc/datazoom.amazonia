@@ -105,13 +105,13 @@ treat_prodes_data <- function(df, aggregation_level, language) {
   if (aggregation_level == "state") {
     df <-
       df %>%
-      dplyr::mutate(CodIBGE = substr(.data$CodIbge, start = 1, stop = 2)) %>%
+      dplyr::mutate(CodIBGE = as.factor(substr(.data$CodIbge, start = 1, stop = 2))) %>%
       dplyr::select(-c("Latgms", "Lat", "Long", "Longms", "Municipio", "CodIbge")) %>%
       dplyr::group_by(.data$Estado, .data$CodIBGE) %>%
       dplyr::summarize_if(is.numeric, sum, na.rm = TRUE)
   }
   else if (aggregation_level == "municipality") {
-    df <- dplyr::rename(df, CodIBGE = .data$CodIbge)
+    df <- dplyr::mutate(df, CodIBGE = as.factor(.data$CodIbge)) %>% dplyr::select(-c("CodIbge"))
   }
   else {
     warning("Aggregation level not supported. Proceeding with Municipality.")

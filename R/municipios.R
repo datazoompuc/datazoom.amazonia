@@ -29,14 +29,13 @@ load_amazon_gdp <- function(years, aggregation_level = "municipality", language 
     )
   )
 
-  df <- df[df[["Munic\u00edpio (C\u00f3digo)"]] %in% legal_amazon$CD_MUN, ] %>%
-    dplyr::rename(CD_MUN = .data[["Munic\u00edpio (C\u00f3digo)"]]) %>%
-    dplyr::mutate(CD_MUN = as.numeric(.data$CD_MUN)) %>%
-    dplyr::full_join(legal_amazon, by = "CD_MUN") %>%
-    dplyr::mutate(CodIBGE = as.factor(.data$CD_MUN))
+  df <- df[df[["Munic\u00edpio (C\u00f3digo)"]] %in% legal_amazon$CD_MUN, ]
 
   if (tolower(aggregation_level) == "state") {
     df <- df %>%
+      dplyr::rename(CD_MUN = .data[["Munic\u00edpio (C\u00f3digo)"]]) %>%
+      dplyr::mutate(CD_MUN = as.numeric(.data$CD_MUN)) %>%
+      dplyr::full_join(legal_amazon, by = "CD_MUN") %>%
       dplyr::group_by(.data$CD_UF, .data$Ano, .data$NM_UF) %>%
       dplyr::summarise(
         PIB = sum(.data$Valor)
@@ -45,51 +44,29 @@ load_amazon_gdp <- function(years, aggregation_level = "municipality", language 
       dplyr::ungroup() %>%
       dplyr::select(-c("CD_UF")) %>%
       dplyr::rename(Estado = .data$NM_UF)
-
-    if (language == "eng") {
-      df <- dplyr::rename(
-        df,
-        State = .data$Estado,
-        Year = .data$Ano,
-        GDP = .data$PIB
-      )
-    }
-    else if (language != "pt") {
-      warning("Selected language is not supported. Proceeding with Portuguese.")
-    }
-
-    df
   }
   else {
     if (tolower(aggregation_level) != "municipality") warning("Aggregation level is not supported. Proceeding with municipality")
 
     df <- df %>%
-      dplyr::select("CodIBGE", "Munic\u00edpio", "Ano", "Valor") %>%
-      dplyr::rename(PIB = .data$Valor)
-
-    if (language == "eng") {
-      df <- dplyr::rename(
-        df,
-        County = .data[["Munic\u00edpio"]],
-        Year = .data$Ano,
-        GDP = .data$PIB
-      )
-    }
-    else if (language != "pt") {
-      warning("Selected language is not supported. Proceeding with Portuguese.")
-    }
-
-    df
+      dplyr::select("Munic\u00edpio (C\u00f3digo)", "Munic\u00edpio", "Ano", "Valor") %>%
+      dplyr::rename(CodIBGE = .data[["Munic\u00edpio (C\u00f3digo)"]], PIB = .data$Valor) %>%
+      dplyr::mutate(CodIBGE = as.factor(CodIBGE))
   }
+
+  if (language == "eng") {
+    df <- translate_munics_to_english(df)
+  }
+  else if (language != "pt") {
+    warning("Selected language is not supported. Proceeding with Portuguese.")
+  }
+
+  df
 }
 
 #' Gets GDP at current prices
 #'
-#' @param years A numeric vector with years of interest. Supported years are 2002-2017.
-#' @param aggregation_level A string that indicates the level of aggregation of the data. It can be by "Municipality" or
-#'   "State"
-#' @param language A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
-#'   The other option is "pt" for Portuguese.
+#' @inheritParams load_amazon_gdp
 #' @return A \code{tibble}.
 #'
 #' @export
@@ -114,20 +91,6 @@ load_gdp <- function(years, aggregation_level = "municipality", language = "eng"
         Estado = .data[["Unidade da Federa\u00e7\u00e3o"]],
         CodIBGE = .data[["Unidade da Federa\u00e7\u00e3o (C\u00f3digo)"]]
       )
-
-    if (language == "eng") {
-      df <- dplyr::rename(
-        df,
-        State = .data$Estado,
-        Year = .data$Ano,
-        GDP = .data$PIB
-      )
-    }
-    else if (language != "pt") {
-      warning("Selected language is not supported. Proceeding with Portuguese.")
-    }
-
-    df
   }
   else {
     if (tolower(aggregation_level) != "municipality") warning("Aggregation level is not supported. Proceeding with municipality")
@@ -147,19 +110,25 @@ load_gdp <- function(years, aggregation_level = "municipality", language = "eng"
         PIB = .data$Valor,
         CodIBGE = .data[["Munic\u00edpio (C\u00f3digo)"]]
       )
-
-    if (language == "eng") {
-      df <- dplyr::rename(
-        df,
-        County = .data[["Munic\u00edpio"]],
-        Year = .data$Ano,
-        GDP = .data$PIB
-      )
-    }
-    else if (language != "pt") {
-      warning("Selected language is not supported. Proceeding with Portuguese.")
-    }
-
-    df
   }
+
+  if (language == "eng") {
+    df <- translate_munics_to_english(df)
+  }
+  else if (language != "pt") {
+    warning("Selected language is not supported. Proceeding with Portuguese.")
+  }
+
+  df
+}
+
+translate_munics_to_english <- function(df) {
+  dplyr::rename_with(
+    df,
+    dplyr::recode,
+    "Munic\u00edpio" = "Municipality",
+    "Ano" = "Year",
+    "PIB" = "GDP",
+    "Estado" = "State"
+  )
 }
