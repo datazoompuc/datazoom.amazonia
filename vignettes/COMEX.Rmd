@@ -31,8 +31,8 @@ Using the function is easy enough:
 ```{r setup}
 library(datazoom.amazonia)
 
-years <- c(2000:2002)
+year <- c(2000)
 
-data <- load_comex(years, ncm = TRUE, imp = TRUE, language = "eng")
+data <- load_comex(year, ncm = TRUE, imp = TRUE, language = "eng")
 
 ```
