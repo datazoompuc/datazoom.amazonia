@@ -17,7 +17,8 @@ NULL
 load_amazon_gdp <- function(years, aggregation_level = "municipality", language = "eng") {
   states <- unique(legal_amazon$CD_UF)
 
-  df <- tibble::as_tibble(
+  # GDP data
+  gdp <- tibble::as_tibble(
     sidrar::get_sidra(
       5938, # Table code at Sidra
       period = as.character(years),
@@ -26,6 +27,27 @@ load_amazon_gdp <- function(years, aggregation_level = "municipality", language 
       geo.filter = stats::setNames(states, rep("State", times = length(states))),
       classific = "all",
       category = NULL
+    )
+  )
+  # Population data
+  pop <- tibble::as_tibble(
+    sidrar::get_sidra(
+      6579, # Table code at Sidra
+      period = as.character(years),
+      geo = rep("City", times = length(states)),
+      geo.filter = stats::setNames(states, rep("State", times = length(states))),
+      classific = "all",
+      category = NULL
+    )
+  )
+  df <- dplyr::full_join(
+    gdp,
+    pop,
+    by = c(
+      "Munic\u00edpio (C\u00f3digo)",
+      "Munic\u00edpio",
+      "Ano (C\u00f3digo)",
+      "Ano"
     )
   )
 
@@ -49,8 +71,8 @@ load_amazon_gdp <- function(years, aggregation_level = "municipality", language 
     if (tolower(aggregation_level) != "municipality") warning("Aggregation level is not supported. Proceeding with municipality")
 
     df <- df %>%
-      dplyr::select("Munic\u00edpio (C\u00f3digo)", "Munic\u00edpio", "Ano", "Valor") %>%
-      dplyr::rename(CodIBGE = .data[["Munic\u00edpio (C\u00f3digo)"]], PIB = .data$Valor) %>%
+      dplyr::select("Munic\u00edpio (C\u00f3digo)", "Munic\u00edpio", "Ano", "Valor.x", "Valor.y") %>%
+      dplyr::rename(CodIBGE = .data[["Munic\u00edpio (C\u00f3digo)"]], PIB = .data$Valor.x, Pop = .data$Valor.y) %>%
       dplyr::mutate(CodIBGE = as.factor(CodIBGE))
   }
 
