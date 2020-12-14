@@ -2,7 +2,7 @@
 % Please edit documentation in R/municipios.R
 \name{load_amazon_gdp}
 \alias{load_amazon_gdp}
-\title{Gets GDP at current prices for the Brazilian Legal Amazon}
+\title{Gets GDP at current prices and Population data for the Brazilian Legal Amazon}
 \usage{
 load_amazon_gdp(years, aggregation_level = "municipality", language = "eng")
 }
@@ -16,10 +16,10 @@ load_amazon_gdp(years, aggregation_level = "municipality", language = "eng")
 The other option is "pt" for Portuguese.}
 }
 \value{
-A \code{tibble}.
+A \code{tibble} with GDP (in thousands), Population and GDP Per Capita (in units).
 }
 \description{
-Gets GDP at current prices for the Brazilian Legal Amazon
+Gets GDP at current prices and Population data for the Brazilian Legal Amazon
 }
 \examples{
 load_amazon_gdp(2017)
