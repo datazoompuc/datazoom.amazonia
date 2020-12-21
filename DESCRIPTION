@@ -1,10 +1,12 @@
 Package: datazoom.amazonia
 Title: Simplify access to data from the Amazon Region
-Version: 0.1.0.9000
+Version: 0.3.0.9000
 Authors@R: c(
     person("Francisco", "de Lima Cavalcanti", role = c("cre"), email = "francisco.lima.cavalcanti@gmail.com"),
     person("Victor", "Aliende da Matta", role = c("aut"), email = "victor.al.matta@gmail.com"),
-    person("Maria", "Mittelbach", role = c("aut"), email = "mariamittelbach@gmail.com")
+    person("Maria", "Mittelbach", role = c("aut"), email = "mariamittelbach@gmail.com"),
+    person("Anna Carolina", "Dutra Saraiva", role = c("aut"), email = "annadutrasaraiva@gmail.com"),
+    person("Bruno", "Alcantara Duarte", role = c("aut"), email = "brunoalcanduarte@gmail.com")
     )
 Description: This package offers functions to download and treat data regarding
              the Brazilian Amazon region from a variety of official sources.
@@ -19,9 +21,14 @@ Imports:
     dplyr,
     purrr,
     readr,
+    sidrar,
+    tibble,
+    stats,
     readxl
 URL: http://www.econ.puc-rio.br/datazoom
 Suggests: 
     knitr,
     rmarkdown
 VignetteBuilder: knitr
+Depends: 
+    R (>= 2.10)

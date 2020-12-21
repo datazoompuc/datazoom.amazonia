@@ -3,6 +3,7 @@
 datazoom.amazonia is an R package that facilitates access to official data regarding the Amazon. The package provides functions that download and pre-process selected datasets. Currently we support:
 * INPE - PRODES: deforestation by municipality
 * MDIC - Comex: exports and imports by municipality or state
+* IBGE - PIB-Munic: gdp by municipality
 
 <!-- badges: start -->
 [![Travis build status](https://travis-ci.com/datazoompuc/datazoom.amazonia.svg?branch=master)](https://travis-ci.com/datazoompuc/datazoom.amazonia)
@@ -43,6 +44,11 @@ raw_data <- load_prodes_raw(2018)
 years <- c(2000:2009)
 
 data2 <- load_comex(years, ncm = TRUE, exp = TRUE, imp = TRUE)
+
+##PIB-Munic
+data <- load_amazon_gdp(c(2014, 2015))
+
+data <- load_amazon_gdp(2017, aggregation_level = "state", language = "pt")
 
 
 ```

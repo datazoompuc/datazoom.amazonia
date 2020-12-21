@@ -2,7 +2,9 @@
 
 export(datazoom_cobertura_mapbiomas)
 export(datazoom_transicao_mapbiomas)
+export(load_amazon_gdp)
 export(load_comex)
+export(load_gdp)
 export(load_prodes)
 export(load_prodes_raw)
 importFrom(magrittr,"%>%")
