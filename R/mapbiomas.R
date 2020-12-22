@@ -1,4 +1,4 @@
-#' @title datazoom_cobertura_mapbiomas
+#' @title load_mapbiomas_cobertura
 #' 
 #' @description Download and filter data on type of soil covering by year
 #' 
@@ -26,13 +26,13 @@
 #' @export
 #'
 #' @examples
-#' datazoom_cobertura_mapbiomas(aggregation_level = 'municipality', path = NULL,
+#' load_mapbiomas_cobertura(aggregation_level = 'municipality', path = NULL,
 #'                              code_state = "PA", code_mun = NULL, covering = 3,
 #'                              type = 'stacked', year_begin = 2000, year_end = 2010)
 
 
 
-datazoom_cobertura_mapbiomas<-function(aggregation_level = c('municipality', 'state','municipio','estado'),path = NULL,
+load_mapbiomas_cobertura<-function(aggregation_level = c('municipality', 'state','municipio','estado'),path = NULL,
                                        code_state = NULL, code_mun = NULL, covering = NULL,
                                        type = c('stacked','normal','empilhado'), year_begin = NULL, year_end = NULL){
   if(is.null(path)){
@@ -138,7 +138,7 @@ datazoom_cobertura_mapbiomas<-function(aggregation_level = c('municipality', 'st
   return(retorno)
 }
 
-#' @title datazoom_transicao_mapbiomas
+#' @title load_mapbiomas_transicao
 #' 
 #' @description Download and filter data on transition of types of soil covering by year
 #' 
@@ -163,13 +163,13 @@ datazoom_cobertura_mapbiomas<-function(aggregation_level = c('municipality', 'st
 #' @export
 #'
 #' @examples
-#' datazoom_transicao_mapbiomas(path = NULL,
+#' load_mapbiomas_transicao(path = NULL,
 #'                              code_state = "PA", covering_from = 3, covering_to = 19,
 #'                              type = 'normal', year_diff = 5)
 
 
 
-datazoom_transicao_mapbiomas<-function(path = NULL,
+load_mapbiomas_transicao<-function(path = NULL,
                                        code_state = NULL, covering_from = NULL, covering_to = NULL,
                                        type = c('stacked','normal','empilhado'), year_diff = NULL){
   if(is.null(path)){
