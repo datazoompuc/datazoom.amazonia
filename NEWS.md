@@ -5,3 +5,6 @@
 
 # datazoom.amazonia 0.3.0.9000
 * Added functions for GDP data 
+
+# datazoom.amazonia 0.4.0.9000
+* Added functions for COMEX data 
