@@ -4,6 +4,7 @@ datazoom.amazonia is an R package that facilitates access to official data regar
 * INPE - PRODES: deforestation by municipality
 * MDIC - Comex: exports and imports by municipality or state
 * IBGE - PIB-Munic: gdp by municipality
+* MAPBIOMAS - land covering by municipality or state
 
 <!-- badges: start -->
 [![R build status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions)
