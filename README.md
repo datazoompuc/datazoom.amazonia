@@ -6,7 +6,7 @@ datazoom.amazonia is an R package that facilitates access to official data regar
 * IBGE - PIB-Munic: gdp by municipality
 
 <!-- badges: start -->
-[![Travis build status](https://travis-ci.com/datazoompuc/datazoom.amazonia.svg?branch=master)](https://travis-ci.com/datazoompuc/datazoom.amazonia)
+[![R build status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions)
 <!-- badges: end -->
 
 ## Installation
