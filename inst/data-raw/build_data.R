@@ -1,17 +1,49 @@
 
 
-dados <- readxl::read_excel("C:/users/arthu/Desktop/finesIBAMA.xlsx",
+dados <- readxl::read_xls("C:/users/arthu/Desktop/fines.xls")
+
                             skip = 6,
                             col_type = c(rep("guess", 13), "date", "guess", "date")
 ) %>%
   janitor::clean_names()
 
-cities_amazon <- read.csv("C:/users/arthu/Desktop/legal_amazon.csv",
+cities_amazon <- read.csv("C:/users/arthu/Desktop/fines.csv",
                           fileEncoding = "UTF-8"
-)
+                          )
 
 data_amazon_fines <- dados %>%
   dplyr::filter(codigo_ibge_municipio_embargo %in% cities_amazon$CD_MUN)
 
 
 usethis::use_data(data_amazon_fines, internal = TRUE)
+
+
+
+
+utils::download.file(
+  url = 'https://servicos.ibama.gov.br/ctf/publico/areasembargadas/downloadListaAreasEmbargadas.php',
+  destfile = 'C:/users/arthu/Desktop/fines.rar',
+  mode = "wb"
+)
+
+
+utils::unzip(
+  zipfile = 'C:/users/arthu/Desktop/fines.rar',
+  exdir = 'C:/users/arthu/Desktop/ibama_data'
+)
+
+files <- list.files('C:/users/arthu/Desktop/ibama_data',
+                    full.names = TRUE)
+
+file.rename(
+  from = files,
+  to = "C:/users/arthu/Desktop/ibama_data/rel_areas_embargadas_0-65000_2020-12-10_080019.xlsx"
+)
+
+
+dados <- readxl::read_xls(
+  "C:/users/arthu/Desktop/ibama_data/rel_areas_embargadas_0-65000_2020-12-10_080019.xlsx",
+  skip = 6,
+  col_type = c(rep("guess", 13), "date", "guess", "date")
+) %>%
+  janitor::clean_names()
