@@ -201,7 +201,7 @@ translate_munics_to_english <- function(df) {
   dplyr::rename_with(
     df,
     dplyr::recode,
-    "Munic\u00edpio" = "Municipality",
+    "Municipio" = "Municipality",
     "Ano" = "Year",
     "PIB" = "GDP",
     "PIBpc" = "GDPpc",
