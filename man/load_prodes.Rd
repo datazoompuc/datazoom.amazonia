@@ -17,8 +17,8 @@ Passing a \code{string} with a directory's path will read data from all files na
 
 Alternatively, \code{source} may be a list of full file paths, or anything else readable by \code{utils::read.csv()}.}
 
-\item{aggregation_level}{A string that indicates the level of aggregation of the data. It can be by "municipality" or
-"state".}
+\item{aggregation_level}{A string that indicates the level of aggregation of the data. It can be by "Municipality" or
+"State".}
 
 \item{language}{A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
 The other option is "pt" for Portuguese.}
