@@ -1,21 +1,21 @@
+######
 
+#dados <- readxl::read_xls("C:/users/arthu/Desktop/fines.xls",
+#                            skip = 6,
+#                            col_type = c(rep("guess", 13), "date", "guess", "date")
+#) %>%
+#  janitor::clean_names()
 
-dados <- readxl::read_xls("C:/users/arthu/Desktop/fines.xls",
-                            skip = 6,
-                            col_type = c(rep("guess", 13), "date", "guess", "date")
-) %>%
-  janitor::clean_names()
-
-cities_amazon <- read.csv("C:/users/arthu/Desktop/fines.csv",
-                          fileEncoding = "UTF-8"
+#cities_amazon <- read.csv("C:/users/arthu/Desktop/fines.csv",
+#                          fileEncoding = "UTF-8"
                           )
 
-data_amazon_fines <- dados %>%
-  dplyr::filter(codigo_ibge_municipio_embargo %in% cities_amazon$CD_MUN)
+#data_amazon_fines <- dados %>%
+#  dplyr::filter(codigo_ibge_municipio_embargo %in% cities_amazon$CD_MUN)
 
 
-usethis::use_data(data_amazon_fines, internal = TRUE)
-
+#usethis::use_data(data_amazon_fines, internal = TRUE)
+######
 
 
 
@@ -39,7 +39,6 @@ file.rename(
   to = "C:/users/arthu/Desktop/teste.xlsx"
 )
 
-file.exists('./teste.xlsx')
 
 dados <- readxl::read_excel(
   "./teste.xlsx",
