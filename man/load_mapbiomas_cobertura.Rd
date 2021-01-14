@@ -12,8 +12,7 @@ load_mapbiomas_cobertura(
   code_mun = NULL,
   covering = NULL,
   type = c("stacked", "normal", "empilhado"),
-  year_begin = NULL,
-  year_end = NULL
+  years = NULL
 )
 }
 \arguments{
@@ -29,13 +28,12 @@ Input has to be IBGE's coding for the municipality desired}
 
 \item{covering}{Output contains only data over the selected covering
 Input has to be the code of the desired covering
-ATT.: This code ranges from 1 to 5 and is different from the covering code for the other functions in this package}
+ATT.: This code ranges from 1 to 5 and is different from the covering code for the other functions in this package
+Ex.: 1-Forrest; 2-Non Forest Natural Formation; 3-Farming; 4-Non Vegetated Area; 5-Water}
 
 \item{type}{Decide if the output should have a column for each year (normal) or a single column for the areas of all years (stacked | empilhado)}
 
-\item{year_begin}{A numeric object containing the first year desired in the data base}
-
-\item{year_end}{A numeric object containing the last year desired in the data base}
+\item{years}{A vector of numbers containing the years desired in the data base}
 }
 \value{
 A data base with data containing the area of each selected type of soil covering in each selected year
@@ -46,7 +44,7 @@ Download and filter data on type of soil covering by year
 \examples{
 load_mapbiomas_cobertura(aggregation_level = 'municipality', path = NULL,
                              code_state = "PA", code_mun = NULL, covering = 3,
-                             type = 'stacked', year_begin = 2000, year_end = 2010)
+                             type = 'stacked', years = c(2000:2010))
 }
 \author{
 DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro
