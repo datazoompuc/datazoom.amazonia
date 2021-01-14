@@ -11,7 +11,7 @@
 #' @param covering Output contains only data over the selected covering
 #' Input has to be the code of the desired covering
 #' ATT.: This code ranges from 1 to 5 and is different from the covering code for the other functions in this package
-#' Ex.: 1-Forrest; 2-Non Forest Natural Formation; 3-Farming; 4-Non Vegetated Area; 5-Water
+#' Ex.: 1-Forest; 2-Non Forest Natural Formation; 3-Farming; 4-Non Vegetated Area; 5-Water
 #' @param type Decide if the output should have a column for each year (normal) or a single column for the areas of all years (stacked | empilhado)
 #' @param years A vector of numbers containing the years desired in the data base
 #' 
