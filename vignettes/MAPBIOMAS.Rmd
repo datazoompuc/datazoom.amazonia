@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 ##The Dataset
 
-The MAPBIOMAS project gathers data reporting the type of land covering each year by area. And also the transition of coverings between given years.
+The MAPBIOMAS project gathers data reporting the type of land covering each year by area, that is, for example, the area used for a temporary crop of soybeans. It also reports the transition between coverings during given years.
 
 The data available has an yearly frequency and is available starting from the year 1989.
 
