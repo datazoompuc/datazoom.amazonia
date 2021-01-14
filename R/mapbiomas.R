@@ -12,8 +12,7 @@
 #' Input has to be the code of the desired covering
 #' ATT.: This code ranges from 1 to 5 and is different from the covering code for the other functions in this package
 #' @param type Decide if the output should have a column for each year (normal) or a single column for the areas of all years (stacked | empilhado)
-#' @param year_begin A numeric object containing the first year desired in the data base
-#' @param year_end A numeric object containing the last year desired in the data base
+#' @param years A vector of numbers containing the years desired in the data base
 #' 
 #' @return A data base with data containing the area of each selected type of soil covering in each selected year
 #'
@@ -28,13 +27,13 @@
 #' @examples
 #' load_mapbiomas_cobertura(aggregation_level = 'municipality', path = NULL,
 #'                              code_state = "PA", code_mun = NULL, covering = 3,
-#'                              type = 'stacked', year_begin = 2000, year_end = 2010)
+#'                              type = 'stacked', years = c(2000:2010))
 
 
 
 load_mapbiomas_cobertura<-function(aggregation_level = c('municipality', 'state','municipio','estado'),path = NULL,
                                        code_state = NULL, code_mun = NULL, covering = NULL,
-                                       type = c('stacked','normal','empilhado'), year_begin = NULL, year_end = NULL){
+                                       type = c('stacked','normal','empilhado'), years = NULL){
   if(is.null(path)){
     if(aggregation_level=='state' | aggregation_level=='estado'){
       url1<-'https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Dados_Cobertura_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx'
@@ -50,11 +49,8 @@ load_mapbiomas_cobertura<-function(aggregation_level = c('municipality', 'state'
       p1f<-paste0(path,'/Dados_Cobertura_MapBiomas_5.0_UF-MUN_SITE.xlsx')
     }
   }
-  if(is.null(year_begin)){
-    year_begin<-1985
-  }
-  if(is.null(year_end)){
-    year_end<-2019
+  if(is.null(years)){
+    years<-c(1985:2020)
   }
   if(aggregation_level=='state' | aggregation_level=='estado'){
     a<-read_excel(path = p1f, sheet = 3)
@@ -77,7 +73,7 @@ load_mapbiomas_cobertura<-function(aggregation_level = c('municipality', 'state'
       tab<-tab[!(substring(tab$level_1,1,1)!=covering),]
     }
     if(type=='stacked' | type=='empilhado'){
-      for(i in year_begin:year_end){
+      for(i in years){
         ret<-c()
         ret<-tab[,1:8]
         ano<-as.character(i)
@@ -91,7 +87,7 @@ load_mapbiomas_cobertura<-function(aggregation_level = c('municipality', 'state'
     }
     if(type=='normal'){
       ret<-tab[,1:8]
-      for(i in year_begin:year_end){
+      for(i in years){
         ano<-as.character(i)
         ret<-cbind(ret,tab[,ano])
       }
@@ -114,7 +110,7 @@ load_mapbiomas_cobertura<-function(aggregation_level = c('municipality', 'state'
       tab<-tab[!(substring(tab$level_1,1,1)!=covering),]
     }
     if(type=='stacked' | type=='empilhado'){
-      for(i in year_begin:year_end){
+      for(i in years){
         ret<-c()
         ret<-tab[,1:8]
         ano<-as.character(i)
@@ -128,7 +124,7 @@ load_mapbiomas_cobertura<-function(aggregation_level = c('municipality', 'state'
     }
     if(type=='normal'){
       ret<-tab[,1:8]
-      for(i in year_begin:year_end){
+      for(i in years){
         ano<-as.character(i)
         ret<-cbind(ret,tab[,ano])
       }
