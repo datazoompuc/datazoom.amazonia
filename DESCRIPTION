@@ -17,7 +17,8 @@ Imports:
     rlang,
     dplyr,
     janitor,
-    lubridate
+    lubridate,
+    XML
 URL: http://www.econ.puc-rio.br/datazoom
 Suggests: 
     knitr,
