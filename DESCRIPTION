@@ -15,11 +15,14 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Imports:
+    magrittr,
     rlang,
     dplyr,
-    janitor,
-    lubridate,
-    XML
+    purrr,
+    readr,
+    sidrar,
+    tibble,
+    stats
 URL: http://www.econ.puc-rio.br/datazoom
 Suggests: 
     knitr,
