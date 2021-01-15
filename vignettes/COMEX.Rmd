@@ -1,0 +1,38 @@
+---
+title: "COMEX"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{COMEX}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+##The Dataset
+
+The Comex dataset gathers data extracted from Siscomex (Integrated System of Foreign Trade), which is a database containing information from all products that are imported to or exported from Brazil. Using data reported from the companies which are responsible for the process of transporting the products, the system adheres to internationally standardized nomenclatures, such as the Harmonized System and the Mercosul Common Nomenclature (which pertains to members of the Mercosul organization). 
+
+The data has a monthly frequency and is available starting from the year 1989. From 1989 to 1996, a different system of nomenclatures was adopted, but all conversions are available on a dictionary in the Comex website (http://www.mdic.gov.br/balanca/bd/tabelas/NBM_NCM.csv). Systems of nomenclature vary in the degree of detail in terms of the product involved, as well as other carachteristics, such as unit and granularity of location. 
+
+##The Function
+
+This package contains a single function \code{load_comex} which extracts data from the Comex website. It allows the user to input the years he would like the data to encompass, the nomenclature used, as well as choosing between import and export data and the language (currently only Portuguese and English are supported). 
+
+The output is a list of dataframes. Each dataframe will contain all years selected, but there will be two for each nomenclature, one for export data and another for import data. The order is of nomenclatures is: NCM first, SH4 second and NBM third. Within each nomentaclature, the dataframe for export comes before the one for import.
+
+Using the function is easy enough:
+
+```{r setup}
+library(datazoom.amazonia)
+
+year <- c(2000)
+
+data <- load_comex(year, ncm = TRUE, imp = TRUE, language = "eng")
+
+```
