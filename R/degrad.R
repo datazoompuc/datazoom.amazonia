@@ -19,34 +19,36 @@ NULL
 #' @export
 #'
 #' @examples
-#' load_degrad(2018)
+#' load_degrad(2016)
 #'
 #' load_degrad(
-#'   c(2017, 2018),
+#'   c(2015, 2016),
 #'   aggregation_level = "state",
 #'   language = "pt"
 #' )
 #'
+#' \dontrun{
 #' load_degrad(
-#'   system.file("extdata", package = "datazoom.amazonia"),
+#'   "~/Downloads",
 #'   aggregation_level = "state",
 #'   language = "en"
 #' )
 #'
 #' load_degrad(
-#'   system.file("extdata", "DesmatamentoMunicipios2015.txt", package = "datazoom.amazonia"),
+#'   "~/Downloads/degrad2016_final_shp/DEGRAD_2016_pol.shp",
 #'   aggregation_level = "municipality",
 #'   language = "pt"
 #' )
-# load_degrad <- function(source, aggregation_level = "municipality", language = "eng") {
-#   raw_list <- load_degrad_raw(source)
-#
-#   list_df <- lapply(raw_list, treat_degrad_data, aggregation_level = aggregation_level, language = language)
-#
-#   dplyr::bind_rows(list_df)
-# }
+#' }
+load_degrad <- function(source, aggregation_level = "municipality", language = "eng") {
+  raw_list <- load_degrad_raw(source)
 
-#' Loads or downloads degradation data from INPE.
+  list_df <- lapply(raw_list, treat_degrad_data, aggregation_level = aggregation_level, language = language)
+
+  dplyr::bind_rows(list_df)
+}
+
+#' Loads degradation data from INPE.
 #'
 #' @param source A number of different sources are supported:
 #'
@@ -106,61 +108,71 @@ find_from_dir <- function(dir) {
   list.files(path = dir, full.names = TRUE) %>%
     grep(pattern = "\\.shp", value = TRUE)
 }
-#
-# treat_degrad_data <- function(df, aggregation_level, language) {
-#   aggregation_level <- tolower(aggregation_level)
-#   if (aggregation_level == "state") {
-#     df <-
-#       df %>%
-#       dplyr::mutate(CodIBGE = as.factor(substr(.data$CodIbge, start = 1, stop = 2))) %>%
-#       dplyr::select(-c("Latgms", "Lat", "Long", "Longms", "Municipio", "CodIbge")) %>%
-#       dplyr::group_by(.data$Estado, .data$CodIBGE) %>%
-#       dplyr::summarize_if(is.numeric, sum, na.rm = TRUE)
-#   }
-#   else if (aggregation_level == "municipality") {
-#     df <- dplyr::mutate(df, CodIBGE = as.factor(.data$CodIbge)) %>% dplyr::select(-c("CodIbge"))
-#   }
-#   else {
-#     warning("Aggregation level not supported. Proceeding with Municipality.")
-#   }
-#
-#   # Get year from column names and put it into its own column
-#   df$Ano <-
-#     colnames(df) %>%
-#     purrr::detect(function(x) startsWith(x, "Des")) %>%
-#     gsub(pattern = ".*(\\d{4}).*", replacement = "\\1") %>%
-#     as.numeric()
-#
-#
-#   # Removes year from column name
-#   colnames(df) <- gsub("(.*)\\d{4}?", "\\1", colnames(df))
-#
-#   language <- tolower(language)
-#   if (language == "eng") {
-#     df <- translate_degrad_to_english(df)
-#   }
-#   else if (language != "pt") {
-#     warning("Selected language is not supported. Proceeding with Portuguese.")
-#   }
-#
-#   # Removes useless columns
-#   dplyr::select(df, -c("Nr", "Soma"))
-# }
-#
-# translate_degrad_to_english <- function(df) {
-#   dplyr::rename_with(
-#     df,
-#     dplyr::recode,
-#     Municipio = "Municipality",
-#     CodIBGE = "CodIBGE",
-#     Estado = "State",
-#     Incremento = "Increment",
-#     Desmatado = "Deforested",
-#     Floresta = "Forest",
-#     Nuvem = "Cloud",
-#     NaoObservado = "NotObserved",
-#     NaoFloresta = "NotForest",
-#     Hidrografia = "Hydrography",
-#     Ano = "Year"
-#   )
-# }
+
+treat_degrad_data <- function(df, aggregation_level, language) {
+  # OPTIMIZE
+  geo_br <- geobr::read_municipality(year = 2019, simplified = FALSE) # 2019 relates to the definition of legal_amazon
+  geo_amazon <- dplyr::filter(geo_br, code_muni %in% legal_amazon$CD_MUN)
+
+  # Set CRS to degrad data
+
+  # Municipalize
+
+  # Adapt prodes code below
+
+  aggregation_level <- tolower(aggregation_level)
+  if (aggregation_level == "state") {
+    df <-
+      df %>%
+      dplyr::mutate(CodIBGE = as.factor(substr(.data$CodIbge, start = 1, stop = 2))) %>%
+      dplyr::select(-c("Latgms", "Lat", "Long", "Longms", "Municipio", "CodIbge")) %>%
+      dplyr::group_by(.data$Estado, .data$CodIBGE) %>%
+      dplyr::summarize_if(is.numeric, sum, na.rm = TRUE)
+  }
+  else if (aggregation_level == "municipality") {
+    df <- dplyr::mutate(df, CodIBGE = as.factor(.data$CodIbge)) %>% dplyr::select(-c("CodIbge"))
+  }
+  else {
+    warning("Aggregation level not supported. Proceeding with Municipality.")
+  }
+
+  # Get year from column names and put it into its own column
+  df$Ano <-
+    colnames(df) %>%
+    purrr::detect(function(x) startsWith(x, "Des")) %>%
+    gsub(pattern = ".*(\\d{4}).*", replacement = "\\1") %>%
+    as.numeric()
+
+
+  # Removes year from column name
+  colnames(df) <- gsub("(.*)\\d{4}?", "\\1", colnames(df))
+
+  language <- tolower(language)
+  if (language == "eng") {
+    df <- translate_degrad_to_english(df)
+  }
+  else if (language != "pt") {
+    warning("Selected language is not supported. Proceeding with Portuguese.")
+  }
+
+  # Removes useless columns
+  dplyr::select(df, -c("Nr", "Soma"))
+}
+
+translate_degrad_to_english <- function(df) {
+  dplyr::rename_with(
+    df,
+    dplyr::recode,
+    Municipio = "Municipality",
+    CodIBGE = "CodIBGE",
+    Estado = "State",
+    Incremento = "Increment",
+    Desmatado = "Deforested",
+    Floresta = "Forest",
+    Nuvem = "Cloud",
+    NaoObservado = "NotObserved",
+    NaoFloresta = "NotForest",
+    Hidrografia = "Hydrography",
+    Ano = "Year"
+  )
+}
