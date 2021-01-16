@@ -2,6 +2,7 @@
 
 export(load_amazon_gdp)
 export(load_comex)
+export(load_degrad_raw)
 export(load_gdp)
 export(load_prodes)
 export(load_prodes_raw)
