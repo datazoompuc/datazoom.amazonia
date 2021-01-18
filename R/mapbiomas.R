@@ -128,7 +128,7 @@ load_mapbiomas_covering<-function(aggregation_level = c('municipality', 'state',
 #' @param covering_to Output contains only data of the transition from all coverings to the covering selected
 #' Input has to be the code of the desired covering
 #' @param type Decide if the output should have a column for each year (normal) or a single column for the areas of all years (stacked | empilhado)
-#' @param year_diff A numeric object containing the year differential desired in the data base, or have all included (NULL)
+#' @param year_diff A numeric object containing the desired interval in years to observe transitions desired in the data base (1, 2, 5 or 10), or have all included (NULL)
 #' 
 #' @return A data base with data containing the area of each selected type of soil covering transition in each selected year
 #'
