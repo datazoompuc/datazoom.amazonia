@@ -14,9 +14,9 @@ NULL
 #'   The other option is "pt" for Portuguese.
 #'
 #' @return A \code{tibble}.
-#' 
+#'
 #' @seealso [load_deter_raw] for loading raw data.
-#' 
+#'
 #' @author DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro.
 #'
 #' @encoding UTF-8
@@ -24,44 +24,44 @@ NULL
 #'
 #' @examples
 #' load_deter("amazonia")
-#' 
+#'
 #' load_deter("cerrado", years = 2018)
 #'
-#' load_deter("C:\\...\\'deter'.zip") 
-#' 
+#' load_deter("C:\\...\\'deter'.zip")
+#'
 #' load_deter(
 #' source = "cerrado",
 #' aggregation_level = "state",
 #' years = c(2017,2018),
 #' language = "pt"
-#' ) 
+#' )
 #'
 load_deter = function(source, aggregation_level = "municipality", years = "all", language = "eng") {
-  
+
   df <- load_deter_raw(source, years)
-  
+
   treat_deter_data(df, aggregation_level, language)
-  
+
 }
 
 
 
 
 #' Loads INPE data on areas with deforestation warnings.
-#' 
+#'
 #' @param source A string indicating where the data will be drawn from.
-#' 
+#'
 #'It can be "Amazonia" or "Cerrado", in which case the data will be pulled from the INPE website for the corresponding biome.
 #'
 #'It can also be a path to a .zip file as is obtained from the INPE website, containing a file named "deter_public.dbf".
 #'
-#' 
+#'
 #' @param years A numeric \code{vector} of years, used to filter the data.
 #'
 #' @return A \code{tibble}
-#' 
+#'
 #' @seealso [load_deter], for loading and treating the data.
-#' 
+#'
 #' @author DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro.
 #'
 #' @encoding UTF-8
@@ -69,115 +69,114 @@ load_deter = function(source, aggregation_level = "municipality", years = "all",
 #'
 #' @examples
 #' load_deter_raw("amazonia")
-#' 
+#'
 #' load_deter_raw("cerrado", c(2016,2017,2018))
-#' 
+#'
 #' load_deter_raw("C:\\...\\'deter'.zip")
-#' 
+#'
 load_deter_raw = function(source, years = "all") {
-  
+
   if (tolower(source) == "amazonia") {source <- "amz"}
-  
-  if (tolower(source) %in% c("amz", "cerrado")){  
+
+  if (tolower(source) %in% c("amz", "cerrado")){
     url <- paste0("http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-", source, "/shape")
-    
+
     temp <- tempfile(fileext = ".zip")
-    
-    download.file(url, temp, mode="wb") 
-    
+
+    download.file(url, temp, mode="wb")
+
     df <- read.dbf(unzip(temp, "deter_public.dbf")) %>%
       as_tibble()
   }
   #As the data is contained in a .zip file also containing other files, downloading to a tempfile provides a way to extract only the .dbf file we're interested in.
-  
+
   else if (file.exists(source)) {
-    
+
     df <- foreign::read.dbf(unzip(source, "deter_public.dbf")) %>%
       as_tibble()
-    
+
   }
-  
+
   else {df = warning("Invalid source.")}
-  
+
   if (is.numeric(years)){
-    
+
     df <- df %>%
       dplyr::filter(lubridate::year(VIEW_DATE) %in% years)
-    
+
   }
-  
+
   return(df)
 }
 
 
 treat_deter_data = function(df, aggregation_level, language) {
-  
+
   aggregation_level <- tolower(aggregation_level)
-  
+
   df <- df %>%
     dplyr::select(-c(QUADRANT, PATH_ROW, SENSOR, SATELLITE))
-  
+
   if (aggregation_level != "state") {
-    
+
     df <- df %>%
       dplyr::select(-UF) %>%
       dplyr::arrange(MUNICIPALI, CLASSNAME, VIEW_DATE) #There can be several occurences in the same date and location
-    
-    
-    
+
+    df <- df %>%
+      dplyr::mutate(MUNICIPALI = gsub("Ã§", "c", MUNICIPALI))
   }
-  
+
   else if (aggregation_level == "state") {
-    
+
     df <- df %>%
       dplyr::select(-MUNICIPALI, -UC) %>%
       dplyr::group_by(UF, CLASSNAME, VIEW_DATE) %>%
       dplyr::summarise(across(-c(AREAUCKM, AREAMUNKM)), AREAUCKM = sum(AREAUCKM), AREAMUNKM = sum(AREAMUNKM)) #Displays only one occurence per class per state per day, which is an aggregate of the total area affected
   }
-  
+
   else if (aggregation_level != "municipality") {
     warning("Aggregation level not supported. Proceeding with municipality.")
-  }  
-  
-  #problema com cedilha
-  
+  }
+
+
+
   df <- df %>%
     dplyr::rename_with(dplyr::recode,
-                       
+
                        CLASSNAME = "Classe",
                        AREAUCKM = "Area_em_UC",
                        AREAMUNKM = "Area_em_Municipio",
                        MUNICIPALI = "Municipio",
                        VIEW_DATE = "Data"
-                       
+
     )
-  
-  
+
   language <- tolower(language)
-  
+
   if(language == "eng") {
     df <- translate_deter_to_english(df)
   }
   else if(language != "pt"){
     warning("Selected language not supported. Proceeding with Portuguese.")
   }
-  
+
   return(df)
 }
 
 
 
 translate_deter_to_english <- function(df) {
-  
+
   df <- df %>%
     dplyr::rename_with(dplyr::recode,
-                       
+
                        Classe = "Class",
                        Data = "Date",
                        UC = "ConservationUnit",
                        Area_em_UC = "Area_in_CU",
                        Area_em_Municipio = "Area_in_Municipality",
                        Municipio = "Municipality",
-                       
+
     )
 }

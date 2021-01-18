@@ -38,14 +38,14 @@ load_deter("amazonia")
 
 load_deter("cerrado", years = 2018)
 
-load_deter("C:\\\\...\\\\'deter'.zip") 
+load_deter("C:\\\\...\\\\'deter'.zip")
 
 load_deter(
 source = "cerrado",
 aggregation_level = "state",
 years = c(2017,2018),
 language = "pt"
-) 
+)
 
 }
 \seealso{
