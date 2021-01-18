@@ -4,10 +4,6 @@
 #' 
 #' @param aggregation_level A string that indicates the level of aggregation of the data. It can be by municipality or state
 #' @param path A string indicating where the raw data is in your computer. The default is NULL which means the data will be extracted directly from the website
-#' @param code_state Output contains only data from the state selected
-#' Input has to be IBGE's coding for the state desired
-#' @param code_mun Output contains only data from the municipality selected (not available for aggregation_level=='state')
-#' Input has to be IBGE's coding for the municipality desired
 #' @param covering Output contains only data over the selected covering
 #' Input has to be the code of the desired covering
 #' ATT.: This code ranges from 1 to 5 and is different from the covering code for the other functions in this package
@@ -28,14 +24,12 @@
 #'
 #' @examples
 #' load_mapbiomas_cobertura(aggregation_level = 'municipality', path = NULL,
-#'                              code_state = "PA", code_mun = NULL, covering = 3,
-#'                              type = 'stacked', years = c(2000:2010))
+#'                              covering = 3, type = 'stacked', years = c(2000:2010))
 
 
 
 load_mapbiomas_cobertura<-function(aggregation_level = c('municipality', 'state','municipio','estado'),path = NULL,
-                                       code_state = NULL, code_mun = NULL, covering = NULL,
-                                       type = c('stacked','normal','empilhado'), years = c(1985:2020)){
+                                       covering = NULL, type = c('stacked','normal','empilhado'), years = c(1985:2020)){
   if(is.null(path)){
     if(aggregation_level=='state' | aggregation_level=='estado'){
       url1<-'https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Dados_Cobertura_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx'
@@ -65,9 +59,6 @@ load_mapbiomas_cobertura<-function(aggregation_level = c('municipality', 'state'
     a$state[substring(a$state,1,3) == "Par"] <- "PA"
     retorno<-data.frame()
     tab<-a
-    if(!is.null(code_state)){
-      tab<-tab[!(tab$state!=code_state),]
-    }
     if(!is.null(covering)){
       tab<-tab[!(substring(tab$level_1,1,1)!=covering),]
     }
@@ -99,12 +90,6 @@ load_mapbiomas_cobertura<-function(aggregation_level = c('municipality', 'state'
     b<-b[!(b$state %notin% as.vector(tipos)),]
     retorno<-data.frame()
     tab<-b
-    if(!is.null(code_state)){
-      tab<-tab[!(tab$state!=code_state),]
-    }
-    if(!is.null(code_mun)){
-      tab<-tab[!(tab$municipality!=code_mun),]
-    }
     if(!is.null(covering)){
       tab<-tab[!(substring(tab$level_1,1,1)!=covering),]
     }
@@ -138,8 +123,6 @@ load_mapbiomas_cobertura<-function(aggregation_level = c('municipality', 'state'
 #' @description Download and filter data on transition of types of soil covering by year
 #' 
 #' @param path A string indicating where the raw data is in your computer. The default is NULL which means the data will be extracted directly from the website
-#' @param code_state Output contains only data from the state selected
-#' Input has to be IBGE's coding for the state desired
 #' @param covering_from Output contains only data of the transition from the covering selected to all other coverings
 #' Input has to be the code of the desired covering
 #' @param covering_to Output contains only data of the transition from all coverings to the covering selected
@@ -159,13 +142,13 @@ load_mapbiomas_cobertura<-function(aggregation_level = c('municipality', 'state'
 #'
 #' @examples
 #' load_mapbiomas_transicao(path = NULL,
-#'                              code_state = "PA", covering_from = 3, covering_to = 19,
+#'                              covering_from = 3, covering_to = 19,
 #'                              type = 'normal', year_diff = 5)
 
 
 
 load_mapbiomas_transicao<-function(path = NULL,
-                                       code_state = NULL, covering_from = NULL, covering_to = NULL,
+                                       covering_from = NULL, covering_to = NULL,
                                        type = c('stacked','normal','empilhado'), year_diff = NULL){
   if(is.null(path)){
     url1<-'https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Dados_Transicao_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx'
@@ -188,9 +171,6 @@ load_mapbiomas_transicao<-function(path = NULL,
   retorno<-data.frame()
   tab<-a
   ncolu<-ncol(a)
-  if(!is.null(code_state)){
-    tab<-tab[!(tab$state!=code_state),]
-  }
   if(!is.null(covering_from)){
     tab<-tab[!(tab$from!=covering_from),]
   }
