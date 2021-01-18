@@ -128,7 +128,7 @@ load_mapbiomas_covering<-function(aggregation_level = c('municipality', 'state',
 #' @param covering_to Output contains only data of the transition from all coverings to the covering selected
 #' Input has to be the code of the desired covering
 #' @param type Decide if the output should have a column for each year (normal) or a single column for the areas of all years (stacked | empilhado)
-#' @param year_diff A numeric object containing the desired interval in years to observe transitions desired in the data base (1, 2, 5 or 10), or have all included (NULL)
+#' @param transition_interval A numeric object containing the desired interval in years to observe transitions desired in the data base (1, 2, 5 or 10), or have all included (NULL)
 #' 
 #' @return A data base with data containing the area of each selected type of soil covering transition in each selected year
 #'
@@ -143,13 +143,13 @@ load_mapbiomas_covering<-function(aggregation_level = c('municipality', 'state',
 #' @examples
 #' load_mapbiomas_transition(path = NULL,
 #'                              covering_from = 3, covering_to = 19,
-#'                              type = 'normal', year_diff = 5)
+#'                              type = 'normal', transition_interval = 5)
 
 
 
 load_mapbiomas_transition<-function(path = NULL,
                                        covering_from = NULL, covering_to = NULL,
-                                       type = c('stacked','normal','empilhado'), year_diff = NULL){
+                                       type = c('stacked','normal','empilhado'), transition_interval = NULL){
   if(is.null(path)){
     url1<-'https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Dados_Transicao_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx'
     p1f <- tempfile()
@@ -177,7 +177,7 @@ load_mapbiomas_transition<-function(path = NULL,
   if(!is.null(covering_to)){
     tab<-tab[!(tab$to!=covering_to),]
   }
-  if(is.null(year_diff)){
+  if(is.null(transition_interval)){
     if(type=='stacked' | type=='empilhado'){
       for(i in 15:ncolu){
         ret<-c()
@@ -212,7 +212,7 @@ load_mapbiomas_transition<-function(path = NULL,
       }
       retorno<-ret
     }
-  }else if(!is.null(year_diff)){
+  }else if(!is.null(transition_interval)){
     if(type=='stacked' | type=='empilhado'){
       for(i in 15:ncolu){
         ret<-c()
@@ -222,7 +222,7 @@ load_mapbiomas_transition<-function(path = NULL,
         anof<-substring(nomecol,8,12)
         anoi<-as.integer(anoi)
         anof<-as.integer(anof)
-        if(anof-anoi==year_diff){
+        if(anof-anoi==transition_interval){
           ret<-cbind(ret,tab[,i])
           colnames(ret)[which(colnames(ret) == nomecol)] <- 'Area'
           num<-nrow(tab[,i])
@@ -241,7 +241,7 @@ load_mapbiomas_transition<-function(path = NULL,
         anof<-substring(nomecol,8,12)
         anoi<-as.integer(anoi)
         anof<-as.integer(anof)
-        if(anof-anoi==year_diff){
+        if(anof-anoi==transition_interval){
           ret<-cbind(ret,tab[,i])
         }
       }
