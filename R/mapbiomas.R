@@ -35,7 +35,7 @@
 
 load_mapbiomas_cobertura<-function(aggregation_level = c('municipality', 'state','municipio','estado'),path = NULL,
                                        code_state = NULL, code_mun = NULL, covering = NULL,
-                                       type = c('stacked','normal','empilhado'), years = NULL){
+                                       type = c('stacked','normal','empilhado'), years = c(1985:2020)){
   if(is.null(path)){
     if(aggregation_level=='state' | aggregation_level=='estado'){
       url1<-'https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Dados_Cobertura_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx'
@@ -50,9 +50,6 @@ load_mapbiomas_cobertura<-function(aggregation_level = c('municipality', 'state'
     }else if(aggregation_level=='municipality' | aggregation_level=='municipio'){
       p1f<-paste0(path,'/Dados_Cobertura_MapBiomas_5.0_UF-MUN_SITE.xlsx')
     }
-  }
-  if(is.null(years)){
-    years<-c(1985:2020)
   }
   if(aggregation_level=='state' | aggregation_level=='estado'){
     a<-read_excel(path = p1f, sheet = 3)
