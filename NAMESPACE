@@ -2,8 +2,13 @@
 
 export(load_amazon_gdp)
 export(load_comex)
+export(load_deter)
+export(load_deter_raw)
 export(load_gdp)
 export(load_prodes)
 export(load_prodes_raw)
+importFrom(foreign,read.dbf)
+importFrom(lubridate,year)
 importFrom(magrittr,"%>%")
 importFrom(rlang,.data)
+importFrom(tibble,as_tibble)
