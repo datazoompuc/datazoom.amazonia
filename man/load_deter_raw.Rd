@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{load_deter_raw}
 \alias{load_deter_raw}
-\title{Loads INPE deforestation data.}
+\title{Loads INPE data on areas with deforestation warnings.}
 \usage{
 load_deter_raw(source, years = "all")
 }
@@ -20,7 +20,7 @@ It can also be a path to a .zip file as is obtained from the INPE website, conta
 A \code{tibble}
 }
 \description{
-Loads INPE deforestation data.
+Loads INPE data on areas with deforestation warnings.
 }
 \examples{
 load_deter_raw("amazonia")

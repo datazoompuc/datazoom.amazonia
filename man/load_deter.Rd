@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{load_deter}
 \alias{load_deter}
-\title{Loads and cleans deforestation data from INPE.}
+\title{Loads and cleans INPE data on areas with deforestation warnings.}
 \usage{
 load_deter(
   source,
@@ -31,7 +31,7 @@ The other option is "pt" for Portuguese.}
 A \code{tibble}.
 }
 \description{
-Loads and cleans deforestation data from INPE.
+Loads and cleans INPE data on areas with deforestation warnings.
 }
 \examples{
 load_deter("amazonia")

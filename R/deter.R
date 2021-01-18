@@ -5,7 +5,7 @@
 #' @importFrom lubridate year
 NULL
 
-#' Loads and cleans deforestation data from INPE.
+#' Loads and cleans INPE data on areas with deforestation warnings.
 #'
 #' @inheritParams load_deter_raw
 #' @param aggregation_level A string that indicates the level of aggregation of the data. It can be by "Municipality" or
@@ -47,7 +47,7 @@ load_deter = function(source, aggregation_level = "municipality", years = "all",
 
 
 
-#' Loads INPE deforestation data.
+#' Loads INPE data on areas with deforestation warnings.
 #' 
 #' @param source A string indicating where the data will be drawn from.
 #' 
