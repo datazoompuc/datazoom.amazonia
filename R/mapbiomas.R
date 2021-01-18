@@ -1,4 +1,4 @@
-#' @title load_mapbiomas_cobertura
+#' @title load_mapbiomas_covering
 #' 
 #' @description Download and filter data on type of soil covering by year
 #' 
@@ -23,12 +23,12 @@
 #' @export
 #'
 #' @examples
-#' load_mapbiomas_cobertura(aggregation_level = 'municipality', path = NULL,
+#' load_mapbiomas_covering(aggregation_level = 'municipality', path = NULL,
 #'                              covering = 3, type = 'stacked', years = c(2000:2010))
 
 
 
-load_mapbiomas_cobertura<-function(aggregation_level = c('municipality', 'state','municipio','estado'),path = NULL,
+load_mapbiomas_covering<-function(aggregation_level = c('municipality', 'state','municipio','estado'),path = NULL,
                                        covering = NULL, type = c('stacked','normal','empilhado'), years = c(1985:2020)){
   if(is.null(path)){
     if(aggregation_level=='state' | aggregation_level=='estado'){
@@ -118,7 +118,7 @@ load_mapbiomas_cobertura<-function(aggregation_level = c('municipality', 'state'
   return(retorno)
 }
 
-#' @title load_mapbiomas_transicao
+#' @title load_mapbiomas_transition
 #' 
 #' @description Download and filter data on transition of types of soil covering by year
 #' 
@@ -141,13 +141,13 @@ load_mapbiomas_cobertura<-function(aggregation_level = c('municipality', 'state'
 #' @export
 #'
 #' @examples
-#' load_mapbiomas_transicao(path = NULL,
+#' load_mapbiomas_transition(path = NULL,
 #'                              covering_from = 3, covering_to = 19,
 #'                              type = 'normal', year_diff = 5)
 
 
 
-load_mapbiomas_transicao<-function(path = NULL,
+load_mapbiomas_transition<-function(path = NULL,
                                        covering_from = NULL, covering_to = NULL,
                                        type = c('stacked','normal','empilhado'), year_diff = NULL){
   if(is.null(path)){
