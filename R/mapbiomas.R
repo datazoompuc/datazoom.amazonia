@@ -138,7 +138,6 @@ load_mapbiomas_covering<-function(aggregation_level = c('municipality', 'state',
 #'
 #' @examples
 #' load_mapbiomas_transition(path = NULL,
-#'                              covering_from = 3, covering_to = 19,
 #'                              type = 'normal', transition_interval = 5)
 
 
