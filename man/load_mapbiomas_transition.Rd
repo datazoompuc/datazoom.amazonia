@@ -26,7 +26,6 @@ Download and filter data on transition of types of soil covering by year
 }
 \examples{
 load_mapbiomas_transition(path = NULL,
-                             covering_from = 3, covering_to = 19,
                              type = 'normal', transition_interval = 5)
 }
 \author{
