@@ -7,20 +7,12 @@
 \usage{
 load_mapbiomas_transition(
   path = NULL,
-  covering_from = NULL,
-  covering_to = NULL,
   type = c("stacked", "normal", "empilhado"),
   transition_interval = NULL
 )
 }
 \arguments{
 \item{path}{A string indicating where the raw data is in your computer. The default is NULL which means the data will be extracted directly from the website}
-
-\item{covering_from}{Output contains only data of the transition from the covering selected to all other coverings
-Input has to be the code of the desired covering}
-
-\item{covering_to}{Output contains only data of the transition from all coverings to the covering selected
-Input has to be the code of the desired covering}
 
 \item{type}{Decide if the output should have a column for each year (normal) or a single column for the areas of all years (stacked | empilhado)}
 
