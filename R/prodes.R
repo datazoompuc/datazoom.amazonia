@@ -46,7 +46,7 @@ load_prodes <- function(source, aggregation_level = "municipality", language = "
   dplyr::bind_rows(list_df)
 }
 
-#' Loads and cleans the deforestation data from INPE in your computer from a specified directory.
+#' Loads deforestation data from INPE.
 #'
 #' @param source A number of different sources are supported:
 #'

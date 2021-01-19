@@ -3,7 +3,7 @@ NULL
 
 #' Gets GDP at current prices and Population data for the Brazilian Legal Amazon
 #'
-#' @param years A numeric vector with years of interest. Supported years are 2002-2017.
+#' @param years A numeric vector with years of interest. Supported years 2002-2017 for GDP data and 2001-2009, 2011-present for population data.
 #' @param aggregation_level A string that indicates the level of aggregation of the data. It can be by "Municipality" or
 #'   "State"
 #' @param language A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
