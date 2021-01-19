@@ -123,10 +123,6 @@ load_mapbiomas_covering<-function(aggregation_level = c('municipality', 'state',
 #' @description Download and filter data on transition of types of soil covering by year
 #' 
 #' @param path A string indicating where the raw data is in your computer. The default is NULL which means the data will be extracted directly from the website
-#' @param covering_from Output contains only data of the transition from the covering selected to all other coverings
-#' Input has to be the code of the desired covering
-#' @param covering_to Output contains only data of the transition from all coverings to the covering selected
-#' Input has to be the code of the desired covering
 #' @param type Decide if the output should have a column for each year (normal) or a single column for the areas of all years (stacked | empilhado)
 #' @param transition_interval A numeric object containing the desired interval in years to observe transitions desired in the data base (1, 2, 5 or 10), or have all included (NULL)
 #' 
@@ -148,7 +144,6 @@ load_mapbiomas_covering<-function(aggregation_level = c('municipality', 'state',
 
 
 load_mapbiomas_transition<-function(path = NULL,
-                                       covering_from = NULL, covering_to = NULL,
                                        type = c('stacked','normal','empilhado'), transition_interval = NULL){
   if(is.null(path)){
     url1<-'https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Dados_Transicao_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx'
@@ -171,12 +166,6 @@ load_mapbiomas_transition<-function(path = NULL,
   retorno<-data.frame()
   tab<-a
   ncolu<-ncol(a)
-  if(!is.null(covering_from)){
-    tab<-tab[!(tab$from!=covering_from),]
-  }
-  if(!is.null(covering_to)){
-    tab<-tab[!(tab$to!=covering_to),]
-  }
   if(is.null(transition_interval)){
     if(type=='stacked' | type=='empilhado'){
       for(i in 15:ncolu){
