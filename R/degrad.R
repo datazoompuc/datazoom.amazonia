@@ -120,8 +120,10 @@ treat_degrad_data <- function(df, aggregation_level, language, geo_amazon) {
   df <- dplyr::filter(df, grepl(.data$class_name, pattern = "degrad", ignore.case = TRUE))
 
   # Insert CRS
-  data_crs <- sf::st_crs("+proj=longlat +ellps=aust_SA +towgs84=-66.8700,4.3700,-38.5200,0.0,0.0,0.0,0.0 +no_defs")
-  sf::st_crs(df) <- data_crs
+  if(is.na(sf::st_crs(df))) {
+    data_crs <- sf::st_crs("+proj=longlat +ellps=aust_SA +towgs84=-66.8700,4.3700,-38.5200,0.0,0.0,0.0,0.0 +no_defs")
+    sf::st_crs(df) <- data_crs
+  }
 
   operation_crs <- sf::st_crs("+proj=poly +lat_0=0 +lon_0=-54 +x_0=5000000 +y_0=10000000 +ellps=aust_SA +units=m +no_defs")
   df <- sf::st_make_valid(sf::st_transform(df, operation_crs))
@@ -129,22 +131,26 @@ treat_degrad_data <- function(df, aggregation_level, language, geo_amazon) {
 
   # Extract date
   if(grepl(df$class_name[1], pattern = "\\d{4}$")) {
-    date <- substr(df$class_name[1], 7, 10)
+    year <- as.numeric(substr(df$class_name[1], 7, 10))
+    month <- NA
   }
   else if(any(grepl(colnames(df), pattern = "ano"))) {
-    date <- as.character(df[["ano"]][1])
+    year <- df[["ano"]][1]
+    month <- NA
   }
   else {
-    date <- substr(as.character(as.Date(df$view_date)), 1, 7)
+    year <- as.numeric(substr(as.character(as.Date(df$view_date)), 1, 4))
+    month <- as.numeric(substr(as.character(as.Date(df$view_date)), 6, 7))
   }
-  df$Data <- date
+  df$Year <- year
+  df$Month <- month
 
   # Municipalize
   st_agr(df) = "constant"
   st_agr(geo_amazon) = "constant"
   df <- st_intersection(df, geo_amazon) %>%
     dplyr::mutate(calculated_area = sf::st_area(.data$geometry)) %>%
-    dplyr::group_by(.data$code_muni, .data$name_muni, .data$code_state, .data$abbrev_state, .data$Data) %>%
+    dplyr::group_by(.data$code_muni, .data$name_muni, .data$code_state, .data$abbrev_state, .data$Year, .data$Month) %>%
     sf::st_drop_geometry() %>%
     dplyr::summarise(Area = sum(calculated_area)) %>%
     dplyr::ungroup() %>%
@@ -156,7 +162,7 @@ treat_degrad_data <- function(df, aggregation_level, language, geo_amazon) {
     df <-
       df %>%
       dplyr::mutate(CodIBGE = as.factor(.data$code_state)) %>%
-      dplyr::group_by(.data$Estado, .data$CodIBGE, .data$Data) %>%
+      dplyr::group_by(.data$Estado, .data$CodIBGE, .data$Year, .data$Month) %>%
       dplyr::summarize_if(is.numeric, sum, na.rm = TRUE) %>%
       dplyr::ungroup()
   }
@@ -189,6 +195,7 @@ translate_degrad_to_english <- function(df) {
     Municipio = "Municipality",
     CodIBGE = "CodIBGE",
     Estado = "State",
-    Data = "Date"
+    Ano = "Year",
+    Mes = "Month"
   )
 }
