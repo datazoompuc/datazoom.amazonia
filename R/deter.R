@@ -79,6 +79,8 @@ load_deter_raw = function(source) {
 
     df <- read.dbf(unzip(temp, "deter_public.dbf"), as.is = TRUE) %>%
       as_tibble()
+
+    Encoding(df$MUNICIPALI) <- "UTF-8"
   }
   #As the data is contained in a .zip file also containing other files, downloading to a tempfile provides a way to extract only the .dbf file we're interested in.
 
@@ -87,11 +89,11 @@ load_deter_raw = function(source) {
     df <- foreign::read.dbf(unzip(source, "deter_public.dbf")) %>% #If source is a valid path, the data is just pulled from there.
       as_tibble()
 
+    Encoding(df$MUNICIPALI) <- "UTF-8"
+
   }
 
   else {df = warning("Invalid source.")}
-
-  Encoding(df$MUNICIPALI) <- "UTF-8"
 
   return(df)
 }
@@ -168,7 +170,7 @@ translate_deter_to_english <- function(df) {
                                           'Corte Seletivo Geometrico' = "Geometric Selection Cutting",
                                           'Degradacao' = "Degradation",
                                           'Desmatamento Corte Raso' = "Clear Cut Deforestation",
-                                          'Desmatamento com Vegetaçao' = "Vegetation Remains Deforestation",
+                                          'Desmatamento com Vegetacao' = "Vegetation Remains Deforestation",
                                           'Mineraçao' = "Mining",
                                           'aviso' = "Warning"
                                           )
