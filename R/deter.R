@@ -37,8 +37,9 @@ load_deter = function(source, aggregation_level = "municipality",  language = "e
 
   df <- load_deter_raw(source)
 
-  treat_deter_data(df, aggregation_level, language)
-
+  if(!is.character(df)){
+    treat_deter_data(df, aggregation_level, language)
+  }
 }
 
 
@@ -171,7 +172,7 @@ translate_deter_to_english <- function(df) {
                                           'Degradacao' = "Degradation",
                                           'Desmatamento Corte Raso' = "Clear Cut Deforestation",
                                           'Desmatamento com Vegetacao' = "Vegetation Remains Deforestation",
-                                          'Mineraçao' = "Mining",
+                                          'Mineracao' = "Mining",
                                           'aviso' = "Warning"
                                           )
 
