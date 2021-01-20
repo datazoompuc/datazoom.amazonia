@@ -103,13 +103,13 @@ treat_deter_data = function(df, aggregation_level, language) {
 
   df <- df %>%
     dplyr::select(-c(QUADRANT, PATH_ROW, SENSOR, SATELLITE)) %>%
-    dplyr::mutate(Ano = lubridate::year(VIEW_DATE), Mês = lubridate::month(VIEW_DATE))
+    dplyr::mutate(Ano = lubridate::year(VIEW_DATE), Mes = lubridate::month(VIEW_DATE))
 
   if (aggregation_level != "state") {
 
     df <- df %>%
       dplyr::select(-UF, -UC) %>%
-      dplyr::group_by(MUNICIPALI, Ano, Mês, CLASSNAME) %>%
+      dplyr::group_by(MUNICIPALI, Ano, Mes, CLASSNAME) %>%
       dplyr::summarise(dplyr::across(-c(AREAUCKM, AREAMUNKM, VIEW_DATE)), AREAUCKM = sum(AREAUCKM), AREAMUNKM = sum(AREAMUNKM))
 
   }
@@ -118,7 +118,7 @@ treat_deter_data = function(df, aggregation_level, language) {
 
     df <- df %>%
       dplyr::select(-MUNICIPALI, -UC) %>%
-      dplyr::group_by(UF, Ano, Mês, CLASSNAME) %>%
+      dplyr::group_by(UF, Ano, Mes, CLASSNAME) %>%
       dplyr::summarise(dplyr::across(-c(AREAUCKM, AREAMUNKM, VIEW_DATE)), AREAUCKM = sum(AREAUCKM), AREAMUNKM = sum(AREAMUNKM))
   }
 
@@ -140,11 +140,11 @@ treat_deter_data = function(df, aggregation_level, language) {
 
   df$Classe <- df$Classe %>% dplyr::recode(CICATRIZ_DE_QUEIMADA = "Cicatriz de Queimada",
                               CS_DESORDENADO = "Corte Seletivo Desordenado",
-                              CS_GEOMETRICO = "Corte Seletivo Geométrico",
-                              DEGRADACAO = "Degradação",
+                              CS_GEOMETRICO = "Corte Seletivo Geometrico",
+                              DEGRADACAO = "Degradacao",
                               DESMATAMENTO_CR = "Desmatamento Corte Raso",
-                              DESMATAMENTO_VEG = "Desmatamento com Vegetação",
-                              MINERACAO = "Mineração"
+                              DESMATAMENTO_VEG = "Desmatamento com Vegetacao",
+                              MINERACAO = "Mineracao"
                               )
 
   language <- tolower(language)
@@ -165,11 +165,11 @@ translate_deter_to_english <- function(df) {
 
   df$Classe <- df$Classe %>% dplyr::recode('Cicatriz de Queimada' = "Fire Scar",
                                           'Corte Seletivo Desordenado' = "Unorganized Selection Cutting",
-                                          'Corte Seletivo Geométrico' = "Geometric Selection Cutting",
-                                          'Degradação' = "Degradation",
+                                          'Corte Seletivo Geometrico' = "Geometric Selection Cutting",
+                                          'Degradacao' = "Degradation",
                                           'Desmatamento Corte Raso' = "Clear Cut Deforestation",
-                                          'Desmatamento com Vegetação' = "Vegetation Remains Deforestation",
-                                          'Mineração' = "Mining",
+                                          'Desmatamento com Vegetaçao' = "Vegetation Remains Deforestation",
+                                          'Mineraçao' = "Mining",
                                           'aviso' = "Warning"
                                           )
 
@@ -182,7 +182,7 @@ translate_deter_to_english <- function(df) {
                        Area_em_UC = "Area_in_CU",
                        Area_em_Municipio = "Area_in_Municipality",
                        Municipio = "Municipality",
-                       Mês = "Month",
+                       Mes = "Month",
                        Ano = "Year"
 
     )
