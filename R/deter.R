@@ -77,19 +77,21 @@ load_deter_raw = function(source) {
 
     download.file(url, temp, mode="wb")
 
-    df <- read.dbf(unzip(temp, "deter_public.dbf")) %>%
+    df <- read.dbf(unzip(temp, "deter_public.dbf"), as.is = TRUE) %>%
       as_tibble()
   }
   #As the data is contained in a .zip file also containing other files, downloading to a tempfile provides a way to extract only the .dbf file we're interested in.
 
   else if (file.exists(source)) {
 
-    df <- foreign::read.dbf(unzip(source, "deter_public.dbf")) %>%
+    df <- foreign::read.dbf(unzip(source, "deter_public.dbf")) %>% #If source is a valid path, the data is just pulled from there.
       as_tibble()
 
   }
 
   else {df = warning("Invalid source.")}
+
+  Encoding(df$MUNICIPALI) <- "UTF-8"
 
   return(df)
 }
@@ -110,8 +112,6 @@ treat_deter_data = function(df, aggregation_level, language) {
       dplyr::group_by(MUNICIPALI, CLASSNAME, Ano, Mês) %>%
       dplyr::summarise(dplyr::across(-c(AREAUCKM, AREAMUNKM, VIEW_DATE)), AREAUCKM = sum(AREAUCKM), AREAMUNKM = sum(AREAMUNKM))
 
-    df <- df %>%
-      dplyr::mutate(MUNICIPALI = gsub("Ã§", "c", MUNICIPALI))
   }
 
   else if (aggregation_level == "state") {
@@ -135,7 +135,6 @@ treat_deter_data = function(df, aggregation_level, language) {
                        AREAUCKM = "Area_em_UC",
                        AREAMUNKM = "Area_em_Municipio",
                        MUNICIPALI = "Municipio",
-                       VIEW_DATE = "Data"
 
     )
 
@@ -159,7 +158,6 @@ translate_deter_to_english <- function(df) {
     dplyr::rename_with(dplyr::recode,
 
                        Classe = "Class",
-                       Data = "Date",
                        UC = "ConservationUnit",
                        Area_em_UC = "Area_in_CU",
                        Area_em_Municipio = "Area_in_Municipality",
