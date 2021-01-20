@@ -46,7 +46,7 @@ load_degrad <- function(source, aggregation_level = "municipality", language = "
   # Optimize?
   message("Downloading map data.")
   geo_br <- geobr::read_municipality(year = 2019, simplified = FALSE) # 2019 relates to the definition of legal_amazon
-  geo_amazon <- dplyr::filter(geo_br, code_muni %in% legal_amazon$CD_MUN)
+  geo_amazon <- dplyr::filter(geo_br, .data$code_muni %in% legal_amazon$CD_MUN)
 
   list_df <- lapply(raw_list, treat_degrad_data, aggregation_level = aggregation_level, language = language, geo_amazon = geo_amazon)
 
@@ -61,7 +61,7 @@ load_degrad <- function(source, aggregation_level = "municipality", language = "
 #'
 #' Passing a \code{string} with a directory's path will read data from all shapefiles in the directory.
 #'
-#' Alternatively, \code{source} may be a list of full file paths, or anything else readable by \code{utils::read.csv()}.
+#' Alternatively, \code{source} may be a list of full file paths, or anything else readable by \code{sf::read_sf()}.
 #'
 #' @return A list of \code{tibble}.
 #'
@@ -93,9 +93,9 @@ load_degrad_raw <- function(source) {
       )
 
       zfile <- tempfile(fileext = ".zip")
-      download.file(url, zfile)
+      utils::download.file(url, zfile)
       dir <- gsub(zfile, pattern = "\\.zip", replacement = "")
-      unzip(zfile, exdir = dir)
+      utils::unzip(zfile, exdir = dir)
       find_from_dir(dir)
     })
   }
@@ -142,17 +142,17 @@ treat_degrad_data <- function(df, aggregation_level, language, geo_amazon) {
     year <- as.numeric(substr(as.character(as.Date(df$view_date)), 1, 4))
     month <- as.numeric(substr(as.character(as.Date(df$view_date)), 6, 7))
   }
-  df$Year <- year
-  df$Month <- month
+  df$Ano <- year
+  df$Mes <- month
 
   # Municipalize
-  st_agr(df) = "constant"
-  st_agr(geo_amazon) = "constant"
-  df <- st_intersection(df, geo_amazon) %>%
+  sf::st_agr(df) = "constant"
+  sf::st_agr(geo_amazon) = "constant"
+  df <- sf::st_intersection(df, geo_amazon) %>%
     dplyr::mutate(calculated_area = sf::st_area(.data$geometry)) %>%
-    dplyr::group_by(.data$code_muni, .data$name_muni, .data$code_state, .data$abbrev_state, .data$Year, .data$Month) %>%
+    dplyr::group_by(.data$code_muni, .data$name_muni, .data$code_state, .data$abbrev_state, .data$Ano, .data$Mes) %>%
     sf::st_drop_geometry() %>%
-    dplyr::summarise(Area = sum(calculated_area)) %>%
+    dplyr::summarise(Area = sum(.data$calculated_area)) %>%
     dplyr::ungroup() %>%
     dplyr::rename(Municipio = .data$name_muni, Estado = .data$abbrev_state)
 
@@ -162,9 +162,10 @@ treat_degrad_data <- function(df, aggregation_level, language, geo_amazon) {
     df <-
       df %>%
       dplyr::mutate(CodIBGE = as.factor(.data$code_state)) %>%
-      dplyr::group_by(.data$Estado, .data$CodIBGE, .data$Year, .data$Month) %>%
+      dplyr::group_by(.data$Estado, .data$CodIBGE, .data$Ano, .data$Mes) %>%
       dplyr::summarize_if(is.numeric, sum, na.rm = TRUE) %>%
-      dplyr::ungroup()
+      dplyr::ungroup() %>%
+      dplyr::select(-c("code_muni", "code_state"))
   }
   else {
     if (aggregation_level != "municipality") {

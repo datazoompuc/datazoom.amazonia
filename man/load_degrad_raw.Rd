@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{load_degrad_raw}
 \alias{load_degrad_raw}
-\title{Loads and cleans degradation data from INPE.}
+\title{Loads degradation data from INPE.}
 \usage{
 load_degrad_raw(source)
 }
@@ -12,47 +12,17 @@ load_degrad_raw(source)
 
 Passing a numeric \code{vector} of years will download the corresponding data from the INPE website. Available years are 2007-2016.
 
-Passing a \code{string} with a directory's path will read data from all files named
-"\{path\}/DesmatamentoMunicipiosXXXX.txt".
+Passing a \code{string} with a directory's path will read data from all shapefiles in the directory.
 
-Alternatively, \code{source} may be a list of full file paths, or anything else readable by \code{utils::read.csv()}.}
-
-\item{aggregation_level}{A string that indicates the level of aggregation of the data. It can be by "Municipality" or
-"State".}
-
-\item{language}{A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
-The other option is "pt" for Portuguese.}
+Alternatively, \code{source} may be a list of full file paths, or anything else readable by \code{sf::read_sf()}.}
 }
 \value{
-A \code{tibble}.
-
 A list of \code{tibble}.
 }
 \description{
-Loads and cleans degradation data from INPE.
+Loads degradation data from INPE.
 }
 \examples{
-load_degrad(2018)
-
-load_degrad(
-  c(2017, 2018),
-  aggregation_level = "state",
-  language = "pt"
-)
-
-load_degrad(
-  system.file("extdata", package = "datazoom.amazonia"),
-  aggregation_level = "state",
-  language = "en"
-)
-
-load_degrad(
-  system.file("extdata", "DesmatamentoMunicipios2015.txt", package = "datazoom.amazonia"),
-  aggregation_level = "municipality",
-  language = "pt"
-)
-Loads or downloads degradation data from INPE.
-
 load_degrad_raw(2016)
 
 load_degrad_raw(c(2013, 2014, 2016))
@@ -64,12 +34,8 @@ load_degrad_raw("~/Downloads/degrad2016_final_shp/DEGRAD_2016_pol.shp")
 }
 }
 \seealso{
-\link{load_degrad_raw} for loading raw data.
-
 \link{load_degrad} for loading and treating the data.
 }
 \author{
-DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro.
-
 DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro.
 }
