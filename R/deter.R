@@ -114,7 +114,7 @@ treat_deter_data = function(df, aggregation_level, language) {
 
   }
 
-  else if (aggregation_level == "state") {
+  if (aggregation_level == "state") {
 
     df <- df %>%
       dplyr::select(-MUNICIPALI, -UC) %>%
