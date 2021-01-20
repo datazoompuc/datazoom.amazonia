@@ -109,7 +109,7 @@ treat_deter_data = function(df, aggregation_level, language) {
 
     df <- df %>%
       dplyr::select(-UF, -UC) %>%
-      dplyr::group_by(MUNICIPALI, CLASSNAME, Ano, Mês) %>%
+      dplyr::group_by(MUNICIPALI, Ano, Mês, CLASSNAME) %>%
       dplyr::summarise(dplyr::across(-c(AREAUCKM, AREAMUNKM, VIEW_DATE)), AREAUCKM = sum(AREAUCKM), AREAMUNKM = sum(AREAMUNKM))
 
   }
@@ -118,7 +118,7 @@ treat_deter_data = function(df, aggregation_level, language) {
 
     df <- df %>%
       dplyr::select(-MUNICIPALI, -UC) %>%
-      dplyr::group_by(UF, CLASSNAME, Ano, Mês) %>%
+      dplyr::group_by(UF, Ano, Mês, CLASSNAME) %>%
       dplyr::summarise(dplyr::across(-c(AREAUCKM, AREAMUNKM, VIEW_DATE)), AREAUCKM = sum(AREAUCKM), AREAMUNKM = sum(AREAMUNKM))
   }
 
@@ -138,6 +138,15 @@ treat_deter_data = function(df, aggregation_level, language) {
 
     )
 
+  df$Classe <- df$Classe %>% dplyr::recode(CICATRIZ_DE_QUEIMADA = "Cicatriz de Queimada",
+                              CS_DESORDENADO = "Corte Seletivo Desordenado",
+                              CS_GEOMETRICO = "Corte Seletivo Geométrico",
+                              DEGRADACAO = "Degradação",
+                              DESMATAMENTO_CR = "Desmatamento Corte Raso",
+                              DESMATAMENTO_VEG = "Desmatamento com Vegetação",
+                              MINERACAO = "Mineração"
+                              )
+
   language <- tolower(language)
 
   if(language == "eng") {
@@ -154,6 +163,17 @@ treat_deter_data = function(df, aggregation_level, language) {
 
 translate_deter_to_english <- function(df) {
 
+  df$Classe <- df$Classe %>% dplyr::recode('Cicatriz de Queimada' = "Fire Scar",
+                                          'Corte Seletivo Desordenado' = "Unorganized Selection Cutting",
+                                          'Corte Seletivo Geométrico' = "Geometric Selection Cutting",
+                                          'Degradação' = "Degradation",
+                                          'Desmatamento Corte Raso' = "Clear Cut Deforestation",
+                                          'Desmatamento com Vegetação' = "Vegetation Remains Deforestation",
+                                          'Mineração' = "Mining",
+                                          'aviso' = "Warning"
+                                          )
+
+
   df <- df %>%
     dplyr::rename_with(dplyr::recode,
 
@@ -166,4 +186,6 @@ translate_deter_to_english <- function(df) {
                        Ano = "Year"
 
     )
+
+
 }
