@@ -3,6 +3,7 @@
 #' @importFrom foreign read.dbf
 #' @importFrom tibble as_tibble
 #' @importFrom lubridate year
+#' @importFrom utils download.file unzip
 NULL
 
 #' Loads and cleans INPE data on areas with deforestation warnings.
@@ -76,9 +77,9 @@ load_deter_raw = function(source) {
 
     temp <- tempfile(fileext = ".zip")
 
-    download.file(url, temp, mode="wb")
+    utils::download.file(url, temp, mode="wb")
 
-    df <- read.dbf(unzip(temp, "deter_public.dbf"), as.is = TRUE) %>%
+    df <- read.dbf(utils::unzip(temp, "deter_public.dbf"), as.is = TRUE) %>%
       as_tibble()
 
     Encoding(df$MUNICIPALI) <- "UTF-8"
@@ -87,7 +88,7 @@ load_deter_raw = function(source) {
 
   else if (file.exists(source)) {
 
-    df <- foreign::read.dbf(unzip(source, "deter_public.dbf")) %>% #If source is a valid path, the data is just pulled from there.
+    df <- foreign::read.dbf(utils::unzip(source, "deter_public.dbf")) %>% #If source is a valid path, the data is just pulled from there.
       as_tibble()
 
     Encoding(df$MUNICIPALI) <- "UTF-8"
