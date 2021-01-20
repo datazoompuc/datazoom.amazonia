@@ -25,7 +25,8 @@ Imports:
     stats,
     geobr,
     sf,
-    utils
+    utils,
+    lwgeom
 URL: http://www.econ.puc-rio.br/datazoom
 Suggests: 
     knitr,
