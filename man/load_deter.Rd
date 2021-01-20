@@ -5,12 +5,7 @@
 \alias{load_deter}
 \title{Loads and cleans INPE data on areas with deforestation warnings.}
 \usage{
-load_deter(
-  source,
-  aggregation_level = "municipality",
-  years = "all",
-  language = "eng"
-)
+load_deter(source, aggregation_level = "municipality", language = "eng")
 }
 \arguments{
 \item{source}{A string indicating where the data will be drawn from.
@@ -19,10 +14,8 @@ It can be "Amazonia" or "Cerrado", in which case the data will be pulled from th
 
 It can also be a path to a .zip file as is obtained from the INPE website, containing a file named "deter_public.dbf".}
 
-\item{aggregation_level}{A string that indicates the level of aggregation of the data. It can be by "Municipality" or
-"State".}
-
-\item{years}{A numeric \code{vector} of years, used to filter the data.}
+\item{aggregation_level}{A string that indicates the level of aggregation of the data. It can be by "Municipality", the default alternative, or
+also "State".}
 
 \item{language}{A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
 The other option is "pt" for Portuguese.}
@@ -36,14 +29,11 @@ Loads and cleans INPE data on areas with deforestation warnings.
 \examples{
 load_deter("amazonia")
 
-load_deter("cerrado", years = 2018)
-
-load_deter("C:\\\\...\\\\'deter'.zip")
+load_deter("C:\\\\...\\\\'deter'.zip", aggregation_level = "municipality")
 
 load_deter(
 source = "cerrado",
 aggregation_level = "state",
-years = c(2017,2018),
 language = "pt"
 )
 

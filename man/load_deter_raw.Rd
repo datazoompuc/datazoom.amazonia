@@ -5,7 +5,7 @@
 \alias{load_deter_raw}
 \title{Loads INPE data on areas with deforestation warnings.}
 \usage{
-load_deter_raw(source, years = "all")
+load_deter_raw(source)
 }
 \arguments{
 \item{source}{A string indicating where the data will be drawn from.
@@ -13,8 +13,6 @@ load_deter_raw(source, years = "all")
 It can be "Amazonia" or "Cerrado", in which case the data will be pulled from the INPE website for the corresponding biome.
 
 It can also be a path to a .zip file as is obtained from the INPE website, containing a file named "deter_public.dbf".}
-
-\item{years}{A numeric \code{vector} of years, used to filter the data.}
 }
 \value{
 A \code{tibble}
@@ -24,8 +22,6 @@ Loads INPE data on areas with deforestation warnings.
 }
 \examples{
 load_deter_raw("amazonia")
-
-load_deter_raw("cerrado", c(2016,2017,2018))
 
 load_deter_raw("C:\\\\...\\\\'deter'.zip")
 

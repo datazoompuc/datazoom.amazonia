@@ -8,8 +8,8 @@ NULL
 #' Loads and cleans INPE data on areas with deforestation warnings.
 #'
 #' @inheritParams load_deter_raw
-#' @param aggregation_level A string that indicates the level of aggregation of the data. It can be by "Municipality" or
-#'   "State".
+#' @param aggregation_level A string that indicates the level of aggregation of the data. It can be by "Municipality", the default alternative, or
+#'  also "State".
 #' @param language A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
 #'   The other option is "pt" for Portuguese.
 #'
@@ -25,20 +25,17 @@ NULL
 #' @examples
 #' load_deter("amazonia")
 #'
-#' load_deter("cerrado", years = 2018)
-#'
-#' load_deter("C:\\...\\'deter'.zip")
+#' load_deter("C:\\...\\'deter'.zip", aggregation_level = "municipality")
 #'
 #' load_deter(
 #' source = "cerrado",
 #' aggregation_level = "state",
-#' years = c(2017,2018),
 #' language = "pt"
 #' )
 #'
-load_deter = function(source, aggregation_level = "municipality", years = "all", language = "eng") {
+load_deter = function(source, aggregation_level = "municipality",  language = "eng") {
 
-  df <- load_deter_raw(source, years)
+  df <- load_deter_raw(source)
 
   treat_deter_data(df, aggregation_level, language)
 
@@ -55,9 +52,6 @@ load_deter = function(source, aggregation_level = "municipality", years = "all",
 #'
 #'It can also be a path to a .zip file as is obtained from the INPE website, containing a file named "deter_public.dbf".
 #'
-#'
-#' @param years A numeric \code{vector} of years, used to filter the data.
-#'
 #' @return A \code{tibble}
 #'
 #' @seealso [load_deter], for loading and treating the data.
@@ -70,11 +64,9 @@ load_deter = function(source, aggregation_level = "municipality", years = "all",
 #' @examples
 #' load_deter_raw("amazonia")
 #'
-#' load_deter_raw("cerrado", c(2016,2017,2018))
-#'
 #' load_deter_raw("C:\\...\\'deter'.zip")
 #'
-load_deter_raw = function(source, years = "all") {
+load_deter_raw = function(source) {
 
   if (tolower(source) == "amazonia") {source <- "amz"}
 
@@ -99,13 +91,6 @@ load_deter_raw = function(source, years = "all") {
 
   else {df = warning("Invalid source.")}
 
-  if (is.numeric(years)){
-
-    df <- df %>%
-      dplyr::filter(lubridate::year(VIEW_DATE) %in% years)
-
-  }
-
   return(df)
 }
 
@@ -115,13 +100,15 @@ treat_deter_data = function(df, aggregation_level, language) {
   aggregation_level <- tolower(aggregation_level)
 
   df <- df %>%
-    dplyr::select(-c(QUADRANT, PATH_ROW, SENSOR, SATELLITE))
+    dplyr::select(-c(QUADRANT, PATH_ROW, SENSOR, SATELLITE)) %>%
+    dplyr::mutate(Ano = lubridate::year(VIEW_DATE), Mês = lubridate::month(VIEW_DATE))
 
   if (aggregation_level != "state") {
 
     df <- df %>%
-      dplyr::select(-UF) %>%
-      dplyr::arrange(MUNICIPALI, CLASSNAME, VIEW_DATE) #There can be several occurences in the same date and location
+      dplyr::select(-UF, -UC) %>%
+      dplyr::group_by(MUNICIPALI, CLASSNAME, Ano, Mês) %>%
+      dplyr::summarise(dplyr::across(-c(AREAUCKM, AREAMUNKM, VIEW_DATE)), AREAUCKM = sum(AREAUCKM), AREAMUNKM = sum(AREAMUNKM))
 
     df <- df %>%
       dplyr::mutate(MUNICIPALI = gsub("Ã§", "c", MUNICIPALI))
@@ -131,8 +118,8 @@ treat_deter_data = function(df, aggregation_level, language) {
 
     df <- df %>%
       dplyr::select(-MUNICIPALI, -UC) %>%
-      dplyr::group_by(UF, CLASSNAME, VIEW_DATE) %>%
-      dplyr::summarise(across(-c(AREAUCKM, AREAMUNKM)), AREAUCKM = sum(AREAUCKM), AREAMUNKM = sum(AREAMUNKM)) #Displays only one occurence per class per state per day, which is an aggregate of the total area affected
+      dplyr::group_by(UF, CLASSNAME, Ano, Mês) %>%
+      dplyr::summarise(dplyr::across(-c(AREAUCKM, AREAMUNKM, VIEW_DATE)), AREAUCKM = sum(AREAUCKM), AREAMUNKM = sum(AREAMUNKM))
   }
 
   else if (aggregation_level != "municipality") {
@@ -177,6 +164,8 @@ translate_deter_to_english <- function(df) {
                        Area_em_UC = "Area_in_CU",
                        Area_em_Municipio = "Area_in_Municipality",
                        Municipio = "Municipality",
+                       Mês = "Month",
+                       Ano = "Year"
 
     )
 }
