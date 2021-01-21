@@ -116,7 +116,7 @@ treat_degrad_data <- function(df, aggregation_level, language, geo_amazon) {
   message("Processing data. This should take a few minutes.")
   # Clean
   names(df) <- tolower(names(df))
-  df <- dplyr::filter(df, grepl(.data$class_name, pattern = "degrad", ignore.case = TRUE))
+  df[grep(df$class_name, pattern = "degrad[^_]", ignore.case = TRUE), ]$class_name <- "DEGRAD"
 
   # Insert CRS
   if(is.na(sf::st_crs(df))) {
@@ -149,11 +149,11 @@ treat_degrad_data <- function(df, aggregation_level, language, geo_amazon) {
   sf::st_agr(geo_amazon) = "constant"
   df <- sf::st_intersection(df, geo_amazon) %>%
     dplyr::mutate(calculated_area = sf::st_area(.data$geometry)) %>%
-    dplyr::group_by(.data$code_muni, .data$name_muni, .data$code_state, .data$abbrev_state, .data$Ano, .data$Mes) %>%
+    dplyr::group_by(.data$code_muni, .data$name_muni, .data$code_state, .data$abbrev_state, .data$Ano, .data$Mes, .data$class_name) %>%
     sf::st_drop_geometry() %>%
     dplyr::summarise(Area = sum(.data$calculated_area)) %>%
     dplyr::ungroup() %>%
-    dplyr::rename(Municipio = .data$name_muni, Estado = .data$abbrev_state)
+    dplyr::rename(Municipio = .data$name_muni, Estado = .data$abbrev_state, Evento = .data$class_name)
 
   # Set aggregation level
   aggregation_level <- tolower(aggregation_level)
@@ -196,6 +196,7 @@ translate_degrad_to_english <- function(df) {
     CodIBGE = "CodIBGE",
     Estado = "State",
     Ano = "Year",
-    Mes = "Month"
+    Mes = "Month",
+    Evento = "Event"
   )
 }
