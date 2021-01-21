@@ -27,6 +27,7 @@ library(datazoom.amazonia)
 
 # Downloads data
 data <- load_prodes(c(2018, 2019))
+data <- load_degrad(2016)
 
 data <- load_prodes(2017, aggregation_level = "state", language = "pt")
 

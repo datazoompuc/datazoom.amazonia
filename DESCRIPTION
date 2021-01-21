@@ -25,12 +25,12 @@ Imports:
     stats,
     geobr,
     sf,
-    utils,
-    lwgeom
+    utils
 URL: http://www.econ.puc-rio.br/datazoom
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    lwgeom
 VignetteBuilder: knitr
 Depends: 
     R (>= 2.10)

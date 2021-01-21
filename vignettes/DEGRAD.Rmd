@@ -1,0 +1,34 @@
+---
+title: "DEGRAD"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{DEGRAD}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## The Dataset
+The DEGRAD project uses sattelites to monitor degradation of forest areas. Raw data is available as simple features (sf) objects, read from shapefiles. The project was substituted in 2016 by DETER-B. Accordingly, data is available from 2007 up to 2016. 
+
+This package provides degradation data by municipality-year (or municipality-month, when available). It does this by intersecting DEGRAD geometries with IBGE's municipality geometries from the year 2019. CRS metadata is missing from the original data source. A best effort approach is used and a CRS is assumed (proj4string: "+proj=longlat +ellps=aust_SA +towgs84=-66.8700,4.3700,-38.5200,0.0,0.0,0.0,0.0 +no_defs"). 
+
+## Usage
+
+Using the package is easy enough:
+
+```{r setup}
+library(datazoom.amazonia)
+
+years <- c(2014:2016)
+
+data <- load_degrad_raw(years)
+
+data <- load_degrad(2016, aggregation_level = "state", language = "pt")
+```

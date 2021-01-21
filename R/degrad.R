@@ -43,7 +43,6 @@ NULL
 load_degrad <- function(source, aggregation_level = "municipality", language = "eng") {
   raw_list <- load_degrad_raw(source)
 
-  # Optimize?
   message("Downloading map data.")
   geo_br <- geobr::read_municipality(year = 2019, simplified = FALSE) # 2019 relates to the definition of legal_amazon
   geo_amazon <- dplyr::filter(geo_br, .data$code_muni %in% legal_amazon$CD_MUN)
@@ -105,7 +104,7 @@ load_degrad_raw <- function(source) {
   }
   # Otherwise, we assume that source is something that can already be interpreted by sf::read_sf
 
-  lapply(source, sf::read_sf)
+  suppressWarnings(lapply(source, sf::read_sf))
 }
 
 find_from_dir <- function(dir) {
