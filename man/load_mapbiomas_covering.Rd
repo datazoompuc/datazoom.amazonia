@@ -9,7 +9,6 @@ load_mapbiomas_covering(
   aggregation_level = c("municipality", "state", "municipio", "estado"),
   path = NULL,
   covering = NULL,
-  type = c("stacked", "normal", "empilhado"),
   years = c(1985:2020)
 )
 }
@@ -23,8 +22,6 @@ Input has to be the code of the desired covering
 ATT.: This code ranges from 1 to 5 and is different from the covering code for the other functions in this package
 Ex.: 1-Forest; 2-Non Forest Natural Formation; 3-Farming; 4-Non Vegetated Area; 5-Water}
 
-\item{type}{Decide if the output should have a column for each year (normal) or a single column for the areas of all years (stacked | empilhado)}
-
 \item{years}{A vector of numbers containing the years desired in the data base (years available are 1985 to 2020)
 Ex.: years = c(1985:2020)}
 }
@@ -36,7 +33,7 @@ Download and filter data on type of soil covering by year
 }
 \examples{
 load_mapbiomas_covering(aggregation_level = 'municipality', path = NULL,
-                             covering = 3, type = 'stacked', years = c(2000:2010))
+                             covering = 3, years = c(2000:2010))
 }
 \author{
 DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro

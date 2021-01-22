@@ -5,16 +5,10 @@
 \alias{load_mapbiomas_transition}
 \title{load_mapbiomas_transition}
 \usage{
-load_mapbiomas_transition(
-  path = NULL,
-  type = c("stacked", "normal", "empilhado"),
-  transition_interval = NULL
-)
+load_mapbiomas_transition(path = NULL, transition_interval = NULL)
 }
 \arguments{
 \item{path}{A string indicating where the raw data is in your computer. The default is NULL which means the data will be extracted directly from the website}
-
-\item{type}{Decide if the output should have a column for each year (normal) or a single column for the areas of all years (stacked | empilhado)}
 
 \item{transition_interval}{A numeric object containing the desired interval in years to observe transitions desired in the data base (1, 2, 5 or 10), or have all included (NULL)}
 }
@@ -25,8 +19,7 @@ A data base with data containing the area of each selected type of soil covering
 Download and filter data on transition of types of soil covering by year
 }
 \examples{
-load_mapbiomas_transition(path = NULL,
-                             type = 'normal', transition_interval = 5)
+load_mapbiomas_transition(path = NULL, transition_interval = 5)
 }
 \author{
 DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro
