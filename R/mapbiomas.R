@@ -24,12 +24,12 @@
 #'
 #' @examples
 #' load_mapbiomas_covering(aggregation_level = 'municipality', path = NULL,
-#'                              covering = 3, type = 'stacked', years = c(2000:2010))
+#'                              covering = 3, years = c(2000:2010))
 
 
 
-load_mapbiomas_covering<-function(aggregation_level = c('municipality', 'state','municipio','estado'),path = NULL,
-                                       covering = NULL, type = c('stacked','normal','empilhado'), years = c(1985:2020)){
+load_mapbiomas_covering<-function(aggregation_level = c('municipality', 'state','municipio','estado'), path = NULL,
+                                       covering = NULL, years = c(1985:2020)){
   if(is.null(path)){
     if(aggregation_level=='state' | aggregation_level=='estado'){
       url1<-'https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Dados_Cobertura_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx'
@@ -62,7 +62,6 @@ load_mapbiomas_covering<-function(aggregation_level = c('municipality', 'state',
     if(!is.null(covering)){
       tab<-tab[!(substring(tab$level_1,1,1)!=covering),]
     }
-    if(type=='stacked' | type=='empilhado'){
       for(i in years){
         ret<-c()
         ret<-tab[,1:8]
@@ -74,15 +73,6 @@ load_mapbiomas_covering<-function(aggregation_level = c('municipality', 'state',
         ret<-cbind(ret,data)
         retorno<-rbind(retorno,ret)
       }
-    }
-    if(type=='normal'){
-      ret<-tab[,1:8]
-      for(i in years){
-        ano<-as.character(i)
-        ret<-cbind(ret,tab[,ano])
-      }
-      retorno<-ret
-    }
   }else if(aggregation_level=='municipality' | aggregation_level=='municipio'){
     b<-read_excel(path = p1f, sheet = 3)
     tipos<-c('RR','RO','AC','AM','MA','TO','PA','AP','MT')
@@ -93,7 +83,6 @@ load_mapbiomas_covering<-function(aggregation_level = c('municipality', 'state',
     if(!is.null(covering)){
       tab<-tab[!(substring(tab$level_1,1,1)!=covering),]
     }
-    if(type=='stacked' | type=='empilhado'){
       for(i in years){
         ret<-c()
         ret<-tab[,1:8]
@@ -105,15 +94,6 @@ load_mapbiomas_covering<-function(aggregation_level = c('municipality', 'state',
         ret<-cbind(ret,data)
         retorno<-rbind(retorno,ret)
       }
-    }
-    if(type=='normal'){
-      ret<-tab[,1:8]
-      for(i in years){
-        ano<-as.character(i)
-        ret<-cbind(ret,tab[,ano])
-      }
-      retorno<-ret
-    }
   }
   return(retorno)
 }
@@ -137,13 +117,11 @@ load_mapbiomas_covering<-function(aggregation_level = c('municipality', 'state',
 #' @export
 #'
 #' @examples
-#' load_mapbiomas_transition(path = NULL,
-#'                              type = 'normal', transition_interval = 5)
+#' load_mapbiomas_transition(path = NULL, transition_interval = 5)
 
 
 
-load_mapbiomas_transition<-function(path = NULL,
-                                       type = c('stacked','normal','empilhado'), transition_interval = NULL){
+load_mapbiomas_transition<-function(path = NULL, transition_interval = NULL){
   if(is.null(path)){
     url1<-'https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Dados_Transicao_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx'
     p1f <- tempfile()
@@ -166,7 +144,6 @@ load_mapbiomas_transition<-function(path = NULL,
   tab<-a
   ncolu<-ncol(a)
   if(is.null(transition_interval)){
-    if(type=='stacked' | type=='empilhado'){
       for(i in 15:ncolu){
         ret<-c()
         ret<-tab[,1:14]
@@ -184,24 +161,7 @@ load_mapbiomas_transition<-function(path = NULL,
           retorno<-rbind(retorno,ret)
         }
       }
-    }
-    if(type=='normal'){
-      ret<-c()
-      ret<-tab[,1:14]
-      for(i in 15:ncolu){
-        nomecol<-colnames(a)[i]
-        anoi<-substring(nomecol,1,4)
-        anof<-substring(nomecol,8,12)
-        anoi<-as.integer(anoi)
-        anof<-as.integer(anof)
-        if(anof-anoi!=0){
-          ret<-cbind(ret,tab[,i])
-        }
-      }
-      retorno<-ret
-    }
   }else if(!is.null(transition_interval)){
-    if(type=='stacked' | type=='empilhado'){
       for(i in 15:ncolu){
         ret<-c()
         ret<-tab[,1:14]
@@ -219,22 +179,6 @@ load_mapbiomas_transition<-function(path = NULL,
           retorno<-rbind(retorno,ret)
         }
       }
-    }
-    if(type=='normal'){
-      ret<-c()
-      ret<-tab[,1:14]
-      for(i in 15:ncolu){
-        nomecol<-colnames(a)[i]
-        anoi<-substring(nomecol,1,4)
-        anof<-substring(nomecol,8,12)
-        anoi<-as.integer(anoi)
-        anof<-as.integer(anof)
-        if(anof-anoi==transition_interval){
-          ret<-cbind(ret,tab[,i])
-        }
-      }
-      retorno<-ret
-    }
   }
   return(retorno)
 }
