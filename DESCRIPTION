@@ -5,7 +5,8 @@ Authors@R: c(
     person("Francisco", "de Lima Cavalcanti", role = c("cre"), email = "francisco.lima.cavalcanti@gmail.com"),
     person("Victor", "Aliende da Matta", role = c("aut"), email = "victor.al.matta@gmail.com"),
     person("Maria", "Mittelbach", role = c("aut"), email = "mariamittelbach@gmail.com"),
-    person("Anna Carolina", "Dutra Saraiva", role = c("aut"), email = "annadutrasaraiva@gmail.com")
+    person("Anna Carolina", "Dutra Saraiva", role = c("aut"), email = "annadutrasaraiva@gmail.com"),
+    person("Arthur", "Carvalho Brito", role = c("aut"), email = "arthurcbps@gmail.com")
     )
 Description: This package offers functions to download and treat data regarding
              the Brazilian Amazon region from a variety of official sources.
@@ -15,10 +16,15 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Imports:
-    rlang,
     dplyr,
     janitor,
     lubridate,
+    purrr,
+    readr,
+    rlang,
+    sidrar,
+    tibble,
+    stats,
     XML
 URL: http://www.econ.puc-rio.br/datazoom
 Suggests: 
