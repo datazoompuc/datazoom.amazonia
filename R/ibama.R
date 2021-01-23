@@ -8,7 +8,7 @@ NULL
 #'
 #' Original data comes from \href{https://servicos.ibama.gov.br/ctf/publico/areasembargadas/ConsultaPublicaAreasEmbargadas.php}{IBAMA's website}
 #'
-#' @name ibama_fines
+#' @name load_ibama
 #' @encoding UTF-8
 #' @param download_data If \code{TRUE}, downloads the data from the original source.
 #' Else, loads data from \code{load_from_where} directory.
@@ -31,13 +31,13 @@ NULL
 #'
 #' @examples
 #'
-#' ibama_fines(
+#' load_ibama(
 #'   download_directory = getwd(),
 #'   time_unit = "year",
 #'   geographic_unit = "state", years = 2005:2006
 #' )
 #'
-#' ibama_fines(
+#' load_ibama(
 #'   download_directory = getwd(),
 #'   time_unit = "ano",
 #'   geographic_unit = "municipio", years = c(2010, 2012),
@@ -45,7 +45,7 @@ NULL
 #' )
 #' \dontrun{
 #'
-#' ibama_fines(
+#' load_ibama(
 #'   download_data = FALSE,
 #'   load_from_where = "./Desktop/data.xls",
 #'   time_unit = c("year", "month"),
@@ -55,7 +55,7 @@ NULL
 #'
 #' @export
 
-ibama_fines <- function(download_data = TRUE,
+load_ibama <- function(download_data = TRUE,
                         download_directory,
                         load_from_where,
                         time_unit = c("year", "month"),
@@ -63,7 +63,7 @@ ibama_fines <- function(download_data = TRUE,
                         years = 2005:2021,
                         language = "english") {
   if (download_data == TRUE) {
-    download_ibama(download_dir = download_directory)
+    download_devtoibama(download_dir = download_directory)
     load_from_where <- list.files(
       path = download_directory,
       pattern = "*.xls$",

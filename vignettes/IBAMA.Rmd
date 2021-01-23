@@ -1,5 +1,5 @@
 ---
-title: "ibama_fines"
+title: "load_ibama"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{ibama_fines}
@@ -21,7 +21,7 @@ https://servicos.ibama.gov.br/ctf/publico/areasembargadas/ConsultaPublicaAreasEm
 
 ## Usage
 
-```ibama_fines``` downloads and compiles data on environmental fines at the municipality or
+```load_ibama``` downloads and compiles data on environmental fines at the municipality or
 state levels considering the Amazon region. The user has the option to either download
 or load the previously stored raw data, choosing a time-location aggregation level.
 
@@ -42,7 +42,7 @@ municipality, respectively.
 ```{r , eval = FALSE}
 library(datazoom.amazonia)
 
-ibama_fines(
+load_ibama(
   download_data = TRUE, 
   download_directory = './Desktop',
   time_unit = c('month', 'year'),
@@ -58,7 +58,7 @@ file's path with the parameter ```load_from_where```. If ```language = 'portugue
 
 ```{r, eval = FALSE }
 
-ibama_fines(
+load_ibama(
   download_data = 'FALSE', 
   download_directory = './Desktop/data.xls',
   time_unit = 'ano',
