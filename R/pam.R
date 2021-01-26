@@ -1,27 +1,32 @@
+#' @importFrom sidrar
+#' @importFrom tidyverse
+NULL
+
+#' Loads agricultural data of permanent tillages from Brazil from 1974 to the present
+#'
+#' @param years A \code{vector} indicating what years will the data be loaded
+#'
+#' @param aggregation_level A \code{string} that defines the geographic level of the data. Defaults to National level, but can be one of "country", "region", "state", "mesoregion", "microregion" and "city"
+#'
+#' @param language A \code{string} that indicates in which language the data will be returned. The default is "pt", so your data will be returned in Portuguese. Currently, only Portuguese and English are supported.
+#'
+#' @return A \code{data frame}
+#'
+#' @author DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro
+#'
+#' @encoding UTF-8
+#'
+#' @export
+#'
+#' @examples load_pam_permanent(2013, aggregation_level = "country")
+#'
+
+
 library(tidyverse)
-library(httr)
-library(jsonlite)
 library(sidrar)
-"http://api.sidra.ibge.gov.br/values/t/1612/n6/all/v/all/p/2000,2002/c81/2702/f/u"
-#request <- GET("http://api.sidra.ibge.gov.br/values/t/1613/n3/all/u/y/v/all/p/all/c82/all/d/v1000215%202,v1000216%202,v1002313%202")
-#request$status_code
-#If API fails request will return non-200 status code
 
-#response <- content(request, as = "text", encoding = "UTF-8")
 
-#df <- fromJSON(response, flatten = TRUE) %>% 
- # data.frame()
-
-#col_names <- df[1,]
-#colnames(df) <- col_names
-#df = df[-1,]
-
-#choices = c("Brasil", "Grande Região", "Unidade da Federação", "Município")
-#nivter = dlgList(choices, multiple = FALSE, title = "Qual o nível territorial desejado?")$res
-
-#load_pam_permanent - COD tabela = 1613
-
-load_pam_permanent <- function(years, aggregation_level = "country", language = "eng"){
+load_pam_permanent <- function(years, aggregation_level = "country", language = "pt"){
   message("Depending on amount of items selected function may take time to run")
   sigla_uf = c(12,27,13,16,29,23,32,52,21,31,50,51,15,25,26,22,41,33,24,11,14,43,42,28,35,17)
   
@@ -115,7 +120,26 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
   
 }
 
-load_pam_temporart <- function(years, aggregation_level = "country", language = "pt"){
+#' Loads agricultural data of temporary tillages from Brazil from 1974 to the present
+#'
+#' @param years A \code{vector} indicating what years will the data be loaded
+#'
+#' @param aggregation_level A \code{string} that defines the geographic level of the data. Defaults to National level, but can be one of "country", "region", "state", "mesoregion", "microregion" and "city"
+#'
+#' @param language A \code{string} that indicates in which language the data will be returned. The default is "pt", so your data will be returned in Portuguese. Currently, only Portuguese and English are supported.
+#'
+#' @return A \code{data frame}
+#'
+#' @author DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro
+#'
+#' @encoding UTF-8
+#'
+#' @export
+#'
+#' @examples load_pam_temporary(2010, aggregation_level = "country")
+#'
+
+load_pam_temporary <- function(years, aggregation_level = "country", language = "pt"){
   message("Depending on amount of items selected function may take time to run")
   sigla_uf = c(12,27,13,16,29,23,32,52,21,31,50,51,15,25,26,22,41,33,24,11,14,43,42,28,35,17)
   
@@ -208,6 +232,26 @@ load_pam_temporart <- function(years, aggregation_level = "country", language = 
   }
   
 }
+
+#' Loads agricultural data of four main tillages - corn, potato, peanut and beans - from Brazil from 2003 to the present
+#'
+#' @param years A \code{vector} indicating what years will the data be loaded
+#'
+#' @param aggregation_level A \code{string} that defines the geographic level of the data. Defaults to National level, but can be one of "country", "region", "state", "mesoregion", "microregion" and "city"
+#'
+#' @param language A \code{string} that indicates in which language the data will be returned. The default is "pt", so your data will be returned in Portuguese. Currently, only Portuguese and English are supported.
+#'
+#' @return A \code{data frame}
+#'
+#' @author DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro
+#'
+#' @encoding UTF-8
+#'
+#' @export
+#'
+#' @examples load_pam_main(2007, aggregation_level = "country")
+#' 
+#'
 
 load_pam_main <- function(years, aggregation_level = "country", "language" = "pt"){
   message("Depending on amount of items selected function may take time to run")
@@ -348,3 +392,22 @@ load_pam_main <- function(years, aggregation_level = "country", "language" = "pt
 #baixar um ano de cada vez
 #se a pessoa escolher municipio, baixar um estado de cada vez
 #funcao mae com para chamar cada nivel de agregacao
+
+"http://api.sidra.ibge.gov.br/values/t/1612/n6/all/v/all/p/2000,2002/c81/2702/f/u"
+#request <- GET("http://api.sidra.ibge.gov.br/values/t/1613/n3/all/u/y/v/all/p/all/c82/all/d/v1000215%202,v1000216%202,v1002313%202")
+#request$status_code
+#If API fails request will return non-200 status code
+
+#response <- content(request, as = "text", encoding = "UTF-8")
+
+#df <- fromJSON(response, flatten = TRUE) %>% 
+# data.frame()
+
+#col_names <- df[1,]
+#colnames(df) <- col_names
+#df = df[-1,]
+
+#choices = c("Brasil", "Grande Região", "Unidade da Federação", "Município")
+#nivter = dlgList(choices, multiple = FALSE, title = "Qual o nível territorial desejado?")$res
+
+#load_pam_permanent - COD tabela = 1613
