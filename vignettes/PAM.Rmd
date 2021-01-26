@@ -13,51 +13,27 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+## The Dataset
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
+Municipal Agricultural Production (PAM, in Portuguese) is a nationwide annual survey conducted by IBGE (Brazilian Institute of Geography and Statistics) which provides information on agricultural products, such as quantity produced, area planted and harvested, average quantity of output and monetary value of such output. The products area divided in permanent and temporary farmed land, as well as dedicated surveys to the four products that yield multiple harvests a year (beans, potato, peanut and corn), which in total survey 64 agricultural products (31 of temporary tillage and 33 of permanent tillage). Output, however, is only included in the dataset if the planted area occupies over 1 acre or if output exceeds one tonne. 
 
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
+Permanent farming is characterized by a cycle of long duration, whose harvests may be done  multiple times across the years without the need of planting seeds again. Temporary farming, on the other hand, consists of cycles of short and medium duration, which after harvesting require planting seeds again.
 
-## Vignette Info
+The data also has multiple aggregation levels, such as nationwide, by region, mesoregion and microregion, as well as state and municipality. 
 
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
+The data available has a yearly frequency and is available from 1974 to the present, with the exception of the four multiple-harvest products, which are only available from 2003. More information can be found on this link (only in Portuguese): https://www.ibge.gov.br/estatisticas/economicas/agricultura-e-pecuaria/9117-producao-agricola-municipal-culturas-temporarias-e-permanentes.html#:~:text=A%20pesquisa%20Produ%C3%A7%C3%A3o%20Agr%C3%ADcola%20Municipal,s%C3%A3o%20da%20cesta%20b%C3%A1sica%20do 
 
-## Styles
+##The Function
 
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
+The package contains of three function: \code{load_pam_permanent}, \code{load_pam_temporary} and \code{load_pam_main} which extracts data from the API of the IBGE database website. It allows the user to input the years he would like the data to encompass, the geographical aggregation level desired, as well as choosing the language of the data (currently only Portuguese and English are supported). 
 
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
+The output is a  dataframe containing data for the territorial level chosen, the name of such geogrpahic level, the year of the data, the variable in question, the unit of measurement and the value. Each column has a corresponding column containing the numerical code of the specific value the variable has, with the exception of the Value column, which is already numeric. 
 
-## Figures
+Using the function is easy enough:
 
-The figure sizes have been customised so that you can easily put two images side-by-side. 
+```{r setup}
+library(datazoom.amazonia)
 
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
+data <- load_pam_permanent(2017, aggregation_level = "state", language = "eng")
+
 ```
-
-You can enable figure captions by `fig_caption: yes` in YAML:
-
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
-
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
-```
-
-Also a quote using `>`:
-
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
