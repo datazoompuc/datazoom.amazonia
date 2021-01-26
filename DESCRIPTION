@@ -24,7 +24,11 @@ Imports:
     sidrar,
     tibble,
     stats,
-    readxl
+    readxl,
+    foreign,
+    lubridate,
+    stringi,
+    tidyr
 URL: http://www.econ.puc-rio.br/datazoom
 Suggests: 
     knitr,
