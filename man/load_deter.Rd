@@ -8,6 +8,7 @@
 load_deter(
   source = "amazonia",
   aggregation_level = "municipality",
+  time_aggregation = "year",
   language = "eng"
 )
 }
@@ -21,6 +22,8 @@ It can also be a path to a .zip file as is obtained from the INPE website, conta
 \item{aggregation_level}{A string that indicates the level of aggregation of the data. It can be by "Municipality", the default alternative, or
 also "State".}
 
+\item{time_aggregation}{A string defining whether data will be aggregated by "month" or by "year".}
+
 \item{language}{A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
 The other option is "pt" for Portuguese.}
 }
@@ -33,12 +36,13 @@ Loads and cleans INPE data on areas with deforestation warnings
 \examples{
 load_deter()
 \dontrun{
-load_deter("path/to/deter.zip", aggregation_level = "municipality")
+load_deter("path/to/deter.zip", aggregation_level = "municipality", time_aggregation = "year")
 }
 
 load_deter(
   source = "cerrado",
   aggregation_level = "state",
+  time_aggregation = "month",
   language = "pt"
 )
 }

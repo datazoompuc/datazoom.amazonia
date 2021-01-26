@@ -7,6 +7,7 @@ NULL
 #' @inheritParams load_deter_raw
 #' @param aggregation_level A string that indicates the level of aggregation of the data. It can be by "Municipality", the default alternative, or
 #'  also "State".
+#' @param time_aggregation A string defining whether data will be aggregated by "month" or by "year".
 #' @param language A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
 #'   The other option is "pt" for Portuguese.
 #'
@@ -22,18 +23,19 @@ NULL
 #' @examples
 #' load_deter()
 #' \dontrun{
-#' load_deter("path/to/deter.zip", aggregation_level = "municipality")
+#' load_deter("path/to/deter.zip", aggregation_level = "municipality", time_aggregation = "year")
 #' }
 #'
 #' load_deter(
 #'   source = "cerrado",
 #'   aggregation_level = "state",
+#'   time_aggregation = "month",
 #'   language = "pt"
 #' )
-load_deter <- function(source = "amazonia", aggregation_level = "municipality", language = "eng") {
+load_deter <- function(source = "amazonia", aggregation_level = "municipality", time_aggregation = "year", language = "eng") {
   df <- load_deter_raw(source)
 
-  treat_deter_data(df, aggregation_level, language)
+  treat_deter_data(df, aggregation_level, time_aggregation, language)
 }
 
 
@@ -104,7 +106,7 @@ load_deter_raw <- function(source = "amazonia") {
 }
 
 
-treat_deter_data <- function(df, aggregation_level, language) {
+treat_deter_data <- function(df, aggregation_level, time_aggregation, language) {
   stopifnot(tibble::is_tibble(df))
 
   aggregation_level <- tolower(aggregation_level)
@@ -134,7 +136,7 @@ treat_deter_data <- function(df, aggregation_level, language) {
       dplyr::distinct()
 
     # Adding IBGE municipality codes
-    # removing accents and umaking everything lower-case to match up the names
+    # removing accents and making everything lower-case to match up the names
     IBGE <- CodIBGE %>%
       dplyr::mutate(Municipio = stringi::stri_trans_general(.data$Municipio, "Latin-ASCII") %>% tolower()) %>%
       dplyr::mutate(CodUF = as.numeric(CodIBGE) %/% 100000)
@@ -158,10 +160,14 @@ treat_deter_data <- function(df, aggregation_level, language) {
       dplyr::select(-.data$Municipio)
   }
 
+  time_aggregation <- tolower(time_aggregation)
 
-
-
-
+  if (time_aggregation == "year") {
+    df <- df %>%
+      dplyr::ungroup(.data$Mes) %>%
+      dplyr::summarise(dplyr::across(-c(.data$Mes, .data$AREAUCKM,.data$AREAMUNKM)), AREAUCKM = sum(.data$AREAUCKM), AREAMUNKM = sum(.data$AREAMUNKM)) %>%
+      dplyr::distinct()
+  }
 
   df <- df %>%
     dplyr::rename_with(dplyr::recode,
@@ -180,7 +186,6 @@ treat_deter_data <- function(df, aggregation_level, language) {
     DESMATAMENTO_VEG = "Desmatamento com Vegetacao",
     MINERACAO = "Mineracao"
   )
-
 
   language <- tolower(language)
 

@@ -22,10 +22,10 @@ Areas are reported in square kilometers and informed as both the area which inte
 
 ## Usage
 
-```{r setup, eval = FALSE}
+```{r setup}
 library(datazoom.amazonia)
 
 load_deter("amazonia", aggregation_level = "municipality", language = "eng")
 ```
 
-Note that data extracted via 'load_deter_raw()' retains some additional information on the satellites used, as well as a variable saying which Conservation Unit was affected in each warning, if any.
+Note that data extracted via 'load_deter_raw()' retains some additional information on the satellites used on each observation, as well as a variable saying which Conservation Unit was affected in each warning, if any.
