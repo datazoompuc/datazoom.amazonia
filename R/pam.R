@@ -1,7 +1,5 @@
-#' @importFrom sidrar
-#' @importFrom tidyverse
-NULL
-
+#' @title PAM
+#'
 #' Loads agricultural data of permanent tillages from Brazil from 1974 to the present
 #'
 #' @param years A \code{vector} indicating what years will the data be loaded
@@ -18,25 +16,20 @@ NULL
 #'
 #' @export
 #'
-#' @examples load_pam_permanent(2013, aggregation_level = "country")
+#' @examples datazoom.amazonia::load_pam_permanent(2013, aggregation_level = "country")
 #'
-
-
-library(tidyverse)
-library(sidrar)
-
 
 load_pam_permanent <- function(years, aggregation_level = "country", language = "pt"){
   message("Depending on amount of items selected function may take time to run")
   sigla_uf = c(12,27,13,16,29,23,32,52,21,31,50,51,15,25,26,22,41,33,24,11,14,43,42,28,35,17)
-  
+
   if (language != "pt" && language != "eng"){
     warning("Language selected not supported! Proceding with Portuguese")
   }
-  
+
   df <- data.frame()
-  
-  if (aggregation_level = "country"){
+
+  if (aggregation_level == "country"){
     for (i in 1:length(years)){
       a <-toString(years[i])
       data <- sidrar::get_sidra(1613, period = a, geo = "Brazil")
@@ -48,8 +41,8 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
       "Value"
     )
   }
-  
-  if (aggregation_level = "region"){
+
+  if (aggregation_level == "region"){
     for (i in 1:length(years)){
       a <-toString(years[i])
       data <- sidrar::get_sidra(1613, period = a, geo = "Region")
@@ -61,8 +54,8 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
       "Value"
     )
   }
-  
-  if (aggregation_level = "state"){
+
+  if (aggregation_level == "state"){
     for (i in 1:length(years)){
       a <-toString(years[i])
       data <- sidrar::get_sidra(1613, period = a, geo = "State")
@@ -74,8 +67,8 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
       "Value"
     )
   }
-  
-  if (aggregation_level = "mesoregion"){
+
+  if (aggregation_level == "mesoregion"){
     for (i in 1:length(years)){
       a <-toString(years[i])
       data <- sidrar::get_sidra(1613, period = a, geo = "MesoRegion")
@@ -87,8 +80,8 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
       "Value"
     )
   }
-   
-  if (aggregation_level = "microregion"){
+
+  if (aggregation_level == "microregion"){
     for (i in 1:length(years)){
       a <-toString(years[i])
         for (s in sigla_uf){
@@ -102,8 +95,8 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
       "Value"
     )
   }
-  
-  if (aggregation_level = "city"){
+
+  if (aggregation_level == "city"){
     for (i in 1:length(years)){
       a <-toString(years[i])
       for (s in sigla_uf){
@@ -117,7 +110,7 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
       "Value"
     )
   }
-  
+
 }
 
 #' Loads agricultural data of temporary tillages from Brazil from 1974 to the present
@@ -136,20 +129,20 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
 #'
 #' @export
 #'
-#' @examples load_pam_temporary(2010, aggregation_level = "country")
+#' @examples datazoom.amazonia::load_pam_temporary(2010, aggregation_level = "country")
 #'
 
 load_pam_temporary <- function(years, aggregation_level = "country", language = "pt"){
   message("Depending on amount of items selected function may take time to run")
   sigla_uf = c(12,27,13,16,29,23,32,52,21,31,50,51,15,25,26,22,41,33,24,11,14,43,42,28,35,17)
-  
+
   if (language != "pt" && language != "eng"){
     warning("Language selected not supported! Proceding with Portuguese")
   }
-  
+
   df <- data.frame()
-  
-  if (aggregation_level = "country"){
+
+  if (aggregation_level == "country"){
     for (i in 1:length(years)){
       a <-toString(years[i])
       data <- sidrar::get_sidra(1612, period = a, geo = "Brazil")
@@ -161,8 +154,8 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
       "Value"
     )
   }
-  
-  if (aggregation_level = "region"){
+
+  if (aggregation_level == "region"){
     for (i in 1:length(years)){
       a <-toString(years[i])
       data <- sidrar::get_sidra(1612, period = a, geo = "Region")
@@ -174,8 +167,8 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
       "Value"
     )
   }
-  
-  if (aggregation_level = "state"){
+
+  if (aggregation_level == "state"){
     for (i in 1:length(years)){
       a <-toString(years[i])
       data <- sidrar::get_sidra(1612, period = a, geo = "State")
@@ -187,8 +180,8 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
       "Value"
     )
   }
-  
-  if (aggregation_level = "mesoregion"){
+
+  if (aggregation_level == "mesoregion"){
     for (i in 1:length(years)){
       a <-toString(years[i])
       data <- sidrar::get_sidra(1612, period = a, geo = "MesoRegion")
@@ -200,8 +193,8 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
       "Value"
     )
   }
-  
-  if (aggregation_level = "microregion"){
+
+  if (aggregation_level == "microregion"){
     for (i in 1:length(years)){
       a <-toString(years[i])
       for (s in sigla_uf){
@@ -215,8 +208,8 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
       "Value"
     )
   }
-  
-  if (aggregation_level = "city"){
+
+  if (aggregation_level == "city"){
     for (i in 1:length(years)){
       a <-toString(years[i])
       for (s in sigla_uf){
@@ -230,7 +223,7 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
       "Value"
     )
   }
-  
+
 }
 
 #' Loads agricultural data of four main tillages - corn, potato, peanut and beans - from Brazil from 2003 to the present
@@ -249,21 +242,21 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
 #'
 #' @export
 #'
-#' @examples load_pam_main(2007, aggregation_level = "country")
-#' 
+#' @examples datazoom.amazonia::load_pam_main(2007, aggregation_level = "country")
+#'
 #'
 
-load_pam_main <- function(years, aggregation_level = "country", "language" = "pt"){
+load_pam_main <- function(years, aggregation_level = "country", language = "pt"){
   message("Depending on amount of items selected function may take time to run")
   sigla_uf = c(12,27,13,16,29,23,32,52,21,31,50,51,15,25,26,22,41,33,24,11,14,43,42,28,35,17)
-  
+
   if (language != "pt" && language != "eng"){
     warning("Language selected not supported! Proceding with Portuguese")
   }
-  
+
   df <- data.frame()
-  
-  if (aggregation_level = "country"){
+
+  if (aggregation_level == "country"){
     for (i in 1:length(years)){
       a <-toString(years[i])
       corn <- sidrar::get_sidra(839, period = a, geo = "Brazil")
@@ -280,8 +273,8 @@ load_pam_main <- function(years, aggregation_level = "country", "language" = "pt
       "Variable", "Product of temporary tillage (Code)", "Product of temporary tillage", "Unit of measure (Code)", "Unit of measure",
       "Value")
   }
-  
-  if (aggregation_level = "region"){
+
+  if (aggregation_level == "region"){
     for (i in 1:length(years)){
       a <-toString(years[i])
       corn <- sidrar::get_sidra(839, period = a, geo = "Region")
@@ -299,8 +292,8 @@ load_pam_main <- function(years, aggregation_level = "country", "language" = "pt
       "Value"
     )
   }
-  
-  if (aggregation_level = "state"){
+
+  if (aggregation_level == "state"){
     for (i in 1:length(years)){
       a <-toString(years[i])
       corn <- sidrar::get_sidra(839, period = a, geo = "State")
@@ -318,8 +311,8 @@ load_pam_main <- function(years, aggregation_level = "country", "language" = "pt
       "Value"
     )
   }
-  
-  if (aggregation_level = "mesoregion"){
+
+  if (aggregation_level == "mesoregion"){
     for (i in 1:length(years)){
       a <-toString(years[i])
       corn <- sidrar::get_sidra(839, period = a, geo = "MesoRegion")
@@ -337,8 +330,8 @@ load_pam_main <- function(years, aggregation_level = "country", "language" = "pt
       "Value"
     )
   }
-  
-  if (aggregation_level = "microregion"){
+
+  if (aggregation_level == "microregion"){
     for (i in 1:length(years)){
       a <-toString(years[i])
       for (s in sigla_uf){
@@ -358,8 +351,8 @@ load_pam_main <- function(years, aggregation_level = "country", "language" = "pt
       "Value"
     )
   }
-  
-  if (aggregation_level = "city"){
+
+  if (aggregation_level == "city"){
     for (i in 1:length(years)){
       a <-toString(years[i])
       for (s in sigla_uf){
@@ -379,35 +372,5 @@ load_pam_main <- function(years, aggregation_level = "country", "language" = "pt
       "Value"
     )
   }
-  
+
 }
-#toString(anos[1])
-#df2 = get_sidra(1613, period = c("2017", "2018"), geo = "Brazil")
-
-#load_pam_temporary - COD tabela 1612
-
-#load_pam_main (fei;ao, mandioca, milho, arroz, soja e cana) - COD tabelas = 1613
-
-#aggregation_level BR GR UF ME MI MU
-#baixar um ano de cada vez
-#se a pessoa escolher municipio, baixar um estado de cada vez
-#funcao mae com para chamar cada nivel de agregacao
-
-"http://api.sidra.ibge.gov.br/values/t/1612/n6/all/v/all/p/2000,2002/c81/2702/f/u"
-#request <- GET("http://api.sidra.ibge.gov.br/values/t/1613/n3/all/u/y/v/all/p/all/c82/all/d/v1000215%202,v1000216%202,v1002313%202")
-#request$status_code
-#If API fails request will return non-200 status code
-
-#response <- content(request, as = "text", encoding = "UTF-8")
-
-#df <- fromJSON(response, flatten = TRUE) %>% 
-# data.frame()
-
-#col_names <- df[1,]
-#colnames(df) <- col_names
-#df = df[-1,]
-
-#choices = c("Brasil", "Grande Região", "Unidade da Federação", "Município")
-#nivter = dlgList(choices, multiple = FALSE, title = "Qual o nível territorial desejado?")$res
-
-#load_pam_permanent - COD tabela = 1613
