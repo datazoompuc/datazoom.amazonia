@@ -125,7 +125,7 @@ treat_deter_data = function(df, aggregation_level, language) {
   df <- df %>%
     dplyr::select(-c(.data$QUADRANT, .data$PATH_ROW, .data$SENSOR, .data$SATELLITE)) %>%
     dplyr::mutate(Ano = lubridate::year(.data$VIEW_DATE), Mes = lubridate::month(.data$VIEW_DATE)) %>%
-    tidyr::drop_na(MUNICIPALI)
+    tidyr::drop_na(.data$MUNICIPALI)
 
   if (!(aggregation_level %in% c("state", "municipality"))) {
     warning("Aggregation level not supported. Proceeding with municipality.")
@@ -135,7 +135,7 @@ treat_deter_data = function(df, aggregation_level, language) {
 
     df <- df %>%
       dplyr::select(-.data$MUNICIPALI, -.data$UC) %>%
-      dplyr::group_by(.data$UF, Ano, Mes, .data$CLASSNAME) %>%
+      dplyr::group_by(.data$UF, .data$Ano, .data$Mes, .data$CLASSNAME) %>%
       dplyr::summarise(dplyr::across(-c(.data$AREAUCKM, .data$AREAMUNKM, .data$VIEW_DATE)), AREAUCKM = sum(.data$AREAUCKM), AREAMUNKM = sum(.data$AREAMUNKM))
   }
 
@@ -143,19 +143,19 @@ treat_deter_data = function(df, aggregation_level, language) {
   else {
     df <- df %>%
       dplyr::select(-.data$UC) %>%
-      dplyr::group_by(.data$MUNICIPALI, Ano, Mes, .data$CLASSNAME) %>%
+      dplyr::group_by(.data$MUNICIPALI, .data$Ano, .data$Mes, .data$CLASSNAME) %>%
       dplyr::summarise(dplyr::across(-c(.data$AREAUCKM, .data$AREAMUNKM,.data$VIEW_DATE)), AREAUCKM = sum(.data$AREAUCKM), AREAMUNKM = sum(.data$AREAMUNKM)) %>%
       dplyr::distinct()
 
     #Adding IBGE municipality codes
     #removing accents and umaking everything lower-case to match up the names
-    IBGE <- datazoom.amazonia::CodIBGE %>%
-      dplyr::mutate(Municipio = stringi::stri_trans_general(Municipio, "Latin-ASCII")%>%tolower()) %>%
+    IBGE <- CodIBGE %>%
+      dplyr::mutate(Municipio = stringi::stri_trans_general(.data$Municipio, "Latin-ASCII")%>%tolower()) %>%
       dplyr::mutate(CodUF = as.numeric(CodIBGE) %/% 100000)
 
     IBGE <- IBGE %>%
-      dplyr::left_join(datazoom.amazonia::EstadosIBGE, by="CodUF") %>% #assigning state abbreviations to match INPE data
-      dplyr::select(-c(CodUF, Estado))
+      dplyr::left_join(EstadosIBGE, by="CodUF") %>% #assigning state abbreviations to match INPE data
+      dplyr::select(-c(.data$CodUF, .data$Estado))
 
     df <- df %>% dplyr::mutate(Municipio = stringi::stri_trans_general(.data$MUNICIPALI, "Latin-ASCII")%>% tolower())
 
@@ -167,7 +167,7 @@ treat_deter_data = function(df, aggregation_level, language) {
 
     df <- df %>%
       dplyr::left_join(IBGE, by=c("UF","Municipio")) %>%
-      dplyr::select(-Municipio)
+      dplyr::select(-.data$Municipio)
   }
 
 
