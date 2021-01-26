@@ -3,14 +3,14 @@
 \encoding{UTF-8}
 \name{load_deter_raw}
 \alias{load_deter_raw}
-\title{Loads INPE data on areas with deforestation warnings.}
+\title{Loads INPE data on areas with deforestation warnings}
 \usage{
-load_deter_raw(source)
+load_deter_raw(source = "amazonia")
 }
 \arguments{
 \item{source}{A string indicating where the data will be drawn from.
 
-It can be "Amazonia" or "Cerrado", in which case the data will be pulled from the INPE website for the corresponding biome.
+It can be "Amazonia" or "Cerrado", in which case the data will be pulled from the INPE website for the corresponding biome. Set to "Amazonia" by default.
 
 It can also be a path to a .zip file as is obtained from the INPE website, containing a file named "deter_public.dbf".}
 }
@@ -18,12 +18,16 @@ It can also be a path to a .zip file as is obtained from the INPE website, conta
 A \code{tibble}
 }
 \description{
-Loads INPE data on areas with deforestation warnings.
+Loads INPE data on areas with deforestation warnings
 }
 \examples{
-load_deter_raw("amazonia")
+load_deter_raw()
 
-load_deter_raw("C:\\\\...\\\\'deter'.zip")
+load_deter_raw("cerrado")
+
+\dontrun{
+load_deter_raw("path/to/deter.zip")
+}
 
 }
 \seealso{

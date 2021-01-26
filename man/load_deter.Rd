@@ -3,14 +3,18 @@
 \encoding{UTF-8}
 \name{load_deter}
 \alias{load_deter}
-\title{Loads and cleans INPE data on areas with deforestation warnings.}
+\title{Loads and cleans INPE data on areas with deforestation warnings}
 \usage{
-load_deter(source, aggregation_level = "municipality", language = "eng")
+load_deter(
+  source = "amazonia",
+  aggregation_level = "municipality",
+  language = "eng"
+)
 }
 \arguments{
 \item{source}{A string indicating where the data will be drawn from.
 
-It can be "Amazonia" or "Cerrado", in which case the data will be pulled from the INPE website for the corresponding biome.
+It can be "Amazonia" or "Cerrado", in which case the data will be pulled from the INPE website for the corresponding biome. Set to "Amazonia" by default.
 
 It can also be a path to a .zip file as is obtained from the INPE website, containing a file named "deter_public.dbf".}
 
@@ -24,12 +28,14 @@ The other option is "pt" for Portuguese.}
 A \code{tibble}.
 }
 \description{
-Loads and cleans INPE data on areas with deforestation warnings.
+Loads and cleans INPE data on areas with deforestation warnings
 }
 \examples{
-load_deter("amazonia")
+load_deter()
 
-load_deter("C:\\\\...\\\\'deter'.zip", aggregation_level = "municipality")
+\dontrun{
+load_deter("path/to/deter.zip", aggregation_level = "municipality")
+}
 
 load_deter(
 source = "cerrado",
