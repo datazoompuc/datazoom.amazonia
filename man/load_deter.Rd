@@ -32,17 +32,15 @@ Loads and cleans INPE data on areas with deforestation warnings
 }
 \examples{
 load_deter()
-
 \dontrun{
 load_deter("path/to/deter.zip", aggregation_level = "municipality")
 }
 
 load_deter(
-source = "cerrado",
-aggregation_level = "state",
-language = "pt"
+  source = "cerrado",
+  aggregation_level = "state",
+  language = "pt"
 )
-
 }
 \seealso{
 \link{load_deter_raw} for loading raw data.

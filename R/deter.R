@@ -21,23 +21,19 @@ NULL
 #'
 #' @examples
 #' load_deter()
-#'
-#'\dontrun{
+#' \dontrun{
 #' load_deter("path/to/deter.zip", aggregation_level = "municipality")
-#'}
+#' }
 #'
 #' load_deter(
-#' source = "cerrado",
-#' aggregation_level = "state",
-#' language = "pt"
+#'   source = "cerrado",
+#'   aggregation_level = "state",
+#'   language = "pt"
 #' )
-#'
-load_deter = function(source = "amazonia", aggregation_level = "municipality",  language = "eng") {
-
+load_deter <- function(source = "amazonia", aggregation_level = "municipality", language = "eng") {
   df <- load_deter_raw(source)
 
   treat_deter_data(df, aggregation_level, language)
-
 }
 
 
@@ -47,9 +43,9 @@ load_deter = function(source = "amazonia", aggregation_level = "municipality",  
 #'
 #' @param source A string indicating where the data will be drawn from.
 #'
-#'It can be "Amazonia" or "Cerrado", in which case the data will be pulled from the INPE website for the corresponding biome. Set to "Amazonia" by default.
+#' It can be "Amazonia" or "Cerrado", in which case the data will be pulled from the INPE website for the corresponding biome. Set to "Amazonia" by default.
 #'
-#'It can also be a path to a .zip file as is obtained from the INPE website, containing a file named "deter_public.dbf".
+#' It can also be a path to a .zip file as is obtained from the INPE website, containing a file named "deter_public.dbf".
 #'
 #' @return A \code{tibble}
 #'
@@ -64,26 +60,21 @@ load_deter = function(source = "amazonia", aggregation_level = "municipality",  
 #' load_deter_raw()
 #'
 #' load_deter_raw("cerrado")
-#'
 #' \dontrun{
 #' load_deter_raw("path/to/deter.zip")
 #' }
 #'
-load_deter_raw = function(source = "amazonia") {
-
-  if (tolower(source) %in% c("amazonia", "cerrado")){
-
+load_deter_raw <- function(source = "amazonia") {
+  if (tolower(source) %in% c("amazonia", "cerrado")) {
     if (tolower(source) == "amazonia") {
-
       source <- "amz"
-
     }
 
     url <- paste0("http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-", source, "/shape")
 
     temp <- tempfile(fileext = ".zip")
 
-    utils::download.file(url, temp, mode="wb")
+    utils::download.file(url, temp, mode = "wb")
 
     data <- utils::unzip(temp, "deter_public.dbf")
 
@@ -93,14 +84,13 @@ load_deter_raw = function(source = "amazonia") {
     Encoding(df$MUNICIPALI) <- "UTF-8"
 
     return(df)
-    }
-  #As the data is contained in a .zip file also containing other files, downloading to a tempfile provides a way to extract only the .dbf file we're interested in.
+  }
+  # As the data is contained in a .zip file also containing other files, downloading to a tempfile provides a way to extract only the .dbf file we're interested in.
 
 
   else if (file.exists(source)) {
-
-    df <- foreign::read.dbf(utils::unzip(source, "deter_public.dbf")) %>% #If source is a valid path, the data is just pulled from there.
-        tibble::as_tibble()
+    df <- foreign::read.dbf(utils::unzip(source, "deter_public.dbf")) %>% # If source is a valid path, the data is just pulled from there.
+      tibble::as_tibble()
 
     Encoding(df$MUNICIPALI) <- "UTF-8"
 
@@ -108,16 +98,13 @@ load_deter_raw = function(source = "amazonia") {
   }
 
 
-  else{
-
+  else {
     warning("Invalid source.")
-
   }
 }
 
 
-treat_deter_data = function(df, aggregation_level, language) {
-
+treat_deter_data <- function(df, aggregation_level, language) {
   stopifnot(tibble::is_tibble(df))
 
   aggregation_level <- tolower(aggregation_level)
@@ -131,8 +118,7 @@ treat_deter_data = function(df, aggregation_level, language) {
     warning("Aggregation level not supported. Proceeding with municipality.")
   }
 
-  else if (aggregation_level=="state"){
-
+  else if (aggregation_level == "state") {
     df <- df %>%
       dplyr::select(-.data$MUNICIPALI, -.data$UC) %>%
       dplyr::group_by(.data$UF, .data$Ano, .data$Mes, .data$CLASSNAME) %>%
@@ -144,29 +130,31 @@ treat_deter_data = function(df, aggregation_level, language) {
     df <- df %>%
       dplyr::select(-.data$UC) %>%
       dplyr::group_by(.data$MUNICIPALI, .data$Ano, .data$Mes, .data$CLASSNAME) %>%
-      dplyr::summarise(dplyr::across(-c(.data$AREAUCKM, .data$AREAMUNKM,.data$VIEW_DATE)), AREAUCKM = sum(.data$AREAUCKM), AREAMUNKM = sum(.data$AREAMUNKM)) %>%
+      dplyr::summarise(dplyr::across(-c(.data$AREAUCKM, .data$AREAMUNKM, .data$VIEW_DATE)), AREAUCKM = sum(.data$AREAUCKM), AREAMUNKM = sum(.data$AREAMUNKM)) %>%
       dplyr::distinct()
 
-    #Adding IBGE municipality codes
-    #removing accents and umaking everything lower-case to match up the names
+    # Adding IBGE municipality codes
+    # removing accents and umaking everything lower-case to match up the names
     IBGE <- CodIBGE %>%
-      dplyr::mutate(Municipio = stringi::stri_trans_general(.data$Municipio, "Latin-ASCII")%>%tolower()) %>%
+      dplyr::mutate(Municipio = stringi::stri_trans_general(.data$Municipio, "Latin-ASCII") %>% tolower()) %>%
       dplyr::mutate(CodUF = as.numeric(CodIBGE) %/% 100000)
 
     IBGE <- IBGE %>%
-      dplyr::left_join(EstadosIBGE, by="CodUF") %>% #assigning state abbreviations to match INPE data
+      dplyr::left_join(EstadosIBGE, by = "CodUF") %>% # assigning state abbreviations to match INPE data
       dplyr::select(-c(.data$CodUF, .data$Estado))
 
-    df <- df %>% dplyr::mutate(Municipio = stringi::stri_trans_general(.data$MUNICIPALI, "Latin-ASCII")%>% tolower())
+    df <- df %>% dplyr::mutate(Municipio = stringi::stri_trans_general(.data$MUNICIPALI, "Latin-ASCII") %>% tolower())
 
-    #cities with names spelt two different ways in the datasets:
-    df$Municipio <- df$Municipio %>% dplyr::recode('eldorado dos carajas' = "eldorado do carajas",
-                                                   'poxoreo' = "poxoreu",
-                                                   'santa isabel do para' = "santa izabel do para")
+    # cities with names spelt two different ways in the datasets:
+    df$Municipio <- df$Municipio %>% dplyr::recode(
+      "eldorado dos carajas" = "eldorado do carajas",
+      "poxoreo" = "poxoreu",
+      "santa isabel do para" = "santa izabel do para"
+    )
 
 
     df <- df %>%
-      dplyr::left_join(IBGE, by=c("UF","Municipio")) %>%
+      dplyr::left_join(IBGE, by = c("UF", "Municipio")) %>%
       dplyr::select(-.data$Municipio)
   }
 
@@ -177,30 +165,29 @@ treat_deter_data = function(df, aggregation_level, language) {
 
   df <- df %>%
     dplyr::rename_with(dplyr::recode,
-
-                       CLASSNAME = "Classe",
-                       AREAUCKM = "Area_em_UC_km2",
-                       AREAMUNKM = "Area_em_Municipio_km2",
-                       MUNICIPALI = "Municipio",
-
+      CLASSNAME = "Classe",
+      AREAUCKM = "Area_em_UC_km2",
+      AREAMUNKM = "Area_em_Municipio_km2",
+      MUNICIPALI = "Municipio",
     )
 
-  df$Classe <- df$Classe %>% dplyr::recode(CICATRIZ_DE_QUEIMADA = "Cicatriz de Queimada",
-                              CS_DESORDENADO = "Corte Seletivo Desordenado",
-                              CS_GEOMETRICO = "Corte Seletivo Geometrico",
-                              DEGRADACAO = "Degradacao",
-                              DESMATAMENTO_CR = "Desmatamento Corte Raso",
-                              DESMATAMENTO_VEG = "Desmatamento com Vegetacao",
-                              MINERACAO = "Mineracao"
-                              )
+  df$Classe <- df$Classe %>% dplyr::recode(
+    CICATRIZ_DE_QUEIMADA = "Cicatriz de Queimada",
+    CS_DESORDENADO = "Corte Seletivo Desordenado",
+    CS_GEOMETRICO = "Corte Seletivo Geometrico",
+    DEGRADACAO = "Degradacao",
+    DESMATAMENTO_CR = "Desmatamento Corte Raso",
+    DESMATAMENTO_VEG = "Desmatamento com Vegetacao",
+    MINERACAO = "Mineracao"
+  )
 
 
   language <- tolower(language)
 
-  if(language == "eng") {
+  if (language == "eng") {
     df <- translate_deter_to_english(df)
   }
-  else if(language != "pt"){
+  else if (language != "pt") {
     warning("Selected language not supported. Proceeding with Portuguese.")
   }
 
@@ -210,30 +197,26 @@ treat_deter_data = function(df, aggregation_level, language) {
 
 
 translate_deter_to_english <- function(df) {
-
-  df$Classe <- df$Classe %>% dplyr::recode('Cicatriz de Queimada' = "Fire Scar",
-                                          'Corte Seletivo Desordenado' = "Unorganized Selection Cutting",
-                                          'Corte Seletivo Geometrico' = "Geometric Selection Cutting",
-                                          'Degradacao' = "Degradation",
-                                          'Desmatamento Corte Raso' = "Clear Cut Deforestation",
-                                          'Desmatamento com Vegetacao' = "Vegetation Remains Deforestation",
-                                          'Mineracao' = "Mining",
-                                          'aviso' = "Warning"
-                                          )
+  df$Classe <- df$Classe %>% dplyr::recode(
+    "Cicatriz de Queimada" = "Fire Scar",
+    "Corte Seletivo Desordenado" = "Unorganized Selection Cutting",
+    "Corte Seletivo Geometrico" = "Geometric Selection Cutting",
+    "Degradacao" = "Degradation",
+    "Desmatamento Corte Raso" = "Clear Cut Deforestation",
+    "Desmatamento com Vegetacao" = "Vegetation Remains Deforestation",
+    "Mineracao" = "Mining",
+    "aviso" = "Warning"
+  )
 
 
   df <- df %>%
     dplyr::rename_with(dplyr::recode,
-
-                       Classe = "Class",
-                       UC = "ConservationUnit",
-                       Area_em_UC_km2 = "Area_in_CU_km2",
-                       Area_em_Municipio_km2 = "Area_in_Municipality_km2",
-                       Municipio = "Municipality",
-                       Mes = "Month",
-                       Ano = "Year"
-
+      Classe = "Class",
+      UC = "ConservationUnit",
+      Area_em_UC_km2 = "Area_in_CU_km2",
+      Area_em_Municipio_km2 = "Area_in_Municipality_km2",
+      Municipio = "Municipality",
+      Mes = "Month",
+      Ano = "Year"
     )
-
-
 }
