@@ -7,7 +7,7 @@
 load_gdp(years, aggregation_level = "municipality", language = "eng")
 }
 \arguments{
-\item{years}{A numeric vector with years of interest. Supported years are 2002-2017.}
+\item{years}{A numeric vector with years of interest. Supported years 2002-2017 for GDP data and 2001-2009, 2011-present for population data.}
 
 \item{aggregation_level}{A string that indicates the level of aggregation of the data. It can be by "Municipality" or
 "State"}
