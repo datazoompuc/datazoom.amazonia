@@ -52,8 +52,8 @@ load_IPS_data <- function(download_directory, language = 'english'){
   ########
    labels <- tibble::tribble(
       ~original_name, ~new_pt.br, ~new_eng,
-      'Código IBGE do município', 'Código IBGE do município', 'IBGE city code',
-      'Município', '', 'City',
+      'Codigo IBGE do municipio', 'Codigo IBGE do municipio', 'IBGE city code',
+      'Municipio', '', 'City',
       'Estado', 'UF', 'State',
       'IPS', 'Índice de progresso social', 'Social progress index',
       'Necessidades Humanas Básicas', '', 'Basic human needs',
@@ -167,9 +167,9 @@ load_IPS_data <- function(download_directory, language = 'english'){
 
   df <- dplyr::bind_rows(raw.data[[1]],
                          raw.data[[2]]) %>%
-    dplyr::relocate(.data$`Código IBGE do município`, .data$Município,
+    dplyr::relocate(.data$`Codigo IBGE do municipio`, .data$Municipio,
                     .data$Estado, .data$Ano, dplyr::everything()) %>%
-    dplyr::filter(.data$`Código IBGE do município` %in% legal_amazon$CD_MUN)
+    dplyr::filter(.data$`Codigo IBGE do municipio` %in% legal_amazon$CD_MUN)
 
 
     if(language == 'portuguese'){
