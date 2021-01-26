@@ -1,6 +1,32 @@
 
-#' @importFrom rlang .data
 #' @importFrom dplyr %>%
+#' @importFrom rlang .data
+
+NULL
+
+
+#' Compiles information on the indicators part of  the Social Progress Index (SPI) for
+#' the Amazon region
+#'
+#' The original data and more information on the construction of the indicator
+#' can be found \href{http://www.ipsamazonia.org.br/}{here}
+#'
+#' @name load_IPS_data
+#' @encoding UTF-8
+#' @param download_directory Directory where raw data should be stored.
+#' @param language Language used in returned dataset. Use \code{language = "portuguese"} or
+#' \code{language = "english"}. Defaults to English.
+#' @return A data frame with information on the 60+ indicators part of the Social
+#' Progress Index (SPI) for 2014 and 2018 considering municipalities part of the Legal
+#' Amazon Region
+#' @examples
+#'
+#' load_IPS_data(
+#'   download_directory = getwd(),
+#'   language = "portuguese"
+#' )
+#'
+#' @export
 
 
 
@@ -17,13 +43,19 @@ load_IPS_data <- function(download_directory, language = 'english'){
                   readxl::read_excel(file.path(download_directory,'IPS.xlsx'), sheet = .)
                 )
 
-    col.names.eng <- tibble::tribble(
+
+  col.names <- data.frame(
+    portuguese = c('cod_municipio', 'municipio', 'uf', 'ano', 'IPS', paste0('V', 1:58)),
+    english = c('city_code', 'city', 'state', 'year', 'SPI', paste0('V', 1:58))
+    )
+
+  ########
+   labels <- tibble::tribble(
       ~original_name, ~new_pt.br, ~new_eng,
-      'IBGEDados', 'cod_municipio', 'city_code',
-      'Município', 'municipio', 'city',
-      'Estado', 'uf', 'state',
-      'ano', 'ano', 'year',
-      'Índice de progresso social', 'IPS', 'SPI',
+      'Código IBGE do município', 'Código IBGE do município', 'IBGE city code',
+      'Município', '', 'City',
+      'Estado', 'UF', 'State',
+      'IPS', 'Índice de progresso social', 'Social progress index',
       'Necessidades Humanas Básicas', '', 'Basic human needs',
       'Fundamentos para o Bem-Estar', '', 'Well-being fundamentals',
       'Oportunidades', '', 'Opportunities',
@@ -122,28 +154,49 @@ load_IPS_data <- function(download_directory, language = 'english'){
       "Frequência ao ensino superior (% da população entre 18-24 anos)", "",
       "Attendance to higher education (% of population aged 18-24)",
       "Pessoas com ensino superior (% da população com mais de 25 anos)", "",
-      "People with higher education (% of population aged 25+)"
+      "People with higher education (% of population aged 25+)",
+      'Ano', 'Ano', 'Year',
     )
+#######
+
+  raw.data[[1]]$Ano <- 2018
+  raw.data[[2]]$Ano <- 2014
+
+  colnames(raw.data[[1]]) <- labels$original_name
+  colnames(raw.data[[2]]) <- labels$original_name
+
+  df <- dplyr::bind_rows(raw.data[[1]],
+                         raw.data[[2]]) %>%
+    dplyr::relocate(.data$`Código IBGE do município`, .data$Município,
+                    .data$Estado, .data$Ano, dplyr::everything()) %>%
+    dplyr::filter(.data$`Código IBGE do município` %in% legal_amazon$CD_MUN)
 
 
-    raw.data[[1]]$ano <- 2018
-    raw.data[[2]]$ano <- 2014
+    if(language == 'portuguese'){
+
+    labels_key <- as.list(colnames(df)) %>%
+        stats::setNames(colnames(df))
+
+    df <- df %>%
+      labelled::set_variable_labels(.labels = labels_key)
+
+    colnames(df) <- col.names$portuguese
 
 
+    } else{
 
-    colnames(raw.data[[1]]) <- col.names.eng[ ,1]
-    colnames(raw.data[[2]]) <- col.names.eng[, 1]
+    labels_key <- as.list(labels$new_eng) %>%
+      stats::setNames(labels$original_name)
 
+    df <- df %>%
+      labelled::set_variable_labels(.labels = labels_key)
 
-    df <- dplyr::bind_rows(raw.data[[1]], raw.data[[2]]) %>%
-      dplyr::filter(cod_municipio %in% CD_MUN) %>%
-      janitor::clean_names()
+    colnames(df) <- col.names$english
 
+    }
  return(df)
 }
 
-x <- load_IPS(download_directory = 'C:/users/arthu/Desktop')
 
 
-load_IPS_data_dictionary <- function(download_directory)
 
