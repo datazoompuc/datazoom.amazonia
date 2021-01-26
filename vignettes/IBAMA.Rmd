@@ -52,7 +52,7 @@ load_ibama(
   )
 ```
 
-To load previously download raw data, set ```download_data = FALSE``` and specify the
+To load previously downloaded raw data, set ```download_data = FALSE``` and specify the
 file's path with the parameter ```load_from_where```. If ```language = 'portuguese```, use 
 ```geographic_unit = c('municipio', 'uf')``` and ```time_unit = c('ano', 'mes')``` instead:
 
