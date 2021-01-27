@@ -10,4 +10,4 @@
 * Added functions for COMEX data 
 
 # datazoom.amazonia 0.5.0.9000
-* Added functions for Ibama data 
+* Added functions for MAPBIOMAS data 
