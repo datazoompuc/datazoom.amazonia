@@ -7,7 +7,7 @@
 \usage{
 load_deter(
   source = "amazonia",
-  aggregation_level = "municipality",
+  space_aggregation = "municipality",
   time_aggregation = "year",
   language = "eng"
 )
@@ -19,8 +19,8 @@ It can be "Amazonia" or "Cerrado", in which case the data will be pulled from th
 
 It can also be a path to a .zip file as is obtained from the INPE website, containing a file named "deter_public.dbf".}
 
-\item{aggregation_level}{A string that indicates the level of aggregation of the data. It can be by "Municipality", the default alternative, or
-also "State".}
+\item{space_aggregation}{A string indicating if you want the data aggregated by "Municipality", the default alternative, or
+by "State".}
 
 \item{time_aggregation}{A string defining whether data will be aggregated by "month" or by "year".}
 
@@ -36,12 +36,12 @@ Loads and cleans INPE data on areas with deforestation warnings
 \examples{
 load_deter()
 \dontrun{
-load_deter("path/to/deter.zip", aggregation_level = "municipality", time_aggregation = "year")
+load_deter("path/to/deter.zip", space_aggregation = "municipality", time_aggregation = "year")
 }
 
 load_deter(
   source = "cerrado",
-  aggregation_level = "state",
+  space_aggregation = "state",
   time_aggregation = "month",
   language = "pt"
 )

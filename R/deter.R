@@ -5,8 +5,8 @@ NULL
 #' Loads and cleans INPE data on areas with deforestation warnings
 #'
 #' @inheritParams load_deter_raw
-#' @param aggregation_level A string that indicates the level of aggregation of the data. It can be by "Municipality", the default alternative, or
-#'  also "State".
+#' @param space_aggregation A string indicating if you want the data aggregated by "Municipality", the default alternative, or
+#'  by "State".
 #' @param time_aggregation A string defining whether data will be aggregated by "month" or by "year".
 #' @param language A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
 #'   The other option is "pt" for Portuguese.
@@ -23,19 +23,19 @@ NULL
 #' @examples
 #' load_deter()
 #' \dontrun{
-#' load_deter("path/to/deter.zip", aggregation_level = "municipality", time_aggregation = "year")
+#' load_deter("path/to/deter.zip", space_aggregation = "municipality", time_aggregation = "year")
 #' }
 #'
 #' load_deter(
 #'   source = "cerrado",
-#'   aggregation_level = "state",
+#'   space_aggregation = "state",
 #'   time_aggregation = "month",
 #'   language = "pt"
 #' )
-load_deter <- function(source = "amazonia", aggregation_level = "municipality", time_aggregation = "year", language = "eng") {
+load_deter <- function(source = "amazonia", space_aggregation = "municipality", time_aggregation = "year", language = "eng") {
   df <- load_deter_raw(source)
 
-  treat_deter_data(df, aggregation_level, time_aggregation, language)
+  treat_deter_data(df, space_aggregation, time_aggregation, language)
 }
 
 
@@ -106,21 +106,21 @@ load_deter_raw <- function(source = "amazonia") {
 }
 
 
-treat_deter_data <- function(df, aggregation_level, time_aggregation, language) {
+treat_deter_data <- function(df, space_aggregation, time_aggregation, language) {
   stopifnot(tibble::is_tibble(df))
 
-  aggregation_level <- tolower(aggregation_level)
+  space_aggregation <- tolower(space_aggregation)
 
   df <- df %>%
     dplyr::select(-c(.data$QUADRANT, .data$PATH_ROW, .data$SENSOR, .data$SATELLITE)) %>%
     dplyr::mutate(Ano = lubridate::year(.data$VIEW_DATE), Mes = lubridate::month(.data$VIEW_DATE)) %>%
     tidyr::drop_na(.data$MUNICIPALI)
 
-  if (!(aggregation_level %in% c("state", "municipality"))) {
+  if (!(space_aggregation %in% c("state", "municipality"))) {
     warning("Aggregation level not supported. Proceeding with municipality.")
   }
 
-  else if (aggregation_level == "state") {
+  else if (space_aggregation == "state") {
     df <- df %>%
       dplyr::select(-.data$MUNICIPALI, -.data$UC) %>%
       dplyr::group_by(.data$UF, .data$Ano, .data$Mes, .data$CLASSNAME) %>%
