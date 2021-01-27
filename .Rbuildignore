@@ -4,3 +4,5 @@
 ^\.travis\.yml$
 ^data-raw$
 ^\.github$
+^doc$
+^Meta$
