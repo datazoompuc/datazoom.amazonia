@@ -3,7 +3,7 @@ title: "DETER"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{DETER}
-  %\VignetteEngine{knitr::knitr}
+  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
