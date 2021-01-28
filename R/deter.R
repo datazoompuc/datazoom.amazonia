@@ -78,10 +78,14 @@ load_deter_raw <- function(source = "amazonia") {
 
     utils::download.file(url, temp, mode = "wb")
 
-    data <- utils::unzip(temp, "deter_public.dbf")
+    dir <- tempdir()
 
-    df <- foreign::read.dbf(data, as.is = TRUE) %>%
+    utils::unzip(temp, "deter_public.dbf", exdir = dir)
+
+    df <- foreign::read.dbf(paste(dir, "deter_public.dbf", sep="/"), as.is = TRUE) %>%
       tibble::as_tibble()
+
+    unlink(temp)
 
     Encoding(df$MUNICIPALI) <- "UTF-8"
 
