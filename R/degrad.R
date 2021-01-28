@@ -116,17 +116,6 @@ treat_degrad_data <- function(df, aggregation_level, language, geo_amazon) {
   message("Processing data. This should take a few minutes.")
   # Clean
   names(df) <- tolower(names(df))
-  df[grep(df$class_name, pattern = "degrad[^_]", ignore.case = TRUE), ]$class_name <- "DEGRAD"
-
-  # Insert CRS
-  if(is.na(sf::st_crs(df))) {
-    data_crs <- sf::st_crs("+proj=longlat +ellps=aust_SA +towgs84=-66.8700,4.3700,-38.5200,0.0,0.0,0.0,0.0 +no_defs")
-    sf::st_crs(df) <- data_crs
-  }
-
-  operation_crs <- sf::st_crs("+proj=poly +lat_0=0 +lon_0=-54 +x_0=5000000 +y_0=10000000 +ellps=aust_SA +units=m +no_defs")
-  df <- sf::st_make_valid(sf::st_transform(df, operation_crs))
-  geo_amazon <- sf::st_transform(geo_amazon, operation_crs)
 
   # Extract date
   if(grepl(df$class_name[1], pattern = "\\d{4}$")) {
@@ -143,6 +132,18 @@ treat_degrad_data <- function(df, aggregation_level, language, geo_amazon) {
   }
   df$Ano <- year
   df$Mes <- month
+
+  df[grep(df$class_name, pattern = "degrad[^_]", ignore.case = TRUE), ]$class_name <- "DEGRAD"
+
+  # Insert CRS
+  if(is.na(sf::st_crs(df))) {
+    data_crs <- sf::st_crs("+proj=longlat +ellps=aust_SA +towgs84=-66.8700,4.3700,-38.5200,0.0,0.0,0.0,0.0 +no_defs")
+    sf::st_crs(df) <- data_crs
+  }
+
+  operation_crs <- sf::st_crs("+proj=poly +lat_0=0 +lon_0=-54 +x_0=5000000 +y_0=10000000 +ellps=aust_SA +units=m +no_defs")
+  df <- sf::st_make_valid(sf::st_transform(df, operation_crs))
+  geo_amazon <- sf::st_transform(geo_amazon, operation_crs)
 
   # Municipalize
   sf::st_agr(df) = "constant"
