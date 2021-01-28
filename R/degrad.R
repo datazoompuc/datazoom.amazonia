@@ -44,7 +44,8 @@ load_degrad <- function(source, aggregation_level = "municipality", language = "
   raw_list <- load_degrad_raw(source)
 
   message("Downloading map data.")
-  geo_br <- purrr::insistently(geobr::read_municipality)(year = 2019, simplified = FALSE) # 2019 relates to the definition of legal_amazon
+  rate <- purrr::rate_backoff(max_times = 10)
+  geo_br <- purrr::insistently(geobr::read_municipality, rate = rate)(year = 2019, simplified = FALSE) # 2019 relates to the definition of legal_amazon
   geo_amazon <- dplyr::filter(geo_br, .data$code_muni %in% legal_amazon$CD_MUN)
 
   list_df <- lapply(raw_list, treat_degrad_data, aggregation_level = aggregation_level, language = language, geo_amazon = geo_amazon)
