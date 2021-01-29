@@ -6,7 +6,6 @@ Authors@R: c(
     person("Victor", "Aliende da Matta", role = c("aut"), email = "victor.al.matta@gmail.com"),
     person("Maria", "Mittelbach", role = c("aut"), email = "mariamittelbach@gmail.com"),
     person("Arthur", "Carvalho Brito", role = c("aut"), email = "arthurcbps@gmail.com"),
-    person("Anna Carolina", "Dutra Saraiva", role = c("aut"), email = "annadutrasaraiva@gmail.com")
     person("Anna Carolina", "Dutra Saraiva", role = c("aut"), email = "annadutrasaraiva@gmail.com"),
     person("Bruno", "Alcantara Duarte", role = c("aut"), email = "brunoalcanduarte@gmail.com")
     )
@@ -35,4 +34,4 @@ Suggests:
     rmarkdown
 VignetteBuilder: knitr
 Depends: 
-    R (>= 2.10)
+    R (>= 4.0)
