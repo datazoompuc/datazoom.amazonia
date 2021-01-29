@@ -26,7 +26,8 @@ Imports:
     sidrar,
     magrittr,
     tibble,
-    stats
+    stats,
+    readxl
 URL: http://www.econ.puc-rio.br/datazoom
 Suggests: 
     knitr,
