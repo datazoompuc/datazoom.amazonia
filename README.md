@@ -5,6 +5,7 @@ datazoom.amazonia is an R package that facilitates access to official data regar
 * MDIC - Comex: exports and imports by municipality or state
 * IBGE - PIB-Munic: gdp by municipality
 * MAPBIOMAS: land covering by municipality or state
+* IBAMA: environmental fines and infractions by municipality or state
 
 <!-- badges: start -->
 [![R build status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions)
@@ -63,6 +64,17 @@ data <- load_mapbiomas_transicao(code_state = "PA", covering_from = 3, covering_
 data <- load_mapbiomas_cobertura("~/Downloads")
 
 data <- load_mapbiomas_transicao("~/Downloads")
+
+##IBAMA
+
+data <- load_ibama(
+  download_data = TRUE, 
+  download_directory = './Desktop',
+  time_unit = c('month', 'year'),
+  geographic_unit = c('city', 'state'),
+  years = c(2010, 2012),
+  language = "eng"
+  )
 
 ```
 
