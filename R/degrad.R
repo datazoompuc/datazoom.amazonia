@@ -11,6 +11,7 @@ NULL
 #'   "Year".
 #' @param language A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
 #'   The other option is "pt" for Portuguese.
+#' @param all_events Set to TRUE if you want non-degradation data from the DEGRAD project.
 #' @return A \code{tibble}.
 #'
 #' @seealso [load_degrad_raw] for loading raw data.
@@ -43,19 +44,17 @@ NULL
 #'   language = "pt"
 #' )
 #' }
-load_degrad <- function(source, space_aggregation = "municipality", time_aggregation = "year", language = "eng") {
+load_degrad <- function(source, space_aggregation = "municipality", time_aggregation = "year", language = "eng", all_events = FALSE) {
   raw_list <- load_degrad_raw(source)
 
-  message("Downloading map data.")
-  geo_br <- geobr::read_municipality(year = 2019, simplified = FALSE) # 2019 relates to the definition of legal_amazon
-  geo_amazon <- dplyr::filter(geo_br, .data$code_muni %in% legal_amazon$CD_MUN)
+  geo_amazon <- download_map()
 
-  list_df <- lapply(raw_list, treat_degrad_data, space_aggregation = space_aggregation, time_aggregation = time_aggregation, language = language, geo_amazon = geo_amazon)
+  list_df <- lapply(raw_list, treat_degrad_data, space_aggregation = space_aggregation, time_aggregation = time_aggregation, language = language, geo_amazon = geo_amazon, filter = !all_events)
 
   dplyr::bind_rows(list_df)
 }
 
-#' Loads degradation data from INPE.
+#' Loads DEGRAD data from INPE.
 #'
 #' @param source A number of different sources are supported:
 #'
@@ -110,15 +109,25 @@ load_degrad_raw <- function(source) {
   suppressWarnings(lapply(source, sf::read_sf))
 }
 
+download_map <- function() {
+  message("Downloading map data.")
+  geo_br <- geobr::read_municipality(year = 2019, simplified = FALSE) # 2019 relates to the definition of legal_amazon
+  dplyr::filter(geo_br, .data$code_muni %in% legal_amazon$CD_MUN)
+}
+
 find_from_dir <- function(dir) {
   list.files(path = dir, full.names = TRUE) %>%
     grep(pattern = "\\.shp", value = TRUE)
 }
 
-treat_degrad_data <- function(df, space_aggregation, time_aggregation, language, geo_amazon) {
+treat_degrad_data <- function(df, space_aggregation, time_aggregation, language, geo_amazon, filter) {
   message("Processing data. This should take a few minutes.")
   # Clean
   names(df) <- tolower(names(df))
+
+  if(filter) {
+    df <- dplyr::filter(df, grepl("degrad", .data$class_name, ignore.case = TRUE))
+  }
 
   # Extract date
   if(grepl(df$class_name[1], pattern = "\\d{4}$")) {
@@ -182,6 +191,10 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
   }
   else if (time_aggregation != "month") {
     warning("Temporal aggregation level not supported. Proceeding with Month.")
+  }
+
+  if(filter) {
+    df <- dplyr::ungroup(df, .data$class_name)
   }
 
   df <- df %>%
