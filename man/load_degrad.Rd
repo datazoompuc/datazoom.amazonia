@@ -9,7 +9,8 @@ load_degrad(
   source,
   space_aggregation = "municipality",
   time_aggregation = "year",
-  language = "eng"
+  language = "eng",
+  all_events = FALSE
 )
 }
 \arguments{
@@ -29,6 +30,8 @@ Alternatively, \code{source} may be a list of full file paths, or anything else 
 
 \item{language}{A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
 The other option is "pt" for Portuguese.}
+
+\item{all_events}{Set to TRUE if you want non-degradation data from the DEGRAD project.}
 }
 \value{
 A \code{tibble}.

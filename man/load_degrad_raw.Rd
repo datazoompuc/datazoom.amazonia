@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{load_degrad_raw}
 \alias{load_degrad_raw}
-\title{Loads degradation data from INPE.}
+\title{Loads DEGRAD data from INPE.}
 \usage{
 load_degrad_raw(source)
 }
@@ -20,7 +20,7 @@ Alternatively, \code{source} may be a list of full file paths, or anything else 
 A list of \code{tibble}.
 }
 \description{
-Loads degradation data from INPE.
+Loads DEGRAD data from INPE.
 }
 \examples{
 load_degrad_raw(2016)
