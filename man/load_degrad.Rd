@@ -5,7 +5,12 @@
 \alias{load_degrad}
 \title{Loads and cleans degradation data from INPE.}
 \usage{
-load_degrad(source, aggregation_level = "municipality", language = "eng")
+load_degrad(
+  source,
+  space_aggregation = "municipality",
+  time_aggregation = "year",
+  language = "eng"
+)
 }
 \arguments{
 \item{source}{A number of different sources are supported:
@@ -16,8 +21,11 @@ Passing a \code{string} with a directory's path will read data from all shapefil
 
 Alternatively, \code{source} may be a list of full file paths, or anything else readable by \code{sf::read_sf()}.}
 
-\item{aggregation_level}{A string that indicates the level of aggregation of the data. It can be by "Municipality" or
+\item{space_aggregation}{A string that indicates the level of spatial aggregation of the data. It can be by "Municipality" or
 "State".}
+
+\item{time_aggregation}{A string that indicates the level of temporal aggregation of the data. It can be by "Month" or
+"Year".}
 
 \item{language}{A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
 The other option is "pt" for Portuguese.}
@@ -33,20 +41,21 @@ load_degrad(2016)
 
 load_degrad(
   c(2015, 2016),
-  aggregation_level = "state",
+  space_aggregation = "state",
   language = "pt"
 )
 
 \dontrun{
 load_degrad(
   "~/Downloads",
-  aggregation_level = "state",
+  space_aggregation = "state",
+  time_aggregation = "year",
   language = "en"
 )
 
 load_degrad(
   "~/Downloads/degrad2016_final_shp/DEGRAD_2016_pol.shp",
-  aggregation_level = "municipality",
+  time_aggregation = "municipality",
   language = "pt"
 )
 }

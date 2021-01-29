@@ -30,5 +30,5 @@ years <- c(2014:2016)
 
 data <- load_degrad_raw(years)
 
-data <- load_degrad(2016, aggregation_level = "state", language = "pt")
+data <- load_degrad(2016, time_aggregation = "year", space_aggregation = "state", language = "pt")
 ```

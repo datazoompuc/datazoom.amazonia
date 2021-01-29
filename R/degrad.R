@@ -5,8 +5,10 @@ NULL
 #' Loads and cleans degradation data from INPE.
 #'
 #' @inheritParams load_degrad_raw
-#' @param aggregation_level A string that indicates the level of aggregation of the data. It can be by "Municipality" or
+#' @param space_aggregation A string that indicates the level of spatial aggregation of the data. It can be by "Municipality" or
 #'   "State".
+#' @param time_aggregation A string that indicates the level of temporal aggregation of the data. It can be by "Month" or
+#'   "Year".
 #' @param language A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
 #'   The other option is "pt" for Portuguese.
 #' @return A \code{tibble}.
@@ -23,31 +25,32 @@ NULL
 #'
 #' load_degrad(
 #'   c(2015, 2016),
-#'   aggregation_level = "state",
+#'   space_aggregation = "state",
 #'   language = "pt"
 #' )
 #'
 #' \dontrun{
 #' load_degrad(
 #'   "~/Downloads",
-#'   aggregation_level = "state",
+#'   space_aggregation = "state",
+#'   time_aggregation = "year",
 #'   language = "en"
 #' )
 #'
 #' load_degrad(
 #'   "~/Downloads/degrad2016_final_shp/DEGRAD_2016_pol.shp",
-#'   aggregation_level = "municipality",
+#'   time_aggregation = "municipality",
 #'   language = "pt"
 #' )
 #' }
-load_degrad <- function(source, aggregation_level = "municipality", language = "eng") {
+load_degrad <- function(source, space_aggregation = "municipality", time_aggregation = "year", language = "eng") {
   raw_list <- load_degrad_raw(source)
 
   message("Downloading map data.")
   geo_br <- geobr::read_municipality(year = 2019, simplified = FALSE) # 2019 relates to the definition of legal_amazon
   geo_amazon <- dplyr::filter(geo_br, .data$code_muni %in% legal_amazon$CD_MUN)
 
-  list_df <- lapply(raw_list, treat_degrad_data, aggregation_level = aggregation_level, language = language, geo_amazon = geo_amazon)
+  list_df <- lapply(raw_list, treat_degrad_data, space_aggregation = space_aggregation, time_aggregation = time_aggregation, language = language, geo_amazon = geo_amazon)
 
   dplyr::bind_rows(list_df)
 }
@@ -112,7 +115,7 @@ find_from_dir <- function(dir) {
     grep(pattern = "\\.shp", value = TRUE)
 }
 
-treat_degrad_data <- function(df, aggregation_level, language, geo_amazon) {
+treat_degrad_data <- function(df, space_aggregation, language, geo_amazon) {
   message("Processing data. This should take a few minutes.")
   # Clean
   names(df) <- tolower(names(df))
@@ -151,31 +154,39 @@ treat_degrad_data <- function(df, aggregation_level, language, geo_amazon) {
   df <- sf::st_intersection(df, geo_amazon) %>%
     dplyr::mutate(calculated_area = sf::st_area(.data$geometry)) %>%
     dplyr::group_by(.data$code_muni, .data$name_muni, .data$code_state, .data$abbrev_state, .data$Ano, .data$Mes, .data$class_name) %>%
-    sf::st_drop_geometry() %>%
-    dplyr::summarise(Area = sum(.data$calculated_area)) %>%
-    dplyr::ungroup() %>%
-    dplyr::rename(Municipio = .data$name_muni, Estado = .data$abbrev_state, Evento = .data$class_name)
+    sf::st_drop_geometry()
 
   # Set aggregation level
-  aggregation_level <- tolower(aggregation_level)
-  if (aggregation_level == "state") {
-    df <-
-      df %>%
+  space_aggregation <- tolower(space_aggregation)
+  if (space_aggregation == "state") {
+    df <- df %>%
+      dplyr::ungroup(.data$code_muni, .data$name_muni) %>%
       dplyr::mutate(CodIBGE = as.factor(.data$code_state)) %>%
-      dplyr::group_by(.data$Estado, .data$CodIBGE, .data$Ano, .data$Mes) %>%
-      dplyr::summarize_if(is.numeric, sum, na.rm = TRUE) %>%
-      dplyr::ungroup() %>%
-      dplyr::select(-c("code_muni", "code_state"))
+      dplyr::select(-c("code_muni", "code_state")) %>%
+      dplyr::rename(Estado = .data$abbrev_state, Evento = .data$class_name)
   }
   else {
-    if (aggregation_level != "municipality") {
-      warning("Aggregation level not supported. Proceeding with Municipality.")
+    if (space_aggregation != "municipality") {
+      warning("Spatial aggregation level not supported. Proceeding with Municipality.")
     }
 
-    df <- dplyr::mutate(df, CodIBGE = as.factor(.data$code_muni)) %>%
-      dplyr::select(-c("code_muni", "code_state"))
+    df <- df %>%
+      dplyr::mutate(CodIBGE = as.factor(.data$code_muni)) %>%
+      dplyr::select(-c("code_muni", "code_state")) %>%
+      dplyr::rename(Municipio = .data$name_muni, Estado = .data$abbrev_state, Evento = .data$class_name)
   }
 
+  time_aggregation <- tolower(time_aggregation)
+  if (time_aggregation == "year") {
+    df <- dplyr::ungroup(df, .data$Mes)
+  }
+  else if (time_aggregation != "month") {
+    warning("Temporal aggregation level not supported. Proceeding with Month.")
+  }
+
+  df <- df %>%
+    dplyr::summarise(Area = sum(.data$calculated_area)) %>%
+    dplyr::ungroup()
 
   # Set language
   language <- tolower(language)
