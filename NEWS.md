@@ -11,3 +11,6 @@
 
 # datazoom.amazonia 0.5.0.9000
 * Added functions for MAPBIOMAS data 
+
+# datazoom.amazonia 0.6.0.9000
+* Added functions for IBAMA data 
