@@ -171,7 +171,6 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
     df <- df %>%
       dplyr::ungroup(.data$code_muni, .data$name_muni) %>%
       dplyr::mutate(CodIBGE = as.factor(.data$code_state)) %>%
-      dplyr::select(-c("code_muni", "code_state")) %>%
       dplyr::rename(Estado = .data$abbrev_state, Evento = .data$class_name)
   }
   else {
@@ -181,7 +180,6 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
 
     df <- df %>%
       dplyr::mutate(CodIBGE = as.factor(.data$code_muni)) %>%
-      dplyr::select(-c("code_muni", "code_state")) %>%
       dplyr::rename(Municipio = .data$name_muni, Estado = .data$abbrev_state, Evento = .data$class_name)
   }
 
@@ -199,7 +197,8 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
 
   df <- df %>%
     dplyr::summarise(Area = sum(.data$calculated_area)) %>%
-    dplyr::ungroup()
+    dplyr::ungroup() %>%
+    dplyr::select(-c("code_muni", "code_state"))
 
   # Set language
   language <- tolower(language)
