@@ -27,6 +27,7 @@ library(datazoom.amazonia)
 
 ## INPE
 
+
 ### Downloads data
 ```
 data <- load_prodes(c(2018, 2019))
