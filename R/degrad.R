@@ -196,6 +196,7 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
   }
 
   df <- df %>%
+    dplyr::group_by(.data$CodIBGE) %>%
     dplyr::summarise(Area = sum(.data$calculated_area)) %>%
     dplyr::ungroup() %>%
     dplyr::select(-c("code_muni", "code_state"))
