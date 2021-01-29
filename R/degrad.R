@@ -192,7 +192,7 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
   }
 
   if(filter) {
-    df <- dplyr::ungroup(df, .data$class_name)
+    df <- dplyr::ungroup(df, .data$Evento)
   }
 
   df <- df %>%
