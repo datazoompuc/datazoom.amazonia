@@ -11,7 +11,7 @@ NULL
 #' The original data and more information on the construction of the indicator
 #' can be found \href{http://www.ipsamazonia.org.br/}{here}
 #'
-#' @name 
+#' @name load_IPS
 #' @encoding UTF-8
 #' @param download_directory Directory where raw data should be stored.
 #' @param language Language used in returned dataset. Use \code{language = "pt"} or
