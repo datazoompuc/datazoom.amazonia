@@ -37,7 +37,7 @@ data <- load_prodes(2017, aggregation_level = "state", language = "pt")
 ```
 data <- load_prodes("~/Downloads")
 ```
-### Comex
+## Comex
 
 ### Downloads data
 ```
