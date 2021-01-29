@@ -29,7 +29,7 @@ in Portuguese or in English
 
 ```{r, eval = FALSE}
 library(datazoom.amazonia)
-my.data <- load_IPS(download_directory = getwd(), language = "portuguese")
+my.data <- load_IPS(download_directory = getwd(), language = "pt")
 ```
 
 ## Credits
