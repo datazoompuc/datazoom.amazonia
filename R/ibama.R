@@ -63,7 +63,7 @@ load_ibama <- function(download_data = TRUE,
                         years = 2005:2021,
                         language = "eng") {
   if (download_data == TRUE) {
-    download_devtoibama(download_dir = download_directory)
+    download_ibama(download_dir = download_directory)
     load_from_where <- list.files(
       path = download_directory,
       pattern = "*.xls$",
