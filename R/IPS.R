@@ -14,8 +14,8 @@ NULL
 #' @name 
 #' @encoding UTF-8
 #' @param download_directory Directory where raw data should be stored.
-#' @param language Language used in returned dataset. Use \code{language = "portuguese"} or
-#' \code{language = "english"}. Defaults to English.
+#' @param language Language used in returned dataset. Use \code{language = "pt"} or
+#' \code{language = "eng"}. Defaults to English.
 #' @return A data frame with information on the 60+ indicators part of the Social
 #' Progress Index (SPI) for 2014 and 2018 considering municipalities part of the Legal
 #' Amazon Region
@@ -23,14 +23,14 @@ NULL
 #'
 #' load_IPS(
 #'   download_directory = getwd(),
-#'   language = "portuguese"
+#'   language = "pt"
 #' )
 #'
 #' @export
 
 
 
-load_IPS <- function(download_directory, language = 'english'){
+load_IPS <- function(download_directory, language = 'eng'){
   utils::download.file(
     url = 'http://www.ipsamazonia.org.br/assets/IPS_Tabela_Completa-8bb3b841e46c8fb17b0331d8ea92bef3.xlsx',
     destfile = file.path(download_directory, 'IPS.xlsx'),
@@ -172,7 +172,7 @@ load_IPS <- function(download_directory, language = 'english'){
     dplyr::filter(.data$`Codigo IBGE do municipio` %in% legal_amazon$CD_MUN)
 
 
-    if(language == 'portuguese'){
+    if(language == 'pt'){
 
     labels_key <- as.list(colnames(df)) %>%
         stats::setNames(colnames(df))
