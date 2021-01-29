@@ -21,8 +21,8 @@ NULL
 #' @param geographic_unit Geographical level of aggregation, choose \code{city} and/or
 #' \code{state}. For Portuguese version, \code{municipio} and/or \code{uf}
 #' @param years Time period to be considered. Contemplates 2005 to the present day
-#' @param language Language used in returned dataset. Use \code{language = "portuguese"} or
-#' \code{language = "english"}
+#' @param language Language used in returned dataset. Use \code{language = "pt"} or
+#' \code{language = "eng"}
 #' @return A data frame with counts for variables related to environmental fines and
 #' infractions by \code{time_unit}-\code{geographic_unit} chosen on the Amazon region.
 #' Data include
@@ -41,7 +41,7 @@ NULL
 #'   download_directory = getwd(),
 #'   time_unit = "ano",
 #'   geographic_unit = "municipio", years = c(2010, 2012),
-#'   language = "portuguese"
+#'   language = "pt"
 #' )
 #' \dontrun{
 #'
@@ -61,7 +61,7 @@ load_ibama <- function(download_data = TRUE,
                         time_unit = c("year", "month"),
                         geographic_unit = "city",
                         years = 2005:2021,
-                        language = "english") {
+                        language = "eng") {
   if (download_data == TRUE) {
     download_devtoibama(download_dir = download_directory)
     load_from_where <- list.files(
@@ -72,7 +72,7 @@ load_ibama <- function(download_data = TRUE,
   }
 
   df <- clean_xml_table(file_location = load_from_where) %>%
-    fines_data_agg(
+    aggregate_fines(
       t = time_unit, g = geographic_unit,
       y = years, lan = language
     )
@@ -83,8 +83,8 @@ load_ibama <- function(download_data = TRUE,
 
 
 
-fines_data_agg <- function(dataset, t = c("year", "month"), g = "city",
-                           y = 2005:2020, lan = "english") {
+aggregate_fines <- function(dataset, t = c("year", "month"), g = "city",
+                           y = 2005:2020, lan = "eng") {
   if ("city" %in% g | "municipio" %in% g) {
     grp <- c(g, "cod_municipio")
   } else {
@@ -115,7 +115,7 @@ fines_data_agg <- function(dataset, t = c("year", "month"), g = "city",
     )
 
 
-  if (lan != "portuguese" | is.null(lan)) {
+  if (lan != "pt" | is.null(lan)) {
     df <- df %>%
       dplyr::rename(
         city = .data$municipio,
@@ -137,7 +137,7 @@ fines_data_agg <- function(dataset, t = c("year", "month"), g = "city",
     )
 
 
-  if (lan != "portuguese" | is.null(lan)) {
+  if (lan != "pt" | is.null(lan)) {
     df <- df %>%
       dplyr::rename(
         cases_already_tried = .data$n_ja_julgado,

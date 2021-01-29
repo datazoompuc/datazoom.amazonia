@@ -12,7 +12,7 @@ load_ibama(
   time_unit = c("year", "month"),
   geographic_unit = "city",
   years = 2005:2021,
-  language = "english"
+  language = "eng"
 )
 }
 \arguments{
@@ -33,8 +33,8 @@ If \code{language = 'portuguese'}, pick "ano" and/or "mes'"}
 
 \item{years}{Time period to be considered. Contemplates 2005 to the present day}
 
-\item{language}{Language used in returned dataset. Use \code{language = "portuguese"} or
-\code{language = "english"}}
+\item{language}{Language used in returned dataset. Use \code{language = "pt"} or
+\code{language = "eng"}}
 }
 \value{
 A data frame with counts for variables related to environmental fines and
@@ -58,7 +58,7 @@ load_ibama(
   download_directory = getwd(),
   time_unit = "ano",
   geographic_unit = "municipio", years = c(2010, 2012),
-  language = "portuguese"
+  language = "pt"
 )
 \dontrun{
 
