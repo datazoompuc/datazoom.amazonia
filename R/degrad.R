@@ -115,7 +115,7 @@ find_from_dir <- function(dir) {
     grep(pattern = "\\.shp", value = TRUE)
 }
 
-treat_degrad_data <- function(df, space_aggregation, language, geo_amazon) {
+treat_degrad_data <- function(df, space_aggregation, time_aggregation, language, geo_amazon) {
   message("Processing data. This should take a few minutes.")
   # Clean
   names(df) <- tolower(names(df))
