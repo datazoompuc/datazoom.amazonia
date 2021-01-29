@@ -23,38 +23,37 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 
 ```
 library(datazoom.amazonia)
-
-##INPE
-
-# Downloads data
-data <- load_prodes(c(2018, 2019))
-
-data <- load_prodes(2017, aggregation_level = "state", language = "pt")
-
-# Loads data locally
-data <- load_prodes("~/Downloads")
-
-##Comex
-
-#Downloads data
-
-years <- c(2000:2009)
-
-data <- load_comex(years, ncm = TRUE, exp = TRUE, imp = TRUE)
-
-##PIB-Munic
-data <- load_amazon_gdp(c(2014, 2015))
-
-data <- load_amazon_gdp(2017, aggregation_level = "state", language = "pt")
-
-##IPS
-
-data <- load_IPS(download_directory = getwd(), language = "pt")
-
-
-
-
 ```
+
+## INPE
+
+### Downloads data
+```
+data <- load_prodes(c(2018, 2019))
+data <- load_prodes(2017, aggregation_level = "state", language = "pt")
+```
+
+### Loads data locally
+```
+data <- load_prodes("~/Downloads")
+```
+### Comex
+
+### Downloads data
+```
+years <- c(2000:2009)
+data <- load_comex(years, ncm = TRUE, exp = TRUE, imp = TRUE)
+```
+## PIB-Munic
+```
+data <- load_amazon_gdp(c(2014, 2015))
+data <- load_amazon_gdp(2017, aggregation_level = "state", language = "pt")
+```
+## IPS
+```
+data <- load_IPS(download_directory = getwd(), language = "pt")
+```
+
 
 ## Credits
 DataZoom is developed by a team at Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio), Department of Economics. Our official website is at: http://www.econ.puc-rio.br/datazoom/index.html.
