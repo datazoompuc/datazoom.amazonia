@@ -11,7 +11,7 @@ NULL
 #' The original data and more information on the construction of the indicator
 #' can be found \href{http://www.ipsamazonia.org.br/}{here}
 #'
-#' @name load_IPS_data
+#' @name 
 #' @encoding UTF-8
 #' @param download_directory Directory where raw data should be stored.
 #' @param language Language used in returned dataset. Use \code{language = "portuguese"} or
@@ -21,7 +21,7 @@ NULL
 #' Amazon Region
 #' @examples
 #'
-#' load_IPS_data(
+#' load_IPS(
 #'   download_directory = getwd(),
 #'   language = "portuguese"
 #' )
@@ -30,7 +30,7 @@ NULL
 
 
 
-load_IPS_data <- function(download_directory, language = 'english'){
+load_IPS <- function(download_directory, language = 'english'){
   utils::download.file(
     url = 'http://www.ipsamazonia.org.br/assets/IPS_Tabela_Completa-8bb3b841e46c8fb17b0331d8ea92bef3.xlsx',
     destfile = file.path(download_directory, 'IPS.xlsx'),
