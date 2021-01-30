@@ -15,7 +15,10 @@ NULL
 #' @examples
 #' load_amazon_gdp(2017)
 load_amazon_gdp <- function(years, aggregation_level = "municipality", language = "eng") {
-  states <- unique(legal_amazon$CD_UF)
+  states <- legal_amazon %>%
+    dplyr::filter(AMZ_LEGAL == 1)
+
+  states <- unique(states$CD_UF)
 
   # GDP data
   gdp <- tibble::as_tibble(
@@ -72,7 +75,9 @@ load_amazon_gdp <- function(years, aggregation_level = "municipality", language 
   else {
     if (tolower(aggregation_level) != "municipality") warning("Aggregation level is not supported. Proceeding with municipality")
 
-    amz <- legal_amazon %>% dplyr::select(CD_MUN, AMZ_LEGAL)
+    amz <- legal_amazon %>%
+      dplyr::select(CD_MUN, AMZ_LEGAL) %>%
+      dplyr::mutate(CD_MUN = as.character(CD_MUN))
 
     df <- df %>%
       dplyr::left_join(amz, by = c("Munic\u00edpio (C\u00f3digo)" = "CD_MUN")) %>%
