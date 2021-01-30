@@ -16,7 +16,7 @@ NULL
 #' load_amazon_gdp(2017)
 load_amazon_gdp <- function(years, aggregation_level = "municipality", language = "eng") {
   states <- legal_amazon %>%
-    dplyr::filter(AMZ_LEGAL == 1)
+    dplyr::filter(.data$AMZ_LEGAL == 1)
 
   states <- unique(states$CD_UF)
 
@@ -58,9 +58,9 @@ load_amazon_gdp <- function(years, aggregation_level = "municipality", language 
     df <- df %>%
       dplyr::rename(CD_MUN = .data[["Munic\u00edpio (C\u00f3digo)"]]) %>%
       dplyr::mutate(CD_MUN = as.numeric(.data$CD_MUN)) %>%
-      dplyr::full_join(legal_amazon, by = "CD_MUN") %>%
-      dplyr::filter(AMZ_LEGAL == 1) %>%
-      dplyr::select(-AMZ_LEGAL)
+      dplyr::left_join(legal_amazon, by = "CD_MUN") %>%
+      dplyr::filter(.data$AMZ_LEGAL == 1) %>%
+      dplyr::select(-.data$AMZ_LEGAL) %>%
       dplyr::group_by(.data$CD_UF, .data$Ano, .data$NM_UF) %>%
       dplyr::summarise(
         PIB = sum(.data$Valor.x),
@@ -76,13 +76,13 @@ load_amazon_gdp <- function(years, aggregation_level = "municipality", language 
     if (tolower(aggregation_level) != "municipality") warning("Aggregation level is not supported. Proceeding with municipality")
 
     amz <- legal_amazon %>%
-      dplyr::select(CD_MUN, AMZ_LEGAL) %>%
-      dplyr::mutate(CD_MUN = as.character(CD_MUN))
+      dplyr::select(.data$CD_MUN, .data$AMZ_LEGAL) %>%
+      dplyr::mutate(CD_MUN = as.character(.data$CD_MUN))
 
     df <- df %>%
       dplyr::left_join(amz, by = c("Munic\u00edpio (C\u00f3digo)" = "CD_MUN")) %>%
-      dplyr::filter(AMZ_LEGAL == 1) %>%
-      dplyr::select(-AMZ_LEGAL)
+      dplyr::filter(.data$AMZ_LEGAL == 1) %>%
+      dplyr::select(-.data$AMZ_LEGAL)
 
     df <- df %>%
       dplyr::select("Munic\u00edpio (C\u00f3digo)", "Munic\u00edpio", "Ano", "Valor.x", "Valor.y") %>%
@@ -213,7 +213,7 @@ translate_munics_to_english <- function(df) {
   dplyr::rename_with(
     df,
     dplyr::recode,
-    "Municipio" = "Municipality",
+    "Município" = "Municipality",
     "Ano" = "Year",
     "PIB" = "GDP",
     "PIBpc" = "GDPpc",
