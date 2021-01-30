@@ -162,17 +162,17 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
   sf::st_agr(geo_amazon) = "constant"
   df <- sf::st_intersection(df, geo_amazon) %>%
     dplyr::mutate(calculated_area = sf::st_area(.data$geometry)) %>%
-    dplyr::mutate(CodIBGE = "") %>%
-    dplyr::group_by(.data$code_muni, .data$name_muni, .data$code_state, .data$abbrev_state, .data$Ano, .data$Mes, .data$class_name, .data$CodIBGE) %>%
+    dplyr::group_by(.data$abbrev_state, .data$Ano, .data$class_name) %>%
     sf::st_drop_geometry()
 
   # Set aggregation level
   space_aggregation <- tolower(space_aggregation)
   if (space_aggregation == "state") {
     df <- df %>%
-      dplyr::ungroup(.data$code_muni, .data$name_muni) %>%
       dplyr::mutate(CodIBGE = as.factor(.data$code_state)) %>%
-      dplyr::rename(Estado = .data$abbrev_state, Evento = .data$class_name)
+      dplyr::group_by(.data$CodIBGE, .add = TRUE) %>%
+      dplyr::rename(Estado = .data$abbrev_state, Evento = .data$class_name) %>%
+      dplyr::select(-c("code_muni", "code_state"))
   }
   else {
     if (space_aggregation != "municipality") {
@@ -181,15 +181,17 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
 
     df <- df %>%
       dplyr::mutate(CodIBGE = as.factor(.data$code_muni)) %>%
-      dplyr::rename(Municipio = .data$name_muni, Estado = .data$abbrev_state, Evento = .data$class_name)
+      dplyr::group_by(.data$CodIBGE, .data$name_muni, .add = TRUE) %>%
+      dplyr::rename(Municipio = .data$name_muni, Estado = .data$abbrev_state, Evento = .data$class_name) %>%
+      dplyr::select(-c("code_muni", "code_state"))
   }
 
   time_aggregation <- tolower(time_aggregation)
-  if (time_aggregation == "year") {
-    df <- dplyr::ungroup(df, .data$Mes)
+  if (time_aggregation == "month") {
+    df <- dplyr::group_by(df, .data$Mes, .add = TRUE)
   }
-  else if (time_aggregation != "month") {
-    warning("Temporal aggregation level not supported. Proceeding with Month.")
+  else if (time_aggregation != "year") {
+    warning("Temporal aggregation level not supported. Proceeding with Year.")
   }
 
   if(filter) {
@@ -197,9 +199,9 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
   }
 
   df <- df %>%
+    dplyr::group_by(.data$CodIBGE, .add = TRUE) %>%
     dplyr::summarise(Area = sum(.data$calculated_area)) %>%
-    dplyr::ungroup() %>%
-    dplyr::select(-c("code_muni", "code_state"))
+    dplyr::ungroup()
 
   # Set language
   language <- tolower(language)
