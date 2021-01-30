@@ -22,6 +22,7 @@ NULL
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' load_degrad(2016)
 #'
 #' load_degrad(
@@ -30,7 +31,6 @@ NULL
 #'   language = "pt"
 #' )
 #'
-#' \dontrun{
 #' load_degrad(
 #'   "~/Downloads",
 #'   space_aggregation = "state",
@@ -194,14 +194,16 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
     warning("Temporal aggregation level not supported. Proceeding with Year.")
   }
 
-  if(filter) {
-    df <- dplyr::ungroup(df, .data$Evento)
-  }
-
   df <- df %>%
     dplyr::group_by(.data$CodIBGE, .add = TRUE) %>%
     dplyr::summarise(Area = sum(.data$calculated_area)) %>%
     dplyr::ungroup()
+
+  if(filter) {
+    df <- df %>%
+      dplyr::rename(Degradacao = .data$Area) %>%
+      dplyr::select(-c("Evento"))
+  }
 
   # Set language
   language <- tolower(language)
@@ -224,6 +226,7 @@ translate_degrad_to_english <- function(df) {
     Estado = "State",
     Ano = "Year",
     Mes = "Month",
-    Evento = "Event"
+    Evento = "Event",
+    Degradacao = "Degradation"
   )
 }

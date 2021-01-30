@@ -40,6 +40,7 @@ A \code{tibble}.
 Loads and cleans degradation data from INPE.
 }
 \examples{
+\dontrun{
 load_degrad(2016)
 
 load_degrad(
@@ -48,7 +49,6 @@ load_degrad(
   language = "pt"
 )
 
-\dontrun{
 load_degrad(
   "~/Downloads",
   space_aggregation = "state",
