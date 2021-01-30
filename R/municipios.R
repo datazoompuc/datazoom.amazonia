@@ -51,13 +51,13 @@ load_amazon_gdp <- function(years, aggregation_level = "municipality", language 
     )
   )
 
-  df <- df[df[["Munic\u00edpio (C\u00f3digo)"]] %in% legal_amazon$CD_MUN, ]
-
   if (tolower(aggregation_level) == "state") {
     df <- df %>%
       dplyr::rename(CD_MUN = .data[["Munic\u00edpio (C\u00f3digo)"]]) %>%
       dplyr::mutate(CD_MUN = as.numeric(.data$CD_MUN)) %>%
       dplyr::full_join(legal_amazon, by = "CD_MUN") %>%
+      dplyr::filter(AMZ_LEGAL == 1) %>%
+      dplyr::select(-AMZ_LEGAL)
       dplyr::group_by(.data$CD_UF, .data$Ano, .data$NM_UF) %>%
       dplyr::summarise(
         PIB = sum(.data$Valor.x),
@@ -71,6 +71,13 @@ load_amazon_gdp <- function(years, aggregation_level = "municipality", language 
   }
   else {
     if (tolower(aggregation_level) != "municipality") warning("Aggregation level is not supported. Proceeding with municipality")
+
+    amz <- legal_amazon %>% dplyr::select(CD_MUN, AMZ_LEGAL)
+
+    df <- df %>%
+      dplyr::left_join(amz, by = c("Munic\u00edpio (C\u00f3digo)" = "CD_MUN")) %>%
+      dplyr::filter(AMZ_LEGAL == 1) %>%
+      dplyr::select(-AMZ_LEGAL)
 
     df <- df %>%
       dplyr::select("Munic\u00edpio (C\u00f3digo)", "Munic\u00edpio", "Ano", "Valor.x", "Valor.y") %>%
