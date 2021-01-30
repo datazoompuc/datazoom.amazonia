@@ -162,7 +162,8 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
   sf::st_agr(geo_amazon) = "constant"
   df <- sf::st_intersection(df, geo_amazon) %>%
     dplyr::mutate(calculated_area = sf::st_area(.data$geometry)) %>%
-    dplyr::group_by(.data$code_muni, .data$name_muni, .data$code_state, .data$abbrev_state, .data$Ano, .data$Mes, .data$class_name) %>%
+    dplyr::mutate(CodIBGE = "") %>%
+    dplyr::group_by(.data$code_muni, .data$name_muni, .data$code_state, .data$abbrev_state, .data$Ano, .data$Mes, .data$class_name, .data$CodIBGE) %>%
     sf::st_drop_geometry()
 
   # Set aggregation level
@@ -196,7 +197,6 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
   }
 
   df <- df %>%
-    dplyr::group_by(.data$CodIBGE) %>%
     dplyr::summarise(Area = sum(.data$calculated_area)) %>%
     dplyr::ungroup() %>%
     dplyr::select(-c("code_muni", "code_state"))
