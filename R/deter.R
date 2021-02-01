@@ -141,13 +141,10 @@ treat_deter_data <- function(df, space_aggregation, time_aggregation, language) 
 
     # Adding IBGE municipality codes
     # removing accents and making everything lower-case to match up the names
-    IBGE <- CodIBGE %>%
-      dplyr::mutate(Municipio = stringi::stri_trans_general(.data$Municipio, "Latin-ASCII") %>% tolower()) %>%
-      dplyr::mutate(CodUF = as.numeric(CodIBGE) %/% 100000)
-
-    IBGE <- IBGE %>%
-      dplyr::left_join(EstadosIBGE, by = "CodUF") %>% # assigning state abbreviations to match INPE data
-      dplyr::select(-c(.data$CodUF, .data$Estado))
+    IBGE <- legal_amazon %>%
+      dplyr::mutate(Municipio = stringi::stri_trans_general(.data$NM_MUN, "Latin-ASCII") %>% tolower()) %>%
+      dplyr::select(-c(.data$NM_REGIAO, .data$CD_UF, .data$NM_UF, .data$NM_MUN, .data$AMZ_LEGAL)) %>%
+      dplyr::rename(UF = .data$SIGLA)
 
     df <- df %>% dplyr::mutate(Municipio = stringi::stri_trans_general(.data$MUNICIPALI, "Latin-ASCII") %>% tolower())
 
@@ -161,7 +158,8 @@ treat_deter_data <- function(df, space_aggregation, time_aggregation, language) 
 
     df <- df %>%
       dplyr::left_join(IBGE, by = c("UF", "Municipio")) %>%
-      dplyr::select(-.data$Municipio)
+      dplyr::select(-.data$Municipio) %>%
+      dplyr::rename(CodIBGE = .data$CD_MUN)
   }
 
   time_aggregation <- tolower(time_aggregation)
