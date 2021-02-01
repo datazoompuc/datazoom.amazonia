@@ -112,7 +112,8 @@ load_degrad_raw <- function(source) {
 download_map <- function() {
   message("Downloading map data.")
   geo_br <- geobr::read_municipality(year = 2019, simplified = FALSE) # 2019 relates to the definition of legal_amazon
-  dplyr::filter(geo_br, .data$code_muni %in% legal_amazon$CD_MUN)
+  amazon_municipalities <- dplyr::filter(legal_amazon, .data$AMZ_LEGAL == 1)
+  dplyr::filter(geo_br, .data$code_muni %in% amazon_municipalities$CD_MUN)
 }
 
 find_from_dir <- function(dir) {
