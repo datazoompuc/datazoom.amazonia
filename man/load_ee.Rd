@@ -9,7 +9,8 @@ load_ee(
   var = "avg_rad",
   year_begin = "2013",
   year_end = "2018",
-  type = "munic"
+  type = "munic",
+  nclusters = 0
 )
 }
 \arguments{
@@ -31,5 +32,6 @@ Monthly average radiance composite images using nighttime data from the
 Visible Infrared Imaging Radiometer Suite (VIIRS) Day/Night Band (DNB).
 }
 \examples{
+
 
 }
