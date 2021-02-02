@@ -31,7 +31,7 @@ library(datazoom.amazonia)
 data <- load_prodes(c(2018, 2019))
 data <- load_degrad(2016)
 
-data <- load_prodes(2017, aggregation_level = "state", language = "pt")
+data <- load_prodes(2017, space_aggregation = "state", language = "pt")
 
 # Loads data locally
 
@@ -49,13 +49,13 @@ data <- load_comex(years, ncm = TRUE, exp = TRUE, imp = TRUE)
 
 data <- load_amazon_gdp(c(2014, 2015))
 
-data <- load_amazon_gdp(2017, aggregation_level = "state", language = "pt")
+data <- load_amazon_gdp(2017, space_aggregation = "state", language = "pt")
 
 ##MAPBIOMAS
 
 # Downloads data
 
-data <- load_mapbiomas_cobertura(aggregation_level = 'municipality', path = NULL, code_state = "PA", code_mun = NULL, covering = 3,
+data <- load_mapbiomas_cobertura(space_aggregation = 'municipality', path = NULL, code_state = "PA", code_mun = NULL, covering = 3,
                                   type = 'stacked', year_begin = 2000, year_end = 2010)
 
 data <- load_mapbiomas_transicao(code_state = "PA", covering_from = 3, covering_to = 19, type = 'normal', year_diff = 5)
