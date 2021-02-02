@@ -82,7 +82,7 @@ load_deter_raw <- function(source = "amazonia") {
 
     utils::unzip(temp, "deter_public.dbf", exdir = dir)
 
-    df <- foreign::read.dbf(paste(dir, "deter_public.dbf", sep="/"), as.is = TRUE) %>%
+    df <- foreign::read.dbf(paste(dir, "deter_public.dbf", sep = "/"), as.is = TRUE) %>%
       tibble::as_tibble()
 
     unlink(temp)
@@ -111,7 +111,6 @@ load_deter_raw <- function(source = "amazonia") {
 
 
 treat_deter_data <- function(df, space_aggregation, time_aggregation, language) {
-  stopifnot(tibble::is_tibble(df))
 
   space_aggregation <- tolower(space_aggregation)
 
@@ -167,9 +166,13 @@ treat_deter_data <- function(df, space_aggregation, time_aggregation, language) 
   if (time_aggregation == "year") {
     df <- df %>%
       dplyr::ungroup(.data$Mes) %>%
-      dplyr::summarise(dplyr::across(-c(.data$Mes, .data$AREAUCKM,.data$AREAMUNKM)), AREAUCKM = sum(.data$AREAUCKM), AREAMUNKM = sum(.data$AREAMUNKM)) %>%
+      dplyr::summarise(dplyr::across(-c(.data$Mes, .data$AREAUCKM, .data$AREAMUNKM)), AREAUCKM = sum(.data$AREAUCKM), AREAMUNKM = sum(.data$AREAMUNKM)) %>%
       dplyr::distinct()
   }
+  else if (time_aggregation != "month") {
+    warning("Invalid time aggregation, grouping by month.")
+  }
+
 
   df <- df %>%
     dplyr::rename_with(dplyr::recode,
