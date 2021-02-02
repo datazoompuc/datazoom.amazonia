@@ -115,7 +115,7 @@ to_english1 <- function(df){
   df$`Product of permanent tillage`[index] <- "Urucum (seed)"
   index <- df$`Product of permanent tillage (Code)` == 2748
   df$`Product of permanent tillage`[index] <- "Grape"
-
+  return(df)
 
 }
 
@@ -237,6 +237,7 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
     }
   }
 
+return(df)
 }
 
 #' Loads agricultural data of temporary tillages from Brazil from 1974 to the present
@@ -274,11 +275,14 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
       data <- sidrar::get_sidra(1612, period = a, geo = "Brazil")
       df <- rbind(df, data)
     }
-    colnames(df) <- c(
-      "Territorial Level (Code)", "Territorial Level", "Brazil (Code)", "Brazil", "Year (Code)", "Year", "Variable (Code)",
-      "Variable", "Product of temporary tillage (Code)", "Product of temporary tillage", "Unit of measure (Code)", "Unit of measure",
-      "Value"
-    )
+    if (language == "eng"){
+      colnames(df) <- c(
+        "Territorial Level (Code)", "Territorial Level", "Brazil (Code)", "Brazil", "Year (Code)", "Year", "Variable (Code)",
+        "Variable", "Product of temporary tillage (Code)", "Product of temporary tillage", "Unit of measure (Code)", "Unit of measure",
+        "Value"
+      )
+      df <- to_english2(df)
+    }
   }
 
   if (aggregation_level == "region"){
@@ -287,11 +291,14 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
       data <- sidrar::get_sidra(1612, period = a, geo = "Region")
       df <- rbind(df, data)
     }
-    colnames(df) <- c(
-      "Territorial Level (Code)", "Territorial Level", "Greater Region (Code)", "Greater Region", "Year (Code)", "Year", "Variable (Code)",
-      "Variable", "Product of temporary tillage (Code)", "Product of temporary tillage", "Unit of measure (Code)", "Unit of measure",
-      "Value"
-    )
+    if (language == "eng"){
+      colnames(df) <- c(
+        "Territorial Level (Code)", "Territorial Level", "Greater Region (Code)", "Greater Region", "Year (Code)", "Year", "Variable (Code)",
+        "Variable", "Product of temporary tillage (Code)", "Product of temporary tillage", "Unit of measure (Code)", "Unit of measure",
+        "Value"
+      )
+      df <- to_english2(df)
+    }
   }
 
   if (aggregation_level == "state"){
@@ -300,11 +307,14 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
       data <- sidrar::get_sidra(1612, period = a, geo = "State")
       df <- rbind(df, data)
     }
-    colnames(df) <- c(
-      "Territorial Level (Code)", "Territorial Level", "State (Code)", "State", "Year (Code)", "Year", "Variable (Code)",
-      "Variable", "Product of temporary tillage (Code)", "Product of temporary tillage", "Unit of measure (Code)", "Unit of measure",
-      "Value"
-    )
+    if (language == "eng"){
+      colnames(df) <- c(
+        "Territorial Level (Code)", "Territorial Level", "State (Code)", "State", "Year (Code)", "Year", "Variable (Code)",
+        "Variable", "Product of temporary tillage (Code)", "Product of temporary tillage", "Unit of measure (Code)", "Unit of measure",
+        "Value"
+      )
+      df <- to_english2(df)
+    }
   }
 
   if (aggregation_level == "mesoregion"){
@@ -313,11 +323,14 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
       data <- sidrar::get_sidra(1612, period = a, geo = "MesoRegion")
       df <- rbind(df, data)
     }
-    colnames(df) <- c(
-      "Territorial Level (Code)", "Territorial Level", "Geographic MesoRegion (Code)", "Geographic MesoRegion", "Year (Code)", "Year", "Variable (Code)",
-      "Variable", "Product of temporary tillage (Code)", "Product of temporary tillage", "Unit of measure (Code)", "Unit of measure",
-      "Value"
-    )
+    if (language == "eng"){
+      colnames(df) <- c(
+        "Territorial Level (Code)", "Territorial Level", "Geographic MesoRegion (Code)", "Geographic MesoRegion", "Year (Code)", "Year", "Variable (Code)",
+        "Variable", "Product of temporary tillage (Code)", "Product of temporary tillage", "Unit of measure (Code)", "Unit of measure",
+        "Value"
+      )
+      df <- to_english2(df)
+    }
   }
 
   if (aggregation_level == "microregion"){
@@ -328,11 +341,14 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
         df <- rbind(df, data)
       }
     }
-    colnames(df) <- c(
-      "Territorial Level (Code)", "Territorial Level", "Geographic MicroRegion (Code)", "Geographic MicroRegion", "Year (Code)", "Year", "Variable (Code)",
-      "Variable", "Product of temporary tillage (Code)", "Product of temporary tillage", "Unit of measure (Code)", "Unit of measure",
-      "Value"
-    )
+    if (language == "eng"){
+      colnames(df) <- c(
+        "Territorial Level (Code)", "Territorial Level", "Geographic MicroRegion (Code)", "Geographic MicroRegion", "Year (Code)", "Year", "Variable (Code)",
+        "Variable", "Product of temporary tillage (Code)", "Product of temporary tillage", "Unit of measure (Code)", "Unit of measure",
+        "Value"
+      )
+      df <- to_english2(df)
+    }
   }
 
   if (aggregation_level == "city"){
@@ -343,13 +359,17 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
         df <- rbind(df, data)
       }
     }
-    colnames(df) <- c(
-      "Territorial Level (Code)", "Territorial Level", "Municipality (Code)", "Municipality", "Year (Code)", "Year", "Variable (Code)",
-      "Variable", "Product of temporary tillage (Code)", "Product of temporary tillage", "Unit of measure (Code)", "Unit of measure",
-      "Value"
-    )
+    if (language == "eng"){
+      colnames(df) <- c(
+        "Territorial Level (Code)", "Territorial Level", "Municipality (Code)", "Municipality", "Year (Code)", "Year", "Variable (Code)",
+        "Variable", "Product of temporary tillage (Code)", "Product of temporary tillage", "Unit of measure (Code)", "Unit of measure",
+        "Value"
+      )
+      df <- to_english2(df)
+    }
   }
 
+return(df)
 }
 
 #' Loads agricultural data of four main tillages - corn, potato, peanut and beans - from Brazil from 2003 to the present
@@ -499,4 +519,5 @@ load_pam_main <- function(years, aggregation_level = "country", language = "pt")
     )
   }
 
+  return(df)
 }
