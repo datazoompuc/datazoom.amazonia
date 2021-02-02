@@ -218,8 +218,9 @@ to_english2 <- function(df){
 
 }
 
-to_long_permanent <- function(df){
-  df <- split(df, df$Variável)
+to_long_permanent <- function(df, a){
+  if( a == 0) {
+    df <- split(df, df$Variável)
     for (i in 1:length(df)){
       df[[i]]$`Brasil` <- NULL
       df[[i]]$`Brasil (Código)` <- NULL
@@ -227,24 +228,59 @@ to_long_permanent <- function(df){
       df[[i]]$`Unidade de Medida (Código)` <- NULL
       df[[i]]$`Unidade de Medida` <- NULL
       df[[i]]$`Produto das lavouras permanentes (Código)` <- NULL
-      df[[i]] <- tidyr::spread(df2a, "Produto das lavouras permanentes", "Valor")
+      df[[i]] <- tidyr::spread(df[[i]], "Produto das lavouras permanentes", "Valor")
     }
+  } elseif ( a == 1 ){
+    df <- split(df, df$Variável)
+    for (i in 1:length(df)){
+      df[[i]]$`Brazil` <- NULL
+      df[[i]]$`Brazil (Code)` <- NULL
+      df[[i]]$`Year (Code)` <- NULL
+      df[[i]]$`Unit of measure (Code)` <- NULL
+      df[[i]]$`Unit of measure` <- NULL
+      df[[i]]$`Product of permanent tillage (Code)` <- NULL
+      df[[i]] <- tidyr::spread(df[[i]], "Product of permanent tillage", "Value")
+    }
+  }
   return(df)
 }
 
-df2 <- split(df, df$Variável)
-df2a <- df2[[1]]
-df2a$Brasil <- NULL
-df2a$`Brasil (Código)` <- NULL
-df2a$`Ano (Código)` <- NULL
-df2a$`Unidade de Medida (Código)` <- NULL
-df2a$`Unidade de Medida` <- NULL
-df2a$`Produto das lavouras temporárias (Código)` <- NULL
-df2a2 <- tidyr::spread(df2a, "Produto das lavouras temporárias", "Valor")
+to_long_temporary <- function(df, a){
+  if( a == 0) {
+    df <- split(df, df$Variável)
+    for (i in 1:length(df)){
+      df[[i]]$`Brasil` <- NULL
+      df[[i]]$`Brasil (Código)` <- NULL
+      df[[i]]$`Ano (Código)` <- NULL
+      df[[i]]$`Unidade de Medida (Código)` <- NULL
+      df[[i]]$`Unidade de Medida` <- NULL
+      df[[i]]$`Produto das lavouras temporárias (Código)` <- NULL
+      df[[i]] <- tidyr::spread(df[[i]], "Produto das lavouras temporárias", "Valor")
+    }
+  } elseif ( a == 1 ){
+    df <- split(df, df$Variável)
+    for (i in 1:length(df)){
+      df[[i]]$`Brazil` <- NULL
+      df[[i]]$`Brazil (Code)` <- NULL
+      df[[i]]$`Year (Code)` <- NULL
+      df[[i]]$`Unit of measure (Code)` <- NULL
+      df[[i]]$`Unit of measure` <- NULL
+      df[[i]]$`Product of temporary tillage (Code)` <- NULL
+      df[[i]] <- tidyr::spread(df[[i]], "Product of temporary tillage", "Value")
+    }
+  }
+  return(df)
+}
 
 load_pam_permanent <- function(years, aggregation_level = "country", language = "pt", long = FALSE){
   message("Depending on amount of items selected function may take time to run")
   sigla_uf = c(12,27,13,16,29,23,32,52,21,31,50,51,15,25,26,22,41,33,24,11,14,43,42,28,35,17)
+
+  if(language == "eng"){
+    a = 1
+  } else {
+    a = 0
+  }
 
   if (language != "pt" && language != "eng"){
     warning("Language selected not supported! Proceding with Portuguese")
@@ -258,7 +294,7 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
       data <- sidrar::get_sidra(1613, period = a, geo = "Brazil")
       df <- rbind(df, data)
     }
-    if (long == FALSE && language == "eng"){
+    if (language == "eng"){
 
       colnames(df) <- c(
       "Territorial Level (Code)", "Territorial Level", "Brazil (Code)", "Brazil", "Year (Code)", "Year", "Variable (Code)",
@@ -269,7 +305,7 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
       }
   }
 
-  if (long == FALSE && aggregation_level == "region"){
+  if (aggregation_level == "region"){
     for (i in 1:length(years)){
       a <-toString(years[i])
       data <- sidrar::get_sidra(1613, period = a, geo = "Region")
@@ -287,7 +323,7 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
     }
   }
 
-  if (long == FALSE && aggregation_level == "state"){
+  if (aggregation_level == "state"){
     for (i in 1:length(years)){
       a <-toString(years[i])
       data <- sidrar::get_sidra(1613, period = a, geo = "State")
@@ -305,7 +341,7 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
     }
   }
 
-  if (long == FALSE && aggregation_level == "mesoregion"){
+  if (aggregation_level == "mesoregion"){
     for (i in 1:length(years)){
       a <-toString(years[i])
       data <- sidrar::get_sidra(1613, period = a, geo = "MesoRegion")
@@ -322,7 +358,7 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
     }
   }
 
-  if (long == FALSE && aggregation_level == "microregion"){
+  if (aggregation_level == "microregion"){
     for (i in 1:length(years)){
       a <-toString(years[i])
         for (s in sigla_uf){
@@ -341,7 +377,7 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
     }
   }
 
-  if (long == FALSE && aggregation_level == "city"){
+  if (aggregation_level == "city"){
     for (i in 1:length(years)){
       a <-toString(years[i])
       for (s in sigla_uf){
@@ -356,12 +392,12 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
         "Variable", "Product of permanent tillage (Code)", "Product of permanent tillage", "Unit of measure (Code)", "Unit of measure",
         "Value"
     )
-      df <- to_english1(df)
+      df <- to_english1(df, a)
     }
   }
 
   if(long == TRUE){
-    df <- to_long_permanent(df)
+    df <- to_long_permanent(df, a)
   }
 
 return(df)
@@ -386,9 +422,15 @@ return(df)
 #' @examples datazoom.amazonia::load_pam_temporary(2010, aggregation_level = "country")
 #'
 
-load_pam_temporary <- function(years, aggregation_level = "country", language = "pt"){
+load_pam_temporary <- function(years, aggregation_level = "country", language = "pt", long = FALSE){
   message("Depending on amount of items selected function may take time to run")
   sigla_uf = c(12,27,13,16,29,23,32,52,21,31,50,51,15,25,26,22,41,33,24,11,14,43,42,28,35,17)
+
+  if(language == "eng"){
+    a = 1
+  } else {
+    a = 0
+  }
 
   if (language != "pt" && language != "eng"){
     warning("Language selected not supported! Proceding with Portuguese")
@@ -494,6 +536,10 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
       )
       df <- to_english2(df)
     }
+  }
+
+  if (long == TRUE){
+    df <- to_long_temporary(df, a)
   }
 
 return(df)
