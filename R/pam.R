@@ -18,6 +18,106 @@
 #'
 #' @examples datazoom.amazonia::load_pam_permanent(2013, aggregation_level = "country")
 #'
+#'
+
+to_english1 <- function(df){
+  index <- df$`Variable (Code)` == 2313
+  df$Variable[index] <- "Area designated for harvest"
+  index <- df$`Variable (Code)` == 216
+  df$Variable[index] <- "Harvested Area"
+  index <- df$`Variable (Code)` == 214
+  df$Variable[index] <- "Quantity produced"
+  index <- df$`Variable (Code)` == 112
+  df$Variable[index] <- "Average revenue of output"
+  index <- df$`Variable (Code)` == 215
+  df$Variable[index] <- "Output value"
+
+  index <- df$`Unit of measure (Code)` == 40
+  df$`Unit of measure`[index] <- "Thousands of Reals"
+  index <- df$`Unit of measure (Code)` == 33
+  df$`Unit of measure`[index] <- "Kgs per hectare"
+  index <- df$`Unit of measure (Code)` == 1017
+  df$`Unit of measure`[index] <- "Tonnes"
+
+  index <- df$`Product of permanent tillage (Code)` == 2717
+  df$`Product of permanent tillage`[index] <- "Avocado"
+  index <- df$`Product of permanent tillage (Code)` == 2718
+  df$`Product of permanent tillage`[index] <- "Tree cotton (lump)"
+  index <- df$`Product of permanent tillage (Code)` == 2719
+  df$`Product of permanent tillage`[index] <- "Olives"
+  index <- df$`Product of permanent tillage (Code)` == 2720
+  df$`Product of permanent tillage`[index] <- "Banana (bunch)"
+  index <- df$`Product of permanent tillage (Code)` == 2721
+  df$`Product of permanent tillage`[index] <- "Rubber (coagulated latex)"
+  index <- df$`Product of permanent tillage (Code)` == 40472
+  df$`Product of permanent tillage`[index] <- "Rubber (liquid latex)"
+  index <- df$`Product of permanent tillage (Code)` == 2722
+  df$`Product of permanent tillage`[index] <- "Cocoa (almond)"
+  index <- df$`Product of permanent tillage (Code)` == 2723
+  df$`Product of permanent tillage`[index] <- "Coffee (grain) total"
+  index <- df$`Product of permanent tillage (Code)` == 31619
+  df$`Product of permanent tillage`[index] <- "Arabica coffee (grain)"
+  index <- df$`Product of permanent tillage (Code)` == 31620
+  df$`Product of permanent tillage`[index] <- "Canephora coffee (grain)"
+  index <- df$`Product of permanent tillage (Code)` == 404
+  df$`Product of permanent tillage`[index] <- "Avocado"
+  index <- df$`Product of permanent tillage (Code)` == 404773
+  df$`Product of permanent tillage`[index] <- "Cashew"
+  index <- df$`Product of permanent tillage (Code)` == 2724
+  df$`Product of permanent tillage`[index] <- "Khaki"
+  index <- df$`Product of permanent tillage (Code)` == 2725
+  df$`Product of permanent tillage`[index] <- "Cashew nuts"
+  index <- df$`Product of permanent tillage (Code)` == 2726
+  df$`Product of permanent tillage`[index] <- "India-tea (green leaf)"
+  index <- df$`Product of permanent tillage (Code)` == 2727
+  df$`Product of permanent tillage`[index] <- "Bay coconut"
+  index <- df$`Product of permanent tillage (Code)` == 2728
+  df$`Product of permanent tillage`[index] <- "Palm (coconut bunch)"
+  index <- df$`Product of permanent tillage (Code)` == 2729
+  df$`Product of permanent tillage`[index] <- "Mate herb (green leaf)"
+  index <- df$`Product of permanent tillage (Code)` == 2730
+  df$`Product of permanent tillage`[index] <- "Fig"
+  index <- df$`Product of permanent tillage (Code)` == 2731
+  df$`Product of permanent tillage`[index] <- "Guava"
+  index <- df$`Product of permanent tillage (Code)` == 2732
+  df$`Product of permanent tillage`[index] <- "Guarana (seed)"
+  index <- df$`Product of permanent tillage (Code)` == 2733
+  df$`Product of permanent tillage`[index] <- "Orange"
+  index <- df$`Product of permanent tillage (Code)` == 2734
+  df$`Product of permanent tillage`[index] <- "Lemon"
+  index <- df$`Product of permanent tillage (Code)` == 2735
+  df$`Product of permanent tillage`[index] <- "Apple"
+  index <- df$`Product of permanent tillage (Code)` == 2736
+  df$`Product of permanent tillage`[index] <- "Papaya"
+  index <- df$`Product of permanent tillage (Code)` == 2737
+  df$`Product of permanent tillage`[index] <- "Mango"
+  index <- df$`Product of permanent tillage (Code)` == 2738
+  df$`Product of permanent tillage`[index] <- "Passion fruit"
+  index <- df$`Product of permanent tillage (Code)` == 2739
+  df$`Product of permanent tillage`[index] <- "Quince"
+  index <- df$`Product of permanent tillage (Code)` == 2740
+  df$`Product of permanent tillage`[index] <- "Nut (dry)"
+  index <- df$`Product of permanent tillage (Code)` == 90001
+  df$`Product of permanent tillage`[index] <- "Palm heart"
+  index <- df$`Product of permanent tillage (Code)` == 2741
+  df$`Product of permanent tillage`[index] <- "Pear"
+  index <- df$`Product of permanent tillage (Code)` == 2742
+  df$`Product of permanent tillage`[index] <- "Peach"
+  index <- df$`Product of permanent tillage (Code)` == 2743
+  df$`Product of permanent tillage`[index] <- "Black pepper"
+  index <- df$`Product of permanent tillage (Code)` == 2744
+  df$`Product of permanent tillage`[index] <- "Sisal or agave (fiber)"
+  index <- df$`Product of permanent tillage (Code)` == 2745
+  df$`Product of permanent tillage`[index] <- "Tangerine"
+  index <- df$`Product of permanent tillage (Code)` == 2746
+  df$`Product of permanent tillage`[index] <- "Tungue (dried fruit)"
+  index <- df$`Product of permanent tillage (Code)` == 2747
+  df$`Product of permanent tillage`[index] <- "Urucum (seed)"
+  index <- df$`Product of permanent tillage (Code)` == 2748
+  df$`Product of permanent tillage`[index] <- "Grape"
+
+
+}
 
 load_pam_permanent <- function(years, aggregation_level = "country", language = "pt"){
   message("Depending on amount of items selected function may take time to run")
@@ -35,11 +135,15 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
       data <- sidrar::get_sidra(1613, period = a, geo = "Brazil")
       df <- rbind(df, data)
     }
-    colnames(df) <- c(
+    if (language == "eng"){
+
+      colnames(df) <- c(
       "Territorial Level (Code)", "Territorial Level", "Brazil (Code)", "Brazil", "Year (Code)", "Year", "Variable (Code)",
       "Variable", "Product of permanent tillage (Code)", "Product of permanent tillage", "Unit of measure (Code)", "Unit of measure",
       "Value"
-    )
+      )
+      df <- to_english1(df)
+      }
   }
 
   if (aggregation_level == "region"){
@@ -48,11 +152,16 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
       data <- sidrar::get_sidra(1613, period = a, geo = "Region")
       df <- rbind(df, data)
     }
-    colnames(df) <- c(
-      "Territorial Level (Code)", "Territorial Level", "Greater Region (Code)", "Greater Region", "Year (Code)", "Year", "Variable (Code)",
-      "Variable", "Product of permanent tillage (Code)", "Product of permanent tillage", "Unit of measure (Code)", "Unit of measure",
-      "Value"
+
+    if (language == "eng"){
+
+      colnames(df) <- c(
+        "Territorial Level (Code)", "Territorial Level", "Greater Region (Code)", "Greater Region", "Year (Code)", "Year", "Variable (Code)",
+        "Variable", "Product of permanent tillage (Code)", "Product of permanent tillage", "Unit of measure (Code)", "Unit of measure",
+        "Value"
     )
+      df <- to_english1(df)
+    }
   }
 
   if (aggregation_level == "state"){
@@ -61,11 +170,16 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
       data <- sidrar::get_sidra(1613, period = a, geo = "State")
       df <- rbind(df, data)
     }
-    colnames(df) <- c(
-      "Territorial Level (Code)", "Territorial Level", "State (Code)", "State", "Year (Code)", "Year", "Variable (Code)",
-      "Variable", "Product of permanent tillage (Code)", "Product of permanent tillage", "Unit of measure (Code)", "Unit of measure",
-      "Value"
+
+    if (language == "eng"){
+
+      colnames(df) <- c(
+        "Territorial Level (Code)", "Territorial Level", "State (Code)", "State", "Year (Code)", "Year", "Variable (Code)",
+        "Variable", "Product of permanent tillage (Code)", "Product of permanent tillage", "Unit of measure (Code)", "Unit of measure",
+        "Value"
     )
+      df <- to_english1(df)
+    }
   }
 
   if (aggregation_level == "mesoregion"){
@@ -74,11 +188,15 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
       data <- sidrar::get_sidra(1613, period = a, geo = "MesoRegion")
       df <- rbind(df, data)
     }
-    colnames(df) <- c(
-      "Territorial Level (Code)", "Territorial Level", "Geographic MesoRegion (Code)", "Geographic MesoRegion", "Year (Code)", "Year", "Variable (Code)",
-      "Variable", "Product of permanent tillage (Code)", "Product of permanent tillage", "Unit of measure (Code)", "Unit of measure",
-      "Value"
+    if (language == "eng"){
+
+      colnames(df) <- c(
+        "Territorial Level (Code)", "Territorial Level", "Geographic MesoRegion (Code)", "Geographic MesoRegion", "Year (Code)", "Year", "Variable (Code)",
+        "Variable", "Product of permanent tillage (Code)", "Product of permanent tillage", "Unit of measure (Code)", "Unit of measure",
+        "Value"
     )
+      df <- to_english1(df)
+    }
   }
 
   if (aggregation_level == "microregion"){
@@ -89,11 +207,15 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
           df <- rbind(df, data)
         }
     }
-    colnames(df) <- c(
-      "Territorial Level (Code)", "Territorial Level", "Geographic MicroRegion (Code)", "Geographic MicroRegion", "Year (Code)", "Year", "Variable (Code)",
-      "Variable", "Product of permanent tillage (Code)", "Product of permanent tillage", "Unit of measure (Code)", "Unit of measure",
-      "Value"
+    if (language == "eng"){
+
+      colnames(df) <- c(
+        "Territorial Level (Code)", "Territorial Level", "Geographic MicroRegion (Code)", "Geographic MicroRegion", "Year (Code)", "Year", "Variable (Code)",
+        "Variable", "Product of permanent tillage (Code)", "Product of permanent tillage", "Unit of measure (Code)", "Unit of measure",
+        "Value"
     )
+      df <- to_english1(df)
+    }
   }
 
   if (aggregation_level == "city"){
@@ -104,11 +226,15 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
         df <- rbind(df, data)
       }
     }
-    colnames(df) <- c(
-      "Territorial Level (Code)", "Territorial Level", "Municipality (Code)", "Municipality", "Year (Code)", "Year", "Variable (Code)",
-      "Variable", "Product of permanent tillage (Code)", "Product of permanent tillage", "Unit of measure (Code)", "Unit of measure",
-      "Value"
+    if (language == "eng"){
+
+      colnames(df) <- c(
+        "Territorial Level (Code)", "Territorial Level", "Municipality (Code)", "Municipality", "Year (Code)", "Year", "Variable (Code)",
+        "Variable", "Product of permanent tillage (Code)", "Product of permanent tillage", "Unit of measure (Code)", "Unit of measure",
+        "Value"
     )
+      df <- to_english1(df)
+    }
   }
 
 }
