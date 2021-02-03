@@ -6,6 +6,7 @@ datazoom.amazonia is an R package that facilitates access to official data regar
 * MDIC - Comex: exports and imports by municipality or state
 * IBGE - PIB-Munic: gdp by municipality
 * MAPBIOMAS: land covering by municipality or state
+* INPE - DETER: deforestation warnings by municipality
 
 <!-- badges: start -->
 [![R build status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions)
@@ -29,13 +30,19 @@ library(datazoom.amazonia)
 # Downloads data
 
 data <- load_prodes(c(2018, 2019))
+
 data <- load_degrad(2016)
 
 data <- load_prodes(2017, space_aggregation = "state", language = "pt")
 
+data <- load_deter("amazonia", space_aggregation = "state",
+                   time_aggregation = "year", language = "pt")
+
 # Loads data locally
 
 data <- load_prodes("~/Downloads")
+
+data <- load_deter("~/Downloads")
 
 ##Comex
 
