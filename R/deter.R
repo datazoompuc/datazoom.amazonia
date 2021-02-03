@@ -74,11 +74,15 @@ load_deter_raw <- function(source = "amazonia") {
 
     url <- paste0("http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-", source, "/shape")
 
-    temp <- tempfile(fileext = ".zip")
-
-    utils::download.file(url, temp, mode = "wb")
-
     dir <- tempdir()
+
+    temp <- tempfile(fileext = ".zip", tmpdir = dir)
+
+    f <- RCurl::CFILE(temp, mode = "wb")
+
+    RCurl::curlPerform(url = url, writedata = f@ref, noprogress = FALSE)
+
+    RCurl::close(f)
 
     utils::unzip(temp, "deter_public.dbf", exdir = dir)
 
