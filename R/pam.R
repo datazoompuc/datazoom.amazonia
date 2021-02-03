@@ -8,7 +8,9 @@
 #'
 #' @param language A \code{string} that indicates in which language the data will be returned. The default is "pt", so your data will be returned in Portuguese. Currently, only Portuguese and English are supported.
 #'
-#' @return A \code{data frame}
+#' @param long A \code{boolean} that sets the format of the returned data. \code{long = TRUE} will return a list where each data frame represents a variable and products are transformed to columns so each geographical aggregation level/year will only have a single line. Default value is \code{FALSE}.
+#'
+#' @return A \code{data frame} or a \code{list} of data frames if \code{long} is set to \code{TRUE}.
 #'
 #' @author DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro
 #'
@@ -20,108 +22,11 @@
 #'
 #'
 
+#VARIAVEL NA FUNCAO LONG e TEMPORARIAS TAMBEM AINDA TEM ACENTO
+
 to_english1 <- function(df){
   index <- df$`Variable (Code)` == 2313
   df$Variable[index] <- "Area designated for harvest"
-  index <- df$`Variable (Code)` == 216
-  df$Variable[index] <- "Harvested Area"
-  index <- df$`Variable (Code)` == 214
-  df$Variable[index] <- "Quantity produced"
-  index <- df$`Variable (Code)` == 112
-  df$Variable[index] <- "Average revenue of output"
-  index <- df$`Variable (Code)` == 215
-  df$Variable[index] <- "Output value"
-
-  index <- df$`Unit of measure (Code)` == 40
-  df$`Unit of measure`[index] <- "Thousands of Reals"
-  index <- df$`Unit of measure (Code)` == 33
-  df$`Unit of measure`[index] <- "Kgs per hectare"
-  index <- df$`Unit of measure (Code)` == 1017
-  df$`Unit of measure`[index] <- "Tonnes"
-
-  index <- df$`Product of permanent tillage (Code)` == 2717
-  df$`Product of permanent tillage`[index] <- "Avocado"
-  index <- df$`Product of permanent tillage (Code)` == 2718
-  df$`Product of permanent tillage`[index] <- "Tree cotton (lump)"
-  index <- df$`Product of permanent tillage (Code)` == 2719
-  df$`Product of permanent tillage`[index] <- "Olives"
-  index <- df$`Product of permanent tillage (Code)` == 2720
-  df$`Product of permanent tillage`[index] <- "Banana (bunch)"
-  index <- df$`Product of permanent tillage (Code)` == 2721
-  df$`Product of permanent tillage`[index] <- "Rubber (coagulated latex)"
-  index <- df$`Product of permanent tillage (Code)` == 40472
-  df$`Product of permanent tillage`[index] <- "Rubber (liquid latex)"
-  index <- df$`Product of permanent tillage (Code)` == 2722
-  df$`Product of permanent tillage`[index] <- "Cocoa (almond)"
-  index <- df$`Product of permanent tillage (Code)` == 2723
-  df$`Product of permanent tillage`[index] <- "Coffee (grain) total"
-  index <- df$`Product of permanent tillage (Code)` == 31619
-  df$`Product of permanent tillage`[index] <- "Arabica coffee (grain)"
-  index <- df$`Product of permanent tillage (Code)` == 31620
-  df$`Product of permanent tillage`[index] <- "Canephora coffee (grain)"
-  index <- df$`Product of permanent tillage (Code)` == 404
-  df$`Product of permanent tillage`[index] <- "Avocado"
-  index <- df$`Product of permanent tillage (Code)` == 404773
-  df$`Product of permanent tillage`[index] <- "Cashew"
-  index <- df$`Product of permanent tillage (Code)` == 2724
-  df$`Product of permanent tillage`[index] <- "Khaki"
-  index <- df$`Product of permanent tillage (Code)` == 2725
-  df$`Product of permanent tillage`[index] <- "Cashew nuts"
-  index <- df$`Product of permanent tillage (Code)` == 2726
-  df$`Product of permanent tillage`[index] <- "India-tea (green leaf)"
-  index <- df$`Product of permanent tillage (Code)` == 2727
-  df$`Product of permanent tillage`[index] <- "Bay coconut"
-  index <- df$`Product of permanent tillage (Code)` == 2728
-  df$`Product of permanent tillage`[index] <- "Palm (coconut bunch)"
-  index <- df$`Product of permanent tillage (Code)` == 2729
-  df$`Product of permanent tillage`[index] <- "Mate herb (green leaf)"
-  index <- df$`Product of permanent tillage (Code)` == 2730
-  df$`Product of permanent tillage`[index] <- "Fig"
-  index <- df$`Product of permanent tillage (Code)` == 2731
-  df$`Product of permanent tillage`[index] <- "Guava"
-  index <- df$`Product of permanent tillage (Code)` == 2732
-  df$`Product of permanent tillage`[index] <- "Guarana (seed)"
-  index <- df$`Product of permanent tillage (Code)` == 2733
-  df$`Product of permanent tillage`[index] <- "Orange"
-  index <- df$`Product of permanent tillage (Code)` == 2734
-  df$`Product of permanent tillage`[index] <- "Lemon"
-  index <- df$`Product of permanent tillage (Code)` == 2735
-  df$`Product of permanent tillage`[index] <- "Apple"
-  index <- df$`Product of permanent tillage (Code)` == 2736
-  df$`Product of permanent tillage`[index] <- "Papaya"
-  index <- df$`Product of permanent tillage (Code)` == 2737
-  df$`Product of permanent tillage`[index] <- "Mango"
-  index <- df$`Product of permanent tillage (Code)` == 2738
-  df$`Product of permanent tillage`[index] <- "Passion fruit"
-  index <- df$`Product of permanent tillage (Code)` == 2739
-  df$`Product of permanent tillage`[index] <- "Quince"
-  index <- df$`Product of permanent tillage (Code)` == 2740
-  df$`Product of permanent tillage`[index] <- "Nut (dry)"
-  index <- df$`Product of permanent tillage (Code)` == 90001
-  df$`Product of permanent tillage`[index] <- "Palm heart"
-  index <- df$`Product of permanent tillage (Code)` == 2741
-  df$`Product of permanent tillage`[index] <- "Pear"
-  index <- df$`Product of permanent tillage (Code)` == 2742
-  df$`Product of permanent tillage`[index] <- "Peach"
-  index <- df$`Product of permanent tillage (Code)` == 2743
-  df$`Product of permanent tillage`[index] <- "Black pepper"
-  index <- df$`Product of permanent tillage (Code)` == 2744
-  df$`Product of permanent tillage`[index] <- "Sisal or agave (fiber)"
-  index <- df$`Product of permanent tillage (Code)` == 2745
-  df$`Product of permanent tillage`[index] <- "Tangerine"
-  index <- df$`Product of permanent tillage (Code)` == 2746
-  df$`Product of permanent tillage`[index] <- "Tungue (dried fruit)"
-  index <- df$`Product of permanent tillage (Code)` == 2747
-  df$`Product of permanent tillage`[index] <- "Urucum (seed)"
-  index <- df$`Product of permanent tillage (Code)` == 2748
-  df$`Product of permanent tillage`[index] <- "Grape"
-  return(df)
-
-}
-
-to_english2 <- function(df){
-  index <- df$`Variable (Code)` == 109
-  df$Variable[index] <- "Planted area"
   index <- df$`Variable (Code)` == 216
   df$Variable[index] <- "Harvested Area"
   index <- df$`Variable (Code)` == 214
@@ -245,41 +150,14 @@ to_long_permanent <- function(df, a){
   return(df)
 }
 
-to_long_temporary <- function(df, a){
-  if( a == 0) {
-    df <- split(df, df$Variável)
-    for (i in 1:length(df)){
-      df[[i]]$`Brasil` <- NULL
-      df[[i]]$`Brasil (Código)` <- NULL
-      df[[i]]$`Ano (Código)` <- NULL
-      df[[i]]$`Unidade de Medida (Código)` <- NULL
-      df[[i]]$`Unidade de Medida` <- NULL
-      df[[i]]$`Produto das lavouras temporárias (Código)` <- NULL
-      df[[i]] <- tidyr::spread(df[[i]], "Produto das lavouras temporárias", "Valor")
-    }
-  } elseif ( a == 1 ){
-    df <- split(df, df$Variável)
-    for (i in 1:length(df)){
-      df[[i]]$`Brazil` <- NULL
-      df[[i]]$`Brazil (Code)` <- NULL
-      df[[i]]$`Year (Code)` <- NULL
-      df[[i]]$`Unit of measure (Code)` <- NULL
-      df[[i]]$`Unit of measure` <- NULL
-      df[[i]]$`Product of temporary tillage (Code)` <- NULL
-      df[[i]] <- tidyr::spread(df[[i]], "Product of temporary tillage", "Value")
-    }
-  }
-  return(df)
-}
-
 load_pam_permanent <- function(years, aggregation_level = "country", language = "pt", long = FALSE){
   message("Depending on amount of items selected function may take time to run")
   sigla_uf = c(12,27,13,16,29,23,32,52,21,31,50,51,15,25,26,22,41,33,24,11,14,43,42,28,35,17)
 
   if(language == "eng"){
-    a = 1
+    e = 1
   } else {
-    a = 0
+    e = 0
   }
 
   if (language != "pt" && language != "eng"){
@@ -392,12 +270,12 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
         "Variable", "Product of permanent tillage (Code)", "Product of permanent tillage", "Unit of measure (Code)", "Unit of measure",
         "Value"
     )
-      df <- to_english1(df, a)
+      df <- to_english1(df)
     }
   }
 
   if(long == TRUE){
-    df <- to_long_permanent(df, a)
+    df <- to_long_permanent(df, e)
   }
 
 return(df)
@@ -411,7 +289,9 @@ return(df)
 #'
 #' @param language A \code{string} that indicates in which language the data will be returned. The default is "pt", so your data will be returned in Portuguese. Currently, only Portuguese and English are supported.
 #'
-#' @return A \code{data frame}
+#' @param long A \code{boolean} that sets the format of the returned data. \code{long = TRUE} will return a list where each data frame represents a variable and products are transformed to columns so each geographical aggregation level/year will only have a single line. Default value is \code{FALSE}.
+#'
+#' @return A \code{data frame} or a \code{list} of data frames if \code{long} is set to \code{TRUE}.
 #'
 #' @author DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro
 #'
@@ -422,14 +302,140 @@ return(df)
 #' @examples datazoom.amazonia::load_pam_temporary(2010, aggregation_level = "country")
 #'
 
+to_english2 <- function(df){
+  index <- df$`Variable (Code)` == 109
+  df$Variable[index] <- "Planted area"
+  index <- df$`Variable (Code)` == 216
+  df$Variable[index] <- "Harvested Area"
+  index <- df$`Variable (Code)` == 214
+  df$Variable[index] <- "Quantity produced"
+  index <- df$`Variable (Code)` == 112
+  df$Variable[index] <- "Average revenue of output"
+  index <- df$`Variable (Code)` == 215
+  df$Variable[index] <- "Output value"
+
+  index <- df$`Unit of measure (Code)` == 40
+  df$`Unit of measure`[index] <- "Thousands of Reals"
+  index <- df$`Unit of measure (Code)` == 33
+  df$`Unit of measure`[index] <- "Kgs per hectare"
+  index <- df$`Unit of measure (Code)` == 1017
+  df$`Unit of measure`[index] <- "Tonnes"
+
+  index <- df$`Product of permanent tillage (Code)` == 2717
+  df$`Product of permanent tillage`[index] <- "Avocado"
+  index <- df$`Product of permanent tillage (Code)` == 2718
+  df$`Product of permanent tillage`[index] <- "Tree cotton (lump)"
+  index <- df$`Product of permanent tillage (Code)` == 2719
+  df$`Product of permanent tillage`[index] <- "Olives"
+  index <- df$`Product of permanent tillage (Code)` == 2720
+  df$`Product of permanent tillage`[index] <- "Banana (bunch)"
+  index <- df$`Product of permanent tillage (Code)` == 2721
+  df$`Product of permanent tillage`[index] <- "Rubber (coagulated latex)"
+  index <- df$`Product of permanent tillage (Code)` == 40472
+  df$`Product of permanent tillage`[index] <- "Rubber (liquid latex)"
+  index <- df$`Product of permanent tillage (Code)` == 2722
+  df$`Product of permanent tillage`[index] <- "Cocoa (almond)"
+  index <- df$`Product of permanent tillage (Code)` == 2723
+  df$`Product of permanent tillage`[index] <- "Coffee (grain) total"
+  index <- df$`Product of permanent tillage (Code)` == 31619
+  df$`Product of permanent tillage`[index] <- "Arabica coffee (grain)"
+  index <- df$`Product of permanent tillage (Code)` == 31620
+  df$`Product of permanent tillage`[index] <- "Canephora coffee (grain)"
+  index <- df$`Product of permanent tillage (Code)` == 404
+  df$`Product of permanent tillage`[index] <- "Avocado"
+  index <- df$`Product of permanent tillage (Code)` == 404773
+  df$`Product of permanent tillage`[index] <- "Cashew"
+  index <- df$`Product of permanent tillage (Code)` == 2724
+  df$`Product of permanent tillage`[index] <- "Khaki"
+  index <- df$`Product of permanent tillage (Code)` == 2725
+  df$`Product of permanent tillage`[index] <- "Cashew nuts"
+  index <- df$`Product of permanent tillage (Code)` == 2726
+  df$`Product of permanent tillage`[index] <- "India-tea (green leaf)"
+  index <- df$`Product of permanent tillage (Code)` == 2727
+  df$`Product of permanent tillage`[index] <- "Bay coconut"
+  index <- df$`Product of permanent tillage (Code)` == 2728
+  df$`Product of permanent tillage`[index] <- "Palm (coconut bunch)"
+  index <- df$`Product of permanent tillage (Code)` == 2729
+  df$`Product of permanent tillage`[index] <- "Mate herb (green leaf)"
+  index <- df$`Product of permanent tillage (Code)` == 2730
+  df$`Product of permanent tillage`[index] <- "Fig"
+  index <- df$`Product of permanent tillage (Code)` == 2731
+  df$`Product of permanent tillage`[index] <- "Guava"
+  index <- df$`Product of permanent tillage (Code)` == 2732
+  df$`Product of permanent tillage`[index] <- "Guarana (seed)"
+  index <- df$`Product of permanent tillage (Code)` == 2733
+  df$`Product of permanent tillage`[index] <- "Orange"
+  index <- df$`Product of permanent tillage (Code)` == 2734
+  df$`Product of permanent tillage`[index] <- "Lemon"
+  index <- df$`Product of permanent tillage (Code)` == 2735
+  df$`Product of permanent tillage`[index] <- "Apple"
+  index <- df$`Product of permanent tillage (Code)` == 2736
+  df$`Product of permanent tillage`[index] <- "Papaya"
+  index <- df$`Product of permanent tillage (Code)` == 2737
+  df$`Product of permanent tillage`[index] <- "Mango"
+  index <- df$`Product of permanent tillage (Code)` == 2738
+  df$`Product of permanent tillage`[index] <- "Passion fruit"
+  index <- df$`Product of permanent tillage (Code)` == 2739
+  df$`Product of permanent tillage`[index] <- "Quince"
+  index <- df$`Product of permanent tillage (Code)` == 2740
+  df$`Product of permanent tillage`[index] <- "Nut (dry)"
+  index <- df$`Product of permanent tillage (Code)` == 90001
+  df$`Product of permanent tillage`[index] <- "Palm heart"
+  index <- df$`Product of permanent tillage (Code)` == 2741
+  df$`Product of permanent tillage`[index] <- "Pear"
+  index <- df$`Product of permanent tillage (Code)` == 2742
+  df$`Product of permanent tillage`[index] <- "Peach"
+  index <- df$`Product of permanent tillage (Code)` == 2743
+  df$`Product of permanent tillage`[index] <- "Black pepper"
+  index <- df$`Product of permanent tillage (Code)` == 2744
+  df$`Product of permanent tillage`[index] <- "Sisal or agave (fiber)"
+  index <- df$`Product of permanent tillage (Code)` == 2745
+  df$`Product of permanent tillage`[index] <- "Tangerine"
+  index <- df$`Product of permanent tillage (Code)` == 2746
+  df$`Product of permanent tillage`[index] <- "Tungue (dried fruit)"
+  index <- df$`Product of permanent tillage (Code)` == 2747
+  df$`Product of permanent tillage`[index] <- "Urucum (seed)"
+  index <- df$`Product of permanent tillage (Code)` == 2748
+  df$`Product of permanent tillage`[index] <- "Grape"
+  return(df)
+
+}
+
+to_long_temporary <- function(df, a){
+  if( a == 0) {
+    df <- split(df, df$Variável)
+    for (i in 1:length(df)){
+      df[[i]]$`Brasil` <- NULL
+      df[[i]]$`Brasil (Código)` <- NULL
+      df[[i]]$`Ano (Código)` <- NULL
+      df[[i]]$`Unidade de Medida (Código)` <- NULL
+      df[[i]]$`Unidade de Medida` <- NULL
+      df[[i]]$`Produto das lavouras temporárias (Código)` <- NULL
+      df[[i]] <- tidyr::spread(df[[i]], "Produto das lavouras temporárias", "Valor")
+    }
+  } elseif ( a == 1 ){
+    df <- split(df, df$Variável)
+    for (i in 1:length(df)){
+      df[[i]]$`Brazil` <- NULL
+      df[[i]]$`Brazil (Code)` <- NULL
+      df[[i]]$`Year (Code)` <- NULL
+      df[[i]]$`Unit of measure (Code)` <- NULL
+      df[[i]]$`Unit of measure` <- NULL
+      df[[i]]$`Product of temporary tillage (Code)` <- NULL
+      df[[i]] <- tidyr::spread(df[[i]], "Product of temporary tillage", "Value")
+    }
+  }
+  return(df)
+}
+
 load_pam_temporary <- function(years, aggregation_level = "country", language = "pt", long = FALSE){
   message("Depending on amount of items selected function may take time to run")
   sigla_uf = c(12,27,13,16,29,23,32,52,21,31,50,51,15,25,26,22,41,33,24,11,14,43,42,28,35,17)
 
   if(language == "eng"){
-    a = 1
+    e = 1
   } else {
-    a = 0
+    e = 0
   }
 
   if (language != "pt" && language != "eng"){
@@ -539,7 +545,7 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
   }
 
   if (long == TRUE){
-    df <- to_long_temporary(df, a)
+    df <- to_long_temporary(df, e)
   }
 
 return(df)
