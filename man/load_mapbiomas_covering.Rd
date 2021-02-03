@@ -6,14 +6,14 @@
 \title{load_mapbiomas_covering}
 \usage{
 load_mapbiomas_covering(
-  aggregation_level = c("municipality", "state", "municipio", "estado"),
+  space_aggregation = c("municipality", "state", "municipio", "estado"),
   path = NULL,
   covering = NULL,
   years = c(1985:2020)
 )
 }
 \arguments{
-\item{aggregation_level}{A string that indicates the level of aggregation of the data. It can be by municipality or state}
+\item{space_aggregation}{A string that indicates the level of aggregation of the data. It can be by municipality or state}
 
 \item{path}{A string indicating where the raw data is in your computer. The default is NULL which means the data will be extracted directly from the website}
 
@@ -32,7 +32,7 @@ A data base with data containing the area of each selected type of soil covering
 Download and filter data on type of soil covering by year
 }
 \examples{
-load_mapbiomas_covering(aggregation_level = 'municipality', path = NULL,
+load_mapbiomas_covering(space_aggregation = 'municipality', path = NULL,
                              covering = 3, years = c(2000:2010))
 }
 \author{

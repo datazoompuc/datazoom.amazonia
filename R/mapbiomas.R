@@ -2,7 +2,7 @@
 #' 
 #' @description Download and filter data on type of soil covering by year
 #' 
-#' @param aggregation_level A string that indicates the level of aggregation of the data. It can be by municipality or state
+#' @param space_aggregation A string that indicates the level of aggregation of the data. It can be by municipality or state
 #' @param path A string indicating where the raw data is in your computer. The default is NULL which means the data will be extracted directly from the website
 #' @param covering Output contains only data over the selected covering
 #' Input has to be the code of the desired covering
@@ -22,29 +22,29 @@
 #' @export
 #'
 #' @examples
-#' load_mapbiomas_covering(aggregation_level = 'municipality', path = NULL,
+#' load_mapbiomas_covering(space_aggregation = 'municipality', path = NULL,
 #'                              covering = 3, years = c(2000:2010))
 
 
 
-load_mapbiomas_covering<-function(aggregation_level = c('municipality', 'state','municipio','estado'), path = NULL,
+load_mapbiomas_covering<-function(space_aggregation = c('municipality', 'state','municipio','estado'), path = NULL,
                                        covering = NULL, years = c(1985:2020)){
   if(is.null(path)){
-    if(aggregation_level=='state' | aggregation_level=='estado'){
+    if(space_aggregation=='state' | space_aggregation=='estado'){
       url1<-'https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Dados_Cobertura_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx'
-    }else if(aggregation_level=='municipality' | aggregation_level=='municipio'){
+    }else if(space_aggregation=='municipality' | space_aggregation=='municipio'){
       url1<-'https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Dados_Cobertura_MapBiomas_5.0_UF-MUN_SITE_v2.xlsx'
     }
     p1f <- tempfile()
     download.file(url1, p1f, mode="wb")
   }else{
-    if(aggregation_level=='state' | aggregation_level=='estado'){
+    if(space_aggregation=='state' | space_aggregation=='estado'){
       p1f<-paste0(path,'/Dados_Cobertura_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx')
-    }else if(aggregation_level=='municipality' | aggregation_level=='municipio'){
+    }else if(space_aggregation=='municipality' | space_aggregation=='municipio'){
       p1f<-paste0(path,'/Dados_Cobertura_MapBiomas_5.0_UF-MUN_SITE.xlsx')
     }
   }
-  if(aggregation_level=='state' | aggregation_level=='estado'){
+  if(space_aggregation=='state' | space_aggregation=='estado'){
     a<-read_excel(path = p1f, sheet = 3)
     a<-a[!(substring(a$biome,1,4)!="Amaz"),]
     a$state[a$state == "Acre"] <- "AC"
@@ -72,7 +72,7 @@ load_mapbiomas_covering<-function(aggregation_level = c('municipality', 'state',
         ret<-cbind(ret,data)
         retorno<-rbind(retorno,ret)
       }
-  }else if(aggregation_level=='municipality' | aggregation_level=='municipio'){
+  }else if(space_aggregation=='municipality' | space_aggregation=='municipio'){
     b<-read_excel(path = p1f, sheet = 3)
     tipos<-c('RR','RO','AC','AM','MA','TO','PA','AP','MT')
     `%notin%` <- Negate(`%in%`)

@@ -31,7 +31,7 @@ years <- c(2015:2017)
 
 data <- load_amazon_gdp(years)
 
-data <- load_amazon_gdp(2017, aggregation_level = "state", language = "pt")
+data <- load_amazon_gdp(2017, space_aggregation = "state", language = "pt")
 
 data <- load_gdp(years)
 ```
