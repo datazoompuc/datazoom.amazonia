@@ -33,9 +33,14 @@ NULL
 #'   language = "pt"
 #' )
 load_deter <- function(source = "amazonia", space_aggregation = "municipality", time_aggregation = "year", language = "eng") {
-  df <- load_deter_raw(source)
 
-  treat_deter_data(df, space_aggregation, time_aggregation, language)
+    df <- load_deter_raw(source)
+
+    if(!is.character(df)){
+      treat_deter_data(df, space_aggregation, time_aggregation, language)
+    }
+
+    df
 }
 
 
@@ -76,18 +81,35 @@ load_deter_raw <- function(source = "amazonia") {
 
     temp <- tempfile(fileext = ".zip")
 
-    utils::download.file(url, temp, mode = "wb")
+    oldw = getOption("warn")
 
-    dir <- tempdir()
+    options(warn = -1)
 
-    utils::unzip(temp, "deter_public.dbf", exdir = dir)
+    sucess <- TRUE
 
-    df <- foreign::read.dbf(paste(dir, "deter_public.dbf", sep = "/"), as.is = TRUE) %>%
-      tibble::as_tibble()
+    tryCatch(
+    utils::download.file(url, temp, mode = "wb"),
+    error = function(e){
+      sucess <<- FALSE
+    },
+    finally = options(warn = oldw)
+    )
 
-    unlink(temp)
+    if(sucess){
 
-    Encoding(df$MUNICIPALI) <- "UTF-8"
+      dir <- tempdir()
+
+      utils::unzip(temp, "deter_public.dbf", exdir = dir)
+
+      df <- foreign::read.dbf(paste(dir, "deter_public.dbf", sep = "/"), as.is = TRUE) %>%
+        tibble::as_tibble()
+
+      Encoding(df$MUNICIPALI) <- "UTF-8"
+    }
+
+    else{
+      df <- "Download failed"
+    }
 
     return(df)
   }
@@ -229,4 +251,8 @@ translate_deter_to_english <- function(df) {
       Mes = "Month",
       Ano = "Year"
     )
+}
+
+if_download_fails <- function(e){
+  print("Download failed")
 }
