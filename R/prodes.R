@@ -5,7 +5,7 @@ NULL
 #' Loads and cleans deforestation data from INPE.
 #'
 #' @inheritParams load_prodes_raw
-#' @param aggregation_level A string that indicates the level of aggregation of the data. It can be by "Municipality" or
+#' @param space_aggregation A string that indicates the level of aggregation of the data. It can be by "Municipality" or
 #'   "State".
 #' @param language A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
 #'   The other option is "pt" for Portuguese.
@@ -23,25 +23,30 @@ NULL
 #'
 #' load_prodes(
 #'   c(2017, 2018),
-#'   aggregation_level = "state",
+#'   space_aggregation = "state",
 #'   language = "pt"
 #' )
 #'
 #' load_prodes(
 #'   system.file("extdata", package = "datazoom.amazonia"),
-#'   aggregation_level = "state",
+#'   space_aggregation = "state",
 #'   language = "en"
 #' )
 #'
 #' load_prodes(
 #'   system.file("extdata", "DesmatamentoMunicipios2015.txt", package = "datazoom.amazonia"),
-#'   aggregation_level = "municipality",
+#'   space_aggregation = "municipality",
 #'   language = "pt"
+<<<<<<< HEAD
 #' )}
 load_prodes <- function(source, aggregation_level = "municipality", language = "eng") {
+=======
+#' )
+load_prodes <- function(source, space_aggregation = "municipality", language = "eng") {
+>>>>>>> origin/master
   raw_list <- load_prodes_raw(source)
 
-  list_df <- lapply(raw_list, treat_prodes_data, aggregation_level = aggregation_level, language = language)
+  list_df <- lapply(raw_list, treat_prodes_data, space_aggregation = space_aggregation, language = language)
 
   dplyr::bind_rows(list_df)
 }
@@ -100,9 +105,9 @@ load_prodes_raw <- function(source) {
   lapply(source, readr::read_csv, col_types = csv_types, locale = readr::locale(encoding = "latin1"))
 }
 
-treat_prodes_data <- function(df, aggregation_level, language) {
-  aggregation_level <- tolower(aggregation_level)
-  if (aggregation_level == "state") {
+treat_prodes_data <- function(df, space_aggregation, language) {
+  space_aggregation <- tolower(space_aggregation)
+  if (space_aggregation == "state") {
     df <-
       df %>%
       dplyr::mutate(CodIBGE = as.factor(substr(.data$CodIbge, start = 1, stop = 2))) %>%
@@ -110,7 +115,7 @@ treat_prodes_data <- function(df, aggregation_level, language) {
       dplyr::group_by(.data$Estado, .data$CodIBGE) %>%
       dplyr::summarize_if(is.numeric, sum, na.rm = TRUE)
   }
-  else if (aggregation_level == "municipality") {
+  else if (space_aggregation == "municipality") {
     df <- dplyr::mutate(df, CodIBGE = as.factor(.data$CodIbge)) %>% dplyr::select(-c("CodIbge"))
   }
   else {

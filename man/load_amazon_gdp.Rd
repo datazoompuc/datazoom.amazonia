@@ -4,12 +4,12 @@
 \alias{load_amazon_gdp}
 \title{Gets GDP at current prices and Population data for the Brazilian Legal Amazon}
 \usage{
-load_amazon_gdp(years, aggregation_level = "municipality", language = "eng")
+load_amazon_gdp(years, space_aggregation = "municipality", language = "eng")
 }
 \arguments{
 \item{years}{A numeric vector with years of interest. Supported years 2002-2017 for GDP data and 2001-2009, 2011-present for population data.}
 
-\item{aggregation_level}{A string that indicates the level of aggregation of the data. It can be by "Municipality" or
+\item{space_aggregation}{A string that indicates the level of aggregation of the data. It can be by "Municipality" or
 "State"}
 
 \item{language}{A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.

@@ -15,3 +15,6 @@
 # datazoom.amazonia 0.6.0.9000
 * Added functions for DEGRAD data 
 
+# datazoom.amazonia 0.7.0.9000
+* Added functions for DETER data 
+

@@ -4,7 +4,7 @@ NULL
 #' Gets GDP at current prices and Population data for the Brazilian Legal Amazon
 #'
 #' @param years A numeric vector with years of interest. Supported years 2002-2017 for GDP data and 2001-2009, 2011-present for population data.
-#' @param aggregation_level A string that indicates the level of aggregation of the data. It can be by "Municipality" or
+#' @param space_aggregation A string that indicates the level of aggregation of the data. It can be by "Municipality" or
 #'   "State"
 #' @param language A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
 #'   The other option is "pt" for Portuguese.
@@ -13,10 +13,15 @@ NULL
 #' @export
 #'
 #' @examples
+<<<<<<< HEAD
 #' \dontrun{load_amazon_gdp(2017)}
 
 
 load_amazon_gdp <- function(years, aggregation_level = "municipality", language = "eng") {
+=======
+#' load_amazon_gdp(2017)
+load_amazon_gdp <- function(years, space_aggregation = "municipality", language = "eng") {
+>>>>>>> origin/master
   states <- legal_amazon %>%
     dplyr::filter(.data$AMZ_LEGAL == 1)
 
@@ -56,7 +61,7 @@ load_amazon_gdp <- function(years, aggregation_level = "municipality", language 
     )
   )
 
-  if (tolower(aggregation_level) == "state") {
+  if (tolower(space_aggregation) == "state") {
     df <- df %>%
       dplyr::rename(CD_MUN = .data[["Munic\u00edpio (C\u00f3digo)"]]) %>%
       dplyr::mutate(CD_MUN = as.numeric(.data$CD_MUN)) %>%
@@ -75,7 +80,7 @@ load_amazon_gdp <- function(years, aggregation_level = "municipality", language 
       dplyr::mutate(PIBpc = .data$PIB / .data$Pop * 1000)
   }
   else {
-    if (tolower(aggregation_level) != "municipality") warning("Aggregation level is not supported. Proceeding with municipality")
+    if (tolower(space_aggregation) != "municipality") warning("Aggregation level is not supported. Proceeding with municipality")
 
     amz <- legal_amazon %>%
       dplyr::select(.data$CD_MUN, .data$AMZ_LEGAL) %>%
@@ -113,11 +118,17 @@ load_amazon_gdp <- function(years, aggregation_level = "municipality", language 
 #' @export
 #'
 #' @examples
+<<<<<<< HEAD
 #' \dontrun{load_gdp(2017)}
 
 
 load_gdp <- function(years, aggregation_level = "municipality", language = "eng") {
   if (tolower(aggregation_level) == "state") {
+=======
+#' load_gdp(2017)
+load_gdp <- function(years, space_aggregation = "municipality", language = "eng") {
+  if (tolower(space_aggregation) == "state") {
+>>>>>>> origin/master
     # GDP data
     gdp <- tibble::as_tibble(
       sidrar::get_sidra(
@@ -161,7 +172,7 @@ load_gdp <- function(years, aggregation_level = "municipality", language = "eng"
       dplyr::mutate(PIBpc = .data$PIB / .data$Pop * 1000)
   }
   else {
-    if (tolower(aggregation_level) != "municipality") warning("Aggregation level is not supported. Proceeding with municipality")
+    if (tolower(space_aggregation) != "municipality") warning("Aggregation level is not supported. Proceeding with municipality")
 
     # GDP data
     gdp <- tibble::as_tibble(
