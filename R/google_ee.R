@@ -23,7 +23,7 @@
 #' load_ee(db = 'NOAA/VIIRS/DNB/MONTHLY_V1/VCMSLCFG',state=c('RJ'))
 #' }
 #'
-load_ee = function(db = 'NOAA/VIIRS/DNB/MONTHLY_V1/VCMSLCFG',var='avg_rad',year_begin = '2014',year_end = '2018',
+load_earth_engine = function(db = 'NOAA/VIIRS/DNB/MONTHLY_V1/VCMSLCFG',var='avg_rad',year_begin = '2014',year_end = '2018',
                    type='municipality',state = 'all',nclusters=0){
 
   ## Initialize Google Earth Engine (EE)
