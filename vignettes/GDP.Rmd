@@ -24,7 +24,7 @@ The definition of the Brazilian Legal Amazon at the municipality level is taken 
 
 Using the package is easy enough:
 
-```{r setup}
+```{r try}
 library(datazoom.amazonia)
 
 years <- c(2015:2017)

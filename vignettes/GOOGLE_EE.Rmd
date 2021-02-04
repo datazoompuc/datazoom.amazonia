@@ -26,7 +26,7 @@ The function currently supports VIIRS Nighlights, but datasets will be added.
 
 You can use the function to construct panel data:
 
-```{r use}
+```{r use,eval=FALSE}
 library(datazoom.amazonia)
 df = load_earth_engine(db = 'NOAA/VIIRS/DNB/MONTHLY_V1/VCMSLCFG',state=c('RJ','SP'))
 head(df)
@@ -34,7 +34,7 @@ head(df)
 
 And then plot cool stuff:
 
-```{r plot}
+```{r plot,eval=FALSE}
 
 ggplot2::ggplot() + 
   hrbrthhemes::theme_modern_rc() + 
