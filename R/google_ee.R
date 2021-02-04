@@ -21,9 +21,6 @@
 #'
 #' \dontrun{load_ee(db = 'NOAA/VIIRS/DNB/MONTHLY_V1/VCMSLCFG',state=c('RJ'))}
 #'
-#'
-#  #ggplot2::ggplot() + ggplot2::geom_sf(data = sf::st_as_sf(ee_df[ee_df$year==2014,]),ggplot2::aes(fill = mean_rad),col=NA)
-#'
 load_ee = function(db = 'NOAA/VIIRS/DNB/MONTHLY_V1/VCMSLCFG',var='avg_rad',year_begin = '2014',year_end = '2018',
                    type='municipality',state = 'all',nclusters=0){
 
@@ -122,7 +119,7 @@ ext_fun = function(uf,shp=shp,ee_data=ee_data,large=large,type=type,un=units,var
   ee_df = ee_df %>% dplyr::select(-geometry,-variable)
 
   ee_df = ee_df %>% dplyr::group_by(id,year) %>%
-    dplyr::summarise(mean_rad = mean(avg_rad),sd_rad = sd(avg_rad)) %>%
+    dplyr::summarise(mean_rad = base::mean(avg_rad),sd_rad = stats::sd(avg_rad)) %>%
     dplyr::ungroup()
 
   ee_df = dplyr::inner_join(ee_df,geo,by='id') %>% dplyr::select(-id)

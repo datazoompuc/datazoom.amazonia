@@ -13,7 +13,7 @@ NULL
 #' @export
 #'
 #' @examples
-#' load_amazon_gdp(2017)
+#' \dontrun{load_amazon_gdp(2017)}
 load_amazon_gdp <- function(years, aggregation_level = "municipality", language = "eng") {
   states <- legal_amazon %>%
     dplyr::filter(.data$AMZ_LEGAL == 1)

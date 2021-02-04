@@ -19,7 +19,7 @@ NULL
 #' @export
 #'
 #' @examples
-#' load_prodes(2018)
+#' \dontrun{load_prodes(2018)
 #'
 #' load_prodes(
 #'   c(2017, 2018),
@@ -37,7 +37,7 @@ NULL
 #'   system.file("extdata", "DesmatamentoMunicipios2015.txt", package = "datazoom.amazonia"),
 #'   aggregation_level = "municipality",
 #'   language = "pt"
-#' )
+#' )}
 load_prodes <- function(source, aggregation_level = "municipality", language = "eng") {
   raw_list <- load_prodes_raw(source)
 

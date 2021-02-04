@@ -28,13 +28,18 @@ Imports:
     geobr,
     sf,
     utils,
-    readxl
+    readxl,
+    reshape2,
+    stringr
 URL: http://www.econ.puc-rio.br/datazoom
 Suggests: 
     knitr,
     rmarkdown,
     lwgeom,
-    rgee
+    rgee,
+    ggplot2,
+    hrbrthemes,
+    viridis
 VignetteBuilder: knitr
 Depends: 
     R (>= 2.10)

@@ -1,8 +1,8 @@
 ---
-title: "GOOGLE_EE"
+title: "Google Earth Engine Interface"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{GOOGLE_EE}
+  %\VignetteIndexEntry{Google Earth Engine Interface}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -36,10 +36,13 @@ And then plot cool stuff:
 
 ```{r plot}
 
-library(ggplot2)
-library(gganimate)
-library(hrbrthemes)
+ggplot2::ggplot() + 
+  hrbrthhemes::theme_modern_rc() + 
+  ggplot2::geom_sf(data = sf::st_as_sf(df[df$year==2014,]),ggplot2::aes(fill = mean_rad),col=NA) +
+  viridis::scale_fill_viridis_c(option='B')
 
-ggplot() + theme_modern_rc() + geom_sf(data = sf::st_as_sf(df[df$year==2014,]),aes(fill = mean_rad),col=NA) +
-  scale_fill_viridis_c(option='B')
+
+```
+
+
 
