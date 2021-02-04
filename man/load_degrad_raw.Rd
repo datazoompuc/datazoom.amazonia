@@ -23,9 +23,9 @@ A list of \code{tibble}.
 Loads DEGRAD data from INPE.
 }
 \examples{
-load_degrad_raw(2016)
+\dontrun{load_degrad_raw(2016)}
 
-load_degrad_raw(c(2013, 2014, 2016))
+\dontrun{load_degrad_raw(c(2013, 2014, 2016))}
 
 \dontrun{
 load_degrad_raw("~/Downloads")

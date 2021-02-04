@@ -19,7 +19,7 @@ A data base with data containing the area of each selected type of soil covering
 Download and filter data on transition of types of soil covering by year
 }
 \examples{
-load_mapbiomas_transition(path = NULL, transition_interval = 5)
+\dontrun{load_mapbiomas_transition(path = NULL, transition_interval = 5)}
 }
 \author{
 DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro

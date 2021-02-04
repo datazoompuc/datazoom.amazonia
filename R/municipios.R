@@ -14,6 +14,8 @@ NULL
 #'
 #' @examples
 #' \dontrun{load_amazon_gdp(2017)}
+
+
 load_amazon_gdp <- function(years, aggregation_level = "municipality", language = "eng") {
   states <- legal_amazon %>%
     dplyr::filter(.data$AMZ_LEGAL == 1)
@@ -102,6 +104,7 @@ load_amazon_gdp <- function(years, aggregation_level = "municipality", language 
   df
 }
 
+
 #' Gets GDP at current prices and Population data for Brazil
 #'
 #' @inheritParams load_amazon_gdp
@@ -110,7 +113,9 @@ load_amazon_gdp <- function(years, aggregation_level = "municipality", language 
 #' @export
 #'
 #' @examples
-#' load_gdp(2017)
+#' \dontrun{load_gdp(2017)}
+
+
 load_gdp <- function(years, aggregation_level = "municipality", language = "eng") {
   if (tolower(aggregation_level) == "state") {
     # GDP data

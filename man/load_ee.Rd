@@ -40,8 +40,6 @@ Visible Infrared Imaging Radiometer Suite (VIIRS) Day/Night Band (DNB).
 
 \dontrun{load_ee(db = 'NOAA/VIIRS/DNB/MONTHLY_V1/VCMSLCFG',state=c('RJ'))}
 
-
-
 }
 \author{
 DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro.

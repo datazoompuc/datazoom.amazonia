@@ -22,5 +22,5 @@ A \code{tibble} with GDP (in thousands), Population and GDP Per Capita (in units
 Gets GDP at current prices and Population data for Brazil
 }
 \examples{
-load_gdp(2017)
+\dontrun{load_gdp(2017)}
 }

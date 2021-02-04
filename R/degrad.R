@@ -44,6 +44,8 @@ NULL
 #'   language = "pt"
 #' )
 #' }
+
+
 load_degrad <- function(source, space_aggregation = "municipality", time_aggregation = "year", language = "eng", all_events = FALSE) {
   raw_list <- load_degrad_raw(source)
 
@@ -74,15 +76,16 @@ load_degrad <- function(source, space_aggregation = "municipality", time_aggrega
 #' @export
 #'
 #' @examples
-#' load_degrad_raw(2016)
+#' \dontrun{load_degrad_raw(2016)}
 #'
-#' load_degrad_raw(c(2013, 2014, 2016))
+#' \dontrun{load_degrad_raw(c(2013, 2014, 2016))}
 #'
 #' \dontrun{
 #' load_degrad_raw("~/Downloads")
 #'
 #' load_degrad_raw("~/Downloads/degrad2016_final_shp/DEGRAD_2016_pol.shp")
 #' }
+
 load_degrad_raw <- function(source) {
   # If source is a list of numbers, we retrieve data from INPE
   if (is.numeric(source)) {

@@ -22,7 +22,7 @@
 #' @export
 #'
 #' @examples
-#' \donrun{load_mapbiomas_covering(aggregation_level = 'municipality', path = NULL,
+#' \dontrun{load_mapbiomas_covering(aggregation_level = 'municipality', path = NULL,
 #'                              covering = 3, years = c(2000:2010))}
 
 
@@ -115,7 +115,7 @@ load_mapbiomas_covering<-function(aggregation_level = c('municipality', 'state',
 #' @export
 #'
 #' @examples
-#' load_mapbiomas_transition(path = NULL, transition_interval = 5)
+#' \dontrun{load_mapbiomas_transition(path = NULL, transition_interval = 5)}
 
 
 
