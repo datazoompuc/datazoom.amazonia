@@ -113,3 +113,28 @@ load_ee = function(db = 'NOAA/VIIRS/DNB/MONTHLY_V1/VCMSLCFG',var='avg_rad',year_
   return(ee_df)
 
 }
+
+initialize_ee = function(){
+
+
+  ## Install Google Earth Engine for the first time
+
+  # install.packages('sf')
+  # install.packages('mapview')
+  # install.packages('remotes')
+
+  if (!requireNamespace("rgee", quietly = TRUE)) {
+    stop("Package \"rgee\" needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
+
+  if (!require("rgee")) {
+    remotes::install_github("rgee")
+    rgee::ee_install()
+  }
+
+  ## Initialize EE
+
+  #rgee::ee_check()
+  rgee::ee_Initialize()
+}

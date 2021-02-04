@@ -6,7 +6,8 @@ Authors@R: c(
     person("Victor", "Aliende da Matta", role = c("aut"), email = "victor.al.matta@gmail.com"),
     person("Maria", "Mittelbach", role = c("aut"), email = "mariamittelbach@gmail.com"),
     person("Anna Carolina", "Dutra Saraiva", role = c("aut"), email = "annadutrasaraiva@gmail.com"),
-    person("Bruno", "Alcantara Duarte", role = c("aut"), email = "brunoalcanduarte@gmail.com")
+    person("Bruno", "Alcantara Duarte", role = c("aut"), email = "brunoalcanduarte@gmail.com"),
+    person("Daniel AC", "Barbosa", role = c("aut"), email = "daniel.adrianocb@gmail.com")
     )
 Description: This package offers functions to download and treat data regarding
              the Brazilian Amazon region from a variety of official sources.
@@ -32,7 +33,8 @@ URL: http://www.econ.puc-rio.br/datazoom
 Suggests: 
     knitr,
     rmarkdown,
-    lwgeom
+    lwgeom,
+    rgee
 VignetteBuilder: knitr
 Depends: 
     R (>= 2.10)

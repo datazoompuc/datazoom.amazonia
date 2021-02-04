@@ -15,7 +15,12 @@ initialize_ee = function(){
   # install.packages('sf')
   # install.packages('mapview')
   # install.packages('remotes')
-  #
+
+  if (!requireNamespace("rgee", quietly = TRUE)) {
+    stop("Package \"rgee\" needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
+
   if (!require("rgee")) {
     remotes::install_github("rgee")
     rgee::ee_install()
