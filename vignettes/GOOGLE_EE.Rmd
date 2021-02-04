@@ -1,0 +1,45 @@
+---
+title: "GOOGLE_EE"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{GOOGLE_EE}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Google Earth Engine
+
+This function provides a wrapper for the \code{r-spatial/rgee} interface for [Google Earth Engine](https://earthengine.google.com/), with an emphasis on building panel data for brazilian geometries.
+
+The function currently supports VIIRS Nighlights, but datasets will be added.
+
+(TO-DO: Write more)
+
+## Usage
+
+You can use the function to construct panel data:
+
+```{r use}
+library(datazoom.amazonia)
+df = load_ee(db = 'NOAA/VIIRS/DNB/MONTHLY_V1/VCMSLCFG',state=c('RJ','SP'))
+head(df)
+```
+
+And then plot cool stuff:
+
+```{r plot}
+
+library(ggplot2)
+library(gganimate)
+library(hrbrthemes)
+
+ggplot() + theme_modern_rc() + geom_sf(data = sf::st_as_sf(df[df$year==2014,]),aes(fill = mean_rad),col=NA) +
+  scale_fill_viridis_c(option='B')
+
