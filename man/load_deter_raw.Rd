@@ -21,10 +21,11 @@ A \code{tibble}
 Loads INPE data on areas with deforestation warnings
 }
 \examples{
+\dontrun{
 load_deter_raw()
 
 load_deter_raw("cerrado")
-\dontrun{
+
 load_deter_raw("path/to/deter.zip")
 }
 

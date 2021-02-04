@@ -38,7 +38,9 @@ Visible Infrared Imaging Radiometer Suite (VIIRS) Day/Night Band (DNB).
 }
 \examples{
 
-\dontrun{load_ee(db = 'NOAA/VIIRS/DNB/MONTHLY_V1/VCMSLCFG',state=c('RJ'))}
+\dontrun{
+load_ee(db = 'NOAA/VIIRS/DNB/MONTHLY_V1/VCMSLCFG',state=c('RJ'))
+}
 
 }
 \author{

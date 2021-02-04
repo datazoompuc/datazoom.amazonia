@@ -4,12 +4,9 @@ export(load_amazon_gdp)
 export(load_comex)
 export(load_degrad)
 export(load_degrad_raw)
-<<<<<<< HEAD
-export(load_ee)
-=======
 export(load_deter)
 export(load_deter_raw)
->>>>>>> origin/master
+export(load_ee)
 export(load_gdp)
 export(load_mapbiomas_covering)
 export(load_mapbiomas_transition)

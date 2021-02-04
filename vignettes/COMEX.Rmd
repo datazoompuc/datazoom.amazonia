@@ -28,7 +28,7 @@ The output is a list of dataframes. Each dataframe will contain all years select
 
 Using the function is easy enough:
 
-```{r setup,eval=FALSE}
+```{r setup}
 library(datazoom.amazonia)
 
 year <- c(2000)

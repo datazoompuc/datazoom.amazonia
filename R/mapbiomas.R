@@ -1,13 +1,8 @@
 #' @title load_mapbiomas_covering
 #'
 #' @description Download and filter data on type of soil covering by year
-<<<<<<< HEAD
 #'
-#' @param aggregation_level A string that indicates the level of aggregation of the data. It can be by municipality or state
-=======
-#' 
 #' @param space_aggregation A string that indicates the level of aggregation of the data. It can be by municipality or state
->>>>>>> origin/master
 #' @param path A string indicating where the raw data is in your computer. The default is NULL which means the data will be extracted directly from the website
 #' @param covering Output contains only data over the selected covering
 #' Input has to be the code of the desired covering
@@ -27,13 +22,8 @@
 #' @export
 #'
 #' @examples
-<<<<<<< HEAD
 #' \dontrun{load_mapbiomas_covering(aggregation_level = 'municipality', path = NULL,
 #'                              covering = 3, years = c(2000:2010))}
-=======
-#' load_mapbiomas_covering(space_aggregation = 'municipality', path = NULL,
-#'                              covering = 3, years = c(2000:2010))
->>>>>>> origin/master
 
 
 

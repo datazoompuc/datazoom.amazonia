@@ -13,15 +13,9 @@ NULL
 #' @export
 #'
 #' @examples
-<<<<<<< HEAD
 #' \dontrun{load_amazon_gdp(2017)}
 
-
-load_amazon_gdp <- function(years, aggregation_level = "municipality", language = "eng") {
-=======
-#' load_amazon_gdp(2017)
 load_amazon_gdp <- function(years, space_aggregation = "municipality", language = "eng") {
->>>>>>> origin/master
   states <- legal_amazon %>%
     dplyr::filter(.data$AMZ_LEGAL == 1)
 
@@ -118,17 +112,10 @@ load_amazon_gdp <- function(years, space_aggregation = "municipality", language 
 #' @export
 #'
 #' @examples
-<<<<<<< HEAD
 #' \dontrun{load_gdp(2017)}
 
-
-load_gdp <- function(years, aggregation_level = "municipality", language = "eng") {
-  if (tolower(aggregation_level) == "state") {
-=======
-#' load_gdp(2017)
 load_gdp <- function(years, space_aggregation = "municipality", language = "eng") {
   if (tolower(space_aggregation) == "state") {
->>>>>>> origin/master
     # GDP data
     gdp <- tibble::as_tibble(
       sidrar::get_sidra(

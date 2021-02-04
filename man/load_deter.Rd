@@ -34,10 +34,12 @@ A \code{tibble}.
 Loads and cleans INPE data on areas with deforestation warnings
 }
 \examples{
-load_deter()
 \dontrun{
+https://r-pkgs.org/vignettes.html
+load_deter()
+
 load_deter("path/to/deter.zip", space_aggregation = "municipality", time_aggregation = "year")
-}
+
 
 load_deter(
   source = "cerrado",
@@ -45,6 +47,7 @@ load_deter(
   time_aggregation = "month",
   language = "pt"
 )
+}
 }
 \seealso{
 \link{load_deter_raw} for loading raw data.

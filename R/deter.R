@@ -21,10 +21,12 @@ NULL
 #' @export
 #'
 #' @examples
-#' load_deter()
 #' \dontrun{
+#' https://r-pkgs.org/vignettes.html
+#' load_deter()
+#'
 #' load_deter("path/to/deter.zip", space_aggregation = "municipality", time_aggregation = "year")
-#' }
+#'
 #'
 #' load_deter(
 #'   source = "cerrado",
@@ -32,6 +34,8 @@ NULL
 #'   time_aggregation = "month",
 #'   language = "pt"
 #' )
+#' }
+
 load_deter <- function(source = "amazonia", space_aggregation = "municipality", time_aggregation = "year", language = "eng") {
   df <- load_deter_raw(source)
 
@@ -59,13 +63,15 @@ load_deter <- function(source = "amazonia", space_aggregation = "municipality", 
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' load_deter_raw()
 #'
 #' load_deter_raw("cerrado")
-#' \dontrun{
+#'
 #' load_deter_raw("path/to/deter.zip")
 #' }
 #'
+
 load_deter_raw <- function(source = "amazonia") {
   if (tolower(source) %in% c("amazonia", "cerrado")) {
     if (tolower(source) == "amazonia") {

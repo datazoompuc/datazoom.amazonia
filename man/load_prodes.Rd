@@ -30,7 +30,9 @@ A \code{tibble}.
 Loads and cleans deforestation data from INPE.
 }
 \examples{
-\dontrun{load_prodes(2018)
+\dontrun{
+
+load_prodes(2018)
 
 load_prodes(
   c(2017, 2018),
@@ -48,7 +50,9 @@ load_prodes(
   system.file("extdata", "DesmatamentoMunicipios2015.txt", package = "datazoom.amazonia"),
   space_aggregation = "municipality",
   language = "pt"
+
 )}
+
 }
 \seealso{
 \link{load_prodes_raw} for loading raw data.
