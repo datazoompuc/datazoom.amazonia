@@ -13,7 +13,7 @@
 #' @param nclusters Numbers of cluster to be used (TO:DO: Still need to implement this properly)
 #'
 #' @return A \code{tibble}
-#' @export load_ee
+#' @export load_earth_engine
 #'
 #' @author DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro.
 #'
