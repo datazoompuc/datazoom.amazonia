@@ -1,3 +1,4 @@
+
 # datazoom.amazonia 0.1.0.9000
 
 * Added a `NEWS.md` file to track changes to the package.
@@ -15,3 +16,8 @@
 # datazoom.amazonia 0.6.0.9000
 * Added functions for DEGRAD data 
 
+# datazoom.amazonia 0.7.0.9000
+* Added functions for DETER data 
+
+# datazoom.amazonia 0.8.0.9000
+* Added functions for IBAMA data 
