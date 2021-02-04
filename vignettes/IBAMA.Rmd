@@ -34,7 +34,7 @@ The user has the option of obtaining data either in Portuguese or in English.
 
 To download the data from Ibama's website, set ```download_data = TRUE``` and choose
 a destination for your data by parameter ```download_directory```. Arguments
-```time_unit``` and ```geographic_unit``` set the levels through which the aggregation
+```time_aggregation``` and ```space_aggregation``` set the levels through which the aggregation
 should be done. Available options are by year and/or month, and by state and/or 
 municipality, respectively.
 
@@ -45,8 +45,8 @@ library(datazoom.amazonia)
 load_ibama(
   download_data = TRUE, 
   download_directory = './Desktop',
-  time_unit = c('month', 'year'),
-  geographic_unit = c('city', 'state'),
+  time_aggregation = c('month', 'year'),
+  space_aggregation = c('municipality', 'state'),
   years = c(2010, 2012),
   language = "eng"
   )
@@ -54,15 +54,15 @@ load_ibama(
 
 To load previously downloaded raw data, set ```download_data = FALSE``` and specify the
 file's path with the parameter ```load_from_where```. If ```language = 'pt```, use 
-```geographic_unit = c('municipio', 'uf')``` and ```time_unit = c('ano', 'mes')``` instead:
+```space_aggregation = c('municipio', 'uf')``` and ```time_aggregation = c('ano', 'mes')``` instead:
 
 ```{r, eval = FALSE }
 
 load_ibama(
   download_data = 'FALSE', 
   download_directory = './Desktop/data.xls',
-  time_unit = 'ano',
-  geographic_unit = 'uf',
+  time_aggregation = 'ano',
+  space_aggregation = 'uf',
   years = 2010:2015,
   language = "pt"
   )

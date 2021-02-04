@@ -9,8 +9,8 @@ load_ibama(
   download_data = TRUE,
   download_directory,
   load_from_where,
-  time_unit = c("year", "month"),
-  geographic_unit = "city",
+  time_aggregation = c("year", "month"),
+  space_aggregation = "municipality",
   years = 2005:2021,
   language = "eng"
 )
@@ -25,11 +25,11 @@ Used in case \code{download_data = TRUE}.}
 \item{load_from_where}{Original that should be loaded. Used in
 case \code{download_data = FALSE}.}
 
-\item{time_unit}{Temporal level of aggregation, choose \code{year} and/or \code{month}.
-If \code{language = 'portuguese'}, pick "ano" and/or "mes'"}
+\item{time_aggregation}{Temporal level of aggregation, choose \code{year} and/or \code{month}.
+If \code{language = 'pt'}, pick "ano" and/or "mes'"}
 
-\item{geographic_unit}{Geographical level of aggregation, choose \code{city} and/or
-\code{state}. For Portuguese version, \code{municipio} and/or \code{uf}}
+\item{space_aggregation}{Geographical level of aggregation, choose \code{municipality} and/or
+\code{State}. For Portuguese version, \code{municipio} and/or \code{uf}}
 
 \item{years}{Time period to be considered. Contemplates 2005 to the present day}
 
@@ -38,7 +38,7 @@ If \code{language = 'portuguese'}, pick "ano" and/or "mes'"}
 }
 \value{
 A data frame with counts for variables related to environmental fines and
-infractions by \code{time_unit}-\code{geographic_unit} chosen on the Amazon region.
+infractions by \code{time_aggregation}-\code{space_aggregation} chosen on the Amazon region.
 Data include
 counts for total number of infractions, infractions that already went to trial, and
 number of unique perpetrators of infractions on the given place-time period.
@@ -50,14 +50,14 @@ Original data comes from \href{https://servicos.ibama.gov.br/ctf/publico/areasem
 
 load_ibama(
   download_directory = getwd(),
-  time_unit = "year",
-  geographic_unit = "state", years = 2005:2006
+  time_aggregation = "year",
+  space_aggregation = "state", years = 2005:2006
 )
 
 load_ibama(
   download_directory = getwd(),
-  time_unit = "ano",
-  geographic_unit = "municipio", years = c(2010, 2012),
+  time_aggregation = "ano",
+  space_aggregation = "municipio", years = c(2010, 2012),
   language = "pt"
 )
 \dontrun{
@@ -65,8 +65,8 @@ load_ibama(
 load_ibama(
   download_data = FALSE,
   load_from_where = "./Desktop/data.xls",
-  time_unit = c("year", "month"),
-  geographic_unit = c("city", "state")
+  time_aggregation = c("year", "month"),
+  space_aggregation = c("municipality", "state")
 )
 }
 

@@ -1,6 +1,6 @@
 Package: datazoom.amazonia
 Title: Simplify access to data from the Amazon Region
-Version: 0.6.0.9000
+Version: 0.7.0.9000
 Authors@R: c(
     person("Francisco", "de Lima Cavalcanti", role = c("cre"), email = "francisco.lima.cavalcanti@gmail.com"),
     person("Victor", "Aliende da Matta", role = c("aut"), email = "victor.al.matta@gmail.com"),
@@ -23,16 +23,20 @@ Imports:
     purrr,
     readr,
     sidrar,
-    lubridate,
-    janitor,
     tibble,
     stats,
+    geobr,
+    sf,
+    utils,
     readxl,
+    lubridate,
+    janitor,
     XML
 URL: http://www.econ.puc-rio.br/datazoom
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    lwgeom
 VignetteBuilder: knitr
 Depends: 
     R (>= 4.0)

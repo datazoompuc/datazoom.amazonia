@@ -4,7 +4,7 @@ NULL
 #' Gets GDP at current prices and Population data for the Brazilian Legal Amazon
 #'
 #' @param years A numeric vector with years of interest. Supported years 2002-2017 for GDP data and 2001-2009, 2011-present for population data.
-#' @param aggregation_level A string that indicates the level of aggregation of the data. It can be by "Municipality" or
+#' @param space_aggregation A string that indicates the level of aggregation of the data. It can be by "Municipality" or
 #'   "State"
 #' @param language A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
 #'   The other option is "pt" for Portuguese.
@@ -14,8 +14,11 @@ NULL
 #'
 #' @examples
 #' load_amazon_gdp(2017)
-load_amazon_gdp <- function(years, aggregation_level = "municipality", language = "eng") {
-  states <- unique(legal_amazon$CD_UF)
+load_amazon_gdp <- function(years, space_aggregation = "municipality", language = "eng") {
+  states <- legal_amazon %>%
+    dplyr::filter(.data$AMZ_LEGAL == 1)
+
+  states <- unique(states$CD_UF)
 
   # GDP data
   gdp <- tibble::as_tibble(
@@ -51,13 +54,13 @@ load_amazon_gdp <- function(years, aggregation_level = "municipality", language 
     )
   )
 
-  df <- df[df[["Munic\u00edpio (C\u00f3digo)"]] %in% legal_amazon$CD_MUN, ]
-
-  if (tolower(aggregation_level) == "state") {
+  if (tolower(space_aggregation) == "state") {
     df <- df %>%
       dplyr::rename(CD_MUN = .data[["Munic\u00edpio (C\u00f3digo)"]]) %>%
       dplyr::mutate(CD_MUN = as.numeric(.data$CD_MUN)) %>%
-      dplyr::full_join(legal_amazon, by = "CD_MUN") %>%
+      dplyr::left_join(legal_amazon, by = "CD_MUN") %>%
+      dplyr::filter(.data$AMZ_LEGAL == 1) %>%
+      dplyr::select(-.data$AMZ_LEGAL) %>%
       dplyr::group_by(.data$CD_UF, .data$Ano, .data$NM_UF) %>%
       dplyr::summarise(
         PIB = sum(.data$Valor.x),
@@ -70,11 +73,21 @@ load_amazon_gdp <- function(years, aggregation_level = "municipality", language 
       dplyr::mutate(PIBpc = .data$PIB / .data$Pop * 1000)
   }
   else {
-    if (tolower(aggregation_level) != "municipality") warning("Aggregation level is not supported. Proceeding with municipality")
+    if (tolower(space_aggregation) != "municipality") warning("Aggregation level is not supported. Proceeding with municipality")
+
+    amz <- legal_amazon %>%
+      dplyr::select(.data$CD_MUN, .data$AMZ_LEGAL) %>%
+      dplyr::mutate(CD_MUN = as.character(.data$CD_MUN))
 
     df <- df %>%
-      dplyr::select("Munic\u00edpio (C\u00f3digo)", "Munic\u00edpio", "Ano", "Valor.x", "Valor.y") %>%
-      dplyr::rename(CodIBGE = .data[["Munic\u00edpio (C\u00f3digo)"]], PIB = .data$Valor.x, Pop = .data$Valor.y) %>%
+      dplyr::rename(CodIBGE = .data[["Munic\u00edpio (C\u00f3digo)"]]) %>%
+      dplyr::left_join(amz, by = c("CodIBGE" = "CD_MUN")) %>%
+      dplyr::filter(.data$AMZ_LEGAL == 1) %>%
+      dplyr::select(-.data$AMZ_LEGAL)
+
+    df <- df %>%
+      dplyr::select(.data$CodIBGE, "Munic\u00edpio", "Ano", "Valor.x", "Valor.y") %>%
+      dplyr::rename(PIB = .data$Valor.x, Pop = .data$Valor.y) %>%
       dplyr::mutate(CodIBGE = as.factor(.data$CodIBGE)) %>%
       dplyr::mutate(PIBpc = .data$PIB / .data$Pop * 1000)
   }
@@ -98,8 +111,8 @@ load_amazon_gdp <- function(years, aggregation_level = "municipality", language 
 #'
 #' @examples
 #' load_gdp(2017)
-load_gdp <- function(years, aggregation_level = "municipality", language = "eng") {
-  if (tolower(aggregation_level) == "state") {
+load_gdp <- function(years, space_aggregation = "municipality", language = "eng") {
+  if (tolower(space_aggregation) == "state") {
     # GDP data
     gdp <- tibble::as_tibble(
       sidrar::get_sidra(
@@ -143,7 +156,7 @@ load_gdp <- function(years, aggregation_level = "municipality", language = "eng"
       dplyr::mutate(PIBpc = .data$PIB / .data$Pop * 1000)
   }
   else {
-    if (tolower(aggregation_level) != "municipality") warning("Aggregation level is not supported. Proceeding with municipality")
+    if (tolower(space_aggregation) != "municipality") warning("Aggregation level is not supported. Proceeding with municipality")
 
     # GDP data
     gdp <- tibble::as_tibble(
@@ -198,10 +211,12 @@ load_gdp <- function(years, aggregation_level = "municipality", language = "eng"
 }
 
 translate_munics_to_english <- function(df) {
+  df <- df %>%
+    dplyr::rename_with(function(cols)"Municipality", dplyr::starts_with("Munic"))
+
   dplyr::rename_with(
     df,
     dplyr::recode,
-    "Municipio" = "Municipality",
     "Ano" = "Year",
     "PIB" = "GDP",
     "PIBpc" = "GDPpc",

@@ -13,4 +13,5 @@
 * Added functions for MAPBIOMAS data 
 
 # datazoom.amazonia 0.6.0.9000
-* Added functions for IBAMA data 
+* Added functions for DEGRAD data 
+

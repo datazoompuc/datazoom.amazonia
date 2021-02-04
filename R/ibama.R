@@ -16,15 +16,15 @@ NULL
 #' Used in case \code{download_data = TRUE}.
 #' @param load_from_where Original that should be loaded. Used in
 #' case \code{download_data = FALSE}.
-#' @param time_unit Temporal level of aggregation, choose \code{year} and/or \code{month}.
-#' If \code{language = 'portuguese'}, pick "ano" and/or "mes'"
-#' @param geographic_unit Geographical level of aggregation, choose \code{city} and/or
-#' \code{state}. For Portuguese version, \code{municipio} and/or \code{uf}
+#' @param time_aggregation Temporal level of aggregation, choose \code{year} and/or \code{month}.
+#' If \code{language = 'pt'}, pick "ano" and/or "mes'"
+#' @param space_aggregation Geographical level of aggregation, choose \code{municipality} and/or
+#' \code{State}. For Portuguese version, \code{municipio} and/or \code{uf}
 #' @param years Time period to be considered. Contemplates 2005 to the present day
 #' @param language Language used in returned dataset. Use \code{language = "pt"} or
 #' \code{language = "eng"}
 #' @return A data frame with counts for variables related to environmental fines and
-#' infractions by \code{time_unit}-\code{geographic_unit} chosen on the Amazon region.
+#' infractions by \code{time_aggregation}-\code{space_aggregation} chosen on the Amazon region.
 #' Data include
 #' counts for total number of infractions, infractions that already went to trial, and
 #' number of unique perpetrators of infractions on the given place-time period.
@@ -33,14 +33,14 @@ NULL
 #'
 #' load_ibama(
 #'   download_directory = getwd(),
-#'   time_unit = "year",
-#'   geographic_unit = "state", years = 2005:2006
+#'   time_aggregation = "year",
+#'   space_aggregation = "state", years = 2005:2006
 #' )
 #'
 #' load_ibama(
 #'   download_directory = getwd(),
-#'   time_unit = "ano",
-#'   geographic_unit = "municipio", years = c(2010, 2012),
+#'   time_aggregation = "ano",
+#'   space_aggregation = "municipio", years = c(2010, 2012),
 #'   language = "pt"
 #' )
 #' \dontrun{
@@ -48,20 +48,20 @@ NULL
 #' load_ibama(
 #'   download_data = FALSE,
 #'   load_from_where = "./Desktop/data.xls",
-#'   time_unit = c("year", "month"),
-#'   geographic_unit = c("city", "state")
+#'   time_aggregation = c("year", "month"),
+#'   space_aggregation = c("municipality", "state")
 #' )
 #' }
 #'
 #' @export
 
 load_ibama <- function(download_data = TRUE,
-                        download_directory,
-                        load_from_where,
-                        time_unit = c("year", "month"),
-                        geographic_unit = "city",
-                        years = 2005:2021,
-                        language = "eng") {
+                       download_directory,
+                       load_from_where,
+                       time_aggregation = c("year", "month"),
+                       space_aggregation = "municipality",
+                       years = 2005:2021,
+                       language = "eng") {
   if (download_data == TRUE) {
     download_ibama(download_dir = download_directory)
     load_from_where <- list.files(
@@ -73,7 +73,7 @@ load_ibama <- function(download_data = TRUE,
 
   df <- clean_xml_table(file_location = load_from_where) %>%
     aggregate_fines(
-      t = time_unit, g = geographic_unit,
+      t = time_aggregation, g = space_aggregation,
       y = years, lan = language
     )
 
@@ -83,9 +83,9 @@ load_ibama <- function(download_data = TRUE,
 
 
 
-aggregate_fines <- function(dataset, t = c("year", "month"), g = "city",
+aggregate_fines <- function(dataset, t = c("year", "month"), g = "municipality",
                            y = 2005:2020, lan = "eng") {
-  if ("city" %in% g | "municipio" %in% g) {
+  if ("municipality" %in% g | "municipio" %in% g) {
     grp <- c(g, "cod_municipio")
   } else {
     grp <- g
