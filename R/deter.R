@@ -170,7 +170,7 @@ treat_deter_data <- function(df, space_aggregation, time_aggregation, language) 
   if (time_aggregation == "year") {
     df <- df %>%
       dplyr::ungroup(.data$Mes) %>%
-      dplyr::group_by(.data$CLASSNAME, add=TRUE) %>%
+      dplyr::group_by(.data$CLASSNAME, .add=TRUE) %>%
       dplyr::summarise(dplyr::across(-c(.data$Mes, .data$AREAUCKM, .data$AREAMUNKM)), AREAUCKM = sum(.data$AREAUCKM), AREAMUNKM = sum(.data$AREAMUNKM)) %>%
       dplyr::distinct()
   }
