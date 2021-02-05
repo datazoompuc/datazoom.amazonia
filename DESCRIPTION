@@ -35,13 +35,11 @@ Imports:
     sf,
     utils,
     readxl,
-    lubridate,
     janitor,
     XML
 URL: http://www.econ.puc-rio.br/datazoom
 Suggests: 
     knitr,
-    readxl,
     RCurl
 URL: http://www.econ.puc-rio.br/datazoom
 Suggests: 
