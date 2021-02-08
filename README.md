@@ -7,6 +7,7 @@ datazoom.amazonia is an R package that facilitates access to official data regar
 * IBGE - PIB-Munic: gdp by municipality
 * MAPBIOMAS: land covering by municipality or state
 * INPE - DETER: deforestation warnings by municipality
+* IMAZON - IPS: Social Progress Index by municipality
 
 <!-- badges: start -->
 [![R build status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions)
@@ -72,6 +73,10 @@ data <- load_mapbiomas_transition(transition_interval = 5)
 data <- load_mapbiomas_covering("~/Downloads")
 
 data <- load_mapbiomas_transition("~/Downloads")
+
+##IPS
+
+data <- load_IPS(download_directory = getwd(), language = "pt")
 
 ```
 
