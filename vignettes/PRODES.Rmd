@@ -7,7 +7,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -24,7 +24,7 @@ The data made available in this package goes back to the year 2000, with ongoing
 
 Using the package is easy enough:
 
-```{r setup}
+```{r, eval = FALSE}
 library(datazoom.amazonia)
 
 years <- c(2015, 2016, 2017)
