@@ -13,6 +13,7 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+
 ## The Dataset
 
 Municipal Agricultural Production (PAM, in Portuguese) is a nationwide annual survey conducted by IBGE (Brazilian Institute of Geography and Statistics) which provides information on agricultural products, such as quantity produced, area planted and harvested, average quantity of output and monetary value of such output. The products area divided in permanent and temporary farmed land, as well as dedicated surveys to the four products that yield multiple harvests a year (beans, potato, peanut and corn), which in total survey 64 agricultural products (31 of temporary tillage and 33 of permanent tillage). Output, however, is only included in the dataset if the planted area occupies over 1 acre or if output exceeds one tonne. 
@@ -25,15 +26,15 @@ The data available has a yearly frequency and is available from 1974 to the pres
 
 ##The Function
 
-The package contains of three function: \code{load_pam_permanent}, \code{load_pam_temporary} and \code{load_pam_main} which extracts data from the API of the IBGE database website. It allows the user to input the years he would like the data to encompass, the geographical aggregation level desired, as well as choosing the language of the data (currently only Portuguese and English are supported). 
+The package contains of three function: \code{load_pam_permanent}, \code{load_pam_temporary} and \code{load_pam_main} which extract data from the API of the IBGE database website. It allows the user to input the years he would like the data to encompass, the geographical aggregation level desired, as well as choosing the language of the data (currently only Portuguese and English are supported). These functions also offer the option to output the data in the long format, in which separate tables are created for each variable and each product becomes a columns (whereas previously both were lines of one single larger data frame).
 
-The output is a  dataframe containing data for the territorial level chosen, the name of such geogrpahic level, the year of the data, the variable in question, the unit of measurement and the value. Each column has a corresponding column containing the numerical code of the specific value the variable has, with the exception of the Value column, which is already numeric. 
+The output is a data frame containing data for the territorial level chosen, the name of such geographic level, the year of the data, the variable in question, the unit of measurement and the value. Each column has a corresponding column containing the numerical code of the specific value the variable has, with the exception of the Value column, which is already numeric. If the long format is selected, the output becomes a list of data frames, one for each one of the variables.
 
 Using the function is easy enough:
 
-```{r setup}
+```{r eval = FALSE}
 library(datazoom.amazonia)
 
-data <- load_pam_permanent(2017, aggregation_level = "state", language = "eng")
+data <- datazoom.amazonia::load_pam_permanent(2017, aggregation_level = "state", language = "eng")
 
 ```
