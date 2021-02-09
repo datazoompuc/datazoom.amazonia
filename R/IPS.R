@@ -21,10 +21,11 @@ NULL
 #' Amazon Region
 #' @examples
 #'
-#' load_IPS(
-#'   download_directory = getwd(),
+#' \dontrun{load_IPS(
+#'   download_directory = "./Desktop",
 #'   language = "pt"
 #' )
+#' }
 #'
 #' @export
 
