@@ -60,15 +60,15 @@ load_sigmine<-function(space_aggregation = c('municipality', 'state','municipio'
       dplyr::group_by(.data$abbrev_state, .data$ANO) %>%
       sf::st_drop_geometry()
     
-    al$AREA_HA<-NULL
-    al$UF<-NULL
-    al$code_region<-NULL
-    al$code_state<-NULL
-    al$code_muni<-NULL
-    al$ULT_EVENTO<-NULL
-    al$NUMERO<-NULL
-    al$name_region<-NULL
-    al$name_state<-NULL
+    al$AREA_HA <- NULL
+    al$UF <- NULL
+    al$code_region <- NULL
+    al$code_state <- NULL
+    al$code_muni <- NULL
+    al$ULT_EVENTO <- NULL
+    al$NUMERO <- NULL
+    al$name_region <- NULL
+    al$name_state <- NULL
     names(al)[names(al) == 'ANO'] <- 'ano'
     names(al)[names(al) == 'PROCESSO'] <- 'processo'
     names(al)[names(al) == 'ID'] <- 'id'
