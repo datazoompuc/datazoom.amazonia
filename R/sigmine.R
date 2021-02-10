@@ -6,6 +6,8 @@
 #' @param source A string indicating where the raw data is in your computer. The default is NULL which means the data will be extracted directly from the website
 #' 
 #' @return A data base with data containing the area of each selected type of soil covering in each selected year
+#'
+#' @importFrom utils unzip
 #' 
 #' @author DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro
 #'
