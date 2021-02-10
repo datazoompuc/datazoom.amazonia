@@ -28,7 +28,7 @@ load_sigmine<-function(space_aggregation = c('municipality', 'state','municipio'
   }
   dir <- gsub(p1f, pattern = "\\.zip", replacement = "")
   unzip(p1f, exdir = dir)
-  a<-read_sf(dir)
+  a<-sf::read_sf(dir)
   
   if(space_aggregation == 'state' | space_aggregation == 'estado'){
     names(a)[names(a) == 'NUMERO'] <- 'numero'
