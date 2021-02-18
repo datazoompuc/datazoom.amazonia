@@ -1,6 +1,6 @@
 #' @title load_sigmine
 #' 
-#' @description Download and filter data on type of soil covering by year
+#' @description Download and filter data on the mines being explored legally in Brazil
 #' 
 #' @param space_aggregation A string that indicates the level of aggregation of the data. It can be by municipality or state
 #' @param source A string indicating where the raw data is in your computer. The default is NULL which means the data will be extracted directly from the website
