@@ -30,7 +30,7 @@ NULL
 #' number of unique perpetrators of infractions on the given place-time period.
 #'
 #' @examples
-#'
+#' \dontrun{
 #' load_ibama(
 #'   download_directory = getwd(),
 #'   time_aggregation = "year",
@@ -43,7 +43,7 @@ NULL
 #'   space_aggregation = "municipio", years = c(2010, 2012),
 #'   language = "pt"
 #' )
-#' \dontrun{
+#'
 #'
 #' load_ibama(
 #'   download_data = FALSE,
@@ -86,7 +86,17 @@ load_ibama <- function(download_data = TRUE,
 aggregate_fines <- function(dataset, t = c("year", "month"), g = "municipality",
                            y = 2005:2020, lan = "eng") {
   if ("municipality" %in% g | "municipio" %in% g) {
+
+    if(lan == 'eng'){
+
+    grp <- c(g, "municipality_code")
+
+    } else{
+
     grp <- c(g, "cod_municipio")
+
+    }
+
   } else {
     grp <- g
   }
@@ -118,11 +128,11 @@ aggregate_fines <- function(dataset, t = c("year", "month"), g = "municipality",
   if (lan != "pt" | is.null(lan)) {
     df <- df %>%
       dplyr::rename(
-        city = .data$municipio,
+        municipality = .data$municipio,
         state = .data$uf,
         month = .data$mes,
         year = .data$ano,
-        city_code = .data$cod_municipio
+        municipality_code = .data$cod_municipio
 
       )
   }

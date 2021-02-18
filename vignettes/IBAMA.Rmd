@@ -39,12 +39,12 @@ should be done. Available options are by year and/or month, and by state and/or
 municipality, respectively.
 
 
-```{r , eval = FALSE}
+```{r , eval = TRUE}
 library(datazoom.amazonia)
 
 load_ibama(
   download_data = TRUE, 
-  download_directory = './Desktop',
+  download_directory = getwd(),
   time_aggregation = c('month', 'year'),
   space_aggregation = c('municipality', 'state'),
   years = c(2010, 2012),
