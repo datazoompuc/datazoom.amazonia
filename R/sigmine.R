@@ -15,7 +15,9 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' load_sigmine(space_aggregation = 'municipality', source = NULL)
+#' }
 
 
 
