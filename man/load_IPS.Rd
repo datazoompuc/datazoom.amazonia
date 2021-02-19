@@ -25,9 +25,10 @@ can be found \href{http://www.ipsamazonia.org.br/}{here}
 }
 \examples{
 
-load_IPS(
-  download_directory = getwd(),
+\dontrun{load_IPS(
+  download_directory = "./Desktop",
   language = "pt"
 )
+}
 
 }
