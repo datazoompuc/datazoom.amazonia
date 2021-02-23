@@ -19,10 +19,12 @@ load_sigmine(
 A data base with data containing the area of each selected type of soil covering in each selected year
 }
 \description{
-Download and filter data on type of soil covering by year
+Download and filter data on the mines being explored legally in Brazil
 }
 \examples{
+\dontrun{
 load_sigmine(space_aggregation = 'municipality', source = NULL)
+}
 }
 \author{
 DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro
