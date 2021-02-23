@@ -7,6 +7,7 @@ datazoom.amazonia is an R package that facilitates access to official data regar
 * MDIC - COMEX: exports and imports
 * IBGE - PIB-Munic: gdp
 * IBGE - CEMPRE: formal employment
+* IBGE - Census: income
 * MAPBIOMAS: land covering
 
 <!-- badges: start -->

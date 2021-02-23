@@ -13,10 +13,33 @@ NULL
 #' load_amazon_gdp(2017)
 #' }
 load_amazon_gdp <- function(years, space_aggregation = "municipality", language = "eng") {
-  filter_amazon(
-    load_gdp(years, space_aggregation = space_aggregation, language = language),
-    space_aggregation = space_aggregation
+  df <- filter_amazon(
+    load_gdp(years, space_aggregation = "municipality", language = "pt")
   )
+
+  space_aggregation <- tolower(space_aggregation)
+  if (space_aggregation == "state") {
+    df <- df %>%
+      dplyr::mutate(CodIBGE = substr(.data$CodIBGE, 1, 2)) %>%
+      dplyr::select(-c("PIBpc")) %>%
+      dplyr::group_by(.data$Estado, .data$CodIBGE, .data$Ano) %>%
+      dplyr::summarize_if(is.numeric, sum, na.rm = TRUE) %>%
+      dplyr::ungroup() %>%
+      dplyr::mutate(PIBpc = .data$PIB / .data$Pop * 1000)
+  }
+  else if (space_aggregation != "municipality") {
+    warning("Selected spatial aggregation is not supported. Proceeding with Municipality.")
+  }
+
+  language <- tolower(language)
+  if (language == "eng") {
+    df <- translate_munics_to_english(df)
+  }
+  else if (language != "pt") {
+    warning("Selected language is not supported. Proceeding with Portuguese.")
+  }
+
+  df
 }
 
 #' Gets GDP at current prices and (estimated) population data for Brazil
@@ -107,10 +130,31 @@ load_gdp <- function(years, space_aggregation = "municipality", language = "eng"
 #' load_amazon_employment(2017)
 #' }
 load_amazon_employment <- function(years, space_aggregation = "municipality", language = "eng") {
-  filter_amazon(
-    load_employment(years, space_aggregation = space_aggregation, language = language),
-    space_aggregation = space_aggregation
+  df <- filter_amazon(
+    load_employment(years, space_aggregation = "municipality", language = "pt")
   )
+
+  space_aggregation <- tolower(space_aggregation)
+  if (space_aggregation == "state") {
+    df <- df %>%
+      dplyr::mutate(CodIBGE = substr(.data$CodIBGE, 1, 2)) %>%
+      dplyr::group_by(.data$Estado, .data$CodIBGE, .data$Ano) %>%
+      dplyr::summarize_if(is.numeric, sum, na.rm = TRUE) %>%
+      dplyr::ungroup()
+  }
+  else if (space_aggregation != "municipality") {
+    warning("Selected spatial aggregation is not supported. Proceeding with Municipality.")
+  }
+
+  language <- tolower(language)
+  if (language == "eng") {
+    df <- translate_munics_to_english(df)
+  }
+  else if (language != "pt") {
+    warning("Selected language is not supported. Proceeding with Portuguese.")
+  }
+
+  df
 }
 
 #' Gets formal employment data for Brazil.
@@ -205,18 +249,153 @@ load_employment <- function(years, space_aggregation = "municipality", language 
   df
 }
 
-filter_amazon <- function(df, space_aggregation) {
+#' Gets income data for the Brazilian Legal Amazon
+#'
+#' @inheritParams load_income
+#' @return A \code{tibble} with Employed population, Mean_Income and Median_Income (in R$).
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' load_amazon_income(2010)
+#' }
+load_amazon_income <- function(years, space_aggregation = "municipality", language = "eng") {
+  df <- filter_amazon(
+    load_income(years, space_aggregation = "municipality", language = "pt")
+  )
+
+  space_aggregation <- tolower(space_aggregation)
+  if (space_aggregation == "state") {
+    df <- df %>%
+      dplyr::mutate(CodIBGE = substr(.data$CodIBGE, 1, 2)) %>%
+      dplyr::group_by(.data$Estado, .data$CodIBGE, .data$Ano) %>%
+      dplyr::summarize(
+        Renda = sum(.data$Ocupados * .data$Renda_media),
+        Ocupados = sum(.data$Ocupados)
+      ) %>%
+      dplyr::mutate(Renda_media = .data$Renda / .data$Ocupados) %>%
+      dplyr::ungroup() %>%
+      dplyr::select(-c("Renda"))
+  }
+  else if (space_aggregation != "municipality") {
+    warning("Selected spatial aggregation is not supported. Proceeding with Municipality.")
+  }
+
+  language <- tolower(language)
+  if (language == "eng") {
+    df <- translate_munics_to_english(df)
+  }
+  else if (language != "pt") {
+    warning("Selected language is not supported. Proceeding with Portuguese.")
+  }
+
+  df
+}
+
+#' Gets income data for Brazil
+#'
+#' @param years A numeric vector with years of interest. Supported years are 2000, 2010 (census years).
+#' @param space_aggregation A string that indicates the level of aggregation of the data. It can be by "Municipality" or
+#'   "State"
+#' @param language A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
+#'   The other option is "pt" for Portuguese.
+#' @return A \code{tibble} with Employed population, Mean_Income and Median_Income (in R$).
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' load_income(2010)
+#' }
+load_income <- function(years, space_aggregation = "municipality", language = "eng") {
+  # Income data
+  people <- tibble::as_tibble(
+    sidrar::get_sidra(
+      2033, # Table code at Sidra
+      period = as.character(years),
+      variable = 841,
+      geo = translate_for_api(space_aggregation),
+      classific = "C2",
+      category = list("6794")
+    )
+  ) %>% dplyr::distinct()
+  mean_income <- tibble::as_tibble(
+    sidrar::get_sidra(
+      2033, # Table code at Sidra
+      period = as.character(years),
+      variable = 842,
+      geo = translate_for_api(space_aggregation),
+      classific = "C2",
+      category = list("6794")
+    )
+  ) %>% dplyr::distinct()
+  median_income <- tibble::as_tibble(
+    sidrar::get_sidra(
+      2033, # Table code at Sidra
+      period = as.character(years),
+      variable = 843,
+      geo = translate_for_api(space_aggregation),
+      classific = "C2",
+      category = list("6794")
+    )
+  ) %>% dplyr::distinct()
+
+  by <- c(
+    paste0(translate_for_response(space_aggregation), " (C\u00f3digo)"),
+    translate_for_response(space_aggregation),
+    "Ano (C\u00f3digo)",
+    "Ano"
+  )
+  df <- people %>%
+    dplyr::full_join(
+      mean_income,
+      by
+    ) %>%
+    dplyr::full_join(
+      median_income,
+      by
+    )
+
+  df <- df %>%
+    dplyr::select(
+      paste0(translate_for_response(space_aggregation), " (C\u00f3digo)"),
+      translate_for_response(space_aggregation),
+      "Ano",
+      "Valor.x",
+      "Valor.y",
+      "Valor"
+    ) %>%
+    dplyr::rename_with(function(cols) "CodIBGE", dplyr::ends_with("digo)")) %>% # ends with (Codigo)
+    dplyr::rename_with(
+      dplyr::recode,
+      "Valor.x" = "Ocupados",
+      "Valor.y" = "Renda_media",
+      "Valor" = "Renda_mediana",
+      "Unidade da Federa\u00e7\u00e3o" = "Estado"
+    )
+
+  if (language == "eng") {
+    df <- translate_munics_to_english(df)
+  }
+  else if (language != "pt") {
+    warning("Selected language is not supported. Proceeding with Portuguese.")
+  }
+
+  df
+}
+
+filter_amazon <- function(df) {
   columns <- colnames(df)
 
-  code <- if (tolower(space_aggregation) == "state") "CD_UF" else "CD_MUN"
   legal_amazon <- legal_amazon %>%
-    dplyr::mutate(CodIBGE = as.character(.data[[code]]))
+    dplyr::mutate(CodIBGE = as.character(.data$CD_MUN))
 
   df %>%
     dplyr::left_join(legal_amazon, by = "CodIBGE") %>%
     dplyr::filter(.data$AMZ_LEGAL == 1) %>%
-    dplyr::select(columns) %>%
-    unique()
+    dplyr::mutate(Estado = .data$SIGLA) %>%
+    dplyr::select(columns, "Estado")
 }
 
 translate_for_api <- function(s) {
@@ -246,6 +425,9 @@ translate_munics_to_english <- function(df) {
       "PIBpc" = "GDPpc",
       "Salario" = "Salary",
       "Empregados" = "Employed",
-      "Firmas" = "Firms"
+      "Firmas" = "Firms",
+      "Ocupados" = "Employed",
+      "Renda_media" = "Mean_Income",
+      "Renda_mediana" = "Median_Income",
     )
 }
