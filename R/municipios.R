@@ -1,7 +1,23 @@
 #' @importFrom rlang .data
 NULL
 
-#' Gets GDP at current prices and Population data for the Brazilian Legal Amazon
+#' Gets GDP at current prices and (estimated) population data for the Brazilian Legal Amazon
+#'
+#' @inheritParams load_gdp
+#' @return A \code{tibble} with GDP (in thousands), Population and GDP Per Capita (in units).
+#'
+#' @export
+#'
+#' @examples
+#' load_amazon_gdp(2017)
+load_amazon_gdp <- function(years, space_aggregation = "municipality", language = "eng") {
+  filter_amazon(
+    load_gdp(years, space_aggregation = space_aggregation, language = language),
+    space_aggregation = space_aggregation
+  )
+}
+
+#' Gets GDP at current prices and (estimated) population data for Brazil
 #'
 #' @param years A numeric vector with years of interest. Supported years 2002-2017 for GDP data and 2001-2009, 2011-present for population data.
 #' @param space_aggregation A string that indicates the level of aggregation of the data. It can be by "Municipality" or
@@ -13,84 +29,57 @@ NULL
 #' @export
 #'
 #' @examples
-#' load_amazon_gdp(2017)
-load_amazon_gdp <- function(years, space_aggregation = "municipality", language = "eng") {
-  states <- legal_amazon %>%
-    dplyr::filter(.data$AMZ_LEGAL == 1)
-
-  states <- unique(states$CD_UF)
-
+#' load_gdp(2017)
+load_gdp <- function(years, space_aggregation = "municipality", language = "eng") {
   # GDP data
   gdp <- tibble::as_tibble(
     sidrar::get_sidra(
       5938, # Table code at Sidra
       period = as.character(years),
       variable = 37,
-      geo = rep("City", times = length(states)),
-      geo.filter = stats::setNames(states, rep("State", times = length(states))),
+      geo = translate_for_api(space_aggregation),
       classific = "all",
       category = NULL
     )
-  ) %>% dplyr::distinct() # Necessary for some misterious reason
+  ) %>% dplyr::distinct()
   # Population data
   pop <- tibble::as_tibble(
     sidrar::get_sidra(
       6579, # Table code at Sidra
       period = as.character(years),
-      geo = rep("City", times = length(states)),
-      geo.filter = stats::setNames(states, rep("State", times = length(states))),
+      geo = translate_for_api(space_aggregation),
       classific = "all",
       category = NULL
     )
   ) %>% dplyr::distinct()
+
   df <- dplyr::full_join(
     gdp,
     pop,
     by = c(
-      "Munic\u00edpio (C\u00f3digo)",
-      "Munic\u00edpio",
+      paste0(translate_for_response(space_aggregation), " (C\u00f3digo)"),
+      translate_for_response(space_aggregation),
       "Ano (C\u00f3digo)",
       "Ano"
     )
   )
 
-  if (tolower(space_aggregation) == "state") {
-    df <- df %>%
-      dplyr::rename(CD_MUN = .data[["Munic\u00edpio (C\u00f3digo)"]]) %>%
-      dplyr::mutate(CD_MUN = as.numeric(.data$CD_MUN)) %>%
-      dplyr::left_join(legal_amazon, by = "CD_MUN") %>%
-      dplyr::filter(.data$AMZ_LEGAL == 1) %>%
-      dplyr::select(-.data$AMZ_LEGAL) %>%
-      dplyr::group_by(.data$CD_UF, .data$Ano, .data$NM_UF) %>%
-      dplyr::summarise(
-        PIB = sum(.data$Valor.x),
-        Pop = sum(.data$Valor.y),
-      ) %>%
-      dplyr::mutate(CodIBGE = as.factor(.data$CD_UF)) %>%
-      dplyr::ungroup() %>%
-      dplyr::select(-c("CD_UF")) %>%
-      dplyr::rename(Estado = .data$NM_UF) %>%
-      dplyr::mutate(PIBpc = .data$PIB / .data$Pop * 1000)
-  }
-  else {
-    if (tolower(space_aggregation) != "municipality") warning("Aggregation level is not supported. Proceeding with municipality")
-
-    amz <- legal_amazon %>%
-      dplyr::select(.data$CD_MUN, .data$AMZ_LEGAL) %>%
-      dplyr::mutate(CD_MUN = as.character(.data$CD_MUN))
-
-    df <- df %>%
-      dplyr::rename(CodIBGE = .data[["Munic\u00edpio (C\u00f3digo)"]]) %>%
-      dplyr::left_join(amz, by = c("CodIBGE" = "CD_MUN")) %>%
-      dplyr::filter(.data$AMZ_LEGAL == 1) %>%
-      dplyr::select(-.data$AMZ_LEGAL)
-
-    df <- df %>%
-      dplyr::select(.data$CodIBGE, "Munic\u00edpio", "Ano", "Valor.x", "Valor.y") %>%
-      dplyr::rename(PIB = .data$Valor.x, Pop = .data$Valor.y) %>%
-      dplyr::mutate(CodIBGE = as.factor(.data$CodIBGE)) %>%
-      dplyr::mutate(PIBpc = .data$PIB / .data$Pop * 1000)
-  }
+  df <- df %>%
+    dplyr::select(
+      paste0(translate_for_response(space_aggregation), " (C\u00f3digo)"),
+      translate_for_response(space_aggregation),
+      "Ano",
+      "Valor.x",
+      "Valor.y"
+    ) %>%
+    dplyr::rename_with(function(cols) "CodIBGE", dplyr::ends_with("digo)")) %>% # ends with (Codigo)
+    dplyr::rename_with(
+      dplyr::recode,
+      "Valor.x" = "PIB",
+      "Valor.y" = "Pop",
+      "Unidade da Federa\u00e7\u00e3o" = "Estado"
+    ) %>%
+    dplyr::mutate(PIBpc = .data$PIB / .data$Pop * 1000)
 
   if (language == "eng") {
     df <- translate_munics_to_english(df)
@@ -102,103 +91,101 @@ load_amazon_gdp <- function(years, space_aggregation = "municipality", language 
   df
 }
 
-#' Gets GDP at current prices and Population data for Brazil
+#' Gets formal employment data for the Brazilian Legal Amazon
 #'
-#' @inheritParams load_amazon_gdp
-#' @return A \code{tibble} with GDP (in thousands), Population and GDP Per Capita (in units).
+#' @inheritParams load_employment
+#' @return A \code{tibble} with (total) Salary (in R$), (number of) Employed people and (number of) Firms.
 #'
 #' @export
 #'
 #' @examples
-#' load_gdp(2017)
-load_gdp <- function(years, space_aggregation = "municipality", language = "eng") {
-  if (tolower(space_aggregation) == "state") {
-    # GDP data
-    gdp <- tibble::as_tibble(
-      sidrar::get_sidra(
-        5938, # Table code at Sidra
-        period = as.character(years),
-        variable = 37,
-        geo = "State",
-        classific = "all",
-        category = NULL
-      )
-    ) %>% dplyr::distinct()
-    # Population data
-    pop <- tibble::as_tibble(
-      sidrar::get_sidra(
-        6579, # Table code at Sidra
-        period = as.character(years),
-        geo = "State",
-        classific = "all",
-        category = NULL
-      )
-    ) %>% dplyr::distinct()
-    df <- dplyr::full_join(
-      gdp,
-      pop,
-      by = c(
-        "Unidade da Federa\u00e7\u00e3o (C\u00f3digo)",
-        "Unidade da Federa\u00e7\u00e3o",
-        "Ano (C\u00f3digo)",
-        "Ano"
-      )
+#' load_amazon_employment(2017)
+load_amazon_employment <- function(years, space_aggregation = "municipality", language = "eng") {
+  filter_amazon(
+    load_employment(years, space_aggregation = space_aggregation, language = language),
+    space_aggregation = space_aggregation
+  )
+}
+
+#' Gets formal employment data for Brazil.
+#'
+#' @param years A numeric vector with years of interest. Supported years 2002-2017 for GDP data and 2001-2009, 2011-present for population data.
+#' @param space_aggregation A string that indicates the level of aggregation of the data. It can be by "Municipality" or
+#'   "State"
+#' @param language A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
+#'   The other option is "pt" for Portuguese.
+#' @return A \code{tibble} with (total) Salary (in R$), (number of) Employed people and (number of) Firms.
+#'
+#' @export
+#'
+#' @examples
+#' load_employment(2017)
+load_employment <- function(years, space_aggregation = "municipality", language = "eng") {
+  # Employment data
+  salaries <- tibble::as_tibble(
+    sidrar::get_sidra(
+      6449, # Table code at Sidra
+      period = as.character(years),
+      variable = 662,
+      geo = translate_for_api(space_aggregation),
+      classific = "C12762",
+      category = list("117897")
+    )
+  ) %>% dplyr::distinct()
+  employed <- tibble::as_tibble(
+    sidrar::get_sidra(
+      6449, # Table code at Sidra
+      period = as.character(years),
+      variable = 707,
+      geo = translate_for_api(space_aggregation),
+      classific = "C12762",
+      category = list("117897")
+    )
+  ) %>% dplyr::distinct()
+  firms <- tibble::as_tibble(
+    sidrar::get_sidra(
+      6449, # Table code at Sidra
+      period = as.character(years),
+      variable = 2585,
+      geo = translate_for_api(space_aggregation),
+      classific = "C12762",
+      category = list("117897")
+    )
+  ) %>% dplyr::distinct()
+
+  by <- c(
+    paste0(translate_for_response(space_aggregation), " (C\u00f3digo)"),
+    translate_for_response(space_aggregation),
+    "Ano (C\u00f3digo)",
+    "Ano"
+  )
+  df <- salaries %>%
+    dplyr::full_join(
+      employed,
+      by
+    ) %>%
+    dplyr::full_join(
+      firms,
+      by
     )
 
-    df <- df %>%
-      dplyr::select("Unidade da Federa\u00e7\u00e3o (C\u00f3digo)", "Unidade da Federa\u00e7\u00e3o", "Ano", "Valor.x", "Valor.y") %>%
-      dplyr::rename(
-        PIB = .data$Valor.x,
-        Pop = .data$Valor.y,
-        Estado = .data[["Unidade da Federa\u00e7\u00e3o"]],
-        CodIBGE = .data[["Unidade da Federa\u00e7\u00e3o (C\u00f3digo)"]]
-      ) %>%
-      dplyr::mutate(PIBpc = .data$PIB / .data$Pop * 1000)
-  }
-  else {
-    if (tolower(space_aggregation) != "municipality") warning("Aggregation level is not supported. Proceeding with municipality")
-
-    # GDP data
-    gdp <- tibble::as_tibble(
-      sidrar::get_sidra(
-        5938, # Table code at Sidra
-        period = as.character(years),
-        variable = 37,
-        geo = "City",
-        classific = "all",
-        category = NULL
-      )
-    ) %>% dplyr::distinct()
-    # Population data
-    pop <- tibble::as_tibble(
-      sidrar::get_sidra(
-        6579, # Table code at Sidra
-        period = as.character(years),
-        geo = "City",
-        classific = "all",
-        category = NULL
-      )
-    ) %>% dplyr::distinct()
-    df <- dplyr::full_join(
-      gdp,
-      pop,
-      by = c(
-        "Munic\u00edpio (C\u00f3digo)",
-        "Munic\u00edpio",
-        "Ano (C\u00f3digo)",
-        "Ano"
-      )
+  df <- df %>%
+    dplyr::select(
+      paste0(translate_for_response(space_aggregation), " (C\u00f3digo)"),
+      translate_for_response(space_aggregation),
+      "Ano",
+      "Valor.x",
+      "Valor.y",
+      "Valor"
+    ) %>%
+    dplyr::rename_with(function(cols) "CodIBGE", dplyr::ends_with("digo)")) %>% # ends with (Codigo)
+    dplyr::rename_with(
+      dplyr::recode,
+      "Valor.x" = "Salario",
+      "Valor.y" = "Empregados",
+      "Valor" = "Firmas",
+      "Unidade da Federa\u00e7\u00e3o" = "Estado"
     )
-
-    df <- df %>%
-      dplyr::select("Munic\u00edpio (C\u00f3digo)", "Munic\u00edpio", "Ano", "Valor.x", "Valor.y") %>%
-      dplyr::rename(
-        PIB = .data$Valor.x,
-        Pop = .data$Valor.y,
-        CodIBGE = .data[["Munic\u00edpio (C\u00f3digo)"]]
-      ) %>%
-      dplyr::mutate(PIBpc = .data$PIB / .data$Pop * 1000)
-  }
 
   if (language == "eng") {
     df <- translate_munics_to_english(df)
@@ -210,16 +197,137 @@ load_gdp <- function(years, space_aggregation = "municipality", language = "eng"
   df
 }
 
-translate_munics_to_english <- function(df) {
-  df <- df %>%
-    dplyr::rename_with(function(cols)"Municipality", dplyr::starts_with("Munic"))
+#' Gets census data for Brazil.
+#'
+#' @param years A numeric vector with years of interest. Supported years 2002-2017 for GDP data and 2001-2009, 2011-present for population data.
+#' @param space_aggregation A string that indicates the level of aggregation of the data. It can be by "Municipality" or
+#'   "State"
+#' @param language A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
+#'   The other option is "pt" for Portuguese.
+#' @return A \code{tibble} with (total) Salary (in R$), (number of) Employed people and (number of) Firms.
+#'
+#' @export
+#'
+#' @examples
+#' load_census(2017)
+load_census <- function(years, space_aggregation = "municipality", language = "eng") {
+  # Employment data
+  salaries <- tibble::as_tibble(
+    sidrar::get_sidra(
+      6449, # Table code at Sidra
+      period = as.character(years),
+      variable = 662,
+      geo = translate_for_api(space_aggregation),
+      classific = "C12762",
+      category = list("117897")
+    )
+  ) %>% dplyr::distinct()
+  employed <- tibble::as_tibble(
+    sidrar::get_sidra(
+      6449, # Table code at Sidra
+      period = as.character(years),
+      variable = 707,
+      geo = translate_for_api(space_aggregation),
+      classific = "C12762",
+      category = list("117897")
+    )
+  ) %>% dplyr::distinct()
+  firms <- tibble::as_tibble(
+    sidrar::get_sidra(
+      6449, # Table code at Sidra
+      period = as.character(years),
+      variable = 2585,
+      geo = translate_for_api(space_aggregation),
+      classific = "C12762",
+      category = list("117897")
+    )
+  ) %>% dplyr::distinct()
 
-  dplyr::rename_with(
-    df,
-    dplyr::recode,
-    "Ano" = "Year",
-    "PIB" = "GDP",
-    "PIBpc" = "GDPpc",
-    "Estado" = "State"
+  by <- c(
+    paste0(translate_for_response(space_aggregation), " (C\u00f3digo)"),
+    translate_for_response(space_aggregation),
+    "Ano (C\u00f3digo)",
+    "Ano"
   )
+  df <- salaries %>%
+    dplyr::full_join(
+      employed,
+      by
+    ) %>%
+    dplyr::full_join(
+      firms,
+      by
+    )
+
+  df <- df %>%
+    dplyr::select(
+      paste0(translate_for_response(space_aggregation), " (C\u00f3digo)"),
+      translate_for_response(space_aggregation),
+      "Ano",
+      "Valor.x",
+      "Valor.y",
+      "Valor"
+    ) %>%
+    dplyr::rename_with(function(cols) "CodIBGE", dplyr::ends_with("digo)")) %>% # ends with (Codigo)
+    dplyr::rename_with(
+      dplyr::recode,
+      "Valor.x" = "Salario",
+      "Valor.y" = "Empregados",
+      "Valor" = "Firmas",
+      "Unidade da Federa\u00e7\u00e3o" = "Estado"
+    )
+
+  if (language == "eng") {
+    df <- translate_munics_to_english(df)
+  }
+  else if (language != "pt") {
+    warning("Selected language is not supported. Proceeding with Portuguese.")
+  }
+
+  df
+}
+
+filter_amazon <- function(df, space_aggregation) {
+  columns <- colnames(df)
+
+  code <- if (tolower(space_aggregation) == "state") "CD_UF" else "CD_MUN"
+  legal_amazon <- legal_amazon %>%
+    dplyr::mutate(CodIBGE = as.character(.data[[code]]))
+
+  df %>%
+    dplyr::left_join(legal_amazon, by = "CodIBGE") %>%
+    dplyr::filter(.data$AMZ_LEGAL == 1) %>%
+    dplyr::select(columns) %>%
+    unique()
+}
+
+translate_for_api <- function(s) {
+  if (tolower(s) == "municipality") {
+    "City"
+  } else {
+    "State"
+  }
+}
+
+translate_for_response <- function(s) {
+  if (tolower(s) == "municipality") {
+    "Munic\u00edpio"
+  } else {
+    "Unidade da Federa\u00e7\u00e3o"
+  }
+}
+
+translate_munics_to_english <- function(df) {
+  df %>%
+    dplyr::rename_with(function(cols) "Municipality", dplyr::starts_with("Munic")) %>%
+    dplyr::rename_with(
+      dplyr::recode,
+      "Ano" = "Year",
+      "Estado" = "State",
+      "PIB" = "GDP",
+      "PIBpc" = "GDPpc",
+      "Salario" = "Salary",
+      "Empregados" = "Employed",
+      "Firmas" = "Firms"
+    )
 }
