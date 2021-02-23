@@ -115,7 +115,7 @@ load_amazon_employment <- function(years, space_aggregation = "municipality", la
 
 #' Gets formal employment data for Brazil.
 #'
-#' @param years A numeric vector with years of interest. Supported years 2002-2017 for GDP data and 2001-2009, 2011-present for population data.
+#' @param years A numeric vector with years of interest. Supported years 2006-2018.
 #' @param space_aggregation A string that indicates the level of aggregation of the data. It can be by "Municipality" or
 #'   "State"
 #' @param language A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
