@@ -9,7 +9,9 @@ NULL
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' load_amazon_gdp(2017)
+#' }
 load_amazon_gdp <- function(years, space_aggregation = "municipality", language = "eng") {
   filter_amazon(
     load_gdp(years, space_aggregation = space_aggregation, language = language),
@@ -29,7 +31,9 @@ load_amazon_gdp <- function(years, space_aggregation = "municipality", language 
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' load_gdp(2017)
+#' }
 load_gdp <- function(years, space_aggregation = "municipality", language = "eng") {
   # GDP data
   gdp <- tibble::as_tibble(
@@ -99,7 +103,9 @@ load_gdp <- function(years, space_aggregation = "municipality", language = "eng"
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' load_amazon_employment(2017)
+#' }
 load_amazon_employment <- function(years, space_aggregation = "municipality", language = "eng") {
   filter_amazon(
     load_employment(years, space_aggregation = space_aggregation, language = language),
@@ -119,98 +125,10 @@ load_amazon_employment <- function(years, space_aggregation = "municipality", la
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' load_employment(2017)
+#' }
 load_employment <- function(years, space_aggregation = "municipality", language = "eng") {
-  # Employment data
-  salaries <- tibble::as_tibble(
-    sidrar::get_sidra(
-      6449, # Table code at Sidra
-      period = as.character(years),
-      variable = 662,
-      geo = translate_for_api(space_aggregation),
-      classific = "C12762",
-      category = list("117897")
-    )
-  ) %>% dplyr::distinct()
-  employed <- tibble::as_tibble(
-    sidrar::get_sidra(
-      6449, # Table code at Sidra
-      period = as.character(years),
-      variable = 707,
-      geo = translate_for_api(space_aggregation),
-      classific = "C12762",
-      category = list("117897")
-    )
-  ) %>% dplyr::distinct()
-  firms <- tibble::as_tibble(
-    sidrar::get_sidra(
-      6449, # Table code at Sidra
-      period = as.character(years),
-      variable = 2585,
-      geo = translate_for_api(space_aggregation),
-      classific = "C12762",
-      category = list("117897")
-    )
-  ) %>% dplyr::distinct()
-
-  by <- c(
-    paste0(translate_for_response(space_aggregation), " (C\u00f3digo)"),
-    translate_for_response(space_aggregation),
-    "Ano (C\u00f3digo)",
-    "Ano"
-  )
-  df <- salaries %>%
-    dplyr::full_join(
-      employed,
-      by
-    ) %>%
-    dplyr::full_join(
-      firms,
-      by
-    )
-
-  df <- df %>%
-    dplyr::select(
-      paste0(translate_for_response(space_aggregation), " (C\u00f3digo)"),
-      translate_for_response(space_aggregation),
-      "Ano",
-      "Valor.x",
-      "Valor.y",
-      "Valor"
-    ) %>%
-    dplyr::rename_with(function(cols) "CodIBGE", dplyr::ends_with("digo)")) %>% # ends with (Codigo)
-    dplyr::rename_with(
-      dplyr::recode,
-      "Valor.x" = "Salario",
-      "Valor.y" = "Empregados",
-      "Valor" = "Firmas",
-      "Unidade da Federa\u00e7\u00e3o" = "Estado"
-    )
-
-  if (language == "eng") {
-    df <- translate_munics_to_english(df)
-  }
-  else if (language != "pt") {
-    warning("Selected language is not supported. Proceeding with Portuguese.")
-  }
-
-  df
-}
-
-#' Gets census data for Brazil.
-#'
-#' @param years A numeric vector with years of interest. Supported years 2002-2017 for GDP data and 2001-2009, 2011-present for population data.
-#' @param space_aggregation A string that indicates the level of aggregation of the data. It can be by "Municipality" or
-#'   "State"
-#' @param language A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
-#'   The other option is "pt" for Portuguese.
-#' @return A \code{tibble} with (total) Salary (in R$), (number of) Employed people and (number of) Firms.
-#'
-#' @export
-#'
-#' @examples
-#' load_census(2017)
-load_census <- function(years, space_aggregation = "municipality", language = "eng") {
   # Employment data
   salaries <- tibble::as_tibble(
     sidrar::get_sidra(
