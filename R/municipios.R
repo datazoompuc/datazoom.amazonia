@@ -100,11 +100,11 @@ load_gdp <- function(years, space_aggregation = "municipality", language = "eng"
       "Valor.y"
     ) %>%
     dplyr::rename_with(function(cols) "CodIBGE", dplyr::ends_with("digo)")) %>% # ends with (Codigo)
+    dplyr::rename_with(function(cols) "Estado", dplyr::starts_with("Unidade da ")) %>%
     dplyr::rename_with(
       dplyr::recode,
       "Valor.x" = "PIB",
-      "Valor.y" = "Pop",
-      "Unidade da Federa\u00e7\u00e3o" = "Estado"
+      "Valor.y" = "Pop"
     ) %>%
     dplyr::mutate(PIBpc = .data$PIB / .data$Pop * 1000)
 
@@ -231,12 +231,12 @@ load_employment <- function(years, space_aggregation = "municipality", language 
       "Valor"
     ) %>%
     dplyr::rename_with(function(cols) "CodIBGE", dplyr::ends_with("digo)")) %>% # ends with (Codigo)
+    dplyr::rename_with(function(cols) "Estado", dplyr::starts_with("Unidade da ")) %>%
     dplyr::rename_with(
       dplyr::recode,
       "Valor.x" = "Salario",
       "Valor.y" = "Empregados",
-      "Valor" = "Firmas",
-      "Unidade da Federa\u00e7\u00e3o" = "Estado"
+      "Valor" = "Firmas"
     )
 
   if (language == "eng") {
@@ -367,12 +367,12 @@ load_income <- function(years, space_aggregation = "municipality", language = "e
       "Valor"
     ) %>%
     dplyr::rename_with(function(cols) "CodIBGE", dplyr::ends_with("digo)")) %>% # ends with (Codigo)
+    dplyr::rename_with(function(cols) "Estado", dplyr::starts_with("Unidade da ")) %>%
     dplyr::rename_with(
       dplyr::recode,
       "Valor.x" = "Ocupados",
       "Valor.y" = "Renda_media",
-      "Valor" = "Renda_mediana",
-      "Unidade da Federa\u00e7\u00e3o" = "Estado"
+      "Valor" = "Renda_mediana"
     )
 
   if (language == "eng") {
