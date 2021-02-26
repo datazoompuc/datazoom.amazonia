@@ -8,6 +8,7 @@ datazoom.amazonia is an R package that facilitates access to official data regar
 * IBGE - PIB-Munic: gdp
 * IBGE - CEMPRE: formal employment
 * IBGE - Census: income
+* IBGE - SIGMINE: mining area
 * MAPBIOMAS: land covering
 
 <!-- badges: start -->
@@ -22,12 +23,10 @@ if(!require(devtools)) install.packages("devtools")
 devtools::install_github("datazoompuc/datazoom.amazonia")
 ```
 
-## Usage
+## Usage for INPE data
 
 ```
 library(datazoom.amazonia)
-
-##INPE
 
 # Downloads data
 
@@ -46,22 +45,37 @@ data <- load_prodes("~/Downloads")
 
 data <- load_deter("~/Downloads")
 
-##Comex
+```
 
+## Usage for COMEX data
+
+```
 # Downloads data
 
 years <- c(2000:2009)
 
 data <- load_comex(years, ncm = TRUE, exp = TRUE, imp = TRUE)
 
+```
+
+## Usage for IBGE data
+
+```
 ##PIB-Munic
 
 data <- load_amazon_gdp(c(2014, 2015))
 
 data <- load_amazon_gdp(2017, space_aggregation = "state", language = "pt")
 
-##MAPBIOMAS
+##SIGMINE
 
+data <- load_sigmine(space_aggregation = 'municipality')
+
+```
+
+## Usage for MAPBIOMAS data
+
+```
 # Downloads data
 
 data <- load_mapbiomas_covering(space_aggregation = 'municipality', path = NULL, code_state = "PA", code_mun = NULL, covering = 3,

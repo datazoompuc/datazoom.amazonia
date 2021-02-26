@@ -1,0 +1,28 @@
+---
+title: "SIGMINE"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{SIGMINE}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+##The Dataset
+
+The SIGMINE project gathers data reporting each mine in the country and their features such as year, area, company ownership, element being explored etc.
+
+Using the function is easy enough:
+
+```{r setup}
+library(datazoom.amazonia)
+data <- load_sigmine(space_aggregation = 'municipality', source = NULL)
+```
+
+Data can be retrieved from the website as above or loaded locally.
