@@ -18,3 +18,5 @@
 # datazoom.amazonia 0.7.0.9000
 * Added functions for DETER data 
 
+# datazoom.amazonia 0.8.0.9000
+* Added functions for SIGMINE data 
