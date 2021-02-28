@@ -47,7 +47,7 @@ number of unique perpetrators of infractions on the given place-time period.
 Original data comes from \href{https://servicos.ibama.gov.br/ctf/publico/areasembargadas/ConsultaPublicaAreasEmbargadas.php}{IBAMA's website}
 }
 \examples{
-
+\dontrun{
 load_ibama(
   download_directory = getwd(),
   time_aggregation = "year",
@@ -60,7 +60,7 @@ load_ibama(
   space_aggregation = "municipio", years = c(2010, 2012),
   language = "pt"
 )
-\dontrun{
+
 
 load_ibama(
   download_data = FALSE,
