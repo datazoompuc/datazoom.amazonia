@@ -23,11 +23,11 @@ A list of \code{tibble}.
 Loads DEGRAD data from INPE.
 }
 \examples{
+\dontrun{
 load_degrad_raw(2016)
 
 load_degrad_raw(c(2013, 2014, 2016))
 
-\dontrun{
 load_degrad_raw("~/Downloads")
 
 load_degrad_raw("~/Downloads/degrad2016_final_shp/DEGRAD_2016_pol.shp")
