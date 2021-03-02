@@ -41,6 +41,8 @@ municipality, respectively.
 
 ```{r setup, eval = TRUE}
 
+library(datazoom.amazonia)
+
 load_ibama(
   download_data = TRUE, 
   download_directory = getwd(),
