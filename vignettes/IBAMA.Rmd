@@ -40,7 +40,6 @@ municipality, respectively.
 
 
 ```{r , eval = TRUE}
-library(datazoom.amazonia)
 
 load_ibama(
   download_data = TRUE, 

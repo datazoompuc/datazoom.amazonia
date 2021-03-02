@@ -7,7 +7,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -22,7 +22,7 @@ Areas are reported in square kilometers and informed as both the area which inte
 
 ## Usage
 
-```{r setup}
+```{r, eval = TRUE}
 library(datazoom.amazonia)
 
 load_deter("amazonia", space_aggregation = "municipality", time_aggregation = "year", language = "eng")

@@ -23,8 +23,7 @@ This package provides degradation data by municipality-year (or municipality-mon
 
 Using the package is easy enough:
 
-```{r}
-library(datazoom.amazonia)
+```{r, eval = TRUE}
 
 years <- c(2014:2016)
 
