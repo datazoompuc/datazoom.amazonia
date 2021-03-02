@@ -5,20 +5,20 @@
 \alias{load_prodes}
 \title{Loads and cleans deforestation data from INPE.}
 \usage{
-load_prodes(source, aggregation_level = "municipality", language = "eng")
+load_prodes(source, space_aggregation = "municipality", language = "eng")
 }
 \arguments{
 \item{source}{A number of different sources are supported:
 
-Passing a numeric \code{vector} of years will download the corresponding data from the INPE website.
+Passing a numeric \code{vector} of years will download the corresponding data from the INPE website (data is organized by prodes-year - from august to july - for more information, see the vignette).
 
 Passing a \code{string} with a directory's path will read data from all files named
 "\{path\}/DesmatamentoMunicipiosXXXX.txt".
 
 Alternatively, \code{source} may be a list of full file paths, or anything else readable by \code{utils::read.csv()}.}
 
-\item{aggregation_level}{A string that indicates the level of aggregation of the data. It can be by "municipality" or
-"state".}
+\item{space_aggregation}{A string that indicates the level of aggregation of the data. It can be by "Municipality" or
+"State".}
 
 \item{language}{A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
 The other option is "pt" for Portuguese.}
@@ -34,19 +34,19 @@ load_prodes(2018)
 
 load_prodes(
   c(2017, 2018),
-  aggregation_level = "state",
+  space_aggregation = "state",
   language = "pt"
 )
 
 load_prodes(
   system.file("extdata", package = "datazoom.amazonia"),
-  aggregation_level = "state",
+  space_aggregation = "state",
   language = "en"
 )
 
 load_prodes(
   system.file("extdata", "DesmatamentoMunicipios2015.txt", package = "datazoom.amazonia"),
-  aggregation_level = "municipality",
+  space_aggregation = "municipality",
   language = "pt"
 )
 }

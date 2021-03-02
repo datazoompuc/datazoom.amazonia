@@ -2,25 +2,27 @@
 % Please edit documentation in R/municipios.R
 \name{load_gdp}
 \alias{load_gdp}
-\title{Gets GDP at current prices}
+\title{Gets GDP at current prices and (estimated) population data for Brazil}
 \usage{
-load_gdp(years, aggregation_level = "municipality", language = "eng")
+load_gdp(years, space_aggregation = "municipality", language = "eng")
 }
 \arguments{
-\item{years}{A numeric vector with years of interest. Supported years are 2002-2017.}
+\item{years}{A numeric vector with years of interest. Supported years 2002-2017 for GDP data and 2001-2009, 2011-present for population data.}
 
-\item{aggregation_level}{A string that indicates the level of aggregation of the data. It can be by "Municipality" or
+\item{space_aggregation}{A string that indicates the level of aggregation of the data. It can be by "Municipality" or
 "State"}
 
 \item{language}{A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
 The other option is "pt" for Portuguese.}
 }
 \value{
-A \code{tibble}.
+A \code{tibble} with GDP (in thousands), Population and GDP Per Capita (in units).
 }
 \description{
-Gets GDP at current prices
+Gets GDP at current prices and (estimated) population data for Brazil
 }
 \examples{
+\dontrun{
 load_gdp(2017)
+}
 }

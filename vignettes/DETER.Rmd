@@ -1,0 +1,31 @@
+---
+title: "DETER"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{DETER}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## The Dataset
+
+DETER uses satellite surveillance to detect and report changes in forest cover across the Legal Amazon and the Cerrado biome. Each data point consists of a warning, describing which type of change has affected a certain area of forest at a given date. Broadly speaking, it makes a distinction between events of deforestation, degradation and logging. 
+
+Areas are reported in square kilometers and informed as both the area which intersects a Conservation Unit and the area intersecting a Municipality. The data extracted here spans from 2016 onward in the Amazon, and from 2018 onward in the Cerrado. 
+
+## Usage
+
+```{r setup}
+library(datazoom.amazonia)
+
+load_deter("amazonia", space_aggregation = "municipality", time_aggregation = "year", language = "eng")
+```
+
+Note that data extracted via 'load_deter_raw()' retains some additional information on the satellites used on each observation, as well as a variable saying which Conservation Unit was affected in each warning, if any.

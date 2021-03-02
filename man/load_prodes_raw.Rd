@@ -3,14 +3,14 @@
 \encoding{UTF-8}
 \name{load_prodes_raw}
 \alias{load_prodes_raw}
-\title{Loads and cleans the deforestation data from INPE in your computer from a specified directory.}
+\title{Loads deforestation data from INPE.}
 \usage{
 load_prodes_raw(source)
 }
 \arguments{
 \item{source}{A number of different sources are supported:
 
-Passing a numeric \code{vector} of years will download the corresponding data from the INPE website.
+Passing a numeric \code{vector} of years will download the corresponding data from the INPE website (data is organized by prodes-year - from august to july - for more information, see the vignette).
 
 Passing a \code{string} with a directory's path will read data from all files named
 "\{path\}/DesmatamentoMunicipiosXXXX.txt".
@@ -21,7 +21,7 @@ Alternatively, \code{source} may be a list of full file paths, or anything else 
 A list of \code{tibble}.
 }
 \description{
-Loads and cleans the deforestation data from INPE in your computer from a specified directory.
+Loads deforestation data from INPE.
 }
 \examples{
 load_prodes_raw(2017)

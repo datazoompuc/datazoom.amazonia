@@ -1,13 +1,19 @@
 # datazoom.amazonia
 
-datazoom.amazonia is an R package that facilitates access to official data regarding the Amazon. The package provides functions that download and pre-process selected datasets. Currently we support:
-* INPE - PRODES: deforestation by municipality
-* MDIC - Comex: exports and imports by municipality or state
-* IBGE - PIB-Munic: gdp by municipality
-* PAM: agricultural data by country, region, state, meso and microregion or city
+datazoom.amazonia is an R package that facilitates access to official data regarding the Amazon. The package provides functions that download and pre-process selected datasets. Data is in general provided at the municipality-year level (see the documentation for more information). Currently we support:
+* INPE - PRODES: deforestation
+* INPE - DETER: deforestation warnings
+* INPE - DEGRAD: degradation
+* MDIC - COMEX: exports and imports
+* IBGE - PIB-Munic: gdp
+* IBGE - CEMPRE: formal employment
+* IBGE - Census: income
+* IBGE - SIGMINE: mining area
+* IBGE - PAM - agricultural data
+* MAPBIOMAS - land covering
 
 <!-- badges: start -->
-[![Travis build status](https://travis-ci.com/datazoompuc/datazoom.amazonia.svg?branch=master)](https://travis-ci.com/datazoompuc/datazoom.amazonia)
+[![R build status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions)
 <!-- badges: end -->
 
 ## Installation
@@ -18,43 +24,75 @@ if(!require(devtools)) install.packages("devtools")
 devtools::install_github("datazoompuc/datazoom.amazonia")
 ```
 
-## Usage
+## Usage for INPE data
 
 ```
 library(datazoom.amazonia)
 
-##INPE
-
 # Downloads data
+
 data <- load_prodes(c(2018, 2019))
 
-data <- load_prodes(2017, aggregation_level = "state", language = "pt")
+data <- load_degrad(2016)
+
+data <- load_prodes(2017, space_aggregation = "state", language = "pt")
+
+data <- load_deter("amazonia", space_aggregation = "state",
+                   time_aggregation = "year", language = "pt")
 
 # Loads data locally
+
 data <- load_prodes("~/Downloads")
 
-data <- load_prodes("~/Downloads/data.txt")
+data <- load_deter("~/Downloads")
 
-# Loads raw data
-raw_data <- load_prodes_raw(2018)
+```
 
-##Comex
+## Usage for COMEX data
 
-#Downloads data
+```
+# Downloads data
 
 years <- c(2000:2009)
 
-data2 <- load_comex(years, ncm = TRUE, exp = TRUE, imp = TRUE)
+data <- load_comex(years, ncm = TRUE, exp = TRUE, imp = TRUE)
 
+```
+
+## Usage for IBGE data
+
+```
 ##PIB-Munic
+
 data <- load_amazon_gdp(c(2014, 2015))
 
-data <- load_amazon_gdp(2017, aggregation_level = "state", language = "pt")
+data <- load_amazon_gdp(2017, space_aggregation = "state", language = "pt")
+
+##SIGMINE
+
+data <- load_sigmine(space_aggregation = 'municipality')
 
 ##PAM
 
-df <- load_pam_permanent(2013, aggregation_level = "region")
+data <- load_pam_permanent(2013, aggregation_level = "region")
 
+```
+
+## Usage for MAPBIOMAS data
+
+```
+# Downloads data
+
+data <- load_mapbiomas_covering(space_aggregation = 'municipality', path = NULL, code_state = "PA", code_mun = NULL, covering = 3,
+                                  type = 'stacked', year_begin = 2000, year_end = 2010)
+
+data <- load_mapbiomas_transition(transition_interval = 5)
+
+# Loads data locally
+
+data <- load_mapbiomas_covering("~/Downloads")
+
+data <- load_mapbiomas_transition("~/Downloads")
 
 ```
 

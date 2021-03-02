@@ -5,3 +5,18 @@
 
 # datazoom.amazonia 0.3.0.9000
 * Added functions for GDP data 
+
+# datazoom.amazonia 0.4.0.9000
+* Added functions for COMEX data 
+
+# datazoom.amazonia 0.5.0.9000
+* Added functions for MAPBIOMAS data 
+
+# datazoom.amazonia 0.6.0.9000
+* Added functions for DEGRAD data 
+
+# datazoom.amazonia 0.7.0.9000
+* Added functions for DETER data 
+
+# datazoom.amazonia 0.8.0.9000
+* Added functions for SIGMINE data 

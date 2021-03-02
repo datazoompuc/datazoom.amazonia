@@ -5,8 +5,8 @@ NULL
 #' Loads and cleans deforestation data from INPE.
 #'
 #' @inheritParams load_prodes_raw
-#' @param aggregation_level A string that indicates the level of aggregation of the data. It can be by "municipality" or
-#'   "state".
+#' @param space_aggregation A string that indicates the level of aggregation of the data. It can be by "Municipality" or
+#'   "State".
 #' @param language A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
 #'   The other option is "pt" for Portuguese.
 #' @return A \code{tibble}.
@@ -23,34 +23,34 @@ NULL
 #'
 #' load_prodes(
 #'   c(2017, 2018),
-#'   aggregation_level = "state",
+#'   space_aggregation = "state",
 #'   language = "pt"
 #' )
 #'
 #' load_prodes(
 #'   system.file("extdata", package = "datazoom.amazonia"),
-#'   aggregation_level = "state",
+#'   space_aggregation = "state",
 #'   language = "en"
 #' )
 #'
 #' load_prodes(
 #'   system.file("extdata", "DesmatamentoMunicipios2015.txt", package = "datazoom.amazonia"),
-#'   aggregation_level = "municipality",
+#'   space_aggregation = "municipality",
 #'   language = "pt"
 #' )
-load_prodes <- function(source, aggregation_level = "municipality", language = "eng") {
+load_prodes <- function(source, space_aggregation = "municipality", language = "eng") {
   raw_list <- load_prodes_raw(source)
 
-  list_df <- lapply(raw_list, treat_data, aggregation_level = aggregation_level, language = language)
+  list_df <- lapply(raw_list, treat_prodes_data, space_aggregation = space_aggregation, language = language)
 
   dplyr::bind_rows(list_df)
 }
 
-#' Loads and cleans the deforestation data from INPE in your computer from a specified directory.
+#' Loads deforestation data from INPE.
 #'
 #' @param source A number of different sources are supported:
 #'
-#' Passing a numeric \code{vector} of years will download the corresponding data from the INPE website.
+#' Passing a numeric \code{vector} of years will download the corresponding data from the INPE website (data is organized by prodes-year - from august to july - for more information, see the vignette).
 #'
 #' Passing a \code{string} with a directory's path will read data from all files named
 #'   "\{path\}/DesmatamentoMunicipiosXXXX.txt".
@@ -96,20 +96,24 @@ load_prodes_raw <- function(source) {
   # Otherwise, we assume that source is something that can already be interpreted by read.csv()
 
   # Useful as integrity check on database
-  csv_types <- readr::cols("d", "d", "d", "c", "c", "c", "d", "c", "d", "d", "d", "d", "d", "d", "d", "d", "d")
+  csv_types <- readr::cols("d", "d", "d", "c", "c", "c", "c", "c", "d", "d", "d", "d", "d", "d", "d", "d", "d")
   lapply(source, readr::read_csv, col_types = csv_types, locale = readr::locale(encoding = "latin1"))
 }
 
-treat_data <- function(df, aggregation_level, language) {
-  aggregation_level <- tolower(aggregation_level)
-  if (aggregation_level == "state") {
+treat_prodes_data <- function(df, space_aggregation, language) {
+  space_aggregation <- tolower(space_aggregation)
+  if (space_aggregation == "state") {
     df <-
       df %>%
+      dplyr::mutate(CodIBGE = as.factor(substr(.data$CodIbge, start = 1, stop = 2))) %>%
       dplyr::select(-c("Latgms", "Lat", "Long", "Longms", "Municipio", "CodIbge")) %>%
-      dplyr::group_by(.data$Estado) %>%
+      dplyr::group_by(.data$Estado, .data$CodIBGE) %>%
       dplyr::summarize_if(is.numeric, sum, na.rm = TRUE)
   }
-  else if (aggregation_level != "municipality") {
+  else if (space_aggregation == "municipality") {
+    df <- dplyr::mutate(df, CodIBGE = as.factor(.data$CodIbge)) %>% dplyr::select(-c("CodIbge"))
+  }
+  else {
     warning("Aggregation level not supported. Proceeding with Municipality.")
   }
 
@@ -126,7 +130,7 @@ treat_data <- function(df, aggregation_level, language) {
 
   language <- tolower(language)
   if (language == "eng") {
-    df <- translate_to_english(df)
+    df <- translate_prodes_to_english(df)
   }
   else if (language != "pt") {
     warning("Selected language is not supported. Proceeding with Portuguese.")
@@ -136,12 +140,12 @@ treat_data <- function(df, aggregation_level, language) {
   dplyr::select(df, -c("Nr", "Soma"))
 }
 
-translate_to_english <- function(df) {
+translate_prodes_to_english <- function(df) {
   dplyr::rename_with(
     df,
     dplyr::recode,
     Municipio = "Municipality",
-    CodIbge = "IBGECode",
+    CodIBGE = "CodIBGE",
     Estado = "State",
     Incremento = "Increment",
     Desmatado = "Deforested",
