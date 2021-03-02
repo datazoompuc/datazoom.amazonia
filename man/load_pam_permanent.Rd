@@ -32,7 +32,7 @@ PAM Permanent Tillage
 Loads agricultural data of permanent tillages from Brazil from 1974 to the present
 }
 \examples{
-datazoom.amazonia::load_pam_permanent(2013, aggregation_level = "country")
+\dontrun{datazoom.amazonia::load_pam_permanent(2013, aggregation_level = "country")}
 
 
 }

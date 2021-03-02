@@ -32,7 +32,7 @@ PAM Temporary tillage
 Loads agricultural data of temporary tillages from Brazil from 1974 to the present
 }
 \examples{
-datazoom.amazonia::load_pam_temporary(2010, aggregation_level = "country")
+\dontrun{datazoom.amazonia::load_pam_temporary(2010, aggregation_level = "country")}
 
 }
 \author{

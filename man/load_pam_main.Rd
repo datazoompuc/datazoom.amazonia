@@ -32,7 +32,7 @@ PAM Main products
 Loads agricultural data of four main tillages - corn, potato, peanut and beans - from Brazil from 2003 to the present
 }
 \examples{
-datazoom.amazonia::load_pam_main(2007, aggregation_level = "country")
+\dontrun{datazoom.amazonia::load_pam_main(2007, aggregation_level = "country")}
 
 
 }

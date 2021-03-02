@@ -18,13 +18,276 @@
 #'
 #' @export load_pam_permanent
 #'
-#' @examples datazoom.amazonia::load_pam_permanent(2013, aggregation_level = "country")
+#' @examples \dontrun{datazoom.amazonia::load_pam_permanent(2013, aggregation_level = "country")}
 #'
 #'
 
 load_pam_permanent <- function(years, aggregation_level = "country", language = "pt", long = FALSE){
   message("Depending on amount of items selected function may take time to run")
+
   sigla_uf = c(12,27,13,16,29,23,32,52,21,31,50,51,15,25,26,22,41,33,24,11,14,43,42,28,35,17)
+  sigla_uf2 = c(12,27,13,16,23,32,21,50,51,15,25,26,22,33,24,11,14,28,17)
+  micro = c(29006,29001,29007,29022,29027,29019,29002,29018,29014,29012,29026,29031,
+            29009,
+            29011,
+            29029,
+            29010,
+            29024,
+            29013,
+            29004,
+            29025,
+            29005,
+            29032,
+            29015,
+            29021,
+            29003,
+            29020,
+            29023,
+            29008,
+            29016,
+            29030,
+            29028,
+            52007,
+            52009,
+            52003,
+            52017,
+            52006,
+            52005,
+            52012,
+            52010,
+            52008,
+            52015,
+            52016,
+            52004,
+            52018,
+            52002,
+            52001,
+            52013,
+            52014,
+            52011,
+            31041,
+            31049,
+            31014,
+            31055,
+            31012,
+            31023,
+            31059,
+            31030,
+            31009,
+            31026,
+            31045,
+            31011,
+            31040,
+            31066,
+            31028,
+            31034,
+            31025,
+            31010,
+            31043,
+            31044,
+            31021,
+            31037,
+            31008,
+            31035,
+            31039,
+            31031,
+            31032,
+            31056,
+            31017,
+            31004,
+            31003,
+            31065,
+            31057,
+            31061,
+            31038,
+            31007,
+            31063,
+            31016,
+            31046,
+            31033,
+            31029,
+            31002,
+            31047,
+            31020,
+            31019,
+            31036,
+            31013,
+            31006,
+            31042,
+            31051,
+            31060,
+            31052,
+            31005,
+            31053,
+            31058,
+            31054,
+            31048,
+            31027,
+            31015,
+            31024,
+            31064,
+            31022,
+            31018,
+            31001,
+            31050,
+            31062,
+            41010,
+            41014,
+            41006,
+            41005,
+            41025,
+            41023,
+            41035,
+            41003,
+            41015,
+            41037,
+            41012,
+            41008,
+            41024,
+            41026,
+            41004,
+            41029,
+            41017,
+            41032,
+            41013,
+            41016,
+            41020,
+            41036,
+            41011,
+            41009,
+            41030,
+            41038,
+            41001,
+            41027,
+            41028,
+            41021,
+            41007,
+            41031,
+            41039,
+            41034,
+            41019,
+            41022,
+            41002,
+            41033,
+            41018,
+            43022,
+            43028,
+            43030,
+            43031,
+            43029,
+            43009,
+            43016,
+            43006,
+            43011,
+            43004,
+            43003,
+            43024,
+            43014,
+            43008,
+            43034,
+            43021,
+            43035,
+            43023,
+            43012,
+            43027,
+            43010,
+            43033,
+            43026,
+            43019,
+            43005,
+            43020,
+            43018,
+            43001,
+            43017,
+            43007,
+            43025,
+            43032,
+            43013,
+            43002,
+            43015,
+            42020,
+            42012,
+            42010,
+            42006,
+            42002,
+            42005,
+            42019,
+            42009,
+            42016,
+            42013,
+            42014,
+            42004,
+            42008,
+            42011,
+            42007,
+            42001,
+            42017,
+            42015,
+            42018,
+            42003,
+            35035,
+            35033,
+            35016,
+            35017,
+            35024,
+            35039,
+            35006,
+            35022,
+            35052,
+            35009,
+            35015,
+            35020,
+            35018,
+            35023,
+            35048,
+            35032,
+            35049,
+            35044,
+            35054,
+            35005,
+            35034,
+            35002,
+            35012,
+            35058,
+            35051,
+            35059,
+            35056,
+            35060,
+            35042,
+            35041,
+            35011,
+            35013,
+            35001,
+            35021,
+            35047,
+            35027,
+            35019,
+            35038,
+            35062,
+            35031,
+            35007,
+            35008,
+            35057,
+            35040,
+            35053,
+            35045,
+            35028,
+            35029,
+            35036,
+            35055,
+            35014,
+            35026,
+            35063,
+            35025,
+            35030,
+            35010,
+            35004,
+            35050,
+            35061,
+            35046,
+            35043,
+            35037,
+            35003)
 
   to_english1 <- function(df){
     index <- df$`Variable (Code)` == 2313
@@ -127,18 +390,18 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
 
   to_long_permanent <- function(df, a){
     if( a == 0) {
-      df <- split(df, df$Variável)
+      df <- split(df, df$variavel)
       for (i in 1:length(df)){
-        df[[i]]$`Brasil` <- NULL
-        df[[i]]$`Brasil (Código)` <- NULL
-        df[[i]]$`Ano (Código)` <- NULL
-        df[[i]]$`Unidade de Medida (Código)` <- NULL
-        df[[i]]$`Unidade de Medida` <- NULL
-        df[[i]]$`Produto das lavouras permanentes (Código)` <- NULL
-        df[[i]] <- tidyr::spread(df[[i]], "Produto das lavouras permanentes", "Valor")
+        df[[i]]$`brasil` <- NULL
+        df[[i]]$`brasil_codigo` <- NULL
+        df[[i]]$`ano_codigo` <- NULL
+        df[[i]]$`unidade_de_medida_codigo` <- NULL
+        df[[i]]$`unidade_de_medida` <- NULL
+        df[[i]]$`produto_das_lavouras_permanentes_codigo` <- NULL
+        df[[i]] <- tidyr::spread(df[[i]], "produto_das_lavouras_permanentes", "valor")
       }
     } else if ( a == 1 ){
-      df <- split(df, df$Variável)
+      df <- split(df, df$variavel)
       for (i in 1:length(df)){
         df[[i]]$`Brazil` <- NULL
         df[[i]]$`Brazil (Code)` <- NULL
@@ -180,6 +443,8 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
       "Value"
       )
       df <- to_english1(df)
+    } else if (language == "pt") {
+      df <- janitor::clean_names(df)
       }
   }
 
@@ -198,6 +463,8 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
         "Value"
     )
       df <- to_english1(df)
+    } else if (language == "pt") {
+      df <- janitor::clean_names(df)
     }
   }
 
@@ -216,6 +483,8 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
         "Value"
     )
       df <- to_english1(df)
+    } else if (language == "pt") {
+      df <- janitor::clean_names(df)
     }
   }
 
@@ -233,6 +502,8 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
         "Value"
     )
       df <- to_english1(df)
+    } else if (language == "pt") {
+      df <- janitor::clean_names(df)
     }
   }
 
@@ -252,14 +523,20 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
         "Value"
     )
       df <- to_english1(df)
+    } else if (language == "pt") {
+      df <- janitor::clean_names(df)
     }
   }
 
   if (aggregation_level == "city"){
     for (i in 1:length(years)){
       a <-toString(years[i])
-      for (s in sigla_uf){
+      for (s in sigla_uf2){
         data <- sidrar::get_sidra(1613, period = a, geo = "City", geo.filter = list("State" = s))
+        df <- rbind(df, data)
+      }
+      for (m in micro){
+        data <- sidrar::get_sidra(1613, period = a, geo = "City", geo.filter = list("MicroRegion" = m))
         df <- rbind(df, data)
       }
     }
@@ -271,6 +548,8 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
         "Value"
     )
       df <- to_english1(df)
+    } else if (language == "pt") {
+      df <- janitor::clean_names(df)
     }
   }
 
@@ -301,7 +580,7 @@ return(df)
 #'
 #' @export load_pam_temporary
 #'
-#' @examples datazoom.amazonia::load_pam_temporary(2010, aggregation_level = "country")
+#' @examples \dontrun{datazoom.amazonia::load_pam_temporary(2010, aggregation_level = "country")}
 #'
 
 load_pam_temporary <- function(years, aggregation_level = "country", language = "pt", long = FALSE){
@@ -408,18 +687,18 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
 
   to_long_temporary <- function(df, a){
     if( a == 0) {
-      df <- split(df, df$Variável)
+      df <- split(df, df$variavel)
       for (i in 1:length(df)){
-        df[[i]]$`Brasil` <- NULL
-        df[[i]]$`Brasil (Código)` <- NULL
-        df[[i]]$`Ano (Código)` <- NULL
-        df[[i]]$`Unidade de Medida (Código)` <- NULL
-        df[[i]]$`Unidade de Medida` <- NULL
-        df[[i]]$`Produto das lavouras temporárias (Código)` <- NULL
-        df[[i]] <- tidyr::spread(df[[i]], "Produto das lavouras temporárias", "Valor")
+        df[[i]]$`brasil` <- NULL
+        df[[i]]$`brasil_codigo` <- NULL
+        df[[i]]$`ano_codigo` <- NULL
+        df[[i]]$`unidade_de_medida_codigo` <- NULL
+        df[[i]]$`unidade_de_medida` <- NULL
+        df[[i]]$`produto_das_lavouras_temporarias_codigo` <- NULL
+        df[[i]] <- tidyr::spread(df[[i]], "produto_das_lavouras_temporarias", "valor")
       }
     } else if ( a == 1 ){
-      df <- split(df, df$Variável)
+      df <- split(df, df$variavel)
       for (i in 1:length(df)){
         df[[i]]$`Brazil` <- NULL
         df[[i]]$`Brazil (Code)` <- NULL
@@ -434,6 +713,268 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
   }
 
   sigla_uf = c(12,27,13,16,29,23,32,52,21,31,50,51,15,25,26,22,41,33,24,11,14,43,42,28,35,17)
+  sigla_uf2 = c(12,27,13,16,23,32,21,50,51,15,25,26,22,33,24,11,14,28,17)
+  micro = c(29006,29001,29007,29022,29027,29019,29002,29018,29014,29012,29026,29031,
+            29009,
+            29011,
+            29029,
+            29010,
+            29024,
+            29013,
+            29004,
+            29025,
+            29005,
+            29032,
+            29015,
+            29021,
+            29003,
+            29020,
+            29023,
+            29008,
+            29016,
+            29030,
+            29028,
+            52007,
+            52009,
+            52003,
+            52017,
+            52006,
+            52005,
+            52012,
+            52010,
+            52008,
+            52015,
+            52016,
+            52004,
+            52018,
+            52002,
+            52001,
+            52013,
+            52014,
+            52011,
+            31041,
+            31049,
+            31014,
+            31055,
+            31012,
+            31023,
+            31059,
+            31030,
+            31009,
+            31026,
+            31045,
+            31011,
+            31040,
+            31066,
+            31028,
+            31034,
+            31025,
+            31010,
+            31043,
+            31044,
+            31021,
+            31037,
+            31008,
+            31035,
+            31039,
+            31031,
+            31032,
+            31056,
+            31017,
+            31004,
+            31003,
+            31065,
+            31057,
+            31061,
+            31038,
+            31007,
+            31063,
+            31016,
+            31046,
+            31033,
+            31029,
+            31002,
+            31047,
+            31020,
+            31019,
+            31036,
+            31013,
+            31006,
+            31042,
+            31051,
+            31060,
+            31052,
+            31005,
+            31053,
+            31058,
+            31054,
+            31048,
+            31027,
+            31015,
+            31024,
+            31064,
+            31022,
+            31018,
+            31001,
+            31050,
+            31062,
+            41010,
+            41014,
+            41006,
+            41005,
+            41025,
+            41023,
+            41035,
+            41003,
+            41015,
+            41037,
+            41012,
+            41008,
+            41024,
+            41026,
+            41004,
+            41029,
+            41017,
+            41032,
+            41013,
+            41016,
+            41020,
+            41036,
+            41011,
+            41009,
+            41030,
+            41038,
+            41001,
+            41027,
+            41028,
+            41021,
+            41007,
+            41031,
+            41039,
+            41034,
+            41019,
+            41022,
+            41002,
+            41033,
+            41018,
+            43022,
+            43028,
+            43030,
+            43031,
+            43029,
+            43009,
+            43016,
+            43006,
+            43011,
+            43004,
+            43003,
+            43024,
+            43014,
+            43008,
+            43034,
+            43021,
+            43035,
+            43023,
+            43012,
+            43027,
+            43010,
+            43033,
+            43026,
+            43019,
+            43005,
+            43020,
+            43018,
+            43001,
+            43017,
+            43007,
+            43025,
+            43032,
+            43013,
+            43002,
+            43015,
+            42020,
+            42012,
+            42010,
+            42006,
+            42002,
+            42005,
+            42019,
+            42009,
+            42016,
+            42013,
+            42014,
+            42004,
+            42008,
+            42011,
+            42007,
+            42001,
+            42017,
+            42015,
+            42018,
+            42003,
+            35035,
+            35033,
+            35016,
+            35017,
+            35024,
+            35039,
+            35006,
+            35022,
+            35052,
+            35009,
+            35015,
+            35020,
+            35018,
+            35023,
+            35048,
+            35032,
+            35049,
+            35044,
+            35054,
+            35005,
+            35034,
+            35002,
+            35012,
+            35058,
+            35051,
+            35059,
+            35056,
+            35060,
+            35042,
+            35041,
+            35011,
+            35013,
+            35001,
+            35021,
+            35047,
+            35027,
+            35019,
+            35038,
+            35062,
+            35031,
+            35007,
+            35008,
+            35057,
+            35040,
+            35053,
+            35045,
+            35028,
+            35029,
+            35036,
+            35055,
+            35014,
+            35026,
+            35063,
+            35025,
+            35030,
+            35010,
+            35004,
+            35050,
+            35061,
+            35046,
+            35043,
+            35037,
+            35003)
 
   if(language == "eng"){
     e = 1
@@ -461,6 +1002,8 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
         "Value"
       )
       df <- to_english2(df)
+    } else if (language == "pt") {
+      df <- janitor::clean_names(df)
     }
   }
 
@@ -477,6 +1020,8 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
         "Value"
       )
       df <- to_english2(df)
+    } else if (language == "pt") {
+      df <- janitor::clean_names(df)
     }
   }
 
@@ -493,6 +1038,8 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
         "Value"
       )
       df <- to_english2(df)
+    } else if (language == "pt") {
+      df <- janitor::clean_names(df)
     }
   }
 
@@ -509,6 +1056,8 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
         "Value"
       )
       df <- to_english2(df)
+    } else if (language == "pt") {
+      df <- janitor::clean_names(df)
     }
   }
 
@@ -527,14 +1076,20 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
         "Value"
       )
       df <- to_english2(df)
+    } else if (language == "pt") {
+      df <- janitor::clean_names(df)
     }
   }
 
   if (aggregation_level == "city"){
     for (i in 1:length(years)){
       a <-toString(years[i])
-      for (s in sigla_uf){
+      for (s in sigla_uf2){
         data <- sidrar::get_sidra(1612, period = a, geo = "City", geo.filter = list("State" = s))
+        df <- rbind(df, data)
+      }
+      for (m in micro){
+        data <- sidrar::get_sidra(1612, period = a, geo = "City", geo.filter = list("MicroRegion" = m))
         df <- rbind(df, data)
       }
     }
@@ -545,6 +1100,8 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
         "Value"
       )
       df <- to_english2(df)
+    } else if (language == "pt") {
+      df <- janitor::clean_names(df)
     }
   }
 
@@ -575,7 +1132,7 @@ return(df)
 #'
 #' @export load_pam_main
 #'
-#' @examples datazoom.amazonia::load_pam_main(2007, aggregation_level = "country")
+#' @examples \dontrun{datazoom.amazonia::load_pam_main(2007, aggregation_level = "country")}
 #'
 #'
 
@@ -629,18 +1186,18 @@ load_pam_main <- function(years, aggregation_level = "country", language = "pt",
 
   to_long_main <- function(df, a){
     if( a == 0) {
-      df <- split(df, df$Variável)
+      df <- split(df, df$variavel)
       for (i in 1:length(df)){
-        df[[i]]$`Brasil` <- NULL
-        df[[i]]$`Brasil (Código)` <- NULL
-        df[[i]]$`Ano (Código)` <- NULL
-        df[[i]]$`Unidade de Medida (Código)` <- NULL
-        df[[i]]$`Unidade de Medida` <- NULL
-        df[[i]]$`Produto das lavouras temporárias (Código)` <- NULL
-        df[[i]] <- tidyr::spread(df[[i]], "Produto das lavouras temporárias", "Valor")
+        df[[i]]$`brasil` <- NULL
+        df[[i]]$`brasil_codigo` <- NULL
+        df[[i]]$`ano_codigo` <- NULL
+        df[[i]]$`unidade_de_medida_codigo` <- NULL
+        df[[i]]$`unidade_de_medida` <- NULL
+        df[[i]]$`produto_das_lavouras_temporarias_codigos` <- NULL
+        df[[i]] <- tidyr::spread(df[[i]], "produto_das_lavouras_temporarias", "valor")
       }
     } else if ( a == 1 ){
-      df <- split(df, df$Variável)
+      df <- split(df, df$variavel)
       for (i in 1:length(df)){
         df[[i]]$`Brazil` <- NULL
         df[[i]]$`Brazil (Code)` <- NULL
@@ -678,7 +1235,8 @@ load_pam_main <- function(years, aggregation_level = "country", language = "pt",
       df <- rbind(df, potato)
       df <- rbind(df, peanut)
       df <- rbind(df, bean)
-      df <- df[!(df$`Produto das lavouras temporárias (Código)` == 31693),]
+      df <- janitor::clean_names(df)
+      df <- df[!(df$`produto_das_lavouras_temporarias_codigo` == 31693),]
     }
     if (language == "eng"){
     colnames(df) <- c(
@@ -700,7 +1258,8 @@ load_pam_main <- function(years, aggregation_level = "country", language = "pt",
       df <- rbind(df, potato)
       df <- rbind(df, peanut)
       df <- rbind(df, bean)
-      df <- df[!(df$`Produto das lavouras temporárias (Código)` == 31693),]
+      df <- janitor::clean_names(df)
+      df <- df[!(df$`produto_das_lavouras_temporarias_codigo` == 31693),]
     }
     if (language == "eng"){
     colnames(df) <- c(
@@ -723,7 +1282,8 @@ load_pam_main <- function(years, aggregation_level = "country", language = "pt",
       df <- rbind(df, potato)
       df <- rbind(df, peanut)
       df <- rbind(df, bean)
-      df <- df[!(df$`Produto das lavouras temporárias (Código)` == 31693),]
+      df <- janitor::clean_names(df)
+      df <- df[!(df$`produto_das_lavouras_temporarias_codigo` == 31693),]
     }
     if (language == "eng"){
     colnames(df) <- c(
@@ -746,7 +1306,8 @@ load_pam_main <- function(years, aggregation_level = "country", language = "pt",
       df <- rbind(df, potato)
       df <- rbind(df, peanut)
       df <- rbind(df, bean)
-      df <- df[!(df$`Produto das lavouras temporárias (Código)` == 31693),]
+      df <- janitor::clean_names(df)
+      df <- df[!(df$`produto_das_lavouras_temporarias_codigo` == 31693),]
     }
     if (language == "eng"){
     colnames(df) <- c(
@@ -770,7 +1331,8 @@ load_pam_main <- function(years, aggregation_level = "country", language = "pt",
         df <- rbind(df, potato)
         df <- rbind(df, peanut)
         df <- rbind(df, bean)
-        df <- df[!(df$`Produto das lavouras temporárias (Código)` == 31693),]
+        df <- janitor::clean_names(df)
+        df <- df[!(df$`produto_das_lavouras_temporarias_codigo` == 31693),]
       }
     }
     if (language == "eng"){
@@ -795,7 +1357,8 @@ load_pam_main <- function(years, aggregation_level = "country", language = "pt",
         df <- rbind(df, potato)
         df <- rbind(df, peanut)
         df <- rbind(df, bean)
-        df <- df[!(df$`Produto das lavouras temporárias (Código)` == 31693),]
+        df <- janitor::clean_names(df)
+        df <- df[!(df$`produto_das_lavouras_temporarias_codigo` == 31693),]
       }
     }
     if (language == "eng"){
