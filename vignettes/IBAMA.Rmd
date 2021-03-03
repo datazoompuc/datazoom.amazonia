@@ -54,21 +54,10 @@ load_ibama(
 ```
 
 To load previously downloaded raw data, set ```download_data = FALSE``` and specify the
-file's path with the parameter ```load_from_where```. If ```language = 'pt```, use 
-```space_aggregation = c('municipio', 'uf')``` and ```time_aggregation = c('ano', 'mes')``` instead:
+file's path with the parameter ```load_from_where```. 
 
-```{r, eval = FALSE }
-
-load_ibama(
-  download_data = 'FALSE', 
-  download_directory = './Desktop/data.xls',
-  time_aggregation = 'ano',
-  space_aggregation = 'uf',
-  years = 2010:2015,
-  language = "pt"
-  )
-```
-
+If ```language = 'pt```, use 
+```space_aggregation = c('municipio', 'uf')``` and ```time_aggregation = c('ano', 'mes')``` instead
 
 ## Credits
 
