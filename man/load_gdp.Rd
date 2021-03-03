@@ -2,7 +2,7 @@
 % Please edit documentation in R/municipios.R
 \name{load_gdp}
 \alias{load_gdp}
-\title{Gets GDP at current prices and Population data for Brazil}
+\title{Gets GDP at current prices and (estimated) population data for Brazil}
 \usage{
 load_gdp(years, space_aggregation = "municipality", language = "eng")
 }
@@ -19,8 +19,10 @@ The other option is "pt" for Portuguese.}
 A \code{tibble} with GDP (in thousands), Population and GDP Per Capita (in units).
 }
 \description{
-Gets GDP at current prices and Population data for Brazil
+Gets GDP at current prices and (estimated) population data for Brazil
 }
 \examples{
+\dontrun{
 load_gdp(2017)
+}
 }

@@ -1,6 +1,7 @@
 
 # datazoom.amazonia
 
+
 datazoom.amazonia is an R package that facilitates access to official data regarding the Amazon. The package provides functions that download and pre-process selected datasets. Currently we support:
 * INPE - PRODES: deforestation by municipality
 * INPE - DEGRAD: degradation by municipality
@@ -10,6 +11,7 @@ datazoom.amazonia is an R package that facilitates access to official data regar
 * IBGE - SIGMINE: mining area by municipality or state
 * MAPBIOMAS - land covering by municipality or state
 * IBAMA - environmental fines and infractions by municipality or state
+
 
 <!-- badges: start -->
 [![R build status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions)
