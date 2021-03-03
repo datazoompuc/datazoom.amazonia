@@ -31,7 +31,6 @@ Imports:
     foreign,
     lubridate,
     stringi,
-    tidyr,
     geobr,
     sf,
     utils,
