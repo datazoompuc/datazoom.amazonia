@@ -30,7 +30,8 @@ NULL
 #' number of unique perpetrators of infractions on the given place-time period.
 #'
 #' @examples
-#' \dontrun{
+#'
+#'  \dontrun{
 #' load_ibama(
 #'   download_directory = getwd(),
 #'   time_aggregation = "year",
@@ -167,7 +168,8 @@ download_ibama <- function(download_dir) {
   utils::download.file(
     url = "https://servicos.ibama.gov.br/ctf/publico/areasembargadas/downloadListaAreasEmbargadas.php",
     destfile = file.path(download_dir, "fines.rar"),
-    mode = "wb"
+    mode = 'wb',
+    method = 'libcurl'
   )
 
   utils::unzip(
