@@ -25,6 +25,7 @@ Imports:
     janitor,
     readr,
     sidrar,
+    httr,
     tibble,
     tidyr,
     tidyverse,
