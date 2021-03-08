@@ -58,7 +58,7 @@ load_degrad <- function(source, space_aggregation = "municipality", time_aggrega
 #'
 #' @param source A number of different sources are supported:
 #'
-#' Passing a numeric \code{vector} of years will download the corresponding data from the INPE website. Available years are 2007-2016.
+#' Passing a numeric \code{vector} of years will download the corresponding DEGRAD datasets from INPE's website. Available versions are 2007-2016.
 #'
 #' Passing a \code{string} with a directory's path will read data from all shapefiles in the directory.
 #'
@@ -74,11 +74,11 @@ load_degrad <- function(source, space_aggregation = "municipality", time_aggrega
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' load_degrad_raw(2016)
 #'
 #' load_degrad_raw(c(2013, 2014, 2016))
 #'
-#' \dontrun{
 #' load_degrad_raw("~/Downloads")
 #'
 #' load_degrad_raw("~/Downloads/degrad2016_final_shp/DEGRAD_2016_pol.shp")
