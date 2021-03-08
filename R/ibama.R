@@ -166,7 +166,7 @@ aggregate_fines <- function(dataset, t = c("year", "month"), g = "municipality",
 
 download_ibama <- function(download_dir) {
   utils::download.file(
-    url = "https://servicos.ibama.gov.br/ctf/publico/areasembargadas/downloadListaAreasEmbargadas.php",
+    url = "http://servicos.ibama.gov.br/ctf/publico/areasembargadas/downloadListaAreasEmbargadas.php",
     destfile = file.path(download_dir, "fines.rar"),
     mode = 'wb',
     method = 'auto'
