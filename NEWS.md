@@ -23,4 +23,14 @@
 * Added functions for SIGMINE data 
 
 # datazoom.amazonia 0.9.0.9000
-* Added functions for IBAMA data 
+* Added functions for SIGMINE data 
+
+# datazoom.amazonia 0.10.0.9000
+* Added functions for IBGE - CEMPRE data
+* Added functions for IBGE - Census data
+
+# datazoom.amazonia 0.11.0.9000
+* Added functions for IBGE - PAM data
+
+# datazoom.amazonia 0.12.0.9000
+* Added functions for IBAMA data
