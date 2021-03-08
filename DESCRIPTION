@@ -25,7 +25,6 @@ Imports:
     janitor,
     readr,
     sidrar,
-    httr,
     tibble,
     tidyr,
     tidyverse,
@@ -41,8 +40,8 @@ Imports:
     XML
 URL: http://www.econ.puc-rio.br/datazoom
 Suggests: 
+    Rcurl,
     knitr,
-    RCurl,
     rmarkdown,
     lwgeom
 VignetteBuilder: knitr
