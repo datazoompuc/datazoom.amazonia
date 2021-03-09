@@ -5,7 +5,7 @@
 #'
 #' @param type A \code{string} with the desired PPM Dataset (see \url{https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019}). Accept the IBGE PPM codes or names. 94 ~ "cow_farm", 3939 ~ "cattle_number", 74 ~ "animal_orig_prod", 3940 ~ "water_orig_prod"
 #' @param years A \code{sequence} of integers in the form year_begin:year_end in which both are numeric. Available time frame is from 1974 to 2019
-#' @param aggregation_level A \code{string} containing the data aggregation level of the output. Can be 'country', 'region', 'state' or 'municipali
+#' @param aggregation_level A \code{string} containing the data aggregation level of the output. Can be 'country', 'region', 'state' or 'municipality'
 #' @param language A \code{string} with the language of the desired output. Can be 'eng' or 'pt' for English or Portuguese.
 #'
 #' @return A panel (\code{tibble} format) with N x T observations in which N is the number of geographical units and T is the number of years selected.
@@ -35,8 +35,8 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
   }
   if (as.numeric(type) == 95 | type == 'sheep_farm'){
     param$type = 95
-    param$data_name = 'Sheep Farming (Ovinos Tosquiados - Produção de La - Cabecas)'
-    stop('Sheep Farming (Ovinos Tosquiados - Produção de La - Cabecas) is empty in this dataset! Available in 74 (Animal Origin Production)')
+    param$data_name = 'Sheep Farming (Ovinos Tosquiados - Producao de La - Cabecas)'
+    stop('Sheep Farming (Ovinos Tosquiados - Producao de La - Cabecas) is empty in this dataset! Available in 74 (Animal Origin Production)')
   }
   if (as.numeric(type) == 3939 | type == 'cattle_number'){
     param$type = 3939
@@ -48,7 +48,7 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
   }
   if (as.numeric(type) == 3940 | type == 'water_orig_prod'){
     param$type = 3940
-    param$data_name = 'Water Origin Production - Fish and others (Producaoo da aquicultura - peixes e outros)'
+    param$data_name = 'Water Origin Production - Fish and others (Producao da aquicultura - peixes e outros)'
   }
 
   ## Aggregation Level
@@ -110,13 +110,13 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
       dplyr::as_tibble()
   }
   if (param$type == 3939){
-    dat = dat %>% select(-tidyselect::matches('nivel_territorial'),
+    dat = dat %>% dplyr::select(-tidyselect::matches('nivel_territorial'),
                          -'ano_codigo',-'variavel_codigo',-'tipo_de_rebanho_codigo',-'unidade_de_medida_codigo') %>%
       dplyr::mutate(valor = as.numeric(valor)) %>%
       dplyr::as_tibble()
   }
   if (param$type == 3940){
-    dat = dat %>% select(-tidyselect::matches('nivel_territorial'),
+    dat = dat %>% dplyr::select(-tidyselect::matches('nivel_territorial'),
                          -'ano_codigo',-'variavel_codigo',-'tipo_de_produto_da_aquicultura_codigo',-'unidade_de_medida_codigo') %>%
       dplyr::mutate(valor = as.numeric(valor)) %>%
       dplyr::as_tibble()
@@ -271,7 +271,7 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
   ## The Output is a tibble with unit and year identifiers + production and/or value of each item
 
   if (param$type == 74){ ## Animal Origin Production
-    dat = dat %>% dplyr::select(-unidade_de_medida) %>%
+    dat = dat %>% dplyr::select(-'unidade_de_medida') %>%
       tidyr::pivot_wider(id_cols = c(geo_id,ano),
                         names_from = variavel:tipo_de_produto_de_origem_animal,
                         values_from=valor,
@@ -282,7 +282,7 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
   }
 
   if (param$type == 94){ ## Cow Farming
-    dat = dat %>% dplyr::select(-unidade_de_medida) %>%
+    dat = dat %>% dplyr::select(-'unidade_de_medida') %>%
       tidyr::pivot_wider(id_cols = c(geo_id,ano),
                   names_from = variavel,
                   values_from=valor,
@@ -294,7 +294,7 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
 
   if (param$type == 3939){ ## Cattle Number
     dat = dat %>%
-      dplyr::select(-unidade_de_medida) %>%
+      dplyr::select(-'unidade_de_medida') %>%
       tidyr::pivot_wider(id_cols = c(geo_id,ano),
                   names_from = variavel:tipo_de_rebanho,
                   values_from=valor,
@@ -307,7 +307,7 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
   if (param$type == 3940){ ## Fish Production
     dat = dat %>%
       dplyr::filter(unidade_de_medida != 'Nenhuma' & unidade_de_medida != '') %>%
-      dplyr::select(-unidade_de_medida) %>%
+      dplyr::select(-'unidade_de_medida') %>%
       tidyr::pivot_wider(id_cols = c(geo_id,ano),
                   names_from = variavel:tipo_de_produto_da_aquicultura,
                   values_from=valor,
