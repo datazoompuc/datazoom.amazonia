@@ -16,7 +16,7 @@ load_ppm(
 
 \item{years}{A \code{sequence} of integers in the form year_begin:year_end in which both are numeric. Available time frame is from 1974 to 2019}
 
-\item{aggregation_level}{A \code{string} containing the data aggregation level of the output. Can be 'country', 'region', 'state' or 'municipali}
+\item{aggregation_level}{A \code{string} containing the data aggregation level of the output. Can be 'country', 'region', 'state' or 'municipality'}
 
 \item{language}{A \code{string} with the language of the desired output. Can be 'eng' or 'pt' for English or Portuguese.}
 }

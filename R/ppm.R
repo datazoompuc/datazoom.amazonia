@@ -144,10 +144,10 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
   }
 
   #########################################################
-  ## Comment Specific To "74	Produção de origem animal" ##
+  ## Comment Specific To "74	Producao de origem animal" ##
   #########################################################
 
-  ## The current state of the data is: Production quantities and values are stacked together -- Produção de Origem Animal e Valor da Produção under one variable
+  ## The current state of the data is: Production quantities and values are stacked together -- Producao de Origem Animal e Valor da Producao under one variable
   ## We will undo this to make visualization compatible with styling guides
   ## There is also a very important decision to be made here: Data contain duplicates, which we can choose to either sum, take the mean or drop
   ## The code below show this problem in action:
@@ -253,14 +253,13 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
   ## Convert values to something comparable across different units (Dozens and Units to Kg based on product type)
 
   # Valor is always in 1k R$ and production can be in 1k dozens, 1k liters or kgs. We standardize to make comparison possible
-  # Dozen is used for eggs, with a mean size of 50 to 54g per unit (https://www.ovoonline.com.br/?:=sobre_ovo&tt=atd&c=8)
+  # Dozen is used for eggs, with a mean size of 50 to 54g per unit (https://www.ovoonline.com.br)
   # Liter is used for milk, with 1,032 g/ml https://www.agencia.cnptia.embrapa.br/Agencia8/AG01/arvore/
-  #AG01_196_21720039246.html#:~:text=A%20densidade%20do%20leite%20%C3%A9,leite%20desnatado%2C%20cerca%20de%201%2C035
   # Milheiro is used for recent-born fish - We use 2g per unit (https://www.revistas.ufg.br/vet/article/view/1472/8597)
 
   dat$valor = base::as.numeric(dat$valor)
 
-  dat$valor = base::ifelse(dat$unidade_de_medida == 'Mil dúzias', (((dat$valor/(12*1e3))*52)/1e3),dat$valor) # 1k Dozen to Kg
+  dat$valor = base::ifelse(dat$unidade_de_medida == 'Mil dzias', (((dat$valor/(12*1e3))*52)/1e3),dat$valor) # 1k Dozen to Kg
   dat$valor = base::ifelse(dat$unidade_de_medida == 'Mil litros',((dat$valor/1e3)*1.032) ,dat$valor) # 1k Liters to Kg
   dat$valor = base::ifelse(dat$unidade_de_medida == 'Milheiros', dat$valor*1e3*2/1e3 ,dat$valor) # 1 Milheiro to Kg
 
