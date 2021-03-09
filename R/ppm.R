@@ -86,7 +86,7 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
   }
 
   dat = dat%>%
-    bind_rows() %>%
+    dplyr::bind_rows() %>%
     janitor::clean_names() %>%
     dplyr::mutate_all(function(x){gsub('[^ -~]', '', x)}) ## Remove Special Characters -- NOT BEST SOLUTION!!
 
@@ -98,28 +98,28 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
   ## drop unnecessary (duplication of already existing variables) variables and produce a tibble
 
   if (param$type == 74){
-    dat = dat %>% select(-tidyselect::matches('nivel_territorial'),
-                         -ano_codigo,-variavel_codigo,-tipo_de_produto_de_origem_animal_codigo,-unidade_de_medida_codigo) %>%
-    mutate(valor = as.numeric(valor)) %>%
-    as_tibble()
+    dat = dat %>% dplyr::select(-tidyselect::matches('nivel_territorial'),
+                         -'ano_codigo',-'variavel_codigo',-'tipo_de_produto_de_origem_animal_codigo',-'unidade_de_medida_codigo') %>%
+    dplyr::mutate(valor = as.numeric(valor)) %>%
+    dplyr::as_tibble()
   }
   if (param$type == 94){
-    dat = dat %>% select(-tidyselect::matches('nivel_territorial'),
-                         -ano_codigo,-variavel_codigo,-unidade_de_medida_codigo) %>%
-    mutate(valor = as.numeric(valor)) %>%
-    as_tibble()
+    dat = dat %>% dplyr::select(-tidyselect::matches('nivel_territorial'),
+                         -'ano_codigo',-'variavel_codigo',-'unidade_de_medida_codigo') %>%
+    dplyr::mutate(valor = as.numeric(valor)) %>%
+      dplyr::as_tibble()
   }
   if (param$type == 3939){
     dat = dat %>% select(-tidyselect::matches('nivel_territorial'),
-                         -ano_codigo,-variavel_codigo,-tipo_de_rebanho_codigo,-unidade_de_medida_codigo) %>%
-      mutate(valor = as.numeric(valor)) %>%
-      as_tibble()
+                         -'ano_codigo',-'variavel_codigo',-'tipo_de_rebanho_codigo',-'unidade_de_medida_codigo') %>%
+      dplyr::mutate(valor = as.numeric(valor)) %>%
+      dplyr::as_tibble()
   }
   if (param$type == 3940){
     dat = dat %>% select(-tidyselect::matches('nivel_territorial'),
-                         -ano_codigo,-variavel_codigo,-tipo_de_produto_da_aquicultura_codigo,-unidade_de_medida_codigo) %>%
-      mutate(valor = as.numeric(valor)) %>%
-      as_tibble()
+                         -'ano_codigo',-'variavel_codigo',-'tipo_de_produto_da_aquicultura_codigo',-'unidade_de_medida_codigo') %>%
+      dplyr::mutate(valor = as.numeric(valor)) %>%
+      dplyr::as_tibble()
   }
 
   #########################################
@@ -128,19 +128,19 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
 
   if(aggregation_level == 'country'){
     dat$geo_id = dat$brasil
-    dat = select(dat,-brasil_codigo,-brasil)
+    dat = dplyr::select(dat,-'brasil_codigo',-'brasil')
   }
   if (aggregation_level == 'region'){
     dat$geo_id = dat$grande_regiao
-    dat = select(dat,-grande_regiao_codigo,-grande_regiao)
+    dat = dplyr::select(dat,-'grande_regiao_codigo',-'grande_regiao')
   }
   if (aggregation_level == 'state'){
     dat$geo_id = dat$unidade_da_federacao_codigo
-    dat = select(dat,-unidade_da_federacao_codigo,-unidade_da_federacao)
+    dat = dplyr::select(dat,-'unidade_da_federacao_codigo',-'unidade_da_federacao')
   }
   if (aggregation_level == 'municipality'){
     dat$geo_id = dat$municipio_codigo
-    dat = select(dat,-municipio,-municipio_codigo)
+    dat = dplyr::select(dat,-'municipio',-'municipio_codigo')
   }
 
   #########################################################
@@ -165,12 +165,12 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
   if (param$type == 74){
 
     if (language == 'pt'){
-      dat$variavel = ifelse(dat$variavel == 'Produo de origem animal','producao_kg','valor_brl')
+      dat$variavel = base::ifelse(dat$variavel == 'Produo de origem animal','producao_kg','valor_brl')
       dat$tipo_de_produto_de_origem_animal[dat$tipo_de_produto_de_origem_animal == 'L'] = 'la'
     }
 
     if (language == 'eng'){
-      dat$variavel = ifelse(dat$variavel == 'Produo de origem animal','production_kg','value_brl')
+      dat$variavel = base::ifelse(dat$variavel == 'Produo de origem animal','production_kg','value_brl')
       dat$tipo_de_produto_de_origem_animal[dat$tipo_de_produto_de_origem_animal == 'L'] = 'wool'
       dat$tipo_de_produto_de_origem_animal[dat$tipo_de_produto_de_origem_animal == 'Casulos do bicho-da-seda'] = 'silk_worm_cocoons'
       dat$tipo_de_produto_de_origem_animal[dat$tipo_de_produto_de_origem_animal == 'Leite'] = 'milk'
@@ -183,15 +183,15 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
 
   if (param$type == 94){
 
-    if (language == 'eng'){dat$variavel = ifelse(dat$variavel == 'Vacas ordenhadas','milked_cows','')}
-    if (language == 'pt'){dat$variavel = ifelse(dat$variavel == 'Vacas ordenhadas','vacas_ordenhadas','')}
+    if (language == 'eng'){dat$variavel = base::ifelse(dat$variavel == 'Vacas ordenhadas','milked_cows','')}
+    if (language == 'pt'){dat$variavel = base::ifelse(dat$variavel == 'Vacas ordenhadas','vacas_ordenhadas','')}
 
   }
 
   if (param$type == 3939){
 
     if(language == 'pt'){
-      dat$variavel = ifelse(dat$variavel == 'Efetivo dos rebanhos','gado_cabeca','')
+      dat$variavel = base::ifelse(dat$variavel == 'Efetivo dos rebanhos','gado_cabeca','')
       dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'Galinceos - galinhas'] = 'galinaceos_galinha'
       dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'Galinceos - total'] = 'galinaceos_total'
       dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'Suno - matrizes de sunos'] = 'suino_matrizes'
@@ -199,7 +199,7 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
     }
 
     if (language == 'eng'){
-    dat$variavel = ifelse(dat$variavel == 'Efetivo dos rebanhos','cattle_number','')
+    dat$variavel = base::ifelse(dat$variavel == 'Efetivo dos rebanhos','cattle_number','')
     dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'Galinceos - galinhas'] = 'gallinaceous_chicken'
     dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'Galinceos - total'] = 'gallinaceous_total'
     dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'Suno - matrizes de sunos'] = 'swine_sows'
@@ -216,7 +216,7 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
   if (param$type == 3940){
 
     if (language == 'pt'){
-      dat$variavel = ifelse(dat$variavel == 'Produo da aquicultura','producao_kg','valor_brl')
+      dat$variavel = base::ifelse(dat$variavel == 'Produo da aquicultura','producao_kg','valor_brl')
       dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Outros peixes'] = 'peixes_outros'
       dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Camaro'] = 'camarao'
       dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Larvas e ps-larvas de camaro'] = 'larvas_camarao'
@@ -226,7 +226,7 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
     }
 
     if (language == 'eng'){
-      dat$variavel = ifelse(dat$variavel == 'Produo da aquicultura','production_kg','value_brl')
+      dat$variavel = base::ifelse(dat$variavel == 'Produo da aquicultura','production_kg','value_brl')
       dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Outros peixes'] = 'fish_others'
       dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Camaro'] = 'shrimp'
       dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Larvas e ps-larvas de camaro'] = 'shrimp_larvae'
@@ -258,11 +258,11 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
   #AG01_196_21720039246.html#:~:text=A%20densidade%20do%20leite%20%C3%A9,leite%20desnatado%2C%20cerca%20de%201%2C035
   # Milheiro is used for recent-born fish - We use 2g per unit (https://www.revistas.ufg.br/vet/article/view/1472/8597)
 
-  dat$valor = as.numeric(dat$valor)
+  dat$valor = base::as.numeric(dat$valor)
 
-  dat$valor = ifelse(dat$unidade_de_medida == 'Mil dúzias', (((dat$valor/(12*1e3))*52)/1e3),dat$valor) # 1k Dozen to Kg
-  dat$valor = ifelse(dat$unidade_de_medida == 'Mil litros',((dat$valor/1e3)*1.032) ,dat$valor) # 1k Liters to Kg
-  dat$valor = ifelse(dat$unidade_de_medida == 'Milheiros', dat$valor*1e3*2/1e3 ,dat$valor) # 1 Milheiro to Kg
+  dat$valor = base::ifelse(dat$unidade_de_medida == 'Mil dúzias', (((dat$valor/(12*1e3))*52)/1e3),dat$valor) # 1k Dozen to Kg
+  dat$valor = base::ifelse(dat$unidade_de_medida == 'Mil litros',((dat$valor/1e3)*1.032) ,dat$valor) # 1k Liters to Kg
+  dat$valor = base::ifelse(dat$unidade_de_medida == 'Milheiros', dat$valor*1e3*2/1e3 ,dat$valor) # 1 Milheiro to Kg
 
   #############################
   ## Create Long Format Data ##
@@ -271,8 +271,8 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
   ## The Output is a tibble with unit and year identifiers + production and/or value of each item
 
   if (param$type == 74){ ## Animal Origin Production
-    dat = dat %>% select(-unidade_de_medida) %>%
-      pivot_wider(id_cols = c(geo_id,ano),
+    dat = dat %>% dplyr::select(-unidade_de_medida) %>%
+      tidyr::pivot_wider(id_cols = c(geo_id,ano),
                         names_from = variavel:tipo_de_produto_de_origem_animal,
                         values_from=valor,
                         names_sep = '_',
@@ -282,8 +282,8 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
   }
 
   if (param$type == 94){ ## Cow Farming
-    dat = dat %>% select(-unidade_de_medida) %>%
-      pivot_wider(id_cols = c(geo_id,ano),
+    dat = dat %>% dplyr::select(-unidade_de_medida) %>%
+      tidyr::pivot_wider(id_cols = c(geo_id,ano),
                   names_from = variavel,
                   values_from=valor,
                   names_sep = '_',
@@ -294,8 +294,8 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
 
   if (param$type == 3939){ ## Cattle Number
     dat = dat %>%
-      select(-unidade_de_medida) %>%
-      pivot_wider(id_cols = c(geo_id,ano),
+      dplyr::select(-unidade_de_medida) %>%
+      tidyr::pivot_wider(id_cols = c(geo_id,ano),
                   names_from = variavel:tipo_de_rebanho,
                   values_from=valor,
                   names_sep = '_',
@@ -306,9 +306,9 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
 
   if (param$type == 3940){ ## Fish Production
     dat = dat %>%
-      filter(unidade_de_medida != 'Nenhuma' & unidade_de_medida != '') %>%
-      select(-unidade_de_medida) %>%
-      pivot_wider(id_cols = c(geo_id,ano),
+      dplyr::filter(unidade_de_medida != 'Nenhuma' & unidade_de_medida != '') %>%
+      dplyr::select(-unidade_de_medida) %>%
+      tidyr::pivot_wider(id_cols = c(geo_id,ano),
                   names_from = variavel:tipo_de_produto_da_aquicultura,
                   values_from=valor,
                   names_sep = '_',
