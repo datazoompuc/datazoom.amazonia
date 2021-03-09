@@ -1,14 +1,6 @@
 Package: datazoom.amazonia
 Title: Simplify access to data from the Amazon Region
-<<<<<<< HEAD
-<<<<<<< HEAD
 Version: 0.8.0.9000
-=======
-Version: 0.11.0.9000
->>>>>>> parent of cf06e04 (Update DESCRIPTION)
-=======
-Version: 0.8.0.9000
->>>>>>> parent of 057b6b1 (Merge branch 'master' into IPS)
 Authors@R: c(
     person("Francisco", "de Lima Cavalcanti", role = c("cre"), email = "francisco.lima.cavalcanti@gmail.com"),
     person("Victor", "Aliende da Matta", role = c("aut"), email = "victor.al.matta@gmail.com"),
