@@ -1,6 +1,6 @@
 Package: datazoom.amazonia
 Title: Simplify access to data from the Amazon Region
-Version: 0.8.0.9000
+Version: 0.12.0.9000
 Authors@R: c(
     person("Francisco", "de Lima Cavalcanti", role = c("cre"), email = "francisco.lima.cavalcanti@gmail.com"),
     person("Victor", "Aliende da Matta", role = c("aut"), email = "victor.al.matta@gmail.com"),
@@ -22,16 +22,18 @@ Imports:
     dplyr,
     labelled,
     purrr,
+    janitor,
     readr,
     readxl,
     sidrar,
     magrittr,
     tibble,
+    tidyr,
+    tidyverse,
     stats,
     foreign,
     lubridate,
     stringi,
-    tidyr,
     geobr,
     sf,
     utils,
