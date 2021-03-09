@@ -1,16 +1,12 @@
 # datazoom.amazonia
 
-datazoom.amazonia is an R package that facilitates access to official data regarding the Amazon. The package provides functions that download and pre-process selected datasets. Data is in general provided at the municipality-year level (see the documentation for more information). Currently we support:
-* INPE - PRODES: deforestation
-* INPE - DETER: deforestation warnings
-* INPE - DEGRAD: degradation
-* MDIC - COMEX: exports and imports
-* IBGE - PIB-Munic: gdp
-* IBGE - CEMPRE: formal employment
-* IBGE - Census: income
-* IBGE - SIGMINE: mining area
-* IBGE - PAM: agricultural data
-* MAPBIOMAS: land covering
+datazoom.amazonia is an R package that facilitates access to official data regarding the Amazon. The package provides functions that download and pre-process selected datasets. Currently we support:
+* INPE - PRODES: deforestation by municipality
+* INPE - DEGRAD: degradation by municipality
+* MDIC - Comex: exports and imports by municipality or state
+* IBGE - PIB-Munic: gdp by municipality
+* MAPBIOMAS: land covering by municipality or state
+* INPE - DETER: deforestation warnings by municipality
 * IMAZON - IPS: Social Progress Index by municipality
 
 <!-- badges: start -->
@@ -25,10 +21,12 @@ if(!require(devtools)) install.packages("devtools")
 devtools::install_github("datazoompuc/datazoom.amazonia")
 ```
 
-## Usage for INPE data
+## Usage
 
 ```
 library(datazoom.amazonia)
+
+##INPE
 
 # Downloads data
 
@@ -47,41 +45,22 @@ data <- load_prodes("~/Downloads")
 
 data <- load_deter("~/Downloads")
 
-```
+##Comex
 
-## Usage for COMEX data
-
-```
 # Downloads data
 
 years <- c(2000:2009)
 
 data <- load_comex(years, ncm = TRUE, exp = TRUE, imp = TRUE)
 
-```
-
-## Usage for IBGE data
-
-```
 ##PIB-Munic
 
 data <- load_amazon_gdp(c(2014, 2015))
 
 data <- load_amazon_gdp(2017, space_aggregation = "state", language = "pt")
 
-##SIGMINE
+##MAPBIOMAS
 
-data <- load_sigmine(space_aggregation = 'municipality')
-
-##PAM
-
-data <- load_pam_permanent(2013, aggregation_level = "region")
-
-```
-
-## Usage for MAPBIOMAS data
-
-```
 # Downloads data
 
 data <- load_mapbiomas_covering(space_aggregation = 'municipality', path = NULL, code_state = "PA", code_mun = NULL, covering = 3,
@@ -95,11 +74,6 @@ data <- load_mapbiomas_covering("~/Downloads")
 
 data <- load_mapbiomas_transition("~/Downloads")
 
-```
-
-## Usage for IMAZON data
-
-```
 ##IPS
 
 data <- load_IPS(download_directory = getwd(), language = "pt")

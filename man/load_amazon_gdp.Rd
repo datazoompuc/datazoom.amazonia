@@ -2,7 +2,7 @@
 % Please edit documentation in R/municipios.R
 \name{load_amazon_gdp}
 \alias{load_amazon_gdp}
-\title{Gets GDP at current prices and (estimated) population data for the Brazilian Legal Amazon}
+\title{Gets GDP at current prices and Population data for the Brazilian Legal Amazon}
 \usage{
 load_amazon_gdp(years, space_aggregation = "municipality", language = "eng")
 }
@@ -19,10 +19,8 @@ The other option is "pt" for Portuguese.}
 A \code{tibble} with GDP (in thousands), Population and GDP Per Capita (in units).
 }
 \description{
-Gets GDP at current prices and (estimated) population data for the Brazilian Legal Amazon
+Gets GDP at current prices and Population data for the Brazilian Legal Amazon
 }
 \examples{
-\dontrun{
 load_amazon_gdp(2017)
-}
 }

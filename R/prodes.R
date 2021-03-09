@@ -50,7 +50,7 @@ load_prodes <- function(source, space_aggregation = "municipality", language = "
 #'
 #' @param source A number of different sources are supported:
 #'
-#' Passing a numeric \code{vector} of years will download the corresponding data from the INPE website (data is organized by prodes-year - from august to july - for more information, see the vignette).
+#' Passing a numeric \code{vector} of years will download the corresponding data from the INPE website.
 #'
 #' Passing a \code{string} with a directory's path will read data from all files named
 #'   "\{path\}/DesmatamentoMunicipiosXXXX.txt".

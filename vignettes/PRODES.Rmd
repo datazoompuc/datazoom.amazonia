@@ -20,8 +20,6 @@ The PRODES project uses satellites to monitor deforestation in Brazil's Legal Am
 
 The data made available in this package goes back to the year 2000, with ongoing updates. In line with INPE's API, requesting data for an unavailable year does not yield an error, but rather a best effort response (columns regarding observation data are filled with default values).
 
-Data is collected based on the PRODES-year, which starts at August 1st and ends on July 31st. Accordingly, 2018 deforestation data covers the period from 01/08/2017 to 31/07/2018. 
-
 ## Usage
 
 Using the package is easy enough:
