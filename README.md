@@ -9,8 +9,9 @@ datazoom.amazonia is an R package that facilitates access to official data regar
 * IBGE - CEMPRE: formal employment
 * IBGE - Census: income
 * IBGE - SIGMINE: mining area
-* IBGE - PAM - agricultural data
-* MAPBIOMAS - land covering
+* IBGE - PAM: agricultural data
+* MAPBIOMAS: land covering
+* IMAZON - IPS: Social Progress Index by municipality
 
 <!-- badges: start -->
 [![R build status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions)
@@ -93,6 +94,15 @@ data <- load_mapbiomas_transition(transition_interval = 5)
 data <- load_mapbiomas_covering("~/Downloads")
 
 data <- load_mapbiomas_transition("~/Downloads")
+
+```
+
+## Usage for IMAZON data
+
+```
+##IPS
+
+data <- load_IPS(download_directory = getwd(), language = "pt")
 
 ```
 
