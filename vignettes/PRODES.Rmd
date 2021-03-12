@@ -26,7 +26,7 @@ Data is collected based on the PRODES-year, which starts at August 1st and ends 
 
 Using the package is easy enough:
 
-```{r, eval = TRUE}
+```{r, eval = FALSE}
 library(datazoom.amazonia)
 
 years <- c(2015, 2016, 2017)

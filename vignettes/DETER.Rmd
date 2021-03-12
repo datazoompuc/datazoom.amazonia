@@ -22,7 +22,7 @@ Areas are reported in square kilometers and informed as both the area which inte
 
 ## Usage
 
-```{r, eval = TRUE}
+```{r}
 library(datazoom.amazonia)
 
 load_deter("amazonia", space_aggregation = "municipality", time_aggregation = "year", language = "eng")

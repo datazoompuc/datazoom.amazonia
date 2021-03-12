@@ -1,10 +1,11 @@
 Package: datazoom.amazonia
 Title: Simplify access to data from the Amazon Region
-Version: 0.11.0.9000
+Version: 0.12.0.9000
 Authors@R: c(
     person("Francisco", "de Lima Cavalcanti", role = c("cre"), email = "francisco.lima.cavalcanti@gmail.com"),
     person("Victor", "Aliende da Matta", role = c("aut"), email = "victor.al.matta@gmail.com"),
     person("Maria", "Mittelbach", role = c("aut"), email = "mariamittelbach@gmail.com"),
+    person("Arthur", "Carvalho Brito", role = c("aut"), email = "arthurcbps@gmail.com"),
     person("Anna Carolina", "Dutra Saraiva", role = c("aut"), email = "annadutrasaraiva@gmail.com"),
     person("Arthur", "Carvalho Brito", role = c("aut"), email = "arthurcbps@gmail.com"), 
     person("Bruno", "Alcantara Duarte", role = c("aut"), email = "brunoalcanduarte@gmail.com"),
@@ -18,13 +19,15 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Imports:
-    magrittr,
     rlang,
     dplyr,
+    labelled,
     purrr,
     janitor,
     readr,
+    readxl,
     sidrar,
+    magrittr,
     tibble,
     tidyr,
     tidyverse,
@@ -37,10 +40,10 @@ Imports:
     utils,
     readxl,
     janitor,
-    XML
+    XML,
+    RCurl
 URL: http://www.econ.puc-rio.br/datazoom
 Suggests: 
-    Rcurl,
     knitr,
     rmarkdown,
     lwgeom

@@ -22,7 +22,7 @@ The data available has an yearly frequency and is available starting from the ye
 
 Using the function is easy enough:
 
-```{r, eval = TRUE }
+```{r}
 library(datazoom.amazonia)
 
 data <- load_mapbiomas_covering(space_aggregation = 'municipality', path = NULL, covering = 3, years = c(2000:2010))

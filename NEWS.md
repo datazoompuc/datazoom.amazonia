@@ -1,4 +1,3 @@
-
 # datazoom.amazonia 0.1.0.9000
 
 * Added a `NEWS.md` file to track changes to the package.
@@ -33,4 +32,4 @@
 * Added functions for IBGE - PAM data
 
 # datazoom.amazonia 0.12.0.9000
-* Added functions for IBAMA data
+* Added functions for IPS data 

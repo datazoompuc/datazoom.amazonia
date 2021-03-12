@@ -1,5 +1,5 @@
-
 # datazoom.amazonia
+
 datazoom.amazonia is an R package that facilitates access to official data regarding the Amazon. The package provides functions that download and pre-process selected datasets. Data is in general provided at the municipality-year level (see the documentation for more information). Currently we support:
 * INPE - PRODES: deforestation
 * INPE - DETER: deforestation warnings
@@ -9,9 +9,9 @@ datazoom.amazonia is an R package that facilitates access to official data regar
 * IBGE - CEMPRE: formal employment
 * IBGE - Census: income
 * IBGE - SIGMINE: mining area
-* IBGE - PAM - agricultural data
-* MAPBIOMAS - land covering
-* IBAMA - environmental fines and infractions by municipality or state
+* IBGE - PAM: agricultural data
+* MAPBIOMAS: land covering
+* IMAZON - IPS: Social Progress Index by municipality
 
 <!-- badges: start -->
 [![R build status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions)
@@ -95,25 +95,14 @@ data <- load_mapbiomas_covering("~/Downloads")
 
 data <- load_mapbiomas_transition("~/Downloads")
 
-##IBAMA
+```
 
-# Downloads data
+## Usage for IMAZON data
 
-data <- load_ibama(
-                   download_directory = getwd(),
-                   time_aggregation = "ano",
-                   space_aggregation = "municipio", 
-                   years = c(2010, 2012),
-                   language = "pt")
+```
+##IPS
 
-# Loads data locally
-
-data <-load_ibama(
-                  download_data = FALSE,
-                  load_from_where = "./Desktop/data.xls",
-                  time_aggregation = c("year", "month"),
-                  space_aggregation = c("municipality", "state"))
-
+data <- load_IPS(download_directory = getwd(), language = "pt")
 
 ```
 
