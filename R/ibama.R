@@ -171,7 +171,8 @@ download_ibama <- function(download_dir) {
     url = "https://servicos.ibama.gov.br/ctf/publico/areasembargadas/downloadListaAreasEmbargadas.php",
     destfile = file.path(download_dir, "fines.rar"),
     mode = 'wb',
-    method = 'libcurl'
+    method = 'curl',
+    extra = '-k -s'
   )
 
   utils::unzip(
