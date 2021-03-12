@@ -18,7 +18,10 @@ NULL
 #' \code{language = "eng"}. Defaults to English.
 #' @return A data frame with information on the 60+ indicators part of the Social
 #' Progress Index (SPI) for 2014 and 2018 considering municipalities part of the Legal
-#' Amazon Region
+#' Amazon Region. Columns indexed by "D" refer to each of the three dimensions of the index.
+#' These dimenstions are split into twelve components, whose columns are indexed by "C".
+#' The components, in turn, are composed of the raw indicators, whose columns are indexed
+#' by "V"
 #' @examples
 #'
 #' \dontrun{load_IPS(
@@ -46,8 +49,13 @@ load_IPS <- function(download_directory, language = 'eng'){
 
 
   col.names <- data.frame(
-    portuguese = c('cod_municipio', 'municipio', 'uf', 'ano', 'IPS', paste0('V', 1:58)),
-    english = c('city_code', 'city', 'state', 'year', 'SPI', paste0('V', 1:58))
+    portuguese = c('cod_municipio', 'municipio', 'uf', 'ano', 'IPS',
+                   'D1', 'D2', 'D3',
+                   paste0('C', 1:12),
+                   paste0('V', 1:43)),
+    english = c('city_code', 'city', 'state', 'year', 'SPI', 'D1', 'D2', 'D3',
+                paste0('C', 1:12),
+                paste0('V', 1:43))
     )
 
   ########
