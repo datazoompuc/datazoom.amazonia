@@ -17,7 +17,10 @@ load_IPS(download_directory, language = "eng")
 \value{
 A data frame with information on the 60+ indicators part of the Social
 Progress Index (SPI) for 2014 and 2018 considering municipalities part of the Legal
-Amazon Region
+Amazon Region. Columns indexed by "D" refer to each of the three dimensions of the index.
+These dimenstions are split into twelve components, whose columns are indexed by "C".
+The components, in turn, are composed of the raw indicators, whose columns are indexed
+by "V"
 }
 \description{
 The original data and more information on the construction of the indicator
