@@ -7,7 +7,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -27,7 +27,7 @@ This package provides degradation data by municipality-year (or municipality-mon
 
 Using the package is easy enough:
 
-```{r setup}
+```{r}
 library(datazoom.amazonia)
 
 years <- c(2014:2016)

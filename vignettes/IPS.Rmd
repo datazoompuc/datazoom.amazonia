@@ -1,0 +1,37 @@
+---
+title: "Social Progress Index"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Social Progress Index}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The Amazônia Social Progress Index, an initiative from Imazon with support from 
+the Social Progress Imperative is an index that measures the social and environmental
+progress of its locations. Namely, the 772 municipalities in the Amazon region.
+For more information, check the [initiative's website](http://www.ipsamazonia.org.br/conheca-o-ips).
+
+
+## Usage
+
+To download and compile data on the index for 2014 and 2018, just run the function
+```load_IPS``` using as its argument the directory in which the data should 
+be stored. Choose with paramenter ```language``` whether yor output should be
+in Portuguese or in English
+
+```{r, eval = TRUE}
+library(datazoom.amazonia)
+my.data <- load_IPS(download_directory = getwd(), language = "pt")
+```
+
+## Credits
+
+Data Zoom is developed by a team at Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio), Department of Economics. Our official website is at: http://www.econ.puc-rio.br/datazoom/index.html
