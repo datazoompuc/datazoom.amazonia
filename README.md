@@ -77,6 +77,10 @@ data <- load_sigmine(space_aggregation = 'municipality')
 
 data <- load_pam_permanent(2013, aggregation_level = "region")
 
+## PPM
+
+data <- load_ppm(type=3939,years = 2018:2019,aggregation_level = 'municipality',language='eng')
+
 ```
 
 ## Usage for MAPBIOMAS data

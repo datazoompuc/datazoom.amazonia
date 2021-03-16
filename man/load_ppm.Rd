@@ -27,7 +27,7 @@ A panel (\code{tibble} format) with N x T observations in which N is the number 
 Download Municipal Livestock Production (Producao Pecuaria Municipal - IBGE)
 }
 \examples{
-load_ppm(type=3939,years = 2018:2019,aggregation_level = 'municipality',language='eng')
+\dontrun{load_ppm(type=3939,years = 2018:2019,aggregation_level = 'municipality',language='eng')}
 }
 \author{
 DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro
