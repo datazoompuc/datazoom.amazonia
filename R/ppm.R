@@ -13,7 +13,7 @@
 #'
 #' @author DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro
 #'
-#' @examples load_ppm(type=3939,years = 2018:2019,aggregation_level = 'municipality',language='eng')
+#' @examples \dontrun{load_ppm(type=3939,years = 2018:2019,aggregation_level = 'municipality',language='eng')}
 
 load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",language = 'pt'){
 
