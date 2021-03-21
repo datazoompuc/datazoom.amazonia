@@ -16,7 +16,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' load_sigmine(space_aggregation = 'municipality', source = NULL)
+#' load_sigmine(space_aggregation = 'municipality', source = NULL, language = 'pt')
 #' }
 
 
