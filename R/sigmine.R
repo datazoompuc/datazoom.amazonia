@@ -34,6 +34,8 @@ load_sigmine<-function(space_aggregation = c('municipality', 'state','municipio'
   unzip(p1f, exdir = dir)
   a<-sf::read_sf(dir)
 
+  a$AREA_HA<-a$AREA_HA*10000
+
   if(space_aggregation == 'state' | space_aggregation == 'estado'){
     if(language == 'pt'){
       names(a)[names(a) == 'NUMERO'] <- 'numero'
@@ -46,7 +48,7 @@ load_sigmine<-function(space_aggregation = c('municipality', 'state','municipio'
       names(a)[names(a) == 'NOME'] <- 'empresa'
       names(a)[names(a) == 'SUBS'] <- 'mineral'
       names(a)[names(a) == 'USO'] <- 'uso'
-      names(a)[names(a) == 'AREA_HA'] <- 'area_hectares'
+      names(a)[names(a) == 'AREA_HA'] <- 'area_m2'
     } else if(language = 'eng'){
       names(a)[names(a) == 'NUMERO'] <- 'number'
       names(a)[names(a) == 'ULT_EVENTO'] <- 'last_event'
@@ -58,7 +60,7 @@ load_sigmine<-function(space_aggregation = c('municipality', 'state','municipio'
       names(a)[names(a) == 'NOME'] <- 'company'
       names(a)[names(a) == 'SUBS'] <- 'mineral'
       names(a)[names(a) == 'USO'] <- 'use'
-      names(a)[names(a) == 'AREA_HA'] <- 'area_hectares'
+      names(a)[names(a) == 'AREA_HA'] <- 'area_m2'
     }
     ret <- a
 
