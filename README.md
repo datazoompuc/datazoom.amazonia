@@ -105,7 +105,7 @@ data <- load_IPS(download_directory = getwd(), language = "pt")
 
 ```
 
-## Usage for MAPBIOMAS data
+## Usage for SIGMINE data
 
 ```
 # Downloads data
