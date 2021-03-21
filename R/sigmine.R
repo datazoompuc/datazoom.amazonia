@@ -22,7 +22,7 @@
 
 
 
-load_sigmine<-function(space_aggregation = c('municipality', 'state','municipio','estado'), source = NULL){
+load_sigmine<-function(space_aggregation = c('municipality', 'state','municipio','estado'), source = NULL, language = c('eng', 'pt')){
   if(is.null(source)){
     url1<-'http://sigmine.dnpm.gov.br/sirgas2000/brasil.zip'
     p1f <- tempfile(fileext = ".zip")
@@ -35,17 +35,31 @@ load_sigmine<-function(space_aggregation = c('municipality', 'state','municipio'
   a<-sf::read_sf(dir)
 
   if(space_aggregation == 'state' | space_aggregation == 'estado'){
-    names(a)[names(a) == 'NUMERO'] <- 'numero'
-    names(a)[names(a) == 'ULT_EVENTO'] <- 'ultimo_evento'
-    names(a)[names(a) == 'UF'] <- 'estado'
-    names(a)[names(a) == 'ANO'] <- 'ano'
-    names(a)[names(a) == 'PROCESSO'] <- 'processo'
-    names(a)[names(a) == 'ID'] <- 'id'
-    names(a)[names(a) == 'FASE'] <- 'fase'
-    names(a)[names(a) == 'NOME'] <- 'empresa'
-    names(a)[names(a) == 'SUBS'] <- 'mineral'
-    names(a)[names(a) == 'USO'] <- 'uso'
-    names(a)[names(a) == 'AREA_HA'] <- 'area_hectares'
+    if(language == 'pt'){
+      names(a)[names(a) == 'NUMERO'] <- 'numero'
+      names(a)[names(a) == 'ULT_EVENTO'] <- 'ultimo_evento'
+      names(a)[names(a) == 'UF'] <- 'estado'
+      names(a)[names(a) == 'ANO'] <- 'ano'
+      names(a)[names(a) == 'PROCESSO'] <- 'processo'
+      names(a)[names(a) == 'ID'] <- 'id'
+      names(a)[names(a) == 'FASE'] <- 'fase'
+      names(a)[names(a) == 'NOME'] <- 'empresa'
+      names(a)[names(a) == 'SUBS'] <- 'mineral'
+      names(a)[names(a) == 'USO'] <- 'uso'
+      names(a)[names(a) == 'AREA_HA'] <- 'area_hectares'
+    } else if(language = 'eng'){
+      names(a)[names(a) == 'NUMERO'] <- 'number'
+      names(a)[names(a) == 'ULT_EVENTO'] <- 'last_event'
+      names(a)[names(a) == 'UF'] <- 'state'
+      names(a)[names(a) == 'ANO'] <- 'year'
+      names(a)[names(a) == 'PROCESSO'] <- 'process'
+      names(a)[names(a) == 'ID'] <- 'id'
+      names(a)[names(a) == 'FASE'] <- 'phase'
+      names(a)[names(a) == 'NOME'] <- 'company'
+      names(a)[names(a) == 'SUBS'] <- 'mineral'
+      names(a)[names(a) == 'USO'] <- 'use'
+      names(a)[names(a) == 'AREA_HA'] <- 'area_hectares'
+    }
     ret <- a
 
   }else if(space_aggregation == 'municipality' | space_aggregation == 'municipio'){
@@ -70,18 +84,32 @@ load_sigmine<-function(space_aggregation = c('municipality', 'state','municipio'
     al$NUMERO <- NULL
     al$name_region <- NULL
     al$name_state <- NULL
-    names(al)[names(al) == 'ANO'] <- 'ano'
-    names(al)[names(al) == 'PROCESSO'] <- 'processo'
-    names(al)[names(al) == 'ID'] <- 'id'
-    names(al)[names(al) == 'FASE'] <- 'fase'
-    names(al)[names(al) == 'NOME'] <- 'empresa'
-    names(al)[names(al) == 'SUBS'] <- 'mineral'
-    names(al)[names(al) == 'USO'] <- 'uso'
-    names(al)[names(al) == 'name_muni'] <- 'municipio'
-    names(al)[names(al) == 'abbrev_state'] <- 'estado'
-    names(al)[names(al) == 'calculated_area'] <- 'area_calculada_m2'
+    if(language == 'pt'){
+      names(al)[names(al) == 'ANO'] <- 'ano'
+      names(al)[names(al) == 'PROCESSO'] <- 'processo'
+      names(al)[names(al) == 'ID'] <- 'id'
+      names(al)[names(al) == 'FASE'] <- 'fase'
+      names(al)[names(al) == 'NOME'] <- 'empresa'
+      names(al)[names(al) == 'SUBS'] <- 'mineral'
+      names(al)[names(al) == 'USO'] <- 'uso'
+      names(al)[names(al) == 'name_muni'] <- 'municipio'
+      names(al)[names(al) == 'abbrev_state'] <- 'estado'
+      names(al)[names(al) == 'calculated_area'] <- 'area_calculada_m2'
+    } else if(language = 'eng'){
+      names(al)[names(al) == 'ANO'] <- 'year'
+      names(al)[names(al) == 'PROCESSO'] <- 'process'
+      names(al)[names(al) == 'ID'] <- 'id'
+      names(al)[names(al) == 'FASE'] <- 'phase'
+      names(al)[names(al) == 'NOME'] <- 'company'
+      names(al)[names(al) == 'SUBS'] <- 'mineral'
+      names(al)[names(al) == 'USO'] <- 'use'
+      names(al)[names(al) == 'name_muni'] <- 'municipality'
+      names(al)[names(al) == 'abbrev_state'] <- 'state'
+      names(al)[names(al) == 'calculated_area'] <- 'calculated_area_m2'
+    }
     ret <- al
   }
+
   return(ret)
 }
 
