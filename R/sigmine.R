@@ -49,7 +49,7 @@ load_sigmine<-function(space_aggregation = c('municipality', 'state','municipio'
       names(a)[names(a) == 'SUBS'] <- 'mineral'
       names(a)[names(a) == 'USO'] <- 'uso'
       names(a)[names(a) == 'AREA_HA'] <- 'area_m2'
-    } else if(language = 'eng'){
+    } else if(language == 'eng'){
       names(a)[names(a) == 'NUMERO'] <- 'number'
       names(a)[names(a) == 'ULT_EVENTO'] <- 'last_event'
       names(a)[names(a) == 'UF'] <- 'state'
@@ -97,7 +97,7 @@ load_sigmine<-function(space_aggregation = c('municipality', 'state','municipio'
       names(al)[names(al) == 'name_muni'] <- 'municipio'
       names(al)[names(al) == 'abbrev_state'] <- 'estado'
       names(al)[names(al) == 'calculated_area'] <- 'area_calculada_m2'
-    } else if(language = 'eng'){
+    } else if(language == 'eng'){
       names(al)[names(al) == 'ANO'] <- 'year'
       names(al)[names(al) == 'PROCESSO'] <- 'process'
       names(al)[names(al) == 'ID'] <- 'id'
