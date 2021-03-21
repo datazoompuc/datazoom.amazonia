@@ -22,7 +22,7 @@ Using the function is easy enough:
 
 ```{r setup}
 library(datazoom.amazonia)
-data <- load_sigmine(space_aggregation = 'municipality', source = NULL)
+load_sigmine(space_aggregation = 'municipality', source = NULL, language = 'pt')
 ```
 
 Data can be retrieved from the website as above or loaded locally.
