@@ -24,9 +24,17 @@
 
 load_sigmine<-function(space_aggregation = c('municipality', 'state','municipio','estado'), source = NULL, language = c('eng', 'pt')){
   if(is.null(source)){
-    url1<-'http://sigmine.dnpm.gov.br/sirgas2000/brasil.zip'
     p1f <- tempfile(fileext = ".zip")
-    download.file(url1, p1f, mode="wb")
+    tryCatch(
+    expr = {
+      url1<-'http://sigmine.dnpm.gov.br/sirgas2000/brasil.zip'
+      download.file(url1, p1f, mode="wb")
+    },
+    error = function(e){
+      url1<-'https://app.anm.gov.br/dadosabertos/SIGMINE/PROCESSOS_MINERARIOS/BRASIL.zip'
+      download.file(url1, p1f, mode="wb")
+    }
+  )
   }else{
     p1f<-paste0(source,'/brasil.zip')
   }
