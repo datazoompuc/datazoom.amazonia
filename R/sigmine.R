@@ -34,10 +34,9 @@ load_sigmine<-function(space_aggregation = c('municipality', 'state','municipio'
   unzip(p1f, exdir = dir)
   a<-sf::read_sf(dir)
 
-  a$AREA_HA<-a$AREA_HA*10000
-
   if(space_aggregation == 'state' | space_aggregation == 'estado'){
     if(language == 'pt'){
+      a$AREA_HA<-a$AREA_HA*10000
       names(a)[names(a) == 'NUMERO'] <- 'numero'
       names(a)[names(a) == 'ULT_EVENTO'] <- 'ultimo_evento'
       names(a)[names(a) == 'UF'] <- 'estado'
@@ -50,6 +49,7 @@ load_sigmine<-function(space_aggregation = c('municipality', 'state','municipio'
       names(a)[names(a) == 'USO'] <- 'uso'
       names(a)[names(a) == 'AREA_HA'] <- 'area_m2'
     } else if(language == 'eng'){
+      a$AREA_HA<-a$AREA_HA*10000
       names(a)[names(a) == 'NUMERO'] <- 'number'
       names(a)[names(a) == 'ULT_EVENTO'] <- 'last_event'
       names(a)[names(a) == 'UF'] <- 'state'
