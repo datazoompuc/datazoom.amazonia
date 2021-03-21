@@ -7,7 +7,8 @@
 \usage{
 load_sigmine(
   space_aggregation = c("municipality", "state", "municipio", "estado"),
-  source = NULL
+  source = NULL,
+  language = c("eng", "pt")
 )
 }
 \arguments{
@@ -23,7 +24,7 @@ Download and filter data on the mines being explored legally in Brazil
 }
 \examples{
 \dontrun{
-load_sigmine(space_aggregation = 'municipality', source = NULL)
+load_sigmine(space_aggregation = 'municipality', source = NULL, language = 'pt')
 }
 }
 \author{
