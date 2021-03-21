@@ -84,8 +84,7 @@ data <- load_pam_permanent(2013, aggregation_level = "region")
 ```
 # Downloads data
 
-data <- load_mapbiomas_covering(space_aggregation = 'municipality', path = NULL, code_state = "PA", code_mun = NULL, covering = 3,
-                                  type = 'stacked', year_begin = 2000, year_end = 2010)
+data <- load_mapbiomas_covering(space_aggregation = 'municipality', path = NULL, covering = 3, years = c(2005:2015))
 
 data <- load_mapbiomas_transition(transition_interval = 5)
 
@@ -103,6 +102,19 @@ data <- load_mapbiomas_transition("~/Downloads")
 ##IPS
 
 data <- load_IPS(download_directory = getwd(), language = "pt")
+
+```
+
+## Usage for MAPBIOMAS data
+
+```
+# Downloads data
+
+data <- load_sigmine(space_aggregation = 'municipality', source = NULL, language = 'pt')
+
+# Loads data locally
+
+data <- load_sigmine(space_aggregation = 'state', source = "~/Downloads", language = 'eng')
 
 ```
 
