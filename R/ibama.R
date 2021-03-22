@@ -85,7 +85,8 @@ load_ibama <- function(download_data = TRUE,
 
 
 aggregate_fines <- function(dataset, t = c("year", "month"), g = "municipality",
-                           y = 2005:2020, lan = "eng") {
+                           y = 2005:2021, lan = "eng") {
+
   if ("municipality" %in% g | "municipio" %in% g) {
 
     if(lan == 'eng'){
@@ -104,7 +105,7 @@ aggregate_fines <- function(dataset, t = c("year", "month"), g = "municipality",
 
   df <- dataset %>%
     dplyr::filter(
-      .data$codigo_ibge_municipio_embargo %in% legal_amazon$CD_MUN
+      .data$codigo_ibge_municipio_embargo %in% legal_amazon[legal_amazon$AMZ_LEGAL == 1,]$CD_MUN
     ) %>%
     dplyr::select(
       .data$municipio_embargo, .data$uf_embargo,
