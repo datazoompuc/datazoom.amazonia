@@ -6,17 +6,21 @@
 \title{load_sigmine}
 \usage{
 load_sigmine(
-  space_aggregation = c("municipality", "state", "municipio", "estado"),
-  source = NULL
+  space_aggregation = "state",
+  info = "all",
+  local = "web",
+  return = "edited"
 )
 }
 \arguments{
-\item{space_aggregation}{A string that indicates the level of aggregation of the data. It can be by municipality or state}
+\item{space_aggregation}{A \code{string} for the geographical aggregation of the data. It can be by municipality, state or country. Currently, only state is available.}
 
-\item{source}{A string indicating where the raw data is in your computer. The default is NULL which means the data will be extracted directly from the website}
+\item{info}{A \code{string} for the data variables of interest. Can be area, commodity, usage, licensing. Default to all.}
+
+\item{local}{A \code{string} with the data path, if locally available. Default is web, which downloads directly from the website.}
 }
 \value{
-A data base with data containing the area of each selected type of soil covering in each selected year
+A \code{tibble} format panel data with N geographic units and T time periods
 }
 \description{
 Download and filter data on the mines being explored legally in Brazil.
@@ -24,7 +28,7 @@ Source data is available at \link{https://dados.gov.br/dataset/sistema-de-inform
 }
 \examples{
 \dontrun{
-load_sigmine(space_aggregation = 'municipality', source = NULL)
+load_sigmine(space_aggregation = 'municipality', local='web')
 }
 }
 \author{

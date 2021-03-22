@@ -37,7 +37,8 @@ Imports:
     geobr,
     sf,
     utils,
-    RCurl
+    RCurl,
+    textclean
 URL: http://www.econ.puc-rio.br/datazoom
 Suggests: 
     knitr,
