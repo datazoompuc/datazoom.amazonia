@@ -18,13 +18,13 @@ knitr::opts_chunk$set(
 
 Employment, salary and firm count data is from IBGE's "Cadastro Central de Empresas" (aka CEMPRE). The data is available between 2006 and 2018.
 
-The definition of the Brazilian Legal Amazon at the municipality level is taken from IBGE's "Mapas Regionais - Amazônia Legal" available here: https://www.ibge.gov.br/geociencias/cartas-e-mapas/mapas-regionais/15819-amazonia-legal.html?=&t=o-que-e. State level information for the Brazilian Legal Amazon is taken from aggregating municipalities. IMPORTANT NOTE: this means that state level information for the amazon region is not representative of the whole state, but rather represents the portion of the state that is also a part of the Brazilian Legal Amazon.
+The definition of the Brazilian Legal Amazon at the municipality level is taken from IBGE's "Mapas Regionais - Amazônia Legal" available here: \url{https://www.ibge.gov.br/geociencias/cartas-e-mapas/mapas-regionais/15819-amazonia-legal.html?=&t=o-que-e}. State level information for the Brazilian Legal Amazon is taken from aggregating municipalities. IMPORTANT NOTE: this means that state level information for the amazon region is not representative of the whole state, but rather represents the portion of the state that is also a part of the Brazilian Legal Amazon.
 
 ## Usage
 
 Using the package is easy enough:
 
-```{r setup}
+```{r setup,eval=FALSE}
 # 
 # library(datazoom.amazonia)
 # 
