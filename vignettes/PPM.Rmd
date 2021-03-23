@@ -1,0 +1,20 @@
+---
+title: "PPM"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{PPM}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(datazoom.amazonia)
+dat = load_ppm(type=3939,years = 2018:2019,aggregation_level = 'country',language='eng')
+```
