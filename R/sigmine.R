@@ -4,6 +4,7 @@
 #'
 #' @param space_aggregation A string that indicates the level of aggregation of the data. It can be by municipality or state
 #' @param source A string indicating where the raw data is in your computer. The default is NULL which means the data will be extracted directly from the website
+#' @param language A string indicating which language is the desired, 'eng' for english and 'pt' for portuguese
 #'
 #' @return A data base with data containing the area of each selected type of soil covering in each selected year
 #'
