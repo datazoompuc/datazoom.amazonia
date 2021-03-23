@@ -180,7 +180,7 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
   if (aggregation_level == "country"){
     for (i in 1:length(years)){
       a <-toString(years[i])
-      data <- sidrar::get_sidra(1613, period = a, geo = "Brazil")
+      data <- suppressMessages(sidrar::get_sidra(1613, period = a, geo = "Brazil"))
       df <- rbind(df, data)
     }
     if (language == "eng"){
@@ -199,7 +199,7 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
   if (aggregation_level == "region"){
     for (i in 1:length(years)){
       a <-toString(years[i])
-      data <- sidrar::get_sidra(1613, period = a, geo = "Region")
+      data <- suppressMessages(sidrar::get_sidra(1613, period = a, geo = "Region"))
       df <- rbind(df, data)
     }
 
@@ -219,7 +219,7 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
   if (aggregation_level == "state"){
     for (i in 1:length(years)){
       a <-toString(years[i])
-      data <- sidrar::get_sidra(1613, period = a, geo = "State")
+      data <- suppressMessages(sidrar::get_sidra(1613, period = a, geo = "State"))
       df <- rbind(df, data)
     }
 
@@ -239,7 +239,7 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
   if (aggregation_level == "mesoregion"){
     for (i in 1:length(years)){
       a <-toString(years[i])
-      data <- sidrar::get_sidra(1613, period = a, geo = "MesoRegion")
+      data <- suppressMessages(sidrar::get_sidra(1613, period = a, geo = "MesoRegion"))
       df <- rbind(df, data)
     }
     if (language == "eng"){
@@ -259,7 +259,7 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
     for (i in 1:length(years)){
       a <-toString(years[i])
         for (s in sigla_uf){
-          data <- sidrar::get_sidra(1613, period = a, geo = "MicroRegion", geo.filter = list("State" = s))
+          data <- suppressMessages(sidrar::get_sidra(1613, period = a, geo = "MicroRegion", geo.filter = list("State" = s)))
           df <- rbind(df, data)
         }
     }
@@ -280,11 +280,11 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
     for (i in 1:length(years)){
       a <-toString(years[i])
       for (s in sigla_uf2){
-        data <- sidrar::get_sidra(1613, period = a, geo = "City", geo.filter = list("State" = s))
+        data <- suppressMessages(sidrar::get_sidra(1613, period = a, geo = "City", geo.filter = list("State" = s)))
         df <- rbind(df, data)
       }
       for (m in micro){
-        data <- sidrar::get_sidra(1613, period = a, geo = "City", geo.filter = list("MicroRegion" = m))
+        data <- suppressMessages(sidrar::get_sidra(1613, period = a, geo = "City", geo.filter = list("MicroRegion" = m)))
         df <- rbind(df, data)
       }
     }
@@ -488,7 +488,7 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
   if (aggregation_level == "country"){
     for (i in 1:length(years)){
       a <-toString(years[i])
-      data <- sidrar::get_sidra(1612, period = a, geo = "Brazil")
+      data <- suppressMessages(sidrar::get_sidra(1612, period = a, geo = "Brazil"))
       df <- rbind(df, data)
     }
     if (language == "eng"){
@@ -506,7 +506,7 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
   if (aggregation_level == "region"){
     for (i in 1:length(years)){
       a <-toString(years[i])
-      data <- sidrar::get_sidra(1612, period = a, geo = "Region")
+      data <- suppressMessages(sidrar::get_sidra(1612, period = a, geo = "Region"))
       df <- rbind(df, data)
     }
     if (language == "eng"){
@@ -524,7 +524,7 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
   if (aggregation_level == "state"){
     for (i in 1:length(years)){
       a <-toString(years[i])
-      data <- sidrar::get_sidra(1612, period = a, geo = "State")
+      data <- suppressMessages(sidrar::get_sidra(1612, period = a, geo = "State"))
       df <- rbind(df, data)
     }
     if (language == "eng"){
@@ -542,7 +542,7 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
   if (aggregation_level == "mesoregion"){
     for (i in 1:length(years)){
       a <-toString(years[i])
-      data <- sidrar::get_sidra(1612, period = a, geo = "MesoRegion")
+      data <- suppressMessages(sidrar::get_sidra(1612, period = a, geo = "MesoRegion"))
       df <- rbind(df, data)
     }
     if (language == "eng"){
@@ -561,7 +561,7 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
     for (i in 1:length(years)){
       a <-toString(years[i])
       for (s in sigla_uf){
-        data <- sidrar::get_sidra(1612, period = a, geo = "MicroRegion", geo.filter = list("State" = s))
+        data <- suppressMessages(sidrar::get_sidra(1612, period = a, geo = "MicroRegion", geo.filter = list("State" = s)))
         df <- rbind(df, data)
       }
     }
@@ -581,11 +581,11 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
     for (i in 1:length(years)){
       a <-toString(years[i])
       for (s in sigla_uf2){
-        data <- sidrar::get_sidra(1612, period = a, geo = "City", geo.filter = list("State" = s))
+        data <- suppressMessages(sidrar::get_sidra(1612, period = a, geo = "City", geo.filter = list("State" = s)))
         df <- rbind(df, data)
       }
       for (m in micro){
-        data <- sidrar::get_sidra(1612, period = a, geo = "City", geo.filter = list("MicroRegion" = m))
+        data <- suppressMessages(sidrar::get_sidra(1612, period = a, geo = "City", geo.filter = list("MicroRegion" = m)))
         df <- rbind(df, data)
       }
     }
@@ -723,10 +723,10 @@ load_pam_main <- function(years, aggregation_level = "country", language = "pt",
   if (aggregation_level == "country"){
     for (i in 1:length(years)){
       a <-toString(years[i])
-      corn <- sidrar::get_sidra(839, period = a, geo = "Brazil")
-      potato <- sidrar::get_sidra(1001, period = a, geo = "Brazil")
-      peanut <- sidrar::get_sidra(1000, period = a, geo = "Brazil")
-      bean <- sidrar::get_sidra(1002, period = a, geo = "Brazil")
+      corn <- suppressMessages(sidrar::get_sidra(839, period = a, geo = "Brazil"))
+      potato <- suppressMessages(sidrar::get_sidra(1001, period = a, geo = "Brazil"))
+      peanut <- suppressMessages(sidrar::get_sidra(1000, period = a, geo = "Brazil"))
+      bean <- suppressMessages(sidrar::get_sidra(1002, period = a, geo = "Brazil"))
       df <- rbind(df, corn)
       df <- rbind(df, potato)
       df <- rbind(df, peanut)
@@ -746,10 +746,10 @@ load_pam_main <- function(years, aggregation_level = "country", language = "pt",
   if (aggregation_level == "region"){
     for (i in 1:length(years)){
       a <-toString(years[i])
-      corn <- sidrar::get_sidra(839, period = a, geo = "Region")
-      potato <- sidrar::get_sidra(1001, period = a, geo = "Region")
-      peanut <- sidrar::get_sidra(1000, period = a, geo = "Region")
-      bean <- sidrar::get_sidra(1002, period = a, geo = "Region")
+      corn <- suppressMessages(sidrar::get_sidra(839, period = a, geo = "Region"))
+      potato <- suppressMessages(sidrar::get_sidra(1001, period = a, geo = "Region"))
+      peanut <- suppressMessages(sidrar::get_sidra(1000, period = a, geo = "Region"))
+      bean <- suppressMessages(sidrar::get_sidra(1002, period = a, geo = "Region"))
       df <- rbind(df, corn)
       df <- rbind(df, potato)
       df <- rbind(df, peanut)
@@ -770,10 +770,10 @@ load_pam_main <- function(years, aggregation_level = "country", language = "pt",
   if (aggregation_level == "state"){
     for (i in 1:length(years)){
       a <-toString(years[i])
-      corn <- sidrar::get_sidra(839, period = a, geo = "State")
-      potato <- sidrar::get_sidra(1001, period = a, geo = "State")
-      peanut <- sidrar::get_sidra(1000, period = a, geo = "State")
-      bean <- sidrar::get_sidra(1002, period = a, geo = "State")
+      corn <- suppressMessages(sidrar::get_sidra(839, period = a, geo = "State"))
+      potato <- suppressMessages(sidrar::get_sidra(1001, period = a, geo = "State"))
+      peanut <- suppressMessages(sidrar::get_sidra(1000, period = a, geo = "State"))
+      bean <- suppressMessages(sidrar::get_sidra(1002, period = a, geo = "State"))
       df <- rbind(df, corn)
       df <- rbind(df, potato)
       df <- rbind(df, peanut)
@@ -794,10 +794,10 @@ load_pam_main <- function(years, aggregation_level = "country", language = "pt",
   if (aggregation_level == "mesoregion"){
     for (i in 1:length(years)){
       a <-toString(years[i])
-      corn <- sidrar::get_sidra(839, period = a, geo = "MesoRegion")
-      potato <- sidrar::get_sidra(1001, period = a, geo = "MesoRegion")
-      peanut <- sidrar::get_sidra(1000, period = a, geo = "MesoRegion")
-      bean <- sidrar::get_sidra(1002, period = a, geo = "MesoRegion")
+      corn <- suppressMessages(sidrar::get_sidra(839, period = a, geo = "MesoRegion"))
+      potato <- suppressMessages(sidrar::get_sidra(1001, period = a, geo = "MesoRegion"))
+      peanut <- suppressMessages(sidrar::get_sidra(1000, period = a, geo = "MesoRegion"))
+      bean <- suppressMessages(sidrar::get_sidra(1002, period = a, geo = "MesoRegion"))
       df <- rbind(df, corn)
       df <- rbind(df, potato)
       df <- rbind(df, peanut)
@@ -819,10 +819,10 @@ load_pam_main <- function(years, aggregation_level = "country", language = "pt",
     for (i in 1:length(years)){
       a <-toString(years[i])
       for (s in sigla_uf){
-        corn <- sidrar::get_sidra(839, period = a, geo = "MicroRegion", geo.filter = list("State" = s))
-        potato <- sidrar::get_sidra(1001, period = a, geo = "MicroRegion", geo.filter = list("State" = s))
-        peanut <- sidrar::get_sidra(1000, period = a, geo = "MicroRegion", geo.filter = list("State" = s))
-        bean <- sidrar::get_sidra(1002, period = a, geo = "MicroRegion", geo.filter = list("State" = s))
+        corn <- suppressMessages(sidrar::get_sidra(839, period = a, geo = "MicroRegion", geo.filter = list("State" = s)))
+        potato <- suppressMessages(sidrar::get_sidra(1001, period = a, geo = "MicroRegion", geo.filter = list("State" = s)))
+        peanut <- suppressMessages(sidrar::get_sidra(1000, period = a, geo = "MicroRegion", geo.filter = list("State" = s)))
+        bean <- suppressMessages(sidrar::get_sidra(1002, period = a, geo = "MicroRegion", geo.filter = list("State" = s)))
         df <- rbind(df, corn)
         df <- rbind(df, potato)
         df <- rbind(df, peanut)
@@ -845,10 +845,10 @@ load_pam_main <- function(years, aggregation_level = "country", language = "pt",
     for (i in 1:length(years)){
       a <-toString(years[i])
       for (s in sigla_uf){
-        corn <- sidrar::get_sidra(839, period = a, geo = "City", geo.filter = list("State" = s))
-        potato <- sidrar::get_sidra(1001, period = a, geo = "City", geo.filter = list("State" = s))
-        peanut <- sidrar::get_sidra(1000, period = a, geo = "City", geo.filter = list("State" = s))
-        bean <- sidrar::get_sidra(1002, period = a, geo = "City", geo.filter = list("State" = s))
+        corn <- suppressMessages(sidrar::get_sidra(839, period = a, geo = "City", geo.filter = list("State" = s)))
+        potato <- suppressMessages(sidrar::get_sidra(1001, period = a, geo = "City", geo.filter = list("State" = s)))
+        peanut <- suppressMessages(sidrar::get_sidra(1000, period = a, geo = "City", geo.filter = list("State" = s)))
+        bean <- suppressMessages(sidrar::get_sidra(1002, period = a, geo = "City", geo.filter = list("State" = s)))
         df <- rbind(df, corn)
         df <- rbind(df, potato)
         df <- rbind(df, peanut)
