@@ -30,7 +30,7 @@ Using the package is easy enough:
 ```{r}
 library(datazoom.amazonia)
 
-years <- c(2014:2016)
+years <- c(2015:2016)
 
 data <- load_degrad_raw(years)
 

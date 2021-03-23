@@ -27,11 +27,11 @@ The definition of the Brazilian Legal Amazon at the municipality level is taken 
 Using the package is easy enough:
 
 ```{r setup}
-library(datazoom.amazonia)
-
-data <- load_amazon_income(2010)
-
-data <- load_amazon_income(2010, space_aggregation = "state", language = "pt")
-
-data <- load_income(2010)
+# library(datazoom.amazonia)
+# 
+# data <- load_amazon_income(2010)
+# 
+# data <- load_amazon_income(2010, space_aggregation = "state", language = "pt")
+# 
+# data <- load_income(2010)
 ```
