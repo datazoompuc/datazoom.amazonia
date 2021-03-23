@@ -31,3 +31,5 @@
 # datazoom.amazonia 0.11.0.9000
 * Added functions for IBGE - PAM data
 
+# datazoom.amazonia 0.12.0.9000
+* Added functions for IPS data 
