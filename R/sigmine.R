@@ -27,11 +27,11 @@ load_sigmine<-function(space_aggregation = c('municipality', 'state','municipio'
     p1f <- tempfile(fileext = ".zip")
     tryCatch(
     expr = {
-      url1<-'http://sigmine.dnpm.gov.br/sirgas2000/brasil.zip'
+      url1<-'https://app.anm.gov.br/dadosabertos/SIGMINE/PROCESSOS_MINERARIOS/BRASIL.zip'
       download.file(url1, p1f, mode="wb")
     },
     error = function(e){
-      url1<-'https://app.anm.gov.br/dadosabertos/SIGMINE/PROCESSOS_MINERARIOS/BRASIL.zip'
+      url1<-'http://sigmine.dnpm.gov.br/sirgas2000/brasil.zip'
       download.file(url1, p1f, mode="wb")
     }
   )
