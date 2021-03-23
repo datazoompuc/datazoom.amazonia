@@ -6,6 +6,7 @@
 #' @param space_aggregation A \code{string} for the geographical aggregation of the data. It can be by municipality, state or country. Currently, only state is available.
 #' @param info A \code{string} for the data variables of interest. Can be area, commodity, usage, licensing. Default to all.
 #' @param local A \code{string} with the data path, if locally available. Default is web, which downloads directly from the website.
+#' @param teturn A \code{string} with the retuned data type. Can be edited or raw.
 #'
 #'
 #' @return A \code{tibble} format panel data with N geographic units and T time periods

@@ -1,7 +1,7 @@
 #' @title load_mapbiomas_covering
-#' 
+#'
 #' @description Download and filter data on type of soil covering by year
-#' 
+#'
 #' @param space_aggregation A string that indicates the level of aggregation of the data. It can be by municipality or state
 #' @param path A string indicating where the raw data is in your computer. The default is NULL which means the data will be extracted directly from the website
 #' @param covering Output contains only data over the selected covering
@@ -10,20 +10,20 @@
 #' Ex.: 1-Forest; 2-Non Forest Natural Formation; 3-Farming; 4-Non Vegetated Area; 5-Water
 #' @param years A vector of numbers containing the years desired in the data base (years available are 1985 to 2020)
 #' Ex.: years = c(1985:2020)
-#' 
+#'
 #' @return A data base with data containing the area of each selected type of soil covering in each selected year
 #'
 #' @importFrom readxl read_excel
 #' @importFrom utils download.file
-#' 
+#'
 #' @author DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro
 #'
 #' @encoding UTF-8
 #' @export
 #'
 #' @examples
-#' load_mapbiomas_covering(space_aggregation = 'municipality', path = NULL,
-#'                              covering = 3, years = c(2000:2010))
+#' \dontrun{load_mapbiomas_covering(space_aggregation = 'municipality', path = NULL,
+#'                              covering = 3, years = c(2000:2010))}
 
 
 
@@ -98,17 +98,17 @@ load_mapbiomas_covering<-function(space_aggregation = c('municipality', 'state',
 }
 
 #' @title load_mapbiomas_transition
-#' 
+#'
 #' @description Download and filter data on transition of types of soil covering by year
-#' 
+#'
 #' @param path A string indicating where the raw data is in your computer. The default is NULL which means the data will be extracted directly from the website
 #' @param transition_interval A numeric object containing the desired interval in years to observe transitions desired in the data base (1, 2, 5 or 10), or have all included (NULL)
-#' 
+#'
 #' @return A data base with data containing the area of each selected type of soil covering transition in each selected year
 #'
 #' @importFrom readxl read_excel
 #' @importFrom utils download.file
-#' 
+#'
 #' @author DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro
 #'
 #' @encoding UTF-8
