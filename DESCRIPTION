@@ -38,7 +38,8 @@ Imports:
     sf,
     utils,
     RCurl,
-    textclean
+    textclean,
+    qpdf
 URL: http://www.econ.puc-rio.br/datazoom
 Suggests: 
     knitr,
