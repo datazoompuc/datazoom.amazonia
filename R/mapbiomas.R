@@ -119,8 +119,9 @@ load_mapbiomas_covering<-function(space_aggregation = c('municipality', 'state',
 
 
 
-load_mapbiomas_transition<-function(path = NULL, transition_interval = NULL){
-  if(is.null(path)){
+load_mapbiomas_transition<-function(space_aggregation = c('municipality', 'state','municipio','estado'), path = NULL, transition_interval = NULL){
+  if(space_aggregation=='state' | space_aggregation=='estado'){
+    if(is.null(path)){
     url1<-'https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Dados_Transicao_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx'
     p1f <- tempfile()
     download.file(url1, p1f, mode="wb")
@@ -178,5 +179,7 @@ load_mapbiomas_transition<-function(path = NULL, transition_interval = NULL){
         }
       }
   }
+ }
+  
   return(retorno)
 }
