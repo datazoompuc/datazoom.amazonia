@@ -19,6 +19,7 @@ NULL
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' load_prodes(2018)
 #'
 #' load_prodes(
@@ -38,6 +39,7 @@ NULL
 #'   space_aggregation = "municipality",
 #'   language = "pt"
 #' )
+#' }
 load_prodes <- function(source, space_aggregation = "municipality", language = "eng") {
   raw_list <- load_prodes_raw(source)
 

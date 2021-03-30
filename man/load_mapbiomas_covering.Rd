@@ -32,8 +32,10 @@ A data base with data containing the area of each selected type of soil covering
 Download and filter data on type of soil covering by year
 }
 \examples{
+\dontrun{
 load_mapbiomas_covering(space_aggregation = 'municipality', path = NULL,
                              covering = 3, years = c(2000:2010))
+}
 }
 \author{
 DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro
