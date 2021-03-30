@@ -178,8 +178,30 @@ load_mapbiomas_transition<-function(space_aggregation = c('municipality', 'state
           retorno<-rbind(retorno,ret)
         }
       }
+    }
+  }else if(space_aggregation=='municipality' | space_aggregation=='municipio'){
+    url1<-'https://storage.googleapis.com/mapbiomas-public/COLECAO/5/DOWNLOADS/ESTATISTICAS/Dados_Transicao_MapBiomas_5.0_UF-MUN_SITE_v2.xlsx'
+    p1f <- tempfile()
+    download.file(url1, p1f, mode="wb")
+    a<-read_excel(path = p1f, sheet = 3)
+    retorno<-data.frame()
+  tab<-a
+  ncolu<-ncol(a)
+  ret<-c()
+  ret<-tab[,1:15]
+  if(!is.null(transition_interval)){
+    for(i in 16:ncolu){
+      nomecol<-colnames(a)[i]
+      anoi<-substring(nomecol,1,4)
+      anof<-substring(nomecol,8,12)
+      anoi<-as.integer(anoi)
+      anof<-as.integer(anof)
+      if(anof-anoi==transition_interval){
+        ret<-cbind(ret,tab[,i])
+      }
+    }
   }
- }
-  
+  retorno<-ret
+}
   return(retorno)
 }
