@@ -87,13 +87,9 @@ data <- load_pam_permanent(2013, aggregation_level = "region")
 data <- load_mapbiomas_covering(space_aggregation = 'municipality', path = NULL, code_state = "PA", code_mun = NULL, covering = 3,
                                   type = 'stacked', year_begin = 2000, year_end = 2010)
 
-data <- load_mapbiomas_transition(transition_interval = 5)
+data <- load_mapbiomas_transition(space_aggregation = 'state', transition_interval = 5)
 
-# Loads data locally
 
-data <- load_mapbiomas_covering("~/Downloads")
-
-data <- load_mapbiomas_transition("~/Downloads")
 
 ```
 
