@@ -20,8 +20,9 @@
 #'
 #' @export
 #'
-#' @examples load_comex(c(2000,2001,2002), ncm = TRUE, exp = TRUE)
-#' load_comex(c(1997,2004,2008), sh4 = TRUE, imp = TRUE, language = "eng")
+#' @examples
+#' \dontrun{load_comex(c(2000,2001,2002), ncm = TRUE, exp = TRUE)
+#' load_comex(c(1997,2004,2008), sh4 = TRUE, imp = TRUE, language = "eng")}
 #'
 
 load_comex <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE, language = "pt") {

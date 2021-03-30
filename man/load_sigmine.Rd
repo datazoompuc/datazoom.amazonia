@@ -7,23 +7,26 @@
 \usage{
 load_sigmine(
   space_aggregation = c("municipality", "state", "municipio", "estado"),
-  source = NULL
+  source = NULL,
+  language = c("eng", "pt")
 )
 }
 \arguments{
 \item{space_aggregation}{A string that indicates the level of aggregation of the data. It can be by municipality or state}
 
 \item{source}{A string indicating where the raw data is in your computer. The default is NULL which means the data will be extracted directly from the website}
+
+\item{language}{A string indicating which language is the desired, 'eng' for english and 'pt' for portuguese}
 }
 \value{
 A data base with data containing the area of each selected type of soil covering in each selected year
 }
 \description{
-Download and filter data on the mines being explored legally in Brazil
+Download and filter data on the mines being explored legally in Brazil, including their location, status, product being mined and area in square meters etc.
 }
 \examples{
 \dontrun{
-load_sigmine(space_aggregation = 'municipality', source = NULL)
+load_sigmine(space_aggregation = 'municipality', source = NULL, language = 'pt')
 }
 }
 \author{

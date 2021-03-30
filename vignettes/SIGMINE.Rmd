@@ -16,13 +16,13 @@ knitr::opts_chunk$set(
 
 ##The Dataset
 
-The SIGMINE project gathers data reporting each mine in the country and their features such as year, area, company ownership, element being explored etc.
+The SIGMINE project gathers data reporting each mine in the country and their features such as year, area in square meters, company ownership, element being explored etc.
 
 Using the function is easy enough:
 
-```{r setup}
+```{r}
 library(datazoom.amazonia)
-data <- load_sigmine(space_aggregation = 'municipality', source = NULL)
+load_sigmine(space_aggregation = 'municipality', source = NULL, language = 'pt')
 ```
 
 Data can be retrieved from the website as above or loaded locally.
