@@ -26,8 +26,11 @@ Download and filter data on the mines being explored legally in Brazil, includin
 }
 \examples{
 \dontrun{
-load_sigmine(space_aggregation = 'municipality', source = NULL, language = 'pt')
+load_sigmine(space_aggregation = "municipality", 
+  source = NULL, 
+  language = "pt")
 }
+
 }
 \author{
 DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro
