@@ -30,6 +30,7 @@ A \code{tibble}.
 Loads and cleans deforestation data from INPE.
 }
 \examples{
+\dontrun{
 load_prodes(2018)
 
 load_prodes(
@@ -49,6 +50,7 @@ load_prodes(
   space_aggregation = "municipality",
   language = "pt"
 )
+}
 }
 \seealso{
 \link{load_prodes_raw} for loading raw data.
