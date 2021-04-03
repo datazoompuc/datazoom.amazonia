@@ -20,7 +20,8 @@
 #'
 #' @examples
 #' \dontrun{
-#' datazoom.amazonia::load_pam_permanent(2013, aggregation_level = "country")
+#' datazoom.amazonia::load_pam_permanent(2013, 
+#'   aggregation_level = "country")
 #' }
 #'
 load_pam_permanent <- function(years, aggregation_level = "country", language = "pt", long = FALSE) {

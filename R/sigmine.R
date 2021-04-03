@@ -17,7 +17,9 @@
 #'
 #' @examples
 #' \dontrun{
-#' load_sigmine(space_aggregation = "municipality", source = NULL, language = "pt")
+#' load_sigmine(space_aggregation = "municipality", 
+#'   source = NULL, 
+#'   language = "pt")
 #' }
 #'
 load_sigmine <- function(space_aggregation = c("municipality", "state", "municipio", "estado"), source = NULL, language = c("eng", "pt")) {
