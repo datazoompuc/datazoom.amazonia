@@ -24,12 +24,12 @@
 #' }
 
 
-load_sigmine<-function(space_aggregation = 'state',info='all',local='web',return='edited'){
+load_sigmine<-function(space_aggregation = 'state',info='all',local='web',raw=FALSE){
 
   ## Defining Url to Download Data and Downlad the Zip File
 
   if(local == 'web'){
-    url = "https://app.anm.gov.br/dadosabertos/SIGMINE/PROCESSOS_MINERARIOS/BRASIL.zip"
+    url = "https://app.anm.gov.br/dadosabertos/SIGMINE/PROCESSOS_MINERARIOS/MG.zip"
     temp_file = tempfile(fileext = ".zip")
     download.file(url, temp_file, mode="wb")
   }else{
@@ -51,7 +51,7 @@ load_sigmine<-function(space_aggregation = 'state',info='all',local='web',return
     janitor::clean_names() %>%
     sf::st_zm(drop=TRUE,what="ZM")
 
-  if (return == 'raw'){return(dat)}
+  if (raw==TRUE){return(dat)}
 
   ##################
   ## Data Editing ##
@@ -64,7 +64,7 @@ load_sigmine<-function(space_aggregation = 'state',info='all',local='web',return
   #dat = dat %>% dplyr::mutate_all(function(x){gsub('[^ -~]', '', x)}) ## Remove Special Characters
 
   dat = dat %>%
-    dplyr::select(-ult_evento,-nome,-processo) %>%
+    dplyr::select(-ult_evento,-nome,-processo) %>% ## Agrupamento por palavras chave
     dplyr::filter(area_ha > 0)  %>%
     dplyr::mutate(dup = duplicated(id)) %>%
     dplyr::filter(dup == 0) %>% ## This choice is clearly not perfect, need to improve!
@@ -91,9 +91,9 @@ load_sigmine<-function(space_aggregation = 'state',info='all',local='web',return
   ## Brazil Shapefile ##
   ######################
 #
-#   geo = geobr::read_municipality(simplified = TRUE) %>%
-#       sf::st_transform(crs = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs") %>%
-#       dplyr::select(code_muni,abbrev_state)
+  geo = geobr::read_municipality(simplified = TRUE) %>%
+      sf::st_transform(crs = "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs") %>%
+      dplyr::select(code_muni,abbrev_state)
 
   ###############
   ## Join Data ##
