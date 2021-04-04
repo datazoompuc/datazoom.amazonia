@@ -6,30 +6,53 @@
 \title{load_sigmine}
 \usage{
 load_sigmine(
+<<<<<<< HEAD
   space_aggregation = "state",
   info = "all",
   local = "web",
   return = "edited"
+=======
+  space_aggregation = c("municipality", "state", "municipio", "estado"),
+  source = NULL,
+  language = c("eng", "pt")
+>>>>>>> master
 )
 }
 \arguments{
 \item{space_aggregation}{A \code{string} for the geographical aggregation of the data. It can be by municipality, state or country. Currently, only state is available.}
 
+<<<<<<< HEAD
 \item{info}{A \code{string} for the data variables of interest. Can be area, commodity, usage, licensing. Default to all.}
 
 \item{local}{A \code{string} with the data path, if locally available. Default is web, which downloads directly from the website.}
+=======
+\item{source}{A string indicating where the raw data is in your computer. The default is NULL which means the data will be extracted directly from the website}
+
+\item{language}{A string indicating which language is the desired, 'eng' for english and 'pt' for portuguese}
+>>>>>>> master
 }
 \value{
 A \code{tibble} format panel data with N geographic units and T time periods
 }
 \description{
+<<<<<<< HEAD
 Download and filter data on the mines being explored legally in Brazil.
 Source data is available at \link{https://dados.gov.br/dataset/sistema-de-informacoes-geograficas-da-mineracao-sigmine}
 }
 \examples{
 \dontrun{
 load_sigmine(space_aggregation = 'municipality', local='web')
+=======
+Download and filter data on the mines being explored legally in Brazil, including their location, status, product being mined and area in square meters etc.
 }
+\examples{
+\dontrun{
+load_sigmine(space_aggregation = "municipality", 
+  source = NULL, 
+  language = "pt")
+>>>>>>> master
+}
+
 }
 \author{
 DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro

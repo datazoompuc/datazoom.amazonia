@@ -16,7 +16,11 @@ knitr::opts_chunk$set(
 
 ## The Dataset
 
+<<<<<<< HEAD
 The Mining Geographical Information System (SIGMINE) is maintained by the Brazilian Mining National Agency (Agencia Nacional de Mineracao - ANM). It contains shapefiles of active mining licenses, leasing, blocked and protected areas and mining reserves. Data is daily updated.
+=======
+The SIGMINE project gathers data reporting each mine in the country and their features such as year, area in square meters, company ownership, element being explored etc.
+>>>>>>> master
 
 The \code{load_sigmine} extracts data from a local path or directly from the website \url{https://dados.gov.br/dataset/sistema-de-informacoes-geograficas-da-mineracao-sigmine} and return a panel data at the year level since the beginning of the historical record. 
 
@@ -24,8 +28,13 @@ Users can choose to retrieve data from mining areas, commodities extracted, land
 
 Using the function is easy enough. The example below returns all data types:
 
-```{r setup}
+```{r, eval = FALSE}
 library(datazoom.amazonia)
+<<<<<<< HEAD
+=======
+load_sigmine(space_aggregation = 'state', source = NULL, language = 'eng')
+```
+>>>>>>> master
 
 dat = load_sigmine(space_aggregation = 'state',info='all',local='web',return='edited')
 

@@ -34,8 +34,15 @@ A \code{list} of data frames
 Loads foreign trade data from the Brazilian government from 1986 to the present
 }
 \examples{
-load_comex(c(2000,2001,2002), ncm = TRUE, exp = TRUE)
-load_comex(c(1997,2004,2008), sh4 = TRUE, imp = TRUE, language = "eng")
+\dontrun{
+load_comex(c(2000, 2001, 2002), 
+  ncm = TRUE,
+  exp = TRUE)
+load_comex(c(1997, 2004, 2008),
+  sh4 = TRUE,
+  imp = TRUE,
+  language = "eng")
+}
 
 }
 \author{

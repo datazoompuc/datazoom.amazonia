@@ -24,6 +24,7 @@ The definition of the Brazilian Legal Amazon at the municipality level is taken 
 
 Using the package is easy enough:
 
+<<<<<<< HEAD
 ```{r setup,eval=FALSE}
 # 
 # library(datazoom.amazonia)
@@ -35,4 +36,16 @@ Using the package is easy enough:
 # data <- load_amazon_employment(years, space_aggregation = "state", language = "pt")
 # 
 # #data <- load_employment(years)
+=======
+```{r setup, include = FALSE}
+library(datazoom.amazonia)
+
+years <- c(2015:2018)
+
+data <- load_amazon_employment(2007)
+
+data <- load_amazon_employment(years, space_aggregation = "state", language = "pt")
+
+data <- load_employment(years)
+>>>>>>> master
 ```
