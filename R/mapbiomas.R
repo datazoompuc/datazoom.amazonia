@@ -185,9 +185,13 @@ load_mapbiomas_transition<-function(space_aggregation = c('municipality', 'state
       }
     }
   }else if(space_aggregation=='municipality' | space_aggregation=='municipio'){
-    url1<-'https://storage.googleapis.com/mapbiomas-public/COLECAO/5/DOWNLOADS/ESTATISTICAS/Dados_Transicao_MapBiomas_5.0_UF-MUN_SITE_v2.xlsx'
-    p1f <- tempfile()
-    download.file(url1, p1f, mode="wb")
+    if(is.null(path)){
+      url1<-'https://storage.googleapis.com/mapbiomas-public/COLECAO/5/DOWNLOADS/ESTATISTICAS/Dados_Transicao_MapBiomas_5.0_UF-MUN_SITE_v2.xlsx'
+      p1f <- tempfile()
+      download.file(url1, p1f, mode="wb")
+    }else{
+      p1f<-paste0(path,'/Dados_Transicao_MapBiomas_5.0_UF-MUN_SITE_v2.xlsx')
+    }
     a<-read_excel(path = p1f, sheet = 3)
     retorno<-data.frame()
     tab<-a
