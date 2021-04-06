@@ -26,7 +26,9 @@ Download and filter data on the mines being explored legally in Brazil, includin
 }
 \examples{
 \dontrun{
-load_sigmine(space_aggregation = 'municipality', source = NULL, language = 'pt')
+load_sigmine(space_aggregation = "municipality", 
+  source = NULL, 
+  language = "pt")
 }
 }
 \author{

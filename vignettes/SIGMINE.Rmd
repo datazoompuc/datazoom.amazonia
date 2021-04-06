@@ -20,9 +20,9 @@ The SIGMINE project gathers data reporting each mine in the country and their fe
 
 Using the function is easy enough:
 
-```{r}
+```{r, eval = FALSE}
 library(datazoom.amazonia)
-load_sigmine(space_aggregation = 'municipality', source = NULL, language = 'pt')
+load_sigmine(space_aggregation = 'state', source = NULL, language = 'eng')
 ```
 
 Data can be retrieved from the website as above or loaded locally.
