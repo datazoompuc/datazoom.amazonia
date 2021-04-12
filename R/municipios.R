@@ -458,7 +458,7 @@ translate_cnae <- function(terms) {
 translate_munics_terms <- function(terms) {
   dplyr::recode(terms,
     "Ano" = "Year",
-    "Munic\u00EDpio" = "Municipality",
+    "Munic\u00edpio" = "Municipality",
     "Estado" = "State",
     "PIB" = "GDP",
     "PIBpc" = "GDPpc",
