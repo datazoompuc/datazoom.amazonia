@@ -20,42 +20,49 @@
 #'
 #' @export
 #'
-#' @examples load_comex(c(2000,2001,2002), ncm = TRUE, exp = TRUE)
-#' load_comex(c(1997,2004,2008), sh4 = TRUE, imp = TRUE, language = "eng")
+#' @examples
+#' \dontrun{
+#' load_comex(c(2000, 2001, 2002), 
+#'   ncm = TRUE,
+#'   exp = TRUE)
+#' load_comex(c(1997, 2004, 2008),
+#'   sh4 = TRUE,
+#'   imp = TRUE,
+#'   language = "eng")
+#' }
 #'
-
 load_comex <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE, language = "pt") {
   message("Depending on amount of items selected function may take time to run")
-  #Unless english is specified, columns will be renamed using Portuguese labels
+  # Unless english is specified, columns will be renamed using Portuguese labels
   if (language != "pt" && language != "eng") {
     warning("Language selected not supported! Proceding with Portuguese")
   }
-  #removes invalid years from input vector
+  # removes invalid years from input vector
   year1 <- year[year <= 2020]
   year1 <- year1[year1 >= 1997]
   year2 <- year[year >= 1989]
   year2 <- year2[year2 <= 1996]
-  #creates list to store data frames
+  # creates list to store data frames
   data_1 <- data.frame()
   data_2 <- data.frame()
   data_3 <- data.frame()
   data_4 <- data.frame()
   data_5 <- data.frame()
   data_6 <- data.frame()
-  #first generates export data frames
+  # first generates export data frames
   if (exp == TRUE) {
-    #after 1997 two types of codes for goods are supported
+    # after 1997 two types of codes for goods are supported
     if (length(year1) != 0) {
-      #first type in Mercosul Common Nomenclature
+      # first type in Mercosul Common Nomenclature
       if (ncm == TRUE) {
-        #Generates URLs for each year to download .csv file from website
+        # Generates URLs for each year to download .csv file from website
         url <- paste0("http://www.balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm/EXP_", year1, ".csv")
-        #for each year, concatenates data frame to all previous year
+        # for each year, concatenates data frame to all previous year
         for (i in 1:length(url)) {
           df <- readr::read_csv2(url[i])
           data_1 <- rbind(data_1, df)
         }
-        #relabels columns in selected language
+        # relabels columns in selected language
         if (language == "eng") {
           colnames(data_1) <- c(
             "Year", "Month", "Code Mercosul Common Nomenclature", "Statistical Unit Code", "Country code",
@@ -70,7 +77,7 @@ load_comex <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
           )
         }
       }
-      #same structure used above but for another system
+      # same structure used above but for another system
       if (sh4 == TRUE) {
         url <- paste0("http://www.balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/EXP_", year1, "_MUN.csv")
 
@@ -92,10 +99,10 @@ load_comex <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
           )
         }
       } else if (sh4 == FALSE & ncm == FALSE) {
-        #warning to help user in case neither systems are set as TRUE in input
+        # warning to help user in case neither systems are set as TRUE in input
         warning("Type of data (Nomenclatura Comum do Mercosul or Sistema Harmonizado) not selected")
       }
-      #before 1997 only one other system is supported, but structure is the same
+      # before 1997 only one other system is supported, but structure is the same
     }
     if (length(year2) != 0) {
       url <- paste0("http://www.balanca.economia.gov.br/balanca/bd/comexstat-bd/nbm/EXP_", year2, "_NBM.csv")
@@ -118,13 +125,13 @@ load_comex <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
           "Quantidade em Kg L\u00edquidos", "Valor Free on Board"
         )
       }
-    } else if (length(year1)==0 && length(year2)==0) {
+    } else if (length(year1) == 0 && length(year2) == 0) {
       stop("Year selected not valid")
     }
   }
   if (imp == TRUE) {
-    #same structure as exports, but for the import data
-    #separate sets of data frame are generated
+    # same structure as exports, but for the import data
+    # separate sets of data frame are generated
     if (length(year1) != 0) {
       if (ncm == TRUE) {
         url <- paste0("http://www.balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm/IMP_", year1, ".csv")
@@ -147,7 +154,6 @@ load_comex <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
             "Quantidade Estat\u00edstica", "Quantidade em Kg L\u00edquidos", "Valor Free on Board"
           )
         }
-
       }
       if (sh4 == TRUE) {
         url <- paste0("http://www.balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/IMP_", year1, "_MUN.csv")
@@ -170,7 +176,6 @@ load_comex <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
             "Quantidade em Kg L\u00edquidos", "Valor Free on Board"
           )
         }
-
       }
     }
     if (length(year2) != 0) {
@@ -194,18 +199,17 @@ load_comex <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
           "Quantidade em Kg L\u00edquidos", "Valor Free on Board"
         )
       }
-    } else if (length(year1)==0 && length(year2)==0) {
+    } else if (length(year1) == 0 && length(year2) == 0) {
       stop("Year selected not valid")
     }
   }
-  if(exp == FALSE && imp == FALSE) {
+  if (exp == FALSE && imp == FALSE) {
     warning("Export or import not selected.")
-    #just like the systems, warning is generated it neither import or export are set to TRUE in input
+    # just like the systems, warning is generated it neither import or export are set to TRUE in input
   }
 
-  all_dtframes <- list(data_1,data_2,data_3,data_4,data_5,data_6)
-  all_dtframes = all_dtframes[lapply(all_dtframes,length)>0]
-  #returns list of data frames, one for each combination of export/import and system
+  all_dtframes <- list(data_1, data_2, data_3, data_4, data_5, data_6)
+  all_dtframes <- all_dtframes[lapply(all_dtframes, length) > 0]
+  # returns list of data frames, one for each combination of export/import and system
   return(all_dtframes)
 }
-
