@@ -44,7 +44,7 @@ load_pevs_vegextr <- function(years, aggregation_level = "country", language = "
     index <- df$`Unit of measure (Code)` == 40
     df$`Unit of measure`[index] <- "Thousands of Reals"
     index <- df$`Unit of measure (Code)` == 1016
-    df$`Unit of measure`[index] <- "Cubis meters"
+    df$`Unit of measure`[index] <- "Cubic meters"
     index <- df$`Unit of measure (Code)` == 1017
     df$`Unit of measure`[index] <- "Tonnes"
     index <- df$`Unit of measure (Code)` == 43
@@ -53,11 +53,11 @@ load_pevs_vegextr <- function(years, aggregation_level = "country", language = "
     index <- df$`Type of product extracted (Code)` == 3402
     df$`Type of product extracted`[index] <- "1. Alimentary (Tonnes)"
     index <- df$`Type of product extracted (Code)` == 3403
-    df$`Type of product extracted`[index] <- "1.1 Açaí (fruit) (Tonnes)"
+    df$`Type of product extracted`[index] <- "1.1 A\u00e7a\u00ed (fruit) (Tonnes)"
     index <- df$`Type of product extracted (Code)` == 3404
     df$`Type of product extracted`[index] <- "1.2 Castanha-de-caju (Tonnes)"
     index <- df$`Type of product extracted (Code)` == 3405
-    df$`Type of product extracted`[index] <- "1.3 Castanha-do-pará (Tonnes)"
+    df$`Type of product extracted`[index] <- "1.3 Castanha-do-par\u00e1 (Tonnes)"
     index <- df$`Type of product extracted (Code)` == 3406
     df$`Type of product extracted`[index] <- "1.4 Erva-mate (Tonnes)"
     index <- df$`Type of product extracted (Code)` == 3407
@@ -67,7 +67,7 @@ load_pevs_vegextr <- function(years, aggregation_level = "country", language = "
     index <- df$`Type of product extracted (Code)` == 39409
     df$`Type of product extracted`[index] <- "1.7 Pequi (fruit) (Tonnes)"
     index <- df$`Type of product extracted (Code)` == 3409
-    df$`Type of product extracted`[index] <- "1.8 Pinhão (Tonnes)"
+    df$`Type of product extracted`[index] <- "1.8 Pinh\u00e3o (Tonnes)"
     index <- df$`Type of product extracted (Code)` == 3410
     df$`Type of product extracted`[index] <- "1.9 Umbu (fruit) (Tonnes)"
     index <- df$`Type of product extracted (Code)` == 11296
@@ -95,9 +95,9 @@ load_pevs_vegextr <- function(years, aggregation_level = "country", language = "
     index <- df$`Type of product extracted (Code)` == 3420
     df$`Type of product extracted`[index] <- "4. Waxes (Tonnes)"
     index <- df$`Type of product extracted (Code)` == 3421
-    df$`Type of product extracted`[index] <- "4.1 Carnaúba (wax) (Tonnes)"
+    df$`Type of product extracted`[index] <- "4.1 Carna\u00faba (wax) (Tonnes)"
     index <- df$`Type of product extracted (Code)` == 3422
-    df$`Type of product extracted`[index] <- "4.2 Carnaúba (powder) (Tonnes)"
+    df$`Type of product extracted`[index] <- "4.2 Carna\u00faba (powder) (Tonnes)"
     index <- df$`Type of product extracted (Code)` == 110011
     df$`Type of product extracted`[index] <- "4.3 Others (Tonnes)"
     index <- df$`Type of product extracted (Code)` == 3423
@@ -105,9 +105,9 @@ load_pevs_vegextr <- function(years, aggregation_level = "country", language = "
     index <- df$`Type of product extracted (Code)` == 3424
     df$`Type of product extracted`[index] <- "5.1 Buriti (Tonnes)"
     index <- df$`Type of product extracted (Code)` == 3425
-    df$`Type of product extracted`[index] <- "5.2 Carnaúba (Tonnes)"
+    df$`Type of product extracted`[index] <- "5.2 Carna\u00faba (Tonnes)"
     index <- df$`Type of product extracted (Code)` == 3426
-    df$`Type of product extracted`[index] <- "5.3 Piaçava (Tonnes)"
+    df$`Type of product extracted`[index] <- "5.3 Pia\u00e7ava (Tonnes)"
     index <- df$`Type of product extracted (Code)` == 3427
     df$`Type of product extracted`[index] <- "5.4 Others (Tonnes)"
     index <- df$`Type of product extracted (Code)` == 3428
@@ -115,7 +115,7 @@ load_pevs_vegextr <- function(years, aggregation_level = "country", language = "
     index <- df$`Type of product extracted (Code)` == 3429
     df$`Type of product extracted`[index] <- "6.1 Balata (Tonnes)"
     index <- df$`Type of product extracted (Code)` == 3430
-    df$`Type of product extracted`[index] <- "6.2 Maçaranduba (Tonnes)"
+    df$`Type of product extracted`[index] <- "6.2 Ma\u00e7aranduba (Tonnes)"
     index <- df$`Type of product extracted (Code)` == 3431
     df$`Type of product extracted`[index] <- "6.3 Sorva (Tonnes)"
     index <- df$`Type of product extracted (Code)` == 3433
@@ -127,9 +127,9 @@ load_pevs_vegextr <- function(years, aggregation_level = "country", language = "
     index <- df$`Type of product extracted (Code)` == 3438
     df$`Type of product extracted`[index] <- "8. Oilseeds (Tonnes)"
     index <- df$`Type of product extracted (Code)` == 3439
-    df$`Type of product extracted`[index] <- "8.1 Babaçu (almond) (Tonnes)"
+    df$`Type of product extracted`[index] <- "8.1 Baba\u00e7u (almond) (Tonnes)"
     index <- df$`Type of product extracted (Code)` == 3440
-    df$`Type of product extracted`[index] <- "8.2 Copaíba (oil) (Tonnes)"
+    df$`Type of product extracted`[index] <- "8.2 Copa\u00edba (oil) (Tonnes)"
     index <- df$`Type of product extracted (Code)` == 3441
     df$`Type of product extracted`[index] <- "8.3 Cumaru (almond) (Tonnes)"
     index <- df$`Type of product extracted (Code)` == 3442
@@ -153,7 +153,7 @@ load_pevs_vegextr <- function(years, aggregation_level = "country", language = "
     index <- df$`Type of product extracted (Code)` == 3452
     df$`Type of product extracted`[index] <- "10.1 Angico (bark) (Tonnes)"
     index <- df$`Type of product extracted (Code)` == 3453
-    df$`Type of product extracted`[index] <- "10.2 Barbatimão (bark) (Tonnes)"
+    df$`Type of product extracted`[index] <- "10.2 Barbatim\u00e3o (bark) (Tonnes)"
     index <- df$`Type of product extracted (Code)` == 3454
     df$`Type of product extracted`[index] <- "10.3 Others (Tonnes)"
     return(df)
@@ -378,7 +378,7 @@ load_pevs_silvprod <- function(years, aggregation_level = "country", language = 
     index <- df$`Unit of measure (Code)` == 40
     df$`Unit of measure`[index] <- "Thousands of Reals"
     index <- df$`Unit of measure (Code)` == 1016
-    df$`Unit of measure`[index] <- "Cubis meters"
+    df$`Unit of measure`[index] <- "Cubic meters"
     index <- df$`Unit of measure (Code)` == 1017
     df$`Unit of measure`[index] <- "Tonnes"
 
@@ -417,7 +417,7 @@ load_pevs_silvprod <- function(years, aggregation_level = "country", language = 
     index <- df$`Type of silviculture product (Code)` == 3460
     df$`Type of silviculture product`[index] <- "2. Other products (Tonnes)"
     index <- df$`Type of silviculture product (Code)` == 3461
-    df$`Type of silviculture product`[index] <- "2.1 Acácia-negra (bark) (Tonnes)"
+    df$`Type of silviculture product`[index] <- "2.1 Ac\u00e1cia-negra (bark) (Tonnes)"
     index <- df$`Type of silviculture product (Code)` == 3462
     df$`Type of silviculture product`[index] <- "2.2 Eucalyptus (leaf) (Tonnes)"
     index <- df$`Type of silviculture product (Code)` == 3463

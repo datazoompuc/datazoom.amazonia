@@ -33,7 +33,7 @@ Loads agricultural data of permanent tillages from Brazil from 1974 to the prese
 }
 \examples{
 \dontrun{
-datazoom.amazonia::load_pam_permanent(2013, 
+datazoom.amazonia::load_pam_permanent(2013,
   aggregation_level = "country")
 }
 
