@@ -85,7 +85,7 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
     index <- df$`Product of permanent tillage (Code)` == 2725
     df$`Product of permanent tillage`[index] <- "Cashew nuts"
     index <- df$`Product of permanent tillage (Code)` == 2726
-    df$`Product of permanent tillage`[index] <- "India-tea (green leaf)"
+    df$`Product of permanent tillage`[index] <- "India tea (green leaf)"
     index <- df$`Product of permanent tillage (Code)` == 2727
     df$`Product of permanent tillage`[index] <- "Bay coconut"
     index <- df$`Product of permanent tillage (Code)` == 2728
@@ -382,7 +382,7 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
     index <- df$`Product of permanent tillage (Code)` == 2725
     df$`Product of permanent tillage`[index] <- "Cashew nuts"
     index <- df$`Product of permanent tillage (Code)` == 2726
-    df$`Product of permanent tillage`[index] <- "India-tea (green leaf)"
+    df$`Product of permanent tillage`[index] <- "India tea (green leaf)"
     index <- df$`Product of permanent tillage (Code)` == 2727
     df$`Product of permanent tillage`[index] <- "Bay coconut"
     index <- df$`Product of permanent tillage (Code)` == 2728
