@@ -440,6 +440,7 @@ translate_for_response <- function(s) {
 translate_munics_to_english <- function(df) {
   df %>%
     dplyr::rename_with(translate_cnae, dplyr::contains(" - ")) %>%
+    dplyr::rename_with(function(cols) "Municipality", dplyr::starts_with("Munic")) %>% # Workaround for Windows compatibility
     dplyr::rename_with(translate_munics_terms)
 }
 
@@ -458,7 +459,6 @@ translate_cnae <- function(terms) {
 translate_munics_terms <- function(terms) {
   dplyr::recode(terms,
     "Ano" = "Year",
-    "Munic\u00edpio" = "Municipality",
     "Estado" = "State",
     "PIB" = "GDP",
     "PIBpc" = "GDPpc",
