@@ -84,6 +84,7 @@ load_degrad <- function(source, space_aggregation = "municipality", time_aggrega
 #' load_degrad_raw("~/Downloads/degrad2016_final_shp/DEGRAD_2016_pol.shp")
 #' }
 load_degrad_raw <- function(source) {
+  warning("This data source is experiencing problems. Execution may result in error.")
   # If source is a list of numbers, we retrieve data from INPE
   if (is.numeric(source)) {
     source <- purrr::map(source, function(year) {
