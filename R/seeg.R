@@ -16,13 +16,18 @@
 #'
 #' @encoding UTF-8
 #'
-#' @export load_pam_permanent
+#' @export load_seeg
 #'
-#' @examples \dontrun{datazoom.amazonia::load_pam_permanent(2013, aggregation_level = "country")}
+#' @examples \dontrun{datazoom.amazonia::load_seeg(2013, language = "eng")}
 #'
 
 load_seeg <- function(language = "pt"){
   message("Function requires download of large file, so it may take time to run")
+
+  if (language != "pt" && language != "eng"){
+    warning("Language selected not supported! Proceding with Portuguese")
+    language = "pt"
+  }
 
   direc <- getwd()
   url <- "https://drive.google.com/file/d/1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd/view?usp=sharing"
@@ -43,11 +48,40 @@ load_seeg <- function(language = "pt"){
   df <- as.data.frame(gsub("\u00f3", "o", as.matrix(df)))
   df <- as.data.frame(gsub("\u00e2", "a", as.matrix(df)))
   df <- as.data.frame(gsub("\u00d3", "O", as.matrix(df)))
+  df <- as.data.frame(gsub("gabagaba", "Energia", as.matrix(df)))
 
 
   to_english <- function(df){
-    index <- df$`Tier 1` == 2720
-    df$`Product of permanent tillage`[index] <- "Banana (bunch)"
+    index <- df$`Tier 1` == "Agropeacuaria"
+    df$`Tier 1`[index] <- "agricultura and cattle raising"
+    index <- df$`Tier 1` == "Energia"
+    df$`Tier 1`[index] <- "Energy"
+    index <- df$`Tier 1` == "Mudança de Uso da Terra e Florestas"
+    df$`Tier 1`[index] <- "Changes in land and forrest use"
+    index <- df$`Tier 1` == "Processos Industriais"
+    df$`Tier 1`[index] <- "industrial processes"
+    index <- df$`Tier 1` == "Residuos"
+    df$`Tier 1`[index] <- "residues"
+    ## TIER 2##
+    index <- df$`Tier 2` == "Alteracoes de Uso do Solo"
+    df$`Tier 2`[index] <- "Changes in Land use"
+    index <- df$`Tier 2` == "Cultivo de Arroz"
+    df$`Tier 2`[index] <- "Rice growing"
+    index <- df$`Tier 2` == "Efluentes Liquidos"
+    df$`Tier 2`[index] <- "Liquid effluents"
+    index <- df$`Tier 2` == "Emissoes de HFCs"
+    df$`Tier 2`[index] <- "HFC emissions"
+    index <- df$`Tier 2` == "Residuos"
+    df$`Tier 2`[index] <- "residues"
+    index <- df$`Tier 2` == "Residuos"
+    df$`Tier 2`[index] <- "residues"
+    index <- df$`Tier 2` == "Residuos"
+    df$`Tier 2`[index] <- "residues"
+    index <- df$`Tier 2` == "Residuos"
+    df$`Tier 2`[index] <- "residues"
+    index <- df$`Tier 2` == "Residuos"
+    df$`Tier 2`[index] <- "residues"
+
   }
 
   if (language == "eng"){
