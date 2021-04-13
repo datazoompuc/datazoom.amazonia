@@ -28,7 +28,8 @@ can be found \href{http://www.ipsamazonia.org.br/}{here}
 }
 \examples{
 
-\dontrun{load_IPS(
+\dontrun{
+load_IPS(
   download_directory = "./Desktop",
   language = "pt"
 )
