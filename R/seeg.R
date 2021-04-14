@@ -2,15 +2,9 @@
 #'
 #' Loads data of estimates of emission of greenhouse gases of Brazilian cities
 #'
-#' @param years A \code{vector} indicating what years will the data be loaded
+#'@param language A \code{string} that indicates in which language the data will be returned. The default is "pt", so your data will be returned in Portuguese. Currently, only Portuguese and English are supported.
 #'
-#' @param aggregation_level A \code{string} that defines the geographic level of the data. Defaults to National level, but can be one of "country", "region", "state", "mesoregion", "microregion" and "city"
-#'
-#' @param language A \code{string} that indicates in which language the data will be returned. The default is "pt", so your data will be returned in Portuguese. Currently, only Portuguese and English are supported.
-#'
-#' @param long A \code{boolean} that sets the format of the returned data. \code{long = TRUE} will return a list where each data frame represents a variable and products are transformed to columns so each geographical aggregation level/year will only have a single line. Default value is \code{FALSE}.
-#'
-#' @return A \code{data frame} or a \code{list} of data frames if \code{long} is set to \code{TRUE}.
+#' @return A \code{data frame}.
 #'
 #' @author DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro
 #'
@@ -18,7 +12,7 @@
 #'
 #' @export load_seeg
 #'
-#' @examples \dontrun{datazoom.amazonia::load_seeg(2013, language = "eng")}
+#' @examples \dontrun{datazoom.amazonia::load_seeg()}
 #'
 
 load_seeg <- function(language = "pt"){
@@ -36,6 +30,7 @@ load_seeg <- function(language = "pt"){
   df <- gsheet::gsheet2tbl(urlteste)
   df <- janitor::clean_names(df)
 
+  #stringi::stri_escape_unicode()
   df <- as.data.frame(gsub("\u00ed", "i", as.matrix(df)))
   df <- as.data.frame(gsub("\u00f5", "o", as.matrix(df)))
   df <- as.data.frame(gsub("\u00e1", "a", as.matrix(df)))
@@ -48,7 +43,7 @@ load_seeg <- function(language = "pt"){
   df <- as.data.frame(gsub("\u00f3", "o", as.matrix(df)))
   df <- as.data.frame(gsub("\u00e2", "a", as.matrix(df)))
   df <- as.data.frame(gsub("\u00d3", "O", as.matrix(df)))
-
+  df <- as.data.frame(gsub("\u00ea", "e", as.matrix(df)))
 
   to_english <- function(df){
     index <- df$`Tier 1` == "Agropeacuaria"
@@ -496,60 +491,46 @@ load_seeg <- function(language = "pt"){
     df$`Tier 6`[index] <- "swine"
     index <- df$`Tier 6` == "Residuos"
     df$`Tier 6`[index] <- "residues"
-    index <- df$`Tier 6` == "Residuos"
-    df$`Tier 6`[index] <- "residues"
-    index <- df$`Tier 6` == "Residuos"
-    df$`Tier 6`[index] <- "residues"
-    index <- df$`Tier 6` == "Residuos"
-    df$`Tier 6`[index] <- "residues"
-    index <- df$`Tier 6` == "Residuos"
-    df$`Tier 6`[index] <- "residues"
-    index <- df$`Tier 6` == "Residuos"
-    df$`Tier 6`[index] <- "residues"
-    index <- df$`Tier 6` == "Residuos"
-    df$`Tier 6`[index] <- "residues"
-    index <- df$`Tier 6` == "Residuos"
-    df$`Tier 6`[index] <- "residues"
-    index <- df$`Tier 6` == "Residuos"
-    df$`Tier 6`[index] <- "residues"
-    index <- df$`Tier 6` == "Residuos"
-    df$`Tier 6`[index] <- "residues"
-    index <- df$`Tier 6` == "Residuos"
-    df$`Tier 6`[index] <- "residues"
-    index <- df$`Tier 6` == "Residuos"
-    df$`Tier 6`[index] <- "residues"
-    index <- df$`Tier 6` == "Residuos"
-    df$`Tier 6`[index] <- "residues"
-    index <- df$`Tier 6` == "Residuos"
-    df$`Tier 6`[index] <- "residues"
-    index <- df$`Tier 6` == "Residuos"
-    df$`Tier 6`[index] <- "residues"
-    index <- df$`Tier 6` == "Residuos"
-    df$`Tier 6`[index] <- "residues"
-    index <- df$`Tier 6` == "Residuos"
-    df$`Tier 6`[index] <- "residues"
-    index <- df$`Tier 6` == "Residuos"
-    df$`Tier 6`[index] <- "residues"
-    index <- df$`Tier 6` == "Residuos"
-    df$`Tier 6`[index] <- "residues"
-    index <- df$`Tier 6` == "Residuos"
-    df$`Tier 6`[index] <- "residues"
-    index <- df$`Tier 6` == "Residuos"
-    df$`Tier 6`[index] <- "residues"
-    index <- df$`Tier 6` == "Residuos"
-    df$`Tier 6`[index] <- "residues"
-    index <- df$`Tier 6` == "Residuos"
-    df$`Tier 6`[index] <- "residues"
-    index <- df$`Tier 6` == "Residuos"
-    df$`Tier 6`[index] <- "residues"
-    index <- df$`Tier 6` == "Residuos"
-    df$`Tier 6`[index] <- "residues"
-    index <- df$`Tier 6` == "Residuos"
-    df$`Tier 6`[index] <- "residues"
-    index <- df$`Tier 6` == "Residuos"
-    df$`Tier 6`[index] <- "residues"
-
-
+    index <- df$`Tier 6` == "Torta de Filtro"
+    df$`Tier 6`[index] <- "cake filter"
+    index <- df$`Tier 6` == "Trigo"
+    df$`Tier 6`[index] <- "wheat"
+    index <- df$`Tier 6` == "Uso agropecuario -- Area sem vegetacao"
+    df$`Tier 6`[index] <- "agricultural and cattle raising use --  area without vegetation"
+    index <- df$`Tier 6` == "Uso agropecuario -- Floresta secundaria"
+    df$`Tier 6`[index] <- "agricultural and cattle raising use -- secondary forrest"
+    index <- df$`Tier 6` == "Uso agropecuario -- Silvicultura"
+    df$`Tier 6`[index] <- "agricultural and cattle raising use -- silviculture"
+    index <- df$`Tier 6` == "Uso agropecuario -- uso agropecuario"
+    df$`Tier 6`[index] <- "agricultural and cattle raising use -- agricultural and cattle raising use"
+    index <- df$`Tier 6` == "Uso agropecuario -- Vegetacao nao florestal secundaria"
+    df$`Tier 6`[index] <- "agricultural and cattle raising use -- non secondary forrest vegetation"
+    index <- df$`Tier 6` == "Uso de Calcario"
+    df$`Tier 6`[index] <- "limestone use"
+    index <- df$`Tier 6` == "Vegetacao nao florestal primaria -- Area sem vegetacao"
+    df$`Tier 6`[index] <- "non primary forrest vegetation --  area without vegetation"
+    index <- df$`Tier 6` == "Vegetacao nao florestal primaria -- Silvicultura"
+    df$`Tier 6`[index] <- "non primary forrest vegetation -- silviculture"
+    index <- df$`Tier 6` == "Vegetacao nao florestal primaria -- Uso agropecuario"
+    df$`Tier 6`[index] <- "non primary forrest vegetation --  agricultural and cattle raising use"
+    index <- df$`Tier 6` == "Vegetacao nao florestal primaria --  Vegetacao nao florestal primaria"
+    df$`Tier 6`[index] <- "non primary forrest vegetation -- non primary forrest vegetation"
+    index <- df$`Tier 6` == "Vegetacao nao florestal secundaria -- Area sem vegetacao"
+    df$`Tier 6`[index] <- "non secondary forrest vegetation -- area without vegetation"
+    index <- df$`Tier 6` == "Vegetacao nao florestal secundaria -- Silvicultura"
+    df$`Tier 6`[index] <- "non secondary forrest vegetation -- silviculture"
+    index <- df$`Tier 6` == "Vegetacao nao florestal secundaria -- Uso agropecuario"
+    df$`Tier 6`[index] <- "non secondary forrest vegetation -- agricultural and cattle raising use"
+    index <- df$`Tier 6` == "Vegetacao nao florestal secundaria -- Vegetacao nao florestal secundaria"
+    df$`Tier 6`[index] <- "non secondary forrest vegetation -- non secondary forrest vegetation"
+    index <- df$`Tier 6` == "Vinhaca"
+    df$`Tier 6`[index] <- "stillage"
+    ## Type of emission ##
+    index <- df$`Type of emission` == "Emissao"
+    df$`Type of emission`[index] <- "emission"
+    index <- df$`Type of emission` == "Remocao"
+    df$`Type of emission`[index] <- "removal"
+    return(df)
   }
 
   if (language == "eng"){
@@ -557,8 +538,7 @@ load_seeg <- function(language = "pt"){
                     "Gas", "Territory", "Municipality_Code", "Municipality", "Economic_activity", "Product",
                     "2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007","2008","2009", "2010",
                     "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019_AREA")
-
-
-
+    df <- to_english(df)
   }
+  return(df)
 }

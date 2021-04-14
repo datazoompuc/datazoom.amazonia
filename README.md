@@ -109,9 +109,9 @@ data <- load_IPS(download_directory = getwd(), language = "pt")
 ## Usage for SEEG data
 
 ```
-##IPS
+##SEEG
 
-data <- load_IPS(download_directory = getwd(), language = "pt")
+data <- load_seeg(language = "eng")
 
 ```
 

@@ -1,8 +1,8 @@
 ---
-title: "GDP"
+title: "SEEG"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{GDP}
+  %\VignetteIndexEntry{SEEG}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
