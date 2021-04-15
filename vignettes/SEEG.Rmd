@@ -27,11 +27,5 @@ Using the package is easy enough:
 ```{r}
 library(datazoom.amazonia)
 
-years <- c(2015:2017)
-
-data <- load_amazon_gdp(years)
-
-data <- load_amazon_gdp(2017, space_aggregation = "state", language = "pt")
-
-data <- load_gdp(years)
+data <- load_seeg(language = "eng")
 ```
