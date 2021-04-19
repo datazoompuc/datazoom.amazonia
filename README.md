@@ -3,7 +3,7 @@
 datazoom.amazonia is an R package that facilitates access to official data regarding the Amazon. The package provides functions that download and pre-process selected datasets. Data is in general provided at the municipality-year level (see the documentation for more information). Currently we support:
 * INPE - PRODES: deforestation
 * INPE - DETER: deforestation warnings
-* INPE - DEGRAD: degradation
+* INPE - DEGRAD: degradation (Work In Progress)
 * MDIC - COMEX: exports and imports
 * IBGE - PIB-Munic: gdp
 * IBGE - CEMPRE: formal employment
@@ -85,8 +85,7 @@ data <- load_pam_permanent(2013, aggregation_level = "region")
 ```
 # Downloads data
 
-data <- load_mapbiomas_covering(space_aggregation = 'municipality', path = NULL, code_state = "PA", code_mun = NULL, covering = 3,
-                                  type = 'stacked', year_begin = 2000, year_end = 2010)
+data <- load_mapbiomas_covering(space_aggregation = 'municipality', path = NULL, covering = 3, years = c(2005:2015))
 
 data <- load_mapbiomas_transition(transition_interval = 5)
 
@@ -115,5 +114,18 @@ data <- load_seeg(language = "eng")
 
 ```
 
+## Usage for SIGMINE data
+
+```
+# Downloads data
+
+data <- load_sigmine(space_aggregation = 'municipality', source = NULL, language = 'pt')
+
+# Loads data locally
+
+data <- load_sigmine(space_aggregation = 'state', source = "~/Downloads", language = 'eng')
+
+```
+
 ## Credits
-DataZoom is developed by a team at Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio), Department of Economics. Our official website is at: http://www.econ.puc-rio.br/datazoom/index.html.
+DataZoom is developed by a team at Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio), Department of Economics. Our official website is at: http://www.econ.puc-rio.br/datazoom.

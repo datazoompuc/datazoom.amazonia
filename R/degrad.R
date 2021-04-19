@@ -84,6 +84,7 @@ load_degrad <- function(source, space_aggregation = "municipality", time_aggrega
 #' load_degrad_raw("~/Downloads/degrad2016_final_shp/DEGRAD_2016_pol.shp")
 #' }
 load_degrad_raw <- function(source) {
+  warning("This data source is experiencing problems. Execution may result in error.")
   # If source is a list of numbers, we retrieve data from INPE
   if (is.numeric(source)) {
     source <- purrr::map(source, function(year) {
@@ -126,16 +127,16 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
   # Clean
   names(df) <- tolower(names(df))
 
-  if(filter) {
+  if (filter) {
     df <- dplyr::filter(df, grepl("degrad", .data$class_name, ignore.case = TRUE))
   }
 
   # Extract date
-  if(grepl(df$class_name[1], pattern = "\\d{4}$")) {
+  if (grepl(df$class_name[1], pattern = "\\d{4}$")) {
     year <- as.numeric(substr(df$class_name[1], 7, 10))
     month <- NA
   }
-  else if(any(grepl(colnames(df), pattern = "ano"))) {
+  else if (any(grepl(colnames(df), pattern = "ano"))) {
     year <- df[["ano"]][1]
     month <- NA
   }
@@ -149,7 +150,7 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
   df[grep(df$class_name, pattern = "degrad[^_]", ignore.case = TRUE), ]$class_name <- "DEGRAD"
 
   # Insert CRS
-  if(is.na(sf::st_crs(df))) {
+  if (is.na(sf::st_crs(df))) {
     data_crs <- sf::st_crs("+proj=longlat +ellps=aust_SA +towgs84=-66.8700,4.3700,-38.5200,0.0,0.0,0.0,0.0 +no_defs")
     sf::st_crs(df) <- data_crs
   }
@@ -159,8 +160,8 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
   geo_amazon <- sf::st_transform(geo_amazon, operation_crs)
 
   # Municipalize
-  sf::st_agr(df) = "constant"
-  sf::st_agr(geo_amazon) = "constant"
+  sf::st_agr(df) <- "constant"
+  sf::st_agr(geo_amazon) <- "constant"
   df <- sf::st_intersection(df, geo_amazon) %>%
     dplyr::mutate(calculated_area = sf::st_area(.data$geometry)) %>%
     dplyr::group_by(.data$abbrev_state, .data$Ano, .data$class_name) %>%
@@ -200,7 +201,7 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
     dplyr::summarise(Area = sum(.data$calculated_area)) %>%
     dplyr::ungroup()
 
-  if(filter) {
+  if (filter) {
     df <- df %>%
       dplyr::rename(Degradacao = .data$Area) %>%
       dplyr::select(-c("Evento"))

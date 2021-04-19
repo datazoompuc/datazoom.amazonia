@@ -19,6 +19,7 @@ NULL
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' load_prodes(2018)
 #'
 #' load_prodes(
@@ -38,6 +39,7 @@ NULL
 #'   space_aggregation = "municipality",
 #'   language = "pt"
 #' )
+#' }
 load_prodes <- function(source, space_aggregation = "municipality", language = "eng") {
   raw_list <- load_prodes_raw(source)
 
@@ -67,15 +69,23 @@ load_prodes <- function(source, space_aggregation = "municipality", language = "
 #' @export
 #'
 #' @examples
-#' \dontrun{load_prodes_raw(2017)}
+#' \dontrun{
+#' load_prodes_raw(2017)
+#' }
 #'
-#' \dontrun{load_prodes_raw(c(2016, 2017, 2018))}
+#' \dontrun{
+#' load_prodes_raw(c(2016, 2017, 2018))
+#' }
 #'
-#' \dontrun{load_prodes_raw(system.file("extdata", package = "datazoom.amazonia"))}
+#' \dontrun{
+#' load_prodes_raw(system.file("extdata", package = "datazoom.amazonia"))
+#' }
 #'
-#' \dontrun{load_prodes_raw(
+#' \dontrun{
+#' load_prodes_raw(
 #'   system.file("extdata", "DesmatamentoMunicipios2015.txt", package = "datazoom.amazonia")
-#' )}
+#' )
+#' }
 load_prodes_raw <- function(source) {
   # If source is a list of numbers, we construct the URLs to INPE
   if (is.numeric(source)) {
