@@ -25,9 +25,9 @@ load_seeg <- function(language = "pt"){
 
   direc <- getwd()
   url <- "https://drive.google.com/file/d/1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd/view?usp=sharing"
-  urlteste <- "https://drive.google.com/file/d/1A_neQegigQuDvGHfpngk_11wsqGyR8US/view?usp=sharing"
+  #urlteste <- "https://drive.google.com/file/d/1A_neQegigQuDvGHfpngk_11wsqGyR8US/view?usp=sharing"
 
-  df <- gsheet::gsheet2tbl(urlteste)
+  df <- gsheet::gsheet2tbl(url)
   df <- janitor::clean_names(df)
 
   #stringi::stri_escape_unicode()
