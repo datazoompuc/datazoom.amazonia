@@ -40,7 +40,7 @@ load_mapbiomas_covering(
   years = c(2000:2010)
 )
 }
-}
+
 }
 \author{
 DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro

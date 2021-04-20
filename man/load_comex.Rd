@@ -43,6 +43,7 @@ load_comex(c(1997, 2004, 2008),
   imp = TRUE,
   language = "eng")
 }
+
 }
 \author{
 DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro

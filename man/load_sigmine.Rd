@@ -30,6 +30,7 @@ load_sigmine(space_aggregation = "municipality",
   source = NULL, 
   language = "pt")
 }
+
 }
 \author{
 DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro
