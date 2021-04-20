@@ -198,8 +198,28 @@ load_mapbiomas_transition<-function(space_aggregation = c('municipality', 'state
     ncolu<-ncol(a)
     ret<-c()
     ret<-tab[,1:15]
-    if(!is.null(transition_interval)){
+    if(is.null(transition_interval)){
       for(i in 16:ncolu){
+        ret<-c()
+        ret<-tab[,1:15]
+        nomecol<-colnames(a)[i]
+        anoi<-substring(nomecol,1,4)
+        anof<-substring(nomecol,8,12)
+        anoi<-as.integer(anoi)
+        anof<-as.integer(anof)
+        if(anof-anoi!=0){
+          ret<-cbind(ret,tab[,i])
+          colnames(ret)[which(colnames(ret) == nomecol)] <- 'Area'
+          num<-nrow(tab[,i])
+          data<-rep(c(nomecol),num)
+          ret<-cbind(ret,data)
+          retorno<-rbind(retorno,ret)
+        }
+      }
+    }else if(!is.null(transition_interval)){
+      for(i in 16:ncolu){
+        ret<-c()
+        ret<-tab[,1:15]
         nomecol<-colnames(a)[i]
         anoi<-substring(nomecol,1,4)
         anof<-substring(nomecol,8,12)
@@ -207,6 +227,11 @@ load_mapbiomas_transition<-function(space_aggregation = c('municipality', 'state
         anof<-as.integer(anof)
         if(anof-anoi==transition_interval){
           ret<-cbind(ret,tab[,i])
+          colnames(ret)[which(colnames(ret) == nomecol)] <- 'Area'
+          num<-nrow(tab[,i])
+          data<-rep(c(nomecol),num)
+          ret<-cbind(ret,data)
+          retorno<-rbind(retorno,ret)
         }
       }
     }
