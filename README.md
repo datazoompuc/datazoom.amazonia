@@ -69,10 +69,6 @@ data <- load_amazon_gdp(c(2014, 2015))
 
 data <- load_amazon_gdp(2017, space_aggregation = "state", language = "pt")
 
-##SIGMINE
-
-data <- load_sigmine(space_aggregation = 'municipality')
-
 ##PAM
 
 data <- load_pam_permanent(2013, aggregation_level = "region")
