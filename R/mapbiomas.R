@@ -120,7 +120,7 @@ load_mapbiomas_covering <- function(space_aggregation = c("municipality", "state
 #' @export
 #'
 #' @examples
-#' load_mapbiomas_transition(space_aggregation = 'municipality', path = NULL, transition_interval = 5)
+#' load_mapbiomas_transition(space_aggregation = 'state', path = NULL, transition_interval = 5)
 
 
 
