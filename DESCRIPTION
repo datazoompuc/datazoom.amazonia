@@ -37,6 +37,7 @@ Imports:
     geobr,
     sf,
     utils,
+    gsheet,
     RCurl
 URL: http://www.econ.puc-rio.br/datazoom
 Suggests: 
