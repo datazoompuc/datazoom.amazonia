@@ -10,6 +10,7 @@ datazoom.amazonia is an R package that facilitates access to official data regar
 * IBGE - Census: income
 * IBGE - SIGMINE: mining area
 * IBGE - PAM: agricultural data
+* IBGE - PEVS: silviculture and plant extraction data
 * MAPBIOMAS: land covering
 * IMAZON - IPS: Social Progress Index by municipality
 * SEEG - Greenhouse gases emissions by municipality
@@ -77,6 +78,10 @@ data <- load_sigmine(space_aggregation = 'municipality')
 ##PAM
 
 data <- load_pam_permanent(2013, aggregation_level = "region")
+
+##PEVS
+
+data <- datazoom.amazonia::load_pevs_areasilv(2017, aggregation_level = "state", language = "eng")
 
 ```
 
