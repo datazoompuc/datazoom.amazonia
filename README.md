@@ -10,8 +10,10 @@ datazoom.amazonia is an R package that facilitates access to official data regar
 * IBGE - Census: income
 * IBGE - SIGMINE: mining area
 * IBGE - PAM: agricultural data
+* IBGE - PEVS: silviculture and plant extraction data
 * MAPBIOMAS: land covering
 * IMAZON - IPS: Social Progress Index by municipality
+* SEEG - Greenhouse gases emissions by municipality
 
 <!-- badges: start -->
 [![R build status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions)
@@ -77,6 +79,10 @@ data <- load_sigmine(space_aggregation = 'municipality')
 
 data <- load_pam_permanent(2013, aggregation_level = "region")
 
+##PEVS
+
+data <- datazoom.amazonia::load_pevs_areasilv(2017, aggregation_level = "state", language = "eng")
+
 ```
 
 ## Usage for MAPBIOMAS data
@@ -104,6 +110,14 @@ data <- load_mapbiomas_transition("~/Downloads")
 data <- load_IPS(download_directory = getwd(), language = "pt")
 
 ```
+## Usage for SEEG data
+
+```
+##SEEG
+
+data <- load_seeg(language = "eng")
+
+```
 
 ## Usage for SIGMINE data
 
@@ -119,4 +133,4 @@ data <- load_sigmine(space_aggregation = 'state', source = "~/Downloads", langua
 ```
 
 ## Credits
-DataZoom is developed by a team at Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio), Department of Economics. Our official website is at: http://www.econ.puc-rio.br/datazoom/index.html.
+DataZoom is developed by a team at Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio), Department of Economics. Our official website is at: http://www.econ.puc-rio.br/datazoom.
