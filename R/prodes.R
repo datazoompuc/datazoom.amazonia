@@ -1,4 +1,4 @@
-#' @importFrom magrittr %>%
+#' @importFrom dplyr %>%
 #' @importFrom rlang .data
 NULL
 

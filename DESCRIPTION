@@ -7,6 +7,7 @@ Authors@R: c(
     person("Maria", "Mittelbach", role = c("aut"), email = "mariamittelbach@gmail.com"),
     person("Arthur", "Carvalho Brito", role = c("aut"), email = "arthurcbps@gmail.com"),
     person("Anna Carolina", "Dutra Saraiva", role = c("aut"), email = "annadutrasaraiva@gmail.com"),
+    person("Arthur", "Carvalho Brito", role = c("aut"), email = "arthurcbps@gmail.com"), 
     person("Bruno", "Alcantara Duarte", role = c("aut"), email = "brunoalcanduarte@gmail.com"),
     person("Igor", "Rigolon Veiga", role = c("aut"), email = "igor.rilave@hotmail.com")
     )
@@ -22,9 +23,7 @@ Imports:
     dplyr,
     labelled,
     purrr,
-    janitor,
     readr,
-    readxl,
     sidrar,
     magrittr,
     tibble,
@@ -37,6 +36,9 @@ Imports:
     geobr,
     sf,
     utils,
+    readxl,
+    janitor,
+    XML,
     gsheet,
     RCurl
 URL: http://www.econ.puc-rio.br/datazoom
