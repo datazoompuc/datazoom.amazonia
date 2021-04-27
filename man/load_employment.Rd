@@ -4,10 +4,17 @@
 \alias{load_employment}
 \title{Gets formal employment data for Brazil.}
 \usage{
-load_employment(years, space_aggregation = "municipality", language = "eng")
+load_employment(
+  years,
+  sectors = FALSE,
+  space_aggregation = "municipality",
+  language = "eng"
+)
 }
 \arguments{
 \item{years}{A numeric vector with years of interest. Supported years 2006-2018.}
+
+\item{sectors}{If sectors is set to TRUE, loads data separated by economics sectors.}
 
 \item{space_aggregation}{A string that indicates the level of aggregation of the data. It can be by "Municipality" or
 "State"}
@@ -16,7 +23,7 @@ load_employment(years, space_aggregation = "municipality", language = "eng")
 The other option is "pt" for Portuguese.}
 }
 \value{
-A \code{tibble} with (total) Salary (in R$), (number of) Employed people and (number of) Firms.
+A \code{tibble} with (total) Salary (in R$1.000,00), (number of) Employed people and (number of) Firms.
 }
 \description{
 Gets formal employment data for Brazil.
