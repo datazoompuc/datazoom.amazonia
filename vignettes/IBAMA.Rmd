@@ -3,7 +3,7 @@ title: "load_ibama"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{ibama_fines}
-  %\VignetteEngine{knitr::knitr}
+  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
