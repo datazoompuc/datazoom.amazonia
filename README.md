@@ -1,33 +1,51 @@
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
 # datazoom.amazonia
 
-datazoom.amazonia is an R package that facilitates access to official data regarding the Amazon. The package provides functions that download and pre-process selected datasets. Data is in general provided at the municipality-year level (see the documentation for more information). Currently we support:
-* INPE - PRODES: deforestation
-* INPE - DETER: deforestation warnings
-* INPE - DEGRAD: degradation
-* MDIC - COMEX: exports and imports
-* IBGE - PIB-Munic: gdp
-* IBGE - CEMPRE: formal employment
-* IBGE - Census: income
-* IBGE - SIGMINE: mining area
-* IBGE - PAM: agricultural data
-* MAPBIOMAS: land covering
-* IMAZON - IPS: Social Progress Index by municipality
-
 <!-- badges: start -->
-[![R build status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions)
+
+[![R build
+status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions)
 <!-- badges: end -->
 
-## Installation
-The package can be installed using `devtools` like so:
+\[EDIT THIS\]
 
-```
-if(!require(devtools)) install.packages("devtools")
+The goal of datazoom.amazonia is to facilitate access to official data
+regarding the Amazon. The package provides functions that download and
+pre-process selected datasets. Data is in general provided at the
+municipality-year level (see the documentation for more information).
+
+**May 4th - All functions are currently under review – please do not
+download till further notice!**
+
+-   INPE - PRODES: deforestation
+-   INPE - DETER: deforestation warnings
+-   INPE - DEGRAD: degradation (Work In Progress)
+-   MDIC - COMEX: exports and imports
+-   IBGE - PIB-Munic: gdp
+-   IBGE - CEMPRE: formal employment
+-   IBGE - Census: income
+-   IBGE - SIGMINE: mining area
+-   IBGE - PAM: agricultural data
+-   IBGE - PEVS: silviculture and plant extraction data
+-   MAPBIOMAS: land covering
+-   IMAZON - IPS: Social Progress Index by municipality
+-   SEEG - Greenhouse gases emissions by municipality
+
+## Installation
+
+Currently you can only install the development version from
+[GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
 devtools::install_github("datazoompuc/datazoom.amazonia")
 ```
 
 ## Usage for INPE data
 
-```
+``` r
 library(datazoom.amazonia)
 
 # Downloads data
@@ -46,23 +64,21 @@ data <- load_deter("amazonia", space_aggregation = "state",
 data <- load_prodes("~/Downloads")
 
 data <- load_deter("~/Downloads")
-
 ```
 
 ## Usage for COMEX data
 
-```
+``` r
 # Downloads data
 
 years <- c(2000:2009)
 
 data <- load_comex(years, ncm = TRUE, exp = TRUE, imp = TRUE)
-
 ```
 
 ## Usage for IBGE data
 
-```
+``` r
 ##PIB-Munic
 
 data <- load_amazon_gdp(c(2014, 2015))
@@ -73,11 +89,14 @@ data <- load_amazon_gdp(2017, space_aggregation = "state", language = "pt")
 
 data <- load_pam_permanent(2013, aggregation_level = "region")
 
+##PEVS
+
+data <- datazoom.amazonia::load_pevs_areasilv(2017, aggregation_level = "state", language = "eng")
 ```
 
 ## Usage for MAPBIOMAS data
 
-```
+``` r
 # Downloads data
 
 data <- load_mapbiomas_covering(space_aggregation = 'municipality', path = NULL, covering = 3, years = c(2005:2015))
@@ -90,16 +109,23 @@ data <- load_mapbiomas_transition(space_aggregation = 'state', transition_interv
 
 ## Usage for IMAZON data
 
-```
+``` r
 ##IPS
 
 data <- load_IPS(download_directory = getwd(), language = "pt")
+```
 
+## Usage for SEEG data
+
+``` r
+##SEEG
+
+data <- load_seeg(language = "eng")
 ```
 
 ## Usage for SIGMINE data
 
-```
+``` r
 # Downloads data
 
 data <- load_sigmine(space_aggregation = 'municipality', source = NULL, language = 'pt')
@@ -107,8 +133,10 @@ data <- load_sigmine(space_aggregation = 'municipality', source = NULL, language
 # Loads data locally
 
 data <- load_sigmine(space_aggregation = 'state', source = "~/Downloads", language = 'eng')
-
 ```
 
 ## Credits
-DataZoom is developed by a team at Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio), Department of Economics. Our official website is at: http://www.econ.puc-rio.br/datazoom/index.html.
+
+DataZoom is developed by a team at Pontifícia Universidade Católica do
+Rio de Janeiro (PUC-Rio), Department of Economics. Our official website
+is at: <http://www.econ.puc-rio.br/datazoom>.

@@ -20,9 +20,11 @@
 #'
 #' @export
 #'
+#' @examples \dontrun{load_comex(c(2000,2001,2002), ncm = TRUE, exp = TRUE)}
+#'
 #' @examples
 #' \dontrun{
-#' load_comex(c(2000, 2001, 2002), 
+#' load_comex(c(2000, 2001, 2002),
 #'   ncm = TRUE,
 #'   exp = TRUE)
 #' load_comex(c(1997, 2004, 2008),

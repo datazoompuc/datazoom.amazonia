@@ -14,6 +14,8 @@ knitr::opts_chunk$set(
 )
 ```
 
+This dataset in currently under development.
+
 ## The Dataset
 The DEGRAD project uses sattelites to monitor degradation of forest areas. Raw data is available as simple features (sf) objects, read from shapefiles. The project was substituted in 2016 by DETER-B. Accordingly, data is available from 2007 up to 2016.
 
@@ -27,12 +29,9 @@ This package provides degradation data by municipality-year (or municipality-mon
 
 Using the package is easy enough:
 
-```{r}
+```{r, eval = FALSE}
 library(datazoom.amazonia)
-
 years <- c(2014:2016)
-
 data <- load_degrad_raw(years)
-
 data <- load_degrad(2016, time_aggregation = "year", space_aggregation = "municipality", language = "pt")
 ```

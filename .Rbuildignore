@@ -1,3 +1,4 @@
+
 ^datazoom\.amazonia\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
@@ -6,3 +7,7 @@
 ^\.github$
 ^doc$
 ^Meta$
+^README\.Rmd$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
