@@ -2,14 +2,15 @@ Package: datazoom.amazonia
 Title: Simplify access to data from the Amazon Region
 Version: 0.12.0.9000
 Authors@R: c(
-    person("Francisco", "de Lima Cavalcanti", role = c("cre"), email = "francisco.lima.cavalcanti@gmail.com"),
+    person("Francisco", "de Lima Cavalcanti", role = c("aut"), email = "francisco.lima.cavalcanti@gmail.com"),
+    person("Daniel", "AC Barbosa", role = c("aut","cre"), email = "daniel.adrianocb@gmail.com.com"),
+    person("Bruno", "Alcantara Duarte", role = c("aut"), email = "brunoalcanduarte@gmail.com"),
     person("Victor", "Aliende da Matta", role = c("aut"), email = "victor.al.matta@gmail.com"),
-    person("Maria", "Mittelbach", role = c("aut"), email = "mariamittelbach@gmail.com"),
     person("Arthur", "Carvalho Brito", role = c("aut"), email = "arthurcbps@gmail.com"),
     person("Anna Carolina", "Dutra Saraiva", role = c("aut"), email = "annadutrasaraiva@gmail.com"),
     person("Arthur", "Carvalho Brito", role = c("aut"), email = "arthurcbps@gmail.com"), 
-    person("Bruno", "Alcantara Duarte", role = c("aut"), email = "brunoalcanduarte@gmail.com"),
-    person("Igor", "Rigolon Veiga", role = c("aut"), email = "igor.rilave@hotmail.com")
+    person("Igor", "Rigolon Veiga", role = c("aut"), email = "igor.rilave@hotmail.com"),
+    person("Maria", "Mittelbach", role = c("aut"), email = "mariamittelbach@gmail.com")
     )
 Description: This package offers functions to download and treat data regarding
              the Brazilian Amazon region from a variety of official sources.
@@ -40,7 +41,8 @@ Imports:
     janitor,
     XML,
     gsheet,
-    RCurl
+    RCurl,
+    tidyselect
 URL: http://www.econ.puc-rio.br/datazoom
 Suggests: 
     knitr,

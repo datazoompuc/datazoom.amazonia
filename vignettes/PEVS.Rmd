@@ -38,7 +38,7 @@ The output is a data frame containing data for the territorial level chosen, the
 
 Using the function is easy enough:
 
-```{r eval = TRUE}
+```{r eval = FALSE}
 library(datazoom.amazonia)
 
 data <- datazoom.amazonia::load_pevs_areasilv(2017, aggregation_level = "state", language = "eng")

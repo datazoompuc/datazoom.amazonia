@@ -21,7 +21,7 @@ https://servicos.ibama.gov.br/ctf/publico/areasembargadas/ConsultaPublicaAreasEm
 
 ## Usage
 
-```load_ibama``` downloads and compiles data on environmental fines at the municipality or
+`load_ibama` downloads and compiles data on environmental fines at the municipality or
 state levels considering the Amazon region. The user has the option to either download
 or load the previously stored raw data, choosing a time-location aggregation level.
 
@@ -32,14 +32,14 @@ number of unique perpetrators of infractions.
 
 The user has the option of obtaining data either in Portuguese or in English.
 
-To download the data from Ibama's website, set ```download_data = TRUE``` and choose
-a destination for your data by parameter ```download_directory```. Arguments
-```time_aggregation``` and ```space_aggregation``` set the levels through which the aggregation
+To download the data from Ibama's website, set `download_data = TRUE` and choose
+a destination for your data by parameter `download_directory`. Arguments
+`time_aggregation` and `space_aggregation` set the levels through which the aggregation
 should be done. Available options are by year and/or month, and by state and/or 
 municipality, respectively.
 
 
-```{r setup, eval = TRUE}
+```{r setup, eval = FALSE}
 
 library(datazoom.amazonia)
 
@@ -53,11 +53,11 @@ load_ibama(
   )
 ```
 
-To load previously downloaded raw data, set ```download_data = FALSE``` and specify the
-file's path with the parameter ```load_from_where```. 
+To load previously downloaded raw data, set `download_data = FALSE` and specify the
+file's path with the parameter `load_from_where`. 
 
-If ```language = 'pt```, use 
-```space_aggregation = c('municipio', 'uf')``` and ```time_aggregation = c('ano', 'mes')``` instead
+If `language = pt, use 
+`space_aggregation = c('municipio', 'uf')` and `time_aggregation = c('ano', 'mes')` instead
 
 ## Credits
 

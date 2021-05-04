@@ -1,23 +1,29 @@
+---
+output: github_document
+---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
 
 # datazoom.amazonia
 
 <!-- badges: start -->
-
-[![R build
-status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions)
+[![R build status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions)
 <!-- badges: end -->
 
-\[EDIT THIS\]
+[EDIT THIS]
 
-The goal of datazoom.amazonia is to facilitate access to official data
-regarding the Amazon. The package provides functions that download and
-pre-process selected datasets. Data is in general provided at the
-municipality-year level (see the documentation for more information).
+The goal of datazoom.amazonia is to facilitate access to official data regarding the Amazon. The package provides functions that download and pre-process selected datasets. Data is in general provided at the municipality-year level (see the documentation for more information).
 
-**May 4th - All functions are currently under review – please do not
-download till further notice!**
+**May 4th - All functions are currently under review -- please do not download till further notice!**
 
 -   INPE - PRODES: deforestation
 -   INPE - DETER: deforestation warnings
@@ -35,8 +41,7 @@ download till further notice!**
 
 ## Installation
 
-Currently you can only install the development version from
-[GitHub](https://github.com/) with:
+Currently you can only install the development version from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
@@ -45,7 +50,7 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 
 ## Usage for INPE data
 
-``` r
+```{r,eval=FALSE}
 library(datazoom.amazonia)
 
 # Downloads data
@@ -64,21 +69,23 @@ data <- load_deter("amazonia", space_aggregation = "state",
 data <- load_prodes("~/Downloads")
 
 data <- load_deter("~/Downloads")
+
 ```
 
 ## Usage for COMEX data
 
-``` r
+```{r,eval=FALSE}
 # Downloads data
 
 years <- c(2000:2009)
 
 data <- load_comex(years, ncm = TRUE, exp = TRUE, imp = TRUE)
+
 ```
 
 ## Usage for IBGE data
 
-``` r
+```{r,eval=FALSE}
 ##PIB-Munic
 
 data <- load_amazon_gdp(c(2014, 2015))
@@ -96,11 +103,12 @@ data <- load_pam_permanent(2013, aggregation_level = "region")
 ##PEVS
 
 data <- datazoom.amazonia::load_pevs_areasilv(2017, aggregation_level = "state", language = "eng")
+
 ```
 
 ## Usage for MAPBIOMAS data
 
-``` r
+```{r,eval=FALSE}
 # Downloads data
 
 data <- load_mapbiomas_covering(space_aggregation = 'municipality', path = NULL, covering = 3, years = c(2005:2015))
@@ -112,27 +120,29 @@ data <- load_mapbiomas_transition(transition_interval = 5)
 data <- load_mapbiomas_covering("~/Downloads")
 
 data <- load_mapbiomas_transition("~/Downloads")
+
 ```
 
 ## Usage for IMAZON data
 
-``` r
+```{r,eval=FALSE}
 ##IPS
 
 data <- load_IPS(download_directory = getwd(), language = "pt")
-```
 
+```
 ## Usage for SEEG data
 
-``` r
+```{r,eval=FALSE}
 ##SEEG
 
 data <- load_seeg(language = "eng")
+
 ```
 
 ## Usage for SIGMINE data
 
-``` r
+```{r,eval=FALSE}
 # Downloads data
 
 data <- load_sigmine(space_aggregation = 'municipality', source = NULL, language = 'pt')
@@ -140,10 +150,8 @@ data <- load_sigmine(space_aggregation = 'municipality', source = NULL, language
 # Loads data locally
 
 data <- load_sigmine(space_aggregation = 'state', source = "~/Downloads", language = 'eng')
+
 ```
 
 ## Credits
-
-DataZoom is developed by a team at Pontifícia Universidade Católica do
-Rio de Janeiro (PUC-Rio), Department of Economics. Our official website
-is at: <http://www.econ.puc-rio.br/datazoom>.
+DataZoom is developed by a team at Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio), Department of Economics. Our official website is at: http://www.econ.puc-rio.br/datazoom.

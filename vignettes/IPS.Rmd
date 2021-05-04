@@ -23,11 +23,11 @@ For more information, check the [initiative's website](http://www.ipsamazonia.or
 ## Usage
 
 To download and compile data on the index for 2014 and 2018, just run the function
-```load_IPS``` using as its argument the directory in which the data should 
-be stored. Choose with paramenter ```language``` whether yor output should be
+`load_IPS` using as its argument the directory in which the data should 
+be stored. Choose with paramenter `language` whether yor output should be
 in Portuguese or in English
 
-```{r, eval = TRUE}
+```{r, eval = FALSE}
 library(datazoom.amazonia)
 my.data <- load_IPS(download_directory = getwd(), language = "pt")
 ```

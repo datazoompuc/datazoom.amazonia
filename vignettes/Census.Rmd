@@ -26,7 +26,7 @@ The definition of the Brazilian Legal Amazon at the municipality level is taken 
 
 Using the package is easy enough:
 
-```{r setup}
+```{r,eval=FALSE}
 library(datazoom.amazonia)
 
 data <- load_amazon_income(2010)

@@ -7,3 +7,7 @@
 ^\.github$
 ^doc$
 ^Meta$
+^README\.Rmd$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
