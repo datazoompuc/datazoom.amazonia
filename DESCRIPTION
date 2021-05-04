@@ -2,7 +2,7 @@ Package: datazoom.amazonia
 Title: Simplify access to data from the Amazon Region
 Version: 0.12.0.9000
 Authors@R: c(
-    person("Francisco", "de Lima Cavalcanti", role = c("cre"), email = "francisco.lima.cavalcanti@gmail.com"),
+    person("Francisco", "de Lima Cavalcanti", role = c("aut"), email = "francisco.lima.cavalcanti@gmail.com"),
     person("Daniel", "AC Barbosa", role = c("aut","cre"), email = "daniel.adrianocb@gmail.com.com"),
     person("Bruno", "Alcantara Duarte", role = c("aut"), email = "brunoalcanduarte@gmail.com"),
     person("Victor", "Aliende da Matta", role = c("aut"), email = "victor.al.matta@gmail.com"),
@@ -41,7 +41,8 @@ Imports:
     janitor,
     XML,
     gsheet,
-    RCurl
+    RCurl,
+    tidyselect
 URL: http://www.econ.puc-rio.br/datazoom
 Suggests: 
     knitr,
