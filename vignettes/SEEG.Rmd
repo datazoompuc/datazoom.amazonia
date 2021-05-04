@@ -30,7 +30,7 @@ The function returns a data frame where each row is a different type of emission
 
 Using the package is easy enough:
 
-```{r}
+```{r,eval=FALSE}
 library(datazoom.amazonia)
 
 data <- load_seeg(language = "eng")
