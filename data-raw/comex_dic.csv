@@ -1,0 +1,14 @@
+Var,x,y,color,size,slider,label,desc,group,tipo,categoria
+Ano,TRUE,FALSE,FALSE,FALSE,TRUE,Ano,Ano,Geral,Data,Economia
+Mêss,TRUE,FALSE,FALSE,FALSE,TRUE,Mês,Mês,Geral,Data,Economia
+Código Nomentaclatura Comum do Mercosul,FALSE,FALSE,FALSE,FALSE,FALSE,Código Nomentaclatura Comum do Mercosul,Código Mercosul do tipo de mercadoria,COMEX,Inteiro,Economia
+Código da Unidade Estatística,FALSE,FALSE,FALSE,FALSE,FALSE,Código da Unidade Estatística,Código Mercosul da unidade de medida utilizada para medir a mercadoria,COMEX,Inteiro,Economia
+Código do país,TRUE,TRUE,FALSE,FALSE,FALSE,Código do país,Código do país,COMEX,Inteiro,Economia
+Sigla da Unidade da Federação exportadora,TRUE,TRUE,FALSE,FALSE,FALSE,Sigla da Unidade da Federação exportadora,Estado (UF),Geral,Texto,Economia
+Código da via de Transporte,TRUE,TRUE,FALSE,FALSE,FALSE,Código da via de Transporte,Meio de transporte da mercadoria,COMEX,Inteiro,Economia
+Código da Unidade da Receita Federal,FALSE,FALSE,FALSE,FALSE,FALSE,Código da Unidade da Receita Federal,Código da Unidade da Receita Federal,COMEX,Inteiro,Economia
+Quantidade Estatística,TRUE,TRUE,FALSE,FALSE,FALSE,Quantidade Estatística,Quantidade em termos da unidade de medida utilizada,COMEX,Inteiro,Economia
+Quantidade em Kg Líquidos,TRUE,TRUE,FALSE,FALSE,FALSE,Quantidade em Kg Líquidos,Quantidade em Kg Líquidos,COMEX,Kg,Economia
+Valor Free on Board,FALSE,FALSE,FALSE,FALSE,FALSE,Valor Free on Board,Valor sem frete incluso no custo do exportador,COMEX,Inteiro,Economia
+Código Sistema Harmonizado,FALSE,FALSE,FALSE,FALSE,FALSE,Código Sistema Harmonizado,Código SH4 do tipo de mercadoria,COMEX,Inteiro,Economia
+Código Município do Domicílio Fiscal,FALSE,FALSE,FALSE,FALSE,FALSE,Código IBGE do município,Código IBGE do município,Geral,Inteiro,Economia

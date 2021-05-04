@@ -1,0 +1,9 @@
+Var,x,y,color,size,slider,label,desc,group,tipo,categoria
+Municipio,FALSE,FALSE,FALSE,FALSE,FALSE,Município,Município,Geral,Texto,Ambiente
+Ano,TRUE,FALSE,FALSE,FALSE,TRUE,Ano,Ano,Geral,Data,Ambiente
+Mes,TRUE,FALSE,FALSE,FALSE,TRUE,Mês,Mês,Geral,Data,Ambiente
+Classe,FALSE,FALSE,FALSE,FALSE,FALSE,Classe,Descreve qual evento ocorreu na área afetada,DETER,Texto,Ambiente
+UF,FALSE,FALSE,FALSE,FALSE,FALSE,Estado,Estado (UF),Geral,Texto,Ambiente
+Area_em_UC_km2,TRUE,TRUE,TRUE,TRUE,FALSE,Área em Unidade de Conservação,Área do aviso contida em uma Unidade de Conservação,DETER,km2,Ambiente
+Area_em_Municipio_km2,TRUE,TRUE,TRUE,TRUE,FALSE,Área em município,Área do aviso que intercepta um município,DETER,km2,Ambiente
+CodIBGE,FALSE,FALSE,FALSE,FALSE,FALSE,Código IBGE do município,Código IBGE do município,Geral,Inteiro,Ambiente

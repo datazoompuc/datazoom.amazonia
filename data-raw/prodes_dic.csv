@@ -1,0 +1,17 @@
+Var,x,y,color,size,slider,label,desc,group,tipo,categoria
+Lat,FALSE,TRUE,FALSE,FALSE,FALSE,Latitude,Latitude,Geral,Coordenadas,Ambiente
+Long,TRUE,FALSE,FALSE,FALSE,FALSE,Longitude,Longitude,PRODES,Coordenadas,Ambiente
+Latgms,FALSE,FALSE,FALSE,FALSE,FALSE,Latitude (ms),"Latitude em graus, minutos e segundos",Geral,Coordenadas,Ambiente
+Longms,FALSE,FALSE,FALSE,FALSE,FALSE,Longitude (ms),"Longitude em graus, minutos e segundos",Geral,Coordenadas,Ambiente
+Municipio,FALSE,FALSE,FALSE,FALSE,FALSE,Município,Município,Geral,Texto,Ambiente
+Estado,TRUE,FALSE,FALSE,FALSE,FALSE,Estado,Estado (UF),Geral,Texto,Ambiente
+AreaKm2,TRUE,TRUE,TRUE,TRUE,FALSE,Área observada,Área total observada,PRODES,km2,Ambiente
+Desmatado,TRUE,TRUE,TRUE,TRUE,FALSE,Área desmatada,Área desmatada,PRODES,km2,Ambiente
+Incremento,TRUE,TRUE,TRUE,TRUE,FALSE,Incremento do desmatamento,Incremento do desmatamento,PRODES,km2,Ambiente
+Floresta,TRUE,TRUE,TRUE,TRUE,FALSE,Área de floresta,Área de floresta,PRODES,km2,Ambiente
+Nuvem,TRUE,TRUE,TRUE,TRUE,FALSE,Área de nuvens,Área de nuvens,PRODES,km2,Ambiente
+NaoObservado,TRUE,TRUE,TRUE,TRUE,FALSE,Área não observada,Área com observações descartadas por baixa visibilidade ou por não pertencer à Amazônia Legal,PRODES,km2,Ambiente
+NaoFloresta,TRUE,TRUE,TRUE,TRUE,FALSE,Área sem floresta,Área sem ocorrência natural de floresta,PRODES,km2,Ambiente
+Hidrografia,TRUE,TRUE,TRUE,TRUE,FALSE,Hidrografia,Área de corpos d'água,PRODES,km2,Ambiente
+CodIBGE,FALSE,FALSE,FALSE,FALSE,FALSE,Código IBGE do município,Código IBGE do município,Geral,Inteiro,Ambiente
+Ano,TRUE,FALSE,FALSE,FALSE,TRUE,Ano,Ano,Geral,Data,Ambiente

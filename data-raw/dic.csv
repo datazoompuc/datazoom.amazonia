@@ -1,0 +1,60 @@
+Var,Base,x,y,color,size,slider,label,desc,group,tipo,categoria
+Municipio,DETER,FALSE,FALSE,FALSE,FALSE,FALSE,Município,Município,Geral,Texto,Ambiente
+Ano,DETER,TRUE,FALSE,FALSE,FALSE,TRUE,Ano,Ano,Geral,Data,Ambiente
+Mes,DETER,TRUE,FALSE,FALSE,FALSE,TRUE,Mês,Mês,Geral,Data,Ambiente
+Classe,DETER,FALSE,FALSE,FALSE,FALSE,FALSE,Classe,Descreve qual evento ocorreu na área afetada,DETER,Texto,Ambiente
+UF,DETER,FALSE,FALSE,FALSE,FALSE,FALSE,Estado,Estado (UF),Geral,Texto,Ambiente
+Area_em_UC_km2,DETER,TRUE,TRUE,TRUE,TRUE,FALSE,Área em Unidade de Conservação,Área do aviso contida em uma Unidade de Conservação,DETER,km2,Ambiente
+Area_em_Municipio_km2,DETER,TRUE,TRUE,TRUE,TRUE,FALSE,Área em município,Área do aviso que intercepta um município,DETER,km2,Ambiente
+CodIBGE,DETER,FALSE,FALSE,FALSE,FALSE,FALSE,Código IBGE do município,Código IBGE do município,Geral,Inteiro,Ambiente
+Lat,PRODES,FALSE,TRUE,FALSE,FALSE,FALSE,Latitude,Latitude,Geral,Coordenadas,Ambiente
+Long,PRODES,TRUE,FALSE,FALSE,FALSE,FALSE,Longitude,Longitude,PRODES,Coordenadas,Ambiente
+Latgms,PRODES,FALSE,FALSE,FALSE,FALSE,FALSE,Latitude (ms),"Latitude em graus, minutos e segundos",Geral,Coordenadas,Ambiente
+Longms,PRODES,FALSE,FALSE,FALSE,FALSE,FALSE,Longitude (ms),"Longitude em graus, minutos e segundos",Geral,Coordenadas,Ambiente
+Municipio,PRODES,FALSE,FALSE,FALSE,FALSE,FALSE,Município,Município,Geral,Texto,Ambiente
+Estado,PRODES,TRUE,FALSE,FALSE,FALSE,FALSE,Estado,Estado (UF),Geral,Texto,Ambiente
+AreaKm2,PRODES,TRUE,TRUE,TRUE,TRUE,FALSE,Área observada,Área total observada,PRODES,km2,Ambiente
+Desmatado,PRODES,TRUE,TRUE,TRUE,TRUE,FALSE,Área desmatada,Área desmatada,PRODES,km2,Ambiente
+Incremento,PRODES,TRUE,TRUE,TRUE,TRUE,FALSE,Incremento do desmatamento,Incremento do desmatamento,PRODES,km2,Ambiente
+Floresta,PRODES,TRUE,TRUE,TRUE,TRUE,FALSE,Área de floresta,Área de floresta,PRODES,km2,Ambiente
+Nuvem,PRODES,TRUE,TRUE,TRUE,TRUE,FALSE,Área de nuvens,Área de nuvens,PRODES,km2,Ambiente
+NaoObservado,PRODES,TRUE,TRUE,TRUE,TRUE,FALSE,Área não observada,Área com observações descartadas por baixa visibilidade ou por não pertencer à Amazônia Legal,PRODES,km2,Ambiente
+NaoFloresta,PRODES,TRUE,TRUE,TRUE,TRUE,FALSE,Área sem floresta,Área sem ocorrência natural de floresta,PRODES,km2,Ambiente
+Hidrografia,PRODES,TRUE,TRUE,TRUE,TRUE,FALSE,Hidrografia,Área de corpos d'água,PRODES,km2,Ambiente
+CodIBGE,PRODES,FALSE,FALSE,FALSE,FALSE,FALSE,Código IBGE do município,Código IBGE do município,Geral,Inteiro,Ambiente
+Ano,PRODES,TRUE,FALSE,FALSE,FALSE,TRUE,Ano,Ano,Geral,Data,Ambiente
+territory_id,MapBiomas,FALSE,FALSE,FALSE,FALSE,FALSE,Código IBGE do município,Código IBGE do município,Geral,Inteiro,Ambiente
+municipality,MapBiomas,FALSE,FALSE,FALSE,FALSE,FALSE,Município,Município,Geral,Texto,Ambiente
+state,MapBiomas,FALSE,FALSE,FALSE,FALSE,FALSE,Estado,Estado (UF),Geral,Texto,Ambiente
+level_0,MapBiomas,FALSE,FALSE,FALSE,FALSE,FALSE,level_0,Se a cobertura é natural ou não,MapBiomas,Texto,Ambiente
+level_1,MapBiomas,FALSE,FALSE,FALSE,FALSE,FALSE,level_1,Tipo de cobertura,MapBiomas,Texto,Ambiente
+level_2,MapBiomas,FALSE,FALSE,FALSE,FALSE,FALSE,level_2,Atividade realizada ou descrição da cobertura natural,MapBiomas,Texto,Ambiente
+level_3,MapBiomas,FALSE,FALSE,FALSE,FALSE,FALSE,level_3,Detalhes do que cobre a área,MapBiomas,Texto,Ambiente
+level_4,MapBiomas,FALSE,FALSE,FALSE,FALSE,FALSE,level_4,Detalhes adicionais,MapBiomas,Texto,Ambiente
+Area,MapBiomas,FALSE,FALSE,FALSE,FALSE,FALSE,Area,Área do território descrito,MapBiomas,ha,Ambiente
+data,MapBiomas,TRUE,FALSE,FALSE,FALSE,TRUE,Ano,Ano,Geral,Data,Ambiente
+Ano,COMEX,TRUE,FALSE,FALSE,FALSE,TRUE,Ano,Ano,Geral,Data,Economia
+Mêss,COMEX,TRUE,FALSE,FALSE,FALSE,TRUE,Mês,Mês,Geral,Data,Economia
+Código Nomentaclatura Comum do Mercosul,COMEX,FALSE,FALSE,FALSE,FALSE,FALSE,Código Nomentaclatura Comum do Mercosul,Código Mercosul do tipo de mercadoria,COMEX,Inteiro,Economia
+Código da Unidade Estatística,COMEX,FALSE,FALSE,FALSE,FALSE,FALSE,Código da Unidade Estatística,Código Mercosul da unidade de medida utilizada para medir a mercadoria,COMEX,Inteiro,Economia
+Código do país,COMEX,TRUE,TRUE,FALSE,FALSE,FALSE,Código do país,Código do país,COMEX,Inteiro,Economia
+Sigla da Unidade da Federação exportadora,COMEX,TRUE,TRUE,FALSE,FALSE,FALSE,Sigla da Unidade da Federação exportadora,Estado (UF),Geral,Texto,Economia
+Código da via de Transporte,COMEX,TRUE,TRUE,FALSE,FALSE,FALSE,Código da via de Transporte,Meio de transporte da mercadoria,COMEX,Inteiro,Economia
+Código da Unidade da Receita Federal,COMEX,FALSE,FALSE,FALSE,FALSE,FALSE,Código da Unidade da Receita Federal,Código da Unidade da Receita Federal,COMEX,Inteiro,Economia
+Quantidade Estatística,COMEX,TRUE,TRUE,FALSE,FALSE,FALSE,Quantidade Estatística,Quantidade em termos da unidade de medida utilizada,COMEX,Inteiro,Economia
+Quantidade em Kg Líquidos,COMEX,TRUE,TRUE,FALSE,FALSE,FALSE,Quantidade em Kg Líquidos,Quantidade em Kg Líquidos,COMEX,Kg,Economia
+Valor Free on Board,COMEX,FALSE,FALSE,FALSE,FALSE,FALSE,Valor Free on Board,Valor sem frete incluso no custo do exportador,COMEX,Inteiro,Economia
+Código Sistema Harmonizado,COMEX,FALSE,FALSE,FALSE,FALSE,FALSE,Código Sistema Harmonizado,Código SH4 do tipo de mercadoria,COMEX,Inteiro,Economia
+Código Município do Domicílio Fiscal,COMEX,FALSE,FALSE,FALSE,FALSE,FALSE,Código IBGE do município,Código IBGE do município,Geral,Inteiro,Economia
+Estado,DEGRAD,TRUE,FALSE,FALSE,FALSE,FALSE,Estado,Estado (UF),Geral,Texto,Ambiente
+Ano,DEGRAD,FALSE,FALSE,FALSE,FALSE,FALSE,Ano,Ano,Geral,Inteiro,Ambiente
+CodIBGE,DEGRAD,FALSE,FALSE,FALSE,FALSE,FALSE,Código IBGE do município,Código IBGE do município,Geral,Inteiro,Ambiente
+Municipio,DEGRAD,FALSE,FALSE,FALSE,FALSE,FALSE,Município,Município,Geral,Texto,Ambiente
+Mes,DEGRAD,TRUE,FALSE,FALSE,FALSE,TRUE,Mês,Mês,Geral,Data,Ambiente
+Degradacao,DEGRAD,TRUE,TRUE,TRUE,TRUE,FALSE,Degradacao,Área degradada,DEGRAD,m2,Ambiente
+CodIBGE,PIB-Munic,FALSE,FALSE,FALSE,FALSE,FALSE,Código IBGE do município,Código IBGE do município,Geral,Inteiro,Economia
+Município,PIB-Munic,FALSE,FALSE,FALSE,FALSE,FALSE,Município,Município,Geral,Texto,Economia
+Ano,PIB-Munic,TRUE,FALSE,FALSE,FALSE,TRUE,Ano,Ano,Geral,Data,Economia
+PIB,PIB-Munic,TRUE,TRUE,TRUE,TRUE,FALSE,PIB,"PIB a preços correntes, em R$",PIB-Munic,Inteiro,Economia
+Pop,PIB-Munic,TRUE,TRUE,TRUE,TRUE,FALSE,População,População do município,PIB-Munic,Inteiro,Economia
+PIBpc,PIB-Munic,TRUE,TRUE,TRUE,TRUE,FALSE,PIBpc,PIB per capita,PIB-Munic,Número,Economia

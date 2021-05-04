@@ -1,0 +1,24 @@
+A,B,C,Base,Desc,Fonte
+Ambiente,Cobertura Florestal,Desmatamento,DETER,Alertas de desmatamento,INPE
+Ambiente,Cobertura Florestal,Desmatamento,PRODES,Área desmatada por ano,INPE
+Ambiente,Cobertura Florestal,Cobertura do solo,MapBiomas,Cobertura do solo,MapBiomas
+Economia,Comércio,Comércio,COMEX,Comércio exterior,MDIC
+Ambiente,Cobertura Florestal,Degradação florestal,DEGRAD,Degradação,INPE
+Economia,Produção,PIB,PIB-Munic,PIB por município,IBGE
+Economia,Desenvolvimento,Desenvolvimento,IPS,Progresso Social,Imazon
+Ambiente,Regulação,Multas,Ibama,Multas,Ibama
+Economia,Produção,Agricultura,PAM,Produção Agrícola,IBGE
+Economia,Produção,Pecuária,PPM,Produção Pecuária,IBGE
+Economia,Produção,Mineração,SIGMINE,Mineração,ANM
+Economia,Produção,Extração Vegetal e Silvicultura,PEVS,Produção da Extração Vegetal e da Silvicultura,IBGE
+Economia,Terras,Terras,INCRA,Dados fundiários,INCRA
+Ambiente,Regulação,Terras,Sicar,Imóveis Rurais,SFB
+Economia,Desenvolvimento,Nightlight,VIIRS,Nightlight,GEE
+Ambiente,Clima,Meteorologia,Uni. Delaware,Weather,Uni. Delaware
+Ambiente,Cobertura Florestal,Desmatamento,SAD,Alertas de desmatamento,Imazon
+Ambiente,Cobertura Florestal,Cobertura do solo,GLAD,Cobertura do solo,University of Maryland
+Ambiente,Cobertura Florestal,Desmatamento,SIPAMsar,Cobertura florestal,Censipam
+Economia,Economia,Economia,Fapespa,Dados econômicos por município,Fapespa
+Economia,Produção,Agropecuária,IMEA,Produção e preços da agropecuária,IMEA
+Economia,Desenvolvimento,Saúde,FVS,Saúde,FVS
+Economia,Crédito,Crédito,BASA,Empréstimos,BASA

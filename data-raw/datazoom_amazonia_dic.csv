@@ -1,0 +1,51 @@
+var,x,y,color,size,slider,label,desc,group,tipo,categoria
+municipio,FALSE,FALSE,FALSE,FALSE,FALSE,Município,Município,Geral,Texto,NA
+idmunic,FALSE,FALSE,FALSE,FALSE,FALSE,Código IBGE,Código IBGE do município,Geral,Inteiro,NA
+estado,TRUE,FALSE,TRUE,FALSE,FALSE,Estado,Estado (UF),Geral,Texto,NA
+lat,TRUE,FALSE,TRUE,FALSE,FALSE,Latitude,Latitude,Geral,Coordenadas,NA
+longitude,TRUE,FALSE,TRUE,FALSE,FALSE,Longitude,Longitude,Geral,Coordenadas,NA
+latgms,FALSE,FALSE,FALSE,FALSE,FALSE,Latitude (ms),"Latitude em graus, minutos e segundos",Geral,Coordenadas,NA
+longms,FALSE,FALSE,FALSE,FALSE,FALSE,Longitude (ms),"Longitude em graus, minutos e segundos",Geral,Coordenadas,NA
+codibge,FALSE,FALSE,FALSE,FALSE,FALSE,Código IBGE,Código IBGE do município,Geral,Inteiro,NA
+areakm2,TRUE,TRUE,TRUE,TRUE,FALSE,Área observada,Área observada,PRODES,km2,Ambiente
+desmatado,TRUE,TRUE,TRUE,TRUE,FALSE,Área desmatada,Área desmatada,PRODES,km2,Ambiente
+incremento,TRUE,TRUE,TRUE,TRUE,FALSE,Incremento do desmatamento,Incremento do desmatamento,PRODES,km2,Ambiente
+floresta,TRUE,TRUE,TRUE,TRUE,FALSE,Área de floresta,Área de floresta,PRODES,km2,Ambiente
+nuvem,TRUE,TRUE,TRUE,TRUE,FALSE,Área de nuvens,Área de nuvens,PRODES,km2,Ambiente
+naoobservado,TRUE,TRUE,TRUE,TRUE,FALSE,Área não observada,Área com observações descartadas por baixa visibilidade ou por não pertencer à Amazônia Legal,PRODES,km2,Ambiente
+naofloresta,TRUE,TRUE,TRUE,TRUE,FALSE,Área sem floresta,Área sem ocorrência natural de floresta,PRODES,km2,Ambiente
+hidrografia,TRUE,TRUE,TRUE,TRUE,FALSE,Hidrografia,Área de corpos d'água,PRODES,km2,Ambiente
+ano,FALSE,FALSE,FALSE,FALSE,FALSE,Ano,Ano,Geral,Inteiro,NA
+year,TRUE,FALSE,FALSE,FALSE,TRUE,Ano,Ano,Geral,Inteiro,NA
+município,FALSE,FALSE,FALSE,FALSE,FALSE,Município,Município,Geral,Texto,NA
+gdp,TRUE,TRUE,TRUE,TRUE,FALSE,PIB,Produto Interno Bruto,IBGE,Inteiro,Economia
+pop,TRUE,TRUE,TRUE,TRUE,FALSE,População,População,IBGE,Inteiro,Economia
+gdppc,TRUE,TRUE,TRUE,TRUE,FALSE,PIB per capita,PIB per capita,IBGE,Número,Economia
+areaAgriculture_and_Pasture,TRUE,TRUE,TRUE,TRUE,FALSE,Área agricultura e pasto,Área agricultura e pasto,MapBiomas,ha,Ambiente
+areaBeach_and_Dune,TRUE,TRUE,TRUE,TRUE,FALSE,Área praia e dunas,Área praia e dunas,MapBiomas,ha,Ambiente
+areaForest_Formation,TRUE,TRUE,TRUE,TRUE,FALSE,Área formação de floresta,Área formação de floresta,MapBiomas,ha,Ambiente
+areaForest_Plantation,TRUE,TRUE,TRUE,TRUE,FALSE,Área plantação de floresta,Área plantação de floresta,MapBiomas,ha,Ambiente
+areaGrassland,TRUE,TRUE,TRUE,TRUE,FALSE,Área campo,Área campo,MapBiomas,ha,Ambiente
+areaMagrove,TRUE,TRUE,TRUE,TRUE,FALSE,Área mangue,Área mangue,MapBiomas,ha,Ambiente
+areaMining,TRUE,TRUE,TRUE,TRUE,FALSE,Área mineração,Área mineração,MapBiomas,ha,Ambiente
+areaMosaic_of_Crops,TRUE,TRUE,TRUE,TRUE,FALSE,Área colheita,Área mosaico de colheita,MapBiomas,ha,Ambiente
+areaNon_Observed,TRUE,TRUE,TRUE,TRUE,FALSE,Área não observada,Área não observada,MapBiomas,ha,Ambiente
+areaOther_Non_Vegetated_Area,TRUE,TRUE,TRUE,TRUE,FALSE,Área não vegetada,Área não vegetada (outros),MapBiomas,ha,Ambiente
+areaPasture,TRUE,TRUE,TRUE,TRUE,FALSE,Área pastagem,Área pastagem,MapBiomas,ha,Ambiente
+areaPerennial_Crops,TRUE,TRUE,TRUE,TRUE,FALSE,Área colheitas perenes,Área colheitas perenes,MapBiomas,ha,Ambiente
+areaRiver_Lake_and_Ocean,TRUE,TRUE,TRUE,TRUE,FALSE,Área hidrografia,Área de corpos d'água,MapBiomas,ha,Ambiente
+areaSalt_flat,TRUE,TRUE,TRUE,TRUE,FALSE,Área salina,Área salina,MapBiomas,ha,Ambiente
+areaSavanna_Formation,TRUE,TRUE,TRUE,TRUE,FALSE,Área formação savana,Área formação savana,MapBiomas,ha,Ambiente
+areaSoy_Beans,TRUE,TRUE,TRUE,TRUE,FALSE,Área soja,Área soja,MapBiomas,ha,Ambiente
+areaSugar_Cane,TRUE,TRUE,TRUE,TRUE,FALSE,Área cana de açucar,Área cana de açucar,MapBiomas,ha,Ambiente
+areaUrban_Infrastructure,TRUE,TRUE,TRUE,TRUE,FALSE,Área urbana,Área de infraestrutura urbana,MapBiomas,ha,Ambiente
+areaWetland,TRUE,TRUE,TRUE,TRUE,FALSE,Área pantanal,Área pantanal,MapBiomas,ha,Ambiente
+deter_area_km2CicatrizdeQueimada,TRUE,TRUE,TRUE,TRUE,FALSE,Área cicatriz queimada,Área cicatriz queimada,DETER,km2,Ambiente
+deter_area_km2CorteSeletivo,TRUE,TRUE,TRUE,TRUE,FALSE,Área corte seletivo,Área corte seletivo,DETER,km2,Ambiente
+deter_area_km2CorteSeletivoDesor,TRUE,TRUE,TRUE,TRUE,FALSE,Área corte seletivo desordenado,Área corte seletivo desordenado,DETER,km2,Ambiente
+deter_area_km2CorteSeletivoGeo,TRUE,TRUE,TRUE,TRUE,FALSE,Área corte seletivo geométrico,Área corte seletivo geométrico,DETER,km2,Ambiente
+deter_area_km2Degradacao,TRUE,TRUE,TRUE,TRUE,FALSE,Área degradação,Área degradação,DETER,km2,Ambiente
+deter_area_km2DesmatCorteRaso,TRUE,TRUE,TRUE,TRUE,FALSE,Área desmatamento corte raso,Área desmatamento corte raso,DETER,km2,Ambiente
+deter_area_km2DesmatcomVegetacao,TRUE,TRUE,TRUE,TRUE,FALSE,Área desmatamento com vegetação,Área desmatamento com vegetação,DETER,km2,Ambiente
+deter_area_km2Mineracao,TRUE,TRUE,TRUE,TRUE,FALSE,Área mineração,Área mineração,DETER,km2,Ambiente
+degrad_degradation,TRUE,TRUE,TRUE,TRUE,FALSE,Degradação,Degradação,DEGRAD,m2,Ambiente

@@ -1,0 +1,11 @@
+Var,x,y,color,size,slider,label,desc,group,tipo,categoria
+territory_id,FALSE,FALSE,FALSE,FALSE,FALSE,Código IBGE do município,Código IBGE do município,Geral,Inteiro,Ambiente
+municipality,FALSE,FALSE,FALSE,FALSE,FALSE,Município,Município,Geral,Texto,Ambiente
+state,FALSE,FALSE,FALSE,FALSE,FALSE,Estado,Estado (UF),Geral,Texto,Ambiente
+level_0,FALSE,FALSE,FALSE,FALSE,FALSE,level_0,Se a cobertura é natural ou não,MapBiomas,Texto,Ambiente
+level_1,FALSE,FALSE,FALSE,FALSE,FALSE,level_1,Tipo de cobertura,MapBiomas,Texto,Ambiente
+level_2,FALSE,FALSE,FALSE,FALSE,FALSE,level_2,Atividade realizada ou descrição da cobertura natural,MapBiomas,Texto,Ambiente
+level_3,FALSE,FALSE,FALSE,FALSE,FALSE,level_3,Detalhes do que cobre a área,MapBiomas,Texto,Ambiente
+level_4,FALSE,FALSE,FALSE,FALSE,FALSE,level_4,Detalhes adicionais,MapBiomas,Texto,Ambiente
+Area,FALSE,FALSE,FALSE,FALSE,FALSE,Area,Área do território descrito,MapBiomas,ha,Ambiente
+data,TRUE,FALSE,FALSE,FALSE,TRUE,Ano,Ano,Geral,Data,Ambiente
