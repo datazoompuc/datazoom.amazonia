@@ -93,6 +93,7 @@ load_sigmine <- function(space_aggregation = c("municipality", "state", "municip
     al$NUMERO <- NULL
     al$name_region <- NULL
     al$name_state <- NULL
+
     if (language == "pt") {
       names(al)[names(al) == "ANO"] <- "ano"
       names(al)[names(al) == "PROCESSO"] <- "processo"

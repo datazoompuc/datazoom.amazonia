@@ -27,7 +27,7 @@ library(datazoom.amazonia)
 
 data <- load_mapbiomas_covering(space_aggregation = 'municipality', path = NULL, covering = 3, years = c(2000:2010))
 
-data <- load_mapbiomas_transition(path = NULL, transition_interval = 5)
+data <- load_mapbiomas_transition(space_aggregation = 'state', path = NULL, transition_interval = 5)
 
 ```
 

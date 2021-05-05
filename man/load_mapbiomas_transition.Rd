@@ -5,9 +5,15 @@
 \alias{load_mapbiomas_transition}
 \title{load_mapbiomas_transition}
 \usage{
-load_mapbiomas_transition(path = NULL, transition_interval = NULL)
+load_mapbiomas_transition(
+  space_aggregation = c("municipality", "state", "municipio", "estado"),
+  path = NULL,
+  transition_interval = NULL
+)
 }
 \arguments{
+\item{space_aggregation}{A string that indicates the level of aggregation of the data. It can be by municipality or state}
+
 \item{path}{A string indicating where the raw data is in your computer. The default is NULL which means the data will be extracted directly from the website}
 
 \item{transition_interval}{A numeric object containing the desired interval in years to observe transitions desired in the data base (1, 2, 5 or 10), or have all included (NULL)}
@@ -19,7 +25,7 @@ A data base with data containing the area of each selected type of soil covering
 Download and filter data on transition of types of soil covering by year
 }
 \examples{
-load_mapbiomas_transition(path = NULL, transition_interval = 5)
+load_mapbiomas_transition(space_aggregation = 'state', path = NULL, transition_interval = 5)
 }
 \author{
 DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro

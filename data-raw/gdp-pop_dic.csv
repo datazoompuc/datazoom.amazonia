@@ -1,0 +1,7 @@
+Var,x,y,color,size,slider,label,desc,group,tipo,categoria
+CodIBGE,FALSE,FALSE,FALSE,FALSE,FALSE,Código IBGE do município,Código IBGE do município,Geral,Inteiro,Economia
+Município,FALSE,FALSE,FALSE,FALSE,FALSE,Município,Município,Geral,Texto,Economia
+Ano,TRUE,FALSE,FALSE,FALSE,TRUE,Ano,Ano,Geral,Data,Economia
+PIB,TRUE,TRUE,TRUE,TRUE,FALSE,PIB,"PIB a preços correntes, em R$",PIB-Munic,Inteiro,Economia
+Pop,TRUE,TRUE,TRUE,TRUE,FALSE,População,População do município,PIB-Munic,Inteiro,Economia
+PIBpc,TRUE,TRUE,TRUE,TRUE,FALSE,PIBpc,PIB per capita,PIB-Munic,Número,Economia

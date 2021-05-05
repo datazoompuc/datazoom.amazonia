@@ -1,0 +1,7 @@
+Var,x,y,color,size,slider,label,desc,group,tipo,categoria
+Estado,TRUE,FALSE,FALSE,FALSE,FALSE,Estado,Estado (UF),Geral,Texto,Ambiente
+Ano,FALSE,FALSE,FALSE,FALSE,FALSE,Ano,Ano,Geral,Inteiro,Ambiente
+CodIBGE,FALSE,FALSE,FALSE,FALSE,FALSE,Código IBGE do município,Código IBGE do município,Geral,Inteiro,Ambiente
+Municipio,FALSE,FALSE,FALSE,FALSE,FALSE,Município,Município,Geral,Texto,Ambiente
+Mes,TRUE,FALSE,FALSE,FALSE,TRUE,Mês,Mês,Geral,Data,Ambiente
+Degradacao,TRUE,TRUE,TRUE,TRUE,FALSE,Degradacao,Área degradada,DEGRAD,m2,Ambiente

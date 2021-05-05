@@ -85,10 +85,6 @@ data <- load_amazon_gdp(c(2014, 2015))
 
 data <- load_amazon_gdp(2017, space_aggregation = "state", language = "pt")
 
-##SIGMINE
-
-data <- load_sigmine(space_aggregation = 'municipality')
-
 ##PAM
 
 data <- load_pam_permanent(2013, aggregation_level = "region")
@@ -105,13 +101,10 @@ data <- datazoom.amazonia::load_pevs_areasilv(2017, aggregation_level = "state",
 
 data <- load_mapbiomas_covering(space_aggregation = 'municipality', path = NULL, covering = 3, years = c(2005:2015))
 
-data <- load_mapbiomas_transition(transition_interval = 5)
+data <- load_mapbiomas_transition(space_aggregation = 'state', transition_interval = 5)
 
-# Loads data locally
 
-data <- load_mapbiomas_covering("~/Downloads")
 
-data <- load_mapbiomas_transition("~/Downloads")
 ```
 
 ## Usage for IMAZON data
