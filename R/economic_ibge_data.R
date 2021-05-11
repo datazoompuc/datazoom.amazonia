@@ -45,6 +45,10 @@ load_amazon_gdp <- function(years, space_aggregation = "municipality", language 
 
 #' Gets GDP at current prices and (estimated) population data for Brazil
 #'
+#' Link for Municipal GDP: \url{https://sidra.ibge.gov.br/Tabela/5938}
+#' Link for Estimated Municipal Population: \url{https://sidra.ibge.gov.br/Tabela/6579}
+#'
+#'
 #' @param years A numeric vector with years of interest. Supported years 2002-2017 for GDP data and 2001-2009, 2011-present for population data.
 #' @param space_aggregation A string that indicates the level of aggregation of the data. It can be by "Municipality" or
 #'   "State"
@@ -59,7 +63,11 @@ load_amazon_gdp <- function(years, space_aggregation = "municipality", language 
 #' load_gdp(2017)
 #' }
 load_gdp <- function(years, space_aggregation = "municipality", language = "eng") {
-  # GDP data
+
+  ##############
+  ## GDP data ##
+  ##############
+
   gdp <- tibble::as_tibble(
     sidrar::get_sidra(
       5938, # Table code at Sidra
@@ -69,8 +77,12 @@ load_gdp <- function(years, space_aggregation = "municipality", language = "eng"
       classific = "all",
       category = NULL
     )
-  ) %>% dplyr::distinct()
-  # Population data
+  ) %>% dplyr::distinct
+
+  #####################
+  ## Population data ##
+  #####################
+
   pop <- tibble::as_tibble(
     sidrar::get_sidra(
       6579, # Table code at Sidra
@@ -80,6 +92,10 @@ load_gdp <- function(years, space_aggregation = "municipality", language = "eng"
       category = NULL
     )
   ) %>% dplyr::distinct()
+
+  ##########
+  ## Join ##
+  ##########
 
   df <- dplyr::full_join(
     gdp,
@@ -91,6 +107,10 @@ load_gdp <- function(years, space_aggregation = "municipality", language = "eng"
       "Ano"
     )
   )
+
+  ######################
+  ## Data Engineering ##
+  ######################
 
   df <- df %>%
     dplyr::select(
@@ -109,12 +129,20 @@ load_gdp <- function(years, space_aggregation = "municipality", language = "eng"
     ) %>%
     dplyr::mutate(PIBpc = .data$PIB / .data$Pop * 1000)
 
+  #################
+  ## Translating ##
+  #################
+
   if (language == "eng") {
     df <- translate_munics_to_english(df)
   }
   else if (language != "pt") {
     warning("Selected language is not supported. Proceeding with Portuguese.")
   }
+
+  ####################
+  ## Returning Data ##
+  ####################
 
   df
 }
@@ -131,9 +159,18 @@ load_gdp <- function(years, space_aggregation = "municipality", language = "eng"
 #' load_amazon_employment(2017)
 #' }
 load_amazon_employment <- function(years, sectors = FALSE, space_aggregation = "municipality", language = "eng") {
+
+  #####################################
+  ## Load Employment Data for Brazil ##
+  #####################################
+
   df <- filter_amazon(
     load_employment(years, sectors = sectors, space_aggregation = "municipality", language = "pt")
   )
+
+  ######################
+  ## Data Engineering ##
+  ######################
 
   space_aggregation <- tolower(space_aggregation)
   if (space_aggregation == "state") {
@@ -147,6 +184,10 @@ load_amazon_employment <- function(years, sectors = FALSE, space_aggregation = "
     warning("Selected spatial aggregation is not supported. Proceeding with Municipality.")
   }
 
+  #################
+  ## Translating ##
+  #################
+
   language <- tolower(language)
   if (language == "eng") {
     df <- translate_munics_to_english(df)
@@ -158,7 +199,11 @@ load_amazon_employment <- function(years, sectors = FALSE, space_aggregation = "
   df
 }
 
-#' Gets formal employment data for Brazil.
+#' Gets formal employment data for Brazil
+#'
+#' CEMPRE: Cadastro Central de Empresas \url{https://sidra.ibge.gov.br/pesquisa/cempre/quadros/brasil/2018}
+#' Tabela 6449 - Empresas e outras organizações, pessoal ocupado total, pessoal ocupado assalariado, salários e outras remunerações,
+#' por seção, divisão, grupo e classe da classificação de atividades (CNAE 2.0)
 #'
 #' @param years A numeric vector with years of interest. Supported years 2006-2018.
 #' @param sectors If sectors is set to TRUE, loads data separated by economics sectors.
@@ -175,6 +220,11 @@ load_amazon_employment <- function(years, sectors = FALSE, space_aggregation = "
 #' load_employment(2017)
 #' }
 load_employment <- function(years, sectors = FALSE, space_aggregation = "municipality", language = "eng") {
+
+  ############################
+  ## Define Main Parameters ##
+  ############################
+
   if (sectors) {
     cnaes <- list("117897", "116830", "116880", "116910", "117296", "117307", "117329", "117363", "117484", "117543", "117555", "117608", "117666", "117673", "117714", "117774", "117788", "117810", "117838", "117861", "117888", "117892")
   }
@@ -189,7 +239,12 @@ load_employment <- function(years, sectors = FALSE, space_aggregation = "municip
     "Ano"
   )
 
-  # Employment data
+  ##############
+  ## Get Data ##
+  ##############
+
+  ## Wages
+
   get_salaries <- function(cnae) {
     df <- tibble::as_tibble(
       sidrar::get_sidra(
@@ -201,12 +256,15 @@ load_employment <- function(years, sectors = FALSE, space_aggregation = "municip
         category = list(cnae)
       )
     ) %>% dplyr::distinct()
-    sector <- dplyr::pull(df, "Classifica\u00E7\u00E3o Nacional de Atividades Econ\u00F4micas (CNAE 2.0)")[1]
+    sector <- dplyr::pull(df, "Classifica\u00E7\u00E3o Nacional de Atividades Econ\u00F4micas (CNAE 2.0)")[1] ## For god's sake, deal with encoding properly!!
     df %>%
       dplyr::select(c(by, "Valor")) %>%
       dplyr::rename(!!sector := "Valor")
   }
+
   salaries <- purrr::map(cnaes, get_salaries) %>% purrr::reduce(dplyr::left_join, by = by)
+
+  ## Employment Status
 
   get_employed <- function(cnae) {
     df <- tibble::as_tibble(
@@ -224,7 +282,10 @@ load_employment <- function(years, sectors = FALSE, space_aggregation = "municip
       dplyr::select(c(by, "Valor")) %>%
       dplyr::rename(!!sector := "Valor")
   }
+
   employed <- purrr::map(cnaes, get_employed) %>% purrr::reduce(dplyr::left_join, by = by)
+
+  ## Establishments
 
   get_firms <- function(cnae) {
     df <- tibble::as_tibble(
@@ -242,11 +303,20 @@ load_employment <- function(years, sectors = FALSE, space_aggregation = "municip
       dplyr::select(c(by, "Valor")) %>%
       dplyr::rename(!!sector := "Valor")
   }
+
   firms <- purrr::map(cnaes, get_firms) %>% purrr::reduce(dplyr::left_join, by = by)
+
+  ######################
+  ## Data Engineering ##
+  ######################
 
   salaries <- dplyr::rename_with(salaries, function(name) paste0("Salarios", " - ", name), !dplyr::any_of(by))
   employed <- dplyr::rename_with(employed, function(name) paste0("Empregados", " - ", name), !dplyr::any_of(by))
   firms <- dplyr::rename_with(firms, function(name) paste0("Firmas", " - ", name), !dplyr::any_of(by))
+
+  #############
+  ## Joining ##
+  #############
 
   df <- salaries %>%
     dplyr::full_join(
@@ -284,9 +354,18 @@ load_employment <- function(years, sectors = FALSE, space_aggregation = "municip
 #' load_amazon_income(2010)
 #' }
 load_amazon_income <- function(years, space_aggregation = "municipality", language = "eng") {
+
+  ############################
+  ## Load Income for Brazil ##
+  ############################
+
   df <- filter_amazon(
     load_income(years, space_aggregation = "municipality", language = "pt")
   )
+
+  ######################
+  ## Data Engineering ##
+  ######################
 
   space_aggregation <- tolower(space_aggregation)
   if (space_aggregation == "state") {
@@ -304,6 +383,10 @@ load_amazon_income <- function(years, space_aggregation = "municipality", langua
   else if (space_aggregation != "municipality") {
     warning("Selected spatial aggregation is not supported. Proceeding with Municipality.")
   }
+
+  #################
+  ## Translating ##
+  #################
 
   language <- tolower(language)
   if (language == "eng") {
@@ -332,7 +415,13 @@ load_amazon_income <- function(years, space_aggregation = "municipality", langua
 #' load_income(2010)
 #' }
 load_income <- function(years, space_aggregation = "municipality", language = "eng") {
-  # Income data
+
+  ###########################################
+  ## Load Income Data from the 2010 Census ##
+  ###########################################
+
+  ## Number of Employed People
+
   people <- tibble::as_tibble(
     sidrar::get_sidra(
       2033, # Table code at Sidra
@@ -343,6 +432,9 @@ load_income <- function(years, space_aggregation = "municipality", language = "e
       category = list("6794")
     )
   ) %>% dplyr::distinct()
+
+  ## Mean nominal income
+
   mean_income <- tibble::as_tibble(
     sidrar::get_sidra(
       2033, # Table code at Sidra
@@ -353,6 +445,9 @@ load_income <- function(years, space_aggregation = "municipality", language = "e
       category = list("6794")
     )
   ) %>% dplyr::distinct()
+
+  ## Median nominal income
+
   median_income <- tibble::as_tibble(
     sidrar::get_sidra(
       2033, # Table code at Sidra
@@ -370,6 +465,11 @@ load_income <- function(years, space_aggregation = "municipality", language = "e
     "Ano (C\u00f3digo)",
     "Ano"
   )
+
+  ##################
+  ## Joining Data ##
+  ##################
+
   df <- people %>%
     dplyr::full_join(
       mean_income,
@@ -379,6 +479,10 @@ load_income <- function(years, space_aggregation = "municipality", language = "e
       median_income,
       by
     )
+
+  ######################
+  ## Data Engineering ##
+  ######################
 
   df <- df %>%
     dplyr::select(
@@ -398,6 +502,10 @@ load_income <- function(years, space_aggregation = "municipality", language = "e
       "Valor" = "Renda_mediana"
     )
 
+  ###############
+  ## Translate ##
+  ###############
+
   if (language == "eng") {
     df <- translate_munics_to_english(df)
   }
@@ -405,10 +513,17 @@ load_income <- function(years, space_aggregation = "municipality", language = "e
     warning("Selected language is not supported. Proceeding with Portuguese.")
   }
 
+  ############
+  ## Return ##
+  ############
+
   df
 }
 
 filter_amazon <- function(df) {
+
+  ## Filter Geographical Units in Legal Amazon Boundaries
+
   columns <- colnames(df)
 
   legal_amazon <- legal_amazon %>%
@@ -422,6 +537,9 @@ filter_amazon <- function(df) {
 }
 
 translate_for_api <- function(s) {
+
+  ## Edit name of space_aggregation to enter the IBGE Sidra API
+
   if (tolower(s) == "municipality") {
     "City"
   } else {
