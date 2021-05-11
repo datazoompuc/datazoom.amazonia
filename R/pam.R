@@ -25,7 +25,10 @@
 #' }
 #'
 load_pam_permanent <- function(years, aggregation_level = "country", language = "pt", long = FALSE) {
-  message("Depending on amount of items selected function may take time to run")
+
+  #message("Depending on amount of items selected function may take time to run")
+
+  # space_aggregation = c("municipality", "state", "municipio", "estado")
 
   sigla_uf <- c(12, 27, 13, 16, 29, 23, 32, 52, 21, 31, 50, 51, 15, 25, 26, 22, 41, 33, 24, 11, 14, 43, 42, 28, 35, 17)
   sigla_uf2 <- c(12, 27, 13, 16, 23, 32, 21, 50, 51, 15, 25, 26, 22, 33, 24, 11, 14, 28, 17)
@@ -40,6 +43,10 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
     35015, 35020, 35018, 35023, 35048, 35032, 35049, 35044, 35054, 35005, 35034, 35002, 35012, 35058, 35051, 35059, 35056, 35060, 35042, 35041, 35011, 35013, 35001, 35021, 35047, 35027, 35019, 35038, 35062, 35031, 35007, 35008,
     35057, 35040, 35053, 35045, 35028, 35029, 35036, 35055, 35014, 35026, 35063, 35025, 35030, 35010, 35004, 35050, 35061, 35046, 35043, 35037, 35003
   )
+
+  ##########################
+  ## Translate to English ##
+  ##########################
 
   to_english1 <- function(df) {
     index <- df$`Variable (Code)` == 2313
@@ -139,6 +146,10 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
     return(df)
   }
 
+  #####################
+  ## Convert to Long ##
+  #####################
+
   to_long_permanent <- function(df, a) {
     if (a == 0) {
       df <- split(df, df$variavel)
@@ -177,6 +188,11 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
     warning("Language selected not supported! Proceding with Portuguese")
     language <- "pt"
   }
+
+
+  #############################################
+  ## Download Data from IBGE using Sidra API ##
+  #############################################
 
   df <- data.frame()
 
@@ -336,6 +352,10 @@ load_pam_permanent <- function(years, aggregation_level = "country", language = 
 load_pam_temporary <- function(years, aggregation_level = "country", language = "pt", long = FALSE) {
   message("Depending on amount of items selected function may take time to run")
 
+  ##########################
+  ## Translate to English ##
+  ##########################
+
   to_english2 <- function(df) {
     index <- df$`Variable (Code)` == 109
     df$Variable[index] <- "Planted area"
@@ -434,6 +454,10 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
     return(df)
   }
 
+  #####################
+  ## Convert to Long ##
+  #####################
+
   to_long_temporary <- function(df, a) {
     if (a == 0) {
       df <- split(df, df$variavel)
@@ -485,6 +509,10 @@ load_pam_temporary <- function(years, aggregation_level = "country", language = 
     warning("Language selected not supported! Proceding with Portuguese")
     language <- "pt"
   }
+
+  #############################################
+  ## Download Data from IBGE using Sidra API ##
+  #############################################
 
   df <- data.frame()
 
@@ -721,8 +749,11 @@ load_pam_main <- function(years, aggregation_level = "country", language = "pt",
     e <- 0
   }
 
-  df <- data.frame()
+  #############################################
+  ## Download Data from IBGE using Sidra API ##
+  #############################################
 
+  df <- data.frame()
 
   if (aggregation_level == "country"){
     for (i in 1:length(years)){
@@ -748,7 +779,6 @@ load_pam_main <- function(years, aggregation_level = "country", language = "pt",
     }
   }
 
-
   if (aggregation_level == "region"){
     for (i in 1:length(years)){
       a <-toString(years[i])
@@ -772,7 +802,6 @@ load_pam_main <- function(years, aggregation_level = "country", language = "pt",
       df <- to_english3(df)
     }
   }
-
 
   if (aggregation_level == "state"){
     for (i in 1:length(years)){
