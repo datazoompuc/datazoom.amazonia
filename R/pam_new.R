@@ -67,4 +67,29 @@ load_pam = function(type=NULL,space_aggregation = 'municipality', years = 2017:2
       purrr::pmap(function(x,y) get_sidra_safe(param$type,geo=param$geo_reg,period = y,geo.filter = list("State" = x)))
   }
 
+  ## Capture Errors
+
+  dat = lapply(dat,"[[", 1)
+
+  boolean_downloaded = unlist(lapply(dat,is.data.frame))
+
+  prob_data = input_df[!boolean_downloaded,]
+
+  ## We need to check the municipalities in these UFs
+
+  ## Binding Rows
+
+  dat = dat[boolean_downloaded] %>%
+    dplyr::bind_rows() %>%
+    janitor::clean_names() %>%
+    dplyr::mutate_all(function(x){iconv(x,to='ASCII')})
+
+  ######################
+  ## Data Enginnering ##
+  ######################
+
+  #table(dat$unidade_de_medida,dat$variavel)
+
+  ## Insert Code Similar to PPM
+
 }
