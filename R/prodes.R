@@ -41,6 +41,11 @@ NULL
 #' )
 #' }
 load_prodes <- function(source, space_aggregation = "municipality", language = "eng") {
+
+  ########################################
+  ## Sequentially Apply Functions Below ##
+  ########################################
+
   raw_list <- load_prodes_raw(source)
 
   list_df <- lapply(raw_list, treat_prodes_data, space_aggregation = space_aggregation, language = language)
@@ -86,7 +91,16 @@ load_prodes <- function(source, space_aggregation = "municipality", language = "
 #'   system.file("extdata", "DesmatamentoMunicipios2015.txt", package = "datazoom.amazonia")
 #' )
 #' }
+#'
+#'
 load_prodes_raw <- function(source) {
+
+  ##########################
+  ## Download Prodes Data ##
+  ##########################
+
+  ## THIS IS A MESS, PLEASE AVOID THAT
+
   # If source is a list of numbers, we construct the URLs to INPE
   if (is.numeric(source)) {
     source <- purrr::map(source, function(year) {
@@ -111,6 +125,11 @@ load_prodes_raw <- function(source) {
 }
 
 treat_prodes_data <- function(df, space_aggregation, language) {
+
+  ######################
+  ## Data Engineering ##
+  ######################
+
   space_aggregation <- tolower(space_aggregation)
   if (space_aggregation == "state") {
     df <-
@@ -138,6 +157,10 @@ treat_prodes_data <- function(df, space_aggregation, language) {
   # Removes year from column name
   colnames(df) <- gsub("(.*)\\d{4}?", "\\1", colnames(df))
 
+  #################
+  ## Translating ##
+  #################
+
   language <- tolower(language)
   if (language == "eng") {
     df <- translate_prodes_to_english(df)
@@ -151,6 +174,11 @@ treat_prodes_data <- function(df, space_aggregation, language) {
 }
 
 translate_prodes_to_english <- function(df) {
+
+  #################
+  ## Translation ##
+  #################
+
   dplyr::rename_with(
     df,
     dplyr::recode,

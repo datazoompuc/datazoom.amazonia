@@ -16,12 +16,18 @@
 #'
 
 load_seeg <- function(language = "pt"){
-  message("Function requires download of large file, so it may take time to run")
+
+
+ # message("Function requires download of large file, so it may take time to run")
 
   if (language != "pt" && language != "eng"){
     warning("Language selected not supported! Proceding with Portuguese")
     language = "pt"
   }
+
+  ###################
+  ## Download Data ##
+  ###################
 
   direc <- getwd()
   url <- "https://drive.google.com/file/d/1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd/view?usp=sharing"
@@ -29,6 +35,10 @@ load_seeg <- function(language = "pt"){
 
   df <- gsheet::gsheet2tbl(url)
   df <- janitor::clean_names(df)
+
+  #################################
+  ## Recode Non-Ascii Characters ##
+  #################################
 
   #stringi::stri_escape_unicode()
   df <- as.data.frame(gsub("\u00ed", "i", as.matrix(df)))
@@ -44,6 +54,14 @@ load_seeg <- function(language = "pt"){
   df <- as.data.frame(gsub("\u00e2", "a", as.matrix(df)))
   df <- as.data.frame(gsub("\u00d3", "O", as.matrix(df)))
   df <- as.data.frame(gsub("\u00ea", "e", as.matrix(df)))
+
+  #################
+  ## Translation ##
+  #################
+
+  ## Please do that in an organized way, the code below is an example of what not to do
+
+  ## Data has tiers, but better documentation is required to understand what these things are
 
   to_english <- function(df){
     index <- df$`Tier 1` == "Agropeacuaria"

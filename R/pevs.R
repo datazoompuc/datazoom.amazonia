@@ -21,6 +21,11 @@
 #' @examples \dontrun{datazoom.amazonia::load_pevs_vegextr(2013, aggregation_level = "country")}
 
 load_pevs_vegextr <- function(years, aggregation_level = "country", language = "pt", long = FALSE){
+
+  ###################################
+  ## SEE PAM EXAMPLE ON WHAT TO DO ##
+  ###################################
+
   message("Depending on amount of items selected function may take time to run")
 
   sigla_uf = c(12,27,13,16,29,23,32,52,21,31,50,51,15,25,26,22,41,33,24,11,14,43,42,28,35,17)
@@ -34,6 +39,10 @@ load_pevs_vegextr <- function(years, aggregation_level = "country", language = "
             43015,42020,42012,42010,42006,42002,42005,42019,42009,42016,42013,42014,42004,42008,42011,42007,42001,42017,42015,42018,42003,35035,35033,35016,35017,35024,35039,35006,35022,35052,35009,
             35015,35020,35018,35023,35048,35032,35049,35044,35054,35005,35034,35002,35012,35058,35051,35059,35056,35060,35042,35041,35011,35013,35001,35021,35047,35027,35019,35038,35062,35031,35007,35008,
             35057,35040,35053,35045,35028,35029,35036,35055,35014,35026,35063,35025,35030,35010,35004,35050,35061,35046,35043,35037,35003)
+
+  #################
+  ## Translation ##
+  #################
 
   to_english1 <- function(df){
     index <- df$`Variable (Code)` == 144
@@ -160,6 +169,10 @@ load_pevs_vegextr <- function(years, aggregation_level = "country", language = "
 
   }
 
+  #####################
+  ## Convert to Long ##
+  #####################
+
   to_long_permanent <- function(df, a){
     if(a == 0) {
       df <- split(df, df$variavel)
@@ -199,7 +212,13 @@ load_pevs_vegextr <- function(years, aggregation_level = "country", language = "
     language = "pt"
   }
 
+  ###################
+  ## Download Data ##
+  ###################
+
   df <- data.frame()
+
+  ## Country Level
 
   if (aggregation_level == "country"){
     for (i in 1:length(years)){
@@ -219,6 +238,8 @@ load_pevs_vegextr <- function(years, aggregation_level = "country", language = "
       df <- janitor::clean_names(df)
     }
   }
+
+  ## Region Level
 
   if (aggregation_level == "region"){
     for (i in 1:length(years)){
@@ -240,6 +261,8 @@ load_pevs_vegextr <- function(years, aggregation_level = "country", language = "
     }
   }
 
+  ## State Level
+
   if (aggregation_level == "state"){
     for (i in 1:length(years)){
       a <-toString(years[i])
@@ -260,6 +283,8 @@ load_pevs_vegextr <- function(years, aggregation_level = "country", language = "
     }
   }
 
+  ## Mesoregion
+
   if (aggregation_level == "mesoregion"){
     for (i in 1:length(years)){
       a <-toString(years[i])
@@ -278,6 +303,8 @@ load_pevs_vegextr <- function(years, aggregation_level = "country", language = "
       df <- janitor::clean_names(df)
     }
   }
+
+  ## Microregion
 
   if (aggregation_level == "microregion"){
     for (i in 1:length(years)){
@@ -299,6 +326,8 @@ load_pevs_vegextr <- function(years, aggregation_level = "country", language = "
       df <- janitor::clean_names(df)
     }
   }
+
+  ## City
 
   if (aggregation_level == "city"){
     for (i in 1:length(years)){
