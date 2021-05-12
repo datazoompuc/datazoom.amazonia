@@ -1,6 +1,6 @@
 
 
-load_pam = function(type=NULL,space_aggregation = 'municipality', years = 2017:2018, language = "pt") {
+load_pam = function(type=NULL,geo_level = 'municipality', time_period = 2017:2018, language = "pt") {
 
   #############################
   ## Define Basic Parameters ##
@@ -8,7 +8,7 @@ load_pam = function(type=NULL,space_aggregation = 'municipality', years = 2017:2
 
   param=list()
   param$uf = c(12,27,13,16,29,23,32,52,21,31,50,51,15,25,26,22,41,33,24,11,14,43,42,28,35,17)
-  param$years = years
+  param$time_period = time_period
 
   ## Dataset
 
@@ -31,10 +31,10 @@ load_pam = function(type=NULL,space_aggregation = 'municipality', years = 2017:2
 
   ## Aggregation Level
 
-  if (space_aggregation == 'country'){param$geo_reg = 'Brazil'}
-  if (space_aggregation == 'region'){param$geo_reg = 'Region'}
-  if (space_aggregation == 'state'){param$geo_reg = 'State'}
-  if (space_aggregation == 'municipality'){param$geo_reg = 'City'}
+  if (geo_level == 'country'){param$geo_reg = 'Brazil'}
+  if (geo_level == 'region'){param$geo_reg = 'Region'}
+  if (geo_level == 'state'){param$geo_reg = 'State'}
+  if (geo_level == 'municipality'){param$geo_reg = 'City'}
 
   ################################################################
   ## Create Grid with every possible combination of UF and Year ##
@@ -42,7 +42,7 @@ load_pam = function(type=NULL,space_aggregation = 'municipality', years = 2017:2
 
   input_df = expand.grid(
     x=param$uf,
-    y=param$years
+    y=param$time_period
   )
 
   input = list(x = as.list(input_df$x),y = as.list(as.character(input_df$y)))
@@ -57,12 +57,12 @@ load_pam = function(type=NULL,space_aggregation = 'municipality', years = 2017:2
 
   ## We use the purrr package (tidyverse equivalent of base apply functions) to run over the above grid
 
-  if (space_aggregation %in% c('country','region','state')){
+  if (geo_level %in% c('country','region','state')){
     dat = input %>%
       purrr::pmap(function(x,y) get_sidra_safe(param$type,geo=param$geo_reg,period = y))
   }
 
-  if (space_aggregation == 'municipality'){
+  if (geo_level == 'municipality'){
     dat = input %>%
       purrr::pmap(function(x,y) get_sidra_safe(param$type,geo=param$geo_reg,period = y,geo.filter = list("State" = x)))
   }
@@ -87,6 +87,9 @@ load_pam = function(type=NULL,space_aggregation = 'municipality', years = 2017:2
   ######################
   ## Data Enginnering ##
   ######################
+
+  dat = dat %>%
+    dplyr::select(-c(nivel_territorial_codigo,nivel_territorial,unidade_de_medida_codigo))
 
   #table(dat$unidade_de_medida,dat$variavel)
 

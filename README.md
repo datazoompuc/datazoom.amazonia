@@ -7,6 +7,7 @@
 
 [![R build
 status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions)
+
 <!-- badges: end -->
 
 \[EDIT THIS\]
@@ -18,6 +19,42 @@ municipality-year level (see the documentation for more information).
 
 **May 4th - All functions are currently under review – please do not
 download till further notice!**
+
+``` r
+tibble::tribble(~Data,~Source,~'Download Type',~'Geographical Units',~'Time Periods',~'Docs Link', ~'Download Link',
+                'PRODES',NA,NA,NA,NA,NA,NA,
+                'DETER',NA,NA,NA,NA,NA,NA,
+                'DEGRAD',NA,NA,NA,NA,NA,NA,
+                'COMEX',NA,NA,NA,NA,NA,NA,
+                'GDP',NA,NA,NA,NA,NA,NA,
+                'CEMPRE',NA,NA,NA,NA,NA,NA,
+                'CENSUS',NA,NA,NA,NA,NA,NA,
+                'SIGMINE',NA,NA,NA,NA,NA,NA,
+                'PAM','IBGE','API - Sidra',NA,NA,NA,NA,
+                'PEVS','IBGE','API - Sidra',NA,NA,NA,NA,
+                'PPM','IBGE','API - Sidra',NA,NA,NA,NA,
+                'MAPBIOMAS',NA,NA,NA,NA,NA,NA,
+                'IPS',NA,NA,NA,NA,NA,NA,
+                'SEEG',NA,NA,NA,NA,NA,NA,)
+#> # A tibble: 14 x 7
+#>    Data     Source `Download Type` `Geographical Uni~ `Time Periods` `Docs Link`
+#>    <chr>    <chr>  <chr>           <lgl>              <lgl>          <lgl>      
+#>  1 PRODES   <NA>   <NA>            NA                 NA             NA         
+#>  2 DETER    <NA>   <NA>            NA                 NA             NA         
+#>  3 DEGRAD   <NA>   <NA>            NA                 NA             NA         
+#>  4 COMEX    <NA>   <NA>            NA                 NA             NA         
+#>  5 GDP      <NA>   <NA>            NA                 NA             NA         
+#>  6 CEMPRE   <NA>   <NA>            NA                 NA             NA         
+#>  7 CENSUS   <NA>   <NA>            NA                 NA             NA         
+#>  8 SIGMINE  <NA>   <NA>            NA                 NA             NA         
+#>  9 PAM      IBGE   API - Sidra     NA                 NA             NA         
+#> 10 PEVS     IBGE   API - Sidra     NA                 NA             NA         
+#> 11 PPM      IBGE   API - Sidra     NA                 NA             NA         
+#> 12 MAPBIOM~ <NA>   <NA>            NA                 NA             NA         
+#> 13 IPS      <NA>   <NA>            NA                 NA             NA         
+#> 14 SEEG     <NA>   <NA>            NA                 NA             NA         
+#> # ... with 1 more variable: Download Link <lgl>
+```
 
 -   INPE - PRODES: deforestation
 -   INPE - DETER: deforestation warnings
@@ -85,6 +122,10 @@ data <- load_amazon_gdp(c(2014, 2015))
 
 data <- load_amazon_gdp(2017, space_aggregation = "state", language = "pt")
 
+##SIGMINE
+
+data <- load_sigmine(space_aggregation = 'municipality')
+
 ##PAM
 
 data <- load_pam_permanent(2013, aggregation_level = "region")
@@ -101,10 +142,13 @@ data <- datazoom.amazonia::load_pevs_areasilv(2017, aggregation_level = "state",
 
 data <- load_mapbiomas_covering(space_aggregation = 'municipality', path = NULL, covering = 3, years = c(2005:2015))
 
-data <- load_mapbiomas_transition(space_aggregation = 'state', transition_interval = 5)
+data <- load_mapbiomas_transition(transition_interval = 5)
 
+# Loads data locally
 
+data <- load_mapbiomas_covering("~/Downloads")
 
+data <- load_mapbiomas_transition("~/Downloads")
 ```
 
 ## Usage for IMAZON data
