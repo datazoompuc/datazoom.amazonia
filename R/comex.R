@@ -34,16 +34,31 @@
 #' }
 #'
 load_comex <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE, language = "pt") {
+
+  ########################
+  ## Language Selection ##
+  ########################
+
   message("Depending on amount of items selected function may take time to run")
   # Unless english is specified, columns will be renamed using Portuguese labels
   if (language != "pt" && language != "eng") {
     warning("Language selected not supported! Proceding with Portuguese")
   }
+
+  #######################################################
+  ## Invalid Years should return an erros to the user! ##
+  ######################################################
+
   # removes invalid years from input vector
   year1 <- year[year <= 2020]
   year1 <- year1[year1 >= 1997]
   year2 <- year[year >= 1989]
   year2 <- year2[year2 <= 1996]
+
+  #####################
+  ## Open DataFrames ##
+  #####################
+
   # creates list to store data frames
   data_1 <- data.frame()
   data_2 <- data.frame()
@@ -51,6 +66,11 @@ load_comex <- function(year, ncm = FALSE, sh4 = FALSE, exp = FALSE, imp = FALSE,
   data_4 <- data.frame()
   data_5 <- data.frame()
   data_6 <- data.frame()
+
+  ###############################
+  ## Nested If's are scarying! ##
+  ###############################
+
   # first generates export data frames
   if (exp == TRUE) {
     # after 1997 two types of codes for goods are supported

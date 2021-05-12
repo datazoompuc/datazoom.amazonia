@@ -17,6 +17,8 @@
 
 load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",language = 'pt'){
 
+  ## THIS NEED TO BE UPDATED -- I will walk you through this example cause the PAM, PPM and PEVS need to be benchmarks
+
   #############################
   ## Define Basic Parameters ##
   #############################

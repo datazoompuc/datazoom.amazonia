@@ -16,7 +16,9 @@ knitr::opts_chunk$set(
 # datazoom.amazonia
 
 <!-- badges: start -->
+
 [![R build status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions)
+
 <!-- badges: end -->
 
 [EDIT THIS]
@@ -24,6 +26,25 @@ knitr::opts_chunk$set(
 The goal of datazoom.amazonia is to facilitate access to official data regarding the Amazon. The package provides functions that download and pre-process selected datasets. Data is in general provided at the municipality-year level (see the documentation for more information).
 
 **May 4th - All functions are currently under review -- please do not download till further notice!**
+
+```{r}
+
+tibble::tribble(~Data,~Source,~'Download Type',~'Geographical Units',~'Time Periods',~'Docs Link', ~'Download Link',
+                'PRODES',NA,NA,NA,NA,NA,NA,
+                'DETER',NA,NA,NA,NA,NA,NA,
+                'DEGRAD',NA,NA,NA,NA,NA,NA,
+                'COMEX',NA,NA,NA,NA,NA,NA,
+                'GDP',NA,NA,NA,NA,NA,NA,
+                'CEMPRE',NA,NA,NA,NA,NA,NA,
+                'CENSUS',NA,NA,NA,NA,NA,NA,
+                'SIGMINE',NA,NA,NA,NA,NA,NA,
+                'PAM','IBGE','API - Sidra',NA,NA,NA,NA,
+                'PEVS','IBGE','API - Sidra',NA,NA,NA,NA,
+                'PPM','IBGE','API - Sidra',NA,NA,NA,NA,
+                'MAPBIOMAS',NA,NA,NA,NA,NA,NA,
+                'IPS',NA,NA,NA,NA,NA,NA,
+                'SEEG',NA,NA,NA,NA,NA,NA,)
+```
 
 -   INPE - PRODES: deforestation
 -   INPE - DETER: deforestation warnings
@@ -131,6 +152,7 @@ data <- load_mapbiomas_transition("~/Downloads")
 data <- load_IPS(download_directory = getwd(), language = "pt")
 
 ```
+
 ## Usage for SEEG data
 
 ```{r,eval=FALSE}
@@ -154,4 +176,5 @@ data <- load_sigmine(space_aggregation = 'state', source = "~/Downloads", langua
 ```
 
 ## Credits
-DataZoom is developed by a team at Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio), Department of Economics. Our official website is at: http://www.econ.puc-rio.br/datazoom.
+
+DataZoom is developed by a team at Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio), Department of Economics. Our official website is at: <http://www.econ.puc-rio.br/datazoom>.

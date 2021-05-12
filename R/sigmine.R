@@ -17,12 +17,18 @@
 #'
 #' @examples
 #' \dontrun{
-#' load_sigmine(space_aggregation = "municipality", 
-#'   source = NULL, 
+#' load_sigmine(space_aggregation = "municipality",
+#'   source = NULL,
 #'   language = "pt")
 #' }
 #'
 load_sigmine <- function(space_aggregation = c("municipality", "state", "municipio", "estado"), source = NULL, language = c("eng", "pt")) {
+
+
+  ##############
+  ## Download ##
+  ##############
+
   if (is.null(source)) {
     p1f <- tempfile(fileext = ".zip")
     tryCatch(
@@ -41,6 +47,12 @@ load_sigmine <- function(space_aggregation = c("municipality", "state", "municip
   dir <- gsub(p1f, pattern = "\\.zip", replacement = "")
   unzip(p1f, exdir = dir)
   a <- sf::read_sf(dir)
+
+  ######################
+  ## Data Engineering ##
+  ######################
+
+  ## State Level Data
 
   if (space_aggregation == "state" | space_aggregation == "estado") {
     if (language == "pt") {
@@ -71,8 +83,11 @@ load_sigmine <- function(space_aggregation = c("municipality", "state", "municip
       names(a)[names(a) == "AREA_HA"] <- "area_m2"
     }
     ret <- a
+
+    ## Municipality Level Data
+
   } else if (space_aggregation == "municipality" | space_aggregation == "municipio") {
-    geo_amazon <- download_map()
+    geo_amazon <- geobr::read_municipality(year = 2019, simplified = TRUE)
     operation_crs <- sf::st_crs("+proj=poly +lat_0=0 +lon_0=-54 +x_0=5000000 +y_0=10000000 +ellps=aust_SA +units=m +no_defs")
     a <- sf::st_transform(a, operation_crs)
     geo_amazon <- sf::st_transform(geo_amazon, operation_crs)
@@ -93,6 +108,11 @@ load_sigmine <- function(space_aggregation = c("municipality", "state", "municip
     al$NUMERO <- NULL
     al$name_region <- NULL
     al$name_state <- NULL
+
+    ########################
+    ## Renaming Variables ##
+    ########################
+
 
     if (language == "pt") {
       names(al)[names(al) == "ANO"] <- "ano"
@@ -124,6 +144,3 @@ load_sigmine <- function(space_aggregation = c("municipality", "state", "municip
 }
 
 
-download_map <- function() {
-  geo_br <- geobr::read_municipality(year = 2019, simplified = FALSE)
-}

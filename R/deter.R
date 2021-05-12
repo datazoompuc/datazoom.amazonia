@@ -33,6 +33,9 @@ NULL
 #'   language = "pt"
 #' )
 load_deter <- function(source = "amazonia", space_aggregation = "municipality", time_aggregation = "year", language = "eng") {
+
+  ## Apply the functions below sequentially
+
   df <- load_deter_raw(source)
 
   treat_deter_data(df, space_aggregation, time_aggregation, language)
@@ -67,6 +70,11 @@ load_deter <- function(source = "amazonia", space_aggregation = "municipality", 
 #' }
 #'
 load_deter_raw <- function(source = "amazonia") {
+
+  ###################
+  ## Download Data ##
+  ###################
+
   if (tolower(source) %in% c("amazonia", "cerrado")) {
     if (tolower(source) == "amazonia") {
       source <- "amz"
@@ -77,6 +85,8 @@ load_deter_raw <- function(source = "amazonia") {
     dir <- tempdir()
 
     temp <- tempfile(fileext = ".zip", tmpdir = dir)
+
+    ## Extraction through Curl Requests
 
     f <- RCurl::CFILE(temp, mode = "wb")
 
@@ -113,8 +123,12 @@ load_deter_raw <- function(source = "amazonia") {
   }
 }
 
-
 treat_deter_data <- function(df, space_aggregation, time_aggregation, language) {
+
+  ######################
+  ## Data Engineering ##
+  ######################
+
   space_aggregation <- tolower(space_aggregation)
 
   df <- df %>%
@@ -126,6 +140,8 @@ treat_deter_data <- function(df, space_aggregation, time_aggregation, language) 
     warning("Aggregation level not supported. Proceeding with municipality.")
   }
 
+  ## State Level
+
   else if (space_aggregation == "state") {
     df <- df %>%
       dplyr::select(-.data$MUNICIPALI, -.data$UC) %>%
@@ -133,6 +149,7 @@ treat_deter_data <- function(df, space_aggregation, time_aggregation, language) 
       dplyr::summarise(dplyr::across(-c(.data$AREAUCKM, .data$AREAMUNKM, .data$VIEW_DATE)), AREAUCKM = sum(.data$AREAUCKM), AREAMUNKM = sum(.data$AREAMUNKM))
   }
 
+  ## Municipality Level
 
   else {
     df <- df %>%
@@ -209,9 +226,12 @@ treat_deter_data <- function(df, space_aggregation, time_aggregation, language) 
   return(df)
 }
 
-
-
 translate_deter_to_english <- function(df) {
+
+  ###############
+  ## Translate ##
+  ###############
+
   df$Classe <- df$Classe %>% dplyr::recode(
     "Cicatriz de Queimada" = "Fire Scar",
     "Corte Seletivo Desordenado" = "Unorganized Selection Cutting",
@@ -224,6 +244,9 @@ translate_deter_to_english <- function(df) {
     "Corte Seletivo" = "Selection Cutting"
   )
 
+  ######################
+  ## Data Engineering ##
+  ######################
 
   df <- df %>%
     dplyr::rename_with(dplyr::recode,
