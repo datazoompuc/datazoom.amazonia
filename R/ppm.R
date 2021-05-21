@@ -79,38 +79,34 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
   ## We use the purrr package (tidyverse equivalent of base apply functions) to run over the above grid
 
   if (aggregation_level %in% c('country','region','state')){
-    dat = input %>%
-      purrr::pmap(function(x,y) sidrar::get_sidra(param$type,geo=param$geo_reg,period = y))
+
+    time = list(x = as.list(as.character(param$years)))
+
+    # dat = input %>%
+    #   purrr::pmap(function(x,y) sidrar::get_sidra(param$type,geo=param$geo_reg,period = y))
+
+    dat = time %>% purrr::pmap(
+      function(x) sidrar::get_sidra(param$type,geo=param$geo_reg,period=x)
+    )
+
   }
 
-  for (t in param$years){
-
-    dat
-
-  }
-
-  time = list(x = as.list(as.character(param$years)))
-
-  dat = time %>% purrr::pmap(
-    function(x) sidrar::get_sidra(param$type,geo=param$geo_reg,period=x)
-  )
 
   if (aggregation_level == 'municipality'){
     dat = input %>%
       purrr::pmap(function(x,y) sidrar::get_sidra(x = param$type,geo=param$geo_reg,period = y,geo.filter = list("State" = x)))
   }
 
-  #####################################
+  ## Loop Version
 
-  dat = list()
+  # dat = list()
+  #
+  # for (t in 1:length(param$years)){
+  #
+  #   dat[[t]] = sidrar::get_sidra(param$type,geo=param$geo_reg,period = as.character(param$years[t]))
+  #
+  # }
 
-  for (t in 1:length(param$years)){
-
-    dat[[t]] = sidrar::get_sidra(param$type,geo=param$geo_reg,period = as.character(param$years[t]))
-
-  }
-
-  dat =
 
     dat = dat %>%
     dplyr::bind_rows() %>%
