@@ -41,6 +41,8 @@ load_prodes_raw(
   system.file("extdata", "DesmatamentoMunicipios2015.txt", package = "datazoom.amazonia")
 )
 }
+
+
 }
 \seealso{
 \link{load_prodes} for loading and treating the data.

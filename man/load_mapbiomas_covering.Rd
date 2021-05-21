@@ -34,9 +34,9 @@ Download and filter data on type of soil covering by year
 \examples{
 \dontrun{
 load_mapbiomas_covering(
-  space_aggregation = "municipality", 
+  space_aggregation = "municipality",
   path = NULL,
-  covering = 3, 
+  covering = 3,
   years = c(2000:2010)
 )
 }

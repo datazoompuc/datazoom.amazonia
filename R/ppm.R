@@ -55,6 +55,7 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
 
   ## Aggregation Level
 
+
   if (aggregation_level == 'country'){param$geo_reg = 'Brazil'}
   if (aggregation_level == 'region'){param$geo_reg = 'Region'}
   if (aggregation_level == 'state'){param$geo_reg = 'State'}
@@ -78,19 +79,45 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
   ## We use the purrr package (tidyverse equivalent of base apply functions) to run over the above grid
 
   if (aggregation_level %in% c('country','region','state')){
-    dat = input %>%
-      purrr::pmap(function(x,y) sidrar::get_sidra(param$type,geo=param$geo_reg,period = y))
+
+    time = list(x = as.list(as.character(param$years)))
+
+    # dat = input %>%
+    #   purrr::pmap(function(x,y) sidrar::get_sidra(param$type,geo=param$geo_reg,period = y))
+
+    dat = time %>% purrr::pmap(
+      function(x) sidrar::get_sidra(param$type,geo=param$geo_reg,period=x)
+    )
+
   }
+
 
   if (aggregation_level == 'municipality'){
     dat = input %>%
-      purrr::pmap(function(x,y) sidrar::get_sidra(param$type,geo=param$geo_reg,period = y,geo.filter = list("State" = x)))
+      purrr::pmap(function(x,y) sidrar::get_sidra(x = param$type,geo=param$geo_reg,period = y,geo.filter = list("State" = x)))
   }
 
-  dat = dat %>%
+  ## Loop Version
+
+  # dat = list()
+  #
+  # for (t in 1:length(param$years)){
+  #
+  #   dat[[t]] = sidrar::get_sidra(param$type,geo=param$geo_reg,period = as.character(param$years[t]))
+  #
+  # }
+
+
+    dat = dat %>%
     dplyr::bind_rows() %>%
     janitor::clean_names() %>%
-    dplyr::mutate_all(function(x){gsub('[^ -~]', '', x)}) ## Remove Special Characters -- NOT BEST SOLUTION!!
+    dplyr::mutate_all(function(var){gsub('[^ -~]', '', var)}) ## Remove Special Characters -- NOT BEST SOLUTION!!
+
+
+  dat_mod = dat %>%
+    dplyr::bind_rows() %>%
+    janitor::clean_names() %>%
+    dplyr::mutate(unidade_da_federacao = gsub('[^ -~]','',unidade_da_federacao))
 
   ######################
   ## Data Enginnering ##
