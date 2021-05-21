@@ -1,6 +1,17 @@
 
 
 
+#' Title
+#'
+#' @param data
+#' @param source
+#' @param geo_id
+#' @param time_id
+#'
+#' @return A tibble
+#' @export download
+#'
+#' @examples
 download = function(data=NULL,source='ibge',geo_id='municipality',time_id=2017:2018){
 
   ## Initialize Parameters
@@ -28,6 +39,8 @@ download = function(data=NULL,source='ibge',geo_id='municipality',time_id=2017:2
 
 
   }
+
+  return('Hey everyone!')
 
 
 }

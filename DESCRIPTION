@@ -42,7 +42,8 @@ Imports:
     XML,
     gsheet,
     RCurl,
-    tidyselect
+    tidyselect,
+    ggplot2
 URL: http://www.econ.puc-rio.br/datazoom
 Suggests: 
     knitr,
