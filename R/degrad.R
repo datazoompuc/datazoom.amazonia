@@ -172,11 +172,15 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
 
   # Insert CRS
   if (is.na(sf::st_crs(df))) {
+    # If df comes without crs, we set the correct crs, the used in the data, of degrad data to the df
     data_crs <- sf::st_crs("+proj=longlat +ellps=aust_SA +towgs84=-66.8700,4.3700,-38.5200,0.0,0.0,0.0,0.0 +no_defs")
     sf::st_crs(df) <- data_crs
   }
 
+  # The crs that will be used to overlap maps below
   operation_crs <- sf::st_crs("+proj=poly +lat_0=0 +lon_0=-54 +x_0=5000000 +y_0=10000000 +ellps=aust_SA +units=m +no_defs")
+
+  # Changing crs of both data to the common crs chosen above
   df <- sf::st_make_valid(sf::st_transform(df, operation_crs))
   geo_amazon <- sf::st_transform(geo_amazon, operation_crs)
 
