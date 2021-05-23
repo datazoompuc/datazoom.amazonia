@@ -45,11 +45,14 @@ NULL
 #' )
 #' }
 load_degrad <- function(source, space_aggregation = "municipality", time_aggregation = "year", language = "eng", all_events = FALSE) {
-  raw_list <- load_degrad_raw(source)
+  #downloading raw data
+  raw_data <- load_degrad_raw(source)
 
+  #downloading municipal map from geobr
   geo_amazon <- download_map()
 
-  list_df <- lapply(raw_list, treat_degrad_data, space_aggregation = space_aggregation, time_aggregation = time_aggregation, language = language, geo_amazon = geo_amazon, filter = !all_events)
+  #treating data according to parameters selected
+  list_df <- lapply(raw_data, treat_degrad_data, space_aggregation = space_aggregation, time_aggregation = time_aggregation, language = language, geo_amazon = geo_amazon, filter = !all_events)
 
   dplyr::bind_rows(list_df)
 }
