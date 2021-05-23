@@ -45,13 +45,13 @@ NULL
 #' )
 #' }
 load_degrad <- function(source, space_aggregation = "municipality", time_aggregation = "year", language = "eng", all_events = FALSE) {
-  #downloading raw data
+  # Downloading raw data
   raw_data <- load_degrad_raw(source)
 
-  #downloading municipal map from geobr
+  # Downloading municipal map from geobr filtered to legl amazon municipalities
   geo_amazon <- download_map()
 
-  #treating data according to parameters selected
+  # Treating data according to parameters selected
   list_df <- lapply(raw_data, treat_degrad_data, space_aggregation = space_aggregation, time_aggregation = time_aggregation, language = language, geo_amazon = geo_amazon, filter = !all_events)
 
   dplyr::bind_rows(list_df)
@@ -93,6 +93,7 @@ load_degrad_raw <- function(source) {
   ##############
 
   warning("This data source is experiencing problems. Execution may result in error.")
+
   # If source is a list of numbers, we retrieve data from INPE
   if (is.numeric(source)) {
     source <- purrr::map(source, function(year) {
@@ -109,19 +110,26 @@ load_degrad_raw <- function(source) {
       find_from_dir(dir)
     })
   }
+
   # If source is a directory, we expand and filter the list of files
   else if (is.character(source) && length(source) == 1 && dir.exists(source)) {
     source <- find_from_dir(source)
   }
-  # Otherwise, we assume that source is something that can already be interpreted by sf::read_sf
 
+  # Otherwise, we assume that source is something that can already be interpreted by sf::read_sf
   suppressWarnings(lapply(source, sf::read_sf))
 }
 
 download_map <- function() {
   message("Downloading map data.")
+
+  # Downloading municipal map from geobr
   geo_br <- geobr::read_municipality(year = 2019, simplified = FALSE) # 2019 relates to the definition of legal_amazon
+
+  # legal_amazon belongs to package's sysdata.rda and filters for municipalities in legal amazon
   amazon_municipalities <- dplyr::filter(legal_amazon, .data$AMZ_LEGAL == 1)
+
+  # Filters geobr shapefiles to legal amazon municipalities
   dplyr::filter(geo_br, .data$code_muni %in% amazon_municipalities$CD_MUN)
 }
 
