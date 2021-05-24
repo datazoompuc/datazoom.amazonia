@@ -117,6 +117,8 @@ load_prodes_raw <- function(source) {
 
   # Useful as integrity check on database
   csv_types <- readr::cols("d", "d", "d", "c", "c", "c", "c", "c", "d", "d", "d", "d", "d", "d", "d", "d", "d")
+
+  # Reads the csvs containing the data
   lapply(source, readr::read_csv, col_types = csv_types, locale = readr::locale(encoding = "latin1"))
 }
 
