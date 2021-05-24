@@ -96,19 +96,7 @@ load_degrad_raw <- function(source) {
 
   # If source is a list of numbers, we retrieve data from INPE
   if (is.numeric(source)) {
-    source <- purrr::map(source, function(year) {
-      url <- paste0(
-        "http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad",
-        year,
-        "_final_shp.zip"
-      )
-
-      zfile <- tempfile(fileext = ".zip")
-      utils::download.file(url, zfile)
-      dir <- gsub(zfile, pattern = "\\.zip", replacement = "")
-      utils::unzip(zfile, exdir = dir)
-      find_from_dir(dir)
-    })
+    source <- purrr::map(source, webscrapping_degrad)
   }
 
   # If source is a directory, we expand and filter the list of files
@@ -256,4 +244,23 @@ translate_degrad_to_english <- function(df) {
     Evento = "Event",
     Degradacao = "Degradation"
   )
+}
+
+webscrapping_degrad <- function(year) {
+  # Gets urls from which to retrieve data
+  url <- paste0(
+    "http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad",
+    year,
+    "_final_shp.zip"
+  )
+
+  # Creates temporary file to put to be downloaded data
+  zfile <- tempfile(fileext = ".zip")
+
+  # Downloads file and puts in the temporary file created above
+  utils::download.file(url, zfile)
+
+  dir <- gsub(zfile, pattern = "\\.zip", replacement = "")
+  utils::unzip(zfile, exdir = dir)
+  find_from_dir(dir)
 }

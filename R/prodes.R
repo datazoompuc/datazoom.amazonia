@@ -46,9 +46,11 @@ load_prodes <- function(source, space_aggregation = "municipality", language = "
   ## Sequentially Apply Functions Below ##
   ########################################
 
-  raw_list <- load_prodes_raw(source)
+  # Downloading raw data
+  raw_data <- load_prodes_raw(source)
 
-  list_df <- lapply(raw_list, treat_prodes_data, space_aggregation = space_aggregation, language = language)
+  # Treating data according to parameters selected
+  list_df <- lapply(raw_data, treat_prodes_data, space_aggregation = space_aggregation, language = language)
 
   dplyr::bind_rows(list_df)
 }
@@ -103,13 +105,7 @@ load_prodes_raw <- function(source) {
 
   # If source is a list of numbers, we construct the URLs to INPE
   if (is.numeric(source)) {
-    source <- purrr::map(source, function(year) {
-      paste0(
-        "http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=",
-        year,
-        "&estado=&ordem=MUNICIPIO&type=tabela&output=txt&"
-      )
-    })
+    source <- purrr::map(source, urls_prodes)
   }
   # If source is a directory, we expand and filter the list of files
   else if (is.character(source) && length(source) == 1 && dir.exists(source)) {
@@ -193,5 +189,14 @@ translate_prodes_to_english <- function(df) {
     NaoFloresta = "NotForest",
     Hidrografia = "Hydrography",
     Ano = "Year"
+  )
+}
+
+urls_prodes <- function(year) {
+  # Generates urls to get prodes data from corresponding year
+  paste0(
+    "http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=",
+    year,
+    "&estado=&ordem=MUNICIPIO&type=tabela&output=txt&"
   )
 }
