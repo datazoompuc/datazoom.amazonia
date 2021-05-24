@@ -23,10 +23,12 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
   ## Define Basic Parameters ##
   #############################
 
-  
+
   #### Michelle aqui
-  
-  
+
+  #### Michelle ja vai sair daqui
+
+
   param=list()
   param$uf = c(12,27,13,16,29,23,32,52,21,31,50,51,15,25,26,22,41,33,24,11,14,43,42,28,35,17)
   param$years = years
@@ -78,7 +80,7 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
   ###############
   ## Load Data ##
   ###############
-  
+
   ## We use the purrr package (tidyverse equivalent of base apply functions) to run over the above grid
 
   if (aggregation_level %in% c('country','region','state')){
