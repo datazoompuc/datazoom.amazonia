@@ -94,7 +94,7 @@ load_degrad_raw <- function(source) {
 
   warning("This data source is experiencing problems. Execution may result in error.")
 
-  # If source is a list of numbers, we retrieve data from INPE
+  # If source is a list of numbers (years), we retrieve data from INPE
   if (is.numeric(source)) {
     source <- purrr::map(source, webscrapping_degrad)
   }
@@ -158,7 +158,7 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
 
   df[grep(df$class_name, pattern = "degrad[^_]", ignore.case = TRUE), ]$class_name <- "DEGRAD"
 
-  # Insert CRS
+  # Insert crs
   if (is.na(sf::st_crs(df))) {
     # If df comes without crs, we set the correct crs, the used in the data, of degrad data to the df
     data_crs <- sf::st_crs("+proj=longlat +ellps=aust_SA +towgs84=-66.8700,4.3700,-38.5200,0.0,0.0,0.0,0.0 +no_defs")
