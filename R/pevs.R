@@ -20,15 +20,100 @@
 #'
 #' @examples \dontrun{datazoom.amazonia::load_pevs_vegextr(2013, aggregation_level = "country")}
 
-load_pevs_vegextr <- function(years, aggregation_level = "country", language = "pt", long = FALSE){
+load_pevs <- function(type = NULL, geo_level = "municipality", time_period = 2014:2019, language = "pt"){
 
-  ###################################
-  ## SEE PAM EXAMPLE ON WHAT TO DO ##
-  ###################################
+  #############################
+  ## Define Basic Parameters ##
+  #############################
 
-  message("Depending on amount of items selected function may take time to run")
+  param = list()
+  param$uf = c(12,27,13,16,29,23,32,52,21,31,50,51,15,25,26,22,41,33,24,11,14,43,42,28,35,17)
+  param$time_period = time_period
+  
+  ## Dataset
+  
+  if (is.null(type)){stop('Missing Dataset!')}
+  
+  if (as.numeric(type) == 289){
+    param$type = 289
+    param$data_name = 'Vegetal extraction quantity and value (Quantidade e valor da extração vegetal)'
+  }
+  
+  if (as.numeric(type) == 291){
+    param$type = 291
+    param$data_name = 'Forestry quantity and value (Quantidade e valor da silvicultura)'
+  }
+  
+  #leave 'Forestry area (Area da silvicultura)' for last
+  
+  if (as.numeric(type) == 5930){
+    param$type = 5930
+    param$data_name = 'Forestry area (Area da silvicultura)'
+  }
+  
+  ## Aggregation Level
+  
+  if (geo_level == 'country'){param$geo_reg = 'Brazil'}
+  if (geo_level == 'region'){param$geo_reg = 'Region'}
+  if (geo_level == 'state'){param$geo_reg = 'State'}
+  if (geo_level == 'municipality'){param$geo_reg = 'City'}
+  
+  
+  ################################################################
+  ## Create Grid with every possible combination of UF and Year ##
+  ################################################################
+  
+  input_df = expand.grid(
+    x=param$uf,
+    y=param$time_period
+  )
+  
+  input_munic = list(x = as.list(input_df$x),y = as.list(as.character(input_df$y)))
+  input_other = list(x = as.list(as.character(param$time_period)))
+  
+  ###############
+  ## Load Data ##
+  ###############
+  
+  
+  ## Loop Version
+  # Still need to apply "purrr::safely"
+  # Still need to separate municipality from country, region and state
+  
+ dat = list()
 
-  sigla_uf = c(12,27,13,16,29,23,32,52,21,31,50,51,15,25,26,22,41,33,24,11,14,43,42,28,35,17)
+ for (t in 1:length(param$time_period)){
+
+   dat[[t]] = sidrar::get_sidra(param$type, geo=param$geo_level, period = as.character(param$time_period[t]))
+
+}
+  
+  
+  #######################
+  ## Cleaning Function ##
+  #######################
+  
+  clean_custom = function(var){
+    var = stringr::str_replace_all(string=var,pattern=' ',replacement='_')
+    var = stringr::str_replace_all(string=var,pattern='-',replacement='')
+    var = stringr::str_replace_all(string=var,pattern='ª',replacement='')
+    var = stringr::str_replace_all(string=var,pattern='\\(',replacement='')
+    var = stringr::str_replace_all(string=var,pattern='\\)',replacement='')
+    var = stringr::str_to_lower(string=var)
+    return(var)
+  }
+  
+  ## Binding Rows
+  #remember to add [boolean_downloaded]
+  
+dat  = dat %>%
+  dplyr::bind_rows() %>%
+  tibble::as_tibble()
+  
+  
+
+  
+   sigla_uf = c(12,27,13,16,29,23,32,52,21,31,50,51,15,25,26,22,41,33,24,11,14,43,42,28,35,17)
   sigla_uf2 = c(12,27,13,16,23,32,21,50,51,15,25,26,22,33,24,11,14,28,17)
   micro = c(29006,29001,29007,29022,29027,29019,29002,29018,29014,29012,29026,29031,29009,
             29011,29029,29010,29024,29013,29004,29025,29005,29032,29015,29021,29003,29020,29023,29008,29016,29030,29028,52007,52009,52003,52017,52006,52005,52012,52010,52008,52015,52016,52004,52018,52002,52001,52013,52014,52011,
