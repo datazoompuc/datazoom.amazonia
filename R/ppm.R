@@ -4,18 +4,19 @@
 #'
 #'
 #' @param type A \code{string} with the desired PPM Dataset (see \url{https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019}). Accept the IBGE PPM codes or names. 94 ~ "cow_farm", 3939 ~ "cattle_number", 74 ~ "animal_orig_prod", 3940 ~ "water_orig_prod"
-#' @param years A \code{sequence} of integers in the form year_begin:year_end in which both are numeric. Available time frame is from 1974 to 2019
-#' @param aggregation_level A \code{string} containing the data aggregation level of the output. Can be 'country', 'region', 'state' or 'municipality'
+#' @param time_period A \code{sequence} of integers in the form year_begin:year_end in which both are numeric. Available time frame is from 1974 to 2019
+#' @param geo_level A \code{string} containing the data aggregation level of the output. Can be 'country', 'region', 'state' or 'municipality'
 #' @param language A \code{string} with the language of the desired output. Can be 'eng' or 'pt' for English or Portuguese.
 #'
-#' @return A panel (\code{tibble} format) with N x T observations in which N is the number of geographical units and T is the number of years selected.
+#' @return A panel (\code{tibble} format) with N x T observations in which N is the number of geographical units and T is the number of time_period selected.
 #' @export load_ppm
 #'
 #' @author DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro
 #'
-#' @examples \dontrun{load_ppm(type=3939,years = 2018:2019,aggregation_level = 'municipality',language='eng')}
+#' @examples \dontrun{load_ppm(type=3939,time_period = 2018:2019,geo_level = 'municipality',language='eng')}
 
-load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",language = 'pt'){
+load_ppm = function(type=NULL,geo_level = "municipality", time_period=2019,language = 'pt'){
+
 
   ## THIS NEED TO BE UPDATED -- I will walk you through this example cause the PAM, PPM and PEVS need to be benchmarks
 
@@ -23,15 +24,9 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
   ## Define Basic Parameters ##
   #############################
 
-
-  #### Michelle aqui
-
-  #### Michelle ja vai sair daqui
-
-
   param=list()
   param$uf = c(12,27,13,16,29,23,32,52,21,31,50,51,15,25,26,22,41,33,24,11,14,43,42,28,35,17)
-  param$years = years
+  param$time_period = time_period
 
   ## Dataset
 
@@ -61,10 +56,10 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
 
   ## Aggregation Level
 
-  if (aggregation_level == 'country'){param$geo_reg = 'Brazil'}
-  if (aggregation_level == 'region'){param$geo_reg = 'Region'}
-  if (aggregation_level == 'state'){param$geo_reg = 'State'}
-  if (aggregation_level == 'municipality'){param$geo_reg = 'City'}
+  if (geo_level == 'country'){param$geo_reg = 'Brazil'}
+  if (geo_level == 'region'){param$geo_reg = 'Region'}
+  if (geo_level == 'state'){param$geo_reg = 'State'}
+  if (geo_level == 'municipality'){param$geo_reg = 'City'}
 
   ################################################################
   ## Create Grid with every possible combination of UF and Year ##
@@ -72,7 +67,7 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
 
   input_df = expand.grid(
     x=param$uf,
-    y=param$years
+    y=param$time_period
   )
 
   input = list(x = as.list(input_df$x),y = as.list(as.character(input_df$y)))
@@ -83,12 +78,12 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
 
   ## We use the purrr package (tidyverse equivalent of base apply functions) to run over the above grid
 
-  if (aggregation_level %in% c('country','region','state')){
+  if (geo_level %in% c('country','region','state')){
     dat = input %>%
       purrr::pmap(function(x,y) sidrar::get_sidra(param$type,geo=param$geo_reg,period = y))
   }
 
-  if (aggregation_level == 'municipality'){
+  if (geo_level == 'municipality'){
     dat = input %>%
       purrr::pmap(function(x,y) sidrar::get_sidra(param$type,geo=param$geo_reg,period = y,geo.filter = list("State" = x)))
   }
@@ -135,19 +130,19 @@ load_ppm = function(type=NULL,years=2019,aggregation_level = "municipality",lang
   ## Create Geographical Unit Identifier ##
   #########################################
 
-  if(aggregation_level == 'country'){
+  if(geo_level == 'country'){
     dat$geo_id = dat$brasil
     dat = dplyr::select(dat,-'brasil_codigo',-'brasil')
   }
-  if (aggregation_level == 'region'){
+  if (geo_level == 'region'){
     dat$geo_id = dat$grande_regiao
     dat = dplyr::select(dat,-'grande_regiao_codigo',-'grande_regiao')
   }
-  if (aggregation_level == 'state'){
+  if (geo_level == 'state'){
     dat$geo_id = dat$unidade_da_federacao_codigo
     dat = dplyr::select(dat,-'unidade_da_federacao_codigo',-'unidade_da_federacao')
   }
-  if (aggregation_level == 'municipality'){
+  if (geo_level == 'municipality'){
     dat$geo_id = dat$municipio_codigo
     dat = dplyr::select(dat,-'municipio',-'municipio_codigo')
   }
