@@ -20,7 +20,7 @@
 #'
 #' @examples \dontrun{datazoom.amazonia::load_pevs_vegextr(2013, aggregation_level = "country")}
 
-load_pevs <- function(type = NULL, geo_level = "municipality", time_period = 2014:2019, language = "pt"){
+load_pevs <- function(type = NULL, geo_level = "municipality", time_period = 2018:2019, language = "pt"){
 
   #############################
   ## Define Basic Parameters ##
@@ -77,17 +77,54 @@ load_pevs <- function(type = NULL, geo_level = "municipality", time_period = 201
   
   
   ## Loop Version
-  # Still need to apply "purrr::safely"
-  # Still need to separate municipality from country, region and state
   
- dat = list()
+ #dat = list()
 
- for (t in 1:length(param$time_period)){
+ #for (t in 1:length(param$time_period)){
 
-   dat[[t]] = sidrar::get_sidra(param$type, geo=param$geo_level, period = as.character(param$time_period[t]))
+ #  dat[[t]] = sidrar::get_sidra(param$type, geo=param$geo_level, period = as.character(param$time_period[t]))
 
-}
+#}
   
+  get_sidra_safe = purrr::safely(sidrar::get_sidra)
+  
+  ## We will need to check for the ones not considered in the loop afterwards
+  
+  ## We use the purrr package (tidyverse equivalent of base apply functions) to run over the above grid
+  
+  if (geo_level %in% c('country','region','state')){
+    
+    base::message(base::cat('Downloading Data:',length(param$time_period),'API requests')) ## Show Message
+    
+    ## Download
+    
+    dat = input_other %>%
+      purrr::pmap(function(x) get_sidra_safe(param$type,geo=param$geo_reg,period = x))
+    
+    ## Completion!
+    
+    base::message(base::cat('Download Completed! Starting Data Processing...'))
+    
+  }
+  
+  if (geo_level == 'municipality'){
+    dat = input %>%
+      purrr::pmap(function(x,y) get_sidra_safe(param$type,geo=param$geo_reg,period = y,geo.filter = list("State" = x)))
+  }
+  
+  ## Capture Errors
+  
+  ## Daniel Comment: The main point here is that the Sidra API has a limit for requests. Thus, for states with a large number
+  ## of municipalities the request may break. We used the purrr::safely to not break the loop (or map), but we will need to
+  ## deal with these problems in this step here. Now its under construction =)
+  
+  dat = lapply(dat,"[[", 1)
+  
+  boolean_downloaded = unlist(lapply(dat,is.data.frame))
+  
+  prob_data = input_df[!boolean_downloaded,]
+  
+  ## We need to check the municipalities in these UFs
   
   #######################
   ## Cleaning Function ##
@@ -99,21 +136,65 @@ load_pevs <- function(type = NULL, geo_level = "municipality", time_period = 201
     var = stringr::str_replace_all(string=var,pattern='ª',replacement='')
     var = stringr::str_replace_all(string=var,pattern='\\(',replacement='')
     var = stringr::str_replace_all(string=var,pattern='\\)',replacement='')
+    var = stringr::str_replace_all(string=var,pattern='_',replacement='')
+    var = stringr::str_replace_all(string=var,pattern='.',replacement='_')
+    var = stringr::str_replace_all(string=var,pattern=',',replacement='_')
     var = stringr::str_to_lower(string=var)
     return(var)
   }
   
   ## Binding Rows
-  #remember to add [boolean_downloaded]
   
-dat  = dat %>%
+dat  = dat[boolean_downloaded] %>%
   dplyr::bind_rows() %>%
   tibble::as_tibble()
   
-  
+######################
+## Data Enginnering ##
+######################
 
-  
-   sigla_uf = c(12,27,13,16,29,23,32,52,21,31,50,51,15,25,26,22,41,33,24,11,14,43,42,28,35,17)
+dat = dat %>%
+  janitor::clean_names() %>%
+  dplyr::mutate_all(function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")}) %>%
+  dplyr::mutate_all(clean_custom)  
+
+dat = dat %>%
+  dplyr::select(-c(nivel_territorial_codigo,nivel_territorial,
+                   unidade_de_medida_codigo,variavel_codigo,
+                   ano_codigo)) %>%
+  dplyr::mutate(valor=as.numeric(valor))
+
+#########################################
+## Create Geographical Unit Identifier ##
+#########################################
+
+if(geo_level == 'country'){
+  dat$geo_id = dat$brasil
+  dat = dplyr::select(dat,-'brasil_codigo',-'brasil')
+}
+if (geo_level == 'region'){
+  dat$geo_id = dat$grande_regiao
+  dat = dplyr::select(dat,-'grande_regiao_codigo',-'grande_regiao')
+}
+if (geo_level == 'state'){
+  dat$geo_id = dat$unidade_da_federacao_codigo
+  dat = dplyr::select(dat,-'unidade_da_federacao_codigo',-'unidade_da_federacao')
+}
+if (geo_level == 'municipality'){
+  dat$geo_id = dat$municipio_codigo
+  dat = dplyr::select(dat,-'municipio',-'municipio_codigo')
+}
+   
+#############################################
+## Adding Measure Information to Variables ##
+#############################################
+
+
+
+
+
+
+sigla_uf = c(12,27,13,16,29,23,32,52,21,31,50,51,15,25,26,22,41,33,24,11,14,43,42,28,35,17)
   sigla_uf2 = c(12,27,13,16,23,32,21,50,51,15,25,26,22,33,24,11,14,28,17)
   micro = c(29006,29001,29007,29022,29027,29019,29002,29018,29014,29012,29026,29031,29009,
             29011,29029,29010,29024,29013,29004,29025,29005,29032,29015,29021,29003,29020,29023,29008,29016,29030,29028,52007,52009,52003,52017,52006,52005,52012,52010,52008,52015,52016,52004,52018,52002,52001,52013,52014,52011,
