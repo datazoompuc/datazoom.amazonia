@@ -70,7 +70,8 @@ load_ppm = function(type=NULL,geo_level = "municipality", time_period=2019,langu
     y=param$time_period
   )
 
-  input = list(x = as.list(input_df$x),y = as.list(as.character(input_df$y)))
+  input_munic = list(x = as.list(input_df$x),y = as.list(as.character(input_df$y)))
+  input_other = list(x = as.list(as.character(param$time_period)))
 
   ###############
   ## Load Data ##
@@ -78,20 +79,66 @@ load_ppm = function(type=NULL,geo_level = "municipality", time_period=2019,langu
 
   ## We use the purrr package (tidyverse equivalent of base apply functions) to run over the above grid
 
+  get_sidra_safe = purrr::safely(sidrar::get_sidra)
+
+  ## We will need to check for the ones not considered in the loop afterwards
+
+  ## We use the purrr package (tidyverse equivalent of base apply functions) to run over the above grid
+
   if (geo_level %in% c('country','region','state')){
-    dat = input %>%
-      purrr::pmap(function(x,y) sidrar::get_sidra(param$type,geo=param$geo_reg,period = y))
+
+    base::message(base::cat('Downloading Data:',length(param$time_period),'API requests')) ## Show Message
+
+    ## Download
+
+    dat = input_other %>%
+      purrr::pmap(function(x) get_sidra_safe(param$type,geo=param$geo_reg,period = x))
+
+    ## Completion!
+
+    base::message(base::cat('Download Completed! Starting Data Processing...'))
+
   }
 
   if (geo_level == 'municipality'){
     dat = input %>%
-      purrr::pmap(function(x,y) sidrar::get_sidra(param$type,geo=param$geo_reg,period = y,geo.filter = list("State" = x)))
+      purrr::pmap(function(x,y) get_sidra_safe(param$type,geo=param$geo_reg,period = y,geo.filter = list("State" = x)))
   }
 
-  dat = dat %>%
+  ## Capture Errors
+
+  ## Daniel Comment: The main point here is that the Sidra API has a limit for requests. Thus, for states with a large number
+  ## of municipalities the request may break. We used the purrr::safely to not break the loop (or map), but we will need to
+  ## deal with these problems in this step here. Now its under construction =)
+
+  dat = lapply(dat,"[[", 1)
+
+  boolean_downloaded = unlist(lapply(dat,is.data.frame))
+
+  prob_data = input_df[!boolean_downloaded,]
+
+  ## We need to check the municipalities in these UFs
+
+  #######################
+  ## Cleaning Function ##
+  #######################
+
+
+  clean_custom = function(var){
+    var = stringr::str_replace_all(string=var,pattern=' ',replacement='_')
+    var = stringr::str_replace_all(string=var,pattern='-',replacement='')
+    var = stringr::str_replace_all(string=var,pattern='ª',replacement='')
+    var = stringr::str_replace_all(string=var,pattern='\\(',replacement='')
+    var = stringr::str_replace_all(string=var,pattern='\\)',replacement='')
+    var = stringr::str_to_lower(string=var)
+    return(var)
+  }
+
+  ## Binding Rows
+
+  dat  = dat[boolean_downloaded] %>%
     dplyr::bind_rows() %>%
-    janitor::clean_names() %>%
-    dplyr::mutate_all(function(x){gsub('[^ -~]', '', x)}) ## Remove Special Characters -- NOT BEST SOLUTION!!
+    tibble::as_tibble()
 
   ######################
   ## Data Enginnering ##
@@ -99,6 +146,14 @@ load_ppm = function(type=NULL,geo_level = "municipality", time_period=2019,langu
 
   ## We bind the datasets stored as elements of a list above, clean the names,
   ## drop unnecessary (duplication of already existing variables) variables and produce a tibble
+
+
+  #### Eu não entendi porque essa parte (156 a 159) não está dentro de "Cleaning Function"
+
+  dat = dat %>%
+    janitor::clean_names() %>%
+    dplyr::mutate_all(function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")}) %>%
+    dplyr::mutate_all(clean_custom)
 
 
   if (param$type == 74){
@@ -250,9 +305,9 @@ load_ppm = function(type=NULL,geo_level = "municipality", time_period=2019,langu
     dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Piau, piapara, piauu, piava'] = 'piau'
   }
 
-  ######################
-  ## Harmonize Values ##
-  ######################
+  ###############################
+  ## Harmonize Variables Names ##
+  ###############################
 
   ## Convert values to something comparable across different units (Dozens and Units to Kg based on product type)
 
@@ -326,9 +381,9 @@ load_ppm = function(type=NULL,geo_level = "municipality", time_period=2019,langu
 
   if (language == 'eng'){names(dat)[which(names(dat) == 'ano')] = 'year'}
 
-  ############
-  ## Return ##
-  ############
+  #########################
+  ## Returning Data Frame ##
+  #########################
 
   return(dat)
 
