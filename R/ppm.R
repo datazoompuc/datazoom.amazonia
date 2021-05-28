@@ -15,7 +15,7 @@
 #'
 #' @examples \dontrun{load_ppm(type=3939,time_period = 2018:2019,geo_level = 'municipality',language='eng')}
 
-load_ppm = function(type=NULL,geo_level = "municipality", time_period=2019,language = 'pt'){
+load_ppm = function(type=NULL,geo_level = "municipality",time_period=2019,language = 'pt'){
 
 
   ## THIS NEED TO BE UPDATED -- I will walk you through this example cause the PAM, PPM and PEVS need to be benchmarks
@@ -140,6 +140,12 @@ load_ppm = function(type=NULL,geo_level = "municipality", time_period=2019,langu
     dplyr::bind_rows() %>%
     tibble::as_tibble()
 
+
+  dat = dat %>%
+    janitor::clean_names() %>%
+    dplyr::mutate_all(function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")}) %>%
+    dplyr::mutate_all(clean_custom)
+
   ######################
   ## Data Enginnering ##
   ######################
@@ -148,37 +154,35 @@ load_ppm = function(type=NULL,geo_level = "municipality", time_period=2019,langu
   ## drop unnecessary (duplication of already existing variables) variables and produce a tibble
 
 
-  #### Eu não entendi porque essa parte (156 a 159) não está dentro de "Cleaning Function"
-
-  dat = dat %>%
-    janitor::clean_names() %>%
-    dplyr::mutate_all(function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")}) %>%
-    dplyr::mutate_all(clean_custom)
-
-
   if (param$type == 74){
     dat = dat %>% dplyr::select(-tidyselect::matches('nivel_territorial'),
                                 -'ano_codigo',-'variavel_codigo',-'tipo_de_produto_de_origem_animal_codigo',-'unidade_de_medida_codigo') %>%
-      dplyr::mutate(valor = as.numeric(valor)) %>%
-      dplyr::as_tibble()
+      dplyr::mutate(valor = as.numeric(valor))
   }
+
   if (param$type == 94){
     dat = dat %>% dplyr::select(-tidyselect::matches('nivel_territorial'),
                                 -'ano_codigo',-'variavel_codigo',-'unidade_de_medida_codigo') %>%
-      dplyr::mutate(valor = as.numeric(valor)) %>%
-      dplyr::as_tibble()
+      dplyr::mutate(valor = as.numeric(valor))
   }
+
+  #### Adicionei o if para o type = 95 -> preciso ver melhor se exclui as colunas certas
+
+  if (param$type == 95){
+    dat = dat %>% dplyr::select(-tidyselect::matches('nivel_territorial'),
+                                -'ano_codigo',-'variavel_codigo',-'unidade_de_medida_codigo') %>%
+      dplyr::mutate(valor = as.numeric(valor))
+  }
+
   if (param$type == 3939){
     dat = dat %>% dplyr::select(-tidyselect::matches('nivel_territorial'),
                                 -'ano_codigo',-'variavel_codigo',-'tipo_de_rebanho_codigo',-'unidade_de_medida_codigo') %>%
-      dplyr::mutate(valor = as.numeric(valor)) %>%
-      dplyr::as_tibble()
+      dplyr::mutate(valor = as.numeric(valor))
   }
   if (param$type == 3940){
     dat = dat %>% dplyr::select(-tidyselect::matches('nivel_territorial'),
                                 -'ano_codigo',-'variavel_codigo',-'tipo_de_produto_da_aquicultura_codigo',-'unidade_de_medida_codigo') %>%
-      dplyr::mutate(valor = as.numeric(valor)) %>%
-      dplyr::as_tibble()
+      dplyr::mutate(valor = as.numeric(valor))
   }
 
   #########################################
@@ -202,24 +206,12 @@ load_ppm = function(type=NULL,geo_level = "municipality", time_period=2019,langu
     dat = dplyr::select(dat,-'municipio',-'municipio_codigo')
   }
 
-  #########################################################
-  ## Comment Specific To "74	Producao de origem animal" ##
-  #########################################################
-
-  ## The current state of the data is: Production quantities and values are stacked together -- Producao de Origem Animal e Valor da Producao under one variable
-  ## We will undo this to make visualization compatible with styling guides
-  ## There is also a very important decision to be made here: Data contain duplicates, which we can choose to either sum, take the mean or drop
-  ## The code below show this problem in action:
-
-  # dat = dat %>% select(-unidade_de_medida) %>% pivot_wider(id_cols = geo_id:ano,
-  #                                                      names_from = variavel:tipo_de_produto_de_origem_animal,
-  #                                                      values_from=valor,
-  #                                                      names_sep = '_x_',
-  #                                                      values_fn = length)
-
   #################################
   ## Simplify names of variables ##
   #################################
+
+
+  ## Falta fazer para o type = 95
 
   if (param$type == 74){
 
@@ -328,6 +320,9 @@ load_ppm = function(type=NULL,geo_level = "municipality", time_period=2019,langu
 
   ## The Output is a tibble with unit and year identifiers + production and/or value of each item
 
+  ## Falta fazer para o type = 95
+  ## Faltar completar o 94
+
   if (param$type == 74){ ## Animal Origin Production
     dat = dat %>% dplyr::select(-'unidade_de_medida') %>%
       tidyr::pivot_wider(id_cols = c(geo_id,ano),
@@ -339,10 +334,12 @@ load_ppm = function(type=NULL,geo_level = "municipality", time_period=2019,langu
       janitor::clean_names()
   }
 
+  ## ERRO -> Colocar nome da variável
+
   if (param$type == 94){ ## Cow Farming
     dat = dat %>% dplyr::select(-'unidade_de_medida') %>%
       tidyr::pivot_wider(id_cols = c(geo_id,ano),
-                         names_from = variavel,
+                         names_from = variavel:,
                          values_from=valor,
                          names_sep = '_',
                          values_fn = sum,
