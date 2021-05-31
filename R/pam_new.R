@@ -84,7 +84,7 @@ load_pam = function(type=NULL,geo_level = "municipality", time_period = 2017:201
   }
 
   if (geo_level == 'municipality'){
-    dat = input %>%
+    dat = input_munic %>%
       purrr::pmap(function(x,y) get_sidra_safe(param$type,geo=param$geo_reg,period = y,geo.filter = list("State" = x)))
   }
 
@@ -102,6 +102,100 @@ load_pam = function(type=NULL,geo_level = "municipality", time_period = 2017:201
 
   ## We need to check the municipalities in these UFs
 
+  ## Binding Rows
+
+  dat  = dat[boolean_downloaded] %>%
+    dplyr::bind_rows() %>%
+    tibble::as_tibble()
+
+  #############################
+  ## Downloading Second Data ##
+  #############################
+
+  ## Download MesoRegion Info
+
+  meso = geobr::read_meso_region(year=2010,simplified=TRUE) %>%
+    sf::st_drop_geometry() %>%
+    dplyr::select(code_meso,code_state) %>%
+    tibble::as_tibble()
+
+  ## Selecting Municipalities we need to download manually
+
+  new_download = meso[meso$code_state %in% as.character(unique(prob_data$x)), ]
+
+  ## Creating Grid
+
+  input_df = expand.grid(
+    x=unique(new_download$code_meso),
+    y=param$time_period
+  )
+
+  input_munic = list(x = as.list(input_df$x),y = as.list(as.character(input_df$y)))
+
+  if (geo_level == 'municipality'){
+    new_dat = input_munic %>%
+      purrr::pmap(function(x,y) get_sidra_safe(param$type,geo=param$geo_reg,period = y,geo.filter = list("MesoRegion" = x)))
+  }
+
+  new_dat = lapply(new_dat,"[[", 1)
+
+  boolean_downloaded = unlist(lapply(new_dat,is.data.frame))
+
+  prob_data = input_df[!boolean_downloaded,]
+
+  new_dat  = new_dat[boolean_downloaded] %>%
+    dplyr::bind_rows() %>%
+    tibble::as_tibble()
+
+  dat = dplyr::bind_rows(dat,new_dat)
+
+  rm(new_dat)
+
+  ################
+  ## Third Data ##
+  ################
+
+  ## Download MicroRegion Info
+
+  micro = geobr::read_micro_region(year=2010,simplified=TRUE) %>%
+    sf::st_drop_geometry() %>%
+    dplyr::select(code_micro,code_state) %>%
+    tibble::as_tibble()
+
+  ## Selecting Municipalities we need to download manually
+
+  uf_need = unique(new_download$code_state[new_download$code_meso %in% unique(prob_data$x)])
+
+  new_download = micro[micro$code_state %in% uf_need, ]
+
+  ## Creating Grid
+
+  input_df = expand.grid(
+    x=unique(new_download$code_micro),
+    y=param$time_period
+  )
+
+  input_munic = list(x = as.list(input_df$x),y = as.list(as.character(input_df$y)))
+
+  if (geo_level == 'municipality'){
+    new_dat2 = input_munic %>%
+      purrr::pmap(function(x,y) get_sidra_safe(param$type,geo=param$geo_reg,period = y,geo.filter = list("MicroRegion" = x)))
+  }
+
+  new_dat2 = lapply(new_dat2,"[[", 1)
+
+  boolean_downloaded = unlist(lapply(new_dat2,is.data.frame))
+
+  prob_data = input_df[!boolean_downloaded,]
+
+  new_dat2  = new_dat2[boolean_downloaded] %>%
+    dplyr::bind_rows() %>%
+    tibble::as_tibble()
+
+  dat = dplyr::bind_rows(dat,new_dat2)
+
+  rm(new_dat2)
+
   #######################
   ## Cleaning Function ##
   #######################
@@ -113,17 +207,11 @@ load_pam = function(type=NULL,geo_level = "municipality", time_period = 2017:201
     var = stringr::str_replace_all(string=var,pattern='\\(',replacement='')
     var = stringr::str_replace_all(string=var,pattern='\\)',replacement='')
     var = stringr::str_replace_all(string=var,pattern='__',replacement='_')
-    var = stringr::str_replace_all(string=var,pattern='.',replacement='_')
-    var = stringr::str_replace_all(string=var,pattern=',',replacement='_')
+    # var = stringr::str_replace_all(string=var,pattern='.',replacement='_')
+    # var = stringr::str_replace_all(string=var,pattern=',',replacement='_')
     var = stringr::str_to_lower(string=var)
     return(var)
   }
-
-  ## Binding Rows
-
-  dat  = dat[boolean_downloaded] %>%
-          dplyr::bind_rows() %>%
-          tibble::as_tibble()
 
   ######################
   ## Data Enginnering ##

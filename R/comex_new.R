@@ -6,6 +6,14 @@
 
 ## https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta
 
+## https://www.m2vconsultoria.com.br/noticias/a-importancia-da-correta-classificacao-fiscal-de-mercadorias-para-os-processos-aduaneiros/
+## http://siscomex.gov.br/balanca-comercial-traz-agora-classificacao-de-produtos-por-setor-de-atividade-economica/
+# https://wits.worldbank.org/WITS/WITS/Restricted/Login.aspx
+# http://www.cepii.fr/cepii/en/bdd_modele/bdd.asp
+# https://www.usitc.gov/data/gravity/data_faq.htm
+# http://siscomex.gov.br/balanca-comercial-traz-agora-classificacao-de-produtos-por-setor-de-atividade-economica/
+
+
 load_br_trade = function(type='exports',geo_level,time_period =2012,
                          time_id='year',language='eng',dic='isic'){
 
