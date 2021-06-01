@@ -41,11 +41,6 @@ NULL
 #' )
 #' }
 load_prodes <- function(source, space_aggregation = "municipality", language = "eng") {
-
-  ########################################
-  ## Sequentially Apply Functions Below ##
-  ########################################
-
   # Downloading raw data
   raw_data <- load_prodes_raw(source)
 
@@ -96,14 +91,7 @@ load_prodes <- function(source, space_aggregation = "municipality", language = "
 #'
 #'
 load_prodes_raw <- function(source) {
-
-  ##########################
-  ## Download Prodes Data ##
-  ##########################
-
-  ## THIS IS A MESS, PLEASE AVOID THAT
-
-  # If source is a list of numbers, we construct the URLs to INPE
+  # If source is a list of numbers (years), we construct the URLs to download data
   if (is.numeric(source)) {
     source <- purrr::map(source, urls_prodes)
   }
@@ -115,7 +103,7 @@ load_prodes_raw <- function(source) {
   }
   # Otherwise, we assume that source is something that can already be interpreted by read.csv()
 
-  # Useful as integrity check on database
+  # Identifies column type ("d" - integer; "c" - character)
   csv_types <- readr::cols("d", "d", "d", "c", "c", "c", "c", "c", "d", "d", "d", "d", "d", "d", "d", "d", "d")
 
   # Reads the csvs containing the data
@@ -123,18 +111,16 @@ load_prodes_raw <- function(source) {
 }
 
 treat_prodes_data <- function(df, space_aggregation, language) {
-
-  ######################
-  ## Data Engineering ##
-  ######################
-
   space_aggregation <- tolower(space_aggregation)
   if (space_aggregation == "state") {
     df <-
       df %>%
+      # Adds column with UF codes, eg. MA = 21
       dplyr::mutate(CodIBGE = as.factor(substr(.data$CodIbge, start = 1, stop = 2))) %>%
+      # Removes unnecessary columns
       dplyr::select(-c("Latgms", "Lat", "Long", "Longms", "Municipio", "CodIbge")) %>%
       dplyr::group_by(.data$Estado, .data$CodIBGE) %>%
+      # Collapses data by state
       dplyr::summarize_if(is.numeric, sum, na.rm = TRUE)
   }
   else if (space_aggregation == "municipality") {
@@ -155,10 +141,8 @@ treat_prodes_data <- function(df, space_aggregation, language) {
   # Removes year from column name
   colnames(df) <- gsub("(.*)\\d{4}?", "\\1", colnames(df))
 
-  #################
-  ## Translating ##
-  #################
 
+  # Translation
   language <- tolower(language)
   if (language == "eng") {
     df <- translate_prodes_to_english(df)
