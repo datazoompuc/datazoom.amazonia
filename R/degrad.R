@@ -5,9 +5,9 @@ NULL
 #' Loads and cleans degradation data from INPE.
 #'
 #' @inheritParams load_degrad_raw
-#' @param space_aggregation A string that indicates the level of spatial aggregation of the data. It can be by "Municipality" or
+#' @param geo_aggregation A string that indicates the level of spatial aggregation of the data. It can be by "Municipality" or
 #'   "State".
-#' @param time_aggregation A string that indicates the level of temporal aggregation of the data. It can be by "Month" or
+#' @param time_period A string that indicates the level of temporal aggregation of the data. It can be by "Month" or
 #'   "Year".
 #' @param language A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
 #'   The other option is "pt" for Portuguese.
@@ -27,24 +27,24 @@ NULL
 #'
 #' load_degrad(
 #'   c(2015, 2016),
-#'   space_aggregation = "state",
+#'   geo_aggregation = "state",
 #'   language = "pt"
 #' )
 #'
 #' load_degrad(
 #'   "~/Downloads",
-#'   space_aggregation = "state",
-#'   time_aggregation = "year",
+#'   geo_aggregation = "state",
+#'   time_period = "year",
 #'   language = "en"
 #' )
 #'
 #' load_degrad(
 #'   "~/Downloads/degrad2016_final_shp/DEGRAD_2016_pol.shp",
-#'   time_aggregation = "municipality",
+#'   time_period = "municipality",
 #'   language = "pt"
 #' )
 #' }
-load_degrad <- function(source, space_aggregation = "municipality", time_aggregation = "year", language = "eng", all_events = FALSE) {
+load_degrad <- function(source, geo_aggregation = "municipality", time_period = "year", language = "eng", all_events = FALSE) {
   # Downloading raw data
   raw_data <- load_degrad_raw(source)
 
@@ -52,7 +52,7 @@ load_degrad <- function(source, space_aggregation = "municipality", time_aggrega
   geo_amazon <- download_map()
 
   # Treating data according to parameters selected
-  list_df <- lapply(raw_data, treat_degrad_data, space_aggregation = space_aggregation, time_aggregation = time_aggregation, language = language, geo_amazon = geo_amazon, filter = !all_events)
+  list_df <- lapply(raw_data, treat_degrad_data, geo_aggregation = geo_aggregation, time_period = time_period, language = language, geo_amazon = geo_amazon, filter = !all_events)
 
   dplyr::bind_rows(list_df)
 }
@@ -119,7 +119,7 @@ find_from_dir <- function(dir) {
     grep(pattern = "\\.shp", value = TRUE)
 }
 
-treat_degrad_data <- function(df, space_aggregation, time_aggregation, language, geo_amazon, filter) {
+treat_degrad_data <- function(df, geo_aggregation, time_period, language, geo_amazon, filter) {
   message("Processing data. This should take a few minutes.")
   # Lowers letters
   names(df) <- tolower(names(df))
@@ -187,8 +187,8 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
     sf::st_drop_geometry()
 
   # Set aggregation level
-  space_aggregation <- tolower(space_aggregation)
-  if (space_aggregation == "state") {
+  geo_aggregation <- tolower(geo_aggregation)
+  if (geo_aggregation == "state") {
     df <- df %>%
       # Replaces state names (with errors because of accents) with state code
       dplyr::mutate(CodIBGE = as.factor(.data$code_state)) %>%
@@ -198,7 +198,7 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
       dplyr::select(-c("code_muni", "code_state"))
   }
   else {
-    if (space_aggregation != "municipality") {
+    if (geo_aggregation != "municipality") {
       warning("Spatial aggregation level not supported. Proceeding with Municipality.")
     }
 
@@ -210,13 +210,13 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
       dplyr::select(-c("code_muni", "code_state"))
   }
 
-  time_aggregation <- tolower(time_aggregation)
+  time_period <- tolower(time_period)
   # Some data don't allow to separate by month, be careful
   # WE NEED TO LOOK AT THIS A LITTLE BIT FURTHER AND THOROUGHLY EXPLAIN TO THE USER
-  if (time_aggregation == "month") {
+  if (time_period == "month") {
     df <- dplyr::group_by(df, .data$Mes, .add = TRUE)
   }
-  else if (time_aggregation != "year") {
+  else if (time_period != "year") {
     warning("Temporal aggregation level not supported. Proceeding with Year.")
   }
 
