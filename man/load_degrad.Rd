@@ -7,8 +7,8 @@
 \usage{
 load_degrad(
   source,
-  space_aggregation = "municipality",
-  time_aggregation = "year",
+  geo_aggregation = "municipality",
+  time_period = "year",
   language = "eng",
   all_events = FALSE
 )
@@ -22,10 +22,10 @@ Passing a \code{string} with a directory's path will read data from all shapefil
 
 Alternatively, \code{source} may be a list of full file paths, or anything else readable by \code{sf::read_sf()}.}
 
-\item{space_aggregation}{A string that indicates the level of spatial aggregation of the data. It can be by "Municipality" or
+\item{geo_aggregation}{A string that indicates the level of spatial aggregation of the data. It can be by "Municipality" or
 "State".}
 
-\item{time_aggregation}{A string that indicates the level of temporal aggregation of the data. It can be by "Month" or
+\item{time_period}{A string that indicates the level of temporal aggregation of the data. It can be by "Month" or
 "Year".}
 
 \item{language}{A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
@@ -45,20 +45,20 @@ load_degrad(2016)
 
 load_degrad(
   c(2015, 2016),
-  space_aggregation = "state",
+  geo_aggregation = "state",
   language = "pt"
 )
 
 load_degrad(
   "~/Downloads",
-  space_aggregation = "state",
-  time_aggregation = "year",
+  geo_aggregation = "state",
+  time_period = "year",
   language = "en"
 )
 
 load_degrad(
   "~/Downloads/degrad2016_final_shp/DEGRAD_2016_pol.shp",
-  time_aggregation = "municipality",
+  time_period = "municipality",
   language = "pt"
 )
 }

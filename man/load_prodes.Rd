@@ -5,7 +5,7 @@
 \alias{load_prodes}
 \title{Loads and cleans deforestation data from INPE.}
 \usage{
-load_prodes(source, space_aggregation = "municipality", language = "eng")
+load_prodes(source, geo_aggregation = "municipality", language = "eng")
 }
 \arguments{
 \item{source}{A number of different sources are supported:
@@ -17,7 +17,7 @@ Passing a \code{string} with a directory's path will read data from all files na
 
 Alternatively, \code{source} may be a list of full file paths, or anything else readable by \code{utils::read.csv()}.}
 
-\item{space_aggregation}{A string that indicates the level of aggregation of the data. It can be by "Municipality" or
+\item{geo_aggregation}{A string that indicates the level of aggregation of the data. It can be by "Municipality" or
 "State".}
 
 \item{language}{A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
@@ -35,19 +35,19 @@ load_prodes(2018)
 
 load_prodes(
   c(2017, 2018),
-  space_aggregation = "state",
+  geo_aggregation = "state",
   language = "pt"
 )
 
 load_prodes(
   system.file("extdata", package = "datazoom.amazonia"),
-  space_aggregation = "state",
+  geo_aggregation = "state",
   language = "en"
 )
 
 load_prodes(
   system.file("extdata", "DesmatamentoMunicipios2015.txt", package = "datazoom.amazonia"),
-  space_aggregation = "municipality",
+  geo_aggregation = "municipality",
   language = "pt"
 )
 }
