@@ -80,10 +80,10 @@ data <- load_prodes(c(2018, 2019))
 
 data <- load_degrad(2016)
 
-data <- load_prodes(2017, space_aggregation = "state", language = "pt")
+data <- load_prodes(2017, geo_aggregation = "state", language = "pt")
 
-data <- load_deter("amazonia", space_aggregation = "state",
-                   time_aggregation = "year", language = "pt")
+data <- load_deter("amazonia", geo_aggregation = "state",
+                   time_period = "year", language = "pt")
 
 # Loads data locally
 
