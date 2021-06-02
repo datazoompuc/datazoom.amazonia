@@ -125,18 +125,27 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
   names(df) <- tolower(names(df))
 
   if (filter) {
+    # Removes non-degradation data
     df <- dplyr::filter(df, grepl("degrad", .data$class_name, ignore.case = TRUE))
   }
 
-  # Extract date
+  # Extracts month and year of observation
+
+  # There are some archives (older ones) that don't have the exact date from observation
+  # Thus we can only recover the year from the type of the data, eg. DEGRAD2007 for data from 2007
+  # So this first "if" gets the year from older data (2007 and 2008)
   if (grepl(df$class_name[1], pattern = "\\d{4}$")) {
     year <- as.numeric(substr(df$class_name[1], 7, 10))
     month <- NA
   }
+  # Data for year 2009 has a column containing the year, which is collected
+  # ATT: THERE IS A WAY TO FIND OUT THE DATE SOMEONE MIGHT WANT TO LOOK AT IT
   else if (any(grepl(colnames(df), pattern = "ano"))) {
     year <- df[["ano"]][1]
     month <- NA
   }
+  # Since 2010, there is a column named "view_date" with the exact date (day) of the observation
+  # Therefore, we collect both month and year of each observation
   else {
     year <- as.numeric(substr(as.character(as.Date(df$view_date)), 1, 4))
     month <- as.numeric(substr(as.character(as.Date(df$view_date)), 6, 7))
@@ -144,13 +153,19 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
   df$Ano <- year
   df$Mes <- month
 
-  df[grep(df$class_name, pattern = "degrad[^_]", ignore.case = TRUE), ]$class_name <- "DEGRAD"
+  # There are multiple names for degradation data eg. "DEGRAD2007", "DEGRADACAO", "DEGRAD"
+  # The grep function gives the row of all degradation observation because of the common format "DEGRAD"
+  # But returns a zero vector if the name is already "DEGRAD", and a vector of numbers (of the rows) elsewhere
+  # Then, the name of all of those is padronized to "DEGRAD"
+  rows_degradation <- grep(df$class_name, pattern = "degrad[^_]", ignore.case = TRUE)
+  if(length(rows_degradation) != 0){
+    df[rows_degradation, ]$class_name <- "DEGRAD"
+  }
 
   # Insert crs
   if (is.na(sf::st_crs(df))) {
     # If df comes without crs, we set the correct crs, the used in the data, of degrad data to the df
-    data_crs <- sf::st_crs("+proj=longlat +ellps=aust_SA +towgs84=-66.8700,4.3700,-38.5200,0.0,0.0,0.0,0.0 +no_defs")
-    sf::st_crs(df) <- data_crs
+    df$geometry <- sf::st_set_crs(df$geometry, "+proj=longlat +ellps=aust_SA +towgs84=-66.8700,4.3700,-38.5200,0.0,0.0,0.0,0.0 +no_defs")
   }
 
   # The crs that will be used to overlap maps below
@@ -163,7 +178,10 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
   # Municipalize
   sf::st_agr(df) <- "constant"
   sf::st_agr(geo_amazon) <- "constant"
+
+  # Overlaps shapefiles
   df <- sf::st_intersection(df, geo_amazon) %>%
+    # Creates column with calculated areas
     dplyr::mutate(calculated_area = sf::st_area(.data$geometry)) %>%
     dplyr::group_by(.data$abbrev_state, .data$Ano, .data$class_name) %>%
     sf::st_drop_geometry()
@@ -172,9 +190,11 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
   space_aggregation <- tolower(space_aggregation)
   if (space_aggregation == "state") {
     df <- df %>%
+      # Replaces state names (with errors because of accents) with state code
       dplyr::mutate(CodIBGE = as.factor(.data$code_state)) %>%
       dplyr::group_by(.data$CodIBGE, .add = TRUE) %>%
       dplyr::rename(Estado = .data$abbrev_state, Evento = .data$class_name) %>%
+      # Removes useless columns
       dplyr::select(-c("code_muni", "code_state"))
   }
   else {
@@ -183,6 +203,7 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
     }
 
     df <- df %>%
+      # Adds from which municipality each observation is
       dplyr::mutate(CodIBGE = as.factor(.data$code_muni)) %>%
       dplyr::group_by(.data$CodIBGE, .data$name_muni, .add = TRUE) %>%
       dplyr::rename(Municipio = .data$name_muni, Estado = .data$abbrev_state, Evento = .data$class_name) %>%
@@ -190,6 +211,8 @@ treat_degrad_data <- function(df, space_aggregation, time_aggregation, language,
   }
 
   time_aggregation <- tolower(time_aggregation)
+  # Some data don't allow to separate by month, be careful
+  # WE NEED TO LOOK AT THIS A LITTLE BIT FURTHER AND THOROUGHLY EXPLAIN TO THE USER
   if (time_aggregation == "month") {
     df <- dplyr::group_by(df, .data$Mes, .add = TRUE)
   }
