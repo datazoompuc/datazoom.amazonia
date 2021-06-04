@@ -79,6 +79,7 @@ load_ppm = function(type=NULL,geo_level = "municipality",time_period=2019,langua
 
   ## We use the purrr package (tidyverse equivalent of base apply functions) to run over the above grid
 
+
   get_sidra_safe = purrr::safely(sidrar::get_sidra)
 
   ## We will need to check for the ones not considered in the loop afterwards
@@ -145,6 +146,7 @@ load_ppm = function(type=NULL,geo_level = "municipality",time_period=2019,langua
     janitor::clean_names() %>%
     dplyr::mutate_all(function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")}) %>%
     dplyr::mutate_all(clean_custom)
+
 
   ######################
   ## Data Enginnering ##
