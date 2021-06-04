@@ -210,92 +210,81 @@ load_ppm = function(type=NULL,geo_level = "municipality",time_period=2019,langua
   ## Simplify names of variables ##
   #################################
 
-
+  table(dat$tipo_de_produto_da_aquicultura)
   ## Falta fazer para o type = 95
+  ## Mudar para tidyverse
 
   if (param$type == 74){
 
     if (language == 'pt'){
-      dat$variavel = base::ifelse(dat$variavel == 'Produo de origem animal','producao_kg','valor_brl')
-      dat$tipo_de_produto_de_origem_animal[dat$tipo_de_produto_de_origem_animal == 'L'] = 'la'
+      dat$variavel = base::ifelse(dat$variavel == 'producao_de_origem_animal','producao_kg','valor_brl')
     }
 
     if (language == 'eng'){
-      dat$variavel = base::ifelse(dat$variavel == 'Produo de origem animal','production_kg','value_brl')
-      dat$tipo_de_produto_de_origem_animal[dat$tipo_de_produto_de_origem_animal == 'L'] = 'wool'
-      dat$tipo_de_produto_de_origem_animal[dat$tipo_de_produto_de_origem_animal == 'Casulos do bicho-da-seda'] = 'silk_worm_cocoons'
-      dat$tipo_de_produto_de_origem_animal[dat$tipo_de_produto_de_origem_animal == 'Leite'] = 'milk'
-      dat$tipo_de_produto_de_origem_animal[dat$tipo_de_produto_de_origem_animal == 'Mel de abelha'] = 'bee_honey'
-      dat$tipo_de_produto_de_origem_animal[dat$tipo_de_produto_de_origem_animal == 'Ovos de codorna'] = 'quail_eggs'
-      dat$tipo_de_produto_de_origem_animal[dat$tipo_de_produto_de_origem_animal == 'Ovos de galinha'] = 'chicken_eggs'
+      dat$variavel = base::ifelse(dat$variavel == 'produto_de_origem_animal','production_kg','value_brl')
+      dat$tipo_de_produto_de_origem_animal[dat$tipo_de_produto_de_origem_animal == 'la'] = 'wool'## o que que é isso??
+      dat$tipo_de_produto_de_origem_animal[dat$tipo_de_produto_de_origem_animal == 'casulos_do_bichodaseda'] = 'silk_worm_cocoons'
+      dat$tipo_de_produto_de_origem_animal[dat$tipo_de_produto_de_origem_animal == 'leite'] = 'milk'
+      dat$tipo_de_produto_de_origem_animal[dat$tipo_de_produto_de_origem_animal == 'mel_de_abelha'] = 'bee_honey'
+      dat$tipo_de_produto_de_origem_animal[dat$tipo_de_produto_de_origem_animal == 'ovos_de_codorna'] = 'quail_eggs'
+      dat$tipo_de_produto_de_origem_animal[dat$tipo_de_produto_de_origem_animal == 'ovos_de_galinha'] = 'chicken_eggs'
     }
 
   }
 
   if (param$type == 94){
 
-    if (language == 'eng'){dat$variavel = base::ifelse(dat$variavel == 'Vacas ordenhadas','milked_cows','')}
-    if (language == 'pt'){dat$variavel = base::ifelse(dat$variavel == 'Vacas ordenhadas','vacas_ordenhadas','')}
+    if (language == 'eng'){dat$variavel = base::ifelse(dat$variavel == 'vacas_ordenhadas','milked_cows','')}
+    if (language == 'pt'){dat$variavel = base::ifelse(dat$variavel == 'vacas_ordenhadas','vacas_ordenhadas','')}
+
+  }
+
+  if (param$type == 95){
+
+    if (language == 'eng'){dat$variavel = base::ifelse(dat$variavel == 'ovinos_tosquiados_nos_estabelecientos_agropecuarios','milked_cows','')}
+    if (language == 'pt'){dat$variavel = base::ifelse(dat$variavel == 'ovinos_tosquiados_nos_estabelecientos_agropecuarios','ovinos_tosquiados_nos_estabelecientos_agropecuarios','')}
 
   }
 
   if (param$type == 3939){
 
     if(language == 'pt'){
-      dat$variavel = base::ifelse(dat$variavel == 'Efetivo dos rebanhos','gado_cabeca','')
-      dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'Galinceos - galinhas'] = 'galinaceos_galinha'
-      dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'Galinceos - total'] = 'galinaceos_total'
-      dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'Suno - matrizes de sunos'] = 'suino_matrizes'
-      dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'Suno - total'] = 'suino_total'
+      dat$variavel = base::ifelse(dat$variavel == 'efetivo_dos_rebanhos','gado_cabeca','')
     }
 
     if (language == 'eng'){
-      dat$variavel = base::ifelse(dat$variavel == 'Efetivo dos rebanhos','cattle_number','')
-      dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'Galinceos - galinhas'] = 'gallinaceous_chicken'
-      dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'Galinceos - total'] = 'gallinaceous_total'
-      dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'Suno - matrizes de sunos'] = 'swine_sows'
-      dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'Suno - total'] = 'swine_total'
-      dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'Bovino'] = 'bovine'
-      dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'Bubalino'] = 'buffalo'
-      dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'Caprinos'] = 'goat'
-      dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'Codornas'] = 'quail'
-      dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'Equino'] = 'equine'
-      dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'Ovino'] = 'ovine'
+      dat$variavel = base::ifelse(dat$variavel == 'efetivo_dos_rebanhos','cattle_number','')
+      dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'galinaceos_galinhas'] = 'gallinaceous_chicken'
+      dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'galinaceos_total'] = 'gallinaceous_total'
+      dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'suino_matrizes_de_suonos'] = 'swine_sows'
+      dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'suino_total'] = 'swine_total'
+      dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'bovino'] = 'bovine'
+      dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'bubalino'] = 'buffalo'
+      dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'caprino'] = 'goat'
+      dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'codornas'] = 'quail'
+      dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'equino'] = 'equine'
+      dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'ovino'] = 'ovine'
     }
   }
 
   if (param$type == 3940){
 
     if (language == 'pt'){
-      dat$variavel = base::ifelse(dat$variavel == 'Produo da aquicultura','producao_kg','valor_brl')
-      dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Outros peixes'] = 'peixes_outros'
-      dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Camaro'] = 'camarao'
-      dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Larvas e ps-larvas de camaro'] = 'larvas_camarao'
-      dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Ostras, vieiras e mexilhes'] = 'ostra_mexilhoes'
-      dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Outros produtos (r, jacar, siri, caranguejo, lagosta, etc)'] = 'outros'
-      dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Sementes de moluscos'] = 'molusco_semente'
+      dat$variavel = base::ifelse(dat$variavel == 'producao_da_aquicultura','producao_kg','valor_brl')
     }
 
     if (language == 'eng'){
-      dat$variavel = base::ifelse(dat$variavel == 'Produo da aquicultura','production_kg','value_brl')
-      dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Outros peixes'] = 'fish_others'
-      dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Camaro'] = 'shrimp'
-      dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Larvas e ps-larvas de camaro'] = 'shrimp_larvae'
-      dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Ostras, vieiras e mexilhes'] = 'oyester_mussels'
-      dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Outros produtos (r, jacar, siri, caranguejo, lagosta, etc)'] = 'others'
-      dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Sementes de moluscos'] = 'shellfish_seeds'
+      dat$variavel = base::ifelse(dat$variavel == 'producao_da_aquicultura','production_kg','value_brl')
+      dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'outros_peixes'] = 'fish_others'
+      dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'camarao'] = 'shrimp'
+      dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'larvas_e_poslarvas_de_camarao'] = 'shrimp_larvae'
+      dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'ostras,_vieiras_e_mexilhoes'] = 'oyester_mussels'
+      dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'outros_produtos_ra,_jacare,_siri,_caranguejo,_lagosta,_etc)'] = 'others'
+      dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'sementes_de_moluscos'] = 'shellfish_seeds'
     }
-
-    dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Matrinx'] = 'matrinxa'
-    dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Pacu e patinga'] = 'pacu'
-    dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Pintado, cachara, cachapira e pintachara, surubim'] = 'pintado'
-    dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Tambacu, tambatinga'] = 'tambacu'
-    dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Tilpia'] = 'tilapia'
-    dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Trara e trairo'] = 'traira'
-    dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Curimat, curimbat'] = 'curimata'
-    dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Jatuarana, piabanha e piracanjuba'] = 'jatuarana'
-    dat$tipo_de_produto_da_aquicultura[dat$tipo_de_produto_da_aquicultura == 'Piau, piapara, piauu, piava'] = 'piau'
   }
+
+
 
   ###############################
   ## Harmonize Variables Names ##
@@ -327,19 +316,6 @@ load_ppm = function(type=NULL,geo_level = "municipality",time_period=2019,langua
     dat = dat %>% dplyr::select(-'unidade_de_medida') %>%
       tidyr::pivot_wider(id_cols = c(geo_id,ano),
                          names_from = variavel:tipo_de_produto_de_origem_animal,
-                         values_from=valor,
-                         names_sep = '_',
-                         values_fn = sum,
-                         values_fill = 0) %>%
-      janitor::clean_names()
-  }
-
-  ## ERRO -> Colocar nome da variável
-
-  if (param$type == 94){ ## Cow Farming
-    dat = dat %>% dplyr::select(-'unidade_de_medida') %>%
-      tidyr::pivot_wider(id_cols = c(geo_id,ano),
-                         names_from = variavel:,
                          values_from=valor,
                          names_sep = '_',
                          values_fn = sum,
