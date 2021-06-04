@@ -123,12 +123,12 @@ load_pevs <- function(type = NULL, geo_level = "municipality", time_period = 201
     var = stringr::str_replace_all(string=var,pattern='ª',replacement='')
     var = stringr::str_replace_all(string=var,pattern='\\(',replacement='')
     var = stringr::str_replace_all(string=var,pattern='\\)',replacement='')
-    var = stringr::str_replace_all(string=var,pattern='_',replacement='')
-    var = stringr::str_replace_all(string=var,pattern='.',replacement='_')
-    var = stringr::str_replace_all(string=var,pattern=',',replacement='_')
     var = stringr::str_to_lower(string=var)
+    #var = stringr::str_replace(string=var,pattern="__",replacement = "_")
+    #var = stringr::str_replace(string=var,pattern=".",replacement = "_")
     return(var)
   }
+  
   
 ## Binding Rows
   
@@ -176,5 +176,63 @@ if (geo_level == 'municipality'){
 ## Adding Measure Information to Variables ##
 #############################################
 
-## Needs to be adjusted according to different units of measurement
+## Needs to be adjusted according to different units of measurement (suggestion: ton, ha and brl)
 
+# dat = dat %>%
+#   dplyr::mutate(variavel = dplyr::case_when(
+#     (variavel == 'area_total_existente_em_31/12_dos_efetivos_da_silvicultura') ~ 'area_total_ha',
+#     (variavel == 'quantidade_produzida_na_extracao_vegetal') ~ 'quant_produzida_extracao_vegetal_ton',
+#     (variavel == 'quantidade_produzida_na_silvicultura') ~ 'quant_produzida_silvicultura_ton',
+#     (variavel == 'valor_da_producao_na_extracao_vegetal') ~ 'valor_da_prod_extracao_vegetal_brl',
+#     (variavel == 'valor_da_producao_na_silvicultura') ~ 'valor_da_prod_silvicultura_brl'
+#   )
+#   )
+
+################################
+## Harmonizing Variable Names ##
+################################
+
+# dat$valor[dat$tipo_de_produto == 'pinheiro_sla'] = dat$valor*(formular de convervsao)
+# BUscar info no google e deixar link comentado aqui
+# table(dat$tipo_de_produto, dat$unidade_de_medida)
+
+if (param$type == 289){
+  dat = dat %>%
+    dplyr::rename(tipo_de_produto_codigo = tipo_de_produto_extrativo_codigo,
+                  tipo_de_produto = tipo_de_produto_extrativo)
+}
+
+if (param$type == 291){
+  dat = dat %>%
+    dplyr::rename(tipo_de_produto_codigo = tipo_de_produto_da_silvicultura_codigo,
+                  tipo_de_produto = tipo_de_produto_da_silvicultura)
+}
+
+if (param$type == 5930){
+  dat = dat %>%
+    dplyr::rename(tipo_de_produto_codigo = especie_florestal_codigo,
+                  tipo_de_produto = especie_florestal)
+}
+#############################
+## Create Long Format Data ##
+#############################
+
+## The Output is a tibble with unit and year identifiers + production and/or value of each item
+
+dat = dat %>%
+  dplyr::select(-'unidade_de_medida',-'tipo_de_produto_codigo') %>%
+  tidyr::pivot_wider(id_cols = c(geo_id,ano),
+                     names_from = variavel:tipo_de_produto,
+                     values_from=valor,
+                     names_sep = '_',
+                     values_fn = sum,
+                     values_fill = 0) %>%
+  janitor::clean_names()
+
+##########################
+## Returning Data Frame ##
+##########################
+
+return(dat)
+
+}
