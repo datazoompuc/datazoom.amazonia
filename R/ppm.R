@@ -211,8 +211,6 @@ load_ppm = function(type=NULL,geo_level = "municipality",time_period=2019,langua
   #################################
 
   table(dat$tipo_de_produto_da_aquicultura)
-  ## Falta fazer para o type = 95
-  ## Mudar para tidyverse
 
   if (param$type == 74){
 
@@ -222,7 +220,7 @@ load_ppm = function(type=NULL,geo_level = "municipality",time_period=2019,langua
 
     if (language == 'eng'){
       dat$variavel = base::ifelse(dat$variavel == 'produto_de_origem_animal','production_kg','value_brl')
-      dat$tipo_de_produto_de_origem_animal[dat$tipo_de_produto_de_origem_animal == 'la'] = 'wool'## o que que é isso??
+      dat$tipo_de_produto_de_origem_animal[dat$tipo_de_produto_de_origem_animal == 'la'] = 'wool'
       dat$tipo_de_produto_de_origem_animal[dat$tipo_de_produto_de_origem_animal == 'casulos_do_bichodaseda'] = 'silk_worm_cocoons'
       dat$tipo_de_produto_de_origem_animal[dat$tipo_de_produto_de_origem_animal == 'leite'] = 'milk'
       dat$tipo_de_produto_de_origem_animal[dat$tipo_de_produto_de_origem_animal == 'mel_de_abelha'] = 'bee_honey'
