@@ -33,5 +33,5 @@ Using the package is easy enough:
 library(datazoom.amazonia)
 years <- c(2014:2016)
 data <- load_degrad_raw(years)
-data <- load_degrad(2016, time_aggregation = "year", space_aggregation = "municipality", language = "pt")
+data <- load_degrad(2016, time_period = "year", geo_aggregation = "municipality", language = "pt")
 ```
