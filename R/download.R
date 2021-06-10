@@ -427,6 +427,46 @@ sidra_download = function(sidra_code = NULL,time_period,geo_id = 'municipality')
 
 external_download = function()
 
+
+terrabrasilis_download = function(geo = 'amazon_biome',type='cumulative_deforestation'){
+
+  ###########################
+  ## Amazon Biome - PRODES ##
+  ###########################
+
+  # amz_prodes
+  # legal_amz_prodes
+
+    ## Cumulative Deforestation
+      ## http://terrabrasilis.dpi.inpe.br/download/dataset/amz-prodes/vector/accumulated_deforestation_1988_2007_biome.zip
+    ## Annual Forest
+      ## http://terrabrasilis.dpi.inpe.br/download/dataset/amz-prodes/vector/forest_biome.zip
+    ## Hidrography
+      ## http://terrabrasilis.dpi.inpe.br/download/dataset/amz-prodes/vector/hydrography_biome.zip
+    ## Annual Increase in Deforestation
+      ## http://terrabrasilis.dpi.inpe.br/download/dataset/amz-prodes/vector/yearly_deforestation_biome.zip
+    ## Yearly Cloudes
+      ## http://terrabrasilis.dpi.inpe.br/download/dataset/amz-prodes/vector/cloud_biome.zip
+    ## Not Forest
+      ## http://terrabrasilis.dpi.inpe.br/download/dataset/amz-prodes/vector/no_forest_biome.zip
+
+
+  amz_base = 'http://terrabrasilis.dpi.inpe.br/download/dataset'
+
+  cum_deforestation = 'accumulated_deforestation_1988_2007_biome.zip'
+  forest_biome = 'forest_biome.zip'
+
+
+
+
+  # if (geo == 'amazon_biome'){
+  #   if (type == 'cumulative_deforestation')
+  # }
+
+
+
+}
+
 datasets_link = function(){
 
   link = tibble::tribble(~survey,~dataset,~sidra_code,~available_time,~available_geo,~link,
