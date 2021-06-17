@@ -6,7 +6,7 @@ NULL
 
 #' Compiles environmental fines data in the Amazon Region from IBAMA
 #'
-#' Original data comes from \href{https://servicos.ibama.gov.br/ctf/publico/areasembargadas/ConsultaPublicaAreasEmbargadas.php}{IBAMA's website}
+#' Original data comes from \href{https://servicos.ibama.gov.br/ctf/publico/areasembargadas/ConsultaPublicaAreasEmbargadas.php }{IBAMA's website}
 #'
 #' @name load_ibama
 #' @encoding UTF-8

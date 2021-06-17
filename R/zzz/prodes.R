@@ -107,8 +107,11 @@ load_prodes_raw <- function(source) {
   csv_types <- readr::cols("d", "d", "d", "c", "c", "c", "c", "c", "d", "d", "d", "d", "d", "d", "d", "d", "d")
 
   # Reads the csvs containing the data
-  lapply(source, readr::read_csv, col_types = csv_types, locale = readr::locale(encoding = "latin1"))
-}
+  source = lapply(source, readr::read_csv, col_types = csv_types, locale = readr::locale(encoding = "latin1"))
+
+  return(source)
+
+  }
 
 treat_prodes_data <- function(df, geo_aggregation, language) {
   geo_aggregation <- tolower(geo_aggregation)
