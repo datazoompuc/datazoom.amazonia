@@ -286,4 +286,3 @@ treat_deter_data <- function(df, geo_level, time_aggregation, language) {
 
   return(df)
 }
-

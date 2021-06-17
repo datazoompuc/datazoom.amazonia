@@ -67,11 +67,12 @@ treat_prodes_data <- function(df, geo_level, language) {
   geo_level <- tolower(geo_level)
 
   df = df %>%
+  #dat_mod = df %>%
     janitor::clean_names() %>%
     # Adds column with UF codes, eg. MA = 21
     dplyr::mutate(cod_uf = as.factor(base::substr(cod_ibge,start=1,stop=2))) %>%
     dplyr::rename(cod_munic_ibge = cod_ibge) %>%
-    # Removes unnecessary columns
+    # Removes unnecessary columns - under review
     dplyr::select(-c('lat','long','latgms','longms','municipio','nr','soma'))
 
   if (geo_level == "state") {
