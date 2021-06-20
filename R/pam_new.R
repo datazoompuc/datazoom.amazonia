@@ -3,19 +3,25 @@
 load_pam = function(dataset=NULL,geo_level = "municipality", time_period = 2017:2018, language = "eng") {
 
   # -----------
-  # Change dataset to dataset
-
+  # Dataset can be either sidra number or name
+  # Need to add translation
   #############################
   ## Define Basic Parameters ##
   #############################
 
   param=list()
   param$dataset = dataset
-  param$geo
-  param$uf = c(11,12,13,14,15,16,17,21,22,23,24,25,26,27,28,29,31,32,33,35,41,42,43,
-               50,51,52,53)
+  param$geo_level = geo_level
   param$time_period = time_period
+  param$language = language
 
+  if (!is.numeric(param$dataset)){
+    param$code = datasets_link() %>%
+      dplyr::filter(dataset == param$dataset) %>%
+      dplyr::select(sidra_code) %>%
+      unlist() %>%
+      as.numeric()
+  } else {param$code = param$dataset}
 
 
   ## Dataset
@@ -45,157 +51,23 @@ load_pam = function(dataset=NULL,geo_level = "municipality", time_period = 2017:
   #   param$data_name = 'Crop with more than one harvest (Corn, Potato, Peanut or Beans)'
   # }
 
+  ##############
+  ## Download ##
+  ##############
 
-  # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+  # We need to show year that is being downloaded as well
+  # Heavy Datasets may take several minutes
 
 
-  # input_df = expand.grid(
-  #   x=param$uf,
-  #   y=param$time_period
-  # )
-  #
-  # input_munic = list(x = as.list(input_df$x),y = as.list(as.character(input_df$y)))
-  # input_other = list(x = as.list(as.character(param$time_period)))
-  #
-  # ###############
-  # ## Load Data ##
-  # ###############
-  #
-  # get_sidra_safe = purrr::safely(sidrar::get_sidra)
-  #
-  # ## We will need to check for the ones not considered in the loop afterwards
-  #
-  # ## We use the purrr package (tidyverse equivalent of base apply functions) to run over the above grid
-  #
-  # if (geo_level %in% c('country','region','state')){
-  #
-  #   base::message(base::cat('Downloading Data:',length(param$time_period),'API requests')) ## Show Message
-  #
-  #   ## Download
-  #
-  #   dat = input_other %>%
-  #     purrr::pmap(function(x) get_sidra_safe(param$dataset,geo=param$geo_reg,period = x))
-  #
-  #   ## Completion!
-  #
-  #   base::message(base::cat('Download Completed! Starting Data Processing...'))
-  #
-  # }
-  #
-  # if (geo_level == 'municipality'){
-  #   dat = input_munic %>%
-  #     purrr::pmap(function(x,y) get_sidra_safe(param$dataset,geo=param$geo_reg,period = y,geo.filter = list("State" = x)))
-  # }
-  #
-  # ## Capture Errors
-  #
-  # ## Daniel Comment: The main point here is that the Sidra API has a limit for requests. Thus, for states with a large number
-  # ## of municipalities the request may break. We used the purrr::safely to not break the loop (or map), but we will need to
-  # ## deal with these problems in this step here. Now its under construction =)
-  #
-  # dat = lapply(dat,"[[", 1)
-  #
-  # boolean_downloaded = unlist(lapply(dat,is.data.frame))
-  #
-  # prob_data = input_df[!boolean_downloaded,]
 
-  ## We need to check the municipalities in these UFs
-
-  # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
-  ## Binding Rows
-
-  dat  = dat[boolean_downloaded] %>%
+  dat = as.list(as.character(param$time_period)) %>%
+    purrr::map(function(year_num){
+      #suppressMessages(
+        sidra_download(sidra_code = param$code,year = year_num,geo_level = param$geo_level)
+        #)
+      }) %>%
     dplyr::bind_rows() %>%
     tibble::as_tibble()
-
-  #############################
-  ## Downloading Second Data ##
-  #############################
-
-  ## Download MesoRegion Info
-
-  meso = geobr::read_meso_region(year=2010,simplified=TRUE) %>%
-    sf::st_drop_geometry() %>%
-    dplyr::select(code_meso,code_state) %>%
-    tibble::as_tibble()
-
-  ## Selecting Municipalities we need to download manually
-
-  new_download = meso[meso$code_state %in% as.character(unique(prob_data$x)), ]
-
-  ## Creating Grid
-
-  input_df = expand.grid(
-    x=unique(new_download$code_meso),
-    y=param$time_period
-  )
-
-  input_munic = list(x = as.list(input_df$x),y = as.list(as.character(input_df$y)))
-
-  if (geo_level == 'municipality'){
-    new_dat = input_munic %>%
-      purrr::pmap(function(x,y) get_sidra_safe(param$dataset,geo=param$geo_reg,period = y,geo.filter = list("MesoRegion" = x)))
-  }
-
-  new_dat = lapply(new_dat,"[[", 1)
-
-  boolean_downloaded = unlist(lapply(new_dat,is.data.frame))
-
-  prob_data = input_df[!boolean_downloaded,]
-
-  new_dat  = new_dat[boolean_downloaded] %>%
-    dplyr::bind_rows() %>%
-    tibble::as_tibble()
-
-  dat = dplyr::bind_rows(dat,new_dat)
-
-  rm(new_dat)
-
-  ################
-  ## Third Data ##
-  ################
-
-  ## Download MicroRegion Info
-
-  micro = geobr::read_micro_region(year=2010,simplified=TRUE) %>%
-    sf::st_drop_geometry() %>%
-    dplyr::select(code_micro,code_state) %>%
-    tibble::as_tibble()
-
-  ## Selecting Municipalities we need to download manually
-
-  uf_need = unique(new_download$code_state[new_download$code_meso %in% unique(prob_data$x)])
-
-  new_download = micro[micro$code_state %in% uf_need, ]
-
-  ## Creating Grid
-
-  input_df = expand.grid(
-    x=unique(new_download$code_micro),
-    y=param$time_period
-  )
-
-  input_munic = list(x = as.list(input_df$x),y = as.list(as.character(input_df$y)))
-
-  if (geo_level == 'municipality'){
-    new_dat2 = input_munic %>%
-      purrr::pmap(function(x,y) get_sidra_safe(param$dataset,geo=param$geo_reg,period = y,geo.filter = list("MicroRegion" = x)))
-  }
-
-  new_dat2 = lapply(new_dat2,"[[", 1)
-
-  boolean_downloaded = unlist(lapply(new_dat2,is.data.frame))
-
-  prob_data = input_df[!boolean_downloaded,]
-
-  new_dat2  = new_dat2[boolean_downloaded] %>%
-    dplyr::bind_rows() %>%
-    tibble::as_tibble()
-
-  dat = dplyr::bind_rows(dat,new_dat2)
-
-  rm(new_dat2)
 
   #######################
   ## Cleaning Function ##
@@ -271,20 +143,20 @@ load_pam = function(dataset=NULL,geo_level = "municipality", time_period = 2017:
   ## Harmonizing Variable Names ##
   ################################
 
-  if (param$dataset == 5457){
+  if (param$code == 5457){
     dat = dat %>%
       dplyr::rename(produto_das_lavouras_codigo = produto_das_lavouras_temporarias_e_permanentes_codigo,
                     produto_das_lavouras = produto_das_lavouras_temporarias_e_permanentes)
   }
 
-  if (param$dataset == 1613){
+  if (param$code == 1613){
     dat = dat %>%
       dplyr::rename(produto_das_lavouras_codigo = produto_das_lavouras_permanentes_codigo,
                     produto_das_lavouras = produto_das_lavouras_permanentes)
   }
 
 
-  if (param$dataset %in% c(839,1000,1001,1002,1612)){
+  if (param$code %in% c(839,1000,1001,1002,1612)){
     dat = dat %>%
       dplyr::rename(produto_das_lavouras_codigo = produto_das_lavouras_temporarias_codigo,
                   produto_das_lavouras = produto_das_lavouras_temporarias)

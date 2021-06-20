@@ -1,4 +1,6 @@
 
+## Add Possibility of Geographical Restrictions - For Instance, only Municipalities in the Legal Amazon
+
 download_br_data = function(dataset=NULL,source=NULL,geo_level='municipality',time_period=2017:2018){
 
   ## Initialize Parameters
