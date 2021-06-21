@@ -15,106 +15,65 @@
 #'
 #' @examples \dontrun{load_ppm(type=3939,time_period = 2018:2019,geo_level = 'municipality',language='eng')}
 
-load_ppm = function(type=NULL,geo_level = "municipality",time_period=2019,language = 'pt'){
+load_ppm = function(dataset=NULL,geo_level = "municipality",time_period=2019,language = 'pt'){
 
+  # Adjust Code Based on State Level Information
+  # Check if any observation geo-time at the final data have multiple NA entries -- this would mean the data is "wrong"
+  # Double Check Translation
 
   #############################
   ## Define Basic Parameters ##
   #############################
 
   param=list()
-  param$uf = c(12,27,13,16,29,23,32,52,21,31,50,51,15,25,26,22,41,33,24,11,14,43,42,28,35,17)
+  param$dataset = dataset
+  param$geo_level = geo_level
   param$time_period = time_period
+  param$language = language
+
+  if (!is.numeric(param$dataset)){
+    param$code = datasets_link() %>%
+      dplyr::filter(dataset == param$dataset) %>%
+      dplyr::select(sidra_code) %>%
+      unlist() %>%
+      as.numeric()
+  } else {param$code = param$dataset}
 
   ## Dataset
 
-  if (is.null(type)){stop('Missing Dataset!')}
+  if (is.null(param$dataset)){stop('Missing Dataset!')}
 
-  if (as.numeric(type) == 94 | type == 'cow_farm'){
-    param$type = 94
+  if (param$code == 94){
     param$data_name = 'Cow Farming (Vacas ordenhadas - Cabecas)'
   }
-  if (as.numeric(type) == 95 | type == 'sheep_farm'){
-    param$type = 95
+  if (param$code == 95){
     param$data_name = 'Sheep Farming (Ovinos Tosquiados - Producao de La - Cabecas)'
   }
-  if (as.numeric(type) == 3939 | type == 'cattle_number'){
-    param$type = 3939
+  if (param$code == 3939){
     param$data_name = 'Cattle Number (Efetivo dos rebanhos)'
   }
-  if (as.numeric(type) == 74 | type == 'animal_orig_prod'){
-    param$type = 74
+  if (param$code == 74){
     param$data_name = 'Animal Origin Production (Producao de origem animal, por tipo de produto)'
   }
-  if (as.numeric(type) == 3940 | type == 'water_orig_prod'){
-    param$type = 3940
+  if (param$code == 3940){
     param$data_name = 'Water Origin Production - Fish and others (Producao da aquicultura - peixes e outros)'
   }
 
-  ## Aggregation Level
+  ##############
+  ## Download ##
+  ##############
 
-  if (geo_level == 'country'){param$geo_reg = 'Brazil'}
-  if (geo_level == 'region'){param$geo_reg = 'Region'}
-  if (geo_level == 'state'){param$geo_reg = 'State'}
-  if (geo_level == 'municipality'){param$geo_reg = 'City'}
+  # We need to show year that is being downloaded as well
+  # Heavy Datasets may take several minutes
 
-  ################################################################
-  ## Create Grid with every possible combination of UF and Year ##
-  ################################################################
-
-  input_df = expand.grid(
-    x=param$uf,
-    y=param$time_period
-  )
-
-  input_munic = list(x = as.list(input_df$x),y = as.list(as.character(input_df$y)))
-  input_other = list(x = as.list(as.character(param$time_period)))
-
-  ###############
-  ## Load Data ##
-  ###############
-
-  ## We use the purrr package (tidyverse equivalent of base apply functions) to run over the above grid
-
-  get_sidra_safe = purrr::safely(sidrar::get_sidra)
-
-  ## We will need to check for the ones not considered in the loop afterwards
-
-  ## We use the purrr package (tidyverse equivalent of base apply functions) to run over the above grid
-
-  if (geo_level %in% c('country','region','state')){
-
-    base::message(base::cat('Downloading Data:',length(param$time_period),'API requests')) ## Show Message
-
-    ## Download
-
-    dat = input_other %>%
-      purrr::pmap(function(x) get_sidra_safe(param$type,geo=param$geo_reg,period = x))
-
-    ## Completion!
-
-    base::message(base::cat('Download Completed! Starting Data Processing...'))
-
-  }
-
-  if (geo_level == 'municipality'){
-    dat = input %>%
-      purrr::pmap(function(x,y) get_sidra_safe(param$type,geo=param$geo_reg,period = y,geo.filter = list("State" = x)))
-  }
-
-  ## Capture Errors
-
-  ## Daniel Comment: The main point here is that the Sidra API has a limit for requests. Thus, for states with a large number
-  ## of municipalities the request may break. We used the purrr::safely to not break the loop (or map), but we will need to
-  ## deal with these problems in this step here. Now its under construction =)
-
-  dat = lapply(dat,"[[", 1)
-
-  boolean_downloaded = unlist(lapply(dat,is.data.frame))
-
-  prob_data = input_df[!boolean_downloaded,]
-
-  ## We need to check the municipalities in these UFs
+  dat = as.list(as.character(param$time_period)) %>%
+    purrr::map(function(year_num){
+      #suppressMessages(
+      sidra_download(sidra_code = param$code,year = year_num,geo_level = param$geo_level)
+      #)
+    }) %>%
+    dplyr::bind_rows() %>%
+    tibble::as_tibble()
 
   #######################
   ## Cleaning Function ##
@@ -133,17 +92,27 @@ load_ppm = function(type=NULL,geo_level = "municipality",time_period=2019,langua
     return(var)
   }
 
-  ## Binding Rows
 
-  dat  = dat[boolean_downloaded] %>%
-    dplyr::bind_rows() %>%
-    tibble::as_tibble()
 
+  ######################
+  ## Data Enginnering ##
+  ######################
 
   dat = dat %>%
     janitor::clean_names() %>%
     dplyr::mutate_all(function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")}) %>%
     dplyr::mutate_all(clean_custom)
+
+  ## The Code Below Depends on the type of data
+
+  dat = dat %>%
+    dplyr::select(-c(nivel_territorial_codigo,nivel_territorial,
+                     unidade_de_medida_codigo,variavel_codigo,
+                     ano_codigo)) %>%
+    dplyr::mutate(valor=as.numeric(valor))
+
+
+
 
   #########################################
   ## Create Geographical Unit Identifier ##
@@ -166,9 +135,51 @@ load_ppm = function(type=NULL,geo_level = "municipality",time_period=2019,langua
     dat = dplyr::select(dat,-'municipio',-'municipio_codigo')
   }
 
-  ######################
-  ## Data Enginnering ##
-  ######################
+
+
+  #############################################
+  ## Adding Measure Information to Variables ##
+  #############################################
+
+  ################################
+  ## Harmonizing Variable Names ##
+  ################################
+
+  ########################
+  ## Measure Conversion ##
+  ########################
+
+  ## Convert values to something comparable across different units (Dozens and Units to Kg based on product dataset)
+
+  # Valor is always in 1k R$ and production can be in 1k dozens, 1k liters or kgs. We standardize to make comparison possible
+  # Dozen is used for eggs, with a mean size of 50 to 54g per unit (https://www.ovoonline.com.br)
+  # Liter is used for milk, with 1,032 g/ml https://www.agencia.cnptia.embrapa.br/Agencia8/AG01/arvore/
+  # Milheiro is used for recent-born fish - We use 2g per unit (https://www.revistas.ufg.br/vet/article/view/1472/8597)
+
+  ## Animal Origin Production
+
+  if (param$code == 74){
+
+    dat$valor = base::ifelse(dat$unidade_de_medida == 'mil_duzias', (((dat$valor/(12*1e3))*52)/1e3),dat$valor) # 1k Dozen to Kg
+    dat$valor = base::ifelse(dat$unidade_de_medida == 'mil_litros',((dat$valor/1e3)*1.032) ,dat$valor) # 1k Liters to Kg
+  }
+
+  ## Water Origin Production
+
+  if (param$code == 3940){
+
+    dat$valor = base::ifelse(dat$unidade_de_medida == 'milheiros', dat$valor*1e3*2/1e3 ,dat$valor) # 1 Milheiro to Kg
+
+  }
+
+
+
+
+  #################
+  ## Translation ##
+  #################
+
+  # I NEED TO RENAME THE VARIABLES!!!!
 
   ## 1
     ## We bind the datasets stored as elements of a list above, clean the names,
@@ -182,13 +193,13 @@ load_ppm = function(type=NULL,geo_level = "municipality",time_period=2019,langua
 
     ## Rewrite in Tidyverse Syntax!!
 
-  if (param$type == 3939){
+  if (param$code == 3939){
 
     ## Selecting Variables
 
-    dat = dat %>% dplyr::select(-tidyselect::matches('nivel_territorial'),
-                                -'ano_codigo',-'variavel_codigo',-'tipo_de_rebanho_codigo',-'unidade_de_medida_codigo') %>%
-      dplyr::mutate(valor = as.numeric(valor))
+    # dat = dat %>% dplyr::select(-tidyselect::matches('nivel_territorial'),
+    #                             -'ano_codigo',-'variavel_codigo',-'tipo_de_rebanho_codigo',-'unidade_de_medida_codigo') %>%
+    #   dplyr::mutate(valor = as.numeric(valor))
 
     ## Translating Names
 
@@ -215,10 +226,10 @@ load_ppm = function(type=NULL,geo_level = "municipality",time_period=2019,langua
 
     ## Include number as "cabecas" measure
 
-  if (param$type == 95){
-    dat = dat %>% dplyr::select(-tidyselect::matches('nivel_territorial'),
-                                -'ano_codigo',-'variavel_codigo',-'unidade_de_medida_codigo') %>%
-      dplyr::mutate(valor = as.numeric(valor))
+  if (param$code == 95){
+    # dat = dat %>% dplyr::select(-tidyselect::matches('nivel_territorial'),
+    #                             -'ano_codigo',-'variavel_codigo',-'unidade_de_medida_codigo') %>%
+    #   dplyr::mutate(valor = as.numeric(valor))
 
     if (language == 'eng'){dat$variavel = base::ifelse(dat$variavel == 'ovinos_tosquiados_nos_estabelecimentos_agropecuarios','sheep_farmed','')}
     if (language == 'pt'){dat$variavel = base::ifelse(dat$variavel == 'ovinos_tosquiados_nos_estabelecimentos_agropecuarios','ovinos_tosquiados','')}
@@ -227,11 +238,11 @@ load_ppm = function(type=NULL,geo_level = "municipality",time_period=2019,langua
 
   ## Animal Origin Production
 
-  if (param$type == 74){
+  if (param$code == 74){
 
-    dat = dat %>% dplyr::select(-tidyselect::matches('nivel_territorial'),
-                                -'ano_codigo',-'variavel_codigo',-'tipo_de_produto_de_origem_animal_codigo',-'unidade_de_medida_codigo') %>%
-      dplyr::mutate(valor = as.numeric(valor))
+    # dat = dat %>% dplyr::select(-tidyselect::matches('nivel_territorial'),
+    #                             -'ano_codigo',-'variavel_codigo',-'tipo_de_produto_de_origem_animal_codigo',-'unidade_de_medida_codigo') %>%
+    #   dplyr::mutate(valor = as.numeric(valor))
 
     if (language == 'pt'){
 
@@ -270,11 +281,11 @@ load_ppm = function(type=NULL,geo_level = "municipality",time_period=2019,langua
 
   ## Milked Cows
 
-  if (param$type == 94){
+  if (param$code == 94){
 
-    dat = dat %>% dplyr::select(-tidyselect::matches('nivel_territorial'),
-                                -'ano_codigo',-'variavel_codigo',-'unidade_de_medida_codigo') %>%
-      dplyr::mutate(valor = as.numeric(valor))
+    # dat = dat %>% dplyr::select(-tidyselect::matches('nivel_territorial'),
+    #                             -'ano_codigo',-'variavel_codigo',-'unidade_de_medida_codigo') %>%
+    #   dplyr::mutate(valor = as.numeric(valor))
 
 
     if (language == 'eng'){dat$variavel = base::ifelse(dat$variavel == 'vacas_ordenhadas','number_milked_cows','')}
@@ -286,13 +297,13 @@ load_ppm = function(type=NULL,geo_level = "municipality",time_period=2019,langua
 
     ## We need to finish the names translation!
 
-  if (param$type == 3940){
+  if (param$code == 3940){
 
     ## Selecting variables
 
-    dat = dat %>% dplyr::select(-tidyselect::matches('nivel_territorial'),
-                                -'ano_codigo',-'variavel_codigo',-'tipo_de_produto_da_aquicultura_codigo',-'unidade_de_medida_codigo') %>%
-      dplyr::mutate(valor = as.numeric(valor))
+    # dat = dat %>% dplyr::select(-tidyselect::matches('nivel_territorial'),
+    #                             -'ano_codigo',-'variavel_codigo',-'tipo_de_produto_da_aquicultura_codigo',-'unidade_de_medida_codigo') %>%
+    #   dplyr::mutate(valor = as.numeric(valor))
 
     ## Translation
 
@@ -332,32 +343,8 @@ load_ppm = function(type=NULL,geo_level = "municipality",time_period=2019,langua
     }
   }
 
-  ################################
-  ## Harmonize Variables Values ##
-  ################################
 
-  ## Convert values to something comparable across different units (Dozens and Units to Kg based on product type)
 
-  # Valor is always in 1k R$ and production can be in 1k dozens, 1k liters or kgs. We standardize to make comparison possible
-  # Dozen is used for eggs, with a mean size of 50 to 54g per unit (https://www.ovoonline.com.br)
-  # Liter is used for milk, with 1,032 g/ml https://www.agencia.cnptia.embrapa.br/Agencia8/AG01/arvore/
-  # Milheiro is used for recent-born fish - We use 2g per unit (https://www.revistas.ufg.br/vet/article/view/1472/8597)
-
-  ## Animal Origin Production
-
-  if (param$type == 74){
-
-    dat$valor = base::ifelse(dat$unidade_de_medida == 'mil_duzias', (((dat$valor/(12*1e3))*52)/1e3),dat$valor) # 1k Dozen to Kg
-    dat$valor = base::ifelse(dat$unidade_de_medida == 'mil_litros',((dat$valor/1e3)*1.032) ,dat$valor) # 1k Liters to Kg
-  }
-
-  ## Water Origin Production
-
-  if (param$type == 3940){
-
-    dat$valor = base::ifelse(dat$unidade_de_medida == 'milheiros', dat$valor*1e3*2/1e3 ,dat$valor) # 1 Milheiro to Kg
-
-  }
 
   #############################
   ## Create Long Format Data ##
@@ -369,7 +356,7 @@ load_ppm = function(type=NULL,geo_level = "municipality",time_period=2019,langua
 
   ## Cattle Number
 
-  if (param$type == 3939){
+  if (param$code == 3939){
     dat = dat %>%
       dplyr::select(-'unidade_de_medida') %>%
       tidyr::pivot_wider(id_cols = c(geo_id,ano),
@@ -383,7 +370,7 @@ load_ppm = function(type=NULL,geo_level = "municipality",time_period=2019,langua
 
   ## Sheep Farm
 
-  if (param$type == 95){
+  if (param$code == 95){
     dat = dat %>% dplyr::select(-'unidade_de_medida') %>%
       tidyr::pivot_wider(id_cols = c(geo_id,ano),
                          names_from = variavel,
@@ -396,7 +383,7 @@ load_ppm = function(type=NULL,geo_level = "municipality",time_period=2019,langua
 
   ## Animal Origin Production
 
-  if (param$type == 74){ ## Animal Origin Production
+  if (param$code == 74){ ## Animal Origin Production
     dat = dat %>%
       dplyr::filter(unidade_de_medida != "") %>%
       dplyr::select(-'unidade_de_medida') %>%
@@ -411,7 +398,7 @@ load_ppm = function(type=NULL,geo_level = "municipality",time_period=2019,langua
 
   ## Milked Cows
 
-  if (param$type == 94){ ## Milked Cows
+  if (param$code == 94){ ## Milked Cows
     dat = dat %>% dplyr::select(-'unidade_de_medida') %>%
       tidyr::pivot_wider(id_cols = c(geo_id,ano),
                          names_from = variavel,
@@ -425,7 +412,7 @@ load_ppm = function(type=NULL,geo_level = "municipality",time_period=2019,langua
   ## Water Origin Production
     ## We need to create a dictionary for this!
 
-  if (param$type == 3940){
+  if (param$code == 3940){
     dat = dat %>%
       dplyr::filter(unidade_de_medida != '') %>%
       dplyr::select(-'unidade_de_medida') %>%
@@ -437,6 +424,7 @@ load_ppm = function(type=NULL,geo_level = "municipality",time_period=2019,langua
                          values_fill = 0) %>%
       janitor::clean_names()
   }
+
 
   ########################
   ## Changing Year Name ##

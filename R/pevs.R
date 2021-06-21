@@ -18,105 +18,70 @@
 #'
 #' @examples \dontrun{datazoom.amazonia::load_pevs_vegextr(2013, aggregation_level = "country")}
 
-load_pevs <- function(type = NULL, geo_level = "municipality", time_period = 2018:2019, language = "pt"){
+load_pevs <- function(dataset = NULL, geo_level = "municipality", time_period = 2018:2019, language = "pt"){
+
+  # Measure Conversion Before Translation
+  # Adjust Tipo de Produto (There are several names in the front of the number and I need to check on how to deal with them)
+  # Check municipality names (D'Oeste)
+  # Check if any observation geo-time at the final data have multiple NA entries -- this would mean the data is "wrong"
+
 
   #############################
   ## Define Basic Parameters ##
   #############################
 
-  param = list()
-  param$uf = c(12,27,13,16,29,23,32,52,21,31,50,51,15,25,26,22,41,33,24,11,14,43,42,28,35,17)
+  param=list()
+  param$dataset = dataset
+  param$geo_level = geo_level
   param$time_period = time_period
-  
+  param$language = language
+
+  if (!is.numeric(param$dataset)){
+    param$code = datasets_link() %>%
+      dplyr::filter(dataset == param$dataset) %>%
+      dplyr::select(sidra_code) %>%
+      unlist() %>%
+      as.numeric()
+  } else {param$code = param$dataset}
+
   ## Dataset
-  
-  if (is.null(type)){stop('Missing Dataset!')}
-  
-  if (as.numeric(type) == 289){
-    param$type = 289
+
+  if (is.null(param$dataset)){stop('Missing Dataset!')}
+
+  if (param$code == 289){
     param$data_name = 'Vegetal extraction quantity and value (Quantidade e valor da extração vegetal)'
   }
-  
-  if (as.numeric(type) == 291){
-    param$type = 291
+
+  if (param$code == 291){
     param$data_name = 'Forestry quantity and value (Quantidade e valor da silvicultura)'
   }
-  
-  #leave 'Forestry area (Area da silvicultura)' for last
-  
-  if (as.numeric(type) == 5930){
-    param$type = 5930
+
+  if (param$code == 5930){
     param$data_name = 'Forestry area (Area da silvicultura)'
   }
-  
-  ## Aggregation Level
-  
-  if (geo_level == 'country'){param$geo_reg = 'Brazil'}
-  if (geo_level == 'region'){param$geo_reg = 'Region'}
-  if (geo_level == 'state'){param$geo_reg = 'State'}
-  if (geo_level == 'municipality'){param$geo_reg = 'City'}
-  
-  
-  ################################################################
-  ## Create Grid with every possible combination of UF and Year ##
-  ################################################################
-  
-  input_df = expand.grid(
-    x=param$uf,
-    y=param$time_period
-  )
-  
-  input_munic = list(x = as.list(input_df$x),y = as.list(as.character(input_df$y)))
-  input_other = list(x = as.list(as.character(param$time_period)))
-  
-  ###############
-  ## Load Data ##
-  ###############
-  
-  get_sidra_safe = purrr::safely(sidrar::get_sidra)
-  
-  ## We will need to check for the ones not considered in the loop afterwards
-  
-  ## We use the purrr package (tidyverse equivalent of base apply functions) to run over the above grid
-  
-  if (geo_level %in% c('country','region','state')){
-    
-    base::message(base::cat('Downloading Data:',length(param$time_period),'API requests')) ## Show Message
-    
-    ## Download
-    
-    dat = input_other %>%
-      purrr::pmap(function(x) get_sidra_safe(param$type,geo=param$geo_reg,period = x))
-    
-    ## Completion!
-    
-    base::message(base::cat('Download Completed! Starting Data Processing...'))
-    
-  }
-  
-  if (geo_level == 'municipality'){
-    dat = input %>%
-      purrr::pmap(function(x,y) get_sidra_safe(param$type,geo=param$geo_reg,period = y,geo.filter = list("State" = x)))
-  }
-  
-  ## Capture Errors
-  
-  ## Daniel Comment: The main point here is that the Sidra API has a limit for requests. Thus, for states with a large number
-  ## of municipalities the request may break. We used the purrr::safely to not break the loop (or map), but we will need to
-  ## deal with these problems in this step here. Now its under construction =)
-  
-  dat = lapply(dat,"[[", 1)
-  
-  boolean_downloaded = unlist(lapply(dat,is.data.frame))
-  
-  prob_data = input_df[!boolean_downloaded,]
-  
-  ## We need to check the municipalities in these UFs
-  
+
+  ##############
+  ## Download ##
+  ##############
+
+  # We need to show year that is being downloaded as well
+  # Heavy Datasets may take several minutes
+
+  dat = as.list(as.character(param$time_period)) %>%
+    purrr::map(function(year_num){
+      #suppressMessages(
+      sidra_download(sidra_code = param$code,year = year_num,geo_level = param$geo_level)
+      #)
+    }) %>%
+    dplyr::bind_rows() %>%
+    tibble::as_tibble()
+
   #######################
   ## Cleaning Function ##
   #######################
-  
+
+  # We need to do check if this really works
+
   clean_custom = function(var){
     var = stringr::str_replace_all(string=var,pattern=' ',replacement='_')
     var = stringr::str_replace_all(string=var,pattern='-',replacement='')
@@ -128,111 +93,116 @@ load_pevs <- function(type = NULL, geo_level = "municipality", time_period = 201
     #var = stringr::str_replace(string=var,pattern=".",replacement = "_")
     return(var)
   }
-  
-  
-## Binding Rows
-  
-dat  = dat[boolean_downloaded] %>%
-  dplyr::bind_rows() %>%
-  tibble::as_tibble()
-  
-######################
-## Data Enginnering ##
-######################
 
-dat = dat %>%
-  janitor::clean_names() %>%
-  dplyr::mutate_all(function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")}) %>%
-  dplyr::mutate_all(clean_custom)  
 
-dat = dat %>%
-  dplyr::select(-c(nivel_territorial_codigo,nivel_territorial,
-                   unidade_de_medida_codigo,variavel_codigo,
-                   ano_codigo)) %>%
-  dplyr::mutate(valor=as.numeric(valor))
+  ######################
+  ## Data Enginnering ##
+  ######################
 
-#########################################
-## Create Geographical Unit Identifier ##
-#########################################
-
-if(geo_level == 'country'){
-  dat$geo_id = dat$brasil
-  dat = dplyr::select(dat,-'brasil_codigo',-'brasil')
-}
-if (geo_level == 'region'){
-  dat$geo_id = dat$grande_regiao
-  dat = dplyr::select(dat,-'grande_regiao_codigo',-'grande_regiao')
-}
-if (geo_level == 'state'){
-  dat$geo_id = dat$unidade_da_federacao_codigo
-  dat = dplyr::select(dat,-'unidade_da_federacao_codigo',-'unidade_da_federacao')
-}
-if (geo_level == 'municipality'){
-  dat$geo_id = dat$municipio_codigo
-  dat = dplyr::select(dat,-'municipio',-'municipio_codigo')
-}
-   
-#############################################
-## Adding Measure Information to Variables ##
-#############################################
-
-## Needs to be adjusted according to different units of measurement (suggestion: ton, ha and brl)
-
-# dat = dat %>%
-#   dplyr::mutate(variavel = dplyr::case_when(
-#     (variavel == 'area_total_existente_em_31/12_dos_efetivos_da_silvicultura') ~ 'area_total_ha',
-#     (variavel == 'quantidade_produzida_na_extracao_vegetal') ~ 'quant_produzida_extracao_vegetal_ton',
-#     (variavel == 'quantidade_produzida_na_silvicultura') ~ 'quant_produzida_silvicultura_ton',
-#     (variavel == 'valor_da_producao_na_extracao_vegetal') ~ 'valor_da_prod_extracao_vegetal_brl',
-#     (variavel == 'valor_da_producao_na_silvicultura') ~ 'valor_da_prod_silvicultura_brl'
-#   )
-#   )
-
-################################
-## Harmonizing Variable Names ##
-################################
-
-# dat$valor[dat$tipo_de_produto == 'pinheiro_sla'] = dat$valor*(formular de convervsao)
-# BUscar info no google e deixar link comentado aqui
-# table(dat$tipo_de_produto, dat$unidade_de_medida)
-
-if (param$type == 289){
   dat = dat %>%
-    dplyr::rename(tipo_de_produto_codigo = tipo_de_produto_extrativo_codigo,
-                  tipo_de_produto = tipo_de_produto_extrativo)
-}
+    janitor::clean_names() %>%
+    dplyr::mutate_all(function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")}) %>%
+    dplyr::mutate_all(clean_custom)
 
-if (param$type == 291){
+  # We need to check if this works for all data
+
   dat = dat %>%
-    dplyr::rename(tipo_de_produto_codigo = tipo_de_produto_da_silvicultura_codigo,
-                  tipo_de_produto = tipo_de_produto_da_silvicultura)
-}
+    dplyr::select(-c(nivel_territorial_codigo,nivel_territorial,
+                    unidade_de_medida_codigo,variavel_codigo,
+                    ano_codigo)) %>%
+    dplyr::mutate(valor=as.numeric(valor))
 
-if (param$type == 5930){
+  #########################################
+  ## Create Geographical Unit Identifier ##
+  #########################################
+
+  if(geo_level == 'country'){
+    dat$geo_id = dat$brasil
+    dat = dplyr::select(dat,-'brasil_codigo',-'brasil')
+  }
+
+  if (geo_level == 'region'){
+    dat$geo_id = dat$grande_regiao
+    dat = dplyr::select(dat,-'grande_regiao_codigo',-'grande_regiao')
+  }
+
+  if (geo_level == 'state'){
+    dat$geo_id = dat$unidade_da_federacao_codigo
+    dat = dplyr::select(dat,-'unidade_da_federacao_codigo',-'unidade_da_federacao')
+  }
+
+  if (geo_level == 'municipality'){
+    dat$geo_id = dat$municipio_codigo
+    dat = dplyr::select(dat,-'municipio',-'municipio_codigo')
+  }
+
+  #############################################
+  ## Adding Measure Information to Variables ##
+  #############################################
+
+  ## Needs to be adjusted according to different units of measurement (suggestion: ton, ha and brl)
+
+  # dat = dat %>%
+  #   dplyr::mutate(variavel = dplyr::case_when(
+  #     (variavel == 'area_total_existente_em_31/12_dos_efetivos_da_silvicultura') ~ 'area_total_ha',
+  #     (variavel == 'quantidade_produzida_na_extracao_vegetal') ~ 'quant_produzida_extracao_vegetal_ton',
+  #     (variavel == 'quantidade_produzida_na_silvicultura') ~ 'quant_produzida_silvicultura_ton',
+  #     (variavel == 'valor_da_producao_na_extracao_vegetal') ~ 'valor_da_prod_extracao_vegetal_brl',
+  #     (variavel == 'valor_da_producao_na_silvicultura') ~ 'valor_da_prod_silvicultura_brl'
+  #   )
+  #   )
+
+  ################################
+  ## Harmonizing Variable Names ##
+  ################################
+
+  # dat$valor[dat$tipo_de_produto == 'pinheiro_sla'] = dat$valor*(formular de convervsao)
+  # BUscar info no google e deixar link comentado aqui
+  # table(dat$tipo_de_produto, dat$unidade_de_medida)
+
+  if (param$code == 289){
+    dat = dat %>%
+      dplyr::rename(tipo_de_produto_codigo = tipo_de_produto_extrativo_codigo,
+                    tipo_de_produto = tipo_de_produto_extrativo)
+  }
+
+  if (param$code == 291){
+    dat = dat %>%
+      dplyr::rename(tipo_de_produto_codigo = tipo_de_produto_da_silvicultura_codigo,
+                    tipo_de_produto = tipo_de_produto_da_silvicultura)
+  }
+
+  if (param$code == 5930){
+    dat = dat %>%
+      dplyr::rename(tipo_de_produto_codigo = especie_florestal_codigo,
+                    tipo_de_produto = especie_florestal)
+  }
+
+  #############################
+  ## Create Long Format Data ##
+  #############################
+
+  ## The Output is a tibble with unit and year identifiers + production and/or value of each item
+
   dat = dat %>%
-    dplyr::rename(tipo_de_produto_codigo = especie_florestal_codigo,
-                  tipo_de_produto = especie_florestal)
-}
-#############################
-## Create Long Format Data ##
-#############################
+    dplyr::select(-'unidade_de_medida',-'tipo_de_produto_codigo') %>%
+    tidyr::pivot_wider(id_cols = c(geo_id,ano),
+                      names_from = variavel:tipo_de_produto,
+                      values_from=valor,
+                      names_sep = '_',
+                      values_fn = sum,
+                      values_fill = 0) %>%
+    janitor::clean_names()
 
-## The Output is a tibble with unit and year identifiers + production and/or value of each item
+  ########################
+  ## Changing Year Name ##
+  ########################
 
-dat = dat %>%
-  dplyr::select(-'unidade_de_medida',-'tipo_de_produto_codigo') %>%
-  tidyr::pivot_wider(id_cols = c(geo_id,ano),
-                     names_from = variavel:tipo_de_produto,
-                     values_from=valor,
-                     names_sep = '_',
-                     values_fn = sum,
-                     values_fill = 0) %>%
-  janitor::clean_names()
+  if (language == 'eng'){names(dat)[which(names(dat) == 'ano')] = 'year'}
 
-##########################
-## Returning Data Frame ##
-##########################
+  ##########################
+  ## Returning Data Frame ##
+  ##########################
 
-return(dat)
-
+  return(dat)
 }

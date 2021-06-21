@@ -2,9 +2,13 @@
 
 load_pam = function(dataset=NULL,geo_level = "municipality", time_period = 2017:2018, language = "eng") {
 
-  # -----------
+  # Measure Conversion Before Translation
   # Dataset can be either sidra number or name
   # Need to add translation
+  # Need to add measure translation
+  # Check for old years
+  # Check if any observation geo-time at the final data have multiple NA entries -- this would mean the data is "wrong"
+
   #############################
   ## Define Basic Parameters ##
   #############################
@@ -28,28 +32,22 @@ load_pam = function(dataset=NULL,geo_level = "municipality", time_period = 2017:
 
   if (is.null(dataset)){stop('Missing Dataset!')}
 
-  # if (as.numeric(dataset) == 1612){ ## This is a subset of all crops
-  #
-  #   param$dataset = as.numeric(dataset)
-  #   param$data_name = 'Temporary Crops (Lavouras Temporárias)'
-  # }
-  #
-  # if (as.numeric(dataset) == 1613){ ## This is a subset of all crops
-  #
-  #   param$dataset = as.numeric(dataset)
-  #   param$data_name = 'Permanent Crops (Lavouras Permanente)'
-  # }
-  #
-  # if (as.numeric(dataset) == 5457){
-  #   param$dataset = 5457
-  #   param$data_name = 'All Crops (Lavouras)'
-  # }
-  #
-  #
-  # if (as.numeric(dataset) %in% c(839,1001,1000,1002)){
-  #   param$dataset = as.numeric(dataset)
-  #   param$data_name = 'Crop with more than one harvest (Corn, Potato, Peanut or Beans)'
-  # }
+  if (param$code == 1612){ ## This is a subset of all crops
+    param$data_name = 'Temporary Crops (Lavouras Temporárias)'
+  }
+
+  if (param$code == 1613){ ## This is a subset of all crops
+    param$data_name = 'Permanent Crops (Lavouras Permanente)'
+  }
+
+  if (param$code == 5457){
+    param$data_name = 'All Crops (Lavouras)'
+  }
+
+
+  if (param$code %in% c(839,1001,1000,1002)){
+    param$data_name = 'Crop with more than one harvest (Corn, Potato, Peanut or Beans)'
+  }
 
   ##############
   ## Download ##
@@ -57,8 +55,6 @@ load_pam = function(dataset=NULL,geo_level = "municipality", time_period = 2017:
 
   # We need to show year that is being downloaded as well
   # Heavy Datasets may take several minutes
-
-
 
   dat = as.list(as.character(param$time_period)) %>%
     purrr::map(function(year_num){
@@ -161,6 +157,17 @@ load_pam = function(dataset=NULL,geo_level = "municipality", time_period = 2017:
       dplyr::rename(produto_das_lavouras_codigo = produto_das_lavouras_temporarias_codigo,
                   produto_das_lavouras = produto_das_lavouras_temporarias)
   }
+
+  #################
+  ## Translation ##
+  #################
+
+
+  ########################
+  ## Measure Conversion ##
+  ########################
+
+
 
 
   #############################

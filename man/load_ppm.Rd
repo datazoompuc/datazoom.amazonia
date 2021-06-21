@@ -6,28 +6,28 @@
 \usage{
 load_ppm(
   type = NULL,
-  years = 2019,
-  aggregation_level = "municipality",
+  geo_level = "municipality",
+  time_period = 2019,
   language = "pt"
 )
 }
 \arguments{
 \item{type}{A \code{string} with the desired PPM Dataset (see \url{https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019}). Accept the IBGE PPM codes or names. 94 ~ "cow_farm", 3939 ~ "cattle_number", 74 ~ "animal_orig_prod", 3940 ~ "water_orig_prod"}
 
-\item{years}{A \code{sequence} of integers in the form year_begin:year_end in which both are numeric. Available time frame is from 1974 to 2019}
+\item{geo_level}{A \code{string} containing the data aggregation level of the output. Can be 'country', 'region', 'state' or 'municipality'}
 
-\item{aggregation_level}{A \code{string} containing the data aggregation level of the output. Can be 'country', 'region', 'state' or 'municipality'}
+\item{time_period}{A \code{sequence} of integers in the form year_begin:year_end in which both are numeric. Available time frame is from 1974 to 2019}
 
 \item{language}{A \code{string} with the language of the desired output. Can be 'eng' or 'pt' for English or Portuguese.}
 }
 \value{
-A panel (\code{tibble} format) with N x T observations in which N is the number of geographical units and T is the number of years selected.
+A panel (\code{tibble} format) with N x T observations in which N is the number of geographical units and T is the number of time_period selected.
 }
 \description{
 Download Municipal Livestock Production (Producao Pecuaria Municipal - IBGE)
 }
 \examples{
-\dontrun{load_ppm(type=3939,years = 2018:2019,aggregation_level = 'municipality',language='eng')}
+\dontrun{load_ppm(type=3939,time_period = 2018:2019,geo_level = 'municipality',language='eng')}
 }
 \author{
 DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro
