@@ -16,10 +16,10 @@
 #'
 #' @encoding UTF-8
 #'
-#' @export load_pevs
+#' @export load_pam
 #'
-#' @examples datazoom.amazonia::load_pam(dataset = 'pam_all_crops', 'state', 2012, language = "pt")
-#'
+#' @examples \dontrun{datazoom.amazonia::load_pam(dataset = 'pam_all_crops', 'state', 2012, language = "pt")}
+
 load_pam = function(dataset=NULL,geo_level = "municipality", time_period = 2017:2018, language = "eng") {
 
   ## Translation is only made through collapsing at the end

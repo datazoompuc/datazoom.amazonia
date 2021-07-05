@@ -16,9 +16,9 @@
 #'
 #' @encoding UTF-8
 #'
-#' @export load_pevs
+#' @export load_ppm
 #'
-#' @examples datazoom.amazonia::load_ppm(dataset = 'ppm_animal_origin_production', 'state', 2012, language = "pt")
+#' @examples \dontrun{datazoom.amazonia::load_ppm(dataset = 'ppm_animal_origin_production', 'state', 2012, language = "pt")}
 
 load_ppm = function(dataset=NULL,geo_level = "municipality",time_period=2019,language = 'pt'){
 
