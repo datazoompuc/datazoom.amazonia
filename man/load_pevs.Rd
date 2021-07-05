@@ -8,13 +8,15 @@
 Loads quantity produced and yield value of plant extraction, by type of product, from 1986 to 2019}
 \usage{
 load_pevs(
-  type = NULL,
+  dataset = NULL,
   geo_level = "municipality",
   time_period = 2018:2019,
   language = "pt"
 )
 }
 \arguments{
+\item{dataset}{A code or name indicating the dataset to be downloaded (ADD MORE INFO)}
+
 \item{geo_level}{A \code{string} that defines the geographic level of the data. Defaults to National level, but can be one of "country", "region", "state", "mesoregion", "microregion" and "city"}
 
 \item{time_period}{A \code{vector} indicating what years will the data be loaded}

@@ -2,6 +2,19 @@
 
 load_pam = function(dataset=NULL,geo_level = "municipality", time_period = 2017:2018, language = "eng") {
 
+
+  ## Bind Global Variables
+
+  sidra_code <- nivel_territorial_codigo <- nivel_territorial <- nivel_territorial_codigo <- NULL
+  unidade_de_medida_codigo <- variavel_codigo <- ano_codigo <- valor <- NULL
+  produto_das_lavouras_temporarias_e_permanentes_codigo  <- NULL
+  produto_das_lavouras_temporarias_e_permanentes <- NULL
+  produto_das_lavouras_permanentes_codigo <- NULL
+  produto_das_lavouras_permanentes <- NULL
+  produto_das_lavouras_temporarias_codigo <- NULL
+  produto_das_lavouras_temporarias <- NULL
+  geo_id <- ano <- variavel <- produto_das_lavouras <- NULL
+
   # Measure Conversion Before Translation
   # Dataset can be either sidra number or name
   # Need to add translation
@@ -33,7 +46,7 @@ load_pam = function(dataset=NULL,geo_level = "municipality", time_period = 2017:
   if (is.null(dataset)){stop('Missing Dataset!')}
 
   if (param$code == 1612){ ## This is a subset of all crops
-    param$data_name = 'Temporary Crops (Lavouras Temporárias)'
+    param$data_name = 'Temporary Crops (Lavouras Temporarias)'
   }
 
   if (param$code == 1613){ ## This is a subset of all crops

@@ -17,6 +17,11 @@
 load_br_trade = function(type='exports',geo_level,time_period =2012,
                          time_id='year',language='eng',dic='isic'){
 
+  ## Bind Global Variables
+
+  co_ano <- co_mes<- sh4<- co_pais<- sg_uf_mun<- co_mun<- kg_liquido<- vl_fob<- munic_code<- NULL
+  quantity_net_kg<- fob_usd<- hs4_code<- hs2_code<- year<- usd_per_kg<- NULL
+
   ## There are two main dissagregated data levels in the COMEX website:
     ## 1 - Dissagregated by Classification: NCM
     ## 2 - Disagreggated by Exporter/Importer Municipality
@@ -135,6 +140,10 @@ load_br_trade = function(type='exports',geo_level,time_period =2012,
 
 load_trade_dic = function(type = 'hs'){
 
+  # Bind Global Variables
+
+  locale <-co_sh6 <-co_sh4 <-co_sh2 <-co_ncm_secrom <-no_sh6_ing <-no_sh4_ing <-no_sh2_ing <-no_sec_ing <- NULL
+
   path = 'https://balanca.economia.gov.br/balanca/bd/'
 
   ################
@@ -149,7 +158,7 @@ load_trade_dic = function(type = 'hs'){
 
   final = paste(path,'tabelas/NCM_SH.csv',sep='')
 
-  dic = readr::read_delim(final,delim=';',locale = locale(encoding='Latin1'),progress=TRUE)
+  dic = readr::read_delim(final,delim=';',locale = readr::locale(encoding='Latin1'),progress=TRUE)
 
   ## Convert Dictionary
 

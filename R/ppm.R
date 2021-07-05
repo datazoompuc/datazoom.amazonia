@@ -3,9 +3,9 @@
 #' @description Download Municipal Livestock Production (Producao Pecuaria Municipal - IBGE)
 #'
 #'
-#' @param type A \code{string} with the desired PPM Dataset (see \url{https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019}). Accept the IBGE PPM codes or names. 94 ~ "cow_farm", 3939 ~ "cattle_number", 74 ~ "animal_orig_prod", 3940 ~ "water_orig_prod"
-#' @param time_period A \code{sequence} of integers in the form year_begin:year_end in which both are numeric. Available time frame is from 1974 to 2019
+#' @param dataset A code or name indicating the dataset to be downloaded (ADD MORE INFO)
 #' @param geo_level A \code{string} containing the data aggregation level of the output. Can be 'country', 'region', 'state' or 'municipality'
+#' @param time_period A \code{sequence} of integers in the form year_begin:year_end in which both are numeric. Available time frame is from 1974 to 2019
 #' @param language A \code{string} with the language of the desired output. Can be 'eng' or 'pt' for English or Portuguese.
 #'
 #' @return A panel (\code{tibble} format) with N x T observations in which N is the number of geographical units and T is the number of time_period selected.
@@ -16,6 +16,23 @@
 #' @examples \dontrun{load_ppm(type=3939,time_period = 2018:2019,geo_level = 'municipality',language='eng')}
 
 load_ppm = function(dataset=NULL,geo_level = "municipality",time_period=2019,language = 'pt'){
+
+  ## Bind Global Variables
+
+  sidra_code <- NULL
+  nivel_territorial_codigo<- NULL
+  nivel_territorial<- NULL
+  unidade_de_medida_codigo<- NULL
+  variavel_codigo<- NULL
+  ano_codigo<- NULL
+  valor<- NULL
+  geo_id<- NULL
+  ano<- NULL
+  tipo_de_rebanho<- NULL
+  variavel<- NULL
+  unidade_de_medida<- NULL
+  tipo_de_produto_de_origem_animal<- NULL
+  tipo_de_produto_da_aquicultura<- NULL
 
   # Adjust Code Based on State Level Information
   # Check if any observation geo-time at the final data have multiple NA entries -- this would mean the data is "wrong"

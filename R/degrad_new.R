@@ -3,6 +3,9 @@ load_degrad <- function(source, geo_level = "municipality",
                         time_period = "year",
                         language = "eng",
                         all_events = FALSE) {
+
+  geo_amazon = NULL
+
   # Downloading raw data
   raw_data <- load_degrad_raw(source)
 

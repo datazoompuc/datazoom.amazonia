@@ -5,14 +5,14 @@
 \title{load_ppm_ibge}
 \usage{
 load_ppm(
-  type = NULL,
+  dataset = NULL,
   geo_level = "municipality",
   time_period = 2019,
   language = "pt"
 )
 }
 \arguments{
-\item{type}{A \code{string} with the desired PPM Dataset (see \url{https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019}). Accept the IBGE PPM codes or names. 94 ~ "cow_farm", 3939 ~ "cattle_number", 74 ~ "animal_orig_prod", 3940 ~ "water_orig_prod"}
+\item{dataset}{A code or name indicating the dataset to be downloaded (ADD MORE INFO)}
 
 \item{geo_level}{A \code{string} containing the data aggregation level of the output. Can be 'country', 'region', 'state' or 'municipality'}
 

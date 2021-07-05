@@ -2,9 +2,11 @@
 #'
 #' Loads quantity produced and yield value of plant extraction, by type of product, from 1986 to 2019
 #'
-#' @param time_period A \code{vector} indicating what years will the data be loaded
+#' @param dataset A code or name indicating the dataset to be downloaded (ADD MORE INFO)
 #'
 #' @param geo_level A \code{string} that defines the geographic level of the data. Defaults to National level, but can be one of "country", "region", "state", "mesoregion", "microregion" and "city"
+#'
+#' @param time_period A \code{vector} indicating what years will the data be loaded
 #'
 #' @param language A \code{string} that indicates in which language the data will be returned. The default is "pt", so your data will be returned in Portuguese. Currently, only Portuguese and English are supported.
 #'
@@ -19,6 +21,24 @@
 #' @examples \dontrun{datazoom.amazonia::load_pevs_vegextr(2013, aggregation_level = "country")}
 
 load_pevs <- function(dataset = NULL, geo_level = "municipality", time_period = 2018:2019, language = "pt"){
+
+  sidra_code  <- NULL
+  nivel_territorial_codigo <- NULL
+  nivel_territorial <- NULL
+  unidade_de_medida_codigo <- NULL
+  variavel_codigo <- NULL
+  ano_codigo <- NULL
+  valor <- NULL
+  tipo_de_produto_extrativo_codigo <- NULL
+  tipo_de_produto_da_silvicultura_codigo <- NULL
+  tipo_de_produto_da_silvicultura <- NULL
+  especie_florestal_codigo <- NULL
+  especie_florestal <- NULL
+  geo_id <- NULL
+  ano <- NULL
+  variavel <- NULL
+  tipo_de_produto <- NULL
+  tipo_de_produto_extrativo <- NULL
 
   # Measure Conversion Before Translation
   # Adjust Tipo de Produto (There are several names in the front of the number and I need to check on how to deal with them)

@@ -85,6 +85,27 @@ load_deter_raw <- function(source = "amazonia") {
 
 treat_deter_data <- function(df, geo_level, time_aggregation, language) {
 
+  ## Bind Global Variables
+
+  quadrant <- NULL
+  path_row <- NULL
+  sensor <- NULL
+  satellite <- NULL
+  view_date <- NULL
+  municipali <- NULL
+  uc <- NULL
+  uf <- NULL
+  ano <- NULL
+  mes <- NULL
+  classname <- NULL
+  areauckm <- NULL
+  areamunkm <- NULL
+  name_muni <- NULL
+  code_state <- NULL
+  area_uc_km <- NULL
+  area_geo_km <- NULL
+
+
   ######################
   ## Data Engineering ##
   ######################
@@ -112,7 +133,6 @@ treat_deter_data <- function(df, geo_level, time_aggregation, language) {
 
   if (geo_level == "state") {
     df <- df %>%
-      dplyr
       dplyr::select(-municipali,-uc) %>%
       dplyr::group_by(uf,ano,mes,classname) %>%
       dplyr::summarise(

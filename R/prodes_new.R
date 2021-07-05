@@ -60,6 +60,21 @@ load_prodes <- function(time_period, geo_level = "municipality", language = "eng
 
 treat_prodes_data <- function(df, geo_level, language) {
 
+  ## Bind Global Variables
+
+  cod_ibge <- NULL
+  estado <- NULL
+  cod_uf <- NULL
+  cod_munic_ibge <- NULL
+  ano <- NULL
+  desmatado <- NULL
+  incremento <- NULL
+  floresta <- NULL
+  nuvem <- NULL
+  nao_observado <- NULL
+  nao_floresta <- NULL
+  hidrografia <- NULL
+
   ####################
   ## Data Carpentry ##
   ####################

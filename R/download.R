@@ -1,114 +1,10 @@
-
-## Add Possibility of Geographical Restrictions - For Instance, only Municipalities in the Legal Amazon
-
-download_br_data = function(dataset=NULL,source=NULL,geo_level='municipality',time_period=2017:2018){
-
-  ## Initialize Parameters
-
-  param = list()
-  param$dataset = data
-  param$source = source
-  param$geo_level = geo_level
-  param$time_period
-
-  ##################
-  ## IBGE - SIDRA ##
-  ##################
-
-  if (param$source == 'ibge'){
-
-    #########
-    ## PAM ##
-    #########
-
-    # https://sidra.ibge.gov.br/pesquisa/pam/tabelas
-
-    if (param$dataset == 'pam_all_crops'){}
-    if (param$dataset == 'pam_permanent_crops'){}
-    if (param$dataset == 'pam_temporary_crops'){}
-    if (param$dataset == 'pam_corn'){}
-    if (param$dataset == 'pam_potato'){}
-    if (param$dataset == 'pam_peanut'){}
-    if (param$dataset == 'pam_beans'){}
-
-    #########
-    ## PPM ##
-    #########
-
-    # https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019
-
-    ##########
-    ## PEVS ##
-    ##########
-
-    # https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019
-
-
-
-    ## Call Function that make the download
-
-
-  }
-
-
-  ## Download from Site
-
-  ## We need to have a database with the official links of the sites in which the data is stored
-
-  ###########
-  ## COMEX ##
-  ###########
-
-  if (param$source == 'comex'){
-
-      # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm/EXP_1997.csv
-      # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncmv2/IMP_1999_V2.csv
-      # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/EXP_2000_MUN.csv
-      # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/IMP_2020_MUN.csv
-
-      if (param$dataset == 'comex_import_product'){}
-
-      if (param$dataset == 'comex_import_municipality'){}
-
-      if (param$dataset == 'comex_export_firm_product'){}
-
-      if (param$dataset == 'comex_export_firm_municipality'){}
-    }
-
-  ##########
-  ## INPE ##
-  ##########
-
-  if (param$source == 'inpe'){
-
-      # http://www.dpi.inpe.br/DPI/
-
-      # http://terrabrasilis.dpi.inpe.br/downloads/
-
-      #http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/prodes
-
-      if (param$dataset == 'prodes'){}
-
-      # www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/acesso-ao-dados-do-degrad
-      # Degrad was discontinued in 2016 - Check Deter-B
-
-      # http://www.inpe.br/cra/projetos_pesquisas/deter.php
-
-      #http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter
-
-      if (param$dataset == 'deter'){}
-
-      if (param$dataset == 'degrad'){
-
-        cat('Do you want degradation data? Try using the Deter function!')
-
-      }
-
-    }
-
-}
-
 sidra_download = function(sidra_code = NULL,year,geo_level = 'municipality'){
+
+  ## Bind Global Variables
+
+  code_state <- NULL
+  code_meso <- NULL
+  code_micro <- NULL
 
   # Obs: Sometimes there are non-catched municipalieis - user should check on IBGE SIDRA
   # f = geo %>% filter(!(code_muni %in% unique(dat_uf$`Município (Código)`)))
@@ -366,6 +262,10 @@ sidra_download = function(sidra_code = NULL,year,geo_level = 'municipality'){
 }
 
 external_download = function(dataset=NULL,source=NULL,year='all',geo_level = 'municipality'){
+
+  ## Bind GLobal Variables
+
+  link  <- NULL
 
   # Need to Check Mapbiomas, Prodes and Comex
 
