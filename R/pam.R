@@ -44,6 +44,8 @@ load_pam = function(dataset=NULL,geo_level = "municipality", time_period = 2017:
   produto_das_lavouras_temporarias_codigo <- NULL
   produto_das_lavouras_temporarias <- NULL
   geo_id <- ano <- variavel <- produto_das_lavouras <- NULL
+  unidade_de_medida <- NULL
+  produto_das_lavouras_codigo <- NULL
 
   #############################
   ## Define Basic Parameters ##

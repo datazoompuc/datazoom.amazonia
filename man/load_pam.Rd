@@ -32,8 +32,7 @@ PAM - Municipal Agricultural Production
 Loads information on the  temporary and permanent crops of the Country that are characterized not only by their great economic importance in the export agenda, but also by their social relevance, since its components are on the Brazilian table (IBGE). Survey is done at the municipal level and data is available from 1974 to 2019 for most datasets. See \url{https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/16773-municipal-agricultural-production-temporary-and-permanent-crops.html?=&t=o-que-e}
 }
 \examples{
-datazoom.amazonia::load_pam(dataset = 'pam_all_crops', 'state', 2012, language = "pt")
-
+\dontrun{datazoom.amazonia::load_pam(dataset = 'pam_all_crops', 'state', 2012, language = "pt")}
 }
 \author{
 DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro.

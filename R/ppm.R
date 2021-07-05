@@ -49,6 +49,7 @@ load_ppm = function(dataset=NULL,geo_level = "municipality",time_period=2019,lan
   unidade_de_medida<- NULL
   tipo_de_produto_de_origem_animal<- NULL
   tipo_de_produto_da_aquicultura<- NULL
+  tipo_de_produto_de_origem_animal_codigo <- NULL
 
   # Adjust Code Based on State Level Information
   # Check if any observation geo-time at the final data have multiple NA entries -- this would mean the data is "wrong"
