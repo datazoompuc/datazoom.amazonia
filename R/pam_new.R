@@ -85,7 +85,7 @@ load_pam = function(dataset=NULL,geo_level = "municipality", time_period = 2017:
   clean_custom = function(var){
     var = stringr::str_replace_all(string=var,pattern=' ',replacement='_')
     var = stringr::str_replace_all(string=var,pattern='-',replacement='')
-    var = stringr::str_replace_all(string=var,pattern='ª',replacement='')
+    var = stringr::str_replace_all(string=var,pattern='\u00aa',replacement='')
     var = stringr::str_replace_all(string=var,pattern='\\(',replacement='')
     var = stringr::str_replace_all(string=var,pattern='\\)',replacement='')
     var = stringr::str_replace_all(string=var,pattern='__',replacement='_')

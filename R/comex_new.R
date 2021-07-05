@@ -19,8 +19,8 @@ load_br_trade = function(type='exports',geo_level,time_period =2012,
 
   ## Bind Global Variables
 
-  co_ano <- co_mes<- sh4<- co_pais<- sg_uf_mun<- co_mun<- kg_liquido<- vl_fob<- munic_code<- NULL
-  quantity_net_kg<- fob_usd<- hs4_code<- hs2_code<- year<- usd_per_kg<- NULL
+  co_ano <- co_mes <- sh4 <- co_pais <- sg_uf_mun <- co_mun <- kg_liquido <- vl_fob <- munic_code <- NULL
+  quantity_net_kg <- fob_usd <- hs4_code <- hs2_code <- year <- usd_per_kg <- NULL
 
   ## There are two main dissagregated data levels in the COMEX website:
     ## 1 - Dissagregated by Classification: NCM

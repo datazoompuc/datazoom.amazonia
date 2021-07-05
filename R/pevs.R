@@ -42,8 +42,20 @@ load_pevs <- function(dataset = NULL, geo_level = "municipality", time_period = 
 
   # Measure Conversion Before Translation
   # Adjust Tipo de Produto (There are several names in the front of the number and I need to check on how to deal with them)
-  # Check municipality names (D'Oeste)
+  # Check municipality names (DOeste)
   # Check if any observation geo-time at the final data have multiple NA entries -- this would mean the data is "wrong"
+
+  ## Needs to be adjusted according to different units of measurement (suggestion: ton, ha and brl)
+
+  # dat = dat %>%
+  #   dplyr::mutate(variavel = dplyr::case_when(
+  #     (variavel == 'area_total_existente_em_31/12_dos_efetivos_da_silvicultura') ~ 'area_total_ha',
+  #     (variavel == 'quantidade_produzida_na_extracao_vegetal') ~ 'quant_produzida_extracao_vegetal_ton',
+  #     (variavel == 'quantidade_produzida_na_silvicultura') ~ 'quant_produzida_silvicultura_ton',
+  #     (variavel == 'valor_da_producao_na_extracao_vegetal') ~ 'valor_da_prod_extracao_vegetal_brl',
+  #     (variavel == 'valor_da_producao_na_silvicultura') ~ 'valor_da_prod_silvicultura_brl'
+  #   )
+  #   )
 
 
   #############################
@@ -69,7 +81,7 @@ load_pevs <- function(dataset = NULL, geo_level = "municipality", time_period = 
   if (is.null(param$dataset)){stop('Missing Dataset!')}
 
   if (param$code == 289){
-    param$data_name = 'Vegetal extraction quantity and value (Quantidade e valor da extração vegetal)'
+    param$data_name = 'Vegetal extraction quantity and value (Quantidade e valor da extracao vegetal)'
   }
 
   if (param$code == 291){
@@ -96,24 +108,6 @@ load_pevs <- function(dataset = NULL, geo_level = "municipality", time_period = 
     dplyr::bind_rows() %>%
     tibble::as_tibble()
 
-  #######################
-  ## Cleaning Function ##
-  #######################
-
-  # We need to do check if this really works
-
-  clean_custom = function(var){
-    var = stringr::str_replace_all(string=var,pattern=' ',replacement='_')
-    var = stringr::str_replace_all(string=var,pattern='-',replacement='')
-    var = stringr::str_replace_all(string=var,pattern='ª',replacement='')
-    var = stringr::str_replace_all(string=var,pattern='\\(',replacement='')
-    var = stringr::str_replace_all(string=var,pattern='\\)',replacement='')
-    var = stringr::str_to_lower(string=var)
-    #var = stringr::str_replace(string=var,pattern="__",replacement = "_")
-    #var = stringr::str_replace(string=var,pattern=".",replacement = "_")
-    return(var)
-  }
-
 
   ######################
   ## Data Enginnering ##
@@ -121,16 +115,19 @@ load_pevs <- function(dataset = NULL, geo_level = "municipality", time_period = 
 
   dat = dat %>%
     janitor::clean_names() %>%
-    dplyr::mutate_all(function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")}) %>%
-    dplyr::mutate_all(clean_custom)
+    dplyr::mutate_all(function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")}) #%>%
+    #dplyr::mutate_all(clean_custom)
 
   # We need to check if this works for all data
 
   dat = dat %>%
-    dplyr::select(-c(nivel_territorial_codigo,nivel_territorial,
-                    unidade_de_medida_codigo,variavel_codigo,
-                    ano_codigo)) %>%
+    dplyr::select(-c(nivel_territorial_codigo,nivel_territorial,ano_codigo)) %>%
     dplyr::mutate(valor=as.numeric(valor))
+
+  ## Only Keep Valid Observations
+
+  dat = dat %>%
+    dplyr::filter(!is.na(valor))
 
   #########################################
   ## Create Geographical Unit Identifier ##
@@ -156,29 +153,14 @@ load_pevs <- function(dataset = NULL, geo_level = "municipality", time_period = 
     dat = dplyr::select(dat,-'municipio',-'municipio_codigo')
   }
 
-  #############################################
-  ## Adding Measure Information to Variables ##
-  #############################################
-
-  ## Needs to be adjusted according to different units of measurement (suggestion: ton, ha and brl)
-
-  # dat = dat %>%
-  #   dplyr::mutate(variavel = dplyr::case_when(
-  #     (variavel == 'area_total_existente_em_31/12_dos_efetivos_da_silvicultura') ~ 'area_total_ha',
-  #     (variavel == 'quantidade_produzida_na_extracao_vegetal') ~ 'quant_produzida_extracao_vegetal_ton',
-  #     (variavel == 'quantidade_produzida_na_silvicultura') ~ 'quant_produzida_silvicultura_ton',
-  #     (variavel == 'valor_da_producao_na_extracao_vegetal') ~ 'valor_da_prod_extracao_vegetal_brl',
-  #     (variavel == 'valor_da_producao_na_silvicultura') ~ 'valor_da_prod_silvicultura_brl'
-  #   )
-  #   )
-
   ################################
   ## Harmonizing Variable Names ##
   ################################
 
-  # dat$valor[dat$tipo_de_produto == 'pinheiro_sla'] = dat$valor*(formular de convervsao)
-  # BUscar info no google e deixar link comentado aqui
-  # table(dat$tipo_de_produto, dat$unidade_de_medida)
+  dat = dat %>%
+    dplyr::select(-unidade_de_medida,-unidade_de_medida_codigo)
+
+  ## Change Variable Names for Common Across Datasets
 
   if (param$code == 289){
     dat = dat %>%
@@ -198,6 +180,37 @@ load_pevs <- function(dataset = NULL, geo_level = "municipality", time_period = 
                     tipo_de_produto = especie_florestal)
   }
 
+  ## Translation
+
+  if (language == 'pt'){
+    dat = dat %>%
+      dplyr::mutate(variavel = dplyr::case_when(
+            #(variavel == 'area_total_existente_em_31/12_dos_efetivos_da_silvicultura') ~ 'area_total_ha',
+            (variavel_codigo == '144') ~ 'quant', # Quantidade produzida na extracao vegetal
+            #(variavel == 'quantidade_produzida_na_silvicultura') ~ 'quant_produzida_silvicultura_ton',
+            (variavel_codigo == '145') ~ 'valor', # Valor da produção na extração vegetal
+            #(variavel == 'valor_da_producao_na_silvicultura') ~ 'valor_da_prod_silvicultura_brl'
+          )
+      )
+  }
+
+  if (language == 'eng'){
+
+    ## Change Variable
+
+    dat = dat %>%
+      dplyr::mutate(variavel = dplyr::case_when(
+        #(variavel_codigo == 'area_total_existente_em_31/12_dos_efetivos_da_silvicultura') ~ 'area_total_ha',
+        (variavel_codigo == '144') ~ 'quant', # Quantidade produzida na extracao vegetal
+        #(variavel == 'quantidade_produzida_na_silvicultura') ~ 'quant_produzida_silvicultura_ton',
+        (variavel_codigo == '145') ~ 'value', #Valor da produção na extração vegetal
+        #(variavel == 'valor_da_producao_na_silvicultura') ~ 'valor_da_prod_silvicultura_brl'
+      )
+
+      )
+
+  }
+
   #############################
   ## Create Long Format Data ##
   #############################
@@ -205,11 +218,12 @@ load_pevs <- function(dataset = NULL, geo_level = "municipality", time_period = 
   ## The Output is a tibble with unit and year identifiers + production and/or value of each item
 
   dat = dat %>%
-    dplyr::select(-'unidade_de_medida',-'tipo_de_produto_codigo') %>%
+    dplyr::select(-'tipo_de_produto') %>%
+    dplyr::arrange(tipo_de_produto_codigo,variavel) %>%
     tidyr::pivot_wider(id_cols = c(geo_id,ano),
-                      names_from = variavel:tipo_de_produto,
+                      names_from = variavel:tipo_de_produto_codigo,
                       values_from=valor,
-                      names_sep = '_',
+                      names_sep = '_V',
                       values_fn = sum,
                       values_fill = 0) %>%
     janitor::clean_names()
@@ -218,7 +232,12 @@ load_pevs <- function(dataset = NULL, geo_level = "municipality", time_period = 
   ## Changing Year Name ##
   ########################
 
-  if (language == 'eng'){names(dat)[which(names(dat) == 'ano')] = 'year'}
+
+  if (language == 'eng'){
+
+    dat = dat %>%
+      dplyr::rename(year = ano)
+  }
 
   ##########################
   ## Returning Data Frame ##
