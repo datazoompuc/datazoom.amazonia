@@ -17,6 +17,8 @@
 
 load_seeg <- function(language = "pt"){
 
+  # Adicionar suporte para agregaçao a nivel do Estado
+
 
  # message("Function requires download of large file, so it may take time to run")
 
