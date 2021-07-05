@@ -1,31 +1,46 @@
-#' @title PEVS Plant extraction
+#' @title PEVS - Forestry Activities
 #'
-#' Loads quantity produced and yield value of plant extraction, by type of product, from 1986 to 2019
+#' Loads information on the amount and value of the production of the exploitation of native plant resources and planted forest massifs, as well as existing total and harvested areas of forest crops. Survey is done at the municipal level and data is available from 1986 to 2019. See \url{https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/18374-forestry-activities.html?=&t=o-que-e}
 #'
-#' @param dataset A code or name indicating the dataset to be downloaded (ADD MORE INFO)
+#' @param dataset A dataset name (\code{pevs_forest_crops}, \code{pevs_silviculture} or \code{pevs_silviculture_area}) or SIDRA code (see https://sidra.ibge.gov.br/pesquisa/pevs/quadros/brasil/2019)
 #'
-#' @param geo_level A \code{string} that defines the geographic level of the data. Defaults to National level, but can be one of "country", "region", "state", "mesoregion", "microregion" and "city"
+#' @param geo_level A \code{string} that defines the geographic level of the data. Defaults to National level, but can be one of "country", "region", "state", "mesoregion", "microregion" or "city". See documentation of \code{sidrar}.
 #'
-#' @param time_period A \code{vector} indicating what years will the data be loaded
+#' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
 #'
-#' @param language A \code{string} that indicates in which language the data will be returned. The default is "pt", so your data will be returned in Portuguese. Currently, only Portuguese and English are supported.
+#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese and English are supported.
 #'
-#' @return A \code{data frame} or a \code{list} of data frames if \code{long} is set to \code{TRUE}.
+#' @return A \code{tibble} with a panel of N x T observations, consisting of geographic units that present positive values for any of the variables in the dataset.
 #'
-#' @author DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro
+#' @author DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro.
 #'
 #' @encoding UTF-8
 #'
 #' @export load_pevs
 #'
-#' @examples \dontrun{datazoom.amazonia::load_pevs_vegextr(2013, aggregation_level = "country")}
+#' @examples datazoom.amazonia::load_pevs(dataset = 'pevs_silviculture', 'state', 2012, language = "pt")
 
 load_pevs <- function(dataset = NULL, geo_level = "municipality", time_period = 2018:2019, language = "pt"){
+
+  ## Translation is only made through collapsing at the end
+  # - What if we wanted to deliver raw data?
+
+  ## To-Dos:
+    ## Include Progress Bar
+    ## Include Labels
+    ## Support for Raw Downloads
+    ## Write Vignettes
+
+  ##############################
+  ## Binding Global Variables ##
+  ##############################
 
   sidra_code  <- NULL
   nivel_territorial_codigo <- NULL
   nivel_territorial <- NULL
   unidade_de_medida_codigo <- NULL
+  unidade_de_medida <- NULL
+  tipo_de_produto_codigo <- NULL
   variavel_codigo <- NULL
   ano_codigo <- NULL
   valor <- NULL
@@ -39,24 +54,6 @@ load_pevs <- function(dataset = NULL, geo_level = "municipality", time_period = 
   variavel <- NULL
   tipo_de_produto <- NULL
   tipo_de_produto_extrativo <- NULL
-
-  # Measure Conversion Before Translation
-  # Adjust Tipo de Produto (There are several names in the front of the number and I need to check on how to deal with them)
-  # Check municipality names (DOeste)
-  # Check if any observation geo-time at the final data have multiple NA entries -- this would mean the data is "wrong"
-
-  ## Needs to be adjusted according to different units of measurement (suggestion: ton, ha and brl)
-
-  # dat = dat %>%
-  #   dplyr::mutate(variavel = dplyr::case_when(
-  #     (variavel == 'area_total_existente_em_31/12_dos_efetivos_da_silvicultura') ~ 'area_total_ha',
-  #     (variavel == 'quantidade_produzida_na_extracao_vegetal') ~ 'quant_produzida_extracao_vegetal_ton',
-  #     (variavel == 'quantidade_produzida_na_silvicultura') ~ 'quant_produzida_silvicultura_ton',
-  #     (variavel == 'valor_da_producao_na_extracao_vegetal') ~ 'valor_da_prod_extracao_vegetal_brl',
-  #     (variavel == 'valor_da_producao_na_silvicultura') ~ 'valor_da_prod_silvicultura_brl'
-  #   )
-  #   )
-
 
   #############################
   ## Define Basic Parameters ##
@@ -115,8 +112,7 @@ load_pevs <- function(dataset = NULL, geo_level = "municipality", time_period = 
 
   dat = dat %>%
     janitor::clean_names() %>%
-    dplyr::mutate_all(function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")}) #%>%
-    #dplyr::mutate_all(clean_custom)
+    dplyr::mutate_all(function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")})
 
   # We need to check if this works for all data
 
@@ -183,12 +179,14 @@ load_pevs <- function(dataset = NULL, geo_level = "municipality", time_period = 
   ## Translation
 
   if (language == 'pt'){
+
     dat = dat %>%
       dplyr::mutate(variavel = dplyr::case_when(
-            #(variavel == 'area_total_existente_em_31/12_dos_efetivos_da_silvicultura') ~ 'area_total_ha',
+            (variavel_codigo == '142') ~ 'quant',# Quantidade produzida na silvicultura
             (variavel_codigo == '144') ~ 'quant', # Quantidade produzida na extracao vegetal
-            #(variavel == 'quantidade_produzida_na_silvicultura') ~ 'quant_produzida_silvicultura_ton',
+            (variavel_codigo == '143') ~ 'valor', # Valor da producao na silvicultura
             (variavel_codigo == '145') ~ 'valor', # Valor da produção na extração vegetal
+            (variavel_codigo == '6549') ~ 'area'# Area total existente em 31/12 dos efetivos da silvicultura
             #(variavel == 'valor_da_producao_na_silvicultura') ~ 'valor_da_prod_silvicultura_brl'
           )
       )
@@ -196,15 +194,13 @@ load_pevs <- function(dataset = NULL, geo_level = "municipality", time_period = 
 
   if (language == 'eng'){
 
-    ## Change Variable
-
     dat = dat %>%
       dplyr::mutate(variavel = dplyr::case_when(
-        #(variavel_codigo == 'area_total_existente_em_31/12_dos_efetivos_da_silvicultura') ~ 'area_total_ha',
+        (variavel_codigo == '142') ~ 'quant',# Quantidade produzida na silvicultura
         (variavel_codigo == '144') ~ 'quant', # Quantidade produzida na extracao vegetal
-        #(variavel == 'quantidade_produzida_na_silvicultura') ~ 'quant_produzida_silvicultura_ton',
-        (variavel_codigo == '145') ~ 'value', #Valor da produção na extração vegetal
-        #(variavel == 'valor_da_producao_na_silvicultura') ~ 'valor_da_prod_silvicultura_brl'
+        (variavel_codigo == '143') ~ 'value', # Valor da producao na silvicultura
+        (variavel_codigo == '145') ~ 'value', # Valor da produção na extração vegetal
+        (variavel_codigo == '6549') ~ 'area' # Area total existente em 31/12 dos efetivos da silvicultura
       )
 
       )

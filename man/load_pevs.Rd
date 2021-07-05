@@ -3,9 +3,9 @@
 \encoding{UTF-8}
 \name{load_pevs}
 \alias{load_pevs}
-\title{PEVS Plant extraction
+\title{PEVS - Forestry Activities
 
-Loads quantity produced and yield value of plant extraction, by type of product, from 1986 to 2019}
+Loads information on the amount and value of the production of the exploitation of native plant resources and planted forest massifs, as well as existing total and harvested areas of forest crops. Survey is done at the municipal level and data is available from 1986 to 2019. See \url{https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/18374-forestry-activities.html?=&t=o-que-e}}
 \usage{
 load_pevs(
   dataset = NULL,
@@ -15,25 +15,25 @@ load_pevs(
 )
 }
 \arguments{
-\item{dataset}{A code or name indicating the dataset to be downloaded (ADD MORE INFO)}
+\item{dataset}{A dataset name (\code{pevs_forest_crops}, \code{pevs_silviculture} or \code{pevs_silviculture_area}) or SIDRA code (see https://sidra.ibge.gov.br/pesquisa/pevs/quadros/brasil/2019)}
 
-\item{geo_level}{A \code{string} that defines the geographic level of the data. Defaults to National level, but can be one of "country", "region", "state", "mesoregion", "microregion" and "city"}
+\item{geo_level}{A \code{string} that defines the geographic level of the data. Defaults to National level, but can be one of "country", "region", "state", "mesoregion", "microregion" or "city". See documentation of \code{sidrar}.}
 
-\item{time_period}{A \code{vector} indicating what years will the data be loaded}
+\item{time_period}{A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.}
 
-\item{language}{A \code{string} that indicates in which language the data will be returned. The default is "pt", so your data will be returned in Portuguese. Currently, only Portuguese and English are supported.}
+\item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese and English are supported.}
 }
 \value{
-A \code{data frame} or a \code{list} of data frames if \code{long} is set to \code{TRUE}.
+A \code{tibble} with a panel of N x T observations, consisting of geographic units that present positive values for any of the variables in the dataset.
 }
 \description{
-PEVS Plant extraction
+PEVS - Forestry Activities
 
-Loads quantity produced and yield value of plant extraction, by type of product, from 1986 to 2019
+Loads information on the amount and value of the production of the exploitation of native plant resources and planted forest massifs, as well as existing total and harvested areas of forest crops. Survey is done at the municipal level and data is available from 1986 to 2019. See \url{https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/18374-forestry-activities.html?=&t=o-que-e}
 }
 \examples{
-\dontrun{datazoom.amazonia::load_pevs_vegextr(2013, aggregation_level = "country")}
+datazoom.amazonia::load_pevs(dataset = 'pevs_silviculture', 'state', 2012, language = "pt")
 }
 \author{
-DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro
+DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro.
 }
