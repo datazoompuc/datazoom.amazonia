@@ -14,8 +14,7 @@
 # http://siscomex.gov.br/balanca-comercial-traz-agora-classificacao-de-produtos-por-setor-de-atividade-economica/
 
 
-load_br_trade = function(type='exports',geo_level,time_period =2012,
-                         time_id='year',language='eng',dic='isic'){
+load_br_trade = function(type='exports',geo_level,time_period=2012,language='eng',time_id='year',dic='isic'){
 
   ## Bind Global Variables
 
