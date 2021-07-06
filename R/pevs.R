@@ -221,7 +221,7 @@ load_pevs <- function(dataset = NULL, geo_level = "municipality", time_period = 
                       values_from=valor,
                       names_sep = '_V',
                       values_fn = sum,
-                      values_fill = 0) %>%
+                      values_fill = NA) %>%
     janitor::clean_names()
 
   ########################

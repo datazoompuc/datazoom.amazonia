@@ -261,7 +261,7 @@ sidra_download = function(sidra_code = NULL,year,geo_level = 'municipality'){
 
 }
 
-external_download = function(dataset=NULL,source=NULL,year='all',geo_level = 'municipality'){
+external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL){
 
   ## Bind GLobal Variables
 
@@ -377,7 +377,7 @@ external_download = function(dataset=NULL,source=NULL,year='all',geo_level = 'mu
   if (source == 'mapbiomas'){file_extension = '.xlsx'}
   if (source == 'prodes'){file_extension = '.txt'}
 
-  # We should Change This to a Curl Process
+  # !!!  We should Change This to a Curl Process
 
   ## Define Empty Directory and Files For Download
 
@@ -434,6 +434,8 @@ external_download = function(dataset=NULL,source=NULL,year='all',geo_level = 'mu
   #################
   ## Return Data ##
   #################
+
+  dat = dat %>% tibble::as_tibble()
 
   return(dat)
 

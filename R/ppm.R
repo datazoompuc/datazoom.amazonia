@@ -325,7 +325,7 @@ load_ppm = function(dataset=NULL,geo_level = "municipality",time_period=2019,lan
                          values_from=valor,
                          names_sep = '_',
                          values_fn = sum,
-                         values_fill = 0) %>%
+                         values_fill = NA) %>%
       janitor::clean_names()
   }
 
@@ -338,7 +338,7 @@ load_ppm = function(dataset=NULL,geo_level = "municipality",time_period=2019,lan
                          values_from=valor,
                          names_sep = '_',
                          values_fn = sum,
-                         values_fill = 0) %>%
+                         values_fill = NA) %>%
       janitor::clean_names()
   }
 
@@ -353,7 +353,7 @@ load_ppm = function(dataset=NULL,geo_level = "municipality",time_period=2019,lan
                          values_from=valor,
                          names_sep = '_V',
                          values_fn = sum,
-                         values_fill = 0) %>%
+                         values_fill = NA) %>%
       janitor::clean_names()
 
   }
@@ -367,7 +367,7 @@ load_ppm = function(dataset=NULL,geo_level = "municipality",time_period=2019,lan
                          values_from=valor,
                          names_sep = '_',
                          values_fn = sum,
-                         values_fill = 0) %>%
+                         values_fill = NA) %>%
       janitor::clean_names()
   }
 
@@ -383,7 +383,7 @@ load_ppm = function(dataset=NULL,geo_level = "municipality",time_period=2019,lan
                          values_from=valor,
                          names_sep = '_',
                          values_fn = sum,
-                         values_fill = 0) %>%
+                         values_fill = NA) %>%
       janitor::clean_names()
   }
 
