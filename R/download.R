@@ -345,6 +345,18 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
   # # Amazonia Legal = legal-amz-prodes
   # Bioma Amazonia = amz-prodes
 
+  if (source == 'deter'){
+    path = paste(param$url,stringr::str_replace(param$dataset,'_','-'),'/shape',sep='')
+  }
+
+  ############
+  ## Degrad ##
+  ############
+
+  if (source == 'degrad'){
+    if (dataset == 'degrad'){path = paste(param$url,'/arquivos/degrad',param$year,'_final_shp.zip',sep='')}
+  }
+
   ###############
   ## MapBiomas ##
   ###############
@@ -376,6 +388,7 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
   file_extension = stringr::str_sub(path,-4)
   if (source == 'mapbiomas'){file_extension = '.xlsx'}
   if (source == 'prodes'){file_extension = '.txt'}
+  if (source == 'deter'){file_extension = '.zip'}
 
   # !!!  We should Change This to a Curl Process
 
@@ -387,13 +400,14 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
   ## Extraction through Curl Requests
   ## Investigate a bit more on how Curl Requests work
 
-  download.file(url = path,destfile = temp,mode='wb')
+  if (source != 'deter'){download.file(url = path,destfile = temp,mode='wb')}
+  if (source == 'deter'){
 
-  # proc = RCurl::CFILE(temp, mode = "wb")
-  #
-  # RCurl::curlPerform(url = path, writedata = proc@ref, noprogress = FALSE)
-  #
-  # RCurl::close(proc)
+    proc = RCurl::CFILE(temp, mode = "wb")
+    RCurl::curlPerform(url = path, writedata = proc@ref, noprogress = FALSE)
+    RCurl::close(proc)
+
+  }
 
   ## This Data Opening Part Should Include the .Shp, not DBF
 
@@ -408,21 +422,83 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
   #df = sf::read_sf(paste(dir, "deter_public.shp", sep = "/"))
 
   if (file_extension == '.csv'){
-    dat = data.table::fread(temp)
+    dat = data.table::fread(temp) %>% tibble::as_tibble()
   }
   if (file_extension == '.txt'){
     dat = readr::read_csv(temp,locale = readr::locale(encoding = "latin1")) %>%
-      janitor::clean_names()
+      janitor::clean_names() %>% tibble::as_tibble()
   }
   if (file_extension == '.xlsx'){
     if (param$dataset == 'mapbiomas_cover'){dat = readxl::read_excel(temp,sheet=3)}
-    dat = dat %>% janitor::clean_names()
+    dat = dat %>%
+      janitor::clean_names() %>% tibble::as_tibble()
+  }
+
+  if (file_extension == '.zip'){
+
+    if (param$dataset == 'degrad'){
+
+      if (param$year %in% 2007){
+        dat = sf::read_sf(paste(dir,'Degrad2007_Final_pol.shp',sep='\\'))
+        dat$year = param$year
+      }
+      if (param$year == 2008){
+        dat = sf::read_sf(paste(dir,'Degrad2008_Final_pol.shp',sep='\\'))
+        dat$year = param$year
+      }
+      if (param$year == 2009){
+        dat = sf::read_sf(paste(dir,'Degrad2009_Final_pol.shp',sep='\\'))
+        dat$year = param$year
+      }
+      if (param$year == 2010){
+        dat = sf::read_sf(paste(dir,'DEGRAD_2010_UF_pol.shp',sep='\\'))
+        dat$year = param$year
+      }
+      if (param$year == 2011){
+        dat = sf::read_sf(paste(dir,'DEGRAD_2011_INPE_pol.shp',sep='\\'))
+        dat$year = param$year
+      }
+      if (param$year == 2012){
+        dat = sf::read_sf(paste(dir,'DEGRAD_2012_INPE_pol.shp',sep='\\'))
+        dat$year = param$year
+      }
+      if (param$year == 2013){
+        dat = sf::read_sf(paste(dir,'DEGRAD_2013_INPE_pol.shp',sep='\\'))
+        dat$year = param$year
+      }
+      if (param$year == 2014){
+        dat = sf::read_sf(paste(dir,'DEGRAD_2014_pol.shp',sep='\\'))
+        dat$year = param$year
+      }
+      if (param$year == 2015){
+        dat = sf::read_sf(paste(dir,'DEGRAD_2015.shp',sep='\\'))
+        dat$year = param$year
+      }
+      if (param$year == 2016){
+        dat = sf::read_sf(paste(dir,'DEGRAD_2016_pol.shp',sep='\\'))
+        dat$year = param$year
+      }
+    }
+
+    if (param$source == 'deter'){
+      dat = sf::read_sf(paste(dir,'deter_public.shp',sep='\\')) %>%
+        janitor::clean_names() %>%
+        tibble::as_tibble()
+    }
   }
 
   # if (source == 'prodes'){
   #   file = list.files(dir)[stringr::str_detect(list.files(dir),'.shp')]
   #   dat = sf::read_sf(paste(dir,file,sep='\\'))
   # }
+
+  ##############################
+  ## Excluding Temporary File ##
+  ##############################
+
+  # Folder is kept
+
+  unlink(temp)
 
   ####################
   ## Pre-Processing ##
@@ -434,8 +510,6 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
   #################
   ## Return Data ##
   #################
-
-  dat = dat %>% tibble::as_tibble()
 
   return(dat)
 
@@ -543,7 +617,14 @@ datasets_link = function(){
     # javascript: download('http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-amz/shape','file-download-1');
     # javascript: download('http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-cerrado/shape','file-download-2');
 
-    'DETER-INPE','deter',NA,'2016-2020',NA,'http://terrabrasilis.dpi.inpe.br/file-delivery/download/',
+    'DETER-INPE','deter_amz',NA,NA,NA,'http://terrabrasilis.dpi.inpe.br/file-delivery/download/',
+    'DETER-INPE','deter_cerrado',NA,NA,NA,'http://terrabrasilis.dpi.inpe.br/file-delivery/download/',
+
+  # DEGRAD
+
+    # "http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad",year,"_final_shp.zip"
+
+    'DEGRAD-INPE','degrad',NA,'2007-2016',NA,'http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad',
 
      ###############
      ## MapBiomas ##
