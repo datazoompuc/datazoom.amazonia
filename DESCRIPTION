@@ -22,14 +22,17 @@ RoxygenNote: 7.1.1
 Imports:
     rlang,
     dplyr,
+    data.table,
+    dtplyr,
+    stringr,
+    readr,
+    tidyr,
+    janitor,
     labelled,
     purrr,
-    readr,
     sidrar,
     magrittr,
     tibble,
-    tidyr,
-    tidyverse,
     stats,
     foreign,
     lubridate,
@@ -38,17 +41,16 @@ Imports:
     sf,
     utils,
     readxl,
-    janitor,
     XML,
     gsheet,
     RCurl,
-    tidyselect,
-    ggplot2
+    tidyselect
 URL: http://www.econ.puc-rio.br/datazoom
 Suggests: 
     knitr,
     rmarkdown,
-    lwgeom
+    lwgeom,
+    ggplot2
 VignetteBuilder: knitr
 Depends: 
     R (>= 4.0)

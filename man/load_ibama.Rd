@@ -44,7 +44,7 @@ counts for total number of infractions, infractions that already went to trial, 
 number of unique perpetrators of infractions on the given place-time period.
 }
 \description{
-Original data comes from \href{https://servicos.ibama.gov.br/ctf/publico/areasembargadas/ConsultaPublicaAreasEmbargadas.php}{IBAMA's website}
+Original data comes from \href{https://servicos.ibama.gov.br/ctf/publico/areasembargadas/ConsultaPublicaAreasEmbargadas.php }{IBAMA's website}
 }
 \examples{
 
