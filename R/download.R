@@ -377,7 +377,13 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
     if (dataset == 'mapbiomas_grazing_quality'){path = paste(param$url,'Estat%C3%ADsticas/MapBIomas_COL5_QUALIDADE_PASTAGEM-biomas-estados-SITE.xlsx',sep='')}
   }
 
+  #############
+  ## SIGMINE ##
+  #############
 
+  if (source == 'sigmine'){
+    if (dataset == 'sigmine_active'){path = paste(param$url,'SIGMINE/PROCESSOS_MINERARIOS/BRASIL.zip',sep='')}
+  }
 
   #######################
   ## Initiate Download ##
@@ -484,6 +490,12 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
       dat = sf::read_sf(paste(dir,'deter_public.shp',sep='\\')) %>%
         janitor::clean_names() %>%
         tibble::as_tibble()
+    }
+
+    if (param$source == 'sigmine'){
+
+      dat = sf::read_sf(paste(dir,'BRASIL.shp',sep='\\'))
+
     }
   }
 
@@ -657,6 +669,9 @@ datasets_link = function(){
     ## SIGMINE ##
     #############
 
+    # Agencia Nacional de Mineracao (ANM)
+
+    'ANM-SIGMINE','sigmine_active',NA,NA,NA,'https://app.anm.gov.br/dadosabertos/',
 
     # https://dados.gov.br/dataset/sistema-de-informacoes-geograficas-da-mineracao-sigmine
 
