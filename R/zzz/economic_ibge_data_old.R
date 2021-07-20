@@ -256,7 +256,7 @@ load_employment <- function(years, sectors = FALSE, space_aggregation = "municip
         category = list(cnae)
       )
     ) %>% dplyr::distinct()
-    sector <- dplyr::pull(df, "Classifica\u00E7\u00E3o Nacional de Atividades Econ\u00F4micas (CNAE 2.0)")[1] ## For god's sake, deal with encoding properly!!
+    sector <- dplyr::pull(df, "Classifica\u00E7\u00E3o Nacional de Atividades Econ\u00F4micas (CNAE 2.0)")[1]
     df %>%
       dplyr::select(c(by, "Valor")) %>%
       dplyr::rename(!!sector := "Valor")
