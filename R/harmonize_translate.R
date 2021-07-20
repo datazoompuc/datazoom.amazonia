@@ -94,4 +94,28 @@ load_dictionary = function(dataset){
 
   }
 
+  if (dataset == 'pam_all_crops'){
+
+    harmonization_dat = tibble::tribble(
+      ~var_code,~var_pt,~var_eng,~unit_value,~unit_quantity,~available_period,
+
+      0,'Total',NA,NA,NA,NA,
+
+    )
+
+
+  }
+
+  if (dataset == 'ppm_animal_origin_production'){
+
+    harmonization_dat = tibble::tribble(
+      ~var_code,~var_pt,~var_eng,~unit_value,~unit_quantity,~available_period,
+
+      0,'Total',NA,NA,NA,NA,
+      2682,'Leite','Milk',
+
+    )
+
+  }
+
 }
