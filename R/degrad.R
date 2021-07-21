@@ -72,7 +72,7 @@ load_degrad <- function(dataset = 'degrad',raw_data=NULL, geo_level=NULL,time_pe
 
   ## The Columns are not always the same name, we have to edit that
 
-  ##################################
+  ###################################
   ## Filter Legal Amazon Geography ##
   ###################################
 

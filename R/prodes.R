@@ -1,0 +1,174 @@
+
+## The Downloaded Data is from 760 Municipalities
+  ## Are these the ones in the Legal Amazon
+
+
+load_prodes <- function(dataset=NULL,raw_data = NULL,geo_level = "municipality",
+                        time_period=2010:2012,language = 'pt') {
+
+  ###########################
+  ## Bind Global Variables ##
+  ###########################
+
+  #############################
+  ## Define Basic Parameters ##
+  #############################
+
+  param=list()
+  param$dataset = dataset
+  param$raw_data = raw_data
+  param$geo_level = geo_level
+  param$time_period = time_period
+  param$language = language
+  #param$time_id = time_id
+
+  param$survey_name = datasets_link() %>%
+    dplyr::filter(dataset == param$dataset) %>%
+    dplyr::select(survey) %>%
+    unlist()
+
+  param$url = datasets_link() %>%
+    dplyr::filter(dataset == param$dataset) %>%
+    dplyr::select(link) %>%
+    unlist()
+
+  ###################
+  ## Download Data ##
+  ###################
+
+  ## Dataset
+
+  if (is.null(param$dataset)){stop('Missing Dataset!')}
+  if (is.null(param$raw_data)){stop('Missing TRUE/FALSE for Raw Data')}
+
+  ## Column Names come with numbers at the side - we need to clean those
+
+  dat = as.list(param$time_period) %>%
+    purrr::map(
+      function(t){external_download(dataset = param$dataset,source='prodes',year = t) %>%
+          dplyr::mutate(ano = t)}
+    )
+
+  ## Include function that treats the data here
+
+  dat = dat %>%
+    dplyr::bind_rows() %>%
+    tibble::as_tibble()
+
+  ######################
+  ## Data Engineering ##
+  ######################
+
+  dat = dat %>%
+    janitor::clean_names() %>%
+    dplyr::mutate_if(is.character,function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")})
+
+  ## Change Data Type
+
+  dat = dat %>%
+    dplyr::mutate_if(is.numeric,as.double)
+
+
+  # ---------------------------------------------------------------------
+
+  # treat_prodes_data = function(df, geo_level, language) {
+  #
+  #   ## Bind Global Variables
+  #
+  #   cod_ibge <- NULL
+  #   estado <- NULL
+  #   cod_uf <- NULL
+  #   cod_munic_ibge <- NULL
+  #   ano <- NULL
+  #   desmatado <- NULL
+  #   incremento <- NULL
+  #   floresta <- NULL
+  #   nuvem <- NULL
+  #   nao_observado <- NULL
+  #   nao_floresta <- NULL
+  #   hidrografia <- NULL
+  #
+  #   ####################
+  #   ## Data Carpentry ##
+  #   ####################
+  #
+  #   geo_level <- tolower(geo_level)
+  #
+  #   df = df %>%
+  #     #dat_mod = df %>%
+  #     janitor::clean_names() %>%
+  #     # Adds column with UF codes, eg. MA = 21
+  #     dplyr::mutate(cod_uf = as.factor(base::substr(cod_ibge,start=1,stop=2))) %>%
+  #     dplyr::rename(cod_munic_ibge = cod_ibge) %>%
+  #     # Removes unnecessary columns - under review
+  #     dplyr::select(-c('lat','long','latgms','longms','municipio','nr','soma'))
+  #
+  #   if (geo_level == "state") {
+  #
+  #     df = df %>%
+  #       dplyr::group_by(estado,cod_uf) %>%
+  #       # Collapses data by state
+  #       dplyr::summarize_if(is.numeric, sum, na.rm = TRUE)
+  #   }
+  #
+  #   if (geo_level == "municipality") {
+  #     df = df %>%
+  #       janitor::clean_names() %>%
+  #       dplyr::mutate(cod_munic_ibge = as.factor(cod_munic_ibge)) %>%
+  #       dplyr::relocate(cod_uf,.after=estado)
+  #   }
+  #
+  #   if (!(geo_level %in% c('municipality','state'))){
+  #
+  #     stop("Aggregation level not supported. Please see documentation.")
+  #
+  #   }
+  #
+  #   ###############################
+  #   ## Extract Year From Columns ##
+  #   ###############################
+  #
+  #   df$ano =
+  #     colnames(df) %>%
+  #     purrr::detect(function(x) startsWith(x, "des")) %>%
+  #     gsub(pattern = ".*(\\d{4}).*", replacement = "\\1") %>%
+  #     as.numeric()
+  #
+  #
+  #   # Removes year from column name
+  #   colnames(df) <- gsub("(.*)\\d{4}?", "\\1", colnames(df))
+  #
+  #   df = df %>%
+  #     dplyr::relocate(ano,.after=cod_munic_ibge)
+  #
+  #   #################
+  #   ## Translation ##
+  #   #################
+  #
+  #   language <- tolower(language)
+  #
+  #   if (language == 'eng'){
+  #     df = df %>%
+  #       dplyr::rename(
+  #         #munic_code_ibge = cod_munic_ibge,
+  #         state = estado,
+  #         deforestation = desmatado,
+  #         increment = incremento,
+  #         forest = floresta,
+  #         cloud = nuvem,
+  #         not_observed = nao_observado,
+  #         not_forest = nao_floresta,
+  #         hydrography = hidrografia,
+  #         year = ano)
+  #   } else if (language != "pt") {
+  #     warning("Selected language is not supported. Proceeding with Portuguese.")
+  #   }
+  #
+  #
+  #   return(df)
+  # }
+
+
+  return(dat)
+}
+

@@ -377,7 +377,33 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
     if (dataset == 'mapbiomas_grazing_quality'){path = paste(param$url,'Estat%C3%ADsticas/MapBIomas_COL5_QUALIDADE_PASTAGEM-biomas-estados-SITE.xlsx',sep='')}
   }
 
+  #############
+  ## SIGMINE ##
+  #############
 
+  if (source == 'sigmine'){
+    if (dataset == 'sigmine_active'){path = paste(param$url,'SIGMINE/PROCESSOS_MINERARIOS/BRASIL.zip',sep='')}
+  }
+
+  ##########
+  ## SEEG ##
+  ##########
+
+  # if (source == 'seeg'){
+  #   if (geo_level == 'municipality'){
+  #     path = 'https://drive.google.com/u/0/uc?export=download&confirm=yN8g&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd'}
+  #   if (geo_level == 'state'){
+  #     path = 'https://seeg-br.s3.amazonaws.com/2019-v7.0/download/1-SEEG8_GERAL-BR_UF_2020.11.05_-_SITE.xlsx'
+  #   }
+  # }
+
+  #########
+  ## IPS ##
+  #########
+
+  if (source == 'ips'){
+   path = paste(param$url,'/assets/IPS_Tabela_Completa-8bb3b841e46c8fb17b0331d8ea92bef3.xlsx',sep='')
+  }
 
   #######################
   ## Initiate Download ##
@@ -387,8 +413,12 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
 
   file_extension = stringr::str_sub(path,-4)
   if (source == 'mapbiomas'){file_extension = '.xlsx'}
+  if (source == 'ips'){file_extension = '.xlsx'}
   if (source == 'prodes'){file_extension = '.txt'}
   if (source == 'deter'){file_extension = '.zip'}
+  # if (source == 'seeg' & geo_level == 'municipality'){
+  #   file_extension = NA
+  # }
 
   # !!!  We should Change This to a Curl Process
 
@@ -400,7 +430,7 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
   ## Extraction through Curl Requests
   ## Investigate a bit more on how Curl Requests work
 
-  if (source != 'deter'){download.file(url = path,destfile = temp,mode='wb')}
+  if (!(source %in% c('deter','seeg'))){download.file(url = path,destfile = temp,mode='wb')}
   if (source == 'deter'){
 
     proc = RCurl::CFILE(temp, mode = "wb")
@@ -408,6 +438,10 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
     RCurl::close(proc)
 
   }
+  # if (source == 'seeg'){
+    # if (geo_level == 'state'){download.file(url = path,destfile = temp,mode='wb')}
+    # if (geo_level == 'municipality'){file = gsheet::gsheet2tbl(path)}
+  #}
 
   ## This Data Opening Part Should Include the .Shp, not DBF
 
@@ -429,9 +463,20 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
       janitor::clean_names() %>% tibble::as_tibble()
   }
   if (file_extension == '.xlsx'){
-    if (param$dataset == 'mapbiomas_cover'){dat = readxl::read_excel(temp,sheet=3)}
+    if (param$dataset == 'mapbiomas_cover'){dat = readxl::read_excel(temp,sheet='LAND COVER - BIOMAS e UF')} ## HA
+    if (param$dataset == 'mapbiomas_transition'){dat = readxl::read_excel(temp,sheet='BD_TRANSICAO_BIOMA-UF')}
+    if (param$dataset == 'mapbiomas_deforestation_regeneration'){dat = readxl::read_excel(temp,sheet='BD Colecao 5.0(h) - Hectares')}
+    if (param$dataset == 'mapbiomas_irrigation'){dat = readxl::read_excel(temp,sheet='BD_IRRIGACAO')}
+    if (param$dataset == 'mapbiomas_grazing_quality'){dat = readxl::read_excel(temp,sheet='BD_Qualidade')}
+
     dat = dat %>%
-      janitor::clean_names() %>% tibble::as_tibble()
+      janitor::clean_names() %>%
+      tibble::as_tibble()
+
+    if (param$dataset == 'ips'){
+      if (param$year == 2014){dat = readxl::read_excel(temp,sheet='IPS 2014')}
+      if (param$year == 2018){dat = readxl::read_excel(temp,sheet=1)}
+    }
   }
 
   if (file_extension == '.zip'){
@@ -484,6 +529,12 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
       dat = sf::read_sf(paste(dir,'deter_public.shp',sep='\\')) %>%
         janitor::clean_names() %>%
         tibble::as_tibble()
+    }
+
+    if (param$source == 'sigmine'){
+
+      dat = sf::read_sf(paste(dir,'BRASIL.shp',sep='\\'))
+
     }
   }
 
@@ -610,42 +661,25 @@ datasets_link = function(){
    # Unidade Conservacao - http://terrabrasilis.dpi.inpe.br/download/dataset/amz-aux/vector/conservation_units_amazon_biome.zip
    # Area Indigena - http://terrabrasilis.dpi.inpe.br/download/dataset/amz-aux/vector/indigeneous_area_amazon_biome.zip
 
-    # DETER (Somente Amazônia Legal e Cerrado)
+   # DETER (Somente Amazônia Legal e Cerrado)
 
-    # DEGRAD is included here http://www.inpe.br/cra/projetos_pesquisas/deter.php
+   # DEGRAD is included here http://www.inpe.br/cra/projetos_pesquisas/deter.php
 
-    # javascript: download('http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-amz/shape','file-download-1');
-    # javascript: download('http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-cerrado/shape','file-download-2');
+   # javascript: download('http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-amz/shape','file-download-1');
+   # javascript: download('http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-cerrado/shape','file-download-2');
 
-    'DETER-INPE','deter_amz',NA,NA,NA,'http://terrabrasilis.dpi.inpe.br/file-delivery/download/',
-    'DETER-INPE','deter_cerrado',NA,NA,NA,'http://terrabrasilis.dpi.inpe.br/file-delivery/download/',
+   'DETER-INPE','deter_amz',NA,NA,NA,'http://terrabrasilis.dpi.inpe.br/file-delivery/download/',
+   'DETER-INPE','deter_cerrado',NA,NA,NA,'http://terrabrasilis.dpi.inpe.br/file-delivery/download/',
 
-  # DEGRAD
+   # DEGRAD
 
-    # "http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad",year,"_final_shp.zip"
+   # "http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad",year,"_final_shp.zip"
 
-    'DEGRAD-INPE','degrad',NA,'2007-2016',NA,'http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad',
+   'DEGRAD-INPE','degrad',NA,'2007-2016',NA,'http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad',
 
-     ###############
-     ## MapBiomas ##
-     ###############
-
-    # COBERTURA BIOMA & ESTADOS - dados de área (ha) de cobertura e uso do solo por bioma e estado e município de 1985 a 2019
-      # https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Dados_Cobertura_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx
-    # COBERTURA ESTADOS & MUNICÍPIOS (V2) - dados de área (ha) de cobertura e uso do solo por bioma e estado e município de 1985 a 2019
-      # https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Dados_Cobertura_MapBiomas_5.0_UF-MUN_SITE_v2.xlsx
-
-    # TRANSIÇÕES ESTADOS & MUNICÍPIOS (V2)- dados de área (ha) de transição/mudança de cobertura e uso do solo por estado e município em períodos selecionados entre os anos 1985 e 2019
-      # https://storage.googleapis.com/mapbiomas-public/COLECAO/5/DOWNLOADS/ESTATISTICAS/Dados_Transicao_MapBiomas_5.0_UF-MUN_SITE_v2.xlsx
-
-    # DESMATAMENTO E REGENERAÇÃO POR BIOMA E ESTADO (BASE COLEÇÃO 5)  (V8H) - dados de área (km e ha) de desmatamento e regeneração por classe de cobertura para cada estado e bioma entre os anos de 1988 e 2017.
-      # https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/BD-DESM_e_REG_COL5_V8h__SITE.xlsx
-
-    # IRRIGAÇÃO - VERSÃO BETA (BASE COLEÇÃO 5) - dados de área (ha) de irrigação para cada estado e bioma entre os anos de 2000 e 2019.
-      # https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/MapBIomas_COL5_IRRIGACAO-biomas-estados-SITE.xlsx
-
-    # QUALIDADE DE PASTAGEM - VERSÃO BETA (BASE COLEÇÃO 5) - dados de área (ha) de diferentes graus de degradação para as pastagens para cada estado e bioma nos anos de 2010 e 2018.
-      # https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/MapBIomas_COL5_QUALIDADE_PASTAGEM-biomas-estados-SITE.xlsx
+    ###############
+    ## MapBiomas ##
+    ###############
 
     'MAPBIOMAS','mapbiomas_cover',NA,'1985-2019',NA,'https://mapbiomas-br-site.s3.amazonaws.com/',
     'MAPBIOMAS','mapbiomas_transition',NA,'1985-2019',NA,'https://mapbiomas-br-site.s3.amazonaws.com/',
@@ -657,6 +691,9 @@ datasets_link = function(){
     ## SIGMINE ##
     #############
 
+    # Agencia Nacional de Mineracao (ANM)
+
+    'ANM-SIGMINE','sigmine_active',NA,NA,NA,'https://app.anm.gov.br/dadosabertos/',
 
     # https://dados.gov.br/dataset/sistema-de-informacoes-geograficas-da-mineracao-sigmine
 
@@ -678,6 +715,7 @@ datasets_link = function(){
     ## SEEG ##
     ##########
 
+    # 'SEEG','seeg',NA,NA,NA,NA,
 
     # http://seeg.eco.br/download
 
@@ -689,6 +727,8 @@ datasets_link = function(){
     #########
 
     #  http://www.ipsamazonia.org.br/assets/IPS_Tabela_Completa-8bb3b841e46c8fb17b0331d8ea92bef3.xlsx
+
+    'IPS','ips',NA,'2014 and/or 2018',NA,'http://www.ipsamazonia.org.br',
 
     ###########
     ## IBAMA ##
