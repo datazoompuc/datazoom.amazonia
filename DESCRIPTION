@@ -44,7 +44,8 @@ Imports:
     XML,
     gsheet,
     RCurl,
-    tidyselect
+    tidyselect,
+    Hmisc
 URL: http://www.econ.puc-rio.br/datazoom
 Suggests: 
     knitr,

@@ -482,4 +482,12 @@ load_dictionary = function(dataset){
 
   }
 
+  ############
+  ## Return ##
+  ############
+
+  return(harmonization_dat)
+
+
+
 }
