@@ -2,6 +2,8 @@
 
 load_dictionary = function(dataset){
 
+  #PEVS
+
   if (dataset == 'pevs_forest_crops'){
 
     harmonization_dat = tibble::tribble(
@@ -135,7 +137,6 @@ load_dictionary = function(dataset){
       3462,'Eucalipto (Folha)','Eucalyptus (Leaf)','1K BRL','Tons',NA,NA,
       3463,'Resina','Resin','1K BRL','Tons',NA,NA,
 
-
       0,'Total','Total','1K BRL','None','None',NA)
 
   }
@@ -151,11 +152,9 @@ load_dictionary = function(dataset){
       39327,'Pinus','pine',NA,'Hectares',NA,NA,
       39328,'Outras Especies','Other Species',NA,'Hectares',NA,NA,
 
-
       0,'Total','Total','1K BRL','None','None',NA)
 
   }
-
 
 
   #########
@@ -200,6 +199,191 @@ load_dictionary = function(dataset){
   }
 
   if (dataset == 'ppm_sheep_farming'){
+  #PAM
+
+  if (dataset == 'pam_temporary_crops'){
+
+    harmonization_dat = tibble::tribble(
+      ~var_code,~var_pt,~var_eng,~unit_value,~unit_quantity,~unit_area,~available_period,
+
+      2688,'Abacaxi',NA,'1K BRL','Tons','Hectares',NA,
+      40471,'Alfafa Fenada',NA,'1K BRL','Tons','Hectares',NA,
+      2689,'Algodao Herbaceo (em Caroco)',NA,'1K BRL','Tons','Hectares',NA,
+      2690,'Alho',NA,'1K BRL','Tons','Hectares',NA,
+      2691,'Amendoim (em Casca)',NA,'1K BRL','Tons','Hectares',NA,
+      2692,'Arroz (em Casca)',NA,'1K BRL','Tons','Hectares',NA,
+      2693,'Aveia (em Grao)',NA,'1K BRL','Tons','Hectares',NA,
+      2694,'Batata Doce',NA,'1K BRL','Tons','Hectares',NA,
+      2695,'Batata Inglesa',NA,'1K BRL','Tons','Hectares',NA,
+      2696,'Cana de Acucar',NA,'1K BRL','Tons','Hectares',NA,
+      40470,'Cana para Forragem',NA,'1K BRL','Tons','Hectares',NA,
+      2697,'Cebola',NA,'1K BRL','Tons','Hectares',NA,
+      2698,'Centeio (em Grao)',NA,'1K BRL','Tons','Hectares',NA,
+      2699,'Cevada (em Grao)',NA,'1K BRL','Tons','Hectares',NA,
+      2700,'Ervilha (em Grao)',NA,'1K BRL','Tons','Hectares',NA,
+      2701,'Fava (em Grao)',NA,'1K BRL','Tons','Hectares',NA,
+      2702,'Feijao (em Grao)',NA,'1K BRL','Tons','Hectares',NA,
+      2703,'Fumo (em Folha)',NA,'1K BRL','Tons','Hectares',NA,
+      109179,'Girassol (em Grao)',NA,'1K BRL','Tons','Hectares',NA,
+      2704,'Juta (Fibra)',NA,'1K BRL','Tons','Hectares',NA,
+      2705,'Linho (Semente)',NA,'1K BRL','Tons','Hectares',NA,
+      2706,'Malva (Fibra)',NA,'1K BRL','Tons','Hectares',NA,
+      2707,'Mamona (Baga)',NA,'1K BRL','Tons','Hectares',NA,
+      2708,'Mandioca',NA,'1K BRL','Tons','Hectares',NA,
+      2709,'Melancia',NA,'1K BRL','Tons','Hectares',NA,
+      2710,'Melao',NA,'1K BRL','Tons','Hectares',NA,
+      2711,'Milho (em Grao)',NA,'1K BRL','Tons','Hectares',NA,
+      2712,'Rami (Fibra)',NA,'1K BRL','Tons','Hectares',NA,
+      2713,'Soja (em Grao)',NA,'1K BRL','Tons','Hectares',NA,
+      2714,'Sorgo (em Grao)',NA,'1K BRL','Tons','Hectares',NA,
+      2715,'Tomate',NA,'1K BRL','Tons','Hectares',NA,
+      2716,'Trigo (em Grao)',NA,'1K BRL','Tons','Hectares',NA,
+      109180,'Triticale (em Grao)',NA,'1K BRL','Tons','Hectares',NA,
+
+      0,'Total','Total','1K BRL','Tons','Hectares',NA)
+
+  }
+
+  if (dataset == 'pam_permanent_crops'){
+
+    harmonization_dat = tibble::tribble(
+      ~var_code,~var_pt,~var_eng,~unit_value,~unit_quantity,~unit_area,~available_period,
+
+      2717,'Abacate',NA,'1K BRL','Tons','Hectares',NA,
+      2718,'Algodao Arboreo (em Caroco)',NA,'1K BRL','Tons','Hectares',NA,
+      45981,'Acai',NA,'1K BRL','Tons','Hectares',NA,
+      2719,'Azeitona',NA,'1K BRL','Tons','Hectares',NA,
+      2720,'Banana (Cacho)',NA,'1K BRL','Tons','Hectares',NA,
+      2721,'Borracha (Latex Coagulado)',NA,'1K BRL','Tons','Hectares',NA,
+      40472,'Borracha (Latex Liquido)',NA,'1K BRL','Tons','Hectares',NA,
+      2722,'Cacau (em Amendoa)',NA,'1K BRL','Tons','Hectares',NA,
+      2723,'Cafe (em Grao) Total',NA,'1K BRL','Tons','Hectares',NA,
+      31619,'Cafe (em Grao) Arabica',NA,'1K BRL','Tons','Hectares',NA,
+      31620,'Cafe (em Grao) Canephora',NA,'1K BRL','Tons','Hectares',NA,
+      40473,'Caju',NA,'1K BRL','Tons','Hectares',NA,
+      2724,'Caqui',NA,'1K BRL','Tons','Hectares',NA,
+      2725,'Castanha de Caju',NA,'1K BRL','Tons','Hectares',NA,
+      2726,'Cha da India (Folha Verde)',NA,'1K BRL','Tons','Hectares',NA,
+      2727,'Coco da Baia',NA,'1K BRL','Tons','Hectares',NA,
+      2728,'Dende (Cacho de Coco)',NA,'1K BRL','Tons','Hectares',NA,
+      2729,'Erva Mate (Folha Verde)',NA,'1K BRL','Tons','Hectares',NA,
+      2730,'Figo',NA,'1K BRL','Tons','Hectares',NA,
+      2731,'Goiaba',NA,'1K BRL','Tons','Hectares',NA,
+      2732,'Guarana (Semente)',NA,'1K BRL','Tons','Hectares',NA,
+      2733,'Laranja',NA,'1K BRL','Tons','Hectares',NA,
+      2734,'Limao',NA,'1K BRL','Tons','Hectares',NA,
+      2735,'Maca',NA,'1K BRL','Tons','Hectares',NA,
+      2736,'Mamao',NA,'1K BRL','Tons','Hectares',NA,
+      2737,'Manga',NA,'1K BRL','Tons','Hectares',NA,
+      2738,'Maracuja',NA,'1K BRL','Tons','Hectares',NA,
+      2739,'Marmelo',NA,'1K BRL','Tons','Hectares',NA,
+      2740,'Noz (Fruto Seco)',NA,'1K BRL','Tons','Hectares',NA,
+      90001,'Palmito',NA,'1K BRL','Tons','Hectares',NA,
+      2741,'Pera',NA,'1K BRL','Tons','Hectares',NA,
+      2742,'Pessego',NA,'1K BRL','Tons','Hectares',NA,
+      2743,'Pimenta do Reino',NA,'1K BRL','Tons','Hectares',NA,
+      2744,'Sisal ou Agave (Fibra)',NA,'1K BRL','Tons','Hectares',NA,
+      2745,'Tangerina',NA,'1K BRL','Tons','Hectares',NA,
+      2746,'Tungue (Fruto Seco)',NA,'1K BRL','Tons','Hectares',NA,
+      2747,'Urucum (Semente)',NA,'1K BRL','Tons','Hectares',NA,
+      2748,'Uva',NA,'1K BRL','Tons','Hectares',NA,
+
+      0,'Total','Total','1K BRL','Tons','Hectares',NA)
+
+  }
+
+  if (dataset == 'pam_all_crops'){
+
+    harmonization_dat = tibble::tribble(
+      ~var_code,~var_pt,~var_eng,~unit_value,~unit_quantity,~unit_area,~available_period,
+
+      40129,'Abacate',NA,'1K BRL','Tons','Hectares',NA,
+      40092,'Abacaxi',NA,'1K BRL','Tons','Hectares',NA,
+      45982,'Acai',NA,'1K BRL','Tons','Hectares',NA,
+      40329,'Alfafa Fenada',NA,'1K BRL','Tons','Hectares',NA,
+      40130,'Algodao Arboreo (em Caroco)',NA,'1K BRL','Tons','Hectares',NA,
+      40099,'Algodao Herbaceo (em Caroco)',NA,'1K BRL','Tons','Hectares',NA,
+      40100,'Alho',NA,'1K BRL','Tons','Hectares',NA,
+      40101,'Amendoim (em Casca)',NA,'1K BRL','Tons','Hectares',NA,
+      40102,'Arroz (em Casca)',NA,'1K BRL','Tons','Hectares',NA,
+      40103,'Aveia (em Grao)',NA,'1K BRL','Tons','Hectares',NA,
+      40131,'Azeitona',NA,'1K BRL','Tons','Hectares',NA,
+      40136,'Banana (Cacho)',NA,'1K BRL','Tons','Hectares',NA,
+      40104,'Batata Doce',NA,'1K BRL','Tons','Hectares',NA,
+      40105,'Batata Inglesa',NA,'1K BRL','Tons','Hectares',NA,
+      40137,'Borracha (Latex Coagulado)',NA,'1K BRL','Tons','Hectares',NA,
+      40468,'Borracha (Latex Liquido)',NA,'1K BRL','Tons','Hectares',NA,
+      40138,'Cacau (em Amendoa)',NA,'1K BRL','Tons','Hectares',NA,
+      40139,'Cafe (em Grao) Total',NA,'1K BRL','Tons','Hectares',NA,
+      40140,'Cafe (em Grao) Arabica',NA,'1K BRL','Tons','Hectares',NA,
+      40141,'Cafe (em Grao) Canephora',NA,'1K BRL','Tons','Hectares',NA,
+      40330,'Caju',NA,'1K BRL','Tons','Hectares',NA,
+      40106,'Cana de Acucar',NA,'1K BRL','Tons','Hectares',NA,
+      40331,'Cana para Forragem',NA,'1K BRL','Tons','Hectares',NA,
+      40142,'Caqui',NA,'1K BRL','Tons','Hectares',NA,
+      40143,'Castanha de Caju',NA,'1K BRL','Tons','Hectares',NA,
+      40107,'Cebola',NA,'1K BRL','Tons','Hectares',NA,
+      40108,'Centeio (em Grao)',NA,'1K BRL','Tons','Hectares',NA,
+      40109,'Cevada (em Grao)',NA,'1K BRL','Tons','Hectares',NA,
+      40144,'Cha da India (Folha Verde)',NA,'1K BRL','Tons','Hectares',NA,
+      40145,'Coco da Baia',NA,'1K BRL','Tons','Hectares',NA,
+      40146,'Dende (Cacho de Coco)',NA,'1K BRL','Tons','Hectares',NA,
+      40147,'Erva Mate (Folha Verde)',NA,'1K BRL','Tons','Hectares',NA,
+      40110,'Ervilha (em Grao)',NA,'1K BRL','Tons','Hectares',NA,
+      40111,'Fava (em Grao)',NA,'1K BRL','Tons','Hectares',NA,
+      40112,'Feijao (em Grao)',NA,'1K BRL','Tons','Hectares',NA,
+      40148,'Figo',NA,'1K BRL','Tons','Hectares',NA,
+      40113,'Fumo (em Folha)',NA,'1K BRL','Tons','Hectares',NA,
+      40114,'Girassol (em Grao)',NA,'1K BRL','Tons','Hectares',NA,
+      40149,'Goiaba',NA,'1K BRL','Tons','Hectares',NA,
+      40150,'Guarana (Semente)',NA,'1K BRL','Tons','Hectares',NA,
+      40115,'Juta (Fibra)',NA,'1K BRL','Tons','Hectares',NA,
+      40151,'Laranja',NA,'1K BRL','Tons','Hectares',NA,
+      40152,'Limao',NA,'1K BRL','Tons','Hectares',NA,
+      40116,'Linho (Semente)',NA,'1K BRL','Tons','Hectares',NA,
+      40260,'Maca',NA,'1K BRL','Tons','Hectares',NA,
+      40117,'Malva (Fibra)',NA,'1K BRL','Tons','Hectares',NA,
+      40261,'Mamao',NA,'1K BRL','Tons','Hectares',NA,
+      40118,'Mamona (Baga)',NA,'1K BRL','Tons','Hectares',NA,
+      40119,'Mandioca',NA,'1K BRL','Tons','Hectares',NA,
+      40262,'Manga',NA,'1K BRL','Tons','Hectares',NA,
+      40263,'Maracuja',NA,'1K BRL','Tons','Hectares',NA,
+      40264,'Marmelo',NA,'1K BRL','Tons','Hectares',NA,
+      40120,'Melancia',NA,'1K BRL','Tons','Hectares',NA,
+      40121,'Melao',NA,'1K BRL','Tons','Hectares',NA,
+      40122,'Milho (em Grao)',NA,'1K BRL','Tons','Hectares',NA,
+      40265,'Noz (Fruto Seco)',NA,'1K BRL','Tons','Hectares',NA,
+      40266,'Palmito',NA,'1K BRL','Tons','Hectares',NA,
+      40267,'Pera',NA,'1K BRL','Tons','Hectares',NA,
+      40268,'Pessego',NA,'1K BRL','Tons','Hectares',NA,
+      40269,'Pimenta do Reino',NA,'1K BRL','Tons','Hectares',NA,
+      40123,'Rami (Fibra)',NA,'1K BRL','Tons','Hectares',NA,
+      40270,'Sisal ou Agave (Fibra)',NA,'1K BRL','Tons','Hectares',NA,
+      40124,'Soja (em Grao)',NA,'1K BRL','Tons','Hectares',NA,
+      40125,'Sorgo (em Grao)',NA,'1K BRL','Tons','Hectares',NA,
+      40271,'Tangerina',NA,'1K BRL','Tons','Hectares',NA,
+      40126,'Tomate',NA,'1K BRL','Tons','Hectares',NA,
+      40127,'Trigo (em Grao)',NA,'1K BRL','Tons','Hectares',NA,
+      40128,'Triticale (em Grao)',NA,'1K BRL','Tons','Hectares',NA,
+      40272,'Tungue (Fruto Seco)',NA,'1K BRL','Tons','Hectares',NA,
+      40273,'Urucum (Semente)',NA,'1K BRL','Tons','Hectares',NA,
+      40274,'Uva',NA,'1K BRL','Tons','Hectares',NA,
+
+      0,'Total','Total','1K BRL','Tons','Hectares',NA)
+
+  }
+
+  # Crops with more than one harvest (Corn, Potato, Peanut or Beans)
+
+  if (dataset == 'pam_corn'){
+
+    harmonization_dat = tibble::tribble(
+      ~var_code,~var_pt,~var_eng,~unit_value,~unit_quantity,~unit_area,~available_period,
+
+      114253,'Milho em Grao (Primeira Safra)',NA,'None','Tons','Hectares',NA,
+      114254,'Milho em Grao (Segunda Safra)',NA,'None','Tons','Hectares',NA,
+
+      31693,'Total','Total','None','Tons','Hectares',NA)
 
     harmonization_dat = tibble::tribble(
       ~var_code,~var_pt,~var_eng,~unit_value,~unit_quantity,~available_period,
@@ -208,6 +392,7 @@ load_dictionary = function(dataset){
 
       0,'Total','Total','1K BRL','None',NA)
   }
+
 
   if (dataset == 'ppm_cow_farming'){
 
@@ -466,7 +651,44 @@ if (dataset == 'pam_peanut'){
     117988,'Amendoim em Casca (Segunda Safra)','Peanuts in Shell (Second Crop)','None','Tons','Hectares',NA,
 
     31693,'Total','Total','None','Tons','Hectares',NA)
+  
+  if (dataset == 'pam_potato'){
 
+    harmonization_dat = tibble::tribble(
+      ~var_code,~var_pt,~var_eng,~unit_value,~unit_quantity,~unit_area,~available_period,
+
+      117989,'Batata Inglesa (Primeira Safra)',NA,'None','Tons','Hectares',NA,
+      117990,'Batata Inglesa (Segunda Safra)',NA,'None','Tons','Hectares',NA,
+      117994,'Batata Inglesa (Terceiraa Safra)',NA,'None','Tons','Hectares',NA,
+
+      31693,'Total','Total','None','Tons','Hectares',NA)
+
+  }
+
+  if (dataset == 'pam_peanut'){
+
+    harmonization_dat = tibble::tribble(
+      ~var_code,~var_pt,~var_eng,~unit_value,~unit_quantity,~unit_area,~available_period,
+
+      117987,'Amendoim em Casca (Primeira Safra)',NA,'None','Tons','Hectares',NA,
+      117988,'Amendoim em Casca (Segunda Safra)',NA,'None','Tons','Hectares',NA,
+
+      31693,'Total','Total','None','Tons','Hectares',NA)
+
+  }
+
+  if (dataset == 'pam_beans'){
+
+    harmonization_dat = tibble::tribble(
+      ~var_code,~var_pt,~var_eng,~unit_value,~unit_quantity,~unit_area,~available_period,
+
+      117991,'Feijao em Grao (Primeira Safra)',NA,'None','Tons','Hectares',NA,
+      117992,'Feijao em Grao (Segunda Safra)',NA,'None','Tons','Hectares',NA,
+      117993,'Feijao em Grao (Terceira Safra)',NA,'None','Tons','Hectares',NA,
+
+      31693,'Total','Total','None','Tons','Hectares',NA)
+
+  }
 }
 
 if (dataset == 'pam_beans'){
