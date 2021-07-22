@@ -115,7 +115,7 @@ load_mapbiomas = function(dataset = NULL,raw_data=NULL,geo_level = 'municipality
   #   }
   #   for (i in years) {
   #     ret <- c()
-  #     ret <- tab[, 1:8]
+  #     ret <- tab[, 1:7]
   #     ano <- as.character(i)
   #     ret <- cbind(ret, tab[, ano])
   #     colnames(ret)[which(colnames(ret) == ano)] <- "Area"
