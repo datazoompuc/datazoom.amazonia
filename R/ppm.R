@@ -20,7 +20,7 @@
 #'
 #' @examples \dontrun{datazoom.amazonia::load_ppm(dataset = 'ppm_animal_origin_production', 'state', 2012, language = "pt")}
 
-load_ppm = function(dataset=NULL,geo_level = "municipality",time_period=2019,language = 'pt'){
+load_ppm = function(dataset=NULL,raw_data = FALSE,geo_level = "municipality",time_period=2019,language = 'pt'){
 
   ## Translation is only made through collapsing at the end
   # - What if we wanted to deliver raw data?
@@ -108,6 +108,10 @@ load_ppm = function(dataset=NULL,geo_level = "municipality",time_period=2019,lan
     }) %>%
     dplyr::bind_rows() %>%
     tibble::as_tibble()
+
+  ## Return Raw Data
+
+  if (raw_data = TRUE){return(dat)}
 
   ######################
   ## Data Enginnering ##
