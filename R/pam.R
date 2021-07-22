@@ -105,7 +105,7 @@ load_pam = function(dataset=NULL,raw_data=FALSE,geo_level = "municipality", time
 
   ## Return Raw Data
 
-  if (raw_data = TRUE){return(dat)}
+  if (raw_data == TRUE){return(dat)}
 
   ######################
   ## Data Enginnering ##
@@ -290,7 +290,7 @@ load_pam = function(dataset=NULL,raw_data=FALSE,geo_level = "municipality", time
 
   }
 
-  if (language == 'port'){
+  if (language == 'pt'){
 
     for (i in 1:length(types)){
 

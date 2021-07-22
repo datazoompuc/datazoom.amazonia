@@ -107,7 +107,7 @@ load_pevs <- function(dataset = NULL, raw_data = FALSE, geo_level = "municipalit
 
   ## Return Raw Data
 
-  if (raw_data = TRUE){return(dat)}
+  if (raw_data == TRUE){return(dat)}
 
 
   ######################
