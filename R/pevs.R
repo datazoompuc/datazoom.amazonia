@@ -297,7 +297,7 @@ load_pevs <- function(dataset = NULL, raw_data = FALSE, geo_level = "municipalit
 
   }
 
-  if (language == 'port'){
+  if (language == 'pt'){
 
     for (i in 1:length(types)){
 
