@@ -9,6 +9,7 @@ Loads information on the  temporary and permanent crops of the Country that are 
 \usage{
 load_pam(
   dataset = NULL,
+  raw_data = FALSE,
   geo_level = "municipality",
   time_period = 2017:2018,
   language = "eng"
@@ -16,6 +17,8 @@ load_pam(
 }
 \arguments{
 \item{dataset}{A dataset name (\code{pam_all_crops}, \code{pam_permanent_crops}, \code{pam_temporary_crops} or \code{pam_xx}, in which xx needs to be corn, potato, peanut or beans. You can also use SIDRA codes (see \url{https://sidra.ibge.gov.br/pesquisa/pam/tabelas})}
+
+\item{raw_data}{A \code{boolean} setting the return of raw or processed data}
 
 \item{geo_level}{A \code{string} that defines the geographic level of the data. Defaults to national level, but can be one of "country", "state" or "municipality". See documentation of \code{sidrar}.}
 

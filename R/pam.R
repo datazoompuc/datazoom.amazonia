@@ -4,6 +4,8 @@
 #'
 #' @param dataset A dataset name (\code{pam_all_crops}, \code{pam_permanent_crops}, \code{pam_temporary_crops} or \code{pam_xx}, in which xx needs to be corn, potato, peanut or beans. You can also use SIDRA codes (see \url{https://sidra.ibge.gov.br/pesquisa/pam/tabelas})
 #'
+#' @param raw_data A \code{boolean} setting the return of raw or processed data
+#'
 #' @param geo_level A \code{string} that defines the geographic level of the data. Defaults to national level, but can be one of "country", "state" or "municipality". See documentation of \code{sidrar}.
 #'
 #' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.

@@ -9,6 +9,7 @@ Loads information on animal farming inventories and livestock products (IBGE). S
 \usage{
 load_ppm(
   dataset = NULL,
+  raw_data = FALSE,
   geo_level = "municipality",
   time_period = 2019,
   language = "pt"
@@ -16,6 +17,8 @@ load_ppm(
 }
 \arguments{
 \item{dataset}{A dataset name (\code{ppm_livetock_inventory}, \code{ppm_sheep_farming}, \code{ppm_animal_orig_production}, \code{ppm_cow_farming} or \code{ppm_aquaculture}. You can also use SIDRA codes (see \url{https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019})}
+
+\item{raw_data}{A \code{boolean} setting the return of raw or processed data}
 
 \item{geo_level}{A \code{string} that defines the geographic level of the data. Defaults to National level, but can be one of "country", "state" or "municipality". See documentation of \code{sidrar}.}
 

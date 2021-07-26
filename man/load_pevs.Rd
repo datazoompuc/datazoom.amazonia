@@ -9,6 +9,7 @@ Loads information on the amount and value of the production of the exploitation 
 \usage{
 load_pevs(
   dataset = NULL,
+  raw_data = FALSE,
   geo_level = "municipality",
   time_period = 2018:2019,
   language = "pt"
@@ -16,6 +17,8 @@ load_pevs(
 }
 \arguments{
 \item{dataset}{A dataset name (\code{pevs_forest_crops}, \code{pevs_silviculture} or \code{pevs_silviculture_area}) or SIDRA code (see https://sidra.ibge.gov.br/pesquisa/pevs/quadros/brasil/2019)}
+
+\item{raw_data}{A \code{boolean} setting the return of raw or processed data}
 
 \item{geo_level}{A \code{string} that defines the geographic level of the data. Defaults to National level, but can be one of "country", "region", "state", "mesoregion", "microregion" or "city". See documentation of \code{sidrar}.}
 
