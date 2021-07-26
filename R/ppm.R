@@ -4,6 +4,8 @@
 #'
 #' @param dataset A dataset name (\code{ppm_livetock_inventory}, \code{ppm_sheep_farming}, \code{ppm_animal_orig_production}, \code{ppm_cow_farming} or \code{ppm_aquaculture}. You can also use SIDRA codes (see \url{https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019})
 #'
+#' @param raw_data A \code{boolean} setting the return of raw or processed data
+#'
 #' @param geo_level A \code{string} that defines the geographic level of the data. Defaults to National level, but can be one of "country", "state" or "municipality". See documentation of \code{sidrar}.
 #'
 #' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
@@ -20,7 +22,7 @@
 #'
 #' @examples \dontrun{datazoom.amazonia::load_ppm(dataset = 'ppm_animal_origin_production', 'state', 2012, language = "pt")}
 
-load_ppm = function(dataset=NULL,geo_level = "municipality",time_period=2019,language = 'pt'){
+load_ppm = function(dataset=NULL,raw_data = FALSE,geo_level = "municipality",time_period=2019,language = 'pt'){
 
   ## Translation is only made through collapsing at the end
   # - What if we wanted to deliver raw data?
@@ -73,6 +75,20 @@ load_ppm = function(dataset=NULL,geo_level = "municipality",time_period=2019,lan
       as.numeric()
   } else {param$code = param$dataset}
 
+  ## Check if year is acceptable
+
+  year_check = datasets_link() %>%
+    dplyr::filter(dataset == param$dataset) %>%
+    dplyr::select(available_time) %>%
+    unlist() %>% as.character() %>%
+    stringr::str_split(pattern = '-') %>%
+    unlist() %>% as.numeric()
+
+  if (min(time_period) < year_check[1]){stop('Provided time period less than supported. Check documentation for time availability.')}
+  if (max(time_period) > year_check[2]){stop('Provided time period greater than supported. Check documentation for time availability.')}
+
+
+
   ## Dataset
 
   if (is.null(param$dataset)){stop('Missing Dataset!')}
@@ -108,6 +124,10 @@ load_ppm = function(dataset=NULL,geo_level = "municipality",time_period=2019,lan
     }) %>%
     dplyr::bind_rows() %>%
     tibble::as_tibble()
+
+  ## Return Raw Data
+
+  if (raw_data == TRUE){return(dat)}
 
   ######################
   ## Data Enginnering ##
@@ -149,63 +169,59 @@ load_ppm = function(dataset=NULL,geo_level = "municipality",time_period=2019,lan
     dat = dplyr::select(dat,-'municipio',-'municipio_codigo')
   }
 
-  ################################
-  ## Harmonizing Variable Names ##
-  ################################
+  ##############################
+  ## Translate Variable Names ##
+  ##############################
+
+  ## Cattle Number
+
+  if (param$dataset == 'ppm_livestock_inventory'){
+
+    if (language == 'pt'){
+
+      dat = dat %>% dplyr::mutate(variavel = dplyr::case_when(
+          (variavel_codigo == '105') ~ 'num') # Efetivo dos Rebanhos
+      )
+
+    }
+
+    if (language == 'eng'){
+
+      dat = dat %>% dplyr::mutate(variavel = dplyr::case_when(
+        (variavel_codigo == '105') ~ 'num') # Efetivo dos Rebanhos
+      )
 
 
-  if (param$code == 3939){
 
-    ## Selecting Variables
+    }
 
-    # dat = dat %>% dplyr::select(-tidyselect::matches('nivel_territorial'),
-    #                             -'ano_codigo',-'variavel_codigo',-'tipo_de_rebanho_codigo',-'unidade_de_medida_codigo') %>%
-    #   dplyr::mutate(valor = as.numeric(valor))
-
-    ## Translating Names
-
-    # if(language == 'pt'){
-    #   dat$variavel = base::ifelse(dat$variavel == 'efetivo_dos_rebanhos','gado_cabeca','')
-    # }
-
-  #   if (language == 'eng'){
-  #     dat$variavel = base::ifelse(dat$variavel == 'efetivo_dos_rebanhos','cattle_number','')
-  #     dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'galinaceos_galinhas'] = 'gallinaceous_chicken'
-  #     dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'galinaceos_total'] = 'gallinaceous_total'
-  #     dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'suino_matrizes_de_suinos'] = 'swine_sows'
-  #     dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'suino_total'] = 'swine_total'
-  #     dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'bovino'] = 'bovine'
-  #     dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'bubalino'] = 'buffalo'
-  #     dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'caprino'] = 'goat'
-  #     dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'codornas'] = 'quail'
-  #     dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'equino'] = 'equine'
-  #     dat$tipo_de_rebanho[dat$tipo_de_rebanho == 'ovino'] = 'ovine'
-  #   }
-  # }
+  }
 
   ## Sheep Farm
 
-    ## Include number as "cabecas" measure
+  if (param$dataset == 'ppm_sheep_farming'){
 
-  # if (param$code == 95){
-  #   # dat = dat %>% dplyr::select(-tidyselect::matches('nivel_territorial'),
-  #   #                             -'ano_codigo',-'variavel_codigo',-'unidade_de_medida_codigo') %>%
-  #   #   dplyr::mutate(valor = as.numeric(valor))
-  #
-  #   if (language == 'eng'){dat$variavel = base::ifelse(dat$variavel == 'ovinos_tosquiados_nos_estabelecimentos_agropecuarios','sheep_farmed','')}
-  #   if (language == 'pt'){dat$variavel = base::ifelse(dat$variavel == 'ovinos_tosquiados_nos_estabelecimentos_agropecuarios','ovinos_tosquiados','')
+    if (language == 'pt'){
 
-  #  }
-  #
+      dat = dat %>% dplyr::mutate(variavel = dplyr::case_when(
+        (variavel_codigo == '108') ~ 'num') # Ovinos Tosquiados
+      )
+
+    }
+
+    if (language == 'eng'){
+
+      dat = dat %>% dplyr::mutate(variavel = dplyr::case_when(
+        (variavel_codigo == '108') ~ 'num') # Ovinos Tosquiados
+      )
+
+    }
+
   }
 
   ## Animal Origin Production
 
-  if (param$code == 74){
-
-    # dat = dat %>% dplyr::select(-tidyselect::matches('nivel_territorial'),
-    #                             -'ano_codigo',-'variavel_codigo',-'tipo_de_produto_de_origem_animal_codigo',-'unidade_de_medida_codigo') %>%
-    #   dplyr::mutate(valor = as.numeric(valor))
+  if (param$dataset == 'ppm_animal_origin_production'){
 
     if (language == 'pt'){
 
@@ -230,80 +246,59 @@ load_ppm = function(dataset=NULL,geo_level = "municipality",time_period=2019,lan
         )
 
     }
-          # tipo_de_produto_de_origem_animal = dplyr::case_when(
-          #   tipo_de_produto_de_origem_animal == 'la' ~ 'wool',
-          #   tipo_de_produto_de_origem_animal == 'casulos_do_bichodaseda' ~ 'silk_worm_cocoons',
-          #   tipo_de_produto_de_origem_animal == 'leite' ~ 'milk',
-          #   tipo_de_produto_de_origem_animal == 'mel_de_abelha' ~ 'bee_honey',
-          #   tipo_de_produto_de_origem_animal == 'ovos_de_codorna' ~ 'quail_eggs',
-          #   tipo_de_produto_de_origem_animal == 'ovos_de_galinha' ~ 'chicken_eggs')
-          #
-          #
+
 
   }
 
   ## Milked Cows
 
-  if (param$code == 94){
+  if (param$dataset == 'ppm_cow_farming'){
 
-    # dat = dat %>% dplyr::select(-tidyselect::matches('nivel_territorial'),
-    #                             -'ano_codigo',-'variavel_codigo',-'unidade_de_medida_codigo') %>%
-    #   dplyr::mutate(valor = as.numeric(valor))
+    if (language == 'pt'){
 
+      dat = dat %>% dplyr::mutate(variavel = dplyr::case_when(
+        (variavel_codigo == '107') ~ 'num') # Vacas ordenhadas
+      )
 
-    # if (language == 'eng'){dat$variavel = base::ifelse(dat$variavel == 'vacas_ordenhadas','number_milked_cows','')}
-    # if (language == 'pt'){dat$variavel = base::ifelse(dat$variavel == 'vacas_ordenhadas','vacas_ordenhadas_num','')}
+    }
 
+    if (language == 'eng'){
+
+      dat = dat %>% dplyr::mutate(variavel = dplyr::case_when(
+        (variavel_codigo == '107') ~ 'num') # Vacas ordenhadas
+      )
+
+    }
   }
 
   ## Water Origin Production
 
-    ## We need to finish the names translation!
+  if (param$dataset == 'ppm_aquaculture'){
 
-  if (param$code == 3940){
 
-    ## Selecting variables
+    if (language == 'pt'){
 
-    # dat = dat %>% dplyr::select(-tidyselect::matches('nivel_territorial'),
-    #                             -'ano_codigo',-'variavel_codigo',-'tipo_de_produto_da_aquicultura_codigo',-'unidade_de_medida_codigo') %>%
-    #   dplyr::mutate(valor = as.numeric(valor))
+      dat = dat %>%
+        dplyr::mutate(
+          variavel = dplyr::case_when(
+            (variavel_codigo == '4146') ~ 'quant', # Producao da aquicultura
+            (variavel_codigo == '215') ~ 'valor', #Valor da producao
+          )
+        )
 
-    ## Translation
+    }
 
-    # if (language == 'pt'){
-    #
-    #   dat = dat %>%
-    #     dplyr::mutate(
-    #       variavel = dplyr::case_when(
-    #         variavel == 'producao_da_aquicultura' ~  'producao_kg',
-    #         variavel == 'valor_da_producao' ~ 'valor_brl',
-    #         TRUE ~ variavel
-    #       )
-    #     )
-    # }
-    #
-    # if (language == 'eng'){
-    #
-    #   dat = dat %>%
-    #     dplyr::mutate(
-    #       variavel = dplyr::case_when(
-    #         variavel == 'producao_da_aquicultura' ~  'production_kg',
-    #         variavel == 'valor_da_producao' ~ 'value_brl',
-    #         TRUE ~ variavel
-    #     ),
-    #     tipo_de_produto_da_aquicultura = dplyr::case_when(
-    #       tipo_de_produto_da_aquicultura == 'outros_peixes' ~ 'fish_others',
-    #       tipo_de_produto_da_aquicultura == 'camarao' ~ 'shrimp',
-    #       tipo_de_produto_da_aquicultura == 'larvas_e_poslarvas_de_camarao' ~ 'shrimp_larvae',
-    #       tipo_de_produto_da_aquicultura == 'ostras_vieiras_e_mexilhoes' ~ 'oyester_mussels',
-    #       tipo_de_produto_da_aquicultura == 'outros_produtos_ra_jacare_siri_caranguejo_lagosta_etc' ~ 'others',
-    #       tipo_de_produto_da_aquicultura == 'sementes_de_moluscos' ~ 'shellfish_seeds',
-    #       TRUE ~ tipo_de_produto_da_aquicultura
-    #     )
-    #
-    #   )
-    #
-    # }
+    if (language == 'eng'){
+
+      dat = dat %>%
+        dplyr::mutate(
+          variavel = dplyr::case_when(
+            (variavel_codigo == '4146') ~ 'quant', # Producao da aquicultura
+            (variavel_codigo == '215') ~ 'value', #Valor da producao
+          )
+        )
+    }
+
   }
 
 
@@ -317,13 +312,13 @@ load_ppm = function(dataset=NULL,geo_level = "municipality",time_period=2019,lan
 
   ## Cattle Number
 
-  if (param$code == 3939){
+  if (param$dataset == 'ppm_livestock_inventory'){
     dat = dat %>%
       dplyr::select(-'unidade_de_medida') %>%
       tidyr::pivot_wider(id_cols = c(geo_id,ano),
-                         names_from = c(tipo_de_rebanho,variavel),
+                         names_from = c(variavel,tipo_de_rebanho_codigo),
                          values_from=valor,
-                         names_sep = '_',
+                         names_sep = '_V',
                          values_fn = sum,
                          values_fill = NA) %>%
       janitor::clean_names()
@@ -331,12 +326,12 @@ load_ppm = function(dataset=NULL,geo_level = "municipality",time_period=2019,lan
 
   ## Sheep Farm
 
-  if (param$code == 95){
+  if (param$dataset == 'ppm_sheep_farming'){
     dat = dat %>% dplyr::select(-'unidade_de_medida') %>%
       tidyr::pivot_wider(id_cols = c(geo_id,ano),
-                         names_from = variavel,
+                         names_from = c(variavel,variavel_codigo),
                          values_from=valor,
-                         names_sep = '_',
+                         names_sep = '_V',
                          values_fn = sum,
                          values_fill = NA) %>%
       janitor::clean_names()
@@ -344,7 +339,7 @@ load_ppm = function(dataset=NULL,geo_level = "municipality",time_period=2019,lan
 
   ## Animal Origin Production
 
-  if (param$code == 74){ ## Animal Origin Production
+  if (param$dataset == 'ppm_animal_origin_production'){ ## Animal Origin Production
 
     dat = dat %>%
       dplyr::arrange(tipo_de_produto_de_origem_animal_codigo,variavel) %>%
@@ -360,12 +355,13 @@ load_ppm = function(dataset=NULL,geo_level = "municipality",time_period=2019,lan
 
   ## Milked Cows
 
-  if (param$code == 94){ ## Milked Cows
+  if (param$dataset == 'ppm_cow_farming'){ ## Milked Cows
+
     dat = dat %>% dplyr::select(-'unidade_de_medida') %>%
       tidyr::pivot_wider(id_cols = c(geo_id,ano),
-                         names_from = variavel,
+                         names_from = c(variavel,variavel_codigo),
                          values_from=valor,
-                         names_sep = '_',
+                         names_sep = '_V',
                          values_fn = sum,
                          values_fill = NA) %>%
       janitor::clean_names()
@@ -374,14 +370,12 @@ load_ppm = function(dataset=NULL,geo_level = "municipality",time_period=2019,lan
   ## Water Origin Production
     ## We need to create a dictionary for this!
 
-  if (param$code == 3940){
+  if (param$dataset == 'ppm_aquaculture'){
     dat = dat %>%
-      dplyr::filter(unidade_de_medida != '') %>%
-      dplyr::select(-'unidade_de_medida') %>%
       tidyr::pivot_wider(id_cols = c(geo_id,ano),
-                         names_from = c(tipo_de_produto_da_aquicultura,variavel),
+                         names_from = c(variavel,tipo_de_produto_da_aquicultura_codigo),
                          values_from=valor,
-                         names_sep = '_',
+                         names_sep = '_V',
                          values_fn = sum,
                          values_fill = NA) %>%
       janitor::clean_names()
@@ -399,6 +393,73 @@ load_ppm = function(dataset=NULL,geo_level = "municipality",time_period=2019,lan
       dplyr::rename(year = ano)
   }
 
+
+  ###############
+  ## Labelling ##
+  ###############
+
+  labelled <- function(x, label) {
+    Hmisc::label(x) <- label
+    x
+  }
+
+  label_data_eng = function(df,cols,dic){
+
+    label_value = as.character(dic[dic$var_code == cols,'var_eng'])
+
+    df = df %>%
+      dplyr::mutate_at(vars(tidyr::matches(cols)),
+                       ~ labelled(.,as.character(dic[dic$var_code == cols,'var_eng']))
+      )
+
+    return(df)
+
+  }
+
+  label_data_pt = function(df,cols,dic){
+
+    label_value = as.character(dic[dic$var_code == cols,'var_pt'])
+
+    df = df %>%
+      dplyr::mutate_at(vars(tidyr::matches(cols)),
+                       ~ labelled(.,as.character(dic[dic$var_code == cols,'var_pt']))
+      )
+
+    return(df)
+
+  }
+
+  ## Load Dictionary
+
+  dic = load_dictionary(param$dataset)
+
+  types = as.character(dic$var_code)
+  types = types[types != "0"] ## Remove 0
+
+
+  if (language == 'eng'){
+
+    # f = dat %>%
+    #   dplyr::mutate_at(vars(tidyr::matches(as.character(types[1]))),
+    #                    ~ labelled::set_variable_labels(. = as.character(dic[dic$var_code == types[1],'var_eng']))
+    #   )
+
+    for (i in 1:length(types)){
+
+      dat = label_data_eng(dat,cols=types[i],dic=dic)
+
+    }
+
+  }
+
+  if (language == 'pt'){
+
+    for (i in 1:length(types)){
+
+      dat = label_data_pt(dat,cols=types[i],dic=dic)
+
+    }
+  }
 
   ##########################
   ## Returning Data Frame ##

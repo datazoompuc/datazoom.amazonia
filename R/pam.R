@@ -4,6 +4,8 @@
 #'
 #' @param dataset A dataset name (\code{pam_all_crops}, \code{pam_permanent_crops}, \code{pam_temporary_crops} or \code{pam_xx}, in which xx needs to be corn, potato, peanut or beans. You can also use SIDRA codes (see \url{https://sidra.ibge.gov.br/pesquisa/pam/tabelas})
 #'
+#' @param raw_data A \code{boolean} setting the return of raw or processed data
+#'
 #' @param geo_level A \code{string} that defines the geographic level of the data. Defaults to national level, but can be one of "country", "state" or "municipality". See documentation of \code{sidrar}.
 #'
 #' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
@@ -20,7 +22,7 @@
 #'
 #' @examples \dontrun{datazoom.amazonia::load_pam(dataset = 'pam_all_crops', 'state', 2012, language = "pt")}
 
-load_pam = function(dataset=NULL,geo_level = "municipality", time_period = 2017:2018, language = "eng") {
+load_pam = function(dataset=NULL,raw_data=FALSE,geo_level = "municipality", time_period = 2017:2018, language = "eng") {
 
   ## Translation is only made through collapsing at the end
   # - What if we wanted to deliver raw data?
@@ -28,7 +30,7 @@ load_pam = function(dataset=NULL,geo_level = "municipality", time_period = 2017:
   ## To-Dos:
   ## Include Progress Bar
   ## Include Labels
-  ## Support for Raw Downloads
+  ## Support for Raw Downloads in English
   ## Write Vignettes
 
   ##############################
@@ -64,6 +66,20 @@ load_pam = function(dataset=NULL,geo_level = "municipality", time_period = 2017:
       unlist() %>%
       as.numeric()
   } else {param$code = param$dataset}
+
+  ## Check if year is acceptable
+
+  year_check = datasets_link() %>%
+    dplyr::filter(dataset == param$dataset) %>%
+    dplyr::select(available_time) %>%
+    unlist() %>% as.character() %>%
+    stringr::str_split(pattern = '-') %>%
+    unlist() %>% as.numeric()
+
+  if (min(time_period) < year_check[1]){stop('Provided time period less than supported. Check documentation for time availability.')}
+  if (max(time_period) > year_check[2]){stop('Provided time period greater than supported. Check documentation for time availability.')}
+
+
 
 
   ## Dataset
@@ -103,6 +119,9 @@ load_pam = function(dataset=NULL,geo_level = "municipality", time_period = 2017:
     dplyr::bind_rows() %>%
     tibble::as_tibble()
 
+  ## Return Raw Data
+
+  if (raw_data == TRUE){return(dat)}
 
   ######################
   ## Data Enginnering ##
@@ -181,7 +200,8 @@ load_pam = function(dataset=NULL,geo_level = "municipality", time_period = 2017:
         (variavel_codigo == '214') ~ 'quant', # Quantidade produzida
         (variavel_codigo == '215') ~ 'valor', # Valor da producao
         (variavel_codigo == '216') ~ 'area_colhida', # Area colhida
-        (variavel_codigo == '8331') ~ 'area_plantada_dest_colheita' # Area plantada ou destinada a colheita
+        (variavel_codigo == '8331') ~ 'area_plantada_dest_colheita', # Area plantada ou destinada a colheita,
+        (variavel_codigo == '109') ~ 'area_plantada' # Area plantada,
         )
       )
   }
@@ -194,7 +214,8 @@ load_pam = function(dataset=NULL,geo_level = "municipality", time_period = 2017:
         (variavel_codigo == '214') ~ 'quant', # Quantidade produzida
         (variavel_codigo == '215') ~ 'value', # Valor da producao
         (variavel_codigo == '216') ~ 'harvested_area', # Area colhida
-        (variavel_codigo == '8331') ~ 'planted_to_harvest_area' # Area plantada ou destinada a colheita
+        (variavel_codigo == '8331') ~ 'planted_to_harvest_area', # Area plantada ou destinada a colheita
+        (variavel_codigo == '109') ~ 'planted_area' # Area plantada,
       )
       )
 
@@ -229,6 +250,72 @@ load_pam = function(dataset=NULL,geo_level = "municipality", time_period = 2017:
       dplyr::rename(year = ano)
   }
 
+  ###############
+  ## Labelling ##
+  ###############
+
+  labelled <- function(x, label) {
+    Hmisc::label(x) <- label
+    x
+  }
+
+  label_data_eng = function(df,cols,dic){
+
+    label_value = as.character(dic[dic$var_code == cols,'var_eng'])
+
+    df = df %>%
+      dplyr::mutate_at(vars(tidyr::matches(cols)),
+                       ~ labelled(.,as.character(dic[dic$var_code == cols,'var_eng']))
+      )
+
+    return(df)
+
+  }
+
+  label_data_pt = function(df,cols,dic){
+
+    label_value = as.character(dic[dic$var_code == cols,'var_pt'])
+
+    df = df %>%
+      dplyr::mutate_at(vars(tidyr::matches(cols)),
+                       ~ labelled(.,as.character(dic[dic$var_code == cols,'var_pt']))
+      )
+
+    return(df)
+
+  }
+
+  ## Load Dictionary
+
+  dic = load_dictionary(param$dataset)
+
+  types = as.character(dic$var_code)
+  types = types[types != "0"] ## Remove 0
+
+
+  if (language == 'eng'){
+
+    # f = dat %>%
+    #   dplyr::mutate_at(vars(tidyr::matches(as.character(types[1]))),
+    #                    ~ labelled::set_variable_labels(. = as.character(dic[dic$var_code == types[1],'var_eng']))
+    #   )
+
+    for (i in 1:length(types)){
+
+      dat = label_data_eng(dat,cols=types[i],dic=dic)
+
+    }
+
+  }
+
+  if (language == 'pt'){
+
+    for (i in 1:length(types)){
+
+      dat = label_data_pt(dat,cols=types[i],dic=dic)
+
+    }
+  }
 
   ##########################
   ## Returning Data Frame ##

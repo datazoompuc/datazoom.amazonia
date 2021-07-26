@@ -4,6 +4,8 @@
 #'
 #' @param dataset A dataset name (\code{pevs_forest_crops}, \code{pevs_silviculture} or \code{pevs_silviculture_area}) or SIDRA code (see https://sidra.ibge.gov.br/pesquisa/pevs/quadros/brasil/2019)
 #'
+#' @param raw_data A \code{boolean} setting the return of raw or processed data
+#'
 #' @param geo_level A \code{string} that defines the geographic level of the data. Defaults to National level, but can be one of "country", "region", "state", "mesoregion", "microregion" or "city". See documentation of \code{sidrar}.
 #'
 #' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
@@ -20,7 +22,7 @@
 #'
 #' @examples \dontrun{datazoom.amazonia::load_pevs(dataset = 'pevs_silviculture', 'state', 2012, language = "pt")}
 
-load_pevs <- function(dataset = NULL, geo_level = "municipality", time_period = 2018:2019, language = "pt"){
+load_pevs <- function(dataset = NULL, raw_data = FALSE, geo_level = "municipality", time_period = 2018:2019, language = "pt"){
 
   ## Translation is only made through collapsing at the end
   # - What if we wanted to deliver raw data?
@@ -73,6 +75,20 @@ load_pevs <- function(dataset = NULL, geo_level = "municipality", time_period = 
       as.numeric()
   } else {param$code = param$dataset}
 
+  ## Check if year is acceptable
+
+  year_check = datasets_link() %>%
+    dplyr::filter(dataset == param$dataset) %>%
+    dplyr::select(available_time) %>%
+    unlist() %>% as.character() %>%
+    stringr::str_split(pattern = '-') %>%
+    unlist() %>% as.numeric()
+
+  if (min(time_period) < year_check[1]){stop('Provided time period less than supported. Check documentation for time availability.')}
+  if (max(time_period) > year_check[2]){stop('Provided time period greater than supported. Check documentation for time availability.')}
+
+
+
   ## Dataset
 
   if (is.null(param$dataset)){stop('Missing Dataset!')}
@@ -104,6 +120,10 @@ load_pevs <- function(dataset = NULL, geo_level = "municipality", time_period = 
     }) %>%
     dplyr::bind_rows() %>%
     tibble::as_tibble()
+
+  ## Return Raw Data
+
+  if (raw_data == TRUE){return(dat)}
 
 
   ######################
@@ -233,6 +253,73 @@ load_pevs <- function(dataset = NULL, geo_level = "municipality", time_period = 
 
     dat = dat %>%
       dplyr::rename(year = ano)
+  }
+
+  ###############
+  ## Labelling ##
+  ###############
+
+  labelled <- function(x, label) {
+    Hmisc::label(x) <- label
+    x
+  }
+
+  label_data_eng = function(df,cols,dic){
+
+    label_value = as.character(dic[dic$var_code == cols,'var_eng'])
+
+    df = df %>%
+      dplyr::mutate_at(vars(tidyr::matches(cols)),
+                       ~ labelled(.,as.character(dic[dic$var_code == cols,'var_eng']))
+      )
+
+    return(df)
+
+  }
+
+  label_data_pt = function(df,cols,dic){
+
+    label_value = as.character(dic[dic$var_code == cols,'var_pt'])
+
+    df = df %>%
+      dplyr::mutate_at(vars(tidyr::matches(cols)),
+                       ~ labelled(.,as.character(dic[dic$var_code == cols,'var_pt']))
+      )
+
+    return(df)
+
+  }
+
+  ## Load Dictionary
+
+  dic = load_dictionary(param$dataset)
+
+  types = as.character(dic$var_code)
+  types = types[types != "0"] ## Remove 0
+
+
+  if (language == 'eng'){
+
+    # f = dat %>%
+    #   dplyr::mutate_at(vars(tidyr::matches(as.character(types[1]))),
+    #                    ~ labelled::set_variable_labels(. = as.character(dic[dic$var_code == types[1],'var_eng']))
+    #   )
+
+    for (i in 1:length(types)){
+
+      dat = label_data_eng(dat,cols=types[i],dic=dic)
+
+    }
+
+  }
+
+  if (language == 'pt'){
+
+    for (i in 1:length(types)){
+
+      dat = label_data_pt(dat,cols=types[i],dic=dic)
+
+    }
   }
 
   ##########################
