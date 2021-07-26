@@ -73,6 +73,20 @@ load_ppm = function(dataset=NULL,raw_data = FALSE,geo_level = "municipality",tim
       as.numeric()
   } else {param$code = param$dataset}
 
+  ## Check if year is acceptable
+
+  year_check = datasets_link() %>%
+    dplyr::filter(dataset == param$dataset) %>%
+    dplyr::select(available_time) %>%
+    unlist() %>% as.character() %>%
+    stringr::str_split(pattern = '-') %>%
+    unlist() %>% as.numeric()
+
+  if (min(time_period) < year_check[1]){stop('Provided time period less than supported. Check documentation for time availability.')}
+  if (max(time_period) > year_check[2]){stop('Provided time period greater than supported. Check documentation for time availability.')}
+
+
+
   ## Dataset
 
   if (is.null(param$dataset)){stop('Missing Dataset!')}
@@ -164,7 +178,7 @@ load_ppm = function(dataset=NULL,raw_data = FALSE,geo_level = "municipality",tim
     if (language == 'pt'){
 
       dat = dat %>% dplyr::mutate(variavel = dplyr::case_when(
-          (variavel_codigo == '105') ~ 'rebanho') # Efetivo dos Rebanhos
+          (variavel_codigo == '105') ~ 'num') # Efetivo dos Rebanhos
       )
 
     }
@@ -172,7 +186,7 @@ load_ppm = function(dataset=NULL,raw_data = FALSE,geo_level = "municipality",tim
     if (language == 'eng'){
 
       dat = dat %>% dplyr::mutate(variavel = dplyr::case_when(
-        (variavel_codigo == '105') ~ 'herd') # Efetivo dos Rebanhos
+        (variavel_codigo == '105') ~ 'num') # Efetivo dos Rebanhos
       )
 
 
@@ -188,7 +202,7 @@ load_ppm = function(dataset=NULL,raw_data = FALSE,geo_level = "municipality",tim
     if (language == 'pt'){
 
       dat = dat %>% dplyr::mutate(variavel = dplyr::case_when(
-        (variavel_codigo == '108') ~ 'ovinos_tosquiados') # Ovinos Tosquiados
+        (variavel_codigo == '108') ~ 'num') # Ovinos Tosquiados
       )
 
     }
@@ -196,7 +210,7 @@ load_ppm = function(dataset=NULL,raw_data = FALSE,geo_level = "municipality",tim
     if (language == 'eng'){
 
       dat = dat %>% dplyr::mutate(variavel = dplyr::case_when(
-        (variavel_codigo == '108') ~ 'sheep_farmed') # Ovinos Tosquiados
+        (variavel_codigo == '108') ~ 'num') # Ovinos Tosquiados
       )
 
     }
@@ -241,7 +255,7 @@ load_ppm = function(dataset=NULL,raw_data = FALSE,geo_level = "municipality",tim
     if (language == 'pt'){
 
       dat = dat %>% dplyr::mutate(variavel = dplyr::case_when(
-        (variavel_codigo == '107') ~ 'vacas_ordenhadas') # Vacas ordenhadas
+        (variavel_codigo == '107') ~ 'num') # Vacas ordenhadas
       )
 
     }
@@ -249,15 +263,13 @@ load_ppm = function(dataset=NULL,raw_data = FALSE,geo_level = "municipality",tim
     if (language == 'eng'){
 
       dat = dat %>% dplyr::mutate(variavel = dplyr::case_when(
-        (variavel_codigo == '107') ~ 'milked_cows') # Vacas ordenhadas
+        (variavel_codigo == '107') ~ 'num') # Vacas ordenhadas
       )
 
     }
   }
 
   ## Water Origin Production
-
-    ## We need to finish the names translation!
 
   if (param$dataset == 'ppm_aquaculture'){
 
@@ -304,7 +316,7 @@ load_ppm = function(dataset=NULL,raw_data = FALSE,geo_level = "municipality",tim
       tidyr::pivot_wider(id_cols = c(geo_id,ano),
                          names_from = c(variavel,tipo_de_rebanho_codigo),
                          values_from=valor,
-                         names_sep = 'V_',
+                         names_sep = '_V',
                          values_fn = sum,
                          values_fill = NA) %>%
       janitor::clean_names()
@@ -315,9 +327,9 @@ load_ppm = function(dataset=NULL,raw_data = FALSE,geo_level = "municipality",tim
   if (param$dataset == 'ppm_sheep_farming'){
     dat = dat %>% dplyr::select(-'unidade_de_medida') %>%
       tidyr::pivot_wider(id_cols = c(geo_id,ano),
-                         names_from = variavel,
+                         names_from = c(variavel,variavel_codigo),
                          values_from=valor,
-                         names_sep = '_',
+                         names_sep = '_V',
                          values_fn = sum,
                          values_fill = NA) %>%
       janitor::clean_names()
@@ -345,9 +357,9 @@ load_ppm = function(dataset=NULL,raw_data = FALSE,geo_level = "municipality",tim
 
     dat = dat %>% dplyr::select(-'unidade_de_medida') %>%
       tidyr::pivot_wider(id_cols = c(geo_id,ano),
-                         names_from = variavel,
+                         names_from = c(variavel,variavel_codigo),
                          values_from=valor,
-                         names_sep = '_',
+                         names_sep = '_V',
                          values_fn = sum,
                          values_fill = NA) %>%
       janitor::clean_names()

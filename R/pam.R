@@ -65,6 +65,20 @@ load_pam = function(dataset=NULL,raw_data=FALSE,geo_level = "municipality", time
       as.numeric()
   } else {param$code = param$dataset}
 
+  ## Check if year is acceptable
+
+  year_check = datasets_link() %>%
+    dplyr::filter(dataset == param$dataset) %>%
+    dplyr::select(available_time) %>%
+    unlist() %>% as.character() %>%
+    stringr::str_split(pattern = '-') %>%
+    unlist() %>% as.numeric()
+
+  if (min(time_period) < year_check[1]){stop('Provided time period less than supported. Check documentation for time availability.')}
+  if (max(time_period) > year_check[2]){stop('Provided time period greater than supported. Check documentation for time availability.')}
+
+
+
 
   ## Dataset
 
@@ -184,7 +198,8 @@ load_pam = function(dataset=NULL,raw_data=FALSE,geo_level = "municipality", time
         (variavel_codigo == '214') ~ 'quant', # Quantidade produzida
         (variavel_codigo == '215') ~ 'valor', # Valor da producao
         (variavel_codigo == '216') ~ 'area_colhida', # Area colhida
-        (variavel_codigo == '8331') ~ 'area_plantada_dest_colheita' # Area plantada ou destinada a colheita
+        (variavel_codigo == '8331') ~ 'area_plantada_dest_colheita', # Area plantada ou destinada a colheita,
+        (variavel_codigo == '109') ~ 'area_plantada' # Area plantada,
         )
       )
   }
@@ -197,7 +212,8 @@ load_pam = function(dataset=NULL,raw_data=FALSE,geo_level = "municipality", time
         (variavel_codigo == '214') ~ 'quant', # Quantidade produzida
         (variavel_codigo == '215') ~ 'value', # Valor da producao
         (variavel_codigo == '216') ~ 'harvested_area', # Area colhida
-        (variavel_codigo == '8331') ~ 'planted_to_harvest_area' # Area plantada ou destinada a colheita
+        (variavel_codigo == '8331') ~ 'planted_to_harvest_area', # Area plantada ou destinada a colheita
+        (variavel_codigo == '109') ~ 'planted_area' # Area plantada,
       )
       )
 

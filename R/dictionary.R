@@ -204,7 +204,7 @@ load_dictionary = function(dataset){
     harmonization_dat = tibble::tribble(
       ~var_code,~var_pt,~var_eng,~unit_value,~unit_quantity,~available_period,
 
-      180,'Ovinos tosquiados nos estabelecimentos agropecuarios', 'Sheared sheep in agricultural establishments', '' ,'Cabecas',NA,
+      108,'Ovinos tosquiados', 'Sheared sheep', '' ,'Cabecas',NA,
 
       0,'Total','Total','1K BRL','None',NA)
   }
@@ -440,7 +440,7 @@ load_dictionary = function(dataset){
       114253,'Milho em Grao (Primeira Safra)','Corn in Grain (First Crop)','None','Tons','Hectares',NA,
       114254,'Milho em Grao (Segunda Safra)','Corn in Grain (Second Crop)','None','Tons','Hectares',NA,
 
-      31693,'Total','Total','None','Tons','Hectares',NA)
+      31693,'Milho em Grao (Total)','Corn in Grain (Total)','None','Tons','Hectares',NA)
 
   }
 
@@ -451,9 +451,9 @@ load_dictionary = function(dataset){
 
       117989,'Batata Inglesa (Primeira Safra)','English Potato (First Crop)','None','Tons','Hectares',NA,
       117990,'Batata Inglesa (Segunda Safra)','English Potato (Second Crop)','None','Tons','Hectares',NA,
-      117994,'Batata Inglesa (Terceiraa Safra)', 'English Potato (Third Crop)','None','Tons','Hectares',NA,
+      117994,'Batata Inglesa (Terceira Safra)', 'English Potato (Third Crop)','None','Tons','Hectares',NA,
 
-      31693,'Total','Total','None','Tons','Hectares',NA)
+      31693,'Batata Inglesa (Total)','English Potato (Total)','None','Tons','Hectares',NA)
 
   }
 
@@ -465,7 +465,7 @@ load_dictionary = function(dataset){
       117987,'Amendoim em Casca (Primeira Safra)', 'Peanuts in Shell (First Crop)','None','Tons','Hectares',NA,
       117988,'Amendoim em Casca (Segunda Safra)','Peanuts in Shell (Second Crop)','None','Tons','Hectares',NA,
 
-      31693,'Total','Total','None','Tons','Hectares',NA)
+      31693,'Amendoim em Casca (Total)','Peanuts in Shell (Total)','None','Tons','Hectares',NA)
 
   }
 
@@ -478,7 +478,7 @@ load_dictionary = function(dataset){
       117992,'Feijao em Grao (Segunda Safra)','Beans in Grain (Second Crop)','None','Tons','Hectares',NA,
       117993,'Feijao em Grao (Terceira Safra)', 'Beans in Grain (Third Crop)','None','Tons','Hectares',NA,
 
-      31693,'Total','Total','None','Tons','Hectares',NA)
+      31693,'Feijao em Grao (Total)','Beans in Grain (Total)','None','Tons','Hectares',NA)
 
   }
 

@@ -73,6 +73,20 @@ load_pevs <- function(dataset = NULL, raw_data = FALSE, geo_level = "municipalit
       as.numeric()
   } else {param$code = param$dataset}
 
+  ## Check if year is acceptable
+
+  year_check = datasets_link() %>%
+    dplyr::filter(dataset == param$dataset) %>%
+    dplyr::select(available_time) %>%
+    unlist() %>% as.character() %>%
+    stringr::str_split(pattern = '-') %>%
+    unlist() %>% as.numeric()
+
+  if (min(time_period) < year_check[1]){stop('Provided time period less than supported. Check documentation for time availability.')}
+  if (max(time_period) > year_check[2]){stop('Provided time period greater than supported. Check documentation for time availability.')}
+
+
+
   ## Dataset
 
   if (is.null(param$dataset)){stop('Missing Dataset!')}
