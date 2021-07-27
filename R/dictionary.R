@@ -169,12 +169,12 @@ load_dictionary = function(dataset){
       ~var_code,~var_pt,~var_eng,~unit_value,~unit_quantity,~available_period,
 
 
-      2682,'Leite', 'Milk','1L BRL',NA,NA,
-      2683,'Casulos do bicho-da-seda', 'silkworm cocoons','1K BRL',NA,NA,
-      2684,'La', 'There','1L BRL',NA,NA,
-      2685,'Ovos de galinha', 'Chicken eggs','Mil Duzias','',NA,
-      2686,'Ovos de codorna', 'Quail eggs','Mil DuziasL','',NA,
-      2687,'Mel de abelha', 'Bee s honey','1K BRL','',NA,
+      2682,'Leite', 'Milk','1L BRL','1K Liters',NA,
+      2683,'Casulos do bicho-da-seda', 'Silkworm cocoons','1K BRL','Kg',NA,
+      2684,'Lã','Wool','1L BRL','Kg',NA,
+      2685,'Ovos de galinha', 'Chicken eggs','1K BRL','1K Dozens',NA,
+      2686,'Ovos de codorna', 'Quail eggs','1K BRL','1K Dozens',NA,
+      2687,'Mel de abelha', 'Bee Honey','1K BRL','Kg',NA,
 
       0,'Total','Total','1K BRL','None',NA)
 
@@ -185,16 +185,16 @@ load_dictionary = function(dataset){
     harmonization_dat = tibble::tribble(
       ~var_code,~var_pt,~var_eng,~unit_value,~unit_quantity,~available_period,
 
-      2670,'Bovino', 'Bovine', '','Cabecas',NA,
-      2675,'Bubalino', 'buffalo','','Cabecas',NA,
-      2672,'Equino', 'Equine', '','Cabecas',NA,
-      32794,'Suino - total', 'swine - total','','Cabecas',NA,
-      32795,'Suino - matrizes de suinos', 'Swine - swine breeders','','Cabecas',NA,
-      2681,'Caprino', 'Goat','','Cabecas',NA,
-      2677,'Ovino', 'Sheep','','Cabecas',NA,
-      32796,'Galinaceos - total', 'Galinaceous - total','','Cabecas',NA,
-      32793,'Galinaceos - galinhas', 'Galinaceos - chickens','','Cabecas',NA,
-      2680,'Codornas', 'Quail','','Cabecas',NA,
+      2670,'Bovino', 'Bovine','None','Cattle',NA,
+      2675,'Bubalino', 'Buffalo','None','Cattle',NA,
+      2672,'Equino', 'Equine', 'None','Cattle',NA,
+      32794,'Suino - Total', 'Swine - Total','None','Cattle',NA,
+      32795,'Suino - Matrizes de Suinos', 'Swine - Breeders','None','Cattle',NA,
+      2681,'Caprino', 'Goat','None','Cattle',NA,
+      2677,'Ovino', 'Sheep','None','Cattle',NA,
+      32796,'Galinaceos - Total', 'Galinaceous - total','None','Cattle',NA,
+      32793,'Galinaceos - Galinhas', 'Galinaceos - chickens','None','Cattle',NA,
+      2680,'Codornas', 'Quail','None','Cattle',NA,
 
       0,'Total','Total','1K BRL','None',NA)
   }
@@ -204,7 +204,7 @@ load_dictionary = function(dataset){
     harmonization_dat = tibble::tribble(
       ~var_code,~var_pt,~var_eng,~unit_value,~unit_quantity,~available_period,
 
-      108,'Ovinos tosquiados', 'Sheared sheep', '' ,'Cabecas',NA,
+      108,'Ovinos tosquiados', 'Sheared sheep','None','Cattle',NA,
 
       0,'Total','Total','1K BRL','None',NA)
   }
@@ -214,7 +214,7 @@ load_dictionary = function(dataset){
     harmonization_dat = tibble::tribble(
       ~var_code,~var_pt,~var_eng,~unit_value,~unit_quantity,~available_period,
 
-      107,'Vacas ordenhadas', 'Milked cows', '' ,'Cabecas',NA,
+      107,'Vacas ordenhadas', 'Milked cows','None','Cattle',NA,
 
       0,'Total','Total','1K BRL','None',NA)
   }
@@ -224,30 +224,30 @@ load_dictionary = function(dataset){
     harmonization_dat = tibble::tribble(
       ~var_code,~var_pt,~var_eng,~unit_value,~unit_quantity,~available_period,
 
-      32861,'Carpa', 'Carp', '1 kg','Mil Reais',NA,
-      32865,'Curimata, curimbata', 'curimbata, curimbata', '','Mil Reais',NA,
-      32866,'Dourado', 'Dourado', '','Mil Reais',NA,
-      32867,'Jatuarana, piabanha e piracanjuba', 'Jatuarana, piabanha and piracanjuba', '','Mil Reais',NA,
-      32868,'Lambari', 'Lambari', '','Mil Reais',NA,
-      32869,'Matrinxa', 'Matrinxa', '','Mil Reais',NA,
-      32870,'Pacu e patinga', 'Pacu and skate', '','Mil Reais',NA,
-      32871,'Piau, piapara, piaucu, piava', 'Piau, piapara, piaucu, chirping', '','Mil Reais',NA,
-      32872,'Pintado, cachara, cachapira e pintachara, surubim', 'Pintado, cachara, cachapira and pintachara, surubim', '','Mil Reais',NA,
-      32873,'Pirapitinga', 'Pirapitinga', '','Mil Reais',NA,
-      32874,'	Pirarucu', 'Pirarucu', '','Mil Reais',NA,
-      32875,'Tambacu, tambatinga', 'tambacu, tambatinga', '','Mil Reais',NA,
-      32876,'Tambaqui', 'Tambaqui', '','Mil Reais',NA,
-      32877,'Tilapia', 'Tilapia', '','Mil Reais',NA,
-      32878,'Traira e trairao', 'Traira e trairao', '','Mil Reais',NA,
-      32879,'Truta', 'Trout', '','Mil Reais',NA,
-      32880,'	Tucunare', 'peacock bass', '','Mil Reais',NA,
-      32881,'Outros peixes', 'Other fish', '','Mil Reais',NA,
-      32886,'Alevinos', 'fingerlings', '','Mil Reais',NA,
-      32887,'Camarao', 'Shrimp', '','Mil Reais',NA,
-      32888,'Larvas e pos-larvas de camarao', 'Shrimp larvae and post-larvae', '','Mil Reais',NA,
-      32889,'Ostras, vieiras e mexilhoes', 'Oysters, scallops and mussels', '','Mil Reais',NA,
-      32890,'Sementes de moluscos', 'mollusc seeds', '','Mil Reais',NA,
-      32891,'Outros produtos (ra, jacare, siri, caranguejo, lagosta, etc)', 'Other products (ra, alligator, crab, crab, lobster, etc.)', '','Mil Reais',NA,
+      32861,'Carpa', 'Carp', '1K BRL','Kg',NA,
+      32865,'Curimata, curimbata', 'curimbata, curimbata', '1K BRL', 'Kg',NA,
+      32866,'Dourado', 'Dourado', '1K BRL', 'Kg',NA,
+      32867,'Jatuarana, piabanha e piracanjuba', 'Jatuarana, piabanha and piracanjuba', '1K BRL', 'Kg',NA,
+      32868,'Lambari', 'Lambari', '1K BRL', 'Kg',NA,
+      32869,'Matrinxa', 'Matrinxa', '1K BRL', 'Kg',NA,
+      32870,'Pacu e patinga', 'Pacu and skate', '1K BRL', 'Kg',NA,
+      32871,'Piau, piapara, piaucu, piava', 'Piau, piapara, piaucu, chirping', '1K BRL', 'Kg',NA,
+      32872,'Pintado, cachara, cachapira e pintachara, surubim', 'Pintado, cachara, cachapira and pintachara, surubim', '1K BRL', 'Kg',NA,
+      32873,'Pirapitinga', 'Pirapitinga', '1K BRL', 'Kg',NA,
+      32874,'Pirarucu', 'Pirarucu', '1K BRL', 'Kg',NA,
+      32875,'Tambacu, tambatinga', 'tambacu, tambatinga', '1K BRL', 'Kg',NA,
+      32876,'Tambaqui', 'Tambaqui', '1K BRL', 'Kg',NA,
+      32877,'Tilapia', 'Tilapia', '1K BRL', 'Kg',NA,
+      32878,'Traira e trairao', 'Traira e trairao', '1K BRL', 'Kg',NA,
+      32879,'Truta', 'Trout', '1K BRL', 'Kg',NA,
+      32880,'Tucunare', 'Peacock bass', '1K BRL', 'Kg',NA,
+      32881,'Outros peixes', 'Other fish', '1K BRL', 'Kg',NA,
+      32886,'Alevinos', 'Fingerlings', '1K BRL', 'Kg',NA,
+      32887,'Camarao', 'Shrimp', '1K BRL', 'Kg',NA,
+      32888,'Larvas e pos-larvas de camarao', 'Shrimp larvae and post-larvae', '1K BRL','1K',NA,
+      32889,'Ostras, vieiras e mexilhoes', 'Oysters, scallops and mussels', '1K BRL', 'Kg',NA,
+      32890,'Sementes de moluscos', 'Mollusc Seeds', '1K BRL','1K',NA,
+      32891,'Outros produtos (ra, jacare, siri, caranguejo, lagosta, etc)', 'Other products (ra, alligator, crab, crab, lobster, etc.)', '1K BRL', 'None',NA,
 
 
       0,'Total','Total','1K BRL','None',NA)
@@ -317,13 +317,13 @@ load_dictionary = function(dataset){
       2723,'Cafe (em Grao) Total', 'Coffee (in Grain) Total','1K BRL','Tons','Hectares',NA,
       31619,'Cafe (em Grao) Arabica', 'Cafe (in Grao) Arabica','1K BRL','Tons','Hectares',NA,
       31620,'Cafe (em Grao) Canephora', 'Cafe (in Grain) Canephora','1K BRL','Tons','Hectares',NA,
-      40473,'Caju','cashew','1K BRL','Tons','Hectares',NA,
+      40473,'Caju','Cashew','1K BRL','Tons','Hectares',NA,
       2724,'Caqui','Khaki','1K BRL','Tons','Hectares',NA,
-      2725,'Castanha de Caju',NA,'1K BRL','Tons','Hectares',NA,
-      2726,'Cha da India (Folha Verde)',NA,'1K BRL','Tons','Hectares',NA,
-      2727,'Coco da Baia',NA,'1K BRL','Tons','Hectares',NA,
-      2728,'Dende (Cacho de Coco)',NA,'1K BRL','Tons','Hectares',NA,
-      2729,'Erva Mate (Folha Verde)',NA,'1K BRL','Tons','Hectares',NA,
+      2725,'Castanha de Caju','Cashew Nuts','1K BRL','Tons','Hectares',NA,
+      2726,'Cha da India (Folha Verde)','India Tea (Leaf)','1K BRL','Tons','Hectares',NA,
+      2727,'Coco da Baia','Coconut','1K BRL','Tons','Hectares',NA,
+      2728,'Dende (Cacho de Coco)','Coconut Bunch','1K BRL','Tons','Hectares',NA,
+      2729,'Erva Mate (Folha Verde)','Mate Herb (Leaf)','1K BRL','Tons','Hectares',NA,
       2730,'Figo','Fig','1K BRL','Tons','Hectares',NA,
       2731,'Goiaba','Guava','1K BRL','Tons','Hectares',NA,
       2732,'Guarana (Semente)','Guarana (Seed)','1K BRL','Tons','Hectares',NA,
@@ -337,7 +337,7 @@ load_dictionary = function(dataset){
       2740,'Noz (Fruto Seco)','Walnut (Dry Fruit)','1K BRL','Tons','Hectares',NA,
       90001,'Palmito','Palm heart','1K BRL','Tons','Hectares',NA,
       2741,'Pera', 'Pear','1K BRL','Tons','Hectares',NA,
-      2742,'Pessego', 'Peach','1K BRL','Tonans','Hectares',NA,
+      2742,'Pessego', 'Peach','1K BRL','Tons','Hectares',NA,
       2743,'Pimenta do Reino','Black pepper','1K BRL','Tons','Hectares',NA,
       2744,'Sisal ou Agave (Fibra)','Sisal or Agave (Fiber)','1K BRL','Tons','Hectares',NA,
       2745,'Tangerina','Tangerine','1K BRL','Tons','Hectares',NA,
@@ -378,12 +378,12 @@ load_dictionary = function(dataset){
       40106,'Cana de Acucar','Sugar cane','1K BRL','Tons','Hectares',NA,
       40331,'Cana para Forragem','Forage cane','1K BRL','Tons','Hectares',NA,
       40142,'Caqui','Khaki','1K BRL','Tons','Hectares',NA,
-      40143,'Castanha de Caju','Cashew nut','1K BRL','Tons','Hectares',NA,
+      40143,'Castanha de Caju','Cashew Nut','1K BRL','Tons','Hectares',NA,
       40107,'Cebola','Onion','1K BRL','Tons','Hectares',NA,
       40108,'Centeio (em Grao)','Rye (in grain)','1K BRL','Tons','Hectares',NA,
       40109,'Cevada (em Grao)','Barley (in Grain)','1K BRL','Tons','Hectares',NA,
       40144,'Cha da India (Folha Verde)','India Tea (Green Leaf)','1K BRL','Tons','Hectares',NA,
-      40145,'Coco da Baia','Coco from the bay','1K BRL','Tons','Hectares',NA,
+      40145,'Coco da Baia','Coconut','1K BRL','Tons','Hectares',NA,
       40146,'Dende (Cacho de Coco)','Dende (Coconut Bunch)','1K BRL','Tons','Hectares',NA,
       40147,'Erva Mate (Folha Verde)','Yerba Mate (Green Leaf)','1K BRL','Tons','Hectares',NA,
       40110,'Ervilha (em Grao)','Pea (in Grain)','1K BRL','Tons','Hectares',NA,
