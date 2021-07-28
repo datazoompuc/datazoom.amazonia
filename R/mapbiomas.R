@@ -1,7 +1,9 @@
 load_mapbiomas = function(dataset = NULL,raw_data=NULL,geo_level = 'municipality',
-               time_period='all',language = 'eng',time_id = 'year'){
+               time_period='all',language = 'eng',time_id = 'year',cover_level = 1){
 
   ## To-Do:
+    ## Add Support to Transition Info Download at the State and Biome Level
+    ## Add Support to Covering Info Download at the State and Biome Level
     ## Include Support for raw raster download
 
 
@@ -40,53 +42,166 @@ load_mapbiomas = function(dataset = NULL,raw_data=NULL,geo_level = 'municipality
   ## Downloading ##
   #################
 
-  ## Covering
-
-  # if (is.null(path)) {
-  #   if (space_aggregation == "state" | space_aggregation == "estado") {
-  #     url1 <- "https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Dados_Cobertura_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx"
-  #   } else if (space_aggregation == "municipality" | space_aggregation == "municipio") {
-  #     url1 <- "https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Dados_Cobertura_MapBiomas_5.0_UF-MUN_SITE_v2.xlsx"
-  #   }
-  #   p1f <- tempfile()
-  #   download.file(url1, p1f, mode = "wb")
-  # } else {
-  #   if (space_aggregation == "state" | space_aggregation == "estado") {
-  #     p1f <- paste0(path, "/Dados_Cobertura_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx")
-  #   } else if (space_aggregation == "municipality" | space_aggregation == "municipio") {
-  #     p1f <- paste0(path, "/Dados_Cobertura_MapBiomas_5.0_UF-MUN_SITE.xlsx")
-  #   }
-  # }
-
-  ## Transition - State Level
-
-  # if(is.null(path)){
-  #   url1<-'https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Dados_Transicao_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx'
-  #   p1f <- tempfile()
-  #   download.file(url1, p1f, mode="wb")
-  # }else{
-  #   p1f<-paste0(path,'/Dados_Transicao_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx')
-  # }
-  #
-  # a<-read_excel(path = p1f, sheet = 3)
-
-  ## Transition - Municipality Level
-
-  # if(is.null(path)){
-  #   url1<-'https://storage.googleapis.com/mapbiomas-public/COLECAO/5/DOWNLOADS/ESTATISTICAS/Dados_Transicao_MapBiomas_5.0_UF-MUN_SITE_v2.xlsx'
-  #   p1f <- tempfile()
-  #   download.file(url1, p1f, mode="wb")
-  # }else{
-  #   p1f<-paste0(path,'/Dados_Transicao_MapBiomas_5.0_UF-MUN_SITE_v2.xlsx')
-  # }
-  # a<-read_excel(path = p1f, sheet = 3)
-
   dat = external_download(dataset = param$dataset,source = 'mapbiomas')
 
   dat = dat %>%
     janitor::clean_names() %>%
     tibble::as_tibble() %>%
     dplyr::mutate_if(is.character,function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")})
+
+  if (raw_data == TRUE){return(dat)}
+
+  ######################
+  ## Data Engineering ##
+  ######################
+
+  if (param$dataset == 'mapbiomas_cover'){
+
+    ## Create Longer Data - Years as a Variable
+
+    dat = dat %>%
+      tidyr::pivot_longer(
+        cols = x1985:x2019,
+        names_to = 'year',
+        names_prefix = 'x',
+        values_to = 'value'
+      )
+
+    ## Aggregating by Cover Level
+
+    if (cover_level == 0){dat$cover_level = dat$level_0}
+    if (cover_level == 1){dat$cover_level = dat$level_1}
+    if (cover_level == 2){dat$cover_level = dat$level_2}
+    if (cover_level == 3){dat$cover_level = dat$level_3}
+    if (cover_level == 4){dat$cover_level = dat$level_4}
+
+    dat = dat %>%
+      tidyr::pivot_wider(id_cols = c(territory_id,municipality,state,year),
+                         names_from = cover_level,
+                         values_from = value,
+                         values_fn = sum,
+                         values_fill = NA) %>%
+      janitor::clean_names()
+
+    ## Adjusting Geo Level Names
+
+    ## Translating Names
+
+    ## Add Labels
+
+    ## Return Data
+
+    return(dat)
+
+  }
+
+  if (param$dataset == 'mapbiomas_transition'){
+
+    ## Create Longer Data - Years as a Variable
+
+    dat = dat %>%
+      tidyr::pivot_longer(
+        cols = x1985_to_1986:x2018_to_2019,
+        names_to = 'transition_year',
+        names_prefix = 'x',
+        values_to = 'value'
+      )
+
+    ## Aggregating by Cover Level
+
+    # if (cover_level == 0){dat$cover_level = dat$level_0}
+    # if (cover_level == 1){dat$cover_level = dat$level_1}
+    # if (cover_level == 2){dat$cover_level = dat$level_2}
+    # if (cover_level == 3){dat$cover_level = dat$level_3}
+    # if (cover_level == 4){dat$cover_level = dat$level_4}
+    #
+    # dat = dat %>%
+    #   tidyr::pivot_wider(id_cols = c(territory_id,municipality,state,year),
+    #                      names_from = cover_level,
+    #                      values_from = value,
+    #                      values_fn = sum,
+    #                      values_fill = NA) %>%
+    #   janitor::clean_names()
+
+    ## Adjusting Geo Level Names
+
+    ## Translating Names
+
+    ## Add Labels
+
+    ## Return Data
+
+    return(dat)
+
+
+
+
+  }
+
+  if (param$dataset == 'mapbiomas_deforestation_regeneration'){
+
+    ## Create Longer Data - Years as a Variable
+
+    dat = dat %>%
+      tidyr::pivot_longer(
+        cols = x1988:x2017,
+        names_to = 'year',
+        names_prefix = 'x',
+        values_to = 'value'
+      )
+
+    ## Return Data
+
+    return(dat)
+
+  }
+
+  if (param$dataset == 'mapbiomas_irrigation'){
+
+    ## Create Longer Data - Years as a Variable
+
+    dat = dat %>%
+      tidyr::pivot_longer(
+        cols = x2000:x2019,
+        names_to = 'year',
+        names_prefix = 'x',
+        values_to = 'value'
+      )
+
+    ## Return Data
+
+    return(dat)
+
+
+
+  }
+
+  if (param$dataset == 'mapbiomas_grazing_quality'){
+
+    dat = dat %>%
+      tidyr::pivot_longer(
+        cols = x2010:x2018,
+        names_to = 'year',
+        names_prefix = 'x',
+        values_to = 'value'
+      )
+
+    dat = dat %>%
+      tidyr::pivot_wider(id_cols = c(biome,state,year),
+                         names_from = level_1,
+                         values_from = value,
+                         values_fn = sum,
+                         values_fill = NA) %>%
+      janitor::clean_names()
+
+    ## Return Data
+
+    return(dat)
+
+
+
+
+  }
 
   #################################
   ## Data Engineering - Covering ##
@@ -115,7 +230,7 @@ load_mapbiomas = function(dataset = NULL,raw_data=NULL,geo_level = 'municipality
   #   }
   #   for (i in years) {
   #     ret <- c()
-  #     ret <- tab[, 1:8]
+  #     ret <- tab[, 1:7]
   #     ano <- as.character(i)
   #     ret <- cbind(ret, tab[, ano])
   #     colnames(ret)[which(colnames(ret) == ano)] <- "Area"

@@ -681,11 +681,11 @@ datasets_link = function(){
     ## MapBiomas ##
     ###############
 
-    'MAPBIOMAS','mapbiomas_cover',NA,'1985-2019',NA,'https://mapbiomas-br-site.s3.amazonaws.com/',
-    'MAPBIOMAS','mapbiomas_transition',NA,'1985-2019',NA,'https://mapbiomas-br-site.s3.amazonaws.com/',
-    'MAPBIOMAS','mapbiomas_deforestation_regeneration',NA,'1988-2017',NA,'https://mapbiomas-br-site.s3.amazonaws.com/',
-    'MAPBIOMAS','mapbiomas_irrigation',NA,'2000-2019',NA,'https://mapbiomas-br-site.s3.amazonaws.com/',
-    'MAPBIOMAS','mapbiomas_grazing_quality',NA,'2010-2018',NA,'https://mapbiomas-br-site.s3.amazonaws.com/',
+    'MAPBIOMAS','mapbiomas_cover',NA,'1985-2019','Municipality, State','https://mapbiomas-br-site.s3.amazonaws.com/',
+    'MAPBIOMAS','mapbiomas_transition',NA,'1985-2019','Municipality, State','https://mapbiomas-br-site.s3.amazonaws.com/',
+    'MAPBIOMAS','mapbiomas_deforestation_regeneration',NA,'1988-2017','State','https://mapbiomas-br-site.s3.amazonaws.com/',
+    'MAPBIOMAS','mapbiomas_irrigation',NA,'2000-2019','State','https://mapbiomas-br-site.s3.amazonaws.com/',
+    'MAPBIOMAS','mapbiomas_grazing_quality',NA,'2010 & 2018','State','https://mapbiomas-br-site.s3.amazonaws.com/',
 
     #############
     ## SIGMINE ##
