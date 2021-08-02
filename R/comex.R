@@ -25,9 +25,9 @@
 #' imp_mun_cuci <- load_br_trade(dataset = "comex_import_mun", raw_data = FALSE, time_period = 1997:2021, prod_class = "cuci")
 #'
 #' @seealso \url{https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta}
+#' @importFrom magrittr %>%
 #'
-#'
-#' @export
+#' @export load_br_trade
 
 load_br_trade <- function(dataset = NULL, raw_data = NULL, geo_level = NULL,
                           time_period = 2018:2019, language = 'eng',
