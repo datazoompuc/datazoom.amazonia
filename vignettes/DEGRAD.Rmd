@@ -31,7 +31,10 @@ Using the package is easy enough:
 
 ```{r, eval = FALSE}
 library(datazoom.amazonia)
-years <- c(2014:2016)
-data <- load_degrad_raw(years)
-data <- load_degrad(2016, time_period = "year", geo_aggregation = "municipality", language = "pt")
+
+# download treated data from 2007 to 2016
+degrad_all <- load_degrad(dataset = "degrad", raw_data = FALSE, time_period = 2007:2016)
+
+# download raw data from 2007 to 2016
+raw_degrad_all <- load_degrad(dataset = "degrad", raw_data = TRUE, time_period = 2007:2016)
 ```
