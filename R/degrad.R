@@ -24,14 +24,11 @@
 #' }
 #'
 #' @importFrom magrittr %>%
-#' @import sf
-#' @import geobr
 #'
 #' @export load_degrad
 
-load_degrad <- function(dataset = 'degrad', raw_data = NULL,
-                        geo_level = NULL, time_period = 2010:2012,
-                        language = 'eng', time_id = 'year') {
+load_degrad <- function(dataset = 'degrad',raw_data=NULL, geo_level=NULL,time_period=2010:2012,
+                        language='eng',time_id='year') {
 
   # ,all_events = FALSE
 
@@ -110,16 +107,17 @@ load_degrad <- function(dataset = 'degrad', raw_data = NULL,
   ## Selecting Municipalities in the Legal Amazon
 
   # Downloading municipal map from geobr filtered to legl amazon municipalities
-  message("Downloading map data.")
+
+  # message("Downloading map data.")
 
   # Downloading municipal map from geobr
-  geo_br <- suppressMessages(geobr::read_municipality(year = 2019, simplified = FALSE)) # 2019 relates to the definition of legal_amazon
+  # geo_br <- geobr::read_municipality(year = 2019, simplified = FALSE) # 2019 relates to the definition of legal_amazon
 
   # legal_amazon belongs to package's sysdata.rda and filters for municipalities in legal amazon
-  amazon_municipalities <- dplyr::filter(legal_amazon, .data$AMZ_LEGAL == 1)
+  # amazon_municipalities <- dplyr::filter(legal_amazon, .data$AMZ_LEGAL == 1)
 
   # Filters geobr shapefiles to legal amazon municipalities
-  dplyr::filter(geo_br, .data$code_muni %in% amazon_municipalities$CD_MUN)
+  # dplyr::filter(geo_br, .data$code_muni %in% amazon_municipalities$CD_MUN)
 
   ######################
   ## Data Engineering ##
