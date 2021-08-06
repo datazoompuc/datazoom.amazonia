@@ -3,9 +3,7 @@
 \encoding{UTF-8}
 \name{load_ppm}
 \alias{load_ppm}
-\title{PPM - Municipal Livestock Production
-
-Loads information on animal farming inventories and livestock products (IBGE). Survey is done at the municipal level and data is available from 1974 to 2019 for most datasets. See \url{https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/17353-municipal-livestock-production.html?=&t=o-que-e}}
+\title{PPM - Municipal Livestock Production}
 \usage{
 load_ppm(
   dataset = NULL,
@@ -30,8 +28,6 @@ load_ppm(
 A \code{tibble} with a panel of N x T observations, consisting of geographic units that present positive values for any of the variables in the dataset.
 }
 \description{
-PPM - Municipal Livestock Production
-
 Loads information on animal farming inventories and livestock products (IBGE). Survey is done at the municipal level and data is available from 1974 to 2019 for most datasets. See \url{https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/17353-municipal-livestock-production.html?=&t=o-que-e}
 }
 \examples{
