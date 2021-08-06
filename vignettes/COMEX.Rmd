@@ -22,17 +22,22 @@ The data has a monthly frequency and is available starting from the year 1989. F
 
 ##The Function
 
-This package contains a single function \code{load_comex} which extracts data from the Comex website. It allows the user to input the years he would like the data to encompass, the nomenclature used, as well as choosing between import and export data and the language (currently only Portuguese and English are supported). 
+This package contains a single function \code{load_br_trade} which extracts data from the Comex website. It allows the user to input the years he would like the data to encompass, the nomenclature used, as well as choosing between import and export data and the language (currently only Portuguese and English are supported). 
 
-The output is a list of dataframes. Each dataframe will contain all years selected, but there will be two for each nomenclature, one for export data and another for import data. The order is of nomenclatures is: NCM first, SH4 second and NBM third. Within each nomentaclature, the dataframe for export comes before the one for import.
+The output is a tibble containing all years selected for the chosen dataset and nomenclature. 
 
 Using the function is easy enough:
 
 ```{r,eval=FALSE}
 library(datazoom.amazonia)
 
-year <- c(2000)
+# download treated exports data by municipality from 1997 to 2021
+exp_mun <- load_br_trade(dataset = "comex_export_mun", raw_data = FALSE, time_period = 1997:2021)
 
-data <- load_comex(year, ncm = TRUE, imp = TRUE, language = "eng")
+# download raw imports data by municipality from 1997 to 2021
+raw_imp_mun <- load_br_trade(dataset = "comex_import_mun", raw_data = TRUE, time_period = 1997:2021)
+
+# download treated imports data by municipality from 1997 to 2021 using "CUCI" classification
+imp_mun_cuci <- load_br_trade(dataset = "comex_import_mun", raw_data = FALSE, time_period = 1997:2021, prod_class = "cuci")
 
 ```

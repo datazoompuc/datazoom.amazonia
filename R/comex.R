@@ -1,20 +1,22 @@
-#' Download and treat Comex data
-#' @description Download and treat both imports and exports data from Comex.
+#' @title Comex - External Trade
+#'
+#' @description Loads information on both imports and exports data. Data is available from 1997 to 2021 for most datasets. See \url{https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta}.
 #'
 #' @encoding UTF-8
 #'
-#' @param dataset A string indicating the type of data to be downloaded, chosen between "comex_export_mun" (**?**), "comex_import_mun" (**?**), "comex_export_prod" (**?**), "comex_import_prod" (**?**).
-#' @param raw_data A logical value indicating whether the data should be raw (\code{TRUE}) or treated (\code{FALSE}).
+#' @param dataset A dataset name ("comex_export_mun", "comex_import_mun", "comex_export_prod" or "comex_import_prod").
+#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
 #' @param geo_level **NOT USED IN THIS FUNCTION**.
-#' @param time_period A \code{vector} of type \code{numeric} indicating the desired years to be downloaded. Defaults to 2018 and 2019 (**WHY?**).
-#' @param language A string indicating the language to be used in variable names, chosen between "en" (english) and "pt" (portuguese). Defaults to "en".
+#' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012. Defaults to 2018 and 2019.
+#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("en") are supported. Defaults to "en".
 #' @param time_id **NOT USED IN THIS FUNCTION**.
-#' @param prod_class A string indicating the classification to be downloaded, chosen between "hs" (SH - Sistema Harmonizado), "cuci" (CUCI - Classificação Uniforme do Comércio Internacional), "isic" (ISIC - Classificação Internacional Padrão por Atividade Econômica), "cgce" (CGCE - Classificação por Grandes Categorias Econômicas). Defaults to "hs2" (**WHY?**).
+#' @param prod_class A string indicating the classification to be downloaded, chosen between "hs" (SH - Sistema Harmonizado), "cuci" (CUCI - Classificação Uniforme do Comércio Internacional), "isic" (ISIC - Classificação Internacional Padrão por Atividade Econômica), "cgce" (CGCE - Classificação por Grandes Categorias Econômicas). Defaults to "hs2".
 #'
-#' @return A tibble with the data.
+#' @return A \code{tibble} with a panel of N x T observations, consisting of imports or exports data.
 #'
 #'
 #' @examples
+#' \dontrun{
 #' # download treated exports data by municipality from 1997 to 2021
 #' exp_mun <- load_br_trade(dataset = "comex_export_mun", raw_data = FALSE, time_period = 1997:2021)
 #'
@@ -23,8 +25,8 @@
 #'
 #' # download treated imports data by municipality from 1997 to 2021 using "CUCI" classification
 #' imp_mun_cuci <- load_br_trade(dataset = "comex_import_mun", raw_data = FALSE, time_period = 1997:2021, prod_class = "cuci")
+#' }
 #'
-#' @seealso \url{https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta}
 #' @importFrom magrittr %>%
 #'
 #' @export load_br_trade
