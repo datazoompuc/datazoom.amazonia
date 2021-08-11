@@ -1,5 +1,4 @@
-sidra_download = function(sidra_code = NULL,year,geo_level = 'municipality',
-                          classific = "all", category = "all"){
+sidra_download = function(sidra_code = NULL,year,geo_level = 'municipality'){
 
   ## Bind Global Variables
 
@@ -28,8 +27,6 @@ sidra_download = function(sidra_code = NULL,year,geo_level = 'municipality',
 
   param$sidra_code = sidra_code
   param$year = year
-  param$classific = classific
-  param$category = category
 
   if (geo_level == 'country'){param$geo_reg = 'Brazil'}
   if (geo_level == 'region'){param$geo_reg = 'Region'}
@@ -64,9 +61,7 @@ sidra_download = function(sidra_code = NULL,year,geo_level = 'municipality',
     dat = suppressMessages(
       get_sidra_safe(x = param$sidra_code,
                      geo = param$geo_reg,
-                     period = as.character(param$year),
-                     classific = param$classific,
-                     category = param$category)
+                     period = as.character(param$year))
       )
 
     dat = dat$result
@@ -103,9 +98,7 @@ sidra_download = function(sidra_code = NULL,year,geo_level = 'municipality',
           get_sidra_safe(x = param$sidra_code,
                          geo = param$geo_reg,
                          period = as.character(param$year),
-                         geo.filter = list("State" = uf),
-                         classific = param$classific,
-                         category = param$category)
+                         geo.filter = list("State" = uf))
         )
 
       }
@@ -162,9 +155,7 @@ sidra_download = function(sidra_code = NULL,year,geo_level = 'municipality',
         get_sidra_safe(x = param$sidra_code,
                       geo = param$geo_reg,
                       period = as.character(param$year),
-                      geo.filter = list("MesoRegion" = meso_reg),
-                      classific = param$classific,
-                      category = param$category)
+                      geo.filter = list("MesoRegion" = meso_reg))
         )
 
       }
@@ -224,9 +215,7 @@ sidra_download = function(sidra_code = NULL,year,geo_level = 'municipality',
         get_sidra_safe(x = param$sidra_code,
                       geo = param$geo_reg,
                       period = as.character(param$year),
-                      geo.filter = list("MicroRegion" = micro_reg),
-                      classific = param$classific,
-                      category = param$category)
+                      geo.filter = list("MicroRegion" = micro_reg))
       )
     }
     )
@@ -757,15 +746,15 @@ datasets_link = function(){
 
     ## Municipal GDP ##
 
-    'PIB_MUNIC-IBGE','pib_munic',5938,'2002-2018','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/pib-munic/tabelas',
+    # https://sidra.ibge.gov.br/pesquisa/pib-munic/tabelas
 
-    ## Estimated Population ##
+    ## Population ##
 
     # https://sidra.ibge.gov.br/pesquisa/estimapop/tabelas
 
     ## Labor Market Info ##
 
-    'CEMPRE-IBGE','cempre',6449,'2006-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/cempre/tabelas',
+    # CEMPRE - https://sidra.ibge.gov.br/pesquisa/cempre/quadros/brasil/2018
 
     ## Demographic Info ##
 
