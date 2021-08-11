@@ -1,4 +1,5 @@
-sidra_download = function(sidra_code = NULL,year,geo_level = 'municipality'){
+sidra_download = function(sidra_code = NULL,year,geo_level = 'municipality',
+                          classific = "all", category = "all"){
 
   ## Bind Global Variables
 
@@ -27,6 +28,8 @@ sidra_download = function(sidra_code = NULL,year,geo_level = 'municipality'){
 
   param$sidra_code = sidra_code
   param$year = year
+  param$classific = classific
+  param$category = category
 
   if (geo_level == 'country'){param$geo_reg = 'Brazil'}
   if (geo_level == 'region'){param$geo_reg = 'Region'}
@@ -61,8 +64,10 @@ sidra_download = function(sidra_code = NULL,year,geo_level = 'municipality'){
     dat = suppressMessages(
       get_sidra_safe(x = param$sidra_code,
                      geo = param$geo_reg,
-                     period = as.character(param$year))
-      )
+                     period = as.character(param$year),
+                     classific = param$classific,
+                     category = param$category)
+    )
 
     dat = dat$result
 
@@ -92,16 +97,18 @@ sidra_download = function(sidra_code = NULL,year,geo_level = 'municipality'){
 
     dat_raw_uf = purrr::map(uf_list,function(uf){
 
-        base::message(base::cat(which(uf == uf_list),'in',length(uf_list),'states...\n'))
+      base::message(base::cat(which(uf == uf_list),'in',length(uf_list),'states...\n'))
 
-        suppressMessages(
-          get_sidra_safe(x = param$sidra_code,
-                         geo = param$geo_reg,
-                         period = as.character(param$year),
-                         geo.filter = list("State" = uf))
-        )
+      suppressMessages(
+        get_sidra_safe(x = param$sidra_code,
+                       geo = param$geo_reg,
+                       period = as.character(param$year),
+                       geo.filter = list("State" = uf),
+                       classific = param$classific,
+                       category = param$category)
+      )
 
-      }
+    }
     )
 
     dat_mod_uf = base::lapply(dat_raw_uf,"[[", 1)
@@ -121,14 +128,14 @@ sidra_download = function(sidra_code = NULL,year,geo_level = 'municipality'){
 
     if (length(missed_uf) > 0){
       base::message(base::cat('Download at the State Level Completed!',length(missed_uf),'failed.\n',
-                                                       'Attempting to Download at the MesoRegion Level...'))
+                              'Attempting to Download at the MesoRegion Level...'))
     } else if (length(missed_uf) == 0){
 
       base::message(base::cat('Download Succesfully Completed!'))
 
       return(dat_uf)
 
-      }
+    }
 
     #################
     ## Meso Region ##
@@ -136,126 +143,130 @@ sidra_download = function(sidra_code = NULL,year,geo_level = 'municipality'){
 
     if (length(missed_uf) > 0){
 
-    geo_meso = geo %>%
-      dplyr::filter(code_state %in% missed_uf)
+      geo_meso = geo %>%
+        dplyr::filter(code_state %in% missed_uf)
 
-    meso_reg_list = geo_meso %>%
-      dplyr::select(code_meso) %>%
-      unlist() %>%
-      unique() %>%
-      as.list()
+      meso_reg_list = geo_meso %>%
+        dplyr::select(code_meso) %>%
+        unlist() %>%
+        unique() %>%
+        as.list()
 
-    names(meso_reg_list) = meso_reg_list
+      names(meso_reg_list) = meso_reg_list
 
-    dat_raw_meso = purrr::map(meso_reg_list,function(meso_reg){
+      dat_raw_meso = purrr::map(meso_reg_list,function(meso_reg){
 
-      base::message(base::cat(which(meso_reg == meso_reg_list),'in',length(meso_reg_list),'meso regions...\n'))
+        base::message(base::cat(which(meso_reg == meso_reg_list),'in',length(meso_reg_list),'meso regions...\n'))
 
-      base::suppressMessages(
-        get_sidra_safe(x = param$sidra_code,
-                      geo = param$geo_reg,
-                      period = as.character(param$year),
-                      geo.filter = list("MesoRegion" = meso_reg))
+        base::suppressMessages(
+          get_sidra_safe(x = param$sidra_code,
+                         geo = param$geo_reg,
+                         period = as.character(param$year),
+                         geo.filter = list("MesoRegion" = meso_reg),
+                         classific = param$classific,
+                         category = param$category)
         )
 
       }
-    )
-
-    dat_mod_meso = base::lapply(dat_raw_meso,"[[", 1)
-
-    dat_meso = dat_mod_meso[unlist(lapply(dat_mod_meso,is.data.frame))] %>% ## Filter for only found dataframes
-      dplyr::bind_rows() %>%
-      tibble::as_tibble() %>%
-      janitor::clean_names()
-
-    dat_uf = dat_uf %>%
-      dplyr::bind_rows(dat_meso)
-
-    ###########################################
-    ## Checking for Completeness of Download ##
-    ###########################################
-
-    missed_meso = dat_mod_meso[!unlist(lapply(dat_mod_meso,is.data.frame))] %>% names()
-
-    rm(dat_mod_meso)
-
-    if (length(missed_meso) > 0){
-      base::message(base::cat('Download at the Meso Region Level Completed!',length(missed_meso),'failed.\n',
-                              'Attempting to Download at the MicroRegion Level...'))
-    } else if (length(missed_meso) == 0){
-
-      base::message(base::cat('Download Succesfully Completed!'))
-
-      return(dat_uf)
-
-    }
-
-    ##################
-    ## Micro Region ##
-    ##################
-
-    if (length(missed_meso) > 0){
-
-    geo_micro = geo %>%
-      dplyr::filter(code_meso %in% missed_meso)
-
-    micro_reg_list = geo_micro %>%
-      dplyr::select(code_micro) %>%
-      unlist() %>%
-      unique() %>%
-      as.list()
-
-    names(micro_reg_list) = micro_reg_list
-
-    dat_raw_micro = purrr::map(micro_reg_list,function(micro_reg){
-
-      base::message(base::cat(which(micro_reg == micro_reg_list),'in',length(micro_reg_list),'micro regions...\n'))
-
-      base::suppressMessages(
-        get_sidra_safe(x = param$sidra_code,
-                      geo = param$geo_reg,
-                      period = as.character(param$year),
-                      geo.filter = list("MicroRegion" = micro_reg))
       )
-    }
-    )
 
-    dat_mod_micro = base::lapply(dat_raw_micro,"[[", 1)
+      dat_mod_meso = base::lapply(dat_raw_meso,"[[", 1)
 
-    dat_micro = dat_mod_micro[unlist(lapply(dat_mod_micro,is.data.frame))] %>% ## Filter for only found dataframes
-      dplyr::bind_rows() %>%
-      tibble::as_tibble() %>%
-      janitor::clean_names()
+      dat_meso = dat_mod_meso[unlist(lapply(dat_mod_meso,is.data.frame))] %>% ## Filter for only found dataframes
+        dplyr::bind_rows() %>%
+        tibble::as_tibble() %>%
+        janitor::clean_names()
 
-    dat_uf = dat_uf %>%
-      dplyr::bind_rows(dat_micro)
+      dat_uf = dat_uf %>%
+        dplyr::bind_rows(dat_meso)
 
-    ###########################################
-    ## Checking for Completeness of Download ##
-    ###########################################
+      ###########################################
+      ## Checking for Completeness of Download ##
+      ###########################################
 
-    missed_micro = dat_mod_micro[!unlist(lapply(dat_mod_micro,is.data.frame))] %>% names()
+      missed_meso = dat_mod_meso[!unlist(lapply(dat_mod_meso,is.data.frame))] %>% names()
 
-    rm(dat_mod_micro)
+      rm(dat_mod_meso)
 
-    if (length(missed_micro) > 0){
-      base::message(base::cat(length(missed_micro),
-                              'missed API requests at the Micro Region level.
-                              Please report this problem to package developers...'))
-    }
-    if (length(missed_micro) == 0){
+      if (length(missed_meso) > 0){
+        base::message(base::cat('Download at the Meso Region Level Completed!',length(missed_meso),'failed.\n',
+                                'Attempting to Download at the MicroRegion Level...'))
+      } else if (length(missed_meso) == 0){
 
-      base::message(base::cat('Download Succesfully Completed!'))
+        base::message(base::cat('Download Succesfully Completed!'))
 
-      return(dat_uf)
+        return(dat_uf)
 
       }
 
-    } # End of if Meso
+      ##################
+      ## Micro Region ##
+      ##################
+
+      if (length(missed_meso) > 0){
+
+        geo_micro = geo %>%
+          dplyr::filter(code_meso %in% missed_meso)
+
+        micro_reg_list = geo_micro %>%
+          dplyr::select(code_micro) %>%
+          unlist() %>%
+          unique() %>%
+          as.list()
+
+        names(micro_reg_list) = micro_reg_list
+
+        dat_raw_micro = purrr::map(micro_reg_list,function(micro_reg){
+
+          base::message(base::cat(which(micro_reg == micro_reg_list),'in',length(micro_reg_list),'micro regions...\n'))
+
+          base::suppressMessages(
+            get_sidra_safe(x = param$sidra_code,
+                           geo = param$geo_reg,
+                           period = as.character(param$year),
+                           geo.filter = list("MicroRegion" = micro_reg),
+                           classific = param$classific,
+                           category = param$category)
+          )
+        }
+        )
+
+        dat_mod_micro = base::lapply(dat_raw_micro,"[[", 1)
+
+        dat_micro = dat_mod_micro[unlist(lapply(dat_mod_micro,is.data.frame))] %>% ## Filter for only found dataframes
+          dplyr::bind_rows() %>%
+          tibble::as_tibble() %>%
+          janitor::clean_names()
+
+        dat_uf = dat_uf %>%
+          dplyr::bind_rows(dat_micro)
+
+        ###########################################
+        ## Checking for Completeness of Download ##
+        ###########################################
+
+        missed_micro = dat_mod_micro[!unlist(lapply(dat_mod_micro,is.data.frame))] %>% names()
+
+        rm(dat_mod_micro)
+
+        if (length(missed_micro) > 0){
+          base::message(base::cat(length(missed_micro),
+                                  'missed API requests at the Micro Region level.
+                              Please report this problem to package developers...'))
+        }
+        if (length(missed_micro) == 0){
+
+          base::message(base::cat('Download Succesfully Completed!'))
+
+          return(dat_uf)
+
+        }
+
+      } # End of if Meso
 
     } # End of if Uf
 
-    } # End of If - Download at the Municipality Level
+  } # End of If - Download at the Municipality Level
 
 
 
@@ -304,10 +315,10 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
   ###########
 
   # 2014 Examples
-    # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm/EXP_2014.csv
-    # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncmv2/IMP_2014_V2.csv
-    # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/EXP_2014_MUN.csv
-    # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/IMP_2014_MUN.csv
+  # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm/EXP_2014.csv
+  # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncmv2/IMP_2014_V2.csv
+  # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/EXP_2014_MUN.csv
+  # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/IMP_2014_MUN.csv
 
 
   if (source == 'comex'){
@@ -402,7 +413,7 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
   #########
 
   if (source == 'ips'){
-   path = paste(param$url,'/assets/IPS_Tabela_Completa-8bb3b841e46c8fb17b0331d8ea92bef3.xlsx',sep='')
+    path = paste(param$url,'/assets/IPS_Tabela_Completa-8bb3b841e46c8fb17b0331d8ea92bef3.xlsx',sep='')
   }
 
   #######################
@@ -439,8 +450,8 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
 
   }
   # if (source == 'seeg'){
-    # if (geo_level == 'state'){download.file(url = path,destfile = temp,mode='wb')}
-    # if (geo_level == 'municipality'){file = gsheet::gsheet2tbl(path)}
+  # if (geo_level == 'state'){download.file(url = path,destfile = temp,mode='wb')}
+  # if (geo_level == 'municipality'){file = gsheet::gsheet2tbl(path)}
   #}
 
   ## This Data Opening Part Should Include the .Shp, not DBF
@@ -575,190 +586,190 @@ datasets_link = function(){
   link = tibble::tribble(~survey,~dataset,~sidra_code,~available_time,~available_geo,~link,
 
 
-  #########
-  ## PAM ##
-  #########
+                         #########
+                         ## PAM ##
+                         #########
 
-  # Agriculture
+                         # Agriculture
 
-  'PAM-IBGE','pam_all_crops',5457,'1974-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/pam/tabelas',
-  'PAM-IBGE','pam_permanent_crops',1613,'1974-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/pam/tabelas',
-  'PAM-IBGE','pam_temporary_crops',1612,'1974-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/pam/tabelas',
-  'PAM-IBGE','pam_corn',839,'2003-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/pam/tabelas',
-  'PAM-IBGE','pam_potato',1001,'2003-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/pam/tabelas',
-  'PAM-IBGE','pam_peanut',1000,'2003-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/pam/tabelas',
-  'PAM-IBGE','pam_beans',1002,'2003-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/pam/tabelas',
+                         'PAM-IBGE','pam_all_crops',5457,'1974-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/pam/tabelas',
+                         'PAM-IBGE','pam_permanent_crops',1613,'1974-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/pam/tabelas',
+                         'PAM-IBGE','pam_temporary_crops',1612,'1974-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/pam/tabelas',
+                         'PAM-IBGE','pam_corn',839,'2003-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/pam/tabelas',
+                         'PAM-IBGE','pam_potato',1001,'2003-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/pam/tabelas',
+                         'PAM-IBGE','pam_peanut',1000,'2003-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/pam/tabelas',
+                         'PAM-IBGE','pam_beans',1002,'2003-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/pam/tabelas',
 
-  #########
-  ## PPM ##
-  #########
+                         #########
+                         ## PPM ##
+                         #########
 
-  # Livestock
+                         # Livestock
 
-  'PPM-IBGE','ppm_livestock_inventory',3939,'1974-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019',
-  'PPM-IBGE','ppm_sheep_farming',95,'1974-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019',
-  'PPM-IBGE','ppm_animal_origin_production',74,'1974-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019',
-  'PPM-IBGE','ppm_cow_farming',94,'1974-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019',
-  'PPM-IBGE','ppm_aquaculture',3940,'2013-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019',
+                         'PPM-IBGE','ppm_livestock_inventory',3939,'1974-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019',
+                         'PPM-IBGE','ppm_sheep_farming',95,'1974-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019',
+                         'PPM-IBGE','ppm_animal_origin_production',74,'1974-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019',
+                         'PPM-IBGE','ppm_cow_farming',94,'1974-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019',
+                         'PPM-IBGE','ppm_aquaculture',3940,'2013-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019',
 
-   ##########
-   ## PEVS ##
-   ##########
+                         ##########
+                         ## PEVS ##
+                         ##########
 
-   ## Vegetal Extraction
+                         ## Vegetal Extraction
 
-   'PEVS-IBGE','pevs_forest_crops',289,'1986-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019',
-   'PEVS-IBGE','pevs_silviculture',291,'1986-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019',
-   'PEVS-IBGE','pevs_silviculture_area',5930,'2013-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019',
+                         'PEVS-IBGE','pevs_forest_crops',289,'1986-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019',
+                         'PEVS-IBGE','pevs_silviculture',291,'1986-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019',
+                         'PEVS-IBGE','pevs_silviculture_area',5930,'2013-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019',
 
-   ###########
-   ## COMEX ##
-   ###########
+                         ###########
+                         ## COMEX ##
+                         ###########
 
-   # https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta
+                         # https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta
 
-   'COMEX-EXP-PROD_NCM','comex_export_prod',NA,NA,NA,'https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm',
-   'COMEX-IMP-PROD_NCM','comex_import_prod',NA,NA,NA,'https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncmv2',
-   'COMEX-EXP-MUNIC_FIRM','comex_export_mun',NA,NA,NA,'https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun',
-   'COMEX-IMP-MUNIC_FIRM','comex_import_mun',NA,NA,NA,'https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun',
-
-
-   ##########
-   ## INPE ##
-   ##########
-
-   # Todos os Biomas
-
-   # We can include CAR as well
-
-   # PRODES
-
-   # http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/prodes
-   # http://www.dpi.inpe.br/prodesdigital/prodesmunicipal.php
-   # http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2020&estado=&ordem=MUNICIPIO&type=tabela&output=txt&
-
-   # Desmatamento Acumulado -http://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/vector/accumulated_deforestation_1988_2007.zip
-   # Floresta Anual - http://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/vector/forest.zip
-   # Hidrografia - http://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/vector/hydrography.zip
-   # Incremento Anual do Desmatamento - http://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/vector/yearly_deforestation.zip
-   # PRODES Completo - http://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/PDigital2000_2020_AMZ_raster_v20210521.zip
-   # Nao Floresta - http://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/vector/cloud.zip
-
-   'PRODES-INPE','prodes',NA,'2000-2020',NA,'http://www.dpi.inpe.br/prodesdigital',
-   # 'PRODES-INPE','prodes_accum_deforestation',NA,'1988-2007',NA,'http://terrabrasilis.dpi.inpe.br/download/dataset',
-   # 'PRODES-INPE','prodes_forest',NA,'2016-2019',NA,'http://terrabrasilis.dpi.inpe.br/download/dataset',
-   # 'PRODES-INPE','prodes_hydrography',NA,NA,NA,'http://terrabrasilis.dpi.inpe.br/download/dataset',
-   # 'PRODES-INPE','prodes_annual_increase_deforestation',NA,'2008-2020',NA,'http://terrabrasilis.dpi.inpe.br/download/dataset',
-   # 'PRODES-INPE','prodes_cloud',NA,'2016-2020',NA,'http://terrabrasilis.dpi.inpe.br/download/dataset',
-   # 'PRODES-INPE','prodes_not_forest',NA,NA,NA,'http://terrabrasilis.dpi.inpe.br/download/dataset',
+                         'COMEX-EXP-PROD_NCM','comex_export_prod',NA,NA,NA,'https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm',
+                         'COMEX-IMP-PROD_NCM','comex_import_prod',NA,NA,NA,'https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncmv2',
+                         'COMEX-EXP-MUNIC_FIRM','comex_export_mun',NA,NA,NA,'https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun',
+                         'COMEX-IMP-MUNIC_FIRM','comex_import_mun',NA,NA,NA,'https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun',
 
 
-   ## Auxiliares
+                         ##########
+                         ## INPE ##
+                         ##########
 
-   # Estados - http://terrabrasilis.dpi.inpe.br/download/dataset/amz-aux/vector/states_amazon_biome.zip
-   # Limite - http://terrabrasilis.dpi.inpe.br/download/dataset/amz-aux/vector/amazon_border.zip
-   # Municipio Bioma Amazonia - http://terrabrasilis.dpi.inpe.br/download/dataset/amz-aux/vector/municipalities_amazon_biome.zip
-   # Unidade Conservacao - http://terrabrasilis.dpi.inpe.br/download/dataset/amz-aux/vector/conservation_units_amazon_biome.zip
-   # Area Indigena - http://terrabrasilis.dpi.inpe.br/download/dataset/amz-aux/vector/indigeneous_area_amazon_biome.zip
+                         # Todos os Biomas
 
-   # DETER (Somente Amazônia Legal e Cerrado)
+                         # We can include CAR as well
 
-   # DEGRAD is included here http://www.inpe.br/cra/projetos_pesquisas/deter.php
+                         # PRODES
 
-   # javascript: download('http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-amz/shape','file-download-1');
-   # javascript: download('http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-cerrado/shape','file-download-2');
+                         # http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/prodes
+                         # http://www.dpi.inpe.br/prodesdigital/prodesmunicipal.php
+                         # http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2020&estado=&ordem=MUNICIPIO&type=tabela&output=txt&
 
-   'DETER-INPE','deter_amz',NA,NA,NA,'http://terrabrasilis.dpi.inpe.br/file-delivery/download/',
-   'DETER-INPE','deter_cerrado',NA,NA,NA,'http://terrabrasilis.dpi.inpe.br/file-delivery/download/',
+                         # Desmatamento Acumulado -http://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/vector/accumulated_deforestation_1988_2007.zip
+                         # Floresta Anual - http://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/vector/forest.zip
+                         # Hidrografia - http://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/vector/hydrography.zip
+                         # Incremento Anual do Desmatamento - http://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/vector/yearly_deforestation.zip
+                         # PRODES Completo - http://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/PDigital2000_2020_AMZ_raster_v20210521.zip
+                         # Nao Floresta - http://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/vector/cloud.zip
 
-   # DEGRAD
-
-   # "http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad",year,"_final_shp.zip"
-
-   'DEGRAD-INPE','degrad',NA,'2007-2016',NA,'http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad',
-
-    ###############
-    ## MapBiomas ##
-    ###############
-
-    'MAPBIOMAS','mapbiomas_cover',NA,'1985-2019','Municipality, State','https://mapbiomas-br-site.s3.amazonaws.com/',
-    'MAPBIOMAS','mapbiomas_transition',NA,'1985-2019','Municipality, State','https://mapbiomas-br-site.s3.amazonaws.com/',
-    'MAPBIOMAS','mapbiomas_deforestation_regeneration',NA,'1988-2017','State','https://mapbiomas-br-site.s3.amazonaws.com/',
-    'MAPBIOMAS','mapbiomas_irrigation',NA,'2000-2019','State','https://mapbiomas-br-site.s3.amazonaws.com/',
-    'MAPBIOMAS','mapbiomas_grazing_quality',NA,'2010 & 2018','State','https://mapbiomas-br-site.s3.amazonaws.com/',
-
-    #############
-    ## SIGMINE ##
-    #############
-
-    # Agencia Nacional de Mineracao (ANM)
-
-    'ANM-SIGMINE','sigmine_active',NA,NA,NA,'https://app.anm.gov.br/dadosabertos/',
-
-    # https://dados.gov.br/dataset/sistema-de-informacoes-geograficas-da-mineracao-sigmine
-
-    # Processos minerários ativos - Brasil
-    # https://app.anm.gov.br/dadosabertos/SIGMINE/PROCESSOS_MINERARIOS/BRASIL.zip
-    # Processos minerários inativos - Brasil
-    # https://app.anm.gov.br/dadosabertos/SIGMINE/PROCESSOS_MINERARIOS/BRASIL_INATIVOS.zip
-    # Arrendamentos
-    # https://app.anm.gov.br/dadosabertos/SIGMINE/ARRENDAMENTO.zip
-    # Áreas de proteção de fonte
-    # https://app.anm.gov.br/dadosabertos/SIGMINE/PROTECAO_FONTE.zip
-    # Áreas de bloqueio
-    # https://app.anm.gov.br/dadosabertos/SIGMINE/BLOQUEIO.zip
-    # Reservas garimpeiras
-    # https://app.anm.gov.br/dadosabertos/SIGMINE/RESERVAS_GARIMPEIRAS.zip
+                         'PRODES-INPE','prodes',NA,'2000-2020',NA,'http://www.dpi.inpe.br/prodesdigital',
+                         # 'PRODES-INPE','prodes_accum_deforestation',NA,'1988-2007',NA,'http://terrabrasilis.dpi.inpe.br/download/dataset',
+                         # 'PRODES-INPE','prodes_forest',NA,'2016-2019',NA,'http://terrabrasilis.dpi.inpe.br/download/dataset',
+                         # 'PRODES-INPE','prodes_hydrography',NA,NA,NA,'http://terrabrasilis.dpi.inpe.br/download/dataset',
+                         # 'PRODES-INPE','prodes_annual_increase_deforestation',NA,'2008-2020',NA,'http://terrabrasilis.dpi.inpe.br/download/dataset',
+                         # 'PRODES-INPE','prodes_cloud',NA,'2016-2020',NA,'http://terrabrasilis.dpi.inpe.br/download/dataset',
+                         # 'PRODES-INPE','prodes_not_forest',NA,NA,NA,'http://terrabrasilis.dpi.inpe.br/download/dataset',
 
 
-    ##########
-    ## SEEG ##
-    ##########
+                         ## Auxiliares
 
-    # 'SEEG','seeg',NA,NA,NA,NA,
+                         # Estados - http://terrabrasilis.dpi.inpe.br/download/dataset/amz-aux/vector/states_amazon_biome.zip
+                         # Limite - http://terrabrasilis.dpi.inpe.br/download/dataset/amz-aux/vector/amazon_border.zip
+                         # Municipio Bioma Amazonia - http://terrabrasilis.dpi.inpe.br/download/dataset/amz-aux/vector/municipalities_amazon_biome.zip
+                         # Unidade Conservacao - http://terrabrasilis.dpi.inpe.br/download/dataset/amz-aux/vector/conservation_units_amazon_biome.zip
+                         # Area Indigena - http://terrabrasilis.dpi.inpe.br/download/dataset/amz-aux/vector/indigeneous_area_amazon_biome.zip
 
-    # http://seeg.eco.br/download
+                         # DETER (Somente Amazônia Legal e Cerrado)
 
-    # UF - https://seeg-br.s3.amazonaws.com/2019-v7.0/download/1-SEEG8_GERAL-BR_UF_2020.11.05_-_SITE.xlsx
-    # Municipios - https://drive.google.com/drive/folders/1S789njrMQCSJdnEjiOisk6VWy7eFwBfi?usp=sharing
+                         # DEGRAD is included here http://www.inpe.br/cra/projetos_pesquisas/deter.php
 
-    #########
-    ## IPS ##
-    #########
+                         # javascript: download('http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-amz/shape','file-download-1');
+                         # javascript: download('http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-cerrado/shape','file-download-2');
 
-    #  http://www.ipsamazonia.org.br/assets/IPS_Tabela_Completa-8bb3b841e46c8fb17b0331d8ea92bef3.xlsx
+                         'DETER-INPE','deter_amz',NA,NA,NA,'http://terrabrasilis.dpi.inpe.br/file-delivery/download/',
+                         'DETER-INPE','deter_cerrado',NA,NA,NA,'http://terrabrasilis.dpi.inpe.br/file-delivery/download/',
 
-    'IPS','ips',NA,'2014 and/or 2018',NA,'http://www.ipsamazonia.org.br',
+                         # DEGRAD
 
-    ###########
-    ## IBAMA ##
-    ###########
+                         # "http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad",year,"_final_shp.zip"
 
-    # There is a lot to map, seem an incredible data source
+                         'DEGRAD-INPE','degrad',NA,'2007-2016',NA,'http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad',
 
-    # http://dadosabertos.ibama.gov.br/organization/instituto-brasileiro-do-meio-ambiente-e-dos-recursos-naturais-renovaveis
+                         ###############
+                         ## MapBiomas ##
+                         ###############
+
+                         'MAPBIOMAS','mapbiomas_cover',NA,'1985-2019','Municipality, State','https://mapbiomas-br-site.s3.amazonaws.com/',
+                         'MAPBIOMAS','mapbiomas_transition',NA,'1985-2019','Municipality, State','https://mapbiomas-br-site.s3.amazonaws.com/',
+                         'MAPBIOMAS','mapbiomas_deforestation_regeneration',NA,'1988-2017','State','https://mapbiomas-br-site.s3.amazonaws.com/',
+                         'MAPBIOMAS','mapbiomas_irrigation',NA,'2000-2019','State','https://mapbiomas-br-site.s3.amazonaws.com/',
+                         'MAPBIOMAS','mapbiomas_grazing_quality',NA,'2010 & 2018','State','https://mapbiomas-br-site.s3.amazonaws.com/',
+
+                         #############
+                         ## SIGMINE ##
+                         #############
+
+                         # Agencia Nacional de Mineracao (ANM)
+
+                         'ANM-SIGMINE','sigmine_active',NA,NA,NA,'https://app.anm.gov.br/dadosabertos/',
+
+                         # https://dados.gov.br/dataset/sistema-de-informacoes-geograficas-da-mineracao-sigmine
+
+                         # Processos minerários ativos - Brasil
+                         # https://app.anm.gov.br/dadosabertos/SIGMINE/PROCESSOS_MINERARIOS/BRASIL.zip
+                         # Processos minerários inativos - Brasil
+                         # https://app.anm.gov.br/dadosabertos/SIGMINE/PROCESSOS_MINERARIOS/BRASIL_INATIVOS.zip
+                         # Arrendamentos
+                         # https://app.anm.gov.br/dadosabertos/SIGMINE/ARRENDAMENTO.zip
+                         # Áreas de proteção de fonte
+                         # https://app.anm.gov.br/dadosabertos/SIGMINE/PROTECAO_FONTE.zip
+                         # Áreas de bloqueio
+                         # https://app.anm.gov.br/dadosabertos/SIGMINE/BLOQUEIO.zip
+                         # Reservas garimpeiras
+                         # https://app.anm.gov.br/dadosabertos/SIGMINE/RESERVAS_GARIMPEIRAS.zip
 
 
-    #################################################################
-    ## Other Economics Datasets IBGE - GDP Munic, Employment, Wage ##
-    #################################################################
+                         ##########
+                         ## SEEG ##
+                         ##########
+
+                         # 'SEEG','seeg',NA,NA,NA,NA,
+
+                         # http://seeg.eco.br/download
+
+                         # UF - https://seeg-br.s3.amazonaws.com/2019-v7.0/download/1-SEEG8_GERAL-BR_UF_2020.11.05_-_SITE.xlsx
+                         # Municipios - https://drive.google.com/drive/folders/1S789njrMQCSJdnEjiOisk6VWy7eFwBfi?usp=sharing
+
+                         #########
+                         ## IPS ##
+                         #########
+
+                         #  http://www.ipsamazonia.org.br/assets/IPS_Tabela_Completa-8bb3b841e46c8fb17b0331d8ea92bef3.xlsx
+
+                         'IPS','ips',NA,'2014 and/or 2018',NA,'http://www.ipsamazonia.org.br',
+
+                         ###########
+                         ## IBAMA ##
+                         ###########
+
+                         # There is a lot to map, seem an incredible data source
+
+                         # http://dadosabertos.ibama.gov.br/organization/instituto-brasileiro-do-meio-ambiente-e-dos-recursos-naturais-renovaveis
 
 
-    ## Municipal GDP ##
+                         #################################################################
+                         ## Other Economics Datasets IBGE - GDP Munic, Employment, Wage ##
+                         #################################################################
 
-    # https://sidra.ibge.gov.br/pesquisa/pib-munic/tabelas
 
-    ## Population ##
+                         ## Municipal GDP ##
 
-    # https://sidra.ibge.gov.br/pesquisa/estimapop/tabelas
+                         'PIB_MUNIC-IBGE','pib_munic',5938,'2002-2018','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/pib-munic/tabelas',
 
-    ## Labor Market Info ##
+                         ## Estimated Population ##
 
-    # CEMPRE - https://sidra.ibge.gov.br/pesquisa/cempre/quadros/brasil/2018
+                         # https://sidra.ibge.gov.br/pesquisa/estimapop/tabelas
 
-    ## Demographic Info ##
+                         ## Labor Market Info ##
 
-    # https://sidra.ibge.gov.br/pesquisa/censo-demografico/series-temporais/series-temporais/
+                         'CEMPRE-IBGE','cempre',6449,'2006-2019','Country, State, Municipality','https://sidra.ibge.gov.br/pesquisa/cempre/tabelas',
+
+                         ## Demographic Info ##
+
+                         # https://sidra.ibge.gov.br/pesquisa/censo-demografico/series-temporais/series-temporais/
 
 
 
