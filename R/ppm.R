@@ -1,6 +1,6 @@
 #' @title PPM - Municipal Livestock Production
 #'
-#' Loads information on animal farming inventories and livestock products (IBGE). Survey is done at the municipal level and data is available from 1974 to 2019 for most datasets. See \url{https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/17353-municipal-livestock-production.html?=&t=o-que-e}
+#' @description Loads information on animal farming inventories and livestock products (IBGE). Survey is done at the municipal level and data is available from 1974 to 2019 for most datasets. See \url{https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/17353-municipal-livestock-production.html?=&t=o-que-e}
 #'
 #' @param dataset A dataset name (\code{ppm_livetock_inventory}, \code{ppm_sheep_farming}, \code{ppm_animal_orig_production}, \code{ppm_cow_farming} or \code{ppm_aquaculture}. You can also use SIDRA codes (see \url{https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019})
 #'

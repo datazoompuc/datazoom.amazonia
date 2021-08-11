@@ -1,3 +1,31 @@
+#' @title Degrad - Forest Degradation in the Brazilian Amazon
+#'
+#' @description Loads information on forest degradation in the Brazilian Amazon, replaced by DETER-B in December 2016. Data is available from 2007 to 2016. See \url{http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad}.
+#'
+#' @encoding UTF-8
+#'
+#' @param dataset A dataset name ("degrad").
+#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
+#' @param geo_level **NOT USED IN THIS FUNCTION**.
+#' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012. Defaults to 2010 and 2012.
+#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("en") are supported. Defaults to "en".
+#' @param time_id **NOT USED IN THIS FUNCTION**.
+#'
+#' @return A \code{tibble} with a panel of N x T observations by municipality-year (or municipality-month, when available).
+#'
+#'
+#' @examples
+#' \dontrun{
+#' # download treated data from 2007 to 2016
+#' degrad_all <- load_degrad(dataset = "degrad", raw_data = FALSE, time_period = 2007:2016)
+#'
+#' # download raw data from 2007 to 2016
+#' raw_degrad_all <- load_degrad(dataset = "degrad", raw_data = TRUE, time_period = 2007:2016)
+#' }
+#'
+#' @importFrom magrittr %>%
+#'
+#' @export load_degrad
 
 load_degrad <- function(dataset = 'degrad',raw_data=NULL, geo_level=NULL,time_period=2010:2012,
                         language='eng',time_id='year') {
