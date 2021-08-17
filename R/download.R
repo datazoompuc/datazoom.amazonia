@@ -400,13 +400,13 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
   ## SEEG ##
   ##########
 
-  # if (source == 'seeg'){
-  #   if (geo_level == 'municipality'){
-  #     path = 'https://drive.google.com/u/0/uc?export=download&confirm=yN8g&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd'}
-  #   if (geo_level == 'state'){
-  #     path = 'https://seeg-br.s3.amazonaws.com/2019-v7.0/download/1-SEEG8_GERAL-BR_UF_2020.11.05_-_SITE.xlsx'
-  #   }
-  # }
+  if (source == 'seeg'){
+    if (geo_level == 'municipality'){
+      path = 'https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd'}
+    if (geo_level == 'state' | geo_level == 'country'){
+      path = 'https://seeg-br.s3.amazonaws.com/2019-v7.0/download/1-SEEG8_GERAL-BR_UF_2020.11.05_-_SITE.xlsx'
+    }
+  }
 
   #########
   ## IPS ##
@@ -427,9 +427,7 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
   if (source == 'ips'){file_extension = '.xlsx'}
   if (source == 'prodes'){file_extension = '.txt'}
   if (source == 'deter'){file_extension = '.zip'}
-  # if (source == 'seeg' & geo_level == 'municipality'){
-  #   file_extension = NA
-  # }
+  if (source == 'seeg'){file_extension = '.xlsx'}
 
   # !!!  We should Change This to a Curl Process
 
@@ -449,10 +447,10 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
     RCurl::close(proc)
 
   }
-  # if (source == 'seeg'){
-  # if (geo_level == 'state'){download.file(url = path,destfile = temp,mode='wb')}
-  # if (geo_level == 'municipality'){file = gsheet::gsheet2tbl(path)}
-  #}
+  if (source == 'seeg'){
+    if (geo_level == 'state' | geo_level == 'country'){download.file(url = path, destfile = temp, mode = 'wb')}
+    if (geo_level == 'municipality'){googledrive::drive_download(path, path = temp, overwrite = TRUE)}
+  }
 
   ## This Data Opening Part Should Include the .Shp, not DBF
 
@@ -479,6 +477,12 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
     if (param$dataset == 'mapbiomas_deforestation_regeneration'){dat = readxl::read_excel(temp,sheet='BD Colecao 5.0(h) - Hectares')}
     if (param$dataset == 'mapbiomas_irrigation'){dat = readxl::read_excel(temp,sheet='BD_IRRIGACAO')}
     if (param$dataset == 'mapbiomas_grazing_quality'){dat = readxl::read_excel(temp,sheet='BD_Qualidade')}
+
+    if (param$source == "seeg") {
+      if (geo_level == 'country'){dat <- readxl::read_excel(temp, sheet = "GEE Brasil")}
+      if (geo_level == 'state'){dat <- readxl::read_excel(temp, sheet = "GEE Estados")}
+      if (geo_level == 'municipality'){dat <- readxl::read_excel(temp, sheet = "BD GEE Municipios GWP-AR5")}
+    }
 
     dat = dat %>%
       janitor::clean_names() %>%
@@ -726,7 +730,7 @@ datasets_link = function(){
    ## SEEG ##
    ##########
 
-   # 'SEEG','seeg',NA,NA,NA,NA,
+   'SEEG','seeg',NA,NA,'Country, State, Municipality','http://seeg.eco.br/download',
 
    # http://seeg.eco.br/download
 
