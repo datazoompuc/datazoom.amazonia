@@ -34,7 +34,7 @@ Loads information on companies and other organizations and their respective form
 # download treated data from 2006 to 2019
 cempre_all <- load_cempre(dataset = "cempre", raw_data = FALSE, time_period = 2006:2019)
 
-# download raw data from 2006 to 2019
+# download raw data from 2007 to 2016
 raw_cempre_all <- load_cempre(dataset = "cempre", raw_data = TRUE, time_period = 2006:2019)
 }
 
