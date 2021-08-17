@@ -1,3 +1,32 @@
+#' @title CEMPRE - Central Register of Companies
+#'
+#'
+#' @description Loads information on companies and other organizations and their respective formally constituted local units, registered with the CNPJ - National Register of Legal Entities. Data is available from 2006 to 2019. See \url {https://sidra.ibge.gov.br/pesquisa/cempre/tabelas}
+#'
+#'  @encoding UTF-8
+#'
+#'   @param dataset A dataset name ("cempre").
+#'   @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
+#'   @param geo_level A \code{string} that defines the geographic level of the data. Defaults to national level, but can be one of "country", "state" or "municipality". See documentation of \code{sidrar}.
+#'   @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
+#'   @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("en") are supported. Defaults to "en".
+#'   @param legal_amazon_only A \code{boolean} setting the return of Legal Amazon Data (\code{TRUE}) or Country's Data (\code{FALSE})
+#'
+#'   @return A \code{tibble} with a panel of N x T observations by municipality-year
+#'
+#'
+#' @examples
+#' \dontrun{
+#' # download treated data from 2006 to 2019
+#' cempre_all <- load_cempre(dataset = "cempre", raw_data = FALSE, time_period = 2006:2019)
+#'
+#' # download raw data from 2007 to 2016
+#' raw_cempre_all <- load_cempre(dataset = "cempre", raw_data = TRUE, time_period = 2006:2019)
+#' }
+#'
+#' @importFrom magrittr %>%
+#'  @export load_cempre
+
 load_cempre <- function(dataset = "cempre", raw_data = FALSE,
                         geo_level = "municipality",
                         time_period = 2017:2018,
