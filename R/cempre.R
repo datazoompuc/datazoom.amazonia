@@ -10,6 +10,7 @@
 #'   @param geo_level A \code{string} that defines the geographic level of the data. Defaults to national level, but can be one of "country", "state" or "municipality". See documentation of \code{sidrar}.
 #'   @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
 #'   @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("en") are supported. Defaults to "en".
+#'   @param sectors A \code{boolean} that defines if the data will be return separated by sectors (\code{TRUE}) or not (\code{FALSE})
 #'   @param legal_amazon_only A \code{boolean} setting the return of Legal Amazon Data (\code{TRUE}) or Country's Data (\code{FALSE})
 #'
 #'   @return A \code{tibble} with a panel of N x T observations by municipality-year
