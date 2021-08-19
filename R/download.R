@@ -416,6 +416,15 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
     path = paste(param$url,'/assets/IPS_Tabela_Completa-8bb3b841e46c8fb17b0331d8ea92bef3.xlsx',sep='')
   }
 
+  ###########
+  ## IBAMA ##
+  ###########
+
+  if (source == 'ibama'){
+    if (dataset == 'areas_embargadas'){path = param$url}
+  }
+
+
   #######################
   ## Initiate Download ##
   #######################
@@ -428,6 +437,7 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
   if (source == 'prodes'){file_extension = '.txt'}
   if (source == 'deter'){file_extension = '.zip'}
   if (source == 'seeg'){file_extension = '.xlsx'}
+  if (source == 'ibama'){file_extension = '.zip'}
 
   # !!!  We should Change This to a Curl Process
 
@@ -549,6 +559,28 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
     if (param$source == 'sigmine'){
 
       dat = sf::read_sf(paste(dir,'BRASIL.shp',sep='\\'))
+
+    }
+
+    if (param$source == 'ibama'){
+
+      # get latest downloaded file (the name changes daily)
+      file <- file.info(list.files(dir, pattern = "rel_areas_embargadas_.*.xls")) %>%
+        .[with(., order(as.POSIXct(mtime))), ] %>%
+        rownames(.)
+
+      doc <- XML::htmlParse(file.path(dir, file), encoding = "UTF-8")
+
+      tableNode <- XML::getNodeSet(doc, "//table")
+
+      dataset <- XML::readHTMLTable(tableNode[[1]])
+
+
+      colnames(dataset) <- dataset[6, ]
+
+      dat <- dataset[-c(1:6), ] %>%
+        janitor::clean_names() %>%
+        tibble::as_tibble()
 
     }
   }
@@ -751,6 +783,7 @@ datasets_link = function(){
 
    # There is a lot to map, seem an incredible data source
 
+   'AREAS_EMBARGADAS-IBAMA','areas_embargadas',NA,NA,'Municipality','https://servicos.ibama.gov.br/ctf/publico/areasembargadas/downloadListaAreasEmbargadas.php',
    # http://dadosabertos.ibama.gov.br/organization/instituto-brasileiro-do-meio-ambiente-e-dos-recursos-naturais-renovaveis
 
 
