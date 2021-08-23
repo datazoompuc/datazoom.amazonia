@@ -1,3 +1,30 @@
+#' @title DETER - Forest Degradation in the Brazilian Amazon
+#'
+#' Loads information on change in forest cover in the Amazon. Survey is done at state or municipal level. See \url{http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter}
+#'
+#' @param dataset A dataset name (\code{deter_amz}, \code{deter_cerrado} with information about both Amazon and Cerrado
+#'
+#' @param raw_data A \code{boolean} setting the return of raw or processed data
+#'
+#' @param geo_level A \code{string} that defines the geographic level of the data. Can be municipality or state.
+#'
+#' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Default is all time-periods
+#'
+#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese and English are supported.
+#'
+#' @param time_id  A \code{numeric} that defines whether data will be aggregated by month or year.
+#'
+#' @return A \code{tibble} with a panel of N x T observations
+#'
+#' @encoding UTF-8
+#'
+#' @export load_deter
+#'
+#' @importFrom magrittr %>%
+#'
+#' @examples \dontrun{datazoom.amazonia::load_deter(dataset = 'deter_amz', 'municipality', all, language = "pt", time_id = "month)}
+
+
 load_deter <- function(dataset = NULL,raw_data=NULL,geo_level = 'municipality',
                        time_period='all',language = 'eng',time_id = 'year') {
 
