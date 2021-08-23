@@ -1,3 +1,17 @@
+#' @title IPS - Amazon Social Progress Index
+#'
+#' Loads information on the social and environmental performance of the Legal Amazon. Survey is done at the municipal level and data is available in 2014 and 2018. See \url{http://www.ipsamazonia.org.br/}
+#'
+#' @param dataset A dataset name(\code{ips})
+#'
+#'  @param raw_data A \code{boolean} setting the return of raw or processed data
+#'
+#'  @param geo_level A \code{string} that defines the geographic level of the data. In this case is municipality
+#'
+#'  @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY.
+#'
+#'  @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese and English are supported.
+
 load_ips = function(dataset = NULL,raw_data=NULL,geo_level = 'municipality',
                           time_period=c(2014,2018),language = 'eng'){
 
