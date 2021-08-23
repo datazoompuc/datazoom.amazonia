@@ -11,6 +11,17 @@
 #'  @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY.
 #'
 #'  @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese and English are supported.
+#'
+#'  @encoding UTF-8
+#'
+#'  @return A \code{tibble} with a panel of N x T observations
+#'
+#'  @importFrom magrittr %>%
+#'
+#'  @export load_ips
+#'
+#'  @examples \dontrun{datazoom.amazonia::load_ips(dataset = 'ips', 'municipality', 2014, language = "pt")}
+
 
 load_ips = function(dataset = NULL,raw_data=NULL,geo_level = 'municipality',
                           time_period=c(2014,2018),language = 'eng'){
