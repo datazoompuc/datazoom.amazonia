@@ -1,25 +1,31 @@
 #' @title SIGMINE - Mining Geographic Information System
 #'
-#' Loads information the mines being explored legally in Brazil, including their location, status, product being mined and area in square meters etc. Survey is done at municipal and state level
+#' @description Loads information the mines being explored legally in Brazil, including their location, status, product being mined and area in square meters etc. Survey is done at municipal and state level
 #'
-#'  @param dataset A dataset name \code {sigmine_active}
-#'
-#'  @param raw_data A \code{boolean} setting the return of raw or processed data
-#'
-#'  @param geo_level A \code{string} that defines the geographic level of the data. In this case, could be municipality or state
-#'
-#'  @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese and English are supported.
+#' @param dataset A dataset name ("sigmine_active")
+#' @param raw_data A \code{boolean} setting the return of raw or processed data
+#' @param geo_level A \code{string} that defines the geographic level of the data. In this case, could be "municipality" or "state".
+#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese and English are supported.
 #'
 #' @encoding UTF-8
 #'
-#' @export load_sigmine
-#'
+#' @export
 #' @importFrom magrittr %>%
 #'
-#' @examples \dontrun{datazoom.amazonia::load_sigmine(dataset = 'sigmine_active', raw_data = FALSE, 'state', language = "pt")}
+#' @examples \dontrun{
+#' sigmine_active <- load_sigmine(dataset = 'sigmine_active',
+#'                               raw_data = FALSE,
+#'                               geo_level = 'state')
+#' }
 
 
-load_sigmine = function(dataset = 'sigmine_active', raw_data=NULL, geo_level=NULL,language='eng'){
+load_sigmine = function(dataset = 'sigmine_active',
+                        raw_data = NULL,
+                        geo_level = NULL,
+                        language = 'eng'){
+
+
+  survey <- link <- NULL
 
   #############################
   ## Define Basic Parameters ##

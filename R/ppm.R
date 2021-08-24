@@ -20,7 +20,11 @@
 #'
 #' @export load_ppm
 #'
-#' @examples \dontrun{datazoom.amazonia::load_ppm(dataset = 'ppm_animal_origin_production', 'state', 2012, language = "pt")}
+#' @examples \dontrun{
+#' ppm_aop <- load_ppm(dataset = 'ppm_animal_origin_production',
+#'                     geo_level = 'state',
+#'                     time_period = 2012)
+#' }
 
 load_ppm = function(dataset=NULL,raw_data = FALSE,geo_level = "municipality",time_period=2019,language = 'pt'){
 
@@ -52,6 +56,7 @@ load_ppm = function(dataset=NULL,raw_data = FALSE,geo_level = "municipality",tim
   tipo_de_produto_de_origem_animal<- NULL
   tipo_de_produto_da_aquicultura<- NULL
   tipo_de_produto_de_origem_animal_codigo <- NULL
+  available_time <- tipo_de_rebanho_codigo <- tipo_de_produto_da_aquicultura_codigo <- vars <- NULL
 
   # Adjust Code Based on State Level Information
   # Check if any observation geo-time at the final data have multiple NA entries -- this would mean the data is "wrong"

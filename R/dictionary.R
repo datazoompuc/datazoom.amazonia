@@ -171,7 +171,7 @@ load_dictionary = function(dataset){
 
       2682,'Leite', 'Milk','1L BRL','1K Liters',NA,
       2683,'Casulos do bicho-da-seda', 'Silkworm cocoons','1K BRL','Kg',NA,
-      2684,'Lã','Wool','1L BRL','Kg',NA,
+      2684,'La','Wool','1L BRL','Kg',NA,
       2685,'Ovos de galinha', 'Chicken eggs','1K BRL','1K Dozens',NA,
       2686,'Ovos de codorna', 'Quail eggs','1K BRL','1K Dozens',NA,
       2687,'Mel de abelha', 'Bee Honey','1K BRL','Kg',NA,

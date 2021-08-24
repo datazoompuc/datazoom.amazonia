@@ -1,34 +1,36 @@
 #' @title IPS - Amazon Social Progress Index
 #'
-#' Loads information on the social and environmental performance of the Legal Amazon. Survey is done at the municipal level and data is available in 2014 and 2018. See \url{http://www.ipsamazonia.org.br/}
+#' @description Loads information on the social and environmental performance of the Legal Amazon. Survey is done at the municipal level and data is available in 2014 and 2018. See \url{http://www.ipsamazonia.org.br/}
 #'
-#' @param dataset A dataset name(\code{ips})
+#' @param dataset A dataset name ("ips")
+#' @param raw_data A \code{boolean} setting the return of raw or processed data
+#' @param geo_level A \code{string} that defines the geographic level of the data. In this case is municipality
+#' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY.
+#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese and English are supported.
 #'
-#'  @param raw_data A \code{boolean} setting the return of raw or processed data
+#' @return A \code{tibble} with a panel of N x T observations
 #'
-#'  @param geo_level A \code{string} that defines the geographic level of the data. In this case is municipality
+#' @encoding UTF-8
 #'
-#'  @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY.
+#' @importFrom magrittr %>%
 #'
-#'  @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese and English are supported.
+#' @export
 #'
-#'  @encoding UTF-8
-#'
-#'  @return A \code{tibble} with a panel of N x T observations
-#'
-#'  @importFrom magrittr %>%
-#'
-#'  @export load_ips
-#'
-#'  @examples \dontrun{datazoom.amazonia::load_ips(dataset = 'ips', 'municipality', 2014, language = "pt")}
+#' @examples \dontrun{
+#' ips <- load_ips(dataset = 'ips', raw_data = TRUE,
+#'                 geo_level = 'municipality',
+#'                 time_period = 2014)
+#' }
 
 
-load_ips = function(dataset = NULL,raw_data=NULL,geo_level = 'municipality',
-                          time_period=c(2014,2018),language = 'eng'){
+load_ips = function(dataset = NULL, raw_data = NULL,
+                    geo_level, time_period, language = 'eng'){
 
   ###########################
   ## Bind Global Variables ##
   ###########################
+  survey <- link <- NULL
+
 
   #############################
   ## Define Basic Parameters ##

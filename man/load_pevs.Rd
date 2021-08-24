@@ -35,7 +35,12 @@ PEVS - Forestry Activities
 Loads information on the amount and value of the production of the exploitation of native plant resources and planted forest massifs, as well as existing total and harvested areas of forest crops. Survey is done at the municipal level and data is available from 1986 to 2019. See \url{https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/18374-forestry-activities.html?=&t=o-que-e}
 }
 \examples{
-\dontrun{datazoom.amazonia::load_pevs(dataset = 'pevs_silviculture', 'state', 2012, language = "pt")}
+\dontrun{
+pevs_silvi <- load_pevs(dataset = 'pevs_silviculture',
+                        raw_data = TRUE,
+                        geo_level = 'state',
+                        time_period = 2012)
+}
 }
 \author{
 DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro.

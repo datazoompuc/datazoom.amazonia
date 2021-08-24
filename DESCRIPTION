@@ -2,8 +2,9 @@ Package: datazoom.amazonia
 Title: Simplify access to data from the Amazon Region
 Version: 0.12.0.9000
 Authors@R: c(
-    person("Francisco", "de Lima Cavalcanti", role = c("aut"), email = "francisco.lima.cavalcanti@gmail.com"),
-    person("Daniel", "AC Barbosa", role = c("aut","cre"), email = "daniel.adrianocb@gmail.com.com"),
+    person("Francisco", "de Lima Cavalcanti", role = c("aut","cre"), email = "francisco.lima.cavalcanti@gmail.com"),
+    person("Guilherme", "Jardim", role = c("aut"), email = "gnjardim1@gmail.com"),
+    person("Daniel", "AC Barbosa", role = c("aut"), email = "daniel.adrianocb@gmail.com"),
     person("Bruno", "Alcantara Duarte", role = c("aut"), email = "brunoalcanduarte@gmail.com"),
     person("Victor", "Aliende da Matta", role = c("aut"), email = "victor.al.matta@gmail.com"),
     person("Arthur", "Carvalho Brito", role = c("aut"), email = "arthurcbps@gmail.com"),
@@ -16,7 +17,6 @@ Description: This package offers functions to download and treat data regarding
              the Brazilian Amazon region from a variety of official sources.
 License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Imports:
@@ -45,12 +45,12 @@ Imports:
     gsheet,
     RCurl,
     tidyselect,
-    Hmisc
+    Hmisc,
+    googledrive
 URL: http://www.econ.puc-rio.br/datazoom
 Suggests: 
     knitr,
     rmarkdown,
-    lwgeom,
     ggplot2
 VignetteBuilder: knitr
 Depends: 

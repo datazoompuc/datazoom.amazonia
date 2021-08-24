@@ -31,7 +31,11 @@ A \code{tibble} with a panel of N x T observations, consisting of geographic uni
 Loads information on animal farming inventories and livestock products (IBGE). Survey is done at the municipal level and data is available from 1974 to 2019 for most datasets. See \url{https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/17353-municipal-livestock-production.html?=&t=o-que-e}
 }
 \examples{
-\dontrun{datazoom.amazonia::load_ppm(dataset = 'ppm_animal_origin_production', 'state', 2012, language = "pt")}
+\dontrun{
+ppm_aop <- load_ppm(dataset = 'ppm_animal_origin_production',
+                    geo_level = 'state',
+                    time_period = 2012)
+}
 }
 \author{
 DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro.

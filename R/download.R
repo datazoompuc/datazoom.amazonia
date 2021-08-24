@@ -449,7 +449,7 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
   ## Extraction through Curl Requests
   ## Investigate a bit more on how Curl Requests work
 
-  if (!(source %in% c('deter','seeg'))){download.file(url = path,destfile = temp,mode='wb')}
+  if (!(source %in% c('deter','seeg'))){utils::download.file(url = path,destfile = temp,mode='wb')}
   if (source == 'deter'){
 
     proc = RCurl::CFILE(temp, mode = "wb")
@@ -458,7 +458,7 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
 
   }
   if (source == 'seeg'){
-    if (geo_level == 'state' | geo_level == 'country'){download.file(url = path, destfile = temp, mode = 'wb')}
+    if (geo_level == 'state' | geo_level == 'country'){utils::download.file(url = path, destfile = temp, mode = 'wb')}
     if (geo_level == 'municipality'){googledrive::drive_download(path, path = temp, overwrite = TRUE)}
   }
 
@@ -565,9 +565,9 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
     if (param$source == 'ibama'){
 
       # get latest downloaded file (the name changes daily)
-      file <- file.info(list.files(dir, pattern = "rel_areas_embargadas_.*.xls")) %>%
-        .[with(., order(as.POSIXct(mtime))), ] %>%
-        rownames(.)
+      file <- file.info(list.files(dir, pattern = "rel_areas_embargadas_.*.xls"))
+      file <- file[with(file, order(as.POSIXct(mtime))), ]
+      file <- rownames(file)
 
       doc <- XML::htmlParse(file.path(dir, file), encoding = "UTF-8")
 

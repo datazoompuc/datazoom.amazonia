@@ -5,27 +5,16 @@
 \alias{load_degrad}
 \title{Degrad - Forest Degradation in the Brazilian Amazon}
 \usage{
-load_degrad(
-  dataset = "degrad",
-  raw_data = NULL,
-  geo_level = NULL,
-  time_period = 2010:2012,
-  language = "eng",
-  time_id = "year"
-)
+load_degrad(dataset = "degrad", raw_data, time_period, language = "eng")
 }
 \arguments{
 \item{dataset}{A dataset name ("degrad").}
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
-\item{geo_level}{\strong{NOT USED IN THIS FUNCTION}.}
+\item{time_period}{A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.}
 
-\item{time_period}{A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012. Defaults to 2010 and 2012.}
-
-\item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("en") are supported. Defaults to "en".}
-
-\item{time_id}{\strong{NOT USED IN THIS FUNCTION}.}
+\item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".}
 }
 \value{
 A \code{tibble} with a panel of N x T observations by municipality-year (or municipality-month, when available).
@@ -36,10 +25,14 @@ Loads information on forest degradation in the Brazilian Amazon, replaced by DET
 \examples{
 \dontrun{
 # download treated data from 2007 to 2016
-degrad_all <- load_degrad(dataset = "degrad", raw_data = FALSE, time_period = 2007:2016)
+degrad_all <- load_degrad(dataset = "degrad",
+                          raw_data = FALSE,
+                          time_period = 2007:2016)
 
 # download raw data from 2007 to 2016
-raw_degrad_all <- load_degrad(dataset = "degrad", raw_data = TRUE, time_period = 2007:2016)
+raw_degrad_all <- load_degrad(dataset = "degrad",
+                              raw_data = TRUE,
+                              time_period = 2007:2016)
 }
 
 }

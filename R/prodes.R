@@ -35,6 +35,7 @@ load_prodes <- function(dataset=NULL,raw_data = NULL,geo_level = "municipality",
   ###########################
   ## Bind Global Variables ##
   ###########################
+  survey <- link <- NULL
 
   #############################
   ## Define Basic Parameters ##

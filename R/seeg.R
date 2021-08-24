@@ -2,6 +2,10 @@
 #'
 #' @description Loads data of estimates of emission of greenhouse gases of Brazilian cities
 #'
+#' @param dataset A dataset name ("seeg").
+#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
+#' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state" or "municipality". See documentation of \code{sidrar}.
+#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
 #'
 #' @author DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro
 #'
@@ -12,9 +16,11 @@
 #' @examples \dontrun{datazoom.amazonia::load_seeg()}
 #'
 
-load_seeg <- function(dataset = "seeg", raw_data = FALSE,
-                      geo_level = "municipality",
-                      language = "eng"){
+load_seeg <- function(dataset = "seeg", raw_data = TRUE,
+                      geo_level, language = "eng"){
+
+
+  survey <- link <- NULL
 
   #############################
   ## Define Basic Parameters ##

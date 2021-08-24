@@ -10,6 +10,10 @@ load_mapbiomas = function(dataset = NULL,raw_data=NULL,geo_level = 'municipality
   ###########################
   ## Bind Global Variables ##
   ###########################
+  survey <- link <- x1985 <- x2019 <- NULL
+  territory_id <- municipality <- state <- year <- value <- NULL
+  x1985_to_1986 <- x2018_to_2019 <- x1988 <- x2017 <- x2000 <- x2010 <- x2018 <- biome <- level_1 <- NULL
+
 
   #############################
   ## Define Basic Parameters ##

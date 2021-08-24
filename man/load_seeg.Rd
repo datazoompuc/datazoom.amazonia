@@ -5,12 +5,16 @@
 \alias{load_seeg}
 \title{Greenhouse gases emission estimates (SEEG)}
 \usage{
-load_seeg(
-  dataset = "seeg",
-  raw_data = FALSE,
-  geo_level = "municipality",
-  language = "eng"
-)
+load_seeg(dataset = "seeg", raw_data = TRUE, geo_level, language = "eng")
+}
+\arguments{
+\item{dataset}{A dataset name ("seeg").}
+
+\item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
+
+\item{geo_level}{A \code{string} that defines the geographic level of the data. Can be one of "country", "state" or "municipality". See documentation of \code{sidrar}.}
+
+\item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".}
 }
 \description{
 Loads data of estimates of emission of greenhouse gases of Brazilian cities

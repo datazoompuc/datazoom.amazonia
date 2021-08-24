@@ -20,7 +20,12 @@
 #'
 #' @export load_pevs
 #'
-#' @examples \dontrun{datazoom.amazonia::load_pevs(dataset = 'pevs_silviculture', 'state', 2012, language = "pt")}
+#' @examples \dontrun{
+#' pevs_silvi <- load_pevs(dataset = 'pevs_silviculture',
+#'                         raw_data = TRUE,
+#'                         geo_level = 'state',
+#'                         time_period = 2012)
+#' }
 
 load_pevs <- function(dataset = NULL, raw_data = FALSE, geo_level = "municipality", time_period = 2018:2019, language = "pt"){
 
@@ -56,6 +61,7 @@ load_pevs <- function(dataset = NULL, raw_data = FALSE, geo_level = "municipalit
   variavel <- NULL
   tipo_de_produto <- NULL
   tipo_de_produto_extrativo <- NULL
+  available_time <- vars <- NULL
 
   #############################
   ## Define Basic Parameters ##

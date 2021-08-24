@@ -1,32 +1,32 @@
 #' @title DETER - Forest Degradation in the Brazilian Amazon
 #'
-#' Loads information on change in forest cover in the Amazon. Survey is done at state or municipal level. See \url{http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter}
+#' @description Loads information on change in forest cover in the Amazon. Survey is done at state or municipal level. See \url{http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter}
 #'
-#' @param dataset A dataset name (\code{deter_amz}, \code{deter_cerrado} with information about both Amazon and Cerrado
-#'
-#' @param raw_data A \code{boolean} setting the return of raw or processed data
-#'
-#' @param geo_level A \code{string} that defines the geographic level of the data. Can be municipality or state.
-#'
-#' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Default is all time-periods
-#'
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese and English are supported.
-#'
-#' @param time_id  A \code{numeric} that defines whether data will be aggregated by month or year.
+#' @param dataset A dataset name ("deter_amz", "deter_cerrado") with information about both Amazon and Cerrado
+#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
+#' @param geo_level A \code{string} that defines the geographic level of the data. Can be "municipality" or "state".
+#' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
+#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
 #'
 #' @return A \code{tibble} with a panel of N x T observations
 #'
 #' @encoding UTF-8
 #'
-#' @export load_deter
-#'
+#' @export
 #' @importFrom magrittr %>%
 #'
-#' @examples \dontrun{datazoom.amazonia::load_deter(dataset = 'deter_amz', 'municipality', all, language = "pt", time_id = "month)}
+#' @examples
+#' \dontrun{
+#' deter_amz <- load_deter(dataset = 'deter_amz',
+#'                         raw_data = TRUE,
+#'                         geo_level = 'municipality',
+#'                         time_period = "all")
+#' }
 
 
-load_deter <- function(dataset = NULL,raw_data=NULL,geo_level = 'municipality',
-                       time_period='all',language = 'eng',time_id = 'year') {
+load_deter <- function(dataset = NULL, raw_data,
+                       geo_level, time_period,
+                       language = 'eng') {
 
   ## Dataset can be either Amazonia or Cerrado
   # Default is all time-periods
@@ -54,6 +54,7 @@ load_deter <- function(dataset = NULL,raw_data=NULL,geo_level = 'municipality',
   code_state <- NULL
   area_uc_km <- NULL
   area_geo_km <- NULL
+  survey <- link <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -64,7 +65,6 @@ load_deter <- function(dataset = NULL,raw_data=NULL,geo_level = 'municipality',
   param$geo_level = geo_level
   param$time_period = time_period
   param$language = language
-  param$time_id = time_id
   param$raw_data = raw_data
 
   param$survey_name = datasets_link() %>%

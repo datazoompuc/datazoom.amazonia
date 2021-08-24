@@ -6,10 +6,8 @@
 #'
 #' @param dataset A dataset name ("degrad").
 #' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
-#' @param geo_level **NOT USED IN THIS FUNCTION**.
-#' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012. Defaults to 2010 and 2012.
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("en") are supported. Defaults to "en".
-#' @param time_id **NOT USED IN THIS FUNCTION**.
+#' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
+#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
 #'
 #' @return A \code{tibble} with a panel of N x T observations by municipality-year (or municipality-month, when available).
 #'
@@ -17,18 +15,22 @@
 #' @examples
 #' \dontrun{
 #' # download treated data from 2007 to 2016
-#' degrad_all <- load_degrad(dataset = "degrad", raw_data = FALSE, time_period = 2007:2016)
+#' degrad_all <- load_degrad(dataset = "degrad",
+#'                           raw_data = FALSE,
+#'                           time_period = 2007:2016)
 #'
 #' # download raw data from 2007 to 2016
-#' raw_degrad_all <- load_degrad(dataset = "degrad", raw_data = TRUE, time_period = 2007:2016)
+#' raw_degrad_all <- load_degrad(dataset = "degrad",
+#'                               raw_data = TRUE,
+#'                               time_period = 2007:2016)
 #' }
 #'
 #' @importFrom magrittr %>%
-#'
-#' @export load_degrad
+#' @export
 
-load_degrad <- function(dataset = 'degrad',raw_data=NULL, geo_level=NULL,time_period=2010:2012,
-                        language='eng',time_id='year') {
+load_degrad <- function(dataset = 'degrad', raw_data,
+                        time_period,
+                        language = 'eng') {
 
   # ,all_events = FALSE
 
@@ -36,7 +38,7 @@ load_degrad <- function(dataset = 'degrad',raw_data=NULL, geo_level=NULL,time_pe
     # Include Safety Download and Message if any Error Occurs
     # Harmonize Columns Names, Create Panel and Deliver Raw Data
 
-
+  survey <- link <- NULL
   geo_amazon = NULL
 
   #############################
@@ -45,10 +47,8 @@ load_degrad <- function(dataset = 'degrad',raw_data=NULL, geo_level=NULL,time_pe
 
   param=list()
   param$dataset = dataset
-  param$geo_level = geo_level
   param$time_period = time_period
   param$language = language
-  param$time_id = time_id
   param$raw_data = raw_data
 
   param$survey_name = datasets_link() %>%
@@ -92,8 +92,7 @@ load_degrad <- function(dataset = 'degrad',raw_data=NULL, geo_level=NULL,time_pe
   dat = as.list(param$time_period) %>%
       purrr::map(
         function(t){external_download(dataset = param$dataset,
-                                      source='degrad',year = t,
-                                      geo_level = param$geo_level) %>%
+                                      source='degrad', year = t) %>%
             janitor::clean_names()
         }
       )

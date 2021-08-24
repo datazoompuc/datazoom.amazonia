@@ -46,7 +46,7 @@ load_pam = function(dataset=NULL,raw_data=FALSE,geo_level = "municipality", time
   produto_das_lavouras_temporarias_codigo <- NULL
   produto_das_lavouras_temporarias <- NULL
   geo_id <- ano <- variavel <- produto_das_lavouras <- NULL
-  unidade_de_medida <- NULL
+  unidade_de_medida <- available_time <- vars <- NULL
   produto_das_lavouras_codigo <- NULL
 
   #############################

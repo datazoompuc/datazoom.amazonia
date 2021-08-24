@@ -6,11 +6,9 @@
 #'
 #' @param dataset A dataset name ("comex_export_mun", "comex_import_mun", "comex_export_prod" or "comex_import_prod").
 #' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
-#' @param geo_level **NOT USED IN THIS FUNCTION**.
-#' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012. Defaults to 2018 and 2019.
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("en") are supported. Defaults to "en".
-#' @param time_id **NOT USED IN THIS FUNCTION**.
-#' @param prod_class A string indicating the classification to be downloaded, chosen between "hs" (SH - Sistema Harmonizado), "cuci" (CUCI - Classificação Uniforme do Comércio Internacional), "isic" (ISIC - Classificação Internacional Padrão por Atividade Econômica), "cgce" (CGCE - Classificação por Grandes Categorias Econômicas). Defaults to "hs2".
+#' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
+#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
+#' @param prod_class A string indicating the classification to be downloaded, chosen between "hs" (SH - Sistema Harmonizado), "cuci" (CUCI - Classificação Uniforme do Comércio Internacional), "isic" (ISIC - Classificação Internacional Padrão por Atividade Econômica), "cgce" (CGCE - Classificação por Grandes Categorias Econômicas). Defaults to "hs".
 #'
 #' @return A \code{tibble} with a panel of N x T observations, consisting of imports or exports data.
 #'
@@ -18,22 +16,26 @@
 #' @examples
 #' \dontrun{
 #' # download treated exports data by municipality from 1997 to 2021
-#' exp_mun <- load_br_trade(dataset = "comex_export_mun", raw_data = FALSE, time_period = 1997:2021)
+#' exp_mun <- load_br_trade(dataset = "comex_export_mun",
+#'                          raw_data = FALSE, time_period = 1997:2021)
 #'
 #' # download raw imports data by municipality from 1997 to 2021
-#' raw_imp_mun <- load_br_trade(dataset = "comex_import_mun", raw_data = TRUE, time_period = 1997:2021)
+#' raw_imp_mun <- load_br_trade(dataset = "comex_import_mun",
+#'                              raw_data = TRUE, time_period = 1997:2021)
 #'
 #' # download treated imports data by municipality from 1997 to 2021 using "CUCI" classification
-#' imp_mun_cuci <- load_br_trade(dataset = "comex_import_mun", raw_data = FALSE, time_period = 1997:2021, prod_class = "cuci")
+#' imp_mun_cuci <- load_br_trade(dataset = "comex_import_mun",
+#'                               raw_data = FALSE, time_period = 1997:2021,
+#'                               prod_class = "cuci")
 #' }
 #'
 #' @importFrom magrittr %>%
 #'
-#' @export load_br_trade
+#' @export
 
-load_br_trade <- function(dataset = NULL, raw_data = NULL, geo_level = NULL,
-                          time_period = 2018:2019, language = 'eng',
-                          time_id = 'year', prod_class = 'hs2'){
+load_br_trade <- function(dataset = NULL, raw_data,
+                          time_period, language = 'eng',
+                          prod_class = 'hs'){
 
   ## We want to download both imports and exports data
 
@@ -60,6 +62,9 @@ load_br_trade <- function(dataset = NULL, raw_data = NULL, geo_level = NULL,
 
   co_ano <- co_mes <- sh4 <- co_pais <- sg_uf_mun <- co_mun <- kg_liquido <- vl_fob <- munic_code <- NULL
   quantity_net_kg <- fob_usd <- hs4_code <- hs2_code <- year <- usd_per_kg <- NULL
+  survey <- link <- co_sh4 <- co_sh2 <- quant_net_kg <- NULL
+  geo_level <- NULL
+
 
   ## There are two main dissagregated data levels in the COMEX website:
     ## 1 - Dissagregated by Classification: NCM
@@ -74,7 +79,6 @@ load_br_trade <- function(dataset = NULL, raw_data = NULL, geo_level = NULL,
   param$geo_level = geo_level
   param$time_period = time_period
   param$language = language
-  param$time_id = time_id
   param$prod_class = prod_class
   param$raw_data = raw_data
 
@@ -156,7 +160,7 @@ load_br_trade <- function(dataset = NULL, raw_data = NULL, geo_level = NULL,
     # CGCe - https://balanca.economia.gov.br/balanca/bd/tabelas/NCM_CGCE.csv
 
 
-  dic = suppressMessages(load_trade_dic(type = 'hs'))
+  dic = suppressMessages(load_trade_dic(type = param$prod_class))
   dic = dic %>%
     dplyr::select(co_sh4,co_sh2)
 
@@ -188,7 +192,6 @@ load_br_trade <- function(dataset = NULL, raw_data = NULL, geo_level = NULL,
   ##############################################
 
   dat_mod = dat %>%
-    dtplyr::lazy_dt() %>%
     dplyr::group_by(co_ano,co_mun,co_sh2) %>%
     dplyr::summarise(kg_liquido = sum(kg_liquido),
                      vl_fob = sum(vl_fob)) %>%

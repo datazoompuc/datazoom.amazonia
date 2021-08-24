@@ -3,6 +3,11 @@ load_ibama <- function(dataset = "areas_embargadas", raw_data = FALSE,
                        language = "eng",
                        legal_amazon_only = FALSE){
 
+
+  survey <- link <- AMZ_LEGAL <- codigo_ibge_municipio_embargo <- NULL
+  municipio_embargo <- uf_embargo <- julgamento <- infracao <- data_de_insercao_na_lista <- NULL
+  cpf_ou_cnpj <- cod_municipio <- ano <- mes <- NULL
+
   #############################
   ## Define Basic Parameters ##
   #############################

@@ -7,12 +7,10 @@
 \usage{
 load_br_trade(
   dataset = NULL,
-  raw_data = NULL,
-  geo_level = NULL,
-  time_period = 2018:2019,
+  raw_data,
+  time_period,
   language = "eng",
-  time_id = "year",
-  prod_class = "hs2"
+  prod_class = "hs"
 )
 }
 \arguments{
@@ -20,15 +18,11 @@ load_br_trade(
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
-\item{geo_level}{\strong{NOT USED IN THIS FUNCTION}.}
+\item{time_period}{A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.}
 
-\item{time_period}{A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012. Defaults to 2018 and 2019.}
+\item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".}
 
-\item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("en") are supported. Defaults to "en".}
-
-\item{time_id}{\strong{NOT USED IN THIS FUNCTION}.}
-
-\item{prod_class}{A string indicating the classification to be downloaded, chosen between "hs" (SH - Sistema Harmonizado), "cuci" (CUCI - Classificação Uniforme do Comércio Internacional), "isic" (ISIC - Classificação Internacional Padrão por Atividade Econômica), "cgce" (CGCE - Classificação por Grandes Categorias Econômicas). Defaults to "hs2".}
+\item{prod_class}{A string indicating the classification to be downloaded, chosen between "hs" (SH - Sistema Harmonizado), "cuci" (CUCI - Classificação Uniforme do Comércio Internacional), "isic" (ISIC - Classificação Internacional Padrão por Atividade Econômica), "cgce" (CGCE - Classificação por Grandes Categorias Econômicas). Defaults to "hs".}
 }
 \value{
 A \code{tibble} with a panel of N x T observations, consisting of imports or exports data.
@@ -39,13 +33,17 @@ Loads information on both imports and exports data. Data is available from 1997 
 \examples{
 \dontrun{
 # download treated exports data by municipality from 1997 to 2021
-exp_mun <- load_br_trade(dataset = "comex_export_mun", raw_data = FALSE, time_period = 1997:2021)
+exp_mun <- load_br_trade(dataset = "comex_export_mun",
+                         raw_data = FALSE, time_period = 1997:2021)
 
 # download raw imports data by municipality from 1997 to 2021
-raw_imp_mun <- load_br_trade(dataset = "comex_import_mun", raw_data = TRUE, time_period = 1997:2021)
+raw_imp_mun <- load_br_trade(dataset = "comex_import_mun",
+                             raw_data = TRUE, time_period = 1997:2021)
 
 # download treated imports data by municipality from 1997 to 2021 using "CUCI" classification
-imp_mun_cuci <- load_br_trade(dataset = "comex_import_mun", raw_data = FALSE, time_period = 1997:2021, prod_class = "cuci")
+imp_mun_cuci <- load_br_trade(dataset = "comex_import_mun",
+                              raw_data = FALSE, time_period = 1997:2021,
+                              prod_class = "cuci")
 }
 
 }
