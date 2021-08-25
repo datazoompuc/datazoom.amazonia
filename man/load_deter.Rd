@@ -19,13 +19,14 @@ load_deter(dataset = NULL, raw_data, geo_level, time_period, language = "eng")
 \item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".}
 }
 \value{
-A \code{tibble} with a panel of N x T observations
+A \code{tibble} with the selected data.
 }
 \description{
 Loads information on change in forest cover in the Amazon. Survey is done at state or municipal level. See \url{http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter}
 }
 \examples{
 \dontrun{
+# download municipality raw data from all years from Amazonia
 deter_amz <- load_deter(dataset = 'deter_amz',
                         raw_data = TRUE,
                         geo_level = 'municipality',

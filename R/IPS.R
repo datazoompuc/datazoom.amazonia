@@ -4,7 +4,6 @@
 #'
 #' @param dataset A dataset name ("ips")
 #' @param raw_data A \code{boolean} setting the return of raw or processed data
-#' @param geo_level A \code{string} that defines the geographic level of the data. In this case is municipality
 #' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY.
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese and English are supported.
 #'

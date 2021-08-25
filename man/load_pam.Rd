@@ -3,40 +3,33 @@
 \encoding{UTF-8}
 \name{load_pam}
 \alias{load_pam}
-\title{PAM - Municipal Agricultural Production
-
-Loads information on the  temporary and permanent crops of the Country that are characterized not only by their great economic importance in the export agenda, but also by their social relevance, since its components are on the Brazilian table (IBGE). Survey is done at the municipal level and data is available from 1974 to 2019 for most datasets. See \url{https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/16773-municipal-agricultural-production-temporary-and-permanent-crops.html?=&t=o-que-e}}
+\title{PAM - Municipal Agricultural Production}
 \usage{
-load_pam(
-  dataset = NULL,
-  raw_data = FALSE,
-  geo_level = "municipality",
-  time_period = 2017:2018,
-  language = "eng"
-)
+load_pam(dataset = NULL, raw_data, geo_level, time_period, language = "eng")
 }
 \arguments{
-\item{dataset}{A dataset name (\code{pam_all_crops}, \code{pam_permanent_crops}, \code{pam_temporary_crops} or \code{pam_xx}, in which xx needs to be corn, potato, peanut or beans. You can also use SIDRA codes (see \url{https://sidra.ibge.gov.br/pesquisa/pam/tabelas})}
+\item{dataset}{A dataset name ("pam_all_crops", "pam_permanent_crops", "pam_temporary_crops" or "pam_xx", in which xx needs to be corn, potato, peanut or beans). You can also use SIDRA codes (see \url{https://sidra.ibge.gov.br/pesquisa/pam/tabelas})}
 
-\item{raw_data}{A \code{boolean} setting the return of raw or processed data}
+\item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
-\item{geo_level}{A \code{string} that defines the geographic level of the data. Defaults to national level, but can be one of "country", "state" or "municipality". See documentation of \code{sidrar}.}
+\item{geo_level}{A \code{string} that defines the geographic level of the data. Can be one of "country", "state" or "municipality". See documentation of \code{sidrar}.}
 
 \item{time_period}{A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.}
 
-\item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese and English are supported.}
+\item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".}
 }
 \value{
-A \code{tibble} with a panel of N x T observations, consisting of geographic units that present positive values for any of the variables in the dataset.
+A \code{tibble} consisting of geographic units that present positive values for any of the variables in the dataset.
 }
 \description{
-PAM - Municipal Agricultural Production
-
 Loads information on the  temporary and permanent crops of the Country that are characterized not only by their great economic importance in the export agenda, but also by their social relevance, since its components are on the Brazilian table (IBGE). Survey is done at the municipal level and data is available from 1974 to 2019 for most datasets. See \url{https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/16773-municipal-agricultural-production-temporary-and-permanent-crops.html?=&t=o-que-e}
 }
 \examples{
-\dontrun{datazoom.amazonia::load_pam(dataset = 'pam_all_crops', 'state', 2012, language = "pt")}
+\dontrun{
+# download state raw data from 2012 for all crops
+pam_all_crops <- load_pam(dataset = 'pam_all_crops',
+                          raw_data = TRUE,
+                          geo_level = 'state',
+                          time_period = 2012)
 }
-\author{
-DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro.
 }

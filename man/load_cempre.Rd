@@ -7,7 +7,7 @@
 \usage{
 load_cempre(
   dataset = "cempre",
-  raw_data = TRUE,
+  raw_data,
   geo_level,
   time_period,
   language = "eng",
@@ -31,7 +31,7 @@ load_cempre(
 \item{legal_amazon_only}{A \code{boolean} setting the return of Legal Amazon Data (\code{TRUE}) or Country's Data (\code{FALSE}). Defaults to \code{FALSE}}
 }
 \value{
-A \code{tibble} with a panel of N x T observations by municipality-year
+A \code{tibble} with the selected data.
 }
 \description{
 Loads information on companies and other organizations and their respective formally constituted local units, registered with the CNPJ - National Register of Legal Entities. Data is available from 2006 to 2019. See \url{https://sidra.ibge.gov.br/pesquisa/cempre/tabelas}

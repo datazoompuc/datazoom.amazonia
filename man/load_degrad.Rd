@@ -17,18 +17,13 @@ load_degrad(dataset = "degrad", raw_data, time_period, language = "eng")
 \item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".}
 }
 \value{
-A \code{tibble} with a panel of N x T observations by municipality-year (or municipality-month, when available).
+A \code{list} with the selected data.
 }
 \description{
 Loads information on forest degradation in the Brazilian Amazon, replaced by DETER-B in December 2016. Data is available from 2007 to 2016. See \url{http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad}.
 }
 \examples{
 \dontrun{
-# download treated data from 2007 to 2016
-degrad_all <- load_degrad(dataset = "degrad",
-                          raw_data = FALSE,
-                          time_period = 2007:2016)
-
 # download raw data from 2007 to 2016
 raw_degrad_all <- load_degrad(dataset = "degrad",
                               raw_data = TRUE,
