@@ -2,31 +2,29 @@
 #'
 #' @description Loads information on animal farming inventories and livestock products (IBGE). Survey is done at the municipal level and data is available from 1974 to 2019 for most datasets. See \url{https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/17353-municipal-livestock-production.html?=&t=o-que-e}
 #'
-#' @param dataset A dataset name (\code{ppm_livetock_inventory}, \code{ppm_sheep_farming}, \code{ppm_animal_orig_production}, \code{ppm_cow_farming} or \code{ppm_aquaculture}. You can also use SIDRA codes (see \url{https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019})
-#'
-#' @param raw_data A \code{boolean} setting the return of raw or processed data
-#'
-#' @param geo_level A \code{string} that defines the geographic level of the data. Defaults to National level, but can be one of "country", "state" or "municipality". See documentation of \code{sidrar}.
-#'
+#' @param dataset A dataset name ("ppm_livetock_inventory", "ppm_sheep_farming", "ppm_animal_orig_production", "ppm_cow_farming" or "ppm_aquaculture". You can also use SIDRA codes (see \url{https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019})
+#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
+#' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state" or "municipality". See documentation of \code{sidrar}.
 #' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
+#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
 #'
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese and English are supported.
-#'
-#' @return A \code{tibble} with a panel of N x T observations, consisting of geographic units that present positive values for any of the variables in the dataset.
-#'
-#' @author DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro.
+#' @return A \code{tibble} consisting of geographic units that present positive values for any of the variables in the dataset.
 #'
 #' @encoding UTF-8
 #'
-#' @export load_ppm
+#' @export
 #'
 #' @examples \dontrun{
+#' # download state raw data from 2012 for animal origin production
 #' ppm_aop <- load_ppm(dataset = 'ppm_animal_origin_production',
+#'                     raw_data = TRUE,
 #'                     geo_level = 'state',
 #'                     time_period = 2012)
 #' }
 
-load_ppm = function(dataset=NULL,raw_data = FALSE,geo_level = "municipality",time_period=2019,language = 'pt'){
+load_ppm = function(dataset = NULL, raw_data,
+                    geo_level, time_period,
+                    language = 'eng'){
 
   ## Translation is only made through collapsing at the end
   # - What if we wanted to deliver raw data?

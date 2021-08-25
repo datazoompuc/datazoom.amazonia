@@ -1,36 +1,33 @@
-#' @title PRODES -Deforestation Monitoring Project in the Legal Amazon by Satellite
+#' @title PRODES - Deforestation Monitoring Project in the Legal Amazon by Satellite
 #'
-#' Loads information on clearcut deforestation in the Legal Amazon and annual deforestation rates in the region. Survey is done at state or municipality level and data is available from 2000 to 2020. See \url{http://www.dpi.inpe.br/prodesdigital}
+#' @description Loads information on clearcut deforestation in the Legal Amazon and annual deforestation rates in the region. Survey is done at state or municipality level and data is available from 2000 to 2020. See \url{http://www.dpi.inpe.br/prodesdigital}
 #'
 #' @encoding UTF-8
 #'
-#' @param dataset A dataset name (\code{prodes_accum_deforestation}, \code{prodes_forest}, \code{prodes_hydrography}, \code{prodes_annual_increase_deforestation}, \code{prodes_cloud})
-#' @param raw_data A \code{boolean} setting the return of raw or processed data
-#' @param geo_level A \code{string} that defines the geographic level of the data.Can be "state" or "municipality"
+#' @param dataset A dataset name ("prodes_accum_deforestation", "prodes_forest", "prodes_hydrography", "prodes_annual_increase_deforestation", "prodes_cloud").
+#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
+#' @param geo_level A \code{string} that defines the geographic level of the data. Can be "state" or "municipality"
 #' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese and English are supported.
+#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
 #'
-#' @return A \code{tibble} with a panel of N x T observations by municipality-year
+#' @return A \code{tibble} with the selected data.
 #'
-#'@examples
+#' @examples
 #' \dontrun{
-#' # download treated data from 2000 to 2020
-#' prodes_all <- load_prodes(dataset = "prodes", raw_data = FALSE, time_period = 2000:2020)
-#'
-#' # download raw data from 2000 to 2020
-#' raw_prodes_all <- load_prodes(dataset = "prodes", raw_data = TRUE, time_period = 2000:2020)
+#' # download raw state data from 2000 to 2020 from prodes_forest
+#' raw_prodes_all <- load_prodes(dataset = "prodes_forest",
+#'                               geo_level = "state",
+#'                               raw_data = TRUE,
+#'                               time_period = 2000:2020)
 #' }
 #'
 #'
 #' @importFrom magrittr %>%
-#' @export load_prodes
+#' @export
 
-## The Downloaded Data is from 760 Municipalities
-  ## Are these the ones in the Legal Amazon
-
-
-load_prodes <- function(dataset=NULL,raw_data = NULL,geo_level = "municipality",
-                        time_period=2010:2012,language = 'pt') {
+load_prodes <- function(dataset = NULL, raw_data,
+                        geo_level, time_period,
+                        language = 'eng') {
 
   ###########################
   ## Bind Global Variables ##
@@ -94,6 +91,12 @@ load_prodes <- function(dataset=NULL,raw_data = NULL,geo_level = "municipality",
 
   dat = dat %>%
     dplyr::mutate_if(is.numeric,as.double)
+
+
+  ## Return Raw Data
+
+  if (raw_data == TRUE){return(dat)}
+
 
 
   # ---------------------------------------------------------------------
@@ -195,7 +198,5 @@ load_prodes <- function(dataset=NULL,raw_data = NULL,geo_level = "municipality",
   #   return(df)
   # }
 
-
-  return(dat)
 }
 

@@ -13,7 +13,7 @@
 #' @param sectors A \code{boolean} that defines if the data will be return separated by sectors (\code{TRUE}) or not (\code{FALSE}). Defaults to \code{FALSE}
 #' @param legal_amazon_only A \code{boolean} setting the return of Legal Amazon Data (\code{TRUE}) or Country's Data (\code{FALSE}). Defaults to \code{FALSE}
 #'
-#' @return A \code{tibble} with a panel of N x T observations by municipality-year
+#' @return A \code{tibble} with the selected data.
 #'
 #' @examples
 #' \dontrun{
@@ -27,7 +27,7 @@
 #' @importFrom magrittr %>%
 #' @export
 
-load_cempre <- function(dataset = "cempre", raw_data = TRUE,
+load_cempre <- function(dataset = "cempre", raw_data,
                         geo_level, time_period,
                         language = "eng", sectors = FALSE,
                         legal_amazon_only = FALSE) {

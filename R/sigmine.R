@@ -3,9 +3,11 @@
 #' @description Loads information the mines being explored legally in Brazil, including their location, status, product being mined and area in square meters etc. Survey is done at municipal and state level
 #'
 #' @param dataset A dataset name ("sigmine_active")
-#' @param raw_data A \code{boolean} setting the return of raw or processed data
+#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
 #' @param geo_level A \code{string} that defines the geographic level of the data. In this case, could be "municipality" or "state".
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese and English are supported.
+#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
+#'
+#' @return A \code{tibble} with the selected data.
 #'
 #' @encoding UTF-8
 #'
@@ -13,15 +15,15 @@
 #' @importFrom magrittr %>%
 #'
 #' @examples \dontrun{
+#' # download state raw data
 #' sigmine_active <- load_sigmine(dataset = 'sigmine_active',
-#'                               raw_data = FALSE,
-#'                               geo_level = 'state')
+#'                                raw_data = TRUE,
+#'                                geo_level = 'state')
 #' }
 
 
 load_sigmine = function(dataset = 'sigmine_active',
-                        raw_data = NULL,
-                        geo_level = NULL,
+                        raw_data, geo_level,
                         language = 'eng'){
 
 
@@ -79,6 +81,10 @@ load_sigmine = function(dataset = 'sigmine_active',
 
   dat = external_download(dataset = param$dataset,source='sigmine') %>%
           janitor::clean_names()
+
+  ## Return Raw Data
+  if (raw_data == TRUE){return(dat)}
+
 
   ######################
   ## Data Engineering ##
@@ -173,7 +179,5 @@ load_sigmine = function(dataset = 'sigmine_active',
   # }
   #
   # return(ret)
-
-  return(dat)
 
 }

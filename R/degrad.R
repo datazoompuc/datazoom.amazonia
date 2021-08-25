@@ -9,16 +9,11 @@
 #' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
 #'
-#' @return A \code{tibble} with a panel of N x T observations by municipality-year (or municipality-month, when available).
+#' @return A \code{list} with the selected data.
 #'
 #'
 #' @examples
 #' \dontrun{
-#' # download treated data from 2007 to 2016
-#' degrad_all <- load_degrad(dataset = "degrad",
-#'                           raw_data = FALSE,
-#'                           time_period = 2007:2016)
-#'
 #' # download raw data from 2007 to 2016
 #' raw_degrad_all <- load_degrad(dataset = "degrad",
 #'                               raw_data = TRUE,
@@ -96,6 +91,11 @@ load_degrad <- function(dataset = 'degrad', raw_data,
             janitor::clean_names()
         }
       )
+
+
+  ## Return Raw Data
+
+  if (raw_data == TRUE){return(dat)}
 
   ## The Columns are not always the same name, we have to edit that
 
@@ -282,7 +282,7 @@ load_degrad <- function(dataset = 'degrad', raw_data,
   #
   # dplyr::bind_rows(list_df)
 
-  return(dat)
+
 }
 
 

@@ -2,14 +2,14 @@
 #'
 #' @description Loads information on gross domestic product at current prices, taxes, net of subsidies, on products at current prices and gross value added at current prices, total and by economic activity, and respective shares. Survey is done at Country, state and municipality level and data is available from 2002 to 2018.
 #'
-#' @param dataset A dataset name pibmunic with Municipal GDP information. You can also use SIDRA codes (See \url{https://sidra.ibge.gov.br/pesquisa/pib-munic/tabelas})
-#' @param raw_data A \code{boolean} setting the return of raw or processed data
-#' @param geo_level A \code{string} that defines the geographic level of the data. Defaults to national level, but can be one of "country", "state" or "municipality".
-#' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese and English are supported.
-#' @param legal_amazon_only A \code{boolean} setting the return of Legal Amazon Data (\code{TRUE}) or Country's Data (\code{FALSE})
+#' @param dataset A dataset name ("pibmunic") with Municipal GDP information. You can also use SIDRA codes (See \url{https://sidra.ibge.gov.br/pesquisa/pib-munic/tabelas})
+#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
+#' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state" or "municipality".
+#' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
+#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
+#' @param legal_amazon_only A \code{boolean} setting the return of Legal Amazon Data (\code{TRUE}) or Country's Data (\code{FALSE}).
 #'
-#' @return A \code{tibble} with a panel of N x T observations
+#' @return A \code{tibble} with the selected data.
 #'
 #' @encoding UTF-8
 #'
@@ -18,6 +18,7 @@
 #' @importFrom magrittr %>%
 #'
 #' @examples \dontrun{
+#' # download state raw data from 2012 for all country
 #' pibmunic <- load_pibmunic(dataset = 'pibmunic',
 #'                           raw_data = TRUE,
 #'                           geo_level = 'state',
@@ -26,9 +27,8 @@
 #' }
 
 
-load_pibmunic <- function(dataset = "pibmunic", raw_data = TRUE,
-                          geo_level = "municipality",
-                          time_period = 2017:2018,
+load_pibmunic <- function(dataset = "pibmunic", raw_data,
+                          geo_level, time_period,
                           language = "eng",
                           legal_amazon_only = FALSE) {
 

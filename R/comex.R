@@ -10,7 +10,7 @@
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
 #' @param prod_class A string indicating the classification to be downloaded, chosen between "hs" (SH - Sistema Harmonizado), "cuci" (CUCI - Classificação Uniforme do Comércio Internacional), "isic" (ISIC - Classificação Internacional Padrão por Atividade Econômica), "cgce" (CGCE - Classificação por Grandes Categorias Econômicas). Defaults to "hs".
 #'
-#' @return A \code{tibble} with a panel of N x T observations, consisting of imports or exports data.
+#' @return A \code{tibble} consisting of imports or exports data.
 #'
 #'
 #' @examples

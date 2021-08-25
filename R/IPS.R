@@ -8,7 +8,7 @@
 #' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY.
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese and English are supported.
 #'
-#' @return A \code{tibble} with a panel of N x T observations
+#' @return A \code{tibble} with the selected data.
 #'
 #' @encoding UTF-8
 #'
@@ -17,14 +17,13 @@
 #' @export
 #'
 #' @examples \dontrun{
-#' ips <- load_ips(dataset = 'ips', raw_data = TRUE,
-#'                 geo_level = 'municipality',
-#'                 time_period = 2014)
+#' # download raw data from 2014
+#' ips <- load_ips(dataset = 'ips', raw_data = TRUE, time_period = 2014)
 #' }
 
 
-load_ips = function(dataset = NULL, raw_data = NULL,
-                    geo_level, time_period, language = 'eng'){
+load_ips = function(dataset = "ips", raw_data,
+                    time_period, language = 'eng'){
 
   ###########################
   ## Bind Global Variables ##
@@ -38,7 +37,6 @@ load_ips = function(dataset = NULL, raw_data = NULL,
 
   param=list()
   param$dataset = dataset
-  param$geo_level = geo_level
   param$time_period = time_period
   param$language = language
   # param$time_id = time_id
@@ -79,7 +77,15 @@ load_ips = function(dataset = NULL, raw_data = NULL,
     purrr::map(
       function(t){external_download(dataset = param$dataset,source='ips',year = t) %>%
           dplyr::mutate(ano = t)}
-    )
+    ) %>%
+    dplyr::bind_rows() %>%
+    tibble::as_tibble()
+
+
+  ## Return Raw Data
+
+  if (raw_data == TRUE){return(dat)}
+
 
   ## Data May Have Different Names, we Need to be careful
 
@@ -242,8 +248,6 @@ load_ips = function(dataset = NULL, raw_data = NULL,
   #   colnames(df) <- col.names$english
   # }
   # return(df)
-
-  return(dat)
 
 
 }

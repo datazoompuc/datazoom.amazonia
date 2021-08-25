@@ -8,7 +8,7 @@
 #' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
 #'
-#' @return A \code{tibble} with a panel of N x T observations
+#' @return A \code{tibble} with the selected data.
 #'
 #' @encoding UTF-8
 #'
@@ -17,6 +17,7 @@
 #'
 #' @examples
 #' \dontrun{
+#' # download municipality raw data from all years from Amazonia
 #' deter_amz <- load_deter(dataset = 'deter_amz',
 #'                         raw_data = TRUE,
 #'                         geo_level = 'municipality',
@@ -99,6 +100,11 @@ load_deter <- function(dataset = NULL, raw_data,
 
   dat = dat %>%
     dplyr::mutate_if(is.character,function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")})
+
+
+  ## Return Raw Data
+
+  if (raw_data == TRUE){return(dat)}
 
   ######################
   ## Data Engineering ##
@@ -305,6 +311,5 @@ load_deter <- function(dataset = NULL, raw_data,
   #
   # return(df)
 
-  return(dat)
 }
 

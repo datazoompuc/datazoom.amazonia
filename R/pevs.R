@@ -1,33 +1,30 @@
 #' @title PEVS - Forestry Activities
 #'
-#' Loads information on the amount and value of the production of the exploitation of native plant resources and planted forest massifs, as well as existing total and harvested areas of forest crops. Survey is done at the municipal level and data is available from 1986 to 2019. See \url{https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/18374-forestry-activities.html?=&t=o-que-e}
+#' @description Loads information on the amount and value of the production of the exploitation of native plant resources and planted forest massifs, as well as existing total and harvested areas of forest crops. Survey is done at the municipal level and data is available from 1986 to 2019. See \url{https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/18374-forestry-activities.html?=&t=o-que-e}
 #'
-#' @param dataset A dataset name (\code{pevs_forest_crops}, \code{pevs_silviculture} or \code{pevs_silviculture_area}) or SIDRA code (see https://sidra.ibge.gov.br/pesquisa/pevs/quadros/brasil/2019)
-#'
-#' @param raw_data A \code{boolean} setting the return of raw or processed data
-#'
-#' @param geo_level A \code{string} that defines the geographic level of the data. Defaults to National level, but can be one of "country", "region", "state", "mesoregion", "microregion" or "city". See documentation of \code{sidrar}.
-#'
+#' @param dataset A dataset name ("pevs_forest_crops", "pevs_silviculture" or "pevs_silviculture_area"). You can also use SIDRA codes (see \url{https://sidra.ibge.gov.br/pesquisa/pevs/quadros/brasil/2019})
+#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
+#' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "region", "state", "mesoregion", "microregion" or "city". See documentation of \code{sidrar}.
 #' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
+#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
 #'
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese and English are supported.
-#'
-#' @return A \code{tibble} with a panel of N x T observations, consisting of geographic units that present positive values for any of the variables in the dataset.
-#'
-#' @author DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro.
+#' @return A \code{tibble} consisting of geographic units that present positive values for any of the variables in the dataset.
 #'
 #' @encoding UTF-8
 #'
-#' @export load_pevs
+#' @export
 #'
 #' @examples \dontrun{
+#' # download state raw data from 2012 for silviculture
 #' pevs_silvi <- load_pevs(dataset = 'pevs_silviculture',
 #'                         raw_data = TRUE,
 #'                         geo_level = 'state',
 #'                         time_period = 2012)
 #' }
 
-load_pevs <- function(dataset = NULL, raw_data = FALSE, geo_level = "municipality", time_period = 2018:2019, language = "pt"){
+load_pevs <- function(dataset = NULL, raw_data,
+                      geo_level, time_period,
+                      language = "eng"){
 
   ## Translation is only made through collapsing at the end
   # - What if we wanted to deliver raw data?

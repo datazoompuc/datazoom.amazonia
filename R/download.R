@@ -492,16 +492,20 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
       if (geo_level == 'country'){dat <- readxl::read_excel(temp, sheet = "GEE Brasil")}
       if (geo_level == 'state'){dat <- readxl::read_excel(temp, sheet = "GEE Estados")}
       if (geo_level == 'municipality'){dat <- readxl::read_excel(temp, sheet = "BD GEE Municipios GWP-AR5")}
+
     }
+
+    if (param$dataset == 'ips'){
+        if (param$year == 2014){dat = readxl::read_excel(temp,sheet='IPS 2014')}
+        if (param$year == 2018){dat = readxl::read_excel(temp,sheet=1)}
+      }
+
+
 
     dat = dat %>%
       janitor::clean_names() %>%
       tibble::as_tibble()
 
-    if (param$dataset == 'ips'){
-      if (param$year == 2014){dat = readxl::read_excel(temp,sheet='IPS 2014')}
-      if (param$year == 2018){dat = readxl::read_excel(temp,sheet=1)}
-    }
   }
 
   if (file_extension == '.zip'){
