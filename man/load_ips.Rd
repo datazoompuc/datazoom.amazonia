@@ -5,35 +5,26 @@
 \alias{load_ips}
 \title{IPS - Amazon Social Progress Index}
 \usage{
-load_ips(
-  dataset = NULL,
-  raw_data = NULL,
-  geo_level,
-  time_period,
-  language = "eng"
-)
+load_ips(dataset = "ips", raw_data, time_period, language = "eng")
 }
 \arguments{
 \item{dataset}{A dataset name ("ips")}
 
 \item{raw_data}{A \code{boolean} setting the return of raw or processed data}
 
-\item{geo_level}{A \code{string} that defines the geographic level of the data. In this case is municipality}
-
 \item{time_period}{A \code{numeric} indicating what years will the data be loaded in the format YYYY.}
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese and English are supported.}
 }
 \value{
-A \code{tibble} with a panel of N x T observations
+A \code{tibble} with the selected data.
 }
 \description{
 Loads information on the social and environmental performance of the Legal Amazon. Survey is done at the municipal level and data is available in 2014 and 2018. See \url{http://www.ipsamazonia.org.br/}
 }
 \examples{
 \dontrun{
-ips <- load_ips(dataset = 'ips', raw_data = TRUE,
-                geo_level = 'municipality',
-                time_period = 2014)
+# download raw data from 2014
+ips <- load_ips(dataset = 'ips', raw_data = TRUE, time_period = 2014)
 }
 }
