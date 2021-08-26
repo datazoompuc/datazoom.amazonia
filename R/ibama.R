@@ -1,34 +1,29 @@
 #' @title IBAMA - Brazilian Institute for the Environment and Renewable Natural Resources
 #'
-#' Loads information on on environmental fines at the municipality or state levels considering the Amazon region
+#' @description Loads information on on environmental fines at the municipality or state levels considering the Amazon region
 #'
 #' @param dataset A dataset name ("areas_embargadas")
-#'
 #' @param raw_data A \code{boolean} setting the return of raw or processed data
-#'
-#' @param geo_level A \code{string} that defines the geographic level of the data. Can be municipality
-#'
+#' @param geo_level A \code{string} that defines the geographic level of the data. Can be only "municipality".
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported.
-#'
 #' @param legal_amazon_only A \code{boolean} setting the return of Legal Amazon Data or not
 #'
 #' @return A \code{tibble} with the selected data.
 #'
 #' @examples
 #' \dontrun{
-#' # download raw data from 2010 to 2012
-#' raw_cempre_all <- load_cempre(dataset = "areas_embargadas",
-#'                               raw_data = TRUE,
-#'                               geo_level = "municipality",
-#'                               language = "pt"
+#' # download raw data from all country
+#' raw_ibama_all <- load_ibama(dataset = "areas_embargadas",
+#'                             raw_data = TRUE,
+#'                             legal_amazon_only = FALSE)
 #' }
 #'
 #' @importFrom magrittr %>%
-#' @export load_ibama
+#' @export
 
 
-
-load_ibama <- function(dataset = "areas_embargadas", raw_data = FALSE,
+load_ibama <- function(dataset = "areas_embargadas",
+                       raw_data,
                        geo_level = "municipality",
                        language = "eng",
                        legal_amazon_only = FALSE){

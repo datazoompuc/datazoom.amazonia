@@ -4,7 +4,7 @@
 #'
 #' @encoding UTF-8
 #'
-#' @param dataset A dataset name ("prodes_accum_deforestation", "prodes_forest", "prodes_hydrography", "prodes_annual_increase_deforestation", "prodes_cloud").
+#' @param dataset A dataset name ("prodes").
 #' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
 #' @param geo_level A \code{string} that defines the geographic level of the data. Can be "state" or "municipality"
 #' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
@@ -14,8 +14,8 @@
 #'
 #' @examples
 #' \dontrun{
-#' # download raw state data from 2000 to 2020 from prodes_forest
-#' raw_prodes_all <- load_prodes(dataset = "prodes_forest",
+#' # download raw state data from 2000 to 2020
+#' raw_prodes_all <- load_prodes(dataset = "prodes",
 #'                               geo_level = "state",
 #'                               raw_data = TRUE,
 #'                               time_period = 2000:2020)
@@ -25,7 +25,7 @@
 #' @importFrom magrittr %>%
 #' @export
 
-load_prodes <- function(dataset = NULL, raw_data,
+load_prodes <- function(dataset = "prodes", raw_data,
                         geo_level, time_period,
                         language = 'eng') {
 
