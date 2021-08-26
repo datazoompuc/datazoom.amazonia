@@ -5,10 +5,16 @@
 \alias{load_prodes}
 \title{PRODES - Deforestation Monitoring Project in the Legal Amazon by Satellite}
 \usage{
-load_prodes(dataset = NULL, raw_data, geo_level, time_period, language = "eng")
+load_prodes(
+  dataset = "prodes",
+  raw_data,
+  geo_level,
+  time_period,
+  language = "eng"
+)
 }
 \arguments{
-\item{dataset}{A dataset name ("prodes_accum_deforestation", "prodes_forest", "prodes_hydrography", "prodes_annual_increase_deforestation", "prodes_cloud").}
+\item{dataset}{A dataset name ("prodes").}
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
@@ -26,8 +32,8 @@ Loads information on clearcut deforestation in the Legal Amazon and annual defor
 }
 \examples{
 \dontrun{
-# download raw state data from 2000 to 2020 from prodes_forest
-raw_prodes_all <- load_prodes(dataset = "prodes_forest",
+# download raw state data from 2000 to 2020
+raw_prodes_all <- load_prodes(dataset = "prodes",
                               geo_level = "state",
                               raw_data = TRUE,
                               time_period = 2000:2020)
