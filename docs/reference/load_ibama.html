@@ -6,14 +6,14 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Compiles environmental fines data in the Amazon Region from IBAMA — load_ibama • datazoom.amazonia</title>
+<title>IBAMA - Brazilian Institute for the Environment and Renewable Natural Resources — load_ibama • datazoom.amazonia</title>
 
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cerulean/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Compiles environmental fines data in the Amazon Region from IBAMA — load_ibama" />
-<meta property="og:description" content="Original data comes from IBAMA's website" />
+<meta property="og:title" content="IBAMA - Brazilian Institute for the Environment and Renewable Natural Resources — load_ibama" />
+<meta property="og:description" content="Loads information on on environmental fines at the municipality or state levels considering the Amazon region" />
 
 
 
@@ -110,9 +110,6 @@
       <a href="../articles/DETER.html">DETER</a>
     </li>
     <li>
-      <a href="../articles/dz_amazonia_guide.html">DataZoom Amazonia</a>
-    </li>
-    <li>
       <a href="../articles/GDP.html">GDP</a>
     </li>
     <li>
@@ -160,95 +157,58 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Compiles environmental fines data in the Amazon Region from IBAMA</h1>
+    <h1>IBAMA - Brazilian Institute for the Environment and Renewable Natural Resources</h1>
     
     <div class="hidden name"><code>load_ibama.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Original data comes from <a href='https://servicos.ibama.gov.br/ctf/publico/areasembargadas/ConsultaPublicaAreasEmbargadas.php'>IBAMA's website</a></p>
+    <p>Loads information on on environmental fines at the municipality or state levels considering the Amazon region</p>
     </div>
 
     <pre class="usage"><span class='fu'>load_ibama</span><span class='op'>(</span>
-  download_data <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  <span class='va'>download_directory</span>,
-  <span class='va'>load_from_where</span>,
-  time_aggregation <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"year"</span>, <span class='st'>"month"</span><span class='op'>)</span>,
-  space_aggregation <span class='op'>=</span> <span class='st'>"municipality"</span>,
-  years <span class='op'>=</span> <span class='fl'>2005</span><span class='op'>:</span><span class='fl'>2021</span>,
-  language <span class='op'>=</span> <span class='st'>"eng"</span>
+  dataset <span class='op'>=</span> <span class='st'>"areas_embargadas"</span>,
+  <span class='va'>raw_data</span>,
+  geo_level <span class='op'>=</span> <span class='st'>"municipality"</span>,
+  language <span class='op'>=</span> <span class='st'>"eng"</span>,
+  legal_amazon_only <span class='op'>=</span> <span class='cn'>FALSE</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>download_data</th>
-      <td><p>If <code>TRUE</code>, downloads the data from the original source.
-Else, loads data from <code>load_from_where</code> directory.</p></td>
+      <th>dataset</th>
+      <td><p>A dataset name ("areas_embargadas")</p></td>
     </tr>
     <tr>
-      <th>download_directory</th>
-      <td><p>Directory where raw data should be stored.
-Used in case <code>download_data = TRUE</code>.</p></td>
+      <th>raw_data</th>
+      <td><p>A <code>boolean</code> setting the return of raw or processed data</p></td>
     </tr>
     <tr>
-      <th>load_from_where</th>
-      <td><p>Original that should be loaded. Used in
-case <code>download_data = FALSE</code>.</p></td>
-    </tr>
-    <tr>
-      <th>time_aggregation</th>
-      <td><p>Temporal level of aggregation, choose <code>year</code> and/or <code>month</code>.
-If <code>language = 'pt'</code>, pick "ano" and/or "mes'"</p></td>
-    </tr>
-    <tr>
-      <th>space_aggregation</th>
-      <td><p>Geographical level of aggregation, choose <code>municipality</code> and/or
-<code>State</code>. For Portuguese version, <code>municipio</code> and/or <code>uf</code></p></td>
-    </tr>
-    <tr>
-      <th>years</th>
-      <td><p>Time period to be considered. Contemplates 2005 to the present day</p></td>
+      <th>geo_level</th>
+      <td><p>A <code>string</code> that defines the geographic level of the data. Can be only "municipality".</p></td>
     </tr>
     <tr>
       <th>language</th>
-      <td><p>Language used in returned dataset. Use <code>language = "pt"</code> or
-<code>language = "eng"</code></p></td>
+      <td><p>A <code>string</code> that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported.</p></td>
+    </tr>
+    <tr>
+      <th>legal_amazon_only</th>
+      <td><p>A <code>boolean</code> setting the return of Legal Amazon Data or not</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A data frame with counts for variables related to environmental fines and
-infractions by <code>time_aggregation</code>-<code>space_aggregation</code> chosen on the Amazon region.
-Data include
-counts for total number of infractions, infractions that already went to trial, and
-number of unique perpetrators of infractions on the given place-time period.</p>
+    <p>A <code>tibble</code> with the selected data.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
- <span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='fu'>load_ibama</span><span class='op'>(</span>
-  download_directory <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/getwd.html'>getwd</a></span><span class='op'>(</span><span class='op'>)</span>,
-  time_aggregation <span class='op'>=</span> <span class='st'>"year"</span>,
-  space_aggregation <span class='op'>=</span> <span class='st'>"state"</span>, years <span class='op'>=</span> <span class='fl'>2005</span><span class='op'>:</span><span class='fl'>2006</span>
-<span class='op'>)</span>
-
-<span class='fu'>load_ibama</span><span class='op'>(</span>
-  download_directory <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/getwd.html'>getwd</a></span><span class='op'>(</span><span class='op'>)</span>,
-  time_aggregation <span class='op'>=</span> <span class='st'>"ano"</span>,
-  space_aggregation <span class='op'>=</span> <span class='st'>"municipio"</span>, years <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>2010</span>, <span class='fl'>2012</span><span class='op'>)</span>,
-  language <span class='op'>=</span> <span class='st'>"pt"</span>
-<span class='op'>)</span>
-
-
-<span class='fu'>load_ibama</span><span class='op'>(</span>
-  download_data <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  load_from_where <span class='op'>=</span> <span class='st'>"./Desktop/data.xls"</span>,
-  time_aggregation <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"year"</span>, <span class='st'>"month"</span><span class='op'>)</span>,
-  space_aggregation <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"municipality"</span>, <span class='st'>"state"</span><span class='op'>)</span>
-<span class='op'>)</span>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># download raw data from all country</span>
+<span class='va'>raw_ibama_all</span> <span class='op'>&lt;-</span> <span class='fu'>load_ibama</span><span class='op'>(</span>dataset <span class='op'>=</span> <span class='st'>"areas_embargadas"</span>,
+                            raw_data <span class='op'>=</span> <span class='cn'>TRUE</span>,
+                            legal_amazon_only <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
 <span class='op'>}</span>
 
 </div></pre>
@@ -263,7 +223,7 @@ number of unique perpetrators of infractions on the given place-time period.</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Francisco de Lima Cavalcanti, Daniel AC Barbosa, Bruno Alcantara Duarte, Victor Aliende da Matta, Arthur Carvalho Brito, Anna Carolina Dutra Saraiva, Arthur Carvalho Brito, Igor Rigolon Veiga, Maria Mittelbach.</p>
+  <p>Developed by Francisco de Lima Cavalcanti, Guilherme Jardim, Daniel AC Barbosa, Bruno Alcantara Duarte, Victor Aliende da Matta, Arthur Carvalho Brito, Anna Carolina Dutra Saraiva, Arthur Carvalho Brito, Igor Rigolon Veiga, Maria Mittelbach.</p>
 </div>
 
 <div class="pkgdown">

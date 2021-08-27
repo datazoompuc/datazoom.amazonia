@@ -6,14 +6,14 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Loads and cleans degradation data from INPE. — load_degrad • datazoom.amazonia</title>
+<title>Degrad - Forest Degradation in the Brazilian Amazon — load_degrad • datazoom.amazonia</title>
 
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cerulean/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Loads and cleans degradation data from INPE. — load_degrad" />
-<meta property="og:description" content="Loads and cleans degradation data from INPE." />
+<meta property="og:title" content="Degrad - Forest Degradation in the Brazilian Amazon — load_degrad" />
+<meta property="og:description" content="Loads information on forest degradation in the Brazilian Amazon, replaced by DETER-B in December 2016. Data is available from 2007 to 2016. See http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad." />
 
 
 
@@ -110,9 +110,6 @@
       <a href="../articles/DETER.html">DETER</a>
     </li>
     <li>
-      <a href="../articles/dz_amazonia_guide.html">DataZoom Amazonia</a>
-    </li>
-    <li>
       <a href="../articles/GDP.html">GDP</a>
     </li>
     <li>
@@ -160,87 +157,50 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Loads and cleans degradation data from INPE.</h1>
+    <h1>Degrad - Forest Degradation in the Brazilian Amazon</h1>
     
     <div class="hidden name"><code>load_degrad.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Loads and cleans degradation data from INPE.</p>
+    <p>Loads information on forest degradation in the Brazilian Amazon, replaced by DETER-B in December 2016. Data is available from 2007 to 2016. See <a href='http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad'>http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad</a>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>load_degrad</span><span class='op'>(</span>
-  <span class='va'>source</span>,
-  space_aggregation <span class='op'>=</span> <span class='st'>"municipality"</span>,
-  time_aggregation <span class='op'>=</span> <span class='st'>"year"</span>,
-  language <span class='op'>=</span> <span class='st'>"eng"</span>,
-  all_events <span class='op'>=</span> <span class='cn'>FALSE</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>load_degrad</span><span class='op'>(</span>dataset <span class='op'>=</span> <span class='st'>"degrad"</span>, <span class='va'>raw_data</span>, <span class='va'>time_period</span>, language <span class='op'>=</span> <span class='st'>"eng"</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>source</th>
-      <td><p>A number of different sources are supported:</p>
-<p>Passing a numeric <code>vector</code> of years will download the corresponding DEGRAD datasets from INPE's website. Available versions are 2007-2016.</p>
-<p>Passing a <code>string</code> with a directory's path will read data from all shapefiles in the directory.</p>
-<p>Alternatively, <code>source</code> may be a list of full file paths, or anything else readable by <code><a href='https://r-spatial.github.io/sf/reference/st_read.html'>sf::read_sf()</a></code>.</p></td>
+      <th>dataset</th>
+      <td><p>A dataset name ("degrad").</p></td>
     </tr>
     <tr>
-      <th>space_aggregation</th>
-      <td><p>A string that indicates the level of spatial aggregation of the data. It can be by "Municipality" or
-"State".</p></td>
+      <th>raw_data</th>
+      <td><p>A <code>boolean</code> setting the return of raw (<code>TRUE</code>) or processed (<code>FALSE</code>) data.</p></td>
     </tr>
     <tr>
-      <th>time_aggregation</th>
-      <td><p>A string that indicates the level of temporal aggregation of the data. It can be by "Month" or
-"Year".</p></td>
+      <th>time_period</th>
+      <td><p>A <code>numeric</code> indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.</p></td>
     </tr>
     <tr>
       <th>language</th>
-      <td><p>A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
-The other option is "pt" for Portuguese.</p></td>
-    </tr>
-    <tr>
-      <th>all_events</th>
-      <td><p>Set to TRUE if you want non-degradation data from the DEGRAD project.</p></td>
+      <td><p>A <code>string</code> that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A <code>tibble</code>.</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p><a href='load_degrad_raw.html'>load_degrad_raw</a> for loading raw data.</p></div>
-    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
-
-    <p>DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro.</p>
+    <p>A <code>list</code> with the selected data.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='fu'>load_degrad</span><span class='op'>(</span><span class='fl'>2016</span><span class='op'>)</span>
-
-<span class='fu'>load_degrad</span><span class='op'>(</span>
-  <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>2015</span>, <span class='fl'>2016</span><span class='op'>)</span>,
-  space_aggregation <span class='op'>=</span> <span class='st'>"state"</span>,
-  language <span class='op'>=</span> <span class='st'>"pt"</span>
-<span class='op'>)</span>
-
-<span class='fu'>load_degrad</span><span class='op'>(</span>
-  <span class='st'>"~/Downloads"</span>,
-  space_aggregation <span class='op'>=</span> <span class='st'>"state"</span>,
-  time_aggregation <span class='op'>=</span> <span class='st'>"year"</span>,
-  language <span class='op'>=</span> <span class='st'>"en"</span>
-<span class='op'>)</span>
-
-<span class='fu'>load_degrad</span><span class='op'>(</span>
-  <span class='st'>"~/Downloads/degrad2016_final_shp/DEGRAD_2016_pol.shp"</span>,
-  time_aggregation <span class='op'>=</span> <span class='st'>"municipality"</span>,
-  language <span class='op'>=</span> <span class='st'>"pt"</span>
-<span class='op'>)</span>
+<span class='co'># download raw data from 2007 to 2016</span>
+<span class='va'>raw_degrad_all</span> <span class='op'>&lt;-</span> <span class='fu'>load_degrad</span><span class='op'>(</span>dataset <span class='op'>=</span> <span class='st'>"degrad"</span>,
+                              raw_data <span class='op'>=</span> <span class='cn'>TRUE</span>,
+                              time_period <span class='op'>=</span> <span class='fl'>2007</span><span class='op'>:</span><span class='fl'>2016</span><span class='op'>)</span>
 <span class='op'>}</span>
+
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -253,7 +213,7 @@ The other option is "pt" for Portuguese.</p></td>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Francisco de Lima Cavalcanti, Daniel AC Barbosa, Bruno Alcantara Duarte, Victor Aliende da Matta, Arthur Carvalho Brito, Anna Carolina Dutra Saraiva, Arthur Carvalho Brito, Igor Rigolon Veiga, Maria Mittelbach.</p>
+  <p>Developed by Francisco de Lima Cavalcanti, Guilherme Jardim, Daniel AC Barbosa, Bruno Alcantara Duarte, Victor Aliende da Matta, Arthur Carvalho Brito, Anna Carolina Dutra Saraiva, Arthur Carvalho Brito, Igor Rigolon Veiga, Maria Mittelbach.</p>
 </div>
 
 <div class="pkgdown">

@@ -6,14 +6,14 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Loads and cleans INPE data on areas with deforestation warnings — load_deter • datazoom.amazonia</title>
+<title>DETER - Forest Degradation in the Brazilian Amazon — load_deter • datazoom.amazonia</title>
 
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cerulean/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="Loads and cleans INPE data on areas with deforestation warnings — load_deter" />
-<meta property="og:description" content="Loads and cleans INPE data on areas with deforestation warnings" />
+<meta property="og:title" content="DETER - Forest Degradation in the Brazilian Amazon — load_deter" />
+<meta property="og:description" content="Loads information on change in forest cover in the Amazon. Survey is done at state or municipal level. See http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter" />
 
 
 
@@ -110,9 +110,6 @@
       <a href="../articles/DETER.html">DETER</a>
     </li>
     <li>
-      <a href="../articles/dz_amazonia_guide.html">DataZoom Amazonia</a>
-    </li>
-    <li>
       <a href="../articles/GDP.html">GDP</a>
     </li>
     <li>
@@ -160,98 +157,55 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Loads and cleans INPE data on areas with deforestation warnings</h1>
+    <h1>DETER - Forest Degradation in the Brazilian Amazon</h1>
     
     <div class="hidden name"><code>load_deter.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Loads and cleans INPE data on areas with deforestation warnings</p>
+    <p>Loads information on change in forest cover in the Amazon. Survey is done at state or municipal level. See <a href='http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter'>http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter</a></p>
     </div>
 
-    <pre class="usage"><span class='fu'>load_deter</span><span class='op'>(</span>
-  source <span class='op'>=</span> <span class='st'>"amazonia"</span>,
-  space_aggregation <span class='op'>=</span> <span class='st'>"municipality"</span>,
-  time_aggregation <span class='op'>=</span> <span class='st'>"year"</span>,
-  language <span class='op'>=</span> <span class='st'>"eng"</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>load_deter</span><span class='op'>(</span>dataset <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>raw_data</span>, <span class='va'>geo_level</span>, <span class='va'>time_period</span>, language <span class='op'>=</span> <span class='st'>"eng"</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>source</th>
-      <td><p>A string indicating where the data will be drawn from.</p>
-<p>It can be "Amazonia" or "Cerrado", in which case the data will be pulled from the INPE website for the corresponding biome. Set to "Amazonia" by default.</p>
-<p>It can also be a path to a .zip file as is obtained from the INPE website, containing a file named "deter_public.dbf".</p></td>
+      <th>dataset</th>
+      <td><p>A dataset name ("deter_amz", "deter_cerrado") with information about both Amazon and Cerrado</p></td>
     </tr>
     <tr>
-      <th>space_aggregation</th>
-      <td><p>A string indicating if you want the data aggregated by "Municipality", the default alternative, or
-by "State".</p></td>
+      <th>raw_data</th>
+      <td><p>A <code>boolean</code> setting the return of raw (<code>TRUE</code>) or processed (<code>FALSE</code>) data.</p></td>
     </tr>
     <tr>
-      <th>time_aggregation</th>
-      <td><p>A string defining whether data will be aggregated by "month" or by "year".</p></td>
+      <th>geo_level</th>
+      <td><p>A <code>string</code> that defines the geographic level of the data. Can be "municipality" or "state".</p></td>
+    </tr>
+    <tr>
+      <th>time_period</th>
+      <td><p>A <code>numeric</code> indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.</p></td>
     </tr>
     <tr>
       <th>language</th>
-      <td><p>A string that indicates in which language the data will be returned. The default is "eng", so your data will be returned in English.
-The other option is "pt" for Portuguese.</p></td>
+      <td><p>A <code>string</code> that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A <code>tibble</code>.</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p><a href='load_deter_raw.html'>load_deter_raw</a> for loading raw data.</p></div>
-    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
-
-    <p>DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro.</p>
+    <p>A <code>tibble</code> with the selected data.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>load_deter</span><span class='op'>(</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span style='color: #949494;'># A tibble: 6,306 x 7</span><span>
-#&gt; </span><span style='color: #949494;'># Groups:   Municipality, Year, Class [6,302]</span><span>
-#&gt;    Municipality   Year Class      UF    CodIBGE Area_in_CU_km2 Area_in_Municipa~
-#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>         </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>      </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>   </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>          </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>             </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> Abaetetuba     </span><span style='text-decoration: underline;'>2</span><span>020 Clear Cut~ PA    1</span><span style='text-decoration: underline;'>500</span><span>107              0            0.944 
-#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> Abel Figueir~  </span><span style='text-decoration: underline;'>2</span><span>016 Fire Scar  PA    1</span><span style='text-decoration: underline;'>500</span><span>131              0            2.26  
-#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> Abel Figueir~  </span><span style='text-decoration: underline;'>2</span><span>016 Clear Cut~ PA    1</span><span style='text-decoration: underline;'>500</span><span>131              0            0.068</span><span style='text-decoration: underline;'>0</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> Abel Figueir~  </span><span style='text-decoration: underline;'>2</span><span>017 Fire Scar  PA    1</span><span style='text-decoration: underline;'>500</span><span>131              0            3.93  
-#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> Abel Figueir~  </span><span style='text-decoration: underline;'>2</span><span>017 Degradati~ PA    1</span><span style='text-decoration: underline;'>500</span><span>131              0            0.295 
-#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> Abel Figueir~  </span><span style='text-decoration: underline;'>2</span><span>017 Clear Cut~ PA    1</span><span style='text-decoration: underline;'>500</span><span>131              0            0.314 
-#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> Abel Figueir~  </span><span style='text-decoration: underline;'>2</span><span>018 Degradati~ PA    1</span><span style='text-decoration: underline;'>500</span><span>131              0            0.141 
-#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> Abel Figueir~  </span><span style='text-decoration: underline;'>2</span><span>018 Clear Cut~ PA    1</span><span style='text-decoration: underline;'>500</span><span>131              0            0.084</span><span style='text-decoration: underline;'>3</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> Abel Figueir~  </span><span style='text-decoration: underline;'>2</span><span>019 Fire Scar  PA    1</span><span style='text-decoration: underline;'>500</span><span>131              0            0.874 
-#&gt; </span><span style='color: #BCBCBC;'>10</span><span> Abel Figueir~  </span><span style='text-decoration: underline;'>2</span><span>019 Degradati~ PA    1</span><span style='text-decoration: underline;'>500</span><span>131              0            0.041</span><span style='text-decoration: underline;'>0</span><span>
-#&gt; </span><span style='color: #949494;'># ... with 6,296 more rows</span><span></div><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='fu'>load_deter</span><span class='op'>(</span><span class='st'>"path/to/deter.zip"</span>, space_aggregation <span class='op'>=</span> <span class='st'>"municipality"</span>, time_aggregation <span class='op'>=</span> <span class='st'>"year"</span><span class='op'>)</span>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># download municipality raw data from all years from Amazonia</span>
+<span class='va'>deter_amz</span> <span class='op'>&lt;-</span> <span class='fu'>load_deter</span><span class='op'>(</span>dataset <span class='op'>=</span> <span class='st'>'deter_amz'</span>,
+                        raw_data <span class='op'>=</span> <span class='cn'>TRUE</span>,
+                        geo_level <span class='op'>=</span> <span class='st'>'municipality'</span>,
+                        time_period <span class='op'>=</span> <span class='st'>"all"</span><span class='op'>)</span>
 <span class='op'>}</span>
-
-<span class='fu'>load_deter</span><span class='op'>(</span>
-  source <span class='op'>=</span> <span class='st'>"cerrado"</span>,
-  space_aggregation <span class='op'>=</span> <span class='st'>"state"</span>,
-  time_aggregation <span class='op'>=</span> <span class='st'>"month"</span>,
-  language <span class='op'>=</span> <span class='st'>"pt"</span>
-<span class='op'>)</span>
-</div><div class='output co'>#&gt; </span><span style='color: #949494;'># A tibble: 349 x 6</span><span>
-#&gt; </span><span style='color: #949494;'># Groups:   UF, Ano, Mes [349]</span><span>
-#&gt;    UF      Ano   Mes Classe Area_em_UC_km2 Area_em_Municipio_km2
-#&gt;    </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #949494;font-style: italic;'>&lt;chr&gt;</span><span>           </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>                 </span><span style='color: #949494;font-style: italic;'>&lt;dbl&gt;</span><span>
-#&gt; </span><span style='color: #BCBCBC;'> 1</span><span> BA     </span><span style='text-decoration: underline;'>2</span><span>018     5 aviso         0.140                   288. 
-#&gt; </span><span style='color: #BCBCBC;'> 2</span><span> BA     </span><span style='text-decoration: underline;'>2</span><span>018     6 aviso         0.005</span><span style='text-decoration: underline;'>96</span><span>                 203. 
-#&gt; </span><span style='color: #BCBCBC;'> 3</span><span> BA     </span><span style='text-decoration: underline;'>2</span><span>018     7 aviso         0                        76.4
-#&gt; </span><span style='color: #BCBCBC;'> 4</span><span> BA     </span><span style='text-decoration: underline;'>2</span><span>018     8 aviso         0.798                    22.9
-#&gt; </span><span style='color: #BCBCBC;'> 5</span><span> BA     </span><span style='text-decoration: underline;'>2</span><span>018     9 aviso         0                        64.1
-#&gt; </span><span style='color: #BCBCBC;'> 6</span><span> BA     </span><span style='text-decoration: underline;'>2</span><span>018    10 aviso         0                        41.6
-#&gt; </span><span style='color: #BCBCBC;'> 7</span><span> BA     </span><span style='text-decoration: underline;'>2</span><span>018    11 aviso         0.464                    84.8
-#&gt; </span><span style='color: #BCBCBC;'> 8</span><span> BA     </span><span style='text-decoration: underline;'>2</span><span>018    12 aviso         0                        38.1
-#&gt; </span><span style='color: #BCBCBC;'> 9</span><span> BA     </span><span style='text-decoration: underline;'>2</span><span>019     1 aviso         0.007</span><span style='text-decoration: underline;'>50</span><span>                 103. 
-#&gt; </span><span style='color: #BCBCBC;'>10</span><span> BA     </span><span style='text-decoration: underline;'>2</span><span>019     2 aviso         0                        35.7
-#&gt; </span><span style='color: #949494;'># ... with 339 more rows</span><span></div></span></pre>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -263,7 +217,7 @@ The other option is "pt" for Portuguese.</p></td>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Francisco de Lima Cavalcanti, Daniel AC Barbosa, Bruno Alcantara Duarte, Victor Aliende da Matta, Arthur Carvalho Brito, Anna Carolina Dutra Saraiva, Arthur Carvalho Brito, Igor Rigolon Veiga, Maria Mittelbach.</p>
+  <p>Developed by Francisco de Lima Cavalcanti, Guilherme Jardim, Daniel AC Barbosa, Bruno Alcantara Duarte, Victor Aliende da Matta, Arthur Carvalho Brito, Anna Carolina Dutra Saraiva, Arthur Carvalho Brito, Igor Rigolon Veiga, Maria Mittelbach.</p>
 </div>
 
 <div class="pkgdown">

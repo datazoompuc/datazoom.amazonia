@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Simplify access to data from the Amazon Region • datazoom.amazonia</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cerulean/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
 <script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
@@ -70,9 +70,6 @@
       <a href="articles/DETER.html">DETER</a>
     </li>
     <li>
-      <a href="articles/dz_amazonia_guide.html">DataZoom Amazonia</a>
-    </li>
-    <li>
       <a href="articles/GDP.html">GDP</a>
     </li>
     <li>
@@ -122,9 +119,44 @@
 <a href="#datazoomamazonia" class="anchor"></a>datazoom.amazonia</h1></div>
 <!-- badges: start -->
 
+<!-- badges: end -->
 <p><span class="math display"><em>E</em><em>D</em><em>I</em><em>T</em><em>T</em><em>H</em><em>I</em><em>S</em></span></p>
 <p>The goal of datazoom.amazonia is to facilitate access to official data regarding the Amazon. The package provides functions that download and pre-process selected datasets. Data is in general provided at the municipality-year level (see the documentation for more information).</p>
 <p><strong>May 4th - All functions are currently under review – please do not download till further notice!</strong></p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html">tribble</a></span><span class="op">(</span><span class="op">~</span><span class="va">Data</span>,<span class="op">~</span><span class="va">Source</span>,<span class="op">~</span><span class="st">'Download Type'</span>,<span class="op">~</span><span class="st">'Geographical Units'</span>,<span class="op">~</span><span class="st">'Time Periods'</span>,<span class="op">~</span><span class="st">'Docs Link'</span>, <span class="op">~</span><span class="st">'Download Link'</span>,
+                <span class="st">'PRODES'</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,
+                <span class="st">'DETER'</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,
+                <span class="st">'DEGRAD'</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,
+                <span class="st">'COMEX'</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,
+                <span class="st">'GDP'</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,
+                <span class="st">'CEMPRE'</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,
+                <span class="st">'CENSUS'</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,
+                <span class="st">'SIGMINE'</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,
+                <span class="st">'PAM'</span>,<span class="st">'IBGE'</span>,<span class="st">'API - Sidra'</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,
+                <span class="st">'PEVS'</span>,<span class="st">'IBGE'</span>,<span class="st">'API - Sidra'</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,
+                <span class="st">'PPM'</span>,<span class="st">'IBGE'</span>,<span class="st">'API - Sidra'</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,
+                <span class="st">'MAPBIOMAS'</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,
+                <span class="st">'IPS'</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,
+                <span class="st">'SEEG'</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,<span class="op">)</span>
+<span class="co">#&gt; # A tibble: 14 x 7</span>
+<span class="co">#&gt;    Data     Source `Download Type` `Geographical Uni~ `Time Periods` `Docs Link`</span>
+<span class="co">#&gt;    &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;           &lt;lgl&gt;              &lt;lgl&gt;          &lt;lgl&gt;      </span>
+<span class="co">#&gt;  1 PRODES   &lt;NA&gt;   &lt;NA&gt;            NA                 NA             NA         </span>
+<span class="co">#&gt;  2 DETER    &lt;NA&gt;   &lt;NA&gt;            NA                 NA             NA         </span>
+<span class="co">#&gt;  3 DEGRAD   &lt;NA&gt;   &lt;NA&gt;            NA                 NA             NA         </span>
+<span class="co">#&gt;  4 COMEX    &lt;NA&gt;   &lt;NA&gt;            NA                 NA             NA         </span>
+<span class="co">#&gt;  5 GDP      &lt;NA&gt;   &lt;NA&gt;            NA                 NA             NA         </span>
+<span class="co">#&gt;  6 CEMPRE   &lt;NA&gt;   &lt;NA&gt;            NA                 NA             NA         </span>
+<span class="co">#&gt;  7 CENSUS   &lt;NA&gt;   &lt;NA&gt;            NA                 NA             NA         </span>
+<span class="co">#&gt;  8 SIGMINE  &lt;NA&gt;   &lt;NA&gt;            NA                 NA             NA         </span>
+<span class="co">#&gt;  9 PAM      IBGE   API - Sidra     NA                 NA             NA         </span>
+<span class="co">#&gt; 10 PEVS     IBGE   API - Sidra     NA                 NA             NA         </span>
+<span class="co">#&gt; 11 PPM      IBGE   API - Sidra     NA                 NA             NA         </span>
+<span class="co">#&gt; 12 MAPBIOM~ &lt;NA&gt;   &lt;NA&gt;            NA                 NA             NA         </span>
+<span class="co">#&gt; 13 IPS      &lt;NA&gt;   &lt;NA&gt;            NA                 NA             NA         </span>
+<span class="co">#&gt; 14 SEEG     &lt;NA&gt;   &lt;NA&gt;            NA                 NA             NA         </span>
+<span class="co">#&gt; # ... with 1 more variable: Download Link &lt;lgl&gt;</span></code></pre></div>
 <ul>
 <li>INPE - PRODES: deforestation</li>
 <li>INPE - DETER: deforestation warnings</li>
@@ -144,14 +176,14 @@
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p>Currently you can only install the development version from <a href="https://github.com/">GitHub</a> with:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># install.packages("devtools")</span>
 <span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="op">(</span><span class="st">"datazoompuc/datazoom.amazonia"</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="usage-for-inpe-data" class="section level2">
 <h2 class="hasAnchor">
 <a href="#usage-for-inpe-data" class="anchor"></a>Usage for INPE data</h2>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://www.econ.puc-rio.br/datazoom">datazoom.amazonia</a></span><span class="op">)</span>
 
 <span class="co"># Downloads data</span>
@@ -174,22 +206,22 @@
 <div id="usage-for-comex-data" class="section level2">
 <h2 class="hasAnchor">
 <a href="#usage-for-comex-data" class="anchor"></a>Usage for COMEX data</h2>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Downloads data</span>
 
 <span class="va">years</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2000</span><span class="op">:</span><span class="fl">2009</span><span class="op">)</span>
 
-<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_comex.html">load_comex</a></span><span class="op">(</span><span class="va">years</span>, ncm <span class="op">=</span> <span class="cn">TRUE</span>, exp <span class="op">=</span> <span class="cn">TRUE</span>, imp <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">load_comex</span><span class="op">(</span><span class="va">years</span>, ncm <span class="op">=</span> <span class="cn">TRUE</span>, exp <span class="op">=</span> <span class="cn">TRUE</span>, imp <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="usage-for-ibge-data" class="section level2">
 <h2 class="hasAnchor">
 <a href="#usage-for-ibge-data" class="anchor"></a>Usage for IBGE data</h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">##PIB-Munic</span>
 
-<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_amazon_gdp.html">load_amazon_gdp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2014</span>, <span class="fl">2015</span><span class="op">)</span><span class="op">)</span>
+<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">load_amazon_gdp</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2014</span>, <span class="fl">2015</span><span class="op">)</span><span class="op">)</span>
 
-<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_amazon_gdp.html">load_amazon_gdp</a></span><span class="op">(</span><span class="fl">2017</span>, space_aggregation <span class="op">=</span> <span class="st">"state"</span>, language <span class="op">=</span> <span class="st">"pt"</span><span class="op">)</span>
+<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">load_amazon_gdp</span><span class="op">(</span><span class="fl">2017</span>, space_aggregation <span class="op">=</span> <span class="st">"state"</span>, language <span class="op">=</span> <span class="st">"pt"</span><span class="op">)</span>
 
 <span class="co">##SIGMINE</span>
 
@@ -197,40 +229,40 @@
 
 <span class="co">##PAM</span>
 
-<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_pam_permanent.html">load_pam_permanent</a></span><span class="op">(</span><span class="fl">2013</span>, aggregation_level <span class="op">=</span> <span class="st">"region"</span><span class="op">)</span>
+<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">load_pam_permanent</span><span class="op">(</span><span class="fl">2013</span>, aggregation_level <span class="op">=</span> <span class="st">"region"</span><span class="op">)</span>
 
 <span class="co">##PEVS</span>
 
-<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">datazoom.amazonia</span><span class="fu">::</span><span class="fu"><a href="reference/load_pevs_areasilv.html">load_pevs_areasilv</a></span><span class="op">(</span><span class="fl">2017</span>, aggregation_level <span class="op">=</span> <span class="st">"state"</span>, language <span class="op">=</span> <span class="st">"eng"</span><span class="op">)</span></code></pre></div>
+<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">datazoom.amazonia</span><span class="fu">::</span><span class="fu">load_pevs_areasilv</span><span class="op">(</span><span class="fl">2017</span>, aggregation_level <span class="op">=</span> <span class="st">"state"</span>, language <span class="op">=</span> <span class="st">"eng"</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="usage-for-mapbiomas-data" class="section level2">
 <h2 class="hasAnchor">
 <a href="#usage-for-mapbiomas-data" class="anchor"></a>Usage for MAPBIOMAS data</h2>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Downloads data</span>
 
-<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_mapbiomas_covering.html">load_mapbiomas_covering</a></span><span class="op">(</span>space_aggregation <span class="op">=</span> <span class="st">'municipality'</span>, path <span class="op">=</span> <span class="cn">NULL</span>, covering <span class="op">=</span> <span class="fl">3</span>, years <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2005</span><span class="op">:</span><span class="fl">2015</span><span class="op">)</span><span class="op">)</span>
+<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">load_mapbiomas_covering</span><span class="op">(</span>space_aggregation <span class="op">=</span> <span class="st">'municipality'</span>, path <span class="op">=</span> <span class="cn">NULL</span>, covering <span class="op">=</span> <span class="fl">3</span>, years <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2005</span><span class="op">:</span><span class="fl">2015</span><span class="op">)</span><span class="op">)</span>
 
-<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_mapbiomas_transition.html">load_mapbiomas_transition</a></span><span class="op">(</span>transition_interval <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>
+<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">load_mapbiomas_transition</span><span class="op">(</span>transition_interval <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>
 
 <span class="co"># Loads data locally</span>
 
-<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_mapbiomas_covering.html">load_mapbiomas_covering</a></span><span class="op">(</span><span class="st">"~/Downloads"</span><span class="op">)</span>
+<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">load_mapbiomas_covering</span><span class="op">(</span><span class="st">"~/Downloads"</span><span class="op">)</span>
 
-<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_mapbiomas_transition.html">load_mapbiomas_transition</a></span><span class="op">(</span><span class="st">"~/Downloads"</span><span class="op">)</span></code></pre></div>
+<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">load_mapbiomas_transition</span><span class="op">(</span><span class="st">"~/Downloads"</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="usage-for-imazon-data" class="section level2">
 <h2 class="hasAnchor">
 <a href="#usage-for-imazon-data" class="anchor"></a>Usage for IMAZON data</h2>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">##IPS</span>
 
-<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_IPS.html">load_IPS</a></span><span class="op">(</span>download_directory <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/getwd.html">getwd</a></span><span class="op">(</span><span class="op">)</span>, language <span class="op">=</span> <span class="st">"pt"</span><span class="op">)</span></code></pre></div>
+<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">load_IPS</span><span class="op">(</span>download_directory <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/getwd.html">getwd</a></span><span class="op">(</span><span class="op">)</span>, language <span class="op">=</span> <span class="st">"pt"</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="usage-for-seeg-data" class="section level2">
 <h2 class="hasAnchor">
 <a href="#usage-for-seeg-data" class="anchor"></a>Usage for SEEG data</h2>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">##SEEG</span>
 
 <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_seeg.html">load_seeg</a></span><span class="op">(</span>language <span class="op">=</span> <span class="st">"eng"</span><span class="op">)</span></code></pre></div>
@@ -238,7 +270,7 @@
 <div id="usage-for-sigmine-data" class="section level2">
 <h2 class="hasAnchor">
 <a href="#usage-for-sigmine-data" class="anchor"></a>Usage for SIGMINE data</h2>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Downloads data</span>
 
 <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_sigmine.html">load_sigmine</a></span><span class="op">(</span>space_aggregation <span class="op">=</span> <span class="st">'municipality'</span>, source <span class="op">=</span> <span class="cn">NULL</span>, language <span class="op">=</span> <span class="st">'pt'</span><span class="op">)</span>
@@ -266,8 +298,9 @@
 <div class="developers">
 <h2>Developers</h2>
 <ul class="list-unstyled">
-<li>Francisco de Lima Cavalcanti <br><small class="roles"> Author </small>  </li>
-<li>Daniel AC Barbosa <br><small class="roles"> Author, maintainer </small>  </li>
+<li>Francisco de Lima Cavalcanti <br><small class="roles"> Author, maintainer </small>  </li>
+<li>Guilherme Jardim <br><small class="roles"> Author </small>  </li>
+<li>Daniel AC Barbosa <br><small class="roles"> Author </small>  </li>
 <li>Bruno Alcantara Duarte <br><small class="roles"> Author </small>  </li>
 <li>Victor Aliende da Matta <br><small class="roles"> Author </small>  </li>
 <li>Arthur Carvalho Brito <br><small class="roles"> Author </small>  </li>
@@ -289,7 +322,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Francisco de Lima Cavalcanti, Daniel AC Barbosa, Bruno Alcantara Duarte, Victor Aliende da Matta, Arthur Carvalho Brito, Anna Carolina Dutra Saraiva, Arthur Carvalho Brito, Igor Rigolon Veiga, Maria Mittelbach.</p>
+  <p>Developed by Francisco de Lima Cavalcanti, Guilherme Jardim, Daniel AC Barbosa, Bruno Alcantara Duarte, Victor Aliende da Matta, Arthur Carvalho Brito, Anna Carolina Dutra Saraiva, Arthur Carvalho Brito, Igor Rigolon Veiga, Maria Mittelbach.</p>
 </div>
 
 <div class="pkgdown">

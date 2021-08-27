@@ -6,14 +6,14 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>load_ppm_ibge — load_ppm • datazoom.amazonia</title>
+<title>PPM - Municipal Livestock Production — load_ppm • datazoom.amazonia</title>
 
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cerulean/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
@@ -39,8 +39,8 @@
 
 
 
-<meta property="og:title" content="load_ppm_ibge — load_ppm" />
-<meta property="og:description" content="Download Municipal Livestock Production (Producao Pecuaria Municipal - IBGE)" />
+<meta property="og:title" content="PPM - Municipal Livestock Production — load_ppm" />
+<meta property="og:description" content="Loads information on animal farming inventories and livestock products (IBGE). Survey is done at the municipal level and data is available from 1974 to 2019 for most datasets. See https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/17353-municipal-livestock-production.html?=&amp;amp;t=o-que-e" />
 
 
 
@@ -110,9 +110,6 @@
       <a href="../articles/DETER.html">DETER</a>
     </li>
     <li>
-      <a href="../articles/dz_amazonia_guide.html">DataZoom Amazonia</a>
-    </li>
-    <li>
       <a href="../articles/GDP.html">GDP</a>
     </li>
     <li>
@@ -160,52 +157,54 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>load_ppm_ibge</h1>
+    <h1>PPM - Municipal Livestock Production</h1>
     
     <div class="hidden name"><code>load_ppm.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Download Municipal Livestock Production (Producao Pecuaria Municipal - IBGE)</p>
+    <p>Loads information on animal farming inventories and livestock products (IBGE). Survey is done at the municipal level and data is available from 1974 to 2019 for most datasets. See <a href='https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/17353-municipal-livestock-production.html?=&amp;t=o-que-e'>https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/17353-municipal-livestock-production.html?=&amp;t=o-que-e</a></p>
     </div>
 
-    <pre class="usage"><span class='fu'>load_ppm</span><span class='op'>(</span>
-  type <span class='op'>=</span> <span class='cn'>NULL</span>,
-  years <span class='op'>=</span> <span class='fl'>2019</span>,
-  aggregation_level <span class='op'>=</span> <span class='st'>"municipality"</span>,
-  language <span class='op'>=</span> <span class='st'>"pt"</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>load_ppm</span><span class='op'>(</span>dataset <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>raw_data</span>, <span class='va'>geo_level</span>, <span class='va'>time_period</span>, language <span class='op'>=</span> <span class='st'>"eng"</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>type</th>
-      <td><p>A <code>string</code> with the desired PPM Dataset (see <a href='https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019'>https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019</a>). Accept the IBGE PPM codes or names. 94 ~ "cow_farm", 3939 ~ "cattle_number", 74 ~ "animal_orig_prod", 3940 ~ "water_orig_prod"</p></td>
+      <th>dataset</th>
+      <td><p>A dataset name ("ppm_livetock_inventory", "ppm_sheep_farming", "ppm_animal_orig_production", "ppm_cow_farming" or "ppm_aquaculture". You can also use SIDRA codes (see <a href='https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019'>https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019</a>)</p></td>
     </tr>
     <tr>
-      <th>years</th>
-      <td><p>A <code>sequence</code> of integers in the form year_begin:year_end in which both are numeric. Available time frame is from 1974 to 2019</p></td>
+      <th>raw_data</th>
+      <td><p>A <code>boolean</code> setting the return of raw (<code>TRUE</code>) or processed (<code>FALSE</code>) data.</p></td>
     </tr>
     <tr>
-      <th>aggregation_level</th>
-      <td><p>A <code>string</code> containing the data aggregation level of the output. Can be 'country', 'region', 'state' or 'municipality'</p></td>
+      <th>geo_level</th>
+      <td><p>A <code>string</code> that defines the geographic level of the data. Can be one of "country", "state" or "municipality". See documentation of <code>sidrar</code>.</p></td>
+    </tr>
+    <tr>
+      <th>time_period</th>
+      <td><p>A <code>numeric</code> indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.</p></td>
     </tr>
     <tr>
       <th>language</th>
-      <td><p>A <code>string</code> with the language of the desired output. Can be 'eng' or 'pt' for English or Portuguese.</p></td>
+      <td><p>A <code>string</code> that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A panel (<code>tibble</code> format) with N x T observations in which N is the number of geographical units and T is the number of years selected.</p>
-    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
-
-    <p>DataZoom, Department of Economics, Pontifical Catholic University of Rio de Janeiro</p>
+    <p>A <code>tibble</code> consisting of geographic units that present positive values for any of the variables in the dataset.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='fu'>load_ppm</span><span class='op'>(</span>type<span class='op'>=</span><span class='fl'>3939</span>,years <span class='op'>=</span> <span class='fl'>2018</span><span class='op'>:</span><span class='fl'>2019</span>,aggregation_level <span class='op'>=</span> <span class='st'>'municipality'</span>,language<span class='op'>=</span><span class='st'>'eng'</span><span class='op'>)</span>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='co'># download state raw data from 2012 for animal origin production</span>
+<span class='va'>ppm_aop</span> <span class='op'>&lt;-</span> <span class='fu'>load_ppm</span><span class='op'>(</span>dataset <span class='op'>=</span> <span class='st'>'ppm_animal_origin_production'</span>,
+                    raw_data <span class='op'>=</span> <span class='cn'>TRUE</span>,
+                    geo_level <span class='op'>=</span> <span class='st'>'state'</span>,
+                    time_period <span class='op'>=</span> <span class='fl'>2012</span><span class='op'>)</span>
+<span class='op'>}</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -218,7 +217,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Francisco de Lima Cavalcanti, Daniel AC Barbosa, Bruno Alcantara Duarte, Victor Aliende da Matta, Arthur Carvalho Brito, Anna Carolina Dutra Saraiva, Arthur Carvalho Brito, Igor Rigolon Veiga, Maria Mittelbach.</p>
+  <p>Developed by Francisco de Lima Cavalcanti, Guilherme Jardim, Daniel AC Barbosa, Bruno Alcantara Duarte, Victor Aliende da Matta, Arthur Carvalho Brito, Anna Carolina Dutra Saraiva, Arthur Carvalho Brito, Igor Rigolon Veiga, Maria Mittelbach.</p>
 </div>
 
 <div class="pkgdown">

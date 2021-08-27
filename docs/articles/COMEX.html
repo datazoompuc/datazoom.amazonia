@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>COMEX • datazoom.amazonia</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cerulean/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
@@ -69,9 +69,6 @@
       <a href="../articles/DETER.html">DETER</a>
     </li>
     <li>
-      <a href="../articles/dz_amazonia_guide.html">DataZoom Amazonia</a>
-    </li>
-    <li>
       <a href="../articles/GDP.html">GDP</a>
     </li>
     <li>
@@ -114,7 +111,7 @@
 
       
 
-      </header><script src="COMEX_files/header-attrs-2.7/header-attrs.js"></script><div class="row">
+      </header><script src="COMEX_files/header-attrs-2.9/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>COMEX</h1>
@@ -132,14 +129,19 @@
 <p>The data has a monthly frequency and is available starting from the year 1989. From 1989 to 1996, a different system of nomenclatures was adopted, but all conversions are available on a dictionary in the Comex website (<a href="http://www.mdic.gov.br/balanca/bd/tabelas/NBM_NCM.csv" class="uri">http://www.mdic.gov.br/balanca/bd/tabelas/NBM_NCM.csv</a>). Systems of nomenclature vary in the degree of detail in terms of the product involved, as well as other carachteristics, such as unit and granularity of location.</p>
 <p>##The Function</p>
 <p>This package contains a single function  which extracts data from the Comex website. It allows the user to input the years he would like the data to encompass, the nomenclature used, as well as choosing between import and export data and the language (currently only Portuguese and English are supported).</p>
-<p>The output is a list of dataframes. Each dataframe will contain all years selected, but there will be two for each nomenclature, one for export data and another for import data. The order is of nomenclatures is: NCM first, SH4 second and NBM third. Within each nomentaclature, the dataframe for export comes before the one for import.</p>
+<p>The output is a tibble containing all years selected for the chosen dataset and nomenclature.</p>
 <p>Using the function is easy enough:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://www.econ.puc-rio.br/datazoom">datazoom.amazonia</a></span><span class="op">)</span>
 
-<span class="va">year</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2000</span><span class="op">)</span>
+<span class="co"># download treated exports data by municipality from 1997 to 2021</span>
+<span class="va">exp_mun</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_br_trade.html">load_br_trade</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"comex_export_mun"</span>, raw_data <span class="op">=</span> <span class="cn">FALSE</span>, time_period <span class="op">=</span> <span class="fl">1997</span><span class="op">:</span><span class="fl">2021</span><span class="op">)</span>
 
-<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_comex.html">load_comex</a></span><span class="op">(</span><span class="va">year</span>, ncm <span class="op">=</span> <span class="cn">TRUE</span>, imp <span class="op">=</span> <span class="cn">TRUE</span>, language <span class="op">=</span> <span class="st">"eng"</span><span class="op">)</span></code></pre></div>
+<span class="co"># download raw imports data by municipality from 1997 to 2021</span>
+<span class="va">raw_imp_mun</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_br_trade.html">load_br_trade</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"comex_import_mun"</span>, raw_data <span class="op">=</span> <span class="cn">TRUE</span>, time_period <span class="op">=</span> <span class="fl">1997</span><span class="op">:</span><span class="fl">2021</span><span class="op">)</span>
+
+<span class="co"># download treated imports data by municipality from 1997 to 2021 using "CUCI" classification</span>
+<span class="va">imp_mun_cuci</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_br_trade.html">load_br_trade</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"comex_import_mun"</span>, raw_data <span class="op">=</span> <span class="cn">FALSE</span>, time_period <span class="op">=</span> <span class="fl">1997</span><span class="op">:</span><span class="fl">2021</span>, prod_class <span class="op">=</span> <span class="st">"cuci"</span><span class="op">)</span></code></pre></div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -151,7 +153,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Francisco de Lima Cavalcanti, Daniel AC Barbosa, Bruno Alcantara Duarte, Victor Aliende da Matta, Arthur Carvalho Brito, Anna Carolina Dutra Saraiva, Arthur Carvalho Brito, Igor Rigolon Veiga, Maria Mittelbach.</p>
+  <p>Developed by Francisco de Lima Cavalcanti, Guilherme Jardim, Daniel AC Barbosa, Bruno Alcantara Duarte, Victor Aliende da Matta, Arthur Carvalho Brito, Anna Carolina Dutra Saraiva, Arthur Carvalho Brito, Igor Rigolon Veiga, Maria Mittelbach.</p>
 </div>
 
 <div class="pkgdown">
