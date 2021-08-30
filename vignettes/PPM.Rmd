@@ -1,0 +1,36 @@
+---
+title: "PPM"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{PPM}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## The Dataset
+Municipal Livestock Survey (PPM, in Portuguese) is a nationwide annual survey conducted by IBGE (Brazilian Institute of Geography and Statistics) which provides information on livestock numbers existing in the municipality on the reference date of the survey, as well as the production of animal origin, and the value of production during the reference year. Herds include cattle, pigs, swine breeders, chickens, chickens, quails, horses, buffaloes, goats and sheep. The production of animal origin, in turn, includes the production of milk, chicken eggs, quail eggs, honey, raw wool and silkworm cocoons; the quantities of milked cows and sheared sheep; and aquaculture.
+
+The data also has multiple aggregation levels, such as nationwide, by region, mesoregion and microregion, as well as state and municipality. 
+
+The data available has a yearly frequency and is available from 1974 to the present. More information can be found on this link (only in Portuguese): https://www.ibge.gov.br/estatisticas/economicas/agricultura-e-pecuaria/9107-producao-da-pecuaria-municipal.html
+
+## Usage
+
+Using the function is easy enough:
+
+```{r,eval=FALSE}
+library(datazoom.amazonia)
+
+# download state raw data from 2012 for animal origin production
+ppm_aop <- load_ppm(dataset = 'ppm_animal_origin_production',
+                    raw_data = TRUE,
+                    geo_level = 'state',
+                    time_period = 2012)
+```

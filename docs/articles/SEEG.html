@@ -57,9 +57,6 @@
       <a href="../articles/CEMPRE.html">CEMPRE</a>
     </li>
     <li>
-      <a href="../articles/Census.html">Census</a>
-    </li>
-    <li>
       <a href="../articles/COMEX.html">COMEX</a>
     </li>
     <li>
@@ -69,10 +66,7 @@
       <a href="../articles/DETER.html">DETER</a>
     </li>
     <li>
-      <a href="../articles/GDP.html">GDP</a>
-    </li>
-    <li>
-      <a href="../articles/IBAMA.html">load_ibama</a>
+      <a href="../articles/IBAMA.html">IBAMA</a>
     </li>
     <li>
       <a href="../articles/IPS.html">Social Progress Index</a>
@@ -85,6 +79,12 @@
     </li>
     <li>
       <a href="../articles/PEVS.html">PEVS</a>
+    </li>
+    <li>
+      <a href="../articles/PIBMUNIC.html">PIBMUNIC</a>
+    </li>
+    <li>
+      <a href="../articles/PPM.html">PPM</a>
     </li>
     <li>
       <a href="../articles/PRODES.html">PRODES</a>
@@ -129,18 +129,20 @@
 <a href="#the-dataset" class="anchor"></a>The Dataset</h2>
 <p>The estimates of emissions and removals of greenhouse gases are a database created by the System of Estimates of Emissions and Removals of Greenhouse Gases (SEEG), an initiative of the Observatório do Clima, a network of institutions focused on climate change research in Brazil.</p>
 <p>Using data collected from government entities, institutes, research centers, NGOs and other institutions, the estimates are created using the methodology of the Brazilian Inventory of Anthropic Emissions and Removals of Greenhouse Gases, assembled by the Ministry of Science, Technology and Innovation (MCTI), and the directives of Intergovernmental Panel on Climate Change (IPCC). A further detailed explanation of the methodology used is available in the following link (only in Portuguese): <a href="http://seeg.eco.br/notas-metodologicas/" class="uri">http://seeg.eco.br/notas-metodologicas/</a></p>
-<p>The data has geographical aggregation level of municipalities, and ranges currently from the years 2000 to 2018. Emissions are divided in five main sources: Agricultural and Cattle Raising, Energy, Changes in Use of Land, Industrial Processses and Residues. All greenhouse gases contained in the national inventory are considered, encompassing CO2, CH4, N2O and the HFCs, with the conversion to carbon equivalence (CO2e) also included, both in the metric of GWP (Global Warming Potential) and GTP (Global Temperature Potential).</p>
-<p>The data is download from the SEEG website in the form of one single file, so the option to select a certain range of years in not available. Also, due to the size of the file, a stable internet connection is necessary, and the function may take time to run. The data frame is download, and then column names and row values are cleaned of the accents included in the Portuguese langugage. The only currently available input is the choice of language for translation (only English is supported).</p>
-<p>The function returns a data frame where each row is a different type of emission/removal for a municipality. Over 6 tier of specification for the origin of the emission/removal are available.</p>
+<p>The data ranges currently from the years 2000 to 2018. Emissions are divided in five main sources: Agricultural and Cattle Raising, Energy, Changes in Use of Land, Industrial Processses and Residues. All greenhouse gases contained in the national inventory are considered, encompassing CO2, CH4, N2O and the HFCs, with the conversion to carbon equivalence (CO2e) also included, both in the metric of GWP (Global Warming Potential) and GTP (Global Temperature Potential).</p>
+<p>The data is download from the SEEG website in the form of one single file, so the option to select a certain range of years in not available. Also, due to the size of the file, a stable internet connection is necessary, and the function may take time to run.</p>
 </div>
 <div id="usage" class="section level2">
 <h2 class="hasAnchor">
 <a href="#usage" class="anchor"></a>Usage</h2>
-<p>Using the package is easy enough:</p>
+<p>Using the function is easy enough:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://www.econ.puc-rio.br/datazoom">datazoom.amazonia</a></span><span class="op">)</span>
 
-<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_seeg.html">load_seeg</a></span><span class="op">(</span>language <span class="op">=</span> <span class="st">"eng"</span><span class="op">)</span></code></pre></div>
+<span class="co"># download state raw data</span>
+<span class="va">seeg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_seeg.html">load_seeg</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">'seeg'</span>,
+                  raw_data <span class="op">=</span> <span class="cn">TRUE</span>,
+                  geo_level <span class="op">=</span> <span class="st">"state"</span><span class="op">)</span></code></pre></div>
 </div>
   </div>
 

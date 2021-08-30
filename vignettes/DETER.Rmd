@@ -25,7 +25,10 @@ Areas are reported in square kilometers and informed as both the area which inte
 ```{r,eval=FALSE}
 library(datazoom.amazonia)
 
-load_deter("amazonia", space_aggregation = "municipality", time_aggregation = "year", language = "eng")
+# download municipality raw data from all years from Amazonia
+deter_amz <- load_deter(dataset = 'deter_amz',
+                        raw_data = TRUE,
+                        geo_level = 'municipality',
+                        time_period = "all")
 ```
 
-Note that data extracted via 'load_deter_raw()' retains some additional information on the satellites used on each observation, as well as a variable saying which Conservation Unit was affected in each warning, if any.

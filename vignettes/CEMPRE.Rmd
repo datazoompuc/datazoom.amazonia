@@ -16,9 +16,9 @@ knitr::opts_chunk$set(
 
 ## The Dataset
 
-Employment, salary and firm count data is from IBGE's "Cadastro Central de Empresas" (aka CEMPRE). The data is available between 2006 and 2018.
+Employment, salary and firm data is from IBGE's "Cadastro Central de Empresas" (aka CEMPRE). The data is available between 2006 and 2019.
 
-The definition of the Brazilian Legal Amazon at the municipality level is taken from IBGE's "Mapas Regionais - Amazônia Legal" available here: https://www.ibge.gov.br/geociencias/cartas-e-mapas/mapas-regionais/15819-amazonia-legal.html?=&t=o-que-e. State level information for the Brazilian Legal Amazon is taken from aggregating municipalities. IMPORTANT NOTE: this means that state level information for the amazon region is not representative of the whole state, but rather represents the portion of the state that is also a part of the Brazilian Legal Amazon.
+The definition of the Brazilian Legal Amazon at the municipality level is taken from IBGE's "Mapas Regionais - Amazônia Legal" available here: https://www.ibge.gov.br/geociencias/cartas-e-mapas/mapas-regionais/15819-amazonia-legal.html?=&t=o-que-e. 
 
 ## Usage
 
@@ -27,11 +27,9 @@ Using the package is easy enough:
 ```{r, eval=FALSE}
 library(datazoom.amazonia)
 
-years <- c(2015:2018)
-
-data <- load_amazon_employment(2007)
-
-data <- load_amazon_employment(years, space_aggregation = "state", language = "pt")
-
-data <- load_employment(years)
+# download raw data from 2006 to 2019
+raw_cempre_all <- load_cempre(dataset = "cempre",
+                              raw_data = TRUE,
+                              geo_level = "municipality",
+                              time_period = 2006:2019)
 ```

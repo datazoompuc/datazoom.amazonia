@@ -20,15 +20,9 @@ The MAPBIOMAS project gathers data reporting the type of land covering each year
 
 The data available has an yearly frequency and is available starting from the year 1989.
 
+## Usage
 Using the function is easy enough:
 
 ```{r, eval=FALSE}
 library(datazoom.amazonia)
-
-data <- load_mapbiomas_covering(space_aggregation = 'municipality', path = NULL, covering = 3, years = c(2000:2010))
-
-data <- load_mapbiomas_transition(space_aggregation = 'state', path = NULL, transition_interval = 5)
-
 ```
-
-Data can be retrieved from the website as above or loaded locally.

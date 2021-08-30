@@ -24,20 +24,14 @@ Data is collected based on the PRODES-year, which starts at August 1st and ends 
 
 ## Usage
 
-Using the package is easy enough:
+Using the function is easy enough:
 
 ```{r, eval = FALSE}
 library(datazoom.amazonia)
 
-years <- c(2015, 2016, 2017)
-
-df <- load_prodes(years)
-
-total_deforestation <- function(x) sum(df[df$Year == x, ]$Increment)
-
-for (year in years) {
-  cat("Deforestation in", year, "was", total_deforestation(year), "km2\n")
-}
+# download raw data from 2000 to 2020
+raw_prodes_all <- load_prodes(dataset = "prodes",
+                              raw_data = TRUE,
+                              time_period = 2000:2020)
 ```
 
-Data can be retrieved from the website as above or loaded locally. The raw data is by default translated and made more convenient. Check out `?load_prodes` and `?load_prodes_raw` for other configurations.

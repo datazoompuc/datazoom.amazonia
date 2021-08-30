@@ -1,8 +1,8 @@
 ---
-title: "load_ibama"
+title: "IBAMA"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{ibama_fines}
+  %\VignetteIndexEntry{IBAMA}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -14,52 +14,21 @@ knitr::opts_chunk$set(
 )
 ```
 
-The dataset is originally from the Brazilian Institute of Environment and Renewable 
-Natural Resources (Ibama), documenting environmental embargoes and fines at the individual
-level from 2005 to the present day. The original data is available at
-https://servicos.ibama.gov.br/ctf/publico/areasembargadas/ConsultaPublicaAreasEmbargadas.php.  
+## The Dataset
+
+The dataset is originally from the Brazilian Institute of Environment and Renewable  Natural Resources (Ibama), documenting environmental embargoes and fines at the individual level from 2005 to the present day. The original data is available at https://servicos.ibama.gov.br/ctf/publico/areasembargadas/ConsultaPublicaAreasEmbargadas.php.  
 
 ## Usage
 
-`load_ibama` downloads and compiles data on environmental fines at the municipality or
-state levels considering the Amazon region. The user has the option to either download
-or load the previously stored raw data, choosing a time-location aggregation level.
+`load_ibama` downloads and compiles data on environmental fines at the municipality level considering the Amazon region. 
 
-The function returns a data frame with aggregates considering, for each
-time-location period, counts for total the number of infractions, 
-infractions that already went to trial, and 
-number of unique perpetrators of infractions.
+The function returns either the raw data or a data frame with aggregates considering, for eachtime-location period, counts for total the number of infractions, infractions that already went to trial, and number of unique perpetrators of infractions.
 
-The user has the option of obtaining data either in Portuguese or in English.
-
-To download the data from Ibama's website, set `download_data = TRUE` and choose
-a destination for your data by parameter `download_directory`. Arguments
-`time_aggregation` and `space_aggregation` set the levels through which the aggregation
-should be done. Available options are by year and/or month, and by state and/or 
-municipality, respectively.
-
-
-```{r setup, eval = FALSE}
-
+```{r, eval = FALSE}
 library(datazoom.amazonia)
 
-load_ibama(
-  download_data = TRUE, 
-  download_directory = getwd(),
-  time_aggregation = c('month', 'year'),
-  space_aggregation = c('municipality', 'state'),
-  years = c(2010, 2012),
-  language = "eng"
-  )
+# download raw data from all country
+raw_ibama_all <- load_ibama(dataset = "areas_embargadas",
+                            raw_data = TRUE,
+                            legal_amazon_only = FALSE)
 ```
-
-To load previously downloaded raw data, set `download_data = FALSE` and specify the
-file's path with the parameter `load_from_where`. 
-
-If `language = pt, use 
-`space_aggregation = c('municipio', 'uf')` and `time_aggregation = c('ano', 'mes')` instead
-
-## Credits
-
-Data Zoom is developed by a team at Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio), Department of Economics. Our official website is at: http://www.econ.puc-rio.br/datazoom/index.html.
-

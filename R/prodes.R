@@ -6,7 +6,6 @@
 #'
 #' @param dataset A dataset name ("prodes").
 #' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
-#' @param geo_level A \code{string} that defines the geographic level of the data. Can be "state" or "municipality"
 #' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
 #'
@@ -14,9 +13,8 @@
 #'
 #' @examples
 #' \dontrun{
-#' # download raw state data from 2000 to 2020
+#' # download raw data from 2000 to 2020
 #' raw_prodes_all <- load_prodes(dataset = "prodes",
-#'                               geo_level = "state",
 #'                               raw_data = TRUE,
 #'                               time_period = 2000:2020)
 #' }
@@ -26,7 +24,8 @@
 #' @export
 
 load_prodes <- function(dataset = "prodes", raw_data,
-                        geo_level, time_period,
+                        #geo_level,
+                        time_period,
                         language = 'eng') {
 
   ###########################
@@ -41,7 +40,7 @@ load_prodes <- function(dataset = "prodes", raw_data,
   param=list()
   param$dataset = dataset
   param$raw_data = raw_data
-  param$geo_level = geo_level
+  #param$geo_level = geo_level
   param$time_period = time_period
   param$language = language
   #param$time_id = time_id

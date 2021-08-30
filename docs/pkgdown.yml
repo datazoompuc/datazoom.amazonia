@@ -3,18 +3,18 @@ pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
   CEMPRE: CEMPRE.html
-  Census: Census.html
   COMEX: COMEX.html
   DEGRAD: DEGRAD.html
   DETER: DETER.html
-  GDP: GDP.html
   IBAMA: IBAMA.html
   IPS: IPS.html
   MAPBIOMAS: MAPBIOMAS.html
   PAM: PAM.html
   PEVS: PEVS.html
+  PIBMUNIC: PIBMUNIC.html
+  PPM: PPM.html
   PRODES: PRODES.html
   SEEG: SEEG.html
   SIGMINE: SIGMINE.html
-last_built: 2021-08-27T14:06Z
+last_built: 2021-08-30T16:23Z
 

@@ -1,0 +1,36 @@
+---
+title: "PIBMUNIC"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{PIBMUNIC}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## The Dataset
+
+GDP data at current prices is from IBGE's "Produto Interno Bruto dos Municípios" (aka PIB-Munic). The data is available between 2002 and 2018.
+
+The definition of the Brazilian Legal Amazon at the municipality level is taken from IBGE's "Mapas Regionais - Amazônia Legal" available here: https://www.ibge.gov.br/geociencias/cartas-e-mapas/mapas-regionais/15819-amazonia-legal.html?=&t=o-que-e. 
+
+## Usage
+
+Using the function is easy enough:
+
+```{r,eval=FALSE}
+library(datazoom.amazonia)
+
+# download state raw data from 2012 for all country
+pibmunic <- load_pibmunic(dataset = 'pibmunic',
+                          raw_data = TRUE,
+                          geo_level = 'state',
+                          time_period = 2012,
+                          legal_amazon_only = FALSE)
+```

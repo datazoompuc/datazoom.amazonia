@@ -57,9 +57,6 @@
       <a href="../articles/CEMPRE.html">CEMPRE</a>
     </li>
     <li>
-      <a href="../articles/Census.html">Census</a>
-    </li>
-    <li>
       <a href="../articles/COMEX.html">COMEX</a>
     </li>
     <li>
@@ -69,10 +66,7 @@
       <a href="../articles/DETER.html">DETER</a>
     </li>
     <li>
-      <a href="../articles/GDP.html">GDP</a>
-    </li>
-    <li>
-      <a href="../articles/IBAMA.html">load_ibama</a>
+      <a href="../articles/IBAMA.html">IBAMA</a>
     </li>
     <li>
       <a href="../articles/IPS.html">Social Progress Index</a>
@@ -85,6 +79,12 @@
     </li>
     <li>
       <a href="../articles/PEVS.html">PEVS</a>
+    </li>
+    <li>
+      <a href="../articles/PIBMUNIC.html">PIBMUNIC</a>
+    </li>
+    <li>
+      <a href="../articles/PPM.html">PPM</a>
     </li>
     <li>
       <a href="../articles/PRODES.html">PRODES</a>
@@ -126,11 +126,14 @@
     
 <p>##The Dataset</p>
 <p>The SIGMINE project gathers data reporting each mine in the country and their features such as year, area in square meters, company ownership, element being explored etc.</p>
-<p>Using the function is easy enough:</p>
+<p>##Usage Using the function is easy enough:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://www.econ.puc-rio.br/datazoom">datazoom.amazonia</a></span><span class="op">)</span>
-<span class="fu"><a href="../reference/load_sigmine.html">load_sigmine</a></span><span class="op">(</span>space_aggregation <span class="op">=</span> <span class="st">'state'</span>, source <span class="op">=</span> <span class="cn">NULL</span>, language <span class="op">=</span> <span class="st">'eng'</span><span class="op">)</span></code></pre></div>
-<p>Data can be retrieved from the website as above or loaded locally.</p>
+
+<span class="co"># download state raw data</span>
+<span class="va">sigmine_active</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_sigmine.html">load_sigmine</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">'sigmine_active'</span>,
+                               raw_data <span class="op">=</span> <span class="cn">TRUE</span>,
+                               geo_level <span class="op">=</span> <span class="st">'state'</span><span class="op">)</span></code></pre></div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -5,20 +5,12 @@
 \alias{load_prodes}
 \title{PRODES - Deforestation Monitoring Project in the Legal Amazon by Satellite}
 \usage{
-load_prodes(
-  dataset = "prodes",
-  raw_data,
-  geo_level,
-  time_period,
-  language = "eng"
-)
+load_prodes(dataset = "prodes", raw_data, time_period, language = "eng")
 }
 \arguments{
 \item{dataset}{A dataset name ("prodes").}
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
-
-\item{geo_level}{A \code{string} that defines the geographic level of the data. Can be "state" or "municipality"}
 
 \item{time_period}{A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.}
 
@@ -32,9 +24,8 @@ Loads information on clearcut deforestation in the Legal Amazon and annual defor
 }
 \examples{
 \dontrun{
-# download raw state data from 2000 to 2020
+# download raw data from 2000 to 2020
 raw_prodes_all <- load_prodes(dataset = "prodes",
-                              geo_level = "state",
                               raw_data = TRUE,
                               time_period = 2000:2020)
 }

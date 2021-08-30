@@ -57,9 +57,6 @@
       <a href="../articles/CEMPRE.html">CEMPRE</a>
     </li>
     <li>
-      <a href="../articles/Census.html">Census</a>
-    </li>
-    <li>
       <a href="../articles/COMEX.html">COMEX</a>
     </li>
     <li>
@@ -69,10 +66,7 @@
       <a href="../articles/DETER.html">DETER</a>
     </li>
     <li>
-      <a href="../articles/GDP.html">GDP</a>
-    </li>
-    <li>
-      <a href="../articles/IBAMA.html">load_ibama</a>
+      <a href="../articles/IBAMA.html">IBAMA</a>
     </li>
     <li>
       <a href="../articles/IPS.html">Social Progress Index</a>
@@ -85,6 +79,12 @@
     </li>
     <li>
       <a href="../articles/PEVS.html">PEVS</a>
+    </li>
+    <li>
+      <a href="../articles/PIBMUNIC.html">PIBMUNIC</a>
+    </li>
+    <li>
+      <a href="../articles/PPM.html">PPM</a>
     </li>
     <li>
       <a href="../articles/PRODES.html">PRODES</a>
@@ -131,14 +131,18 @@
 <p>Permanent farming is characterized by a cycle of long duration, whose harvests may be done multiple times across the years without the need of planting seeds again. Temporary farming, on the other hand, consists of cycles of short and medium duration, which after harvesting require planting seeds again.</p>
 <p>The data also has multiple aggregation levels, such as nationwide, by region, mesoregion and microregion, as well as state and municipality.</p>
 <p>The data available has a yearly frequency and is available from 1974 to the present, with the exception of the four multiple-harvest products, which are only available from 2003. More information can be found on this link (only in Portuguese): <a href="https://www.ibge.gov.br/estatisticas/economicas/agricultura-e-pecuaria/9117-producao-agricola-municipal-culturas-temporarias-e-permanentes.html#" class="uri">https://www.ibge.gov.br/estatisticas/economicas/agricultura-e-pecuaria/9117-producao-agricola-municipal-culturas-temporarias-e-permanentes.html#</a>:~:text=A%20pesquisa%20Produ%C3%A7%C3%A3o%20Agr%C3%ADcola%20Municipal,s%C3%A3o%20da%20cesta%20b%C3%A1sica%20do</p>
-<p>##The Function</p>
-<p>The package contains of three function: ,  and  which extract data from the API of the IBGE database website. The first one extracts the data from products of permanent tillage, the second one from products of temporary tillage and the last one encompasses specifically the four products that yield multiple harvests per year (corn, potato, bean and peanut). All of them allow the user to input the years he would like the data to encompass, the geographical aggregation level desired, as well as choosing the language of the data (currently only Portuguese and English are supported). These functions also offer the option to output the data in the long format, in which separate tables are created for each variable and each product becomes a column (whereas previously both were lines of one single larger data frame).</p>
-<p>The output is a data frame containing data for the territorial level chosen, the name of such geographic level, the year of the data, the variable in question, the unit of measurement and the value. Each column has a corresponding column containing the numerical code of the specific value, with the exception of the Value column, which is already numeric. If the long format is selected, the output becomes a list of data frames, one for each one of the variables.</p>
+<p>##Usage</p>
+<!-- The package contains of three function: \code{load_pam_permanent}, \code{load_pam_temporary} and \code{load_pam_main} which extract data from the API of the IBGE database website. The first one extracts the data from products of permanent tillage, the second one from products of temporary tillage and the last one encompasses specifically the four products that yield multiple harvests per year (corn, potato, bean and peanut). All of them allow the user to input the years he would like the data to encompass, the geographical aggregation level desired, as well as choosing the language of the data (currently only Portuguese and English are supported). These functions also offer the option to output the data in the long format, in which separate tables are created for each variable and each product becomes a column (whereas previously both were lines of one single larger data frame). -->
+<!-- The output is a data frame containing data for the territorial level chosen, the name of such geographic level, the year of the data, the variable in question, the unit of measurement and the value. Each column has a corresponding column containing the numerical code of the specific value, with the exception of the Value column, which is already numeric. If the long format is selected, the output becomes a list of data frames, one for each one of the variables. -->
 <p>Using the function is easy enough:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://www.econ.puc-rio.br/datazoom">datazoom.amazonia</a></span><span class="op">)</span>
 
-<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">datazoom.amazonia</span><span class="fu">::</span><span class="fu">load_pam_permanent</span><span class="op">(</span><span class="fl">2017</span>, aggregation_level <span class="op">=</span> <span class="st">"state"</span>, language <span class="op">=</span> <span class="st">"eng"</span><span class="op">)</span></code></pre></div>
+<span class="co"># download state raw data from 2012 for all crops</span>
+<span class="va">pam_all_crops</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_pam.html">load_pam</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">'pam_all_crops'</span>,
+                          raw_data <span class="op">=</span> <span class="cn">TRUE</span>,
+                          geo_level <span class="op">=</span> <span class="st">'state'</span>,
+                          time_period <span class="op">=</span> <span class="fl">2012</span><span class="op">)</span></code></pre></div>
 </div>
   </div>
 
