@@ -1,4 +1,4 @@
-
+^.gitignore$
 ^datazoom\.amazonia\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
