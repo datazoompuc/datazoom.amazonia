@@ -6,6 +6,7 @@ Authors@R: c(
     person("Guilherme", "Jardim", role = c("aut"), email = "gnjardim1@gmail.com"),
     person("Daniel", "AC Barbosa", role = c("aut"), email = "daniel.adrianocb@gmail.com"),
     person("Bruno", "Alcantara Duarte", role = c("aut"), email = "brunoalcanduarte@gmail.com"),
+    person("Fredie", "Didier", role = c("aut"), email = "fdidier@terra.com.br"),
     person("Victor", "Aliende da Matta", role = c("aut"), email = "victor.al.matta@gmail.com"),
     person("Arthur", "Carvalho Brito", role = c("aut"), email = "arthurcbps@gmail.com"),
     person("Anna Carolina", "Dutra Saraiva", role = c("aut"), email = "annadutrasaraiva@gmail.com"),
