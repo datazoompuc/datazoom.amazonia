@@ -5,14 +5,12 @@
 \alias{load_sigmine}
 \title{SIGMINE - Mining Geographic Information System}
 \usage{
-load_sigmine(dataset = "sigmine_active", raw_data, geo_level, language = "eng")
+load_sigmine(dataset = "sigmine_active", raw_data, language = "eng")
 }
 \arguments{
 \item{dataset}{A dataset name ("sigmine_active")}
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
-
-\item{geo_level}{A \code{string} that defines the geographic level of the data. In this case, could be "municipality" or "state".}
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".}
 }
@@ -26,7 +24,6 @@ Loads information the mines being explored legally in Brazil, including their lo
 \dontrun{
 # download state raw data
 sigmine_active <- load_sigmine(dataset = 'sigmine_active',
-                               raw_data = TRUE,
-                               geo_level = 'state')
+                               raw_data = TRUE)
 }
 }

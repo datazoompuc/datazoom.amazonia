@@ -4,7 +4,6 @@
 #'
 #' @param dataset A dataset name ("deter_amz", "deter_cerrado") with information about both Amazon and Cerrado
 #' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
-#' @param geo_level A \code{string} that defines the geographic level of the data. Can be "municipality" or "state".
 #' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
 #'
@@ -17,17 +16,15 @@
 #'
 #' @examples
 #' \dontrun{
-#' # download municipality raw data from all years from Amazonia
+#' # download raw data from all years from Amazonia
 #' deter_amz <- load_deter(dataset = 'deter_amz',
 #'                         raw_data = TRUE,
-#'                         geo_level = 'municipality',
 #'                         time_period = "all")
 #' }
 
 
 load_deter <- function(dataset = NULL, raw_data,
-                       geo_level, time_period,
-                       language = 'eng') {
+                       time_period, language = 'eng') {
 
   ## Dataset can be either Amazonia or Cerrado
   # Default is all time-periods
@@ -63,7 +60,6 @@ load_deter <- function(dataset = NULL, raw_data,
 
   param=list()
   param$dataset = dataset
-  param$geo_level = geo_level
   param$time_period = time_period
   param$language = language
   param$raw_data = raw_data

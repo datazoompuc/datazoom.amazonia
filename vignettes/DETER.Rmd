@@ -25,10 +25,9 @@ Areas are reported in square kilometers and informed as both the area which inte
 ```{r,eval=FALSE}
 library(datazoom.amazonia)
 
-# download municipality raw data from all years from Amazonia
+# download raw data from all years from Amazonia
 deter_amz <- load_deter(dataset = 'deter_amz',
                         raw_data = TRUE,
-                        geo_level = 'municipality',
                         time_period = "all")
 ```
 

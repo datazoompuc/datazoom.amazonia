@@ -24,7 +24,7 @@ The data also has multiple aggregation levels, such as nationwide, by region, me
 
 The data available has a yearly frequency and is available from 1974 to the present, with the exception of the four multiple-harvest products, which are only available from 2003. More information can be found on this link (only in Portuguese): https://www.ibge.gov.br/estatisticas/economicas/agricultura-e-pecuaria/9117-producao-agricola-municipal-culturas-temporarias-e-permanentes.html#:~:text=A%20pesquisa%20Produ%C3%A7%C3%A3o%20Agr%C3%ADcola%20Municipal,s%C3%A3o%20da%20cesta%20b%C3%A1sica%20do 
 
-##Usage
+## Usage
 
 <!-- The package contains of three function: \code{load_pam_permanent}, \code{load_pam_temporary} and \code{load_pam_main} which extract data from the API of the IBGE database website. The first one extracts the data from products of permanent tillage, the second one from products of temporary tillage and the last one encompasses specifically the four products that yield multiple harvests per year (corn, potato, bean and peanut). All of them allow the user to input the years he would like the data to encompass, the geographical aggregation level desired, as well as choosing the language of the data (currently only Portuguese and English are supported). These functions also offer the option to output the data in the long format, in which separate tables are created for each variable and each product becomes a column (whereas previously both were lines of one single larger data frame). -->
 

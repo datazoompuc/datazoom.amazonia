@@ -22,7 +22,7 @@ The data also has multiple aggregation levels, such as nationwide, by region, me
 
 The data available has a yearly frequency and is available from 1986 to the present, with the exception of the data on total area for production, which are only available from 2013 onwards. More information can be found on this link (only in Portuguese): https://www.ibge.gov.br/estatisticas/economicas/agricultura-e-pecuaria/9105-producao-da-extracao-vegetal-e-da-silvicultura.html?=&t=o-que-e
 
-##Usage
+## Usage
 
 <!-- The package contains of three function: \code{load_pevs_vegextr}, \code{load_pevs_silvprod} and \code{load_pevs_areasilv} which extract data from the API of the IBGE database website.  -->
 

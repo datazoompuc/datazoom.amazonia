@@ -45,6 +45,8 @@
 
 
 
+
+
 <!-- mathjax -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script>
@@ -56,9 +58,15 @@
 
 
 
+  
+
+  
+
   </head>
 
   <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -72,19 +80,13 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">datazoom.amazonia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.12.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
@@ -166,13 +168,7 @@
     <p>Loads information on both imports and exports data. Data is available from 1997 to 2021 for most datasets. See <a href='https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta'>https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta</a>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>load_br_trade</span><span class='op'>(</span>
-  dataset <span class='op'>=</span> <span class='cn'>NULL</span>,
-  <span class='va'>raw_data</span>,
-  <span class='va'>time_period</span>,
-  language <span class='op'>=</span> <span class='st'>"eng"</span>,
-  prod_class <span class='op'>=</span> <span class='st'>"hs"</span>
-<span class='op'>)</span></pre>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>load_br_trade</span><span class='op'>(</span>dataset <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>raw_data</span>, <span class='va'>time_period</span>, language <span class='op'>=</span> <span class='st'>"eng"</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -193,10 +189,6 @@
       <th>language</th>
       <td><p>A <code>string</code> that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".</p></td>
     </tr>
-    <tr>
-      <th>prod_class</th>
-      <td><p>A string indicating the classification to be downloaded, chosen between "hs" (SH - Sistema Harmonizado), "cuci" (CUCI - Classificação Uniforme do Comércio Internacional), "isic" (ISIC - Classificação Internacional Padrão por Atividade Econômica), "cgce" (CGCE - Classificação por Grandes Categorias Econômicas). Defaults to "hs".</p></td>
-    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -204,22 +196,21 @@
     <p>A <code>tibble</code> consisting of imports or exports data.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='co'># download treated exports data by municipality from 1997 to 2021</span>
-<span class='va'>exp_mun</span> <span class='op'>&lt;-</span> <span class='fu'>load_br_trade</span><span class='op'>(</span>dataset <span class='op'>=</span> <span class='st'>"comex_export_mun"</span>,
-                         raw_data <span class='op'>=</span> <span class='cn'>FALSE</span>, time_period <span class='op'>=</span> <span class='fl'>1997</span><span class='op'>:</span><span class='fl'>2021</span><span class='op'>)</span>
-
-<span class='co'># download raw imports data by municipality from 1997 to 2021</span>
-<span class='va'>raw_imp_mun</span> <span class='op'>&lt;-</span> <span class='fu'>load_br_trade</span><span class='op'>(</span>dataset <span class='op'>=</span> <span class='st'>"comex_import_mun"</span>,
-                             raw_data <span class='op'>=</span> <span class='cn'>TRUE</span>, time_period <span class='op'>=</span> <span class='fl'>1997</span><span class='op'>:</span><span class='fl'>2021</span><span class='op'>)</span>
-
-<span class='co'># download treated imports data by municipality from 1997 to 2021 using "CUCI" classification</span>
-<span class='va'>imp_mun_cuci</span> <span class='op'>&lt;-</span> <span class='fu'>load_br_trade</span><span class='op'>(</span>dataset <span class='op'>=</span> <span class='st'>"comex_import_mun"</span>,
-                              raw_data <span class='op'>=</span> <span class='cn'>FALSE</span>, time_period <span class='op'>=</span> <span class='fl'>1997</span><span class='op'>:</span><span class='fl'>2021</span>,
-                              prod_class <span class='op'>=</span> <span class='st'>"cuci"</span><span class='op'>)</span>
-<span class='op'>}</span>
-
-</div></pre>
+    <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span class='r-in'><span class='co'># download treated exports data by municipality from 1997 to 2021</span></span>
+<span class='r-in'><span class='va'>exp_mun</span> <span class='op'>&lt;-</span> <span class='fu'>load_br_trade</span><span class='op'>(</span>dataset <span class='op'>=</span> <span class='st'>"comex_export_mun"</span>,</span>
+<span class='r-in'>                         raw_data <span class='op'>=</span> <span class='cn'>FALSE</span>, time_period <span class='op'>=</span> <span class='fl'>1997</span><span class='op'>:</span><span class='fl'>2021</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># download raw imports data by municipality from 1997 to 2021</span></span>
+<span class='r-in'><span class='va'>raw_imp_mun</span> <span class='op'>&lt;-</span> <span class='fu'>load_br_trade</span><span class='op'>(</span>dataset <span class='op'>=</span> <span class='st'>"comex_import_mun"</span>,</span>
+<span class='r-in'>                             raw_data <span class='op'>=</span> <span class='cn'>TRUE</span>, time_period <span class='op'>=</span> <span class='fl'>1997</span><span class='op'>:</span><span class='fl'>2021</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># download treated imports data by ncm from 1997 to 2021</span></span>
+<span class='r-in'><span class='va'>imp_prod</span> <span class='op'>&lt;-</span> <span class='fu'>load_br_trade</span><span class='op'>(</span>dataset <span class='op'>=</span> <span class='st'>"comex_import_prod"</span>,</span>
+<span class='r-in'>                          raw_data <span class='op'>=</span> <span class='cn'>FALSE</span>, time_period <span class='op'>=</span> <span class='fl'>1997</span><span class='op'>:</span><span class='fl'>2021</span><span class='op'>)</span></span>
+<span class='r-in'><span class='op'>}</span></span>
+<span class='r-in'></span>
+</code></pre></div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -231,11 +222,11 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Francisco de Lima Cavalcanti, Guilherme Jardim, Daniel AC Barbosa, Bruno Alcantara Duarte, Victor Aliende da Matta, Arthur Carvalho Brito, Anna Carolina Dutra Saraiva, Arthur Carvalho Brito, Igor Rigolon Veiga, Maria Mittelbach.</p>
+  <p><p>Developed by DataZoom (PUC-Rio), Francisco de Lima Cavalcanti, Guilherme Jardim, Daniel AC Barbosa, Bruno Alcantara Duarte, Fredie Didier, Tito Bruni, Victor Aliende da Matta, Arthur Carvalho Brito, Anna Carolina Dutra Saraiva, Arthur Carvalho Brito, Igor Rigolon Veiga, Maria Mittelbach.</p></p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
 </div>
 
       </footer>
@@ -243,6 +234,8 @@
 
   
 
+
+  
 
   </body>
 </html>

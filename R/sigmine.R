@@ -4,7 +4,6 @@
 #'
 #' @param dataset A dataset name ("sigmine_active")
 #' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
-#' @param geo_level A \code{string} that defines the geographic level of the data. In this case, could be "municipality" or "state".
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
 #'
 #' @return A \code{tibble} with the selected data.
@@ -17,13 +16,12 @@
 #' @examples \dontrun{
 #' # download state raw data
 #' sigmine_active <- load_sigmine(dataset = 'sigmine_active',
-#'                                raw_data = TRUE,
-#'                                geo_level = 'state')
+#'                                raw_data = TRUE)
 #' }
 
 
 load_sigmine = function(dataset = 'sigmine_active',
-                        raw_data, geo_level,
+                        raw_data,
                         language = 'eng'){
 
 
@@ -35,7 +33,7 @@ load_sigmine = function(dataset = 'sigmine_active',
 
   param=list()
   param$dataset = dataset
-  param$geo_level = geo_level
+  #param$geo_level = geo_level
   #param$time_period = time_period
   param$language = language
   #param$time_id = time_id
