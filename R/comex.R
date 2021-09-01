@@ -8,7 +8,6 @@
 #' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
 #' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
-#' @param prod_class A string indicating the classification to be downloaded, chosen between "hs" (SH - Sistema Harmonizado), "cuci" (CUCI - Classificação Uniforme do Comércio Internacional), "isic" (ISIC - Classificação Internacional Padrão por Atividade Econômica), "cgce" (CGCE - Classificação por Grandes Categorias Econômicas). Defaults to "hs".
 #'
 #' @return A \code{tibble} consisting of imports or exports data.
 #'
@@ -23,10 +22,9 @@
 #' raw_imp_mun <- load_br_trade(dataset = "comex_import_mun",
 #'                              raw_data = TRUE, time_period = 1997:2021)
 #'
-#' # download treated imports data by municipality from 1997 to 2021 using "CUCI" classification
-#' imp_mun_cuci <- load_br_trade(dataset = "comex_import_mun",
-#'                               raw_data = FALSE, time_period = 1997:2021,
-#'                               prod_class = "cuci")
+#' # download treated imports data by ncm from 1997 to 2021
+#' imp_prod <- load_br_trade(dataset = "comex_import_prod",
+#'                           raw_data = FALSE, time_period = 1997:2021)
 #' }
 #'
 #' @importFrom magrittr %>%
@@ -34,8 +32,7 @@
 #' @export
 
 load_br_trade <- function(dataset = NULL, raw_data,
-                          time_period, language = 'eng',
-                          prod_class = 'hs'){
+                          time_period, language = 'eng'){
 
   ## We want to download both imports and exports data
 
@@ -64,6 +61,10 @@ load_br_trade <- function(dataset = NULL, raw_data,
   quantity_net_kg <- fob_usd <- hs4_code <- hs2_code <- year <- usd_per_kg <- NULL
   survey <- link <- co_sh4 <- co_sh2 <- quant_net_kg <- NULL
   geo_level <- NULL
+  no_sh4_por <- no_sh4_ing <- no_sh4 <- ano <- mes <- cod_municipio <- cod_pais <- NULL
+  nome_sh4 <- month <- municipality_code <- country_code <- hs4_name <- NULL
+  co_ncm <- no_ncm_por <- no_ncm_ing <- sg_uf_ncm <- no_ncm <- co_via <- co_unid <- NULL
+  co_urf <- qt_estat <- uf <- nome_ncm <- state <- ncm_name <- NULL
 
 
   ## There are two main dissagregated data levels in the COMEX website:
@@ -79,7 +80,6 @@ load_br_trade <- function(dataset = NULL, raw_data,
   param$geo_level = geo_level
   param$time_period = time_period
   param$language = language
-  param$prod_class = prod_class
   param$raw_data = raw_data
 
   param$survey_name = datasets_link() %>%
@@ -139,15 +139,6 @@ load_br_trade <- function(dataset = NULL, raw_data,
 
   ## ---------------------------------------------------------------------------##
 
-  ## Double Check all the info below depending on the database we want to analyze
-
-  dat = dat %>%
-    dplyr::filter(!(co_mun %in% c(9999999,9300000)))
-
-  dat = dat %>%
-    dplyr::filter(kg_liquido > 0) %>%
-    dplyr::filter(vl_fob > 0)
-
   #####################
   ## Load Dictionary ##
   #####################
@@ -156,88 +147,129 @@ load_br_trade <- function(dataset = NULL, raw_data,
 
     # HS (2,4,6) - https://balanca.economia.gov.br/balanca/bd/tabelas/NCM_SH.csv
     # NCM - https://balanca.economia.gov.br/balanca/bd/tabelas/NCM.csv
-    # CUCI- https://balanca.economia.gov.br/balanca/bd/tabelas/NCM_CUCI.csv
-    # CGCe - https://balanca.economia.gov.br/balanca/bd/tabelas/NCM_CGCE.csv
+
+  if (param$dataset == "comex_export_mun" | param$dataset == "comex_import_mun") {
+
+    dic = suppressMessages(load_trade_dic(type = "hs"))
+
+    if (param$language == 'pt'){
+      dic = dic %>%
+        dplyr::select(co_sh4, no_sh4 = no_sh4_por)
+    }
+    if (param$language == 'eng'){
+      dic = dic %>%
+        dplyr::select(co_sh4, no_sh4 = no_sh4_ing)
+    }
+
+    non_dup = !duplicated(dic)
+
+    dic = dic %>%
+      dplyr::filter(non_dup)
+
+    #######################
+    ## Add Variable Name ##
+    #######################
+
+    dat = dat %>%
+      dplyr::rename(co_sh4 = sh4) %>%
+      dplyr::mutate(co_sh4 = formatC(co_sh4, width = 4, format = "d", flag = "0")) %>%
+      dplyr::left_join(dic,by='co_sh4')
 
 
-  dic = suppressMessages(load_trade_dic(type = param$prod_class))
-  dic = dic %>%
-    dplyr::select(co_sh4,co_sh2)
+    ## Translation
 
-  non_dup = !duplicated(dic)
+    if (param$language == 'pt'){
 
-  dic = dic %>%
-    dplyr::filter(non_dup)
+      dat_mod = dat %>%
+        dplyr::select(ano = co_ano, mes = co_mes,
+                      cod_pais = co_pais, uf = sg_uf_mun,
+                      cod_municipio = co_mun,
+                      cod_sh4 = co_sh4, nome_sh4 = no_sh4,
+                      kg_liquido, valor_fob = vl_fob
+        ) %>%
+        dplyr::arrange(ano, mes, cod_municipio, cod_pais, nome_sh4)
 
-  #######################
-  ## Add Variable Name ##
-  #######################
+    }
 
-  ## Data at Comex Export - Municipalities come at the HS4 level
-    ## We merge HS2 Information (More Aggregate)
+    if (param$language == 'eng'){
 
-  dat = dat %>%
-    dplyr::rename(co_sh4 = sh4) %>%
-    dplyr::mutate(co_sh4 = as.character(co_sh4)) %>%
-    dplyr::left_join(dic,by='co_sh4')
+      dat_mod = dat %>%
+        dplyr::select(year = co_ano, month = co_mes,
+                      country_code = co_pais, state = sg_uf_mun,
+                      municipality_code = co_mun,
+                      hs4_code = co_sh4, hs4_name = no_sh4,
+                      kg_net = kg_liquido, value_fob = vl_fob
+        ) %>%
+        dplyr::arrange(year, month, municipality_code, country_code, hs4_name)
 
-  dat = dat %>%
-    dplyr::filter(!is.na(co_sh2)) %>%
-    dplyr::mutate(co_sh2 = as.numeric(co_sh2))
-
-  ## Be careful with other info
-
-  ##############################################
-  ## Aggregate to Desired Geo-Year-Code Level ##
-  ##############################################
-
-  dat_mod = dat %>%
-    dplyr::group_by(co_ano,co_mun,co_sh2) %>%
-    dplyr::summarise(kg_liquido = sum(kg_liquido),
-                     vl_fob = sum(vl_fob)) %>%
-    dplyr::ungroup() %>%
-    dplyr::mutate(usd_per_kg = vl_fob/kg_liquido) %>%
-    tibble::as_tibble()
-
-  ## wide Format
-
-  if (param$language == 'pt'){
-
-  dat_mod = dat_mod %>%
-    dplyr::arrange(co_sh2,co_ano) %>%
-    tidyr::pivot_wider(id_cols = c(co_mun,co_ano),
-                       names_from = co_sh2,
-                       values_from=kg_liquido:usd_per_kg,
-                       names_sep = '_',
-                       values_fn = sum,
-                       values_fill = NA) %>%
-    janitor::clean_names()
-
+    }
   }
 
-  if (param$language == 'eng'){
+  if (param$dataset == "comex_export_prod" | param$dataset == "comex_import_prod") {
 
-    dat_mod = dat_mod %>%
-      dplyr::arrange(co_sh2,co_ano) %>%
-      dplyr::rename(year = co_ano, munic_code = co_mun,
-                    quant_net_kg = kg_liquido, fob_usd = vl_fob) %>%
-      tidyr::pivot_wider(id_cols = c(munic_code,year),
-                         names_from = co_sh2,
-                         values_from=quant_net_kg:usd_per_kg,
-                         names_sep = '_',
-                         values_fn = sum,
-                         values_fill = NA) %>%
-      janitor::clean_names()
+    dic = suppressMessages(load_trade_dic(type = "ncm"))
 
+    if (param$language == 'pt'){
+      dic = dic %>%
+        dplyr::select(co_ncm, no_ncm = no_ncm_por)
+    }
+    if (param$language == 'eng'){
+      dic = dic %>%
+        dplyr::select(co_ncm, no_ncm = no_ncm_ing)
+    }
+
+    non_dup = !duplicated(dic)
+
+    dic = dic %>%
+      dplyr::filter(non_dup)
+
+    #######################
+    ## Add Variable Name ##
+    #######################
+
+    dat = dat %>%
+      dplyr::mutate(co_ncm = formatC(co_ncm, width = 8, format = "d", flag = "0")) %>%
+      dplyr::left_join(dic,by='co_ncm')
+
+
+    ## Translation
+
+    if (param$language == 'pt'){
+
+      dat_mod = dat %>%
+        dplyr::select(ano = co_ano, mes = co_mes,
+                      cod_pais = co_pais, uf = sg_uf_ncm,
+                      cod_ncm = co_ncm, nome_ncm = no_ncm,
+                      cod_transporte = co_via, cod_unidade = co_unid,
+                      cod_urf = co_urf, qtd_estatistica = qt_estat,
+                      kg_liquido, valor_fob = vl_fob
+        ) %>%
+        dplyr::arrange(ano, mes, uf, cod_pais, nome_ncm)
+
+    }
+
+    if (param$language == 'eng'){
+
+      dat_mod = dat %>%
+        dplyr::select(year = co_ano, month = co_mes,
+                      country_code = co_pais, state = sg_uf_ncm,
+                      ncm_code = co_ncm, ncm_name = no_ncm,
+                      transport_code = co_via, unit_code = co_unid,
+                      urf_code = co_urf, statistical_qt = qt_estat,
+                      kg_net = kg_liquido, value_fob = vl_fob
+        ) %>%
+        dplyr::arrange(year, month, state, country_code, ncm_name)
+
+
+    }
   }
 
-
-  return(dat)
+  return(dat_mod)
 
 }
 
 
-load_trade_dic <- function(type = 'hs'){
+load_trade_dic <- function(type){
 
   # Bind Global Variables
 
@@ -250,9 +282,10 @@ load_trade_dic <- function(type = 'hs'){
   path = 'https://balanca.economia.gov.br/balanca/bd/'
 
   if (type == 'hs'){final = paste(path,'tabelas/NCM_SH.csv',sep='')} # Harmonized System
-  if (type == 'cuci'){final = paste(path,'tabelas/NCM_CUCI.csv',sep='')}
-  if (type == 'isic'){final = paste(path,'tabelas/NCM_ISIC.csv',sep='')}
-  if (type == 'cgce'){final = paste(path,'tabelas/NCM_CGCE.csv',sep='')}
+  if (type == 'ncm'){final = paste(path,'tabelas/NCM.csv',sep='')}
+  #if (type == 'cuci'){final = paste(path,'tabelas/NCM_CUCI.csv',sep='')}
+  #if (type == 'isic'){final = paste(path,'tabelas/NCM_ISIC.csv',sep='')}
+  #if (type == 'cgce'){final = paste(path,'tabelas/NCM_CGCE.csv',sep='')}
   # if (type == 'aggreg'){final = paste(path,'tabelas/NCM_FAT_AGREG.csv',sep='')}
   # if (type == 'ppe'){final = paste(path,'tabelas/NCM_PPE.csv',sep='')}
   # if (type == 'ppi'){final = paste(path,'tabelas/NCM_PPI.csv',sep='')}
@@ -266,21 +299,6 @@ load_trade_dic <- function(type = 'hs'){
   dic = dic %>%
     dplyr::mutate_if(is.character,function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")}) %>%
     janitor::clean_names()
-
-  #################
-  ## Translation ##
-  #################
-
-  # if (language == 'eng'){
-  #   dic = dic %>%
-  #     dplyr::select(co_sh6,co_sh4,co_sh2,co_ncm_secrom,no_sh6_ing,no_sh4_ing,no_sh2_ing,no_sec_ing) %>%
-  #     dplyr::rename(hs6_code = co_sh6,hs4_code = co_sh4,hs2_code = co_sh2,ncm_secrom_code = co_ncm_secrom)
-  # }
-  #
-  # if (language == 'pt'){
-  #   dic = dic %>%
-  #     dplyr::select(co_sh6,co_sh4,co_sh2,co_ncm_secrom,no_sh6_por,no_sh4_por,no_sh2_por,no_sec_por)
-  # }
 
   return(dic)
 

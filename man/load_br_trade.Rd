@@ -5,13 +5,7 @@
 \alias{load_br_trade}
 \title{Comex - External Trade}
 \usage{
-load_br_trade(
-  dataset = NULL,
-  raw_data,
-  time_period,
-  language = "eng",
-  prod_class = "hs"
-)
+load_br_trade(dataset = NULL, raw_data, time_period, language = "eng")
 }
 \arguments{
 \item{dataset}{A dataset name ("comex_export_mun", "comex_import_mun", "comex_export_prod" or "comex_import_prod").}
@@ -21,8 +15,6 @@ load_br_trade(
 \item{time_period}{A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.}
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".}
-
-\item{prod_class}{A string indicating the classification to be downloaded, chosen between "hs" (SH - Sistema Harmonizado), "cuci" (CUCI - Classificação Uniforme do Comércio Internacional), "isic" (ISIC - Classificação Internacional Padrão por Atividade Econômica), "cgce" (CGCE - Classificação por Grandes Categorias Econômicas). Defaults to "hs".}
 }
 \value{
 A \code{tibble} consisting of imports or exports data.
@@ -40,10 +32,9 @@ exp_mun <- load_br_trade(dataset = "comex_export_mun",
 raw_imp_mun <- load_br_trade(dataset = "comex_import_mun",
                              raw_data = TRUE, time_period = 1997:2021)
 
-# download treated imports data by municipality from 1997 to 2021 using "CUCI" classification
-imp_mun_cuci <- load_br_trade(dataset = "comex_import_mun",
-                              raw_data = FALSE, time_period = 1997:2021,
-                              prod_class = "cuci")
+# download treated imports data by ncm from 1997 to 2021
+imp_prod <- load_br_trade(dataset = "comex_import_prod",
+                          raw_data = FALSE, time_period = 1997:2021)
 }
 
 }

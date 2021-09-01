@@ -24,7 +24,7 @@ The data has a monthly frequency and is available starting from the year 1989. F
 
 This package contains a single function \code{load_br_trade} which extracts data from the Comex website. It allows the user to input the years he would like the data to encompass, the nomenclature used, as well as choosing between import and export data and the language (currently only Portuguese and English are supported). 
 
-The output is a tibble containing all years selected for the chosen dataset and nomenclature. 
+The output is a tibble containing all years selected for the chosen dataset. 
 
 Using the function is easy enough:
 
@@ -37,7 +37,6 @@ exp_mun <- load_br_trade(dataset = "comex_export_mun", raw_data = FALSE, time_pe
 # download raw imports data by municipality from 1997 to 2021
 raw_imp_mun <- load_br_trade(dataset = "comex_import_mun", raw_data = TRUE, time_period = 1997:2021)
 
-# download treated imports data by municipality from 1997 to 2021 using "CUCI" classification
-imp_mun_cuci <- load_br_trade(dataset = "comex_import_mun", raw_data = FALSE, time_period = 1997:2021, prod_class = "cuci")
-
+# download treated imports data by ncm from 1997 to 2021
+imp_prod <- load_br_trade(dataset = "comex_import_prod", raw_data = FALSE, time_period = 1997:2021)
 ```

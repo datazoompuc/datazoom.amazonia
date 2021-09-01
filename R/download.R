@@ -325,7 +325,7 @@ external_download = function(dataset=NULL,source=NULL,year=NULL,geo_level = NULL
     if (dataset == 'comex_export_mun'){path = paste(param$url,'/EXP_',param$year,'_MUN.csv',sep='')}
     if (dataset == 'comex_import_mun'){path = paste(param$url,'/IMP_',param$year,'_MUN.csv',sep='')}
     if (dataset == 'comex_export_prod'){path = paste(param$url,'/EXP_',param$year,'.csv',sep='')}
-    if (dataset == 'comex_import_prod'){path = paste(param$url,'/IMP_',param$year,'_V2.csv',sep='')}
+    if (dataset == 'comex_import_prod'){path = paste(param$url,'/IMP_',param$year,'.csv',sep='')}
   }
 
   ############
@@ -668,10 +668,10 @@ datasets_link = function(){
 
    # https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta
 
-   'COMEX-EXP-PROD_NCM','comex_export_prod',NA,NA,NA,'https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm',
-   'COMEX-IMP-PROD_NCM','comex_import_prod',NA,NA,NA,'https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncmv2',
-   'COMEX-EXP-MUNIC_FIRM','comex_export_mun',NA,NA,NA,'https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun',
-   'COMEX-IMP-MUNIC_FIRM','comex_import_mun',NA,NA,NA,'https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun',
+   'COMEX-EXP-PROD_NCM','comex_export_prod',NA,'1997-2021',NA,'https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm',
+   'COMEX-IMP-PROD_NCM','comex_import_prod',NA,'1997-2021',NA,'https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm',
+   'COMEX-EXP-MUNIC_FIRM','comex_export_mun',NA,'1997-2021',NA,'https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun',
+   'COMEX-IMP-MUNIC_FIRM','comex_import_mun',NA,'1997-2021',NA,'https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun',
 
 
    ##########
