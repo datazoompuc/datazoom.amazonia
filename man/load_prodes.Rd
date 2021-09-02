@@ -20,7 +20,7 @@ load_prodes(dataset = "prodes", raw_data, time_period, language = "eng")
 A \code{tibble} with the selected data.
 }
 \description{
-Loads information on clearcut deforestation in the Legal Amazon and annual deforestation rates in the region. Survey is done at state or municipality level and data is available from 2000 to 2020. See \url{http://www.dpi.inpe.br/prodesdigital}
+Loads information on clearcut deforestation in the Legal Amazon and annual deforestation rates in the region. Survey is done at state or municipality level and data is available from 2000 to 2020.
 }
 \examples{
 \dontrun{

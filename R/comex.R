@@ -1,6 +1,6 @@
 #' @title Comex - External Trade
 #'
-#' @description Loads information on both imports and exports data. Data is available from 1997 to 2021 for most datasets. See \url{https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta}.
+#' @description Loads information on both imports and exports data. Data is available from 1997 to 2021 for most datasets. See \url{https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta/}.
 #'
 #' @encoding UTF-8
 #'

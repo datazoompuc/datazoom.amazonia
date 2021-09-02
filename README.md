@@ -4,10 +4,6 @@
 # datazoom.amazonia
 
 <!-- badges: start -->
-
-[![R build
-status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions)
-
 <!-- badges: end -->
 
 The goal of datazoom.amazonia is to facilitate access to official data
@@ -155,7 +151,8 @@ organization).
 The data has a monthly frequency and is available starting from the year
 1989. From 1989 to 1996, a different system of nomenclatures was
 adopted, but all conversions are available on a dictionary in the Comex
-website (<http://www.mdic.gov.br/balanca/bd/tabelas/NBM_NCM.csv>).
+website
+(<https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta/>).
 
     There are four parameters in this function:
       
@@ -554,4 +551,4 @@ data <- load_sigmine(dataset = 'sigmine_active', raw_data = TRUE)
 
 DataZoom is developed by a team at Pontifícia Universidade Católica do
 Rio de Janeiro (PUC-Rio), Department of Economics. Our official website
-is at: <http://www.econ.puc-rio.br/datazoom>.
+is at: <https://www.econ.puc-rio.br/datazoom/>.

@@ -1,5 +1,5 @@
 Package: datazoom.amazonia
-Title: Simplify access to data from the Amazon Region
+Title: Simplify Access to Data from the Amazon Region
 Version: 0.1.0
 Authors@R: c(
     person("DataZoom (PUC-Rio)", role = c("aut", "cre"), email = "datazoom@econ.puc-rio.br"),
@@ -16,8 +16,7 @@ Authors@R: c(
     person("Igor", "Rigolon Veiga", role = c("aut"), email = "igor.rilave@hotmail.com"),
     person("Maria", "Mittelbach", role = c("aut"), email = "mariamittelbach@gmail.com")
     )
-Description: This package offers functions to download and treat data regarding
-             the Brazilian Amazon region from a variety of official sources.
+Description: Functions to download and treat data regarding the Brazilian Amazon region from a variety of official sources.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -45,7 +44,7 @@ Imports:
     RCurl,
     Hmisc,
     googledrive
-URL: http://www.econ.puc-rio.br/datazoom
+URL: https://www.econ.puc-rio.br/datazoom/
 Suggests: 
     knitr,
     rmarkdown,

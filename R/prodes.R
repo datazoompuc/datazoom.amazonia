@@ -1,6 +1,6 @@
 #' @title PRODES - Deforestation Monitoring Project in the Legal Amazon by Satellite
 #'
-#' @description Loads information on clearcut deforestation in the Legal Amazon and annual deforestation rates in the region. Survey is done at state or municipality level and data is available from 2000 to 2020. See \url{http://www.dpi.inpe.br/prodesdigital}
+#' @description Loads information on clearcut deforestation in the Legal Amazon and annual deforestation rates in the region. Survey is done at state or municipality level and data is available from 2000 to 2020.
 #'
 #' @encoding UTF-8
 #'

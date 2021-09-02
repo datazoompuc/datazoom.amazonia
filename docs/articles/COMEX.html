@@ -124,7 +124,7 @@
 <h2 class="hasAnchor">
 <a href="#the-dataset" class="anchor" aria-hidden="true"></a>The Dataset</h2>
 <p>The Comex dataset gathers data extracted from Siscomex (Integrated System of Foreign Trade), which is a database containing information from all products that are imported to or exported from Brazil. Using data reported from the companies which are responsible for the process of transporting the products, the system adheres to internationally standardized nomenclatures, such as the Harmonized System and the Mercosul Common Nomenclature (which pertains to members of the Mercosul organization).</p>
-<p>The data has a monthly frequency and is available starting from the year 1989. From 1989 to 1996, a different system of nomenclatures was adopted, but all conversions are available on a dictionary in the Comex website (<a href="http://www.mdic.gov.br/balanca/bd/tabelas/NBM_NCM.csv" class="external-link uri">http://www.mdic.gov.br/balanca/bd/tabelas/NBM_NCM.csv</a>). Systems of nomenclature vary in the degree of detail in terms of the product involved, as well as other carachteristics, such as unit and granularity of location.</p>
+<p>The data has a monthly frequency and is available starting from the year 1989. From 1989 to 1996, a different system of nomenclatures was adopted, but all conversions are available on a dictionary in the Comex website (<a href="https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta/" class="external-link uri">https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta/</a>). Systems of nomenclature vary in the degree of detail in terms of the product involved, as well as other carachteristics, such as unit and granularity of location.</p>
 </div>
 <div id="usage" class="section level2">
 <h2 class="hasAnchor">
@@ -133,7 +133,7 @@
 <p>The output is a tibble containing all years selected for the chosen dataset.</p>
 <p>Using the function is easy enough:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.econ.puc-rio.br/datazoom" class="external-link">datazoom.amazonia</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.econ.puc-rio.br/datazoom/" class="external-link">datazoom.amazonia</a></span><span class="op">)</span>
 
 <span class="co"># download treated exports data by municipality from 1997 to 2021</span>
 <span class="va">exp_mun</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_br_trade.html">load_br_trade</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"comex_export_mun"</span>, raw_data <span class="op">=</span> <span class="cn">FALSE</span>, time_period <span class="op">=</span> <span class="fl">1997</span><span class="op">:</span><span class="fl">2021</span><span class="op">)</span>
