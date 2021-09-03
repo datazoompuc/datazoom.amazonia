@@ -44,7 +44,7 @@ Imports:
     RCurl,
     Hmisc,
     googledrive
-URL: https://www.econ.puc-rio.br/datazoom/
+URL: http://www.econ.puc-rio.br/datazoom/
 Suggests: 
     knitr,
     rmarkdown,

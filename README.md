@@ -551,4 +551,4 @@ data <- load_sigmine(dataset = 'sigmine_active', raw_data = TRUE)
 
 DataZoom is developed by a team at Pontifícia Universidade Católica do
 Rio de Janeiro (PUC-Rio), Department of Economics. Our official website
-is at: <https://www.econ.puc-rio.br/datazoom/>.
+is at: <http://www.econ.puc-rio.br/datazoom/>.
