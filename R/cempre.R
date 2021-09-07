@@ -139,3 +139,59 @@ load_cempre <- function(dataset = "cempre", raw_data,
 
 
 }
+
+
+dat = dat %>%
+  janitor::clean_names() %>%
+  dplyr::mutate_all(function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")})# %>%
+# dplyr::mutate_all(clean_custom)
+
+
+dat = dat %>%
+  dplyr::select(-c(nivel_territorial_codigo,nivel_territorial,ano_codigo)) %>%
+  dplyr::mutate(valor=as.numeric(valor))
+
+## Only Keep Valid Observations
+
+dat = dat %>%
+  dplyr::filter(!is.na(valor))
+
+#########################################
+## Create Geographical Unit Identifier ##
+#########################################
+
+if(geo_level == 'country'){
+  dat$geo_id = dat$brasil
+  dat = dplyr::select(dat,-'brasil_codigo',-'brasil')
+}
+
+if (geo_level == 'state'){
+  dat$geo_id = dat$unidade_da_federacao_codigo
+  dat = dplyr::select(dat,-'unidade_da_federacao_codigo',-'unidade_da_federacao')
+}
+if (geo_level == 'municipality'){
+  dat$geo_id = dat$municipio_codigo
+  dat = dplyr::select(dat,-'municipio',-'municipio_codigo')
+}
+
+################################
+## Harmonizing Variable Names ##
+################################
+
+dat = dat %>%
+  dplyr::select(-unidade_de_medida,-unidade_de_medida_codigo)
+
+
+
+
+########## OBS:
+data_1 = data_1 %>%
+dplyr::select(-'classificacao_nacional_de_atividades_economicas_cnae_2_0') %>%
+dplyr::arrange(classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo,variavel) %>%
+tidyr::pivot_wider(id_cols = c(ano),
+names_from = variavel:classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo,
+values_from=valor,
+names_sep = '_V',
+values_fn = sum,
+values_fill = NA) %>%
+janitor::clean_names()
