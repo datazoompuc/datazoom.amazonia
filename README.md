@@ -4,6 +4,13 @@
 # datazoom.amazonia
 
 <!-- badges: start -->
+
+[![CRAN
+version](https://www.r-pkg.org/badges/version/datazoom.amazonia?color=orange)](https://cran.r-project.org/package=datazoom.amazonia)
+[![CRAN
+downloads](https://cranlogs.r-pkg.org/badges/datazoom.amazonia?color=blue)](https://cran.r-project.org/package=datazoom.amazonia)
+[![R build
+status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions)
 <!-- badges: end -->
 
 The goal of datazoom.amazonia is to facilitate access to official data
@@ -35,7 +42,6 @@ data:
 
 ``` r
 load_cempre()
-load_degrad()
 load_deter()
 load_ips()
 load_pibmunic()
@@ -135,6 +141,12 @@ replaced by DETER-B in December 2016. Data is available from 2007 to
 data <- load_degrad(dataset = 'degrad', 
                     raw_data = TRUE,
                     time_period = 2010:2012)
+
+# download treated data (raw_data = FALSE) related to forest degradation from 2013 (time_period = 2013) in portuguese (language = "pt").
+data <- load_degrad(dataset = 'degrad', 
+                    raw_data = FALSE,
+                    time_period = 2013,
+                    language = 'pt')
 ```
 
 # 2) COMEX data:
