@@ -14,10 +14,18 @@
 #'
 #' @examples
 #' \dontrun{
-#' # download raw data from 2007 to 2016
-#' raw_degrad_all <- load_degrad(dataset = "degrad",
-#'                               raw_data = TRUE,
-#'                               time_period = 2007:2016)
+#' # download raw data (raw_data = TRUE) related to forest degradation
+#' # from 2010 to 2012 (time_period = 2010:2012).
+#' data <- load_degrad(dataset = 'degrad',
+#'                     raw_data = TRUE,
+#'                     time_period = 2010:2012)
+#'
+#' # download treated data (raw_data = FALSE) related to forest degradation
+#' # from 2013 (time_period = 2013) in portuguese (language = "pt").
+#' data <- load_degrad(dataset = 'degrad',
+#'                     raw_data = FALSE,
+#'                     time_period = 2013,
+#'                     language = 'pt')
 #' }
 #'
 #' @importFrom magrittr %>%
@@ -33,7 +41,11 @@ load_degrad <- function(dataset = 'degrad', raw_data,
     # Include Safety Download and Message if any Error Occurs
     # Harmonize Columns Names, Create Panel and Deliver Raw Data
 
-  survey <- link <- NULL
+  survey <- link <- .data <- abbrev_state <- ano <- area <-  NULL
+  areameters <- areametros <- class_name <- classe <- cod_municipio <- NULL
+  code_muni <- code_state <- codigouf <- geometry <- julday <- linkcolumn <- NULL
+  municipality_code <- name_muni <- name_region <- name_state <- nome <- NULL
+  pathrow <- code_region <- scene_id <- sigla <- uf <- view_date <- year <- NULL
   geo_amazon = NULL
 
   #############################
@@ -66,38 +78,89 @@ load_degrad <- function(dataset = 'degrad', raw_data,
   ## Downloading Data ##
   ######################
 
-  # find_from_dir <- function(dir) {
-  #   list.files(path = dir, full.names = TRUE) %>%
-  #     grep(pattern = "\\.shp", value = TRUE)
-  # }
-  #
-  # # If source is a list of numbers (years), we retrieve data from INPE
-  # if (is.numeric(source)) {
-  #   source <- purrr::map(source, webscrapping_degrad)
-  # }
-  #
-  # # If source is a directory, we expand and filter the list of files
-  # else if (is.character(source) && length(source) == 1 && dir.exists(source)) {
-  #   source <- find_from_dir(source)
-  # }
-  #
-  # # Otherwise, we assume that source is something that can already be interpreted by sf::read_sf
-  # suppressWarnings(lapply(source, sf::read_sf))
-
-  dat = as.list(param$time_period) %>%
+  dat = suppressWarnings(as.list(param$time_period) %>%
       purrr::map(
         function(t){external_download(dataset = param$dataset,
                                       source='degrad', year = t) %>%
             janitor::clean_names()
         }
-      )
-
+      ))
 
   ## Return Raw Data
 
   if (raw_data == TRUE){return(dat)}
 
-  ## The Columns are not always the same name, we have to edit that
+  # Join all tables
+  temp <- tibble::tribble(~linkcolumn, ~scene_id, ~class_name, ~pathrow, ~uf,
+                          ~area, ~geometry, ~year, ~con_ai_id, ~julday,
+                          ~ano, ~objet_id_3, ~cell_oid, ~view_date,
+                          ~codigouf, ~nome, ~inter_oid, ~areametros, ~areameters)
+
+  dat = c(dat, list(temp)) %>%
+    dplyr::bind_rows() %>%
+    tibble::as_tibble()
+
+  # Remove useless columns
+  dat <- dat %>%
+    dplyr::select(-ano, -nome)
+
+  # Add sigla UF
+  ufs <- tibble::tribble(
+    ~sigla, ~codigouf,
+    "AC", 12,
+    "AL", 27,
+    "AP", 16,
+    "AM", 13,
+    "BA", 29,
+    "CE", 23,
+    "ES", 32,
+    "GO", 52,
+    "MA", 21,
+    "MT", 51,
+    "MS", 50,
+    "MG", 31,
+    "PA", 15,
+    "PB", 25,
+    "PR", 41,
+    "PE", 26,
+    "PI", 22,
+    "RJ", 33,
+    "RN", 24,
+    "RS", 43,
+    "RO", 11,
+    "RR", 14,
+    "SC", 42,
+    "SP", 35,
+    "SE", 28,
+    "TO", 17,
+    "DF", 53)
+
+
+  dat <- dat %>%
+    dplyr::mutate(codigouf = as.numeric(codigouf)) %>%
+    dplyr::left_join(ufs, by = "codigouf") %>%
+    dplyr::mutate(uf = ifelse(is.na(uf), sigla, uf)) %>%
+    dplyr::select(-codigouf, -sigla) %>%
+    dplyr::select(-area, -areametros, -areameters)
+
+
+  # Clean geometry
+  dat$geometry <- sf::st_set_crs(dat$geometry,
+                                 "+proj=longlat +ellps=aust_SA +towgs84=-66.8700,4.3700,-38.5200,0.0,0.0,0.0,0.0 +no_defs")
+
+  dat$geometry <- dat$geometry %>%
+    sf::st_make_valid()
+
+  ######################
+  ## Data Engineering ##
+  ######################
+
+  # There are multiple names for degradation data eg. "DEGRAD2007", "DEGRADACAO", "DEGRAD"
+  # The name of all of those is padronized to "DEGRAD"
+  dat <- dat %>%
+    dplyr::mutate(class_name = ifelse(stringr::str_detect(class_name, "DEGRAD"),
+                                      "DEGRAD", class_name)
+                  )
 
   ###################################
   ## Filter Legal Amazon Geography ##
@@ -107,109 +170,54 @@ load_degrad <- function(dataset = 'degrad', raw_data,
 
   # Downloading municipal map from geobr filtered to legl amazon municipalities
 
-  # message("Downloading map data.")
+  message("Downloading map data.")
 
   # Downloading municipal map from geobr
-  # geo_br <- geobr::read_municipality(year = 2019, simplified = FALSE) # 2019 relates to the definition of legal_amazon
+  geo_br <- geobr::read_municipality(year = 2019, simplified = FALSE) # 2019 relates to the definition of legal_amazon
 
   # legal_amazon belongs to package's sysdata.rda and filters for municipalities in legal amazon
-  # amazon_municipalities <- dplyr::filter(legal_amazon, .data$AMZ_LEGAL == 1)
+  amazon_municipalities <- dplyr::filter(legal_amazon, .data$AMZ_LEGAL == 1)
 
   # Filters geobr shapefiles to legal amazon municipalities
-  # dplyr::filter(geo_br, .data$code_muni %in% amazon_municipalities$CD_MUN)
-
-  ######################
-  ## Data Engineering ##
-  ######################
-
-  ## Month information is only available after 2010
-
-  # Since 2010, there is a column named "view_date" with the exact date (day) of the observation
-  # Therefore, we collect both month and year of each observation
-
-  # There are some archives (older ones) that don't have the exact date from observation
-  # Thus we can only recover the year from the type of the data, eg. DEGRAD2007 for data from 2007
-  # So this first "if" gets the year from older data (2007 and 2008)
-  # if (grepl(df$class_name[1], pattern = "\\d{4}$")) {
-  #   year <- as.numeric(substr(df$class_name[1], 7, 10))
-  #   month <- NA
-  # }
-  # # Data for year 2009 has a column containing the year, which is collected
-  # # ATT: THERE IS A WAY TO FIND OUT THE DATE SOMEONE MIGHT WANT TO LOOK AT IT
-  # else if (any(grepl(colnames(df), pattern = "ano"))) {
-  #   year <- df[["ano"]][1]
-  #   month <- NA
-  # }
-  # # Since 2010, there is a column named "view_date" with the exact date (day) of the observation
-  # # Therefore, we collect both month and year of each observation
-  # else {
-  #   year <- as.numeric(substr(as.character(as.Date(df$view_date)), 1, 4))
-  #   month <- as.numeric(substr(as.character(as.Date(df$view_date)), 6, 7))
-  # }
-  # df$Ano <- year
-  # df$Mes <- month
-
-  # There are multiple names for degradation data eg. "DEGRAD2007", "DEGRADACAO", "DEGRAD"
-  # The grep function gives the row of all degradation observation because of the common format "DEGRAD"
-  # But returns a zero vector if the name is already "DEGRAD", and a vector of numbers (of the rows) elsewhere
-  # Then, the name of all of those is padronized to "DEGRAD"
-  # rows_degradation <- grep(df$class_name, pattern = "degrad[^_]", ignore.case = TRUE)
-  # if(length(rows_degradation) != 0){
-  #   df[rows_degradation, ]$class_name <- "DEGRAD"
-  # }
-
-  #######################################
-  ## Harmonize Degradation Measurement ##
-  #######################################
-
-  # There are multiple names for degradation data eg. "DEGRAD2007", "DEGRADACAO", "DEGRAD"
-  # The grep function gives the row of all degradation observation because of the common format "DEGRAD"
-  # But returns a zero vector if the name is already "DEGRAD", and a vector of numbers (of the rows) elsewhere
-  # Then, the name of all of those is padronized to "DEGRAD"
-  # rows_degradation <- grep(df$class_name, pattern = "degrad[^_]", ignore.case = TRUE)
-  # if(length(rows_degradation) != 0){
-  #   df[rows_degradation, ]$class_name <- "DEGRAD"
-  # }
+  geo_amazon <- dplyr::filter(geo_br, .data$code_muni %in% amazon_municipalities$CD_MUN)
 
   ###################
   ## Harmonize CRS ##
   ###################
 
-  # Insert crs
-  # if (is.na(sf::st_crs(df))) {
-  #   # If df comes without crs, we set the correct crs, the used in the data, of degrad data to the df
-  #   df$geometry <- sf::st_set_crs(df$geometry, "+proj=longlat +ellps=aust_SA +towgs84=-66.8700,4.3700,-38.5200,0.0,0.0,0.0,0.0 +no_defs")
-  # }
-  #
-  # # The crs that will be used to overlap maps below
-  # operation_crs <- sf::st_crs("+proj=poly +lat_0=0 +lon_0=-54 +x_0=5000000 +y_0=10000000 +ellps=aust_SA +units=m +no_defs")
-  #
-  # # Changing crs of both data to the common crs chosen above
-  # df <- sf::st_make_valid(sf::st_transform(df, operation_crs))
-  # geo_amazon <- sf::st_transform(geo_amazon, operation_crs)
-  #
-  # # Municipalize
-  # sf::st_agr(df) <- "constant"
-  # sf::st_agr(geo_amazon) <- "constant"
+  # The crs that will be used to overlap maps below
+  operation_crs <- sf::st_crs("+proj=poly +lat_0=0 +lon_0=-54 +x_0=5000000 +y_0=10000000 +ellps=aust_SA +units=m +no_defs")
+
+  # Changing crs of both data to the common crs chosen above
+  dat$geometry <- sf::st_make_valid(sf::st_transform(dat$geometry, operation_crs))
+  geo_amazon$geom <- sf::st_transform(geo_amazon$geom, operation_crs)
 
   ##########################################################
   ## Aggregation Municipality or State Level x Time Level ##
   ##########################################################
 
   # Overlaps shapefiles
-  # df <- sf::st_intersection(df, geo_amazon) %>%
-  #   # Creates column with calculated areas
-  #   dplyr::mutate(calculated_area = sf::st_area(.data$geometry)) %>%
-  #   dplyr::group_by(.data$abbrev_state, .data$Ano, .data$class_name) %>%
-  #   sf::st_drop_geometry()
-  #
+  sf::st_geometry(dat) <- dat$geometry
+  sf::st_geometry(geo_amazon) <- geo_amazon$geom
+
+  dat <- suppressWarnings(sf::st_intersection(dat, geo_amazon)) %>%
+     dplyr::mutate(area = sf::st_area(.data$geometry))
+
+  dat <- dat %>%
+    dplyr::select(-name_muni, -abbrev_state, -name_state,
+                  -code_region, -name_region)
+
+  dat <- dat %>%
+    dplyr::select(year, linkcolumn, scene_id, code_state, code_muni,
+                  class_name, pathrow, area, view_date, julday, geometry)
+
   # # Set aggregation level
   # geo_level <- tolower(geo_level)
   # if (geo_level == "state") {
   #   df <- df %>%
   #     # Replaces state names (with errors because of accents) with state code
-  #     dplyr::mutate(CodIBGE = as.factor(.data$code_state)) %>%
-  #     dplyr::group_by(.data$CodIBGE, .add = TRUE) %>%
+  #     dplyr::mutate(code_state = as.factor(.data$code_state)) %>%
+  #     dplyr::group_by(.data$code_state) %>%
   #     dplyr::rename(Estado = .data$abbrev_state, Evento = .data$class_name) %>%
   #     # Removes useless columns
   #     dplyr::select(-c("code_muni", "code_state"))
@@ -227,61 +235,40 @@ load_degrad <- function(dataset = 'degrad', raw_data,
   #     dplyr::select(-c("code_muni", "code_state"))
   # }
   #
-  # time_period <- tolower(time_period)
-  # # Some data don't allow to separate by month, be careful
-  # # WE NEED TO LOOK AT THIS A LITTLE BIT FURTHER AND THOROUGHLY EXPLAIN TO THE USER
-  # if (time_period == "month") {
-  #   df <- dplyr::group_by(df, .data$Mes, .add = TRUE)
-  # }
-  # else if (time_period != "year") {
-  #   warning("Temporal aggregation level not supported. Proceeding with Year.")
-  # }
-  #
-  # df <- df %>%
-  #   dplyr::group_by(.data$CodIBGE, .add = TRUE) %>%
-  #   dplyr::summarise(Area = sum(.data$calculated_area)) %>%
-  #   dplyr::ungroup()
-  #
-  # if (filter) {
-  #   df <- df %>%
-  #     dplyr::rename(Degradacao = .data$Area) %>%
-  #     dplyr::select(-c("Evento"))
-  # }
 
   #################
   ## Translation ##
   #################
 
-  # Set language
-  # language <- tolower(language)
-  # if (language == "eng") {
-  #   df <- dplyr::rename_with(
-  #     df,
-  #     dplyr::recode,
-  #     Municipio = "Municipality",
-  #     CodIBGE = "CodIBGE",
-  #     Estado = "State",
-  #     Ano = "Year",
-  #     Mes = "Month",
-  #     Evento = "Event",
-  #     Degradacao = "Degradation"
-  #   )
-  # }
-  # else if (language != "pt") {
-  #   warning("Selected language is not supported. Proceeding with Portuguese.")
-  # }
+  if (param$language == 'pt'){
+
+    dat_mod = dat %>%
+      dplyr::select(ano = year, linkcolumn, scene_id,
+                    cod_uf = code_state, cod_municipio = code_muni,
+                    classe = class_name, pathrow, area, data = view_date,
+                    julday, geometry
+      ) %>%
+      dplyr::arrange(ano, cod_municipio, classe)
+
+  }
+
+  if (param$language == 'eng'){
+
+    dat_mod = dat %>%
+      dplyr::select(year, linkcolumn, scene_id,
+                    state_code = code_state, municipality_code = code_muni,
+                    class_name, pathrow, area, date = view_date,
+                    julday, geometry
+      ) %>%
+      dplyr::arrange(year, municipality_code, class_name)
+
+  }
 
   ####################
   ## Returning Data ##
   ####################
 
-  # Treating data according to parameters selected
-  # list_df <- lapply(raw_data, treat_degrad_data,
-  #                   geo_level = geo_level, time_period = time_period,
-  #                   language = language, geo_amazon = geo_amazon, filter = !all_events)
-  #
-  # dplyr::bind_rows(list_df)
-
+  return(dat_mod)
 
 }
 
