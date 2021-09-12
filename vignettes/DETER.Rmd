@@ -16,18 +16,24 @@ knitr::opts_chunk$set(
 
 ## The Dataset
 
-DETER uses satellite surveillance to detect and report changes in forest cover across the Legal Amazon and the Cerrado biome. Each data point consists of a warning, describing which type of change has affected a certain area of forest at a given date. Broadly speaking, it makes a distinction between events of deforestation, degradation and logging. 
-
-Areas are reported in square kilometers and informed as both the area which intersects a Conservation Unit and the area intersecting a Municipality. The data extracted here spans from 2016 onward in the Amazon, and from 2018 onward in the Cerrado. 
+DETER uses satellite surveillance to detect and report changes in forest cover across the Legal Amazon and the Cerrado biome. Each data point consists of a warning, describing which type of change has affected a certain area of forest at a given date. Broadly speaking, it makes a distinction between events of deforestation, degradation and logging. The data extracted here spans from 2016 onward in the Amazon, and from 2018 onward in the Cerrado. 
 
 ## Usage
 
 ```{r,eval=FALSE}
 library(datazoom.amazonia)
 
-# download raw data from all years from Amazonia
+# Download raw data (raw_data = TRUE) from all years (time_period = "all") 
+# from Amazonia (dataset = "deter_amz")
 deter_amz <- load_deter(dataset = 'deter_amz',
                         raw_data = TRUE,
                         time_period = "all")
+
+# Download treated data (raw_data = FALSE) from all years (time_period = "all") 
+# from Cerrado (dataset = "deter_cerrado") in portuguese (language = 'pt')
+deter_cer <- load_deter(dataset = 'deter_cerrado',
+                        raw_data = FALSE,
+                        time_period = "all",
+                        language = "pt")
 ```
 

@@ -1,6 +1,6 @@
 #' @title DETER - Forest Degradation in the Brazilian Amazon
 #'
-#' @description Loads information on change in forest cover in the Amazon. Survey is done at state or municipal level. See \url{http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter}
+#' @description Loads information on change in forest cover in the Amazon. See \url{http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter}
 #'
 #' @param dataset A dataset name ("deter_amz", "deter_cerrado") with information about both Amazon and Cerrado
 #' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
@@ -16,10 +16,19 @@
 #'
 #' @examples
 #' \dontrun{
-#' # download raw data from all years from Amazonia
+#' # Download raw data (raw_data = TRUE) from all years (time_period = "all")
+#' # from Amazonia (dataset = "deter_amz")
 #' deter_amz <- load_deter(dataset = 'deter_amz',
 #'                         raw_data = TRUE,
 #'                         time_period = "all")
+#'
+#' # Download treated data (raw_data = FALSE) from all years (time_period = "all")
+#' # from Cerrado (dataset = "deter_cerrado") in portuguese (language = 'pt')
+#' deter_cer <- load_deter(dataset = 'deter_cerrado',
+#'                         raw_data = FALSE,
+#'                         time_period = "all",
+#'                         language = "pt")
+#'
 #' }
 
 
@@ -35,10 +44,10 @@ load_deter <- function(dataset = NULL, raw_data,
 
   ## Bind Global Variables
 
-  quadrant <- NULL
-  path_row <- NULL
-  sensor <- NULL
-  satellite <- NULL
+  quadrant <- .data <- abbrev_state <- name_state <- code_region <- NULL
+  path_row <- name_region <- code_muni <- area <- geometry <- NULL
+  sensor <- data <- cod_municipio <- class <- municipality_code <- NULL
+  satellite <- class_name <- classe <- NULL
   view_date <- NULL
   municipali <- NULL
   uc <- NULL
@@ -83,15 +92,6 @@ load_deter <- function(dataset = NULL, raw_data,
   ## Downloading ##
   #################
 
-  # dat = as.list(param$time_period) %>%
-  #   purrr::map(
-  #     function(t){external_download(dataset = param$dataset,
-  #                                   source='degrad',year = t,
-  #                                   geo_level = param$geo_level) %>%
-  #         janitor::clean_names()
-  #     }
-  #   )
-
   dat = external_download(dataset = param$dataset,source = 'deter')
 
   dat = dat %>%
@@ -105,137 +105,64 @@ load_deter <- function(dataset = NULL, raw_data,
   ######################
   ## Data Engineering ##
   ######################
+  # Downloading municipal map from geobr filtered to legl amazon municipalities
 
-  # geo_level <- tolower(geo_level)
-  #
-  # # Can we extract information from the variables
-  # # we are dropping below
-  #
-  # # quadrant,path_row,sensor,satellite
-  # # uc is unidade de conservacao - we potentially want to create a dummy from it
-  #
-  # df = df %>%
-  #   dplyr::select(-c(quadrant,path_row,sensor,satellite)) %>%
-  #   dplyr::mutate(ano = lubridate::year(view_date),
-  #                 mes = lubridate::month(view_date)) %>%
-  #   tidyr::drop_na(municipali)
+  message("Downloading map data.")
 
-  #######################################
-  ## Aggregate at the Geographic Level ##
-  #######################################
+  # Downloading municipal map from geobr
+  geo_br <- geobr::read_municipality(year = 2019, simplified = FALSE)
 
-  # if (!(geo_level %in% c("state", "municipality"))) {
-  #   warning("Aggregation level not supported. Proceeding with municipality.")
-  # }
+  ###################
+  ## Harmonize CRS ##
+  ###################
 
-  ## State Level
+  # The crs that will be used to overlap maps below
+  operation_crs <- sf::st_crs("+proj=poly +lat_0=0 +lon_0=-54 +x_0=5000000 +y_0=10000000 +ellps=aust_SA +units=m +no_defs")
 
-  # if (geo_level == "state") {
-  #   df <- df %>%
-  #     dplyr::select(-municipali,-uc) %>%
-  #     dplyr::group_by(uf,ano,mes,classname) %>%
-  #     dplyr::summarise(
-  #       #dplyr::across(-c(.data$AREAUCKM, .data$AREAMUNKM, .data$VIEW_DATE)),
-  #       area_uc_km = sum(areauckm),
-  #       area_geo_km = sum(areamunkm))
-  # }
+  # Changing crs of both data to the common crs chosen above
+  dat$geometry <- sf::st_make_valid(sf::st_transform(dat$geometry, operation_crs))
+  geo_br$geom <- sf::st_transform(geo_br$geom, operation_crs)
 
-  ## Municipality Level
+  # Overlaps shapefiles
+  sf::st_geometry(dat) <- dat$geometry
+  sf::st_geometry(geo_br) <- geo_br$geom
 
-  # if (geo_level == "municipality") {
-  #   df <- df %>%
-  #     dplyr::select(-uc) %>%
-  #     dplyr::group_by(uf,municipali,ano,mes,classname) %>%
-  #     dplyr::summarise(
-  #       #dplyr::across(-c(.data$AREAUCKM, .data$AREAMUNKM, .data$VIEW_DATE)),
-  #       area_uc_km = sum(areauckm),
-  #       area_geo_km = sum(areamunkm)) %>%
-  #     #dplyr::distinct() %>%
-  #     dplyr::ungroup()
-  #
-  # }
+  dat <- suppressWarnings(sf::st_intersection(dat, geo_br)) %>%
+    dplyr::mutate(area = sf::st_area(.data$geometry))
 
-  ###########################
-  ## Add Municipality Code ##
-  ###########################
+  dat <- dat %>%
+    dplyr::select(-name_muni, -abbrev_state, -name_state,
+                  -code_region, -name_region)
 
-  # if (geo_level == 'municipality'){
-  #
-  #   munic = geobr::read_municipality() %>%
-  #     sf::st_drop_geometry() %>%
-  #     dplyr::mutate(name_muni = stringi::stri_trans_general(name_muni, "Latin-ASCII"),
-  #                   name_muni = tolower(name_muni)) %>%
-  #     dplyr::rename(uf = code_state)
-  #
-  #   ## Fuzzy String Matching
-  #
-  #   df = df %>%
-  #     dplyr::mutate(name_muni = stringi::stri_trans_general(municipali,'Latin-ASCII'),
-  #                   name_muni = tolower(name_muni),
-  #                   name_muni = dplyr::recode(name_muni,
-  #                                             "eldorado dos carajas" = "eldorado do carajas",
-  #                                             "poxoreo" = "poxoreu",
-  #                                             "santa isabel do para" = "santa izabel do para"
-  #                   )
-  #     )
-  #
-  #   df <- df %>%
-  #     dplyr::left_join(munic, by = c("uf", "name_muni")) #%>%
-    # dplyr::select(-.data$Municipio) %>%
-    # dplyr::rename(CodIBGE = .data$CD_MUN)
-
-
-    # Adding IBGE municipality codes
-    # removing accents and making everything lower-case to match up the names
-
-    # IBGE <- legal_amazon %>%
-    #   dplyr::mutate(Municipio = stringi::stri_trans_general(.data$NM_MUN, "Latin-ASCII") %>% tolower()) %>%
-    #   dplyr::select(-c(.data$NM_REGIAO, .data$CD_UF, .data$NM_UF, .data$NM_MUN, .data$AMZ_LEGAL)) %>%
-    #   dplyr::rename(UF = .data$SIGLA)
-
-    # df <- df %>% dplyr::mutate(Municipio = stringi::stri_trans_general(.data$MUNICIPALI, "Latin-ASCII") %>% tolower())
-
-    # cities with names spelt two different ways in the datasets:
-    # df$Municipio <- df$Municipio %>% dplyr::recode(
-    #   "eldorado dos carajas" = "eldorado do carajas",
-    #   "poxoreo" = "poxoreu",
-    #   "santa isabel do para" = "santa izabel do para"
-    # )
-
-
-    # df <- df %>%
-    #   dplyr::left_join(IBGE, by = c("UF", "Municipio")) %>%
-    #   dplyr::select(-.data$Municipio) %>%
-    #   dplyr::rename(CodIBGE = .data$CD_MUN)
-  #}
-
-  ######################
-  ## Time Aggregation ##
-  ######################
-
-  ## Data is already aggregated by month-geo_unit at previous step
-
-  # time_aggregation <- tolower(time_aggregation)
-  #
-  # if (time_aggregation == "year") {
-  #   df <- df %>%
-  #     #dplyr::ungroup(.data$Mes) %>%
-  #     #dplyr::group_by(.data$CLASSNAME, .add = TRUE) %>%
-  #     dplyr::group_by(classname) %>%
-  #     dplyr::summarise(
-  #       #dplyr::across(-c(.data$Mes, .data$AREAUCKM, .data$AREAMUNKM)),
-  #       area_uc_km = sum(area_uc_km),
-  #       area_geo_km = sum(area_geo_km)) #%>%
-  #   #dplyr::distinct()
-  # } else if (time_aggregation != "month") {
-  #   warning("Invalid time aggregation, grouping by month.")
-  # }
-
+  dat <- dat %>%
+    dplyr::select(view_date, code_state, code_muni, sensor, satellite, uc,
+                  classname, path_row, area, quadrant, geometry)
 
   ################### ### -------------------- Need to Work
   ## Renaming Data ##
   ###################
 
+  if (param$language == 'pt'){
+
+    dat_mod = dat %>%
+      dplyr::select(data = view_date, cod_uf = code_state,
+                    cod_municipio = code_muni, sensor = sensor,
+                    satelite = satellite, uc, classe = classname,
+                    path_row, area, quadrante = quadrant, geometry) %>%
+      dplyr::arrange(data, cod_municipio, classe)
+
+  }
+
+  if (param$language == 'eng'){
+
+    dat_mod = dat %>%
+      dplyr::select(date = view_date, state_code = code_state,
+                    municipality_code = code_muni, sensor = sensor,
+                    satellite, uc, class_name = classname,
+                    pathrow = path_row, area, quadrant, geometry) %>%
+      dplyr::arrange(date, municipality_code, class_name)
+
+  }
   # df <- df %>%
   #   dplyr::rename_with(dplyr::recode,
   #                      CLASSNAME = "Classe",
@@ -299,13 +226,8 @@ load_deter <- function(dataset = NULL, raw_data,
   ## Return Data ##
   #################
 
-  ## Apply the functions below sequentially
-
-  # df = load_deter_raw(source)
-  #
-  # df = treat_deter_data(df, geo_level, time_aggregation, language)
-  #
-  # return(df)
+  return(dat_mod)
 
 }
+
 

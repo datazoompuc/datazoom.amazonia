@@ -40,7 +40,7 @@
 
 
 <meta property="og:title" content="DETER - Forest Degradation in the Brazilian Amazon — load_deter" />
-<meta property="og:description" content="Loads information on change in forest cover in the Amazon. Survey is done at state or municipal level. See http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter" />
+<meta property="og:description" content="Loads information on change in forest cover in the Amazon. See http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter" />
 
 
 
@@ -165,7 +165,7 @@
     </div>
 
     <div class="ref-description">
-    <p>Loads information on change in forest cover in the Amazon. Survey is done at state or municipal level. See <a href='http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter'>http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter</a></p>
+    <p>Loads information on change in forest cover in the Amazon. See <a href='http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter'>http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter</a></p>
     </div>
 
     <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>load_deter</span><span class='op'>(</span>dataset <span class='op'>=</span> <span class='cn'>NULL</span>, <span class='va'>raw_data</span>, <span class='va'>time_period</span>, language <span class='op'>=</span> <span class='st'>"eng"</span><span class='op'>)</span></code></pre></div>
@@ -197,10 +197,19 @@
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <div class="ref-examples sourceCode"><pre class='sourceCode r'><code><span class='r-in'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span></span>
-<span class='r-in'><span class='co'># download raw data from all years from Amazonia</span></span>
+<span class='r-in'><span class='co'># Download raw data (raw_data = TRUE) from all years (time_period = "all")</span></span>
+<span class='r-in'><span class='co'># from Amazonia (dataset = "deter_amz")</span></span>
 <span class='r-in'><span class='va'>deter_amz</span> <span class='op'>&lt;-</span> <span class='fu'>load_deter</span><span class='op'>(</span>dataset <span class='op'>=</span> <span class='st'>'deter_amz'</span>,</span>
 <span class='r-in'>                        raw_data <span class='op'>=</span> <span class='cn'>TRUE</span>,</span>
 <span class='r-in'>                        time_period <span class='op'>=</span> <span class='st'>"all"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
+<span class='r-in'><span class='co'># Download treated data (raw_data = FALSE) from all years (time_period = "all")</span></span>
+<span class='r-in'><span class='co'># from Cerrado (dataset = "deter_cerrado") in portuguese (language = 'pt')</span></span>
+<span class='r-in'><span class='va'>deter_cer</span> <span class='op'>&lt;-</span> <span class='fu'>load_deter</span><span class='op'>(</span>dataset <span class='op'>=</span> <span class='st'>'deter_cerrado'</span>,</span>
+<span class='r-in'>                        raw_data <span class='op'>=</span> <span class='cn'>FALSE</span>,</span>
+<span class='r-in'>                        time_period <span class='op'>=</span> <span class='st'>"all"</span>,</span>
+<span class='r-in'>                        language <span class='op'>=</span> <span class='st'>"pt"</span><span class='op'>)</span></span>
+<span class='r-in'></span>
 <span class='r-in'><span class='op'>}</span></span>
 </code></pre></div>
   </div>

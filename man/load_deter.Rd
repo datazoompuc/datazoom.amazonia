@@ -20,13 +20,22 @@ load_deter(dataset = NULL, raw_data, time_period, language = "eng")
 A \code{tibble} with the selected data.
 }
 \description{
-Loads information on change in forest cover in the Amazon. Survey is done at state or municipal level. See \url{http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter}
+Loads information on change in forest cover in the Amazon. See \url{http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter}
 }
 \examples{
 \dontrun{
-# download raw data from all years from Amazonia
+# Download raw data (raw_data = TRUE) from all years (time_period = "all")
+# from Amazonia (dataset = "deter_amz")
 deter_amz <- load_deter(dataset = 'deter_amz',
                         raw_data = TRUE,
                         time_period = "all")
+
+# Download treated data (raw_data = FALSE) from all years (time_period = "all")
+# from Cerrado (dataset = "deter_cerrado") in portuguese (language = 'pt')
+deter_cer <- load_deter(dataset = 'deter_cerrado',
+                        raw_data = FALSE,
+                        time_period = "all",
+                        language = "pt")
+
 }
 }

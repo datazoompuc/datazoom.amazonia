@@ -9,7 +9,7 @@
 #' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
 #'
-#' @return A \code{list} with the selected data.
+#' @return A \code{list} (if \code{raw_data} = \code{TRUE}) or a tibble (if \code{raw_data} = \code{FALSE}) with the selected data.
 #'
 #'
 #' @examples

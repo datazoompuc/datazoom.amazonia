@@ -42,7 +42,6 @@ data:
 
 ``` r
 load_cempre()
-load_deter()
 load_ips()
 load_pibmunic()
 load_prodes()
@@ -52,8 +51,15 @@ load_sigmine()
 
 ## Installation
 
-Currently you can only install the development version from
-[GitHub](https://github.com/) with:
+You can install the released version of `datazoom.amazonia` from
+[CRAN](https://CRAN.R-project.org/package=datazoom.amazonia) with:
+
+``` r
+install.packages("datazoom.amazonia")
+```
+
+And the development version from
+[GitHub](https://github.com/datazoompuc/datazoom.amazonia) with:
 
 ``` r
 # install.packages("devtools")
@@ -106,15 +112,18 @@ Loads information on change in forest cover in the Amazon.
       4. language: you can choose between portuguese and english
 
 ``` r
-# Download raw data (raw_data = TRUE) about Amazon (dataset = "deter_amz") from all periods.
-data <- load_deter(dataset = "deter_amz", 
-                   raw_data = TRUE,
-                   time_period = "all") 
+# Download raw data (raw_data = TRUE) from all years (time_period = "all") 
+# from Amazonia (dataset = "deter_amz")
+deter_amz <- load_deter(dataset = 'deter_amz',
+                        raw_data = TRUE,
+                        time_period = "all")
 
-# Download raw data (raw_data = TRUE) about Cerrado (dataset = "deter_cerrado") from all periods.
-data <- load_deter(dataset = "deter_cerrado", 
-                   raw_data = TRUE,
-                   time_period = "all")
+# Download treated data (raw_data = FALSE) from all years (time_period = "all") 
+# from Cerrado (dataset = "deter_cerrado") in portuguese (language = 'pt')
+deter_cer <- load_deter(dataset = 'deter_cerrado',
+                        raw_data = FALSE,
+                        time_period = "all",
+                        language = "pt")
   
 ```
 

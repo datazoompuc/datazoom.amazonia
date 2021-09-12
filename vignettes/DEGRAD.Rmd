@@ -23,7 +23,7 @@ Original documentation for this data is very scarce, users beware. Some things t
 
 Event data is organized through yearly editions (DEGRAD 2007-2016). Inside a given edition however, there may be data from different years (events that happened in 2015 inside DEGRAD 2016 for example). 
 
-<!-- This package provides degradation data by municipality-year (or municipality-month, when available). It does this by intersecting DEGRAD geometries with IBGE's municipality geometries from the year 2019. CRS metadata however is missing from the original data source. A best effort approach is used and a CRS is assumed (proj4string: "+proj=longlat +ellps=aust_SA +towgs84=-66.8700,4.3700,-38.5200,0.0,0.0,0.0,0.0 +no_defs"). -->
+This package provides degradation data with municipality identification. It does this by intersecting DEGRAD geometries with IBGE's municipality geometries from the year 2019. CRS metadata however is missing from the original data source. A best effort approach is used and a CRS is assumed (proj4string: "+proj=longlat +ellps=aust_SA +towgs84=-66.8700,4.3700,-38.5200,0.0,0.0,0.0,0.0 +no_defs").
 
 ## Usage
 
