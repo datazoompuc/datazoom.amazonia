@@ -533,10 +533,15 @@ unique perpetrators of infractions.
       5. legal_amazon_only: setting the return of Legal Amazon Data (legal_amazon_only = TRUE) or Country´s Data (legal_amazon_only = FALSE)
 
 ``` r
-# Download treated data (raw_data = FALSE) from the entire country (legal_amazon_only = FALSE)
-data <- load_ibama(dataset = "areas_embargadas", 
-                   raw_data = FALSE, 
-                   legal_amazon_only = FALSE)
+# Download treated data (raw_data = FALSE) from the entire country 
+# (legal_amazon_only = FALSE) in english (language = "eng")
+data <- load_ibama(dataset = "areas_embargadas", raw_data = FALSE, 
+                   language = "eng", legal_amazon_only = FALSE)
+
+# Download raw data (raw_data = TRUE) from Legal Amazon region 
+# (legal_amazon_only = TRUE)
+data <- load_ibama(dataset = "areas_embargadas", raw_data = TRUE, 
+                   legal_amazon_only = TRUE)
 ```
 
 # 7) SIGMINE:

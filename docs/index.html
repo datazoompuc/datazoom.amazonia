@@ -543,10 +543,15 @@
 <span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>  <span class="fl">5.</span> legal_amazon_only<span class="sc">:</span> setting the return of Legal Amazon <span class="fu">Data</span> (<span class="at">legal_amazon_only =</span> <span class="cn">TRUE</span>) or Country´s <span class="fu">Data</span> (<span class="at">legal_amazon_only =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Download treated data (raw_data = FALSE) from the entire country (legal_amazon_only = FALSE)</span>
-<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_ibama.html">load_ibama</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"areas_embargadas"</span>, 
-                   raw_data <span class="op">=</span> <span class="cn">FALSE</span>, 
-                   legal_amazon_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="co"># Download treated data (raw_data = FALSE) from the entire country </span>
+<span class="co"># (legal_amazon_only = FALSE) in english (language = "eng")</span>
+<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_ibama.html">load_ibama</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"areas_embargadas"</span>, raw_data <span class="op">=</span> <span class="cn">FALSE</span>, 
+                   language <span class="op">=</span> <span class="st">"eng"</span>, legal_amazon_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+
+<span class="co"># Download raw data (raw_data = TRUE) from Legal Amazon region </span>
+<span class="co"># (legal_amazon_only = TRUE)</span>
+<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_ibama.html">load_ibama</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"areas_embargadas"</span>, raw_data <span class="op">=</span> <span class="cn">TRUE</span>, 
+                   legal_amazon_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="7-sigmine" class="section level1">
 <h1 class="hasAnchor">
@@ -603,7 +608,6 @@
 <li>Fredie Didier <br><small class="roles"> Author </small>  </li>
 <li>Tito Bruni <br><small class="roles"> Author </small>  </li>
 <li>Victor Aliende da Matta <br><small class="roles"> Author </small>  </li>
-<li>Arthur Carvalho Brito <br><small class="roles"> Author </small>  </li>
 <li>Anna Carolina Dutra Saraiva <br><small class="roles"> Author </small>  </li>
 <li>Arthur Carvalho Brito <br><small class="roles"> Author </small>  </li>
 <li>Igor Rigolon Veiga <br><small class="roles"> Author </small>  </li>
@@ -626,7 +630,7 @@
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by DataZoom (PUC-Rio), Francisco de Lima Cavalcanti, Guilherme Jardim, Daniel AC Barbosa, Bruno Alcantara Duarte, Fredie Didier, Tito Bruni, Victor Aliende da Matta, Arthur Carvalho Brito, Anna Carolina Dutra Saraiva, Arthur Carvalho Brito, Igor Rigolon Veiga, Maria Mittelbach.</p>
+<p>Developed by DataZoom (PUC-Rio), Francisco de Lima Cavalcanti, Guilherme Jardim, Daniel AC Barbosa, Bruno Alcantara Duarte, Fredie Didier, Tito Bruni, Victor Aliende da Matta, Anna Carolina Dutra Saraiva, Arthur Carvalho Brito, Igor Rigolon Veiga, Maria Mittelbach.</p>
 </div>
 
 <div class="pkgdown">

@@ -32,6 +32,8 @@ load_ibama <- function(dataset = "areas_embargadas",
   survey <- link <- AMZ_LEGAL <- codigo_ibge_municipio_embargo <- NULL
   municipio_embargo <- uf_embargo <- julgamento <- infracao <- data_de_insercao_na_lista <- NULL
   cpf_ou_cnpj <- cod_municipio <- ano <- mes <- NULL
+  month <- year <- municipality_code <- n_infracoes <- n_ja_julgado <- NULL
+  n_cpf_cnpj_unicos <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -108,5 +110,27 @@ load_ibama <- function(dataset = "areas_embargadas",
       n_cpf_cnpj_unicos = length(unique(cpf_ou_cnpj)),
       .groups = "drop"
     )
+
+  if (param$language == 'pt'){
+
+    dat_mod = dat %>%
+      dplyr::select(ano, mes, cod_municipio,
+                    n_ja_julgado, n_infracoes, n_cpf_cnpj_unicos
+      ) %>%
+      dplyr::arrange(ano, mes, cod_municipio)
+
+  }
+
+  if (param$language == 'eng'){
+
+    dat_mod = dat %>%
+      dplyr::select(year = ano, month = mes, municipality_code = cod_municipio,
+                    n_already_judged = n_ja_julgado,
+                    n_infringement = n_infracoes,
+                    n_unique_cpf_cnpj = n_cpf_cnpj_unicos
+      ) %>%
+      dplyr::arrange(year, month, municipality_code)
+
+  }
 
 }
