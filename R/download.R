@@ -75,6 +75,8 @@ sidra_download = function(sidra_code = NULL,year,geo_level = 'municipality',
       tibble::as_tibble() %>%
       janitor::clean_names()
 
+    if (nrow(dat) == 0) {stop("Error in Download.")}
+
     base::message(base::cat('Download Succesfully Completed!'))
 
     return(dat)
