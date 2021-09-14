@@ -34,7 +34,6 @@ datazoom.amazonia::datasets_link()
 The package is under development so the following functions still do not support pre-processing and language arguments, returning only the raw data:
 ```{r,eval=FALSE}
 load_cempre()
-load_ips()
 load_pibmunic()
 load_prodes()
 load_seeg()
@@ -443,11 +442,13 @@ There are four parameters in this function:
 
   
 ```{r, eval = FALSE}
-# Download raw data (raw_data = TRUE) from 2014 (time_period = 2014).
-data <- load_ips(dataset = "ips", 
-                 raw_data = TRUE,
-                 time_period = 2014)
+# Download raw data (raw_data = TRUE) from 2014 (time_period = 2014)
+data <- load_ips(dataset = "ips", raw_data = TRUE, time_period = 2014)
 
+# Download treated data (raw_data = FALSE) from 2018 
+# (time_period = 2018) in portuguese (language = 'pt')
+data <- load_ips(dataset = "ips", raw_data = FALSE,
+                 time_period = 2018, language = 'pt')
 ```
 
 
