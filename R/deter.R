@@ -4,7 +4,6 @@
 #'
 #' @param dataset A dataset name ("deter_amz", "deter_cerrado") with information about both Amazon and Cerrado
 #' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
-#' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
 #'
 #' @return A \code{tibble} with the selected data.
@@ -16,24 +15,21 @@
 #'
 #' @examples
 #' \dontrun{
-#' # Download raw data (raw_data = TRUE) from all years (time_period = "all")
-#' # from Amazonia (dataset = "deter_amz")
+#' # Download raw data (raw_data = TRUE) from Amazonia (dataset = "deter_amz")
 #' deter_amz <- load_deter(dataset = 'deter_amz',
-#'                         raw_data = TRUE,
-#'                         time_period = "all")
+#'                         raw_data = TRUE)
 #'
-#' # Download treated data (raw_data = FALSE) from all years (time_period = "all")
-#' # from Cerrado (dataset = "deter_cerrado") in portuguese (language = 'pt')
+#' # Download treated data (raw_data = FALSE) from Cerrado (dataset = "deter_cerrado")
+#' # in portuguese (language = 'pt')
 #' deter_cer <- load_deter(dataset = 'deter_cerrado',
 #'                         raw_data = FALSE,
-#'                         time_period = "all",
 #'                         language = "pt")
 #'
 #' }
 
 
 load_deter <- function(dataset = NULL, raw_data,
-                       time_period, language = 'eng') {
+                       language = 'eng') {
 
   ## Dataset can be either Amazonia or Cerrado
   # Default is all time-periods
@@ -62,6 +58,7 @@ load_deter <- function(dataset = NULL, raw_data,
   area_uc_km <- NULL
   area_geo_km <- NULL
   survey <- link <- NULL
+  time_period <- NULL
 
   #############################
   ## Define Basic Parameters ##

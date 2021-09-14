@@ -23,17 +23,14 @@ DETER uses satellite surveillance to detect and report changes in forest cover a
 ```{r,eval=FALSE}
 library(datazoom.amazonia)
 
-# Download raw data (raw_data = TRUE) from all years (time_period = "all") 
-# from Amazonia (dataset = "deter_amz")
+# Download raw data (raw_data = TRUE) from Amazonia (dataset = "deter_amz")
 deter_amz <- load_deter(dataset = 'deter_amz',
-                        raw_data = TRUE,
-                        time_period = "all")
+                        raw_data = TRUE)
 
-# Download treated data (raw_data = FALSE) from all years (time_period = "all") 
-# from Cerrado (dataset = "deter_cerrado") in portuguese (language = 'pt')
+# Download treated data (raw_data = FALSE) from Cerrado (dataset = "deter_cerrado")
+# in portuguese (language = 'pt')
 deter_cer <- load_deter(dataset = 'deter_cerrado',
                         raw_data = FALSE,
-                        time_period = "all",
                         language = "pt")
 ```
 

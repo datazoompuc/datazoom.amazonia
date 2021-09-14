@@ -107,24 +107,18 @@ Loads information on change in forest cover in the Amazon.
       # TRUE: if you want the raw data.
       # FALSE: if you want the processed version of the data. 
       
-      3. time_period: you can choose from 1988 to 2020
-
-      4. language: you can choose between portuguese and english
+      3. language: you can choose between portuguese and english
 
 ``` r
-# Download raw data (raw_data = TRUE) from all years (time_period = "all") 
-# from Amazonia (dataset = "deter_amz")
+# Download raw data (raw_data = TRUE) from Amazonia (dataset = "deter_amz")
 deter_amz <- load_deter(dataset = 'deter_amz',
-                        raw_data = TRUE,
-                        time_period = "all")
+                        raw_data = TRUE)
 
-# Download treated data (raw_data = FALSE) from all years (time_period = "all") 
-# from Cerrado (dataset = "deter_cerrado") in portuguese (language = 'pt')
+# Download treated data (raw_data = FALSE) from Cerrado (dataset = "deter_cerrado")
+# in portuguese (language = 'pt')
 deter_cer <- load_deter(dataset = 'deter_cerrado',
                         raw_data = FALSE,
-                        time_period = "all",
                         language = "pt")
-  
 ```
 
 ## 1.3) DEGRAD:
