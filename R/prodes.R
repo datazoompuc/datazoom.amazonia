@@ -24,7 +24,6 @@
 #' @export
 
 load_prodes <- function(dataset = "prodes", raw_data,
-                        #geo_level,
                         time_period,
                         language = 'eng') {
 
@@ -73,6 +72,7 @@ load_prodes <- function(dataset = "prodes", raw_data,
     )
 
   ## Include function that treats the data here
+  list_dat <- dat
 
   dat = dat %>%
     dplyr::bind_rows() %>%
@@ -100,102 +100,91 @@ load_prodes <- function(dataset = "prodes", raw_data,
 
   # ---------------------------------------------------------------------
 
-  # treat_prodes_data = function(df, geo_level, language) {
-  #
-  #   ## Bind Global Variables
-  #
-  #   cod_ibge <- NULL
-  #   estado <- NULL
-  #   cod_uf <- NULL
-  #   cod_munic_ibge <- NULL
-  #   ano <- NULL
-  #   desmatado <- NULL
-  #   incremento <- NULL
-  #   floresta <- NULL
-  #   nuvem <- NULL
-  #   nao_observado <- NULL
-  #   nao_floresta <- NULL
-  #   hidrografia <- NULL
-  #
-  #   ####################
-  #   ## Data Carpentry ##
-  #   ####################
-  #
-  #   geo_level <- tolower(geo_level)
-  #
-  #   df = df %>%
-  #     #dat_mod = df %>%
-  #     janitor::clean_names() %>%
-  #     # Adds column with UF codes, eg. MA = 21
-  #     dplyr::mutate(cod_uf = as.factor(base::substr(cod_ibge,start=1,stop=2))) %>%
-  #     dplyr::rename(cod_munic_ibge = cod_ibge) %>%
-  #     # Removes unnecessary columns - under review
-  #     dplyr::select(-c('lat','long','latgms','longms','municipio','nr','soma'))
-  #
-  #   if (geo_level == "state") {
-  #
-  #     df = df %>%
-  #       dplyr::group_by(estado,cod_uf) %>%
-  #       # Collapses data by state
-  #       dplyr::summarize_if(is.numeric, sum, na.rm = TRUE)
-  #   }
-  #
-  #   if (geo_level == "municipality") {
-  #     df = df %>%
-  #       janitor::clean_names() %>%
-  #       dplyr::mutate(cod_munic_ibge = as.factor(cod_munic_ibge)) %>%
-  #       dplyr::relocate(cod_uf,.after=estado)
-  #   }
-  #
-  #   if (!(geo_level %in% c('municipality','state'))){
-  #
-  #     stop("Aggregation level not supported. Please see documentation.")
-  #
-  #   }
-  #
-  #   ###############################
-  #   ## Extract Year From Columns ##
-  #   ###############################
-  #
-  #   df$ano =
-  #     colnames(df) %>%
-  #     purrr::detect(function(x) startsWith(x, "des")) %>%
-  #     gsub(pattern = ".*(\\d{4}).*", replacement = "\\1") %>%
-  #     as.numeric()
-  #
-  #
-  #   # Removes year from column name
-  #   colnames(df) <- gsub("(.*)\\d{4}?", "\\1", colnames(df))
-  #
-  #   df = df %>%
-  #     dplyr::relocate(ano,.after=cod_munic_ibge)
-  #
-  #   #################
-  #   ## Translation ##
-  #   #################
-  #
-  #   language <- tolower(language)
-  #
-  #   if (language == 'eng'){
-  #     df = df %>%
-  #       dplyr::rename(
-  #         #munic_code_ibge = cod_munic_ibge,
-  #         state = estado,
-  #         deforestation = desmatado,
-  #         increment = incremento,
-  #         forest = floresta,
-  #         cloud = nuvem,
-  #         not_observed = nao_observado,
-  #         not_forest = nao_floresta,
-  #         hydrography = hidrografia,
-  #         year = ano)
-  #   } else if (language != "pt") {
-  #     warning("Selected language is not supported. Proceeding with Portuguese.")
-  #   }
-  #
-  #
-  #   return(df)
-  # }
+   treat_prodes_data = function(df, language) {
+
+     ## Bind Global Variables
+
+     cod_ibge <- nr <- lat <- long <- latgms <- longms <- NULL
+     estado <- soma <- area_km2 <- NULL
+     cod_uf <- NULL
+     cod_munic_ibge <- NULL
+     ano <- NULL
+     desmatado <- NULL
+     incremento <- NULL
+     floresta <- NULL
+     nuvem <- NULL
+     nao_observado <- NULL
+     nao_floresta <- NULL
+     hidrografia <- NULL
+
+     ####################
+     ## Data Carpentry ##
+     ####################
+
+     df = df %>%
+       janitor::clean_names() %>%
+       # Adds column with UF codes, eg. MA = 21
+       dplyr::mutate(cod_uf = as.factor(base::substr(cod_ibge,start=1,stop=2))) %>%
+       dplyr::rename(cod_munic_ibge = cod_ibge)
+
+     ###############################
+     ## Extract Year From Columns ##
+     ###############################
+
+     # Removes year from column name
+     colnames(df) <- gsub("(.*)\\d{4}?", "\\1", colnames(df))
+
+     #################
+     ## Translation ##
+     #################
+
+     language <- tolower(language)
+
+     if (language == 'eng'){
+       df = df %>%
+         dplyr::select(
+           year = ano,
+           nr, lat, lon = long, latgms, longms,
+           state_code = cod_uf,
+           municipality_code = cod_munic_ibge,
+           area_km2,
+           deforestation = desmatado,
+           increment = incremento,
+           forest = floresta,
+           cloud = nuvem,
+           not_observed = nao_observado,
+           not_forest = nao_floresta,
+           hydrography = hidrografia,
+           sum = soma
+           )
+     }
+
+     if (language == "pt") {
+       df = df %>%
+         dplyr::select(
+           ano,
+           nr, lat, lon = long, latgms, longms,
+           cod_uf,
+           cod_municipio = cod_munic_ibge,
+           area_km2,
+           desmatado,
+           incremento,
+           floresta,
+           nuvem,
+           nao_observado,
+           nao_floresta,
+           hidrografia,
+           soma
+         )
+     }
+
+     return(df)
+   }
+
+  dat_mod <- purrr::map(dat, ~treat_prodes_data(.x, param$language)) %>%
+    dplyr::bind_rows()
+
+  return(dat_mod)
 
 }
 

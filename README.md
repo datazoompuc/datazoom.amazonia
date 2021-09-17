@@ -43,9 +43,7 @@ data:
 ``` r
 load_cempre()
 load_pibmunic()
-load_prodes()
 load_seeg()
-load_sigmine()
 ```
 
 ## Installation
@@ -90,6 +88,13 @@ annual deforestation rates in the region. Data is available from 2000 to
 data <- load_prodes(dataset = "prodes", 
                     raw_data = TRUE,
                     time_period = 2000:2005) 
+
+# Download treated data (raw_data = FALSE) from 2010 (time_period = 2010) 
+# in portuguese (language = 'pt').
+data <- load_prodes(dataset = "prodes", 
+                    raw_data = FALSE,
+                    time_period = 2010,
+                    language = 'pt')  
 ```
 
 ## 1.2) DETER:
@@ -567,6 +572,11 @@ Agency (ANM) is responsible for this survey.
 ``` r
 # Download raw data (raw_data = TRUE).
 data <- load_sigmine(dataset = 'sigmine_active', raw_data = TRUE)
+
+# Download treated data (raw_data = FALSE) in portuguese (language = "pt").
+data <- load_sigmine(dataset = 'sigmine_active', 
+                     raw_data = TRUE,
+                     language = "pt")
 ```
 
 ## Credits
