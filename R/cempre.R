@@ -105,7 +105,7 @@ load_cempre <- function(dataset = "cempre", raw_data,
       dplyr::bind_rows() %>%
       tibble::as_tibble()
 
-    ## Download only the total
+  ## Download only the total
   } else {
     cnaes <- list("117897")
 
@@ -138,322 +138,326 @@ load_cempre <- function(dataset = "cempre", raw_data,
   if (raw_data == TRUE){return(dat)}
 
 
-  dat = dat %>%
-    janitor::clean_names() %>%
-    dplyr::mutate_all(function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")})
+dat = dat %>%
+  janitor::clean_names() %>%
+  dplyr::mutate_all(function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")})
 
 
-  dat = dat %>%
-    dplyr::select(-c(nivel_territorial_codigo,nivel_territorial,ano_codigo)) %>%
-    dplyr::mutate(valor=as.numeric(valor))
+dat = dat %>%
+  dplyr::select(-c(nivel_territorial_codigo,nivel_territorial,ano_codigo)) %>%
+  dplyr::mutate(valor=as.numeric(valor))
 
-  ## Only Keep Valid Observations
+## Only Keep Valid Observations
 
-  dat = dat %>%
-    dplyr::filter(!is.na(valor))
-
-
-  if(geo_level == 'country'){
-    dat$geo_id = dat$brasil
-    dat = dplyr::select(dat,-'brasil_codigo',-'brasil')
-  }
-
-  if (geo_level == 'state'){
-    dat$geo_id = dat$unidade_da_federacao_codigo
-    dat = dplyr::select(dat,-'unidade_da_federacao_codigo',-'unidade_da_federacao')
-  }
-
-  if (geo_level == 'municipality'){
-    dat$geo_id = dat$municipio_codigo
-    dat = dplyr::select(dat,-'municipio',-'municipio_codigo')
-  }
+dat = dat %>%
+  dplyr::filter(!is.na(valor))
 
 
-  ################################
-  ## Harmonizing Variable Names ##
-  ################################
+if(geo_level == 'country'){
+  dat$geo_id = dat$brasil
+  dat = dplyr::select(dat,-'brasil_codigo',-'brasil')
+}
 
-  dat = dat %>%
-    dplyr::select(-unidade_de_medida,-unidade_de_medida_codigo)
+if (geo_level == 'state'){
+  dat$geo_id = dat$unidade_da_federacao_codigo
+  dat = dplyr::select(dat,-'unidade_da_federacao_codigo',-'unidade_da_federacao')
+}
 
-  if(sectors == TRUE){dat = dat %>%
-    dplyr::mutate(id_code = dplyr::case_when(variavel_codigo == 2585 &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117897 ~ "117897_1",
-                                             variavel == "Pessoal ocupado total" &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117897 ~ "117897_2",
-                                             variavel == "Pessoal ocupado assalariado" &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117897 ~ "117897_3",
-                                             variavel_codigo == 662 &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117897 ~ "117897_4",
-
-                                             variavel_codigo == 2585 &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 116830 ~ "116830_1",
-                                             variavel == "Pessoal ocupado total" &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 116830 ~ "116830_2",
-                                             variavel == "Pessoal ocupado assalariado" &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 116830 ~ "116830_3",
-                                             variavel_codigo == 662 &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 116830 ~ "116830_4",
-
-                                             variavel_codigo == 2585 &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 116880 ~ "116880_1",
-                                             variavel == "Pessoal ocupado total" &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 116880 ~ "116880_2",
-                                             variavel == "Pessoal ocupado assalariado" &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 116880 ~ "116880_3",
-                                             variavel_codigo == 662 &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 116880 ~ "116880_4",
-
-                                             variavel_codigo == 2585 &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 116910 ~ "116910_1",
-                                             variavel == "Pessoal ocupado total" &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 116910 ~ "116910_2",
-                                             variavel == "Pessoal ocupado assalariado" &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 116910 ~ "116910_3",
-                                             variavel_codigo == 662 &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 116910 ~ "116910_4",
-
-                                             variavel_codigo == 2585 &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117296 ~ "117296_1",
-                                             variavel == "Pessoal ocupado total" &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117296 ~ "117296_2",
-                                             variavel == "Pessoal ocupado assalariado" &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117296 ~ "117296_3",
-                                             variavel_codigo == 662 &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117296 ~ "117296_4",
-
-                                             variavel_codigo == 2585 &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117307 ~ "117307_1",
-                                             variavel == "Pessoal ocupado total" &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117307 ~ "117307_2",
-                                             variavel == "Pessoal ocupado assalariado" &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117307 ~ "117307_3",
-                                             variavel_codigo == 662 &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117307 ~ "117307_4",
-
-                                             variavel_codigo == 2585 &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117329 ~ "117329_1",
-                                             variavel == "Pessoal ocupado total" &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117329 ~ "117329_2",
-                                             variavel == "Pessoal ocupado assalariado" &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117329 ~ "117329_3",
-                                             variavel_codigo == 662 &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117329 ~ "117329_4",
-
-                                             variavel_codigo == 2585 &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117363 ~ "117363_1",
-                                             variavel == "Pessoal ocupado total" &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117363 ~ "117363_2",
-                                             variavel == "Pessoal ocupado assalariado" &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117363 ~ "117363_3",
-                                             variavel_codigo == 662 &
-                                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117363 ~ "117363_4",
-
-                                             variavel_codigo == 2585
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117484 ~ "117484_1",
-                                             variavel == "Pessoal ocupado total"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117484 ~ "117484_2",
-                                             variavel == "Pessoal ocupado assalariado"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117484 ~ "117484_3",
-                                             variavel_codigo == 662
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117484 ~ "117484_4",
-
-                                             variavel_codigo == 2585
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117543 ~ "117543_1",
-                                             variavel == "Pessoal ocupado total"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117543 ~ "117543_2",
-                                             variavel == "Pessoal ocupado assalariado"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117543 ~ "117543_3",
-                                             variavel_codigo == 662
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117543 ~ "117543_4",
-
-                                             variavel_codigo == 2585
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117555 ~ "117555_1",
-                                             variavel == "Pessoal ocupado total"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117555 ~ "117555_2",
-                                             variavel == "Pessoal ocupado assalariado"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117555 ~ "117555_3",
-                                             variavel_codigo == 662
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117555 ~ "117555_4",
-
-                                             variavel_codigo == 2585
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117608 ~ "117608_1",
-                                             variavel == "Pessoal ocupado total"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117608 ~ "117608_2",
-                                             variavel == "Pessoal ocupado assalariado"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117608 ~ "117608_3",
-                                             variavel_codigo == 662
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117608 ~ "117608_4",
-
-                                             variavel_codigo == 2585
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117666 ~ "117666_1",
-                                             variavel == "Pessoal ocupado total"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117666 ~ "117666_2",
-                                             variavel == "Pessoal ocupado assalariado"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117666 ~ "117666_3",
-                                             variavel_codigo == 662
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117666 ~ "117666_4",
-
-                                             variavel_codigo == 2585
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117673 ~ "117673_1",
-                                             variavel == "Pessoal ocupado total"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117673 ~ "117673_2",
-                                             variavel == "Pessoal ocupado assalariado"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117673 ~ "117673_3",
-                                             variavel_codigo == 662
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117673 ~ "117673_4",
-
-                                             variavel_codigo == 2585
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117714 ~ "117714_1",
-                                             variavel == "Pessoal ocupado total"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117714 ~ "117714_2",
-                                             variavel == "Pessoal ocupado assalariado"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117714 ~ "117714_3",
-                                             variavel_codigo == 662
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117714 ~ "117714_4",
-
-                                             variavel_codigo == 2585
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117774 ~ "117774_1",
-                                             variavel == "Pessoal ocupado total"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117774 ~ "117774_2",
-                                             variavel == "Pessoal ocupado assalariado"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117774 ~ "117774_3",
-                                             variavel_codigo == 662
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117774 ~ "117774_4",
-
-                                             variavel_codigo == 2585
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117788 ~ "117788_1",
-                                             variavel == "Pessoal ocupado total"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117788 ~ "117788_2",
-                                             variavel == "Pessoal ocupado assalariado"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117788 ~ "117788_3",
-                                             variavel_codigo == 662
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117788 ~ "117788_4",
-
-                                             variavel_codigo == 2585
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117810 ~ "117810_1",
-                                             variavel == "Pessoal ocupado total"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117810 ~ "117810_2",
-                                             variavel == "Pessoal ocupado assalariado"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117810 ~ "117810_3",
-                                             variavel_codigo == 662
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117810 ~ "117810_4",
-
-                                             variavel_codigo == 2585
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117838 ~ "117838_1",
-                                             variavel == "Pessoal ocupado total"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117838 ~ "117838_2",
-                                             variavel == "Pessoal ocupado assalariado"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117838 ~ "117838_3",
-                                             variavel_codigo == 662
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117838 ~ "117838_4",
-
-                                             variavel_codigo == 2585
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117861 ~ "117861_1",
-                                             variavel == "Pessoal ocupado total"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117861 ~ "117861_2",
-                                             variavel == "Pessoal ocupado assalariado"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117861 ~ "117861_3",
-                                             variavel_codigo == 662
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117861 ~ "117861_4",
-
-                                             variavel_codigo == 2585
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117888 ~ "117888_1",
-                                             variavel == "Pessoal ocupado total"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117888 ~ "117888_2",
-                                             variavel == "Pessoal ocupado assalariado"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117888 ~ "117888_3",
-                                             variavel_codigo == 662
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117888 ~ "117888_4",
-
-                                             variavel_codigo == 2585
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117892 ~ "117892_1",
-                                             variavel == "Pessoal ocupado total"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117892 ~ "117892_2",
-                                             variavel == "Pessoal ocupado assalariado"
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117892 ~ "117892_3",
-                                             variavel_codigo == 662
-                                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117892 ~ "117892_4"
-    ))}
+if (geo_level == 'municipality'){
+  dat$geo_id = dat$municipio_codigo
+  dat = dplyr::select(dat,-'municipio',-'municipio_codigo')
+}
 
 
+################################
+## Harmonizing Variable Names ##
+################################
 
-  dat = dat %>%
-    dplyr::select(-'classificacao_nacional_de_atividades_economicas_cnae_2_0') %>%
-    dplyr::arrange(classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo,variavel) %>%
-    tidyr::pivot_wider(id_cols = c(ano),
-                       names_from = c(variavel, id_code),
-                       values_from = valor,
-                       names_sep = '_V',
-                       values_fn = sum,
-                       values_fill = NA) %>%
-    janitor::clean_names()
+dat = dat %>%
+  dplyr::select(-unidade_de_medida,-unidade_de_medida_codigo)
+
+if(sectors == TRUE){dat = dat %>%
+  dplyr::mutate(id_code = dplyr::case_when(variavel_codigo == 2585 &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117897 ~ "117897_1",
+                             variavel == "Pessoal ocupado total" &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117897 ~ "117897_2",
+                             variavel == "Pessoal ocupado assalariado" &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117897 ~ "117897_3",
+                             variavel_codigo == 662 &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117897 ~ "117897_4",
+
+                            variavel_codigo == 2585 &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 116830 ~ "116830_1",
+                             variavel == "Pessoal ocupado total" &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 116830 ~ "116830_2",
+                             variavel == "Pessoal ocupado assalariado" &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 116830 ~ "116830_3",
+                             variavel_codigo == 662 &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 116830 ~ "116830_4",
+
+                            variavel_codigo == 2585 &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 116880 ~ "116880_1",
+                             variavel == "Pessoal ocupado total" &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 116880 ~ "116880_2",
+                             variavel == "Pessoal ocupado assalariado" &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 116880 ~ "116880_3",
+                             variavel_codigo == 662 &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 116880 ~ "116880_4",
+
+                            variavel_codigo == 2585 &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 116910 ~ "116910_1",
+                             variavel == "Pessoal ocupado total" &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 116910 ~ "116910_2",
+                             variavel == "Pessoal ocupado assalariado" &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 116910 ~ "116910_3",
+                             variavel_codigo == 662 &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 116910 ~ "116910_4",
+
+                            variavel_codigo == 2585 &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117296 ~ "117296_1",
+                             variavel == "Pessoal ocupado total" &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117296 ~ "117296_2",
+                             variavel == "Pessoal ocupado assalariado" &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117296 ~ "117296_3",
+                             variavel_codigo == 662 &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117296 ~ "117296_4",
+
+                            variavel_codigo == 2585 &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117307 ~ "117307_1",
+                             variavel == "Pessoal ocupado total" &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117307 ~ "117307_2",
+                             variavel == "Pessoal ocupado assalariado" &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117307 ~ "117307_3",
+                             variavel_codigo == 662 &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117307 ~ "117307_4",
+
+                            variavel_codigo == 2585 &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117329 ~ "117329_1",
+                             variavel == "Pessoal ocupado total" &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117329 ~ "117329_2",
+                             variavel == "Pessoal ocupado assalariado" &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117329 ~ "117329_3",
+                             variavel_codigo == 662 &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117329 ~ "117329_4",
+
+                            variavel_codigo == 2585 &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117363 ~ "117363_1",
+                             variavel == "Pessoal ocupado total" &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117363 ~ "117363_2",
+                             variavel == "Pessoal ocupado assalariado" &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117363 ~ "117363_3",
+                             variavel_codigo == 662 &
+                               classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117363 ~ "117363_4",
+
+                            variavel_codigo == 2585
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117484 ~ "117484_1",
+                             variavel == "Pessoal ocupado total"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117484 ~ "117484_2",
+                             variavel == "Pessoal ocupado assalariado"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117484 ~ "117484_3",
+                             variavel_codigo == 662
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117484 ~ "117484_4",
+
+                            variavel_codigo == 2585
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117543 ~ "117543_1",
+                             variavel == "Pessoal ocupado total"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117543 ~ "117543_2",
+                             variavel == "Pessoal ocupado assalariado"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117543 ~ "117543_3",
+                             variavel_codigo == 662
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117543 ~ "117543_4",
+
+                            variavel_codigo == 2585
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117555 ~ "117555_1",
+                             variavel == "Pessoal ocupado total"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117555 ~ "117555_2",
+                             variavel == "Pessoal ocupado assalariado"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117555 ~ "117555_3",
+                             variavel_codigo == 662
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117555 ~ "117555_4",
+
+                            variavel_codigo == 2585
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117608 ~ "117608_1",
+                             variavel == "Pessoal ocupado total"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117608 ~ "117608_2",
+                             variavel == "Pessoal ocupado assalariado"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117608 ~ "117608_3",
+                             variavel_codigo == 662
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117608 ~ "117608_4",
+
+                            variavel_codigo == 2585
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117666 ~ "117666_1",
+                             variavel == "Pessoal ocupado total"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117666 ~ "117666_2",
+                             variavel == "Pessoal ocupado assalariado"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117666 ~ "117666_3",
+                             variavel_codigo == 662
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117666 ~ "117666_4",
+
+                            variavel_codigo == 2585
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117673 ~ "117673_1",
+                             variavel == "Pessoal ocupado total"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117673 ~ "117673_2",
+                             variavel == "Pessoal ocupado assalariado"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117673 ~ "117673_3",
+                             variavel_codigo == 662
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117673 ~ "117673_4",
+
+                            variavel_codigo == 2585
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117714 ~ "117714_1",
+                             variavel == "Pessoal ocupado total"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117714 ~ "117714_2",
+                             variavel == "Pessoal ocupado assalariado"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117714 ~ "117714_3",
+                             variavel_codigo == 662
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117714 ~ "117714_4",
+
+                            variavel_codigo == 2585
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117774 ~ "117774_1",
+                             variavel == "Pessoal ocupado total"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117774 ~ "117774_2",
+                             variavel == "Pessoal ocupado assalariado"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117774 ~ "117774_3",
+                             variavel_codigo == 662
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117774 ~ "117774_4",
+
+                            variavel_codigo == 2585
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117788 ~ "117788_1",
+                             variavel == "Pessoal ocupado total"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117788 ~ "117788_2",
+                             variavel == "Pessoal ocupado assalariado"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117788 ~ "117788_3",
+                             variavel_codigo == 662
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117788 ~ "117788_4",
+
+                            variavel_codigo == 2585
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117810 ~ "117810_1",
+                             variavel == "Pessoal ocupado total"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117810 ~ "117810_2",
+                             variavel == "Pessoal ocupado assalariado"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117810 ~ "117810_3",
+                             variavel_codigo == 662
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117810 ~ "117810_4",
+
+                            variavel_codigo == 2585
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117838 ~ "117838_1",
+                             variavel == "Pessoal ocupado total"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117838 ~ "117838_2",
+                             variavel == "Pessoal ocupado assalariado"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117838 ~ "117838_3",
+                             variavel_codigo == 662
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117838 ~ "117838_4",
+
+                            variavel_codigo == 2585
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117861 ~ "117861_1",
+                             variavel == "Pessoal ocupado total"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117861 ~ "117861_2",
+                             variavel == "Pessoal ocupado assalariado"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117861 ~ "117861_3",
+                             variavel_codigo == 662
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117861 ~ "117861_4",
+
+                            variavel_codigo == 2585
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117888 ~ "117888_1",
+                             variavel == "Pessoal ocupado total"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117888 ~ "117888_2",
+                             variavel == "Pessoal ocupado assalariado"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117888 ~ "117888_3",
+                             variavel_codigo == 662
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117888 ~ "117888_4",
+
+                            variavel_codigo == 2585
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117892 ~ "117892_1",
+                             variavel == "Pessoal ocupado total"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117892 ~ "117892_2",
+                             variavel == "Pessoal ocupado assalariado"
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117892 ~ "117892_3",
+                             variavel_codigo == 662
+                             & classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo == 117892 ~ "117892_4"
+  ))}
 
 
 
-  labelled <- function(x, label) {
-    Hmisc::label(x) <- label
-    x
-  }
-
-  label_data_eng = function(df,cols,dic){
-
-    label_value = as.character(dic[dic$id_code == cols,'var_eng'])
-
-    df = df %>%
-      dplyr::mutate_at(dplyr::vars(tidyr::matches(cols)),
-                       ~ labelled(.,as.character(dic[dic$id_code == cols,'var_eng']))
-      )
-
-    return(df)
-
-  }
-
-
-  label_data_pt = function(df,cols,dic){
-
-    label_value = as.character(dic[dic$id_code == cols,'var_pt'])
-
-    df = df %>%
-      dplyr::mutate_at(dplyr::vars(tidyr::matches(cols)),
-                       ~ labelled(.,as.character(dic[dic$id_code == cols,'var_pt']))
-      )
-
-    return(df)
-
-  }
+dat = dat %>%
+  dplyr::select(-'classificacao_nacional_de_atividades_economicas_cnae_2_0') %>%
+  dplyr::arrange(classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo,variavel) %>%
+  tidyr::pivot_wider(id_cols = c(ano, geo_id),
+                     names_from = c(variavel, id_code),
+                     values_from = valor,
+                     names_sep = '_V',
+                     values_fn = sum,
+                     values_fill = NA) %>%
+  janitor::clean_names()
 
 
 
-  ## Load Dictionary
+labelled <- function(x, label) {
+  Hmisc::label(x) <- label
+  x
+}
 
-  dic = load_dictionary(param$dataset)
+label_data_eng = function(df,cols,dic){
 
-  types = as.character(dic$id_code)
-  types = types[types != "0"] ## Remove 0
+  label_value = as.character(dic[dic$id_code == cols,'var_eng'])
+
+  df = df %>%
+    dplyr::mutate_at(dplyr::vars(tidyr::matches(cols)),
+                     ~ labelled(.,as.character(dic[dic$id_code == cols,'var_eng']))
+    )
+
+  return(df)
+
+}
 
 
-  if (language == 'eng'){
-    for (i in 1:length(types)){
+label_data_pt = function(df,cols,dic){
 
-      dat = label_data_eng(dat,cols=types[i],dic=dic)
+  label_value = as.character(dic[dic$id_code == cols,'var_pt'])
 
-    }
+  df = df %>%
+    dplyr::mutate_at(dplyr::vars(tidyr::matches(cols)),
+                     ~ labelled(.,as.character(dic[dic$id_code == cols,'var_pt']))
+    )
+
+  return(df)
+
+}
+
+
+
+## Load Dictionary
+
+dic = load_dictionary(param$dataset)
+
+types = as.character(dic$id_code)
+types = types[types != "0"] ## Remove 0
+
+
+if (language == 'eng'){
+  for (i in 1:length(types)){
+
+    dat = label_data_eng(dat,cols=types[i],dic=dic)
 
   }
 
-  if (language == 'pt'){
+}
 
-    for (i in 1:length(types)){
+if (language == 'pt'){
 
-      dat = label_data_pt(dat,cols=types[i],dic=dic)
+  for (i in 1:length(types)){
 
-    }
+    dat = label_data_pt(dat,cols=types[i],dic=dic)
+
   }
+}
 
-  ##########################
-  ## Returning Data Frame ##
-  ##########################
+remove_numbers = function(string){
 
-  return(dat)
+  stringr::str_remove(string = string, pattern = "_\\d")
+
+##########################
+## Returning Data Frame ##
+##########################
+
+ return(dat)
 }
