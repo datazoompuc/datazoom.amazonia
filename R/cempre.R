@@ -453,7 +453,7 @@ if (language == 'pt'){
 
 remove_numbers = function(string){
 
-  stringr::str_remove(string = string, pattern = "_\\d")
+  stringr::str_remove(string = string, pattern = "_\\d")}
 
 ##########################
 ## Returning Data Frame ##
