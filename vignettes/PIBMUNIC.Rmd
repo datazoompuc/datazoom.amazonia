@@ -36,7 +36,7 @@ pibmunic <- load_pibmunic(dataset = 'pibmunic',
 ```
 
 
-```{r}
+```{r, eval = FALSE}
 #Download treated data (raw_data = FALSE) by state (geo_level = "state") from 2008 to 2010 (time_period = 2008:2010) in portuguese (language = "pt")
 
 pibmunic <- load_pibmunic(dataset = 'pibmunic',

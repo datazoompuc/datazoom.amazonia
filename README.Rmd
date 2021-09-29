@@ -588,6 +588,7 @@ data = load_pibmunic(dataset = "pibmunic", raw_data = TRUE, geo_level = "state",
 
 # Download Treated Data
 data = load_pibmunic(dataset = "pibmunic", raw_data = FALSE, geo_level = "country", time_period = 2008, language = "eng")
+
 ```
 
 
