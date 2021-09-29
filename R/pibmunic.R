@@ -32,7 +32,7 @@ load_pibmunic <- function(dataset = "pibmunic", raw_data,
                           language = "eng",
                           legal_amazon_only = FALSE) {
 
-  sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- NULL
+  sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- ano <- ano_codigo <- geo_id <- nivel_territorial <- nivel_territorial_codigo <- unidade_de_medida <- unidade_de_medida_codigo <- valor <- variavel <- variavel_codigo <- NULL
 
 
   #############################
