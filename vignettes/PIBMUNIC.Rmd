@@ -30,7 +30,19 @@ library(datazoom.amazonia)
 # download state raw data from 2012 for all country
 pibmunic <- load_pibmunic(dataset = 'pibmunic',
                           raw_data = TRUE,
-                          geo_level = 'state',
+                          geo_level = 'country',
                           time_period = 2012,
                           legal_amazon_only = FALSE)
 ```
+
+
+```{r}
+#Download treated data (raw_data = FALSE) by state (geo_level = "state") from 2008 to 2010 (time_period = 2008:2010) in portuguese (language = "pt")
+
+pibmunic <- load_pibmunic(dataset = 'pibmunic',
+                          raw_data = FALSE,
+                          geo_level = 'state',
+                          time_period = 2008:2010,
+                          legal_amazon_only = FALSE)
+```
+
