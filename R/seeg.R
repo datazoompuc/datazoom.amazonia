@@ -88,7 +88,7 @@ if (param$dataset == "seeg_farming"){
            tipo_emissao = nivel_3,
            emissores_diretos_e_indiretos = nivel_4,
            fonte_de_emissoes = nivel_5,
-           categorias_dos_emissores = nivel_6)%>%
+           emissores = nivel_6)%>%
     dplyr::mutate(atividade_economica = dplyr::case_when(atividade_economica == "PEC" ~ "Pecuaria",
                                            atividade_economica == "AGR" ~ "Agricultura"))%>%
     dplyr::mutate(produto = dplyr::case_when(produto == "ALIM_BEBIDAS" ~ "Alimentos/Bebidas",
@@ -117,16 +117,27 @@ if (param$dataset == "seeg_industry"){
   dat = dat %>%
     dplyr::filter(nivel_1_setor == "Processos Industriais") %>%
     dplyr::rename(setor = nivel_1_setor, processos_geradores_emissoes = nivel_2,
-           produtos_emissores = nivel_3,
+           producao_emissores = nivel_3,
            destinacao_produto = nivel_4,
-           fonte_energetica = nivel_5)%>%
-  dplyr::select(-nivel_6) %>%
+           emissao_bunker = emissao_remocao_bunker)%>%
+  dplyr::select(-c(nivel_6, nivel_5)) %>%
     dplyr::mutate(atividade_economica = dplyr::case_when(atividade_economica == "CIM" ~ "Industria Cimenteira",
                                            atividade_economica == "ENE_ELET" ~ "Industria Energia Eletrica",
                                            atividade_economica == "MET" ~ "Industria Metaleira",
-                                           atividade_economica == "Outra_IND" ~ "Outra Industria"))%>%
-    dplyr::mutate(produto = dplyr::case_when(produto == "ALU" ~ "Aluminio")) %>%
-    dplyr::filter(!is.na(produto))
+                                           atividade_economica == "Outra_IND" ~ "Outra Industria",
+                                           atividade_economica == "HFC" ~ "HFC"))%>%
+    dplyr::mutate(estado = dplyr::case_when(estado== "BA" ~ "BA",
+                                            estado == "ES"~"ES",
+                                            estado == "MA"~ "MA",
+                                            estado == "NA" ~ as.character(NA),
+                                            estado == "PA" ~ "PA",
+                                            estado == "RJ" ~ "RJ",
+                                            estado == "RS" ~ "RS",
+                                            estado == "SP" ~ "SP"))%>%
+    dplyr::mutate(produto = dplyr::case_when(produto == "ALU" ~ "Aluminio",
+                                             produto == "ACO"~ "Aco")) %>%
+    dplyr::filter(!is.na(produto)) %>%
+    dplyr::filter(!is.na(estado))
 
 }
 
@@ -213,6 +224,11 @@ if (param$dataset == "seeg_residuals"){
                                produto == "CAR/LEI/ALIM_BEBIDAS" ~ "Carro/Leite/Alimentos/Bebidas")) %>%
     dplyr::filter(!is.na(produto))
 }
+
+  if(param$dataset == "seeg_industry" & language == "eng"){
+
+    dat = readxl::read_excel('./inst/extdata/industry_seeg.xlsx')
+  }
 
   return(dat)
 }
