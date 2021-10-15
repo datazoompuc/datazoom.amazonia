@@ -70,7 +70,7 @@ load_seeg <- function(dataset = "seeg", raw_data,
   ## Return Raw Data
   if (raw_data == TRUE){return(dat)}
 
-if (param$dataset == "seeg_agro"){
+if (param$dataset == "seeg_farming"){
 
   ## Create Longer Data - Years as a Variable
 
