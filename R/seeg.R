@@ -120,7 +120,8 @@ if (param$dataset == "seeg_industry"){
     filter(!is.na(produto))%>%
     rename(setor = nivel_1_setor, processos_geradores_emissoes = nivel_2,
            produtos_emissores = nivel_3,
-           destinacao_produto = nivel_4)%>%
+           destinacao_produto = nivel_4,
+           fonte_energetica = nivel_5)%>%
   select(-nivel_6) %>%
     mutate(atividade_economica = case_when(atividade_economica == "CIM" ~ "Industria Cimenteira",
                                            atividade_economica == "ENE_ELET" ~ "Industria Energia Eletrica",
