@@ -212,3 +212,4 @@ if (param$dataset == "seeg_residuals"){
                                produto == "ALU" ~ "Aluminio",
                                produto == "ENE_ELET" ~ "Energia Eletrica",
                                produto == "CAR/LEI/ALIM_BEBIDAS" ~ "Carro/Leite/Alimentos/Bebidas"))
+}
