@@ -125,7 +125,7 @@ if (param$dataset == "seeg_industry"){
                                            atividade_economica == "ENE_ELET" ~ "Industria Energia Eletrica",
                                            atividade_economica == "MET" ~ "Industria Metaleira",
                                            atividade_economica == "Outra_IND" ~ "Outra Industria"))%>%
-    dplyr::mutate(produto = case_when(produto == "ALU" ~ "Aluminio"))
+    dplyr::mutate(produto = dplyr::case_when(produto == "ALU" ~ "Aluminio"))
 
 }
 
