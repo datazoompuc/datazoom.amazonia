@@ -174,7 +174,7 @@ if (param$dataset == "seeg_land"){
     filter(!is.na(Valor)) %>%
     rename(setor = nivel_1_setor, processos_geradores_emissoes = nivel_2,
            bioma = nivel_3,
-           area = nivel_4,
+           area_bioma = nivel_4,
            tipo_atividade_geradora = nivel_5,
            local_atividade_geradora = nivel_6) %>%
     mutate(atividade_economica = case_when(atividade_economica == "AGROPEC" ~ "Agropecuaria")) %>%
