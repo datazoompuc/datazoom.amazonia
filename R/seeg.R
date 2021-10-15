@@ -95,7 +95,8 @@ if (param$dataset == "seeg_agro"){
                                produto == "CAR" ~ "Carro",
                                produto == "CAR/LEI" ~ "Carro/Leite",
                                produto == "CAR/LEI/ALIM_BEBIDAS" ~ "Carro/Leite/Alimentos/Bebidas",
-                               produto == "LEI" ~ "Leite"))
+                               produto == "LEI" ~ "Leite")) %>%
+    dplyr::filter(!is.na(produto))
 
 
 
@@ -115,7 +116,6 @@ if (param$dataset == "seeg_industry"){
   ## Changing column name, filtering by the specific sector and harmonizing variables
   dat = dat %>%
     dplyr::filter(nivel_1_setor == "Processos Industriais") %>%
-    dplyr::filter(!is.na(produto))%>%
     dplyr::rename(setor = nivel_1_setor, processos_geradores_emissoes = nivel_2,
            produtos_emissores = nivel_3,
            destinacao_produto = nivel_4,
@@ -125,7 +125,8 @@ if (param$dataset == "seeg_industry"){
                                            atividade_economica == "ENE_ELET" ~ "Industria Energia Eletrica",
                                            atividade_economica == "MET" ~ "Industria Metaleira",
                                            atividade_economica == "Outra_IND" ~ "Outra Industria"))%>%
-    dplyr::mutate(produto = dplyr::case_when(produto == "ALU" ~ "Aluminio"))
+    dplyr::mutate(produto = dplyr::case_when(produto == "ALU" ~ "Aluminio")) %>%
+    dplyr::filter(!is.na(produto))
 
 }
 
@@ -143,7 +144,6 @@ if (param$dataset == "seeg_energy"){
   ## Changing column name, filtering by the specific sector and harmonizing variables
   dat = dat %>%
     dplyr::filter(nivel_1_setor == "Energia")%>%
-    dplyr::filter(!is.na(produto)) %>%
     dplyr::rename(setor = nivel_1_setor, tipo_emissao = nivel_2,
            processos_geradores_emissoes = nivel_3,
            atividade_geradora = nivel_4,
@@ -152,7 +152,8 @@ if (param$dataset == "seeg_energy"){
     dplyr::mutate(produto = dplyr::case_when(produto == "ALIM_BEBIDAS" ~ "Alimentos/Bebidas",
                                produto == "ENE_ELET" ~ "Energia Eletrica",
                                produto == "ALU" ~ "Aluminio")) %>%
-      dplyr::select(-atividade_economica)
+      dplyr::select(-atividade_economica) %>%
+    dplyr::filter(!is.na(produto))
 
 }
 
@@ -195,7 +196,6 @@ if (param$dataset == "seeg_residuals"){
   ## Changing column name, filtering by the specific sector and harmonizing variables
   dat = dat %>%
     dplyr::filter(nivel_1_setor == "Residuos") %>%
-    dplyr::filter(!is.na(produto)) %>%
     dplyr::rename(setor = nivel_1_setor, categorias_emissao = nivel_2,
            processos_geradores_emissoes = nivel_3,
            atividade_geradora = nivel_4,
@@ -210,7 +210,8 @@ if (param$dataset == "seeg_residuals"){
                                produto == "CAR/LEI" ~ "Carro/Leite",
                                produto == "ALU" ~ "Aluminio",
                                produto == "ENE_ELET" ~ "Energia Eletrica",
-                               produto == "CAR/LEI/ALIM_BEBIDAS" ~ "Carro/Leite/Alimentos/Bebidas"))
+                               produto == "CAR/LEI/ALIM_BEBIDAS" ~ "Carro/Leite/Alimentos/Bebidas")) %>%
+    dplyr::filter(!is.na(produto))
 }
 
   return(dat)
