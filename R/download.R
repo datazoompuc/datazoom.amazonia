@@ -829,7 +829,7 @@ datasets_seeg = function(){
 
   link = tibble::tribble(~survey,~dataset,~id_code,~link,
 
-  'SEEG','seeg_agro',100,'http://seeg.eco.br/download',
+  'SEEG','seeg_farming',100,'http://seeg.eco.br/download',
   'SEEG','seeg_industry',101,'http://seeg.eco.br/download',
   'SEEG','seeg_energy',102,'http://seeg.eco.br/download',
   'SEEG','seeg_land',103,'http://seeg.eco.br/download',

@@ -2,7 +2,7 @@
 #'
 #' @description Loads data of estimates of emission of greenhouse gases
 #'
-#' @param dataset A dataset name ("seeg_agro", "seeg_industry", "seeg_energy", "seeg_land" and "seeg_residuals").
+#' @param dataset A dataset name ("seeg_farming", "seeg_industry", "seeg_energy", "seeg_land" and "seeg_residuals").
 #' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
 #' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state" or "municipality".
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
