@@ -24,7 +24,7 @@ load_seeg <- function(dataset = "seeg", raw_data,
                       geo_level, language = "eng"){
 
 
-  survey <- link <- id_code <- x1970 <- x2019 <- nivel_1_setor <- nivel_2 <- nivel_3 <- nivel_4 <- nivel_5 <- nivel_6 <- produto <- atvidade_economica <- Valor <- NULL
+  survey <- link <- id_code <- x1970 <- x2019 <- nivel_1_setor <- nivel_2 <- nivel_3 <- nivel_4 <- nivel_5 <- nivel_6 <- produto <- atividade_economica <- Valor <- NULL
 
   #############################
   ## Define Basic Parameters ##
