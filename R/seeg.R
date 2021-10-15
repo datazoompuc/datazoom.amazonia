@@ -70,8 +70,6 @@ load_seeg <- function(dataset = "seeg", raw_data,
   ## Return Raw Data
   if (raw_data == TRUE){return(dat)}
 
-}
-
 if (param$dataset == "seeg_agro"){
 
   ## Create Longer Data - Years as a Variable
@@ -214,3 +212,8 @@ if (param$dataset == "seeg_residuals"){
                                produto == "ENE_ELET" ~ "Energia Eletrica",
                                produto == "CAR/LEI/ALIM_BEBIDAS" ~ "Carro/Leite/Alimentos/Bebidas"))
 }
+
+  return(dat)
+}
+
+
