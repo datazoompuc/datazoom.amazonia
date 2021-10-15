@@ -81,7 +81,7 @@ if (param$dataset == "seeg_agro"){
       names_prefix = 'x',
       values_to = 'Valor'
     )
-  ## Changing column name and filtering by the specific sector
+  ## Changing column name, filtering by the specific sector and harmonizing variables
   dat = dat %>%
     filter(nivel_1_setor == "Agropecuaria") %>%
     rename(setor = nivel_1_setor, processos_geradores_emissoes = nivel_2,
@@ -112,7 +112,7 @@ if (param$dataset == "seeg_industry"){
       names_prefix = 'x',
       values_to = 'Valor'
     )
-  ## Changing column name and filtering by the specific sector
+  ## Changing column name, filtering by the specific sector and harmonizing variables
   dat = dat %>%
     filter(nivel_1_setor == "Processos Industriais") %>%
     filter(!is.na(produto))%>%
@@ -140,7 +140,7 @@ if (param$dataset == "seeg_energy"){
       names_prefix = 'x',
       values_to = 'Valor'
     )
-  ## Changing column name and filtering by the specific sector
+  ## Changing column name, filtering by the specific sector and harmonizing variables
   dat = dat %>%
     filter(nivel_1_setor == "Energia")%>%
     filter(!is.na(produto)) %>%
@@ -166,7 +166,7 @@ if (param$dataset == "seeg_land"){
       names_prefix = 'x',
       values_to = 'Valor'
     )
-  ## Changing column name and filtering by the specific sector
+  ## Changing column name, filtering by the specific sector and harmonizing variables
   dat = dat %>%
     filter(nivel_1_setor == "Mudanca de Uso da Terra e Floresta") %>%
     filter(!is.na(Valor)) %>%
@@ -192,7 +192,7 @@ if (param$dataset == "seeg_residuals"){
       names_prefix = 'x',
       values_to = 'Valor'
     )
-  ## Changing column name and filtering by the specific sector
+  ## Changing column name, filtering by the specific sector and harmonizing variables
   dat = dat %>%
     filter(nivel_1_setor == "Residuos") %>%
     filter(!is.na(produto)) %>%
