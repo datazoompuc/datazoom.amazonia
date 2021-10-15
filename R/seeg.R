@@ -149,7 +149,7 @@ if (param$dataset == "seeg_energy"){
            processos_geradores_emissoes = nivel_3,
            atividade_geradora = nivel_4,
            fonte_energetica = nivel_5,
-           categorias_dos_emissores = nivel_6)%>%
+           destinacao_atividade = nivel_6)%>%
     mutate(produto = case_when(produto == "ALIM_BEBIDAS" ~ "Alimentos/Bebidas",
                                produto == "ENE_ELET" ~ "Energia Eletrica",
                                produto == "ALU" ~ "Aluminio")) %>%
