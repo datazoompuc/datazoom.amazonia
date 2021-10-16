@@ -95,8 +95,7 @@ if (param$dataset == "seeg_farming"){
                                produto == "CAR" ~ "Carne",
                                produto == "CAR/LEI" ~ "Carne/Leite",
                                produto == "CAR/LEI/ALIM_BEBIDAS" ~ "Carne/Leite/Alimentos/Bebidas",
-                               produto == "LEI" ~ "Leite")) %>%
-    dplyr::filter(!is.na(produto))
+                               produto == "LEI" ~ "Leite"))
 
   dat = dat%>%
     relocate(Ano, estado, setor, processos_geradores_emissoes, fonte_de_emissoes, emissores, gas, atividade_economica, produto,
@@ -140,9 +139,10 @@ if (param$dataset == "seeg_industry"){
                                             estado == "RS" ~ "RS",
                                             estado == "SP" ~ "SP"))%>%
     dplyr::mutate(produto = dplyr::case_when(produto == "ALU" ~ "Aluminio",
-                                             produto == "ACO"~ "Aco")) %>%
-    dplyr::filter(!is.na(produto)) %>%
-    dplyr::filter(!is.na(estado))
+                                             produto == "ACO"~ "Aco"))
+  dat = dat %>%
+    relocate(Ano, estado, setor, processos_geradores_emissoes, producao_emissores, destinacao_produto, gas, atividade_economica, produto, Valor)
+
 
 }
 
@@ -168,8 +168,7 @@ if (param$dataset == "seeg_energy"){
     dplyr::mutate(produto = dplyr::case_when(produto == "ALIM_BEBIDAS" ~ "Alimentos/Bebidas",
                                produto == "ENE_ELET" ~ "Energia Eletrica",
                                produto == "ALU" ~ "Aluminio")) %>%
-      dplyr::select(-atividade_economica) %>%
-    dplyr::filter(!is.na(produto))
+      dplyr::select(-atividade_economica)
 
 }
 
@@ -226,16 +225,12 @@ if (param$dataset == "seeg_residuals"){
                                produto == "CAR/LEI" ~ "Carne/Leite",
                                produto == "ALU" ~ "Aluminio",
                                produto == "ENE_ELET" ~ "Energia Eletrica",
-                               produto == "CAR/LEI/ALIM_BEBIDAS" ~ "Carne/Leite/Alimentos/Bebidas")) %>%
-    dplyr::filter(!is.na(produto))
+                               produto == "CAR/LEI/ALIM_BEBIDAS" ~ "Carne/Leite/Alimentos/Bebidas"))
 }
 
   if(param$dataset == "seeg_industry" & language == "eng"){
 
     dat = readxl::read_excel('./inst/extdata/industry_seeg.xlsx')
-
-    dat = dat %>%
-      relocate(Ano, estado, setor, processos_geradores_emissoes, producao_emissores, destinacao_produto, gas, atividade_economica, produto, Valor)
 
   }
 
