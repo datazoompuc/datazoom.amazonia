@@ -15,17 +15,17 @@
 #'
 #' @examples \dontrun{
 #' # download farming state raw data
-#' seeg <- load_seeg(dataset = 'seeg_farming',
+#' seeg <- load_seeg(dataset = "seeg_farming",
 #'                   raw_data = TRUE,
 #'                   geo_level = "state")
 #'
 #' # download energy country treated data
-#' seeg = load_seeg(dataset = "seeg_energy,
+#' seeg = load_seeg(dataset = "seeg_energy",
 #'                  raw_data = FALSE,
 #'                  geo_level = "country)
 #'
 #' #  download residuals municipality treated data
-#' seeg = load_seeg(dataset = "seeg_residuals,
+#' seeg = load_seeg(dataset = "seeg_residuals",
 #'                  raw_data = FALSE,
 #'                  geo_level = "municipality)
 #' }
