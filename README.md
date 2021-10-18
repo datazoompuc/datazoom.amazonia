@@ -487,11 +487,11 @@ for the Land Use Change Sector that has the series from 1990 to 2019.
     There are four parameters in this function:
       
       1. dataset. There are five possible choices:
-      # seeg_farming
-      # seeg_industry
-      # seeg_energy
-      # seeg_land
-      # seeg_residuals
+      # 'seeg_farming'
+      # 'seeg_industry'
+      # 'seeg_energy'
+      # 'seeg_land'
+      # 'seeg_residuals'
       
       2. raw_data: there are two options:
       # TRUE: if you want the raw data.
