@@ -134,8 +134,7 @@
 <span class="co">#&gt; # ... with 24 more rows</span></code></pre></div>
 <p>The package is under development so the following functions still do not support pre-processing and language arguments, returning only the raw data:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="reference/load_pibmunic.html">load_pibmunic</a></span><span class="op">(</span><span class="op">)</span>
-<span class="fu"><a href="reference/load_seeg.html">load_seeg</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu"><a href="reference/load_seeg.html">load_seeg</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor" aria-hidden="true"></a>Installation</h2>
@@ -292,16 +291,20 @@
 <span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>  <span class="fl">6.</span> legal_amazon_only<span class="sc">:</span> setting the return of Legal Amazon <span class="fu">Data</span> (<span class="at">legal_amazon_only =</span> <span class="cn">TRUE</span>) or Country <span class="fu">Data</span> (<span class="at">legal_amazon_only =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>  </span></code></pre></div>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Download raw data (raw_data = TRUE) on gross domestic product (dataset = 'pibmunic') from the entire country (legal_amazon_only = FALSE) by state (geo_level = 'state') from 2012 (time_period = 2012)</span>
+<code class="sourceCode R"><span class="co"># Download raw data (raw_data = TRUE) on gross domestic product </span>
+<span class="co"># (dataset = 'pibmunic') from the entire country (legal_amazon_only = FALSE) </span>
+<span class="co"># by state (geo_level = 'state') from 2012 (time_period = 2012)</span>
 <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_pibmunic.html">load_pibmunic</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">'pibmunic'</span>,
                       raw_data <span class="op">=</span> <span class="cn">TRUE</span>,
                       geo_level <span class="op">=</span> <span class="st">'state'</span>,
                       time_period <span class="op">=</span> <span class="fl">2012</span>,
                       legal_amazon_only <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 
-<span class="co"># Download raw data (raw_data = TRUE) on gross domestic product (dataset = 'pibmunic') from the Legal Amazon territory (legal_amazon_only = TRUE) by municipality (geo_level = 'municipality') during the year 2012 (time_period = 2012).   </span>
+<span class="co"># Download treated data (raw_data = FALSE) on gross domestic product </span>
+<span class="co"># (dataset = 'pibmunic') from the Legal Amazon (legal_amazon_only = TRUE) </span>
+<span class="co"># by municipality (geo_level = 'municipality') from 2012 (time_period = 2012).  </span>
 <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_pibmunic.html">load_pibmunic</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">'pibmunic'</span>,
-                      raw_data <span class="op">=</span> <span class="cn">TRUE</span>,
+                      raw_data <span class="op">=</span> <span class="cn">FALSE</span>,
                       geo_level <span class="op">=</span> <span class="st">'municipality'</span>,
                       time_period <span class="op">=</span> <span class="fl">2012</span>,
                       legal_amazon_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
@@ -588,6 +591,36 @@
 <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_sigmine.html">load_sigmine</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">'sigmine_active'</span>, 
                      raw_data <span class="op">=</span> <span class="cn">TRUE</span>,
                      language <span class="op">=</span> <span class="st">"pt"</span><span class="op">)</span></code></pre></div>
+</div>
+<div id="8-pibmunic" class="section level1">
+<h1 class="hasAnchor">
+<a href="#8-pibmunic" class="anchor" aria-hidden="true"></a>8) PIBMUNIC</h1>
+<p>Loads GDP data at current prices of the three large sectors of economic activity - Agriculture, Industry and Services - as well as taxes, net of subsidies, GDP and GDP per capita.</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>There are five parameters <span class="cf">in</span> this <span class="cf">function</span><span class="sc">:</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="fl">1.</span> dataset <span class="ot">=</span> <span class="st">"pibmunic</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="st">2. raw_data = TRUE (raw) or FALSE (treated)</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="st">3. geo_level = "</span>country<span class="st">", "</span>state<span class="st">" or "</span>municipality<span class="st">"</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a><span class="st">4. time_period = 2002:2018</span></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a><span class="st">5. language = "</span>pt<span class="st">" (portuguese) or "</span>eng<span class="st">" (english)</span></span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Download Raw Data</span>
+<span class="va">data</span> <span class="op">=</span> <span class="fu"><a href="reference/load_pibmunic.html">load_pibmunic</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"pibmunic"</span>, raw_data <span class="op">=</span> <span class="cn">TRUE</span>, geo_level <span class="op">=</span> <span class="st">"state"</span>, time_period <span class="op">=</span> <span class="fl">2012</span>, language <span class="op">=</span> <span class="st">"pt"</span><span class="op">)</span>
+<span class="co">#&gt; Downloading Data at the State level</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Download Succesfully Completed!</span>
+<span class="co">#&gt; </span>
+
+<span class="co"># Download Treated Data</span>
+<span class="va">data</span> <span class="op">=</span> <span class="fu"><a href="reference/load_pibmunic.html">load_pibmunic</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"pibmunic"</span>, raw_data <span class="op">=</span> <span class="cn">FALSE</span>, geo_level <span class="op">=</span> <span class="st">"country"</span>, time_period <span class="op">=</span> <span class="fl">2008</span>, language <span class="op">=</span> <span class="st">"eng"</span><span class="op">)</span>
+<span class="co">#&gt; Downloading Data at the Brazil level</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Download Succesfully Completed!</span>
+<span class="co">#&gt; </span></code></pre></div>
 <div id="credits" class="section level2">
 <h2 class="hasAnchor">
 <a href="#credits" class="anchor" aria-hidden="true"></a>Credits</h2>
