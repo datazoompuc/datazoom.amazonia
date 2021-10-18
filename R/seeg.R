@@ -98,10 +98,8 @@ if (param$dataset == "seeg_farming"){
                                produto == "LEI" ~ "Leite"))
 
   dat = dat%>%
-    relocate(Ano, estado, setor, processos_geradores_emissoes, fonte_de_emissoes, emissores, gas, atividade_economica, produto,
+    dplyr::relocate(Ano, estado, setor, processos_geradores_emissoes, fonte_de_emissoes, emissores, gas, atividade_economica, produto,
              Valor)
-
-
 
 
 }
@@ -122,7 +120,7 @@ if (param$dataset == "seeg_industry"){
     dplyr::filter(nivel_1_setor == "Processos Industriais") %>%
     dplyr::rename(setor = nivel_1_setor, processos_geradores_emissoes = nivel_2,
            producao_emissores = nivel_3,
-           destinacao_produto = nivel_4,
+           emissores = nivel_4,
            emissao_bunker = emissao_remocao_bunker)%>%
   dplyr::select(-c(nivel_6, nivel_5)) %>%
     dplyr::mutate(atividade_economica = dplyr::case_when(atividade_economica == "CIM" ~ "Industria Cimenteira",
@@ -141,7 +139,7 @@ if (param$dataset == "seeg_industry"){
     dplyr::mutate(produto = dplyr::case_when(produto == "ALU" ~ "Aluminio",
                                              produto == "ACO"~ "Aco"))
   dat = dat %>%
-    relocate(Ano, estado, setor, processos_geradores_emissoes, producao_emissores, destinacao_produto, gas, atividade_economica, produto, Valor)
+    dplyr::relocate(Ano, estado, setor, processos_geradores_emissoes, producao_emissores, emissores, gas, atividade_economica, produto, Valor)
 
 
 }
@@ -164,11 +162,14 @@ if (param$dataset == "seeg_energy"){
            processos_geradores_emissoes = nivel_3,
            atividade_geradora = nivel_4,
            fonte_energetica = nivel_5,
-           destinacao_atividade = nivel_6)%>%
+           emissores = nivel_6)%>%
     dplyr::mutate(produto = dplyr::case_when(produto == "ALIM_BEBIDAS" ~ "Alimentos/Bebidas",
                                produto == "ENE_ELET" ~ "Energia Eletrica",
                                produto == "ALU" ~ "Aluminio")) %>%
       dplyr::select(-atividade_economica)
+
+  dat = dat%>%
+    dplyr::relocate(Ano, estado, setor)
 
 }
 
@@ -191,8 +192,12 @@ if (param$dataset == "seeg_land"){
            area_bioma = nivel_4,
            tipo_atividade_geradora = nivel_5,
            local_atividade_geradora = nivel_6) %>%
-    dplyr::mutate(atividade_economica = dplyr::case_when(atividade_economica == "AGROPEC" ~ "Agropecuaria")) %>%
+    dplyr::mutate(atividade_economica = dplyr::case_when(atividade_economica == "AGROPEC" ~ "Agropecuaria",
+                                                         atividade_economica == "Conservacao" ~ "Conservacao")) %>%
     dplyr::select(-produto)
+
+  dat = dat %>%
+    dplyr::relocate(Ano, estado, setor, processos_geradores_emissoes, atividade_economica)
 
 
 }
@@ -214,10 +219,12 @@ if (param$dataset == "seeg_residuals"){
     dplyr::rename(setor = nivel_1_setor, categorias_emissao = nivel_2,
            processos_geradores_emissoes = nivel_3,
            atividade_geradora = nivel_4,
-           categorias_processos_geradores = nivel_5) %>%
+           categorias_processos_geradores = nivel_5,
+           emissao_bunker = emissao_remocao_bunker) %>%
     dplyr::select(-nivel_6) %>%
     dplyr::mutate(atividade_economica = dplyr::case_when(atividade_economica == "PEC" ~ "Pecuaria",
-                                           atividade_economica == "Outra_IND" ~ "Outra Industria"
+                                           atividade_economica == "Outra_IND" ~ "Outra Industria",
+                                           atividade_economica == "SANEAMENTO" ~ "Saneamento"
                                            )) %>%
     dplyr::mutate(produto = dplyr::case_when(produto == "ALIM_BEBIDAS" ~ "Alimentos/Bebidas",
                                produto == "LEI" ~ "Leite",
@@ -225,13 +232,182 @@ if (param$dataset == "seeg_residuals"){
                                produto == "CAR/LEI" ~ "Carne/Leite",
                                produto == "ALU" ~ "Aluminio",
                                produto == "ENE_ELET" ~ "Energia Eletrica",
-                               produto == "CAR/LEI/ALIM_BEBIDAS" ~ "Carne/Leite/Alimentos/Bebidas"))
+                               produto == "CAR/LEI/ALIM_BEBIDAS" ~ "Carne/Leite/Alimentos/Bebidas")) %>%
+    dplyr::mutate(estado = dplyr::case_when(estado == "BA" ~ "BA",
+                                            estado == "ES"~"ES",
+                                            estado == "MA"~ "MA",
+                                            estado == "NA" ~ as.character(NA),
+                                            estado == "PA" ~ "PA",
+                                            estado == "RJ" ~ "RJ",
+                                            estado == "RS" ~ "RS",
+                                            estado == "SP" ~ "SP",
+                                            estado == "AC" ~ "AC",
+                                            estado == "AL" ~ "AL",
+                                            estado == "AP" ~ "AP",
+                                            estado == "CE" ~ "CE",
+                                            estado == "DF" ~ "DF",
+                                            estado == "ES" ~ "ES",
+                                            estado == "GO" ~ "GO",
+                                            estado == "MG" ~ "MG",
+                                            estado == "MS" ~ "MS",
+                                            estado == "MT" ~ "MT",
+                                            estado == "PB" ~ "PB",
+                                            estado == "PE" ~ "PE",
+                                            estado == "PI" ~ "PI",
+                                            estado == "PR" ~ "PR",
+                                            estado == "RN" ~ "RN",
+                                            estado == "RO" ~ "RO",
+                                            estado == "RR" ~ "RR",
+                                            estado == "SC" ~ "SC",
+                                            estado == "SE" ~ "SE",
+                                            estado == "TO" ~ "TO",
+                                            estado == "AM" ~ "AM"))
+
+  dat = dat%>%
+    dplyr::relocate(Ano, estado, setor, categorias_emissao, processos_geradores_emissoes, atividade_geradora, categorias_processos_geradores, atividade_economica, produto, Valor)
 }
 
   if(param$dataset == "seeg_industry" & language == "eng"){
 
     dat = readxl::read_excel('./inst/extdata/industry_seeg.xlsx')
 
+  }
+
+  if(param$dataset == "seeg_farming" & language == "eng"){
+
+    dat = readxl::read_excel('./inst/extdata/farming_seeg.xlsx')
+  }
+
+  if(param$dataset == "seeg_land" & language == "eng"){
+
+    dat = readxl::read_excel('./inst/extdata/land_seeg.xlsx')
+  }
+
+
+  if(param$dataset == "seeg_residuals" & language == "eng"){
+
+    dat = readxl::read_excel('./inst/extdata/residuals_seeg.xlsx')
+  }
+
+  if(param$dataset == "seeg_energy" & language == "eng"){
+
+    dat = dat %>%
+      tidyr::pivot_longer(
+        cols = x1970:x2019,
+        names_to = 'year',
+        names_prefix = 'x',
+        values_to = 'value')
+
+    dat = dat %>%
+      dplyr::filter(nivel_1_setor == "Energia")%>%
+      dplyr::rename(sector = nivel_1_setor, state = estado,
+                    emission_type = nivel_2,
+                    emissions_generating_processes = nivel_3,
+                    generating_activity = nivel_4,
+                    energetic_source = nivel_5,
+                    emitters = nivel_6,
+                    emission_bunker = emissao_remocao_bunker,
+                    product = produto)%>%
+      dplyr::mutate(product = dplyr::case_when(product == "ALIM_BEBIDAS" ~ "Food/Beverages",
+                                               product == "ENE_ELET" ~ "Eletric energy",
+                                               product == "ALU" ~ "Aluminum")) %>%
+      dplyr::mutate(sector = dplyr::case_when(sector == "Energia" ~ "Energy")) %>%
+      dplyr::mutate(emission_type = dplyr::case_when(emission_type == "Emissoes Fugitivas" ~ "Fugitive emissions",
+                                                    emission_type == "Emissoes pela Queima de Combustiveis" ~ "Emissions from fuel burning")) %>%
+      dplyr::mutate(emissions_generating_processes = dplyr::case_when(emissions_generating_processes == "Agropecuario" ~ "Farming",
+                                                                      emissions_generating_processes == "Geracao de Eletricidade (Servico Publico)" ~ "Eletricity generation (public service)",
+                                                                      emissions_generating_processes == "Nao Identificado" ~ "Not Identified",
+                                                                      emissions_generating_processes == "Publico" ~ "Public",
+                                                                      emissions_generating_processes == "Transportes" ~ "Transports",
+                                                                      emissions_generating_processes == "Comercial" ~ "Business",
+                                                                      emissions_generating_processes == "Industrial" ~ "Industrial",
+                                                                      emissions_generating_processes == "Producao de Combustiveis" ~ "Fuel production",
+                                                                      emissions_generating_processes == "Residencial" ~ "Residential")) %>%
+      dplyr::mutate(generating_activity = dplyr::case_when(generating_activity == "Aereo" ~ "Air",
+                                                           generating_activity == "Cimento" ~ "Cement",
+                                                           generating_activity == "Ferro Ligas" ~ "Iron garters",
+                                                           generating_activity == "Mineracao e pelotizacao" ~ "Mining and pelletizing",
+                                                           generating_activity == "Outras industrias" ~ "Other industries",
+                                                           generating_activity == "Producao de carvao mineral e outros" ~ " Mineral coal production and others",
+                                                           generating_activity == "Refino de petroleo" ~ "Oil refining",
+                                                           generating_activity == "Transporte de gas natural" ~ "Natural gas transport",
+                                                           generating_activity == "Alimentos e bebidas" ~ "Food and beverages",
+                                                           generating_activity == "Exploracao de petroleo e gas natural" ~ "Oil and natural gas exploration",
+                                                           generating_activity == "Ferroviario" ~ "Railroad",
+                                                           generating_activity == "Nao ferrosos e outros da metalurgia" ~ "Non-ferrous and other metallurgy",
+                                                           generating_activity == "Papel e celulose" ~ "Paper and Cellulose",
+                                                           generating_activity == "Producao de carvao vegetal" ~ "Charcoal production",
+                                                           generating_activity == "Rodoviario" ~ "Road",
+                                                           generating_activity == "Ceramica" ~ "Ceramics",
+                                                           generating_activity == "Ferro gusa e aco" ~ "Pig iron and steel",
+                                                           generating_activity == "Hidroviario" ~ "Waterway",
+                                                           generating_activity == "NAO SE APLICA" ~ "Not Applicable",
+                                                           generating_activity == "Producao de Alcool" ~ "Alcohol production",
+                                                           generating_activity == "Quimica" ~ "Chemical",
+                                                           generating_activity == "Textil" ~ "Textile")) %>%
+      dplyr::mutate(energetic_source = dplyr::case_when(energetic_source == "Alcatrao" ~ "Tar",
+                                                        energetic_source == "Biogas" ~ "Biogas",
+                                                        energetic_source == "Carvao vapor 3300" ~ "Steam coal 3300",
+                                                        energetic_source == "Carvao vapor 4500" ~ "Steam coal 4500",
+                                                        energetic_source == "Carvao vapor 5900" ~ "Steam coal 5900",
+                                                        energetic_source == "Carvao vegetal" ~ "Charcoal",
+                                                        energetic_source == "Diesel de petroleo" ~ "Petroleum diesel",
+                                                        energetic_source == "Gas de coqueria" ~ "Coke oven gas",
+                                                        energetic_source == "Gas natural seco" ~ "Dry natural gas",
+                                                        energetic_source == "Gasolina C" ~ "Gasoline C",
+                                                        energetic_source == "Lenha" ~ "Firewood",
+                                                        energetic_source == "Nafta" ~ "Naphta",
+                                                        energetic_source == "Outras biomassas" ~ "Other biomasses",
+                                                        energetic_source == "Petroleo" ~ "Oil",
+                                                        energetic_source == "Querosene iluminante" ~ "Illuminating kerosene",
+                                                        energetic_source == "Petroleo e gas natural" ~ "Oil and natural gas",
+                                                        energetic_source == "Outras nao renovaveis" ~ "Other non-renewable",
+                                                        energetic_source == "Oleo combustivel" ~ "Fuel oil",
+                                                        energetic_source == "Lenha carvoejamento" ~ "Charcoal firewood",
+                                                        energetic_source == "Gasolina de aviacao" ~ "Aviation gasoline",
+                                                        energetic_source == "Gas natural umido" ~ "Umid natural gas",
+                                                        energetic_source == "Gas de refinaria" ~ "Refinery gas",
+                                                        energetic_source == "Gas canalizado RJ" ~ "Piped gas RJ",
+                                                        energetic_source == "Coque de carvao mineral" ~ "Coal coke",
+                                                        energetic_source == "Carvao vapor 6000" ~ "Steam coal 6000",
+                                                        energetic_source == "Carvao vapor 4700" ~ "Steam coal 4700",
+                                                        energetic_source == "Carvao vapor 3700" ~ "Steam coal 3700",
+                                                        energetic_source == "Carvao mineral" ~ "Mineral coal",
+                                                        energetic_source == "Alcool hidratado" ~ "Hydrated alcohol",
+                                                        energetic_source == "Bagaco de cana" ~ "Sugarcane bagasse",
+                                                        energetic_source == "Carvao vapor 3100" ~ "Steam coal 3100",
+                                                        energetic_source == "Carvao vapor 4200" ~ "Steam coal 4200",
+                                                        energetic_source == "Carvao vapor 5200" ~ "Steam coal 5200",
+                                                        energetic_source == "Carvao vapor sem especificacao" ~ "Steam coal without specification",
+                                                        energetic_source == "Coque de petroleo" ~ "Oil coke",
+                                                        energetic_source == "Gas canalizadp SP" ~ "Piped gas SP",
+                                                        energetic_source == "Gas natural" ~ "Natural gas",
+                                                        energetic_source == "Gasolina autmotiva" ~ "Automotive gasoline",
+                                                        energetic_source == "GLP" ~ "Liquefied oil gas",
+                                                        energetic_source == "Lixivia" ~ "Bleach",
+                                                        energetic_source == "Oleo diesel" ~ "Diesel oil",
+                                                        energetic_source == "Outros energeticos de petroleo" ~ "Other petroleum energy",
+                                                        energetic_source == "Querosene de aviacao" ~ "Aviation kerosene")) %>%
+      dplyr::mutate(emitters = dplyr::case_when(emitters == "Aeronaves" ~ "Airplanes",
+                                         emitters == "Carvoarias" ~ "Charcoals",
+                                         emitters == "Comerciais Leves" ~ "Light commercials",
+                                         emitters == "Locomotivas" ~ "Locomotives",
+                                         emitters == "Onibus" ~ "Bus",
+                                         emitters == "Automoveis" ~ "Automobiles",
+                                         emitters == "Centrais Eletricas Autoprodutoras" ~ "Self-producing power plants",
+                                         emitters == "Consumo Final Energetico" ~ "Final energy consumption",
+                                         emitters == "Motocicletas" ~ "Motorbikes",
+                                         emitters == "Caminhoes" ~ "Trucks",
+                                         emitters == "Centrais Eletricas de Servico Publico" ~ "Public service power plants",
+                                         emitters == "Embarcacoes" ~ "Vessels",
+                                         emitters == "NAO SE APLICA" ~ "Not Applicable")) %>%
+      dplyr::mutate(emission_bunker = dplyr::case_when(emission_bunker == "Emissao" ~ "Emission",
+                                                       emission_bunker == "Bunker" ~ "Bunker")) %>%
+
+dplyr::select(-atividade_economica)
+
+    dat = dat %>%
+      dplyr::relocate(year, state, sector)
   }
 
   return(dat)
