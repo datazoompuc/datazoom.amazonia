@@ -31,12 +31,6 @@ devtools::load_all()
 datazoom.amazonia::datasets_link()
 ```
 
-The package is under development so the following functions still do not support pre-processing and language arguments, returning only the raw data:
-```{r,eval=FALSE}
-load_seeg()
-```
-
-
 ## Installation
 
 You can install the released version of `datazoom.amazonia` from
