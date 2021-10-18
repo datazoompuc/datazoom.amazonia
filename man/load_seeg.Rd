@@ -8,7 +8,7 @@
 load_seeg(dataset = "seeg", raw_data, geo_level, language = "eng")
 }
 \arguments{
-\item{dataset}{A dataset name ("seeg_agro", "seeg_industry", "seeg_energy", "seeg_land" and "seeg_residuals").}
+\item{dataset}{A dataset name ("seeg").}
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
