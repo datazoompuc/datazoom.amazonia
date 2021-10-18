@@ -821,3 +821,21 @@ datasets_link = function(){
   return(link)
 
 }
+
+
+datasets_seeg = function(){
+
+  ## Add file type at the end in order to set the Curl Process
+
+  link = tibble::tribble(~survey,~dataset,~id_code,~link,
+
+  'SEEG','seeg_farming',100,'http://seeg.eco.br/download',
+  'SEEG','seeg_industry',101,'http://seeg.eco.br/download',
+  'SEEG','seeg_energy',102,'http://seeg.eco.br/download',
+  'SEEG','seeg_land',103,'http://seeg.eco.br/download',
+  'SEEG','seeg_residuals',104,'http://seeg.eco.br/download',
+
+
+  )
+  return(link)
+  }
