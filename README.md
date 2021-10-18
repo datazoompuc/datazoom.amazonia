@@ -36,6 +36,14 @@ datazoom.amazonia::datasets_link()
 #> # ... with 24 more rows
 ```
 
+The package is under development so the following functions still do not
+support pre-processing and language arguments, returning only the raw
+data:
+
+``` r
+load_seeg()
+```
+
 ## Installation
 
 You can install the released version of `datazoom.amazonia` from
@@ -479,7 +487,7 @@ data <- load_ips(dataset = "ips", raw_data = FALSE,
 # 5) SEEG:
 
 Loads data of estimates of emission of greenhouse gases of Brazilian
-cities and states.
+cities.
 
 According to the “SEEG Brasil” website: all five sectors that are
 sources of emissions - Agriculture, Energy, Land Use Change, Industrial
@@ -490,12 +498,7 @@ for the Land Use Change Sector that has the series from 1990 to 2019.
 
     There are four parameters in this function:
       
-      1. dataset. There are five possible choices:
-      # 'seeg_farming'
-      # 'seeg_industry'
-      # 'seeg_energy'
-      # 'seeg_land'
-      # 'seeg_residuals'
+      1. dataset = "seeg"
       
       2. raw_data: there are two options:
       # TRUE: if you want the raw data.
@@ -509,14 +512,14 @@ for the Land Use Change Sector that has the series from 1990 to 2019.
       4. language: you can choose between portuguese and english
 
 ``` r
-# Download raw data (raw_data = TRUE) of farming gases (dataset = "seeg_farming") by municipality (geo_level = "municipality")
-data <- load_seeg(dataset = "seeg_farming", 
+# Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg") by municipality (geo_level = "municipality")
+data <- load_seeg(dataset = "seeg", 
                   raw_data = TRUE,
                   geo_level = "municipality")
   
 
-# Download raw data (raw_data = TRUE) of energy gases (dataset = "seeg_energy") by state (geo_level = "state")
-data <- load_seeg(dataset = "seeg_energy", 
+# Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg") by state (geo_level = "state")
+data <- load_seeg(dataset = "seeg", 
                   raw_data = TRUE,
                   geo_level = "state")
 ```
