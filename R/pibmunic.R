@@ -32,7 +32,7 @@ load_pibmunic <- function(dataset = "pibmunic", raw_data,
                           language = "eng",
                           legal_amazon_only = FALSE) {
 
-  sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- NULL
+  sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- ano <- ano_codigo <- geo_id <- nivel_territorial <- nivel_territorial_codigo <- unidade_de_medida <- unidade_de_medida_codigo <- valor <- variavel <- variavel_codigo <- NULL
 
 
   #############################
@@ -99,5 +99,139 @@ load_pibmunic <- function(dataset = "pibmunic", raw_data,
 
   if (raw_data == TRUE){return(dat)}
 
+
+
+######################
+## Data Enginnering ##
+######################
+
+dat = dat %>%
+  janitor::clean_names() %>%
+  dplyr::mutate_all(function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")})
+
+dat = dat %>%
+  dplyr::select(-c(nivel_territorial_codigo,nivel_territorial,ano_codigo)) %>%
+  dplyr::mutate(valor=as.numeric(valor))
+
+## Only Keep Valid Observations
+
+dat = dat %>%
+  dplyr::filter(!is.na(valor))
+
+#########################################
+## Create Geographical Unit Identifier ##
+#########################################
+
+if(geo_level == 'country'){
+  dat$geo_id = dat$brasil
+  dat = dplyr::select(dat,-'brasil_codigo',-'brasil')
+}
+
+if (geo_level == 'state'){
+  dat$geo_id = dat$unidade_da_federacao_codigo
+  dat = dplyr::select(dat,-'unidade_da_federacao_codigo',-'unidade_da_federacao')
+}
+if (geo_level == 'municipality'){
+  dat$geo_id = dat$municipio_codigo
+  dat = dplyr::select(dat,-'municipio',-'municipio_codigo')
+}
+
+################################
+## Harmonizing Variable Names ##
+################################
+
+dat = dat %>%
+  dplyr::select(-unidade_de_medida,-unidade_de_medida_codigo)
+
+
+dat = dat %>%
+  dplyr::arrange(variavel_codigo, variavel)%>%
+  tidyr::pivot_wider(id_cols = c(geo_id,ano),
+                     names_from = variavel:variavel_codigo,
+                     values_from =valor,
+                     names_sep = '_V',
+                     values_fn = sum,
+                     values_fill = NA) %>%
+  janitor::clean_names()
+
+
+if (language == 'eng'){
+
+  dat = dat %>%
+    dplyr::rename(year = ano)
+}
+
+###############
+## Labelling ##
+###############
+
+labelled <- function(x, label) {
+  Hmisc::label(x) <- label
+  x
+}
+
+label_data_eng = function(df,cols,dic){
+
+  label_value = as.character(dic[dic$var_code == cols,'var_eng'])
+
+  df = df %>%
+    dplyr::mutate_at(dplyr::vars(tidyr::matches(cols)),
+                     ~ labelled(.,as.character(dic[dic$var_code == cols,'var_eng']))
+    )
+
+  return(df)
+
+}
+
+label_data_pt = function(df,cols,dic){
+
+  label_value = as.character(dic[dic$var_code == cols,'var_pt'])
+
+  df = df %>%
+    dplyr::mutate_at(dplyr::vars(tidyr::matches(cols)),
+                     ~ labelled(.,as.character(dic[dic$var_code == cols,'var_pt']))
+    )
+
+  return(df)
+
+}
+
+## Load Dictionary
+
+dic = load_dictionary(param$dataset)
+
+types = as.character(dic$var_code)
+types = types[types != "0"] ## Remove 0
+
+
+if (language == 'eng'){
+
+  # f = dat %>%
+  #   dplyr::mutate_at(vars(tidyr::matches(as.character(types[1]))),
+  #                    ~ labelled::set_variable_labels(. = as.character(dic[dic$var_code == types[1],'var_eng']))
+  #   )
+
+  for (i in 1:length(types)){
+
+    dat = label_data_eng(dat,cols=types[i],dic=dic)
+
+  }
+
+}
+
+if (language == 'pt'){
+
+  for (i in 1:length(types)){
+
+    dat = label_data_pt(dat,cols=types[i],dic=dic)
+
+  }
+}
+
+##########################
+## Returning Data Frame ##
+##########################
+
+return(dat)
 
 }

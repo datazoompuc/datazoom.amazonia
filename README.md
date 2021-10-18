@@ -223,16 +223,20 @@ to 2018.
       
 
 ``` r
-# Download raw data (raw_data = TRUE) on gross domestic product (dataset = 'pibmunic') from the entire country (legal_amazon_only = FALSE) by state (geo_level = 'state') from 2012 (time_period = 2012)
+# Download raw data (raw_data = TRUE) on gross domestic product 
+# (dataset = 'pibmunic') from the entire country (legal_amazon_only = FALSE) 
+# by state (geo_level = 'state') from 2012 (time_period = 2012)
 data <- load_pibmunic(dataset = 'pibmunic',
                       raw_data = TRUE,
                       geo_level = 'state',
                       time_period = 2012,
                       legal_amazon_only = FALSE)
 
-# Download raw data (raw_data = TRUE) on gross domestic product (dataset = 'pibmunic') from the Legal Amazon territory (legal_amazon_only = TRUE) by municipality (geo_level = 'municipality') during the year 2012 (time_period = 2012).   
+# Download treated data (raw_data = FALSE) on gross domestic product 
+# (dataset = 'pibmunic') from the Legal Amazon (legal_amazon_only = TRUE) 
+# by municipality (geo_level = 'municipality') from 2012 (time_period = 2012).  
 data <- load_pibmunic(dataset = 'pibmunic',
-                      raw_data = TRUE,
+                      raw_data = FALSE,
                       geo_level = 'municipality',
                       time_period = 2012,
                       legal_amazon_only = TRUE)
@@ -579,6 +583,40 @@ data <- load_sigmine(dataset = 'sigmine_active', raw_data = TRUE)
 data <- load_sigmine(dataset = 'sigmine_active', 
                      raw_data = TRUE,
                      language = "pt")
+```
+
+# 8) PIBMUNIC
+
+Loads GDP data at current prices of the three large sectors of economic
+activity - Agriculture, Industry and Services - as well as taxes, net of
+subsidies, GDP and GDP per capita.
+
+    There are five parameters in this function:
+
+    1. dataset = "pibmunic
+
+    2. raw_data = TRUE (raw) or FALSE (treated)
+
+    3. geo_level = "country", "state" or "municipality"
+
+    4. time_period = 2002:2018
+
+    5. language = "pt" (portuguese) or "eng" (english)
+
+``` r
+# Download Raw Data
+data = load_pibmunic(dataset = "pibmunic", raw_data = TRUE, geo_level = "state", time_period = 2012, language = "pt")
+#> Downloading Data at the State level
+#> 
+#> Download Succesfully Completed!
+#> 
+
+# Download Treated Data
+data = load_pibmunic(dataset = "pibmunic", raw_data = FALSE, geo_level = "country", time_period = 2008, language = "eng")
+#> Downloading Data at the Brazil level
+#> 
+#> Download Succesfully Completed!
+#> 
 ```
 
 ## Credits
