@@ -22,12 +22,12 @@
 #' # download energy country treated data
 #' seeg = load_seeg(dataset = "seeg_energy",
 #'                  raw_data = FALSE,
-#'                  geo_level = "country)
+#'                  geo_level = "country")
 #'
 #' #  download residuals municipality treated data
 #' seeg = load_seeg(dataset = "seeg_residuals",
 #'                  raw_data = FALSE,
-#'                  geo_level = "municipality)
+#'                  geo_level = "municipality")
 #' }
 
 load_seeg <- function(dataset = "seeg", raw_data,
