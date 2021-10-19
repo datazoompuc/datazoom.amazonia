@@ -2,7 +2,7 @@
 #'
 #' @description Loads data of estimates of emission of greenhouse gases
 #'
-#' @param dataset A dataset name ("seeg", seeg_farming", "seeg_industry", "seeg_energy", "seeg_land", "seeg_residuals"). On which "seeg" contains all five sectors (only works with raw_data = TRUE) and the others are filtered specifically. See \url{https://seeg8-brasil-municipios-site.herokuapp.com/notas-metodologicas}
+#' @param dataset A dataset name ("seeg", seeg_farming", "seeg_industry", "seeg_energy", "seeg_land", "seeg_residuals"). On which "seeg" contains all five sectors (only works with raw_data = TRUE) and the others are filtered specifically by a main source of emission. See \url{https://seeg8-brasil-municipios-site.herokuapp.com/notas-metodologicas}
 #' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
 #' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state" or "municipality".
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
@@ -91,7 +91,7 @@ load_seeg <- function(dataset = NULL, raw_data,
   ## Raw Data = FALSE
 
 
-if (param$dataset == "seeg_farming"){
+if (param$dataset == "seeg_farming" & param$language == "pt"){
 
   ## Create Longer Data - Years as a Variable
 
@@ -124,7 +124,7 @@ if (param$dataset == "seeg_farming"){
 }
 
 
-if(param$dataset == "seeg_industry"){
+if(param$dataset == "seeg_industry" & param$language == "pt"){
 
   ## Create Longer Data - Years as a Variable
 
@@ -165,7 +165,7 @@ if(param$dataset == "seeg_industry"){
 }
 
 
-if (param$dataset == "seeg_energy"){
+if (param$dataset == "seeg_energy" & param$language == "pt"){
 
   ## Create Longer Data - Years as a Variable
 
@@ -196,7 +196,7 @@ if (param$dataset == "seeg_energy"){
 
 
 
-if (param$dataset == "seeg_land"){
+if (param$dataset == "seeg_land"  & param$language == "pt"){
   ## Create Longer Data - Years as a Variable
 
   dat = dat %>%
@@ -226,7 +226,7 @@ if (param$dataset == "seeg_land"){
 }
 
 
-if (param$dataset == "seeg_residuals"){
+if (param$dataset == "seeg_residuals" & param$language == "pt"){
 
   ## Create Longer Data - Years as a Variable
 
