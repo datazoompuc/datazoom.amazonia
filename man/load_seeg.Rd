@@ -5,10 +5,10 @@
 \alias{load_seeg}
 \title{Greenhouse gases emission estimates (SEEG)}
 \usage{
-load_seeg(dataset = "seeg", raw_data, geo_level, language = "eng")
+load_seeg(dataset = NULL, raw_data, geo_level, language = "eng")
 }
 \arguments{
-\item{dataset}{A dataset name ("seeg").}
+\item{dataset}{A dataset name ("seeg_farming", "seeg_industry", "seeg_energy", "seeg_land", "seeg_residuals", in which each one is filtered by one main emission source).}
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
@@ -24,8 +24,8 @@ Loads data of estimates of emission of greenhouse gases
 }
 \examples{
 \dontrun{
-# download state raw data
-seeg <- load_seeg(dataset = 'seeg',
+# download industry state raw data
+seeg <- load_seeg(dataset = 'seeg_industry',
                   raw_data = TRUE,
                   geo_level = "state")
 }

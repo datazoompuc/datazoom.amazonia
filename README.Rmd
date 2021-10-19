@@ -31,12 +31,6 @@ devtools::load_all()
 datazoom.amazonia::datasets_link()
 ```
 
-The package is under development so the following functions still do not support pre-processing and language arguments, returning only the raw data:
-```{r,eval=FALSE}
-load_seeg()
-```
-
-
 ## Installation
 
 You can install the released version of `datazoom.amazonia` from
@@ -467,14 +461,19 @@ data <- load_ips(dataset = "ips", raw_data = FALSE,
 
 # 5) SEEG:
 
-Loads data of estimates of emission of greenhouse gases of Brazilian cities.
+Loads data of estimates of emission of greenhouse gases of Brazilian cities and states.
 
 According to the "SEEG Brasil" website: all five sectors that are sources of emissions - Agriculture, Energy, Land Use Change, Industrial Processes and Waste with the same degree of detail contained in the emissions inventories are evaluated. The data provided in SEEG's Collection 8 is a series covering the period from 1970 to 2019, except for the Land Use Change Sector that has the series from 1990 to 2019.
 
 ```
 There are four parameters in this function:
   
-  1. dataset = "seeg"
+  1. dataset: There are five choices:
+  # "seeg_farming"
+  # "seeg_industry"
+  # "seeg_energy"
+  # "seeg_land"
+  # "seeg_residuals"
   
   2. raw_data: there are two options:
   # TRUE: if you want the raw data.
@@ -490,16 +489,32 @@ There are four parameters in this function:
 
   
 ```{r eval=FALSE}
-# Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg") by municipality (geo_level = "municipality")
-data <- load_seeg(dataset = "seeg", 
+# Download raw data (raw_data = TRUE) of farming greenhouse gases (dataset = "seeg_farming") by municipality (geo_level = "municipality")
+data <- load_seeg(dataset = "seeg_farming", 
                   raw_data = TRUE,
                   geo_level = "municipality")
   
 
-# Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg") by state (geo_level = "state")
-data <- load_seeg(dataset = "seeg", 
-                  raw_data = TRUE,
+# Download treated data (raw_data = FALSE) of industry greenhouse gases (dataset = "seeg_industry") by state (geo_level = "state")
+data <- load_seeg(dataset = "seeg_industry", 
+                  raw_data = FALSE,
                   geo_level = "state")
+
+
+# Download treated data (raw_data = FALSE) of energy greenhouse gases (dataset = "seeg_energy") by state (geo_level = "state")
+data <- load_seeg(dataset = "seeg_energy", 
+                  raw_data = FALSE,
+                  geo_level = "state")
+
+# Download treated data (raw_data = FALSE) of land greenhouse gases (dataset = "seeg_land") by country (geo_level = "country")
+data <- load_seeg(dataset = "seeg_land", 
+                  raw_data = FALSE,
+                  geo_level = "country")
+
+# Download raw data (raw_data = TRUE) of residuals greenhouse gases (dataset = "seeg_residuals") by municipality (geo_level = "municipality")
+data <- load_seeg(dataset = "seeg_residuals", 
+                  raw_data = TRUE,
+                  geo_level = "municipality")
 ```
 
 
