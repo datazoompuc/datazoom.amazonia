@@ -24,7 +24,7 @@ The data ranges currently from the years 2000 to 2018. Emissions are divided in 
 
 The data is download from the SEEG website in the form of one single file, so the option to select a certain range of years in not available. Also, due to the size of the file, a stable internet connection is necessary, and the function may take time to run. 
 
-There are five available datasets. Each one is filtered on one main emission source.
+There are six available datasets.The "seeg" one contemplates all sectors and the others are each divided by a specific emission source.
 
 ## Usage
 
@@ -32,8 +32,8 @@ Using the function is easy enough:
 
 ```{r,eval=FALSE}
 library(datazoom.amazonia)
-# download farming state raw data
-seeg <- load_seeg(dataset = 'seeg_farming',
+# download state raw data
+seeg <- load_seeg(dataset = 'seeg',
                   raw_data = TRUE,
                   geo_level = 'state')
 
@@ -52,8 +52,4 @@ seeg = load_seeg(dataset = 'seeg_land',
                   raw_data = FALSE,
                   geo_level = 'municipality', language = 'eng')
 
-# download residuals state raw data in portuguese
-seeg = load_seeg(dataset = 'seeg_residuals',
-                  raw_data = TRUE,
-                  geo_level = 'state', language = 'pt')
 ```

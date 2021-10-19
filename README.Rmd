@@ -468,7 +468,8 @@ According to the "SEEG Brasil" website: all five sectors that are sources of emi
 ```
 There are four parameters in this function:
   
-  1. dataset: There are five choices:
+  1. dataset: There are six choices:
+  # "seeg": provides all sectores in a same dataframe. Only works with raw_data = TRUE.
   # "seeg_farming"
   # "seeg_industry"
   # "seeg_energy"
@@ -489,8 +490,8 @@ There are four parameters in this function:
 
   
 ```{r eval=FALSE}
-# Download raw data (raw_data = TRUE) of farming greenhouse gases (dataset = "seeg_farming") by municipality (geo_level = "municipality")
-data <- load_seeg(dataset = "seeg_farming", 
+# Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg") by municipality (geo_level = "municipality")
+data <- load_seeg(dataset = "seeg", 
                   raw_data = TRUE,
                   geo_level = "municipality")
   
@@ -511,10 +512,10 @@ data <- load_seeg(dataset = "seeg_land",
                   raw_data = FALSE,
                   geo_level = "country")
 
-# Download raw data (raw_data = TRUE) of residuals greenhouse gases (dataset = "seeg_residuals") by municipality (geo_level = "municipality")
-data <- load_seeg(dataset = "seeg_residuals", 
+# Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg") by state (geo_level = "municipality")
+data <- load_seeg(dataset = "seeg", 
                   raw_data = TRUE,
-                  geo_level = "municipality")
+                  geo_level = "state")
 ```
 
 

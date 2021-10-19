@@ -2,7 +2,7 @@
 #'
 #' @description Loads data of estimates of emission of greenhouse gases
 #'
-#' @param dataset A dataset name ("seeg_farming", "seeg_industry", "seeg_energy", "seeg_land", "seeg_residuals"). Each is filtered by one main emission source. See \url{https://seeg8-brasil-municipios-site.herokuapp.com/notas-metodologicas}
+#' @param dataset A dataset name ("seeg", seeg_farming", "seeg_industry", "seeg_energy", "seeg_land", "seeg_residuals"). On which "seeg" contains all five sectors (only works with raw_data = TRUE) and the others are filtered specifically. See \url{https://seeg8-brasil-municipios-site.herokuapp.com/notas-metodologicas}
 #' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
 #' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state" or "municipality".
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
@@ -12,10 +12,11 @@
 #' @encoding UTF-8
 #'
 #' @export
+#' @importFrom magrittr %>%
 #'
 #' @examples \dontrun{
-#' # download farming state raw data
-#' seeg <- load_seeg(dataset = 'seeg_farming',
+#' # download state raw data
+#' seeg <- load_seeg(dataset = 'seeg',
 #'                   raw_data = TRUE,
 #'                   geo_level = 'state')
 #'
@@ -34,7 +35,7 @@ load_seeg <- function(dataset = NULL, raw_data,
                       geo_level, language = "eng"){
 
 
-  survey <- link <- id_code <- x1970 <- x2019 <- nivel_1_setor <- nivel_2 <- nivel_3 <- nivel_4 <- nivel_5 <- nivel_6 <- produto <- atividade_economica <- Valor <- Ano <- estado <- setor <- processos_geradores_emissoes <- fonte_de_emissoes <- emissores <- gas <- emissao_remocao_bunker <- producao_emissores <- categorias_emissao <- atividade_geradora <- categorias_processos_geradores <- year <- state <- sector <- emitters_production <- emitters <- economic_activity <- product <- value <- emissions_category <- activity <- generating_processes_categories <- biome <- biome_area <- transition_type <- emission_removal_bunker <- emissions_sources <- emissions_type <- emissions_generating_processes <- NULL
+  survey <-link <- id_code <- x1970 <- x2019 <- nivel_1_setor <- nivel_2 <- nivel_3 <- nivel_4 <- nivel_5 <- nivel_6 <- produto <- atividade_economica <- Valor <- Ano <- estado <- setor <- processos_geradores_emissoes <- fonte_de_emissoes <- emissores <- gas <- emissao_remocao_bunker <- producao_emissores <- categorias_emissao <- atividade_geradora <- categorias_processos_geradores <- year <- state <- sector <- emitters_production <- emitters <- economic_activity <- product <- value <- emissions_category <- activity <- generating_processes_categories <- biome <- biome_area <- transition_type <- emission_removal_bunker <- emissions_sources <- emissions_type <- emissions_generating_processes <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -58,6 +59,12 @@ load_seeg <- function(dataset = NULL, raw_data,
 
   if (is.null(param$dataset)){stop('Missing Dataset!')}
   if (is.null(param$raw_data)){stop('Missing TRUE/FALSE for Raw Data')}
+  if(param$dataset == "seeg" & param$raw_data == FALSE){stop('This dataset only works with raw_data = TRUE')}
+  if(param$dataset == "seeg_farming" & param$raw_data == TRUE){stop('This dataset only works with raw_data = FALSE')}
+  if(param$dataset == "seeg_energy" & param$raw_data == TRUE){stop('This dataset only works with raw_data = FALSE')}
+  if(param$dataset == "seeg_industry" & param$raw_data == TRUE){stop('This dataset only works with raw_data = FALSE')}
+  if(param$dataset == "seeg_land" & param$raw_data == TRUE){stop('This dataset only works with raw_data = FALSE')}
+  if(param$dataset == "seeg_residuals" & param$raw_data == TRUE){stop('This dataset only works with raw_data = FALSE')}
 
 
   ##############
@@ -78,7 +85,10 @@ load_seeg <- function(dataset = NULL, raw_data,
 
 
   ## Return Raw Data
-  if (raw_data == TRUE){return(dat)}
+  if (param$dataset == "seeg" & param$raw_data == TRUE){return(dat)}
+
+
+  ## Raw Data = FALSE
 
 
 if (param$dataset == "seeg_farming"){
@@ -112,6 +122,7 @@ if (param$dataset == "seeg_farming"){
     dplyr::relocate(Ano, estado, setor, processos_geradores_emissoes, fonte_de_emissoes, emissores, gas, atividade_economica, produto,
                     Valor)
 }
+
 
 if(param$dataset == "seeg_industry"){
 
@@ -153,6 +164,7 @@ if(param$dataset == "seeg_industry"){
 
 }
 
+
 if (param$dataset == "seeg_energy"){
 
   ## Create Longer Data - Years as a Variable
@@ -182,6 +194,8 @@ if (param$dataset == "seeg_energy"){
 
 }
 
+
+
 if (param$dataset == "seeg_land"){
   ## Create Longer Data - Years as a Variable
 
@@ -210,6 +224,7 @@ if (param$dataset == "seeg_land"){
 
 
 }
+
 
 if (param$dataset == "seeg_residuals"){
 
@@ -271,7 +286,8 @@ if (param$dataset == "seeg_residuals"){
     dplyr::relocate(Ano, estado, setor, categorias_emissao, processos_geradores_emissoes, atividade_geradora, categorias_processos_geradores, atividade_economica, produto, Valor)
 }
 
-if(param$dataset == "seeg_energy" & language == "eng"){
+
+if(param$dataset == "seeg_energy" & param$language == "eng"){
 
   dat = dat %>%
     tidyr::pivot_longer(
@@ -392,7 +408,8 @@ if(param$dataset == "seeg_energy" & language == "eng"){
     dplyr::relocate(year, state, sector)
 }
 
-  if(param$dataset == "seeg_industry" & language == "eng"){
+
+  if(param$dataset == "seeg_industry" & param$language == "eng"){
 
     dat = dat %>%
       tidyr::pivot_longer(
@@ -475,14 +492,6 @@ if(param$dataset == "seeg_energy" & language == "eng"){
                                                           economic_activity == "MET" ~ "Metal Industry",
                                                           economic_activity == "Outra_IND" ~ "Other Industry",
                                                           economic_activity == "HFC" ~ "HFC"))%>%
-      dplyr::mutate(state = dplyr::case_when(state == "BA" ~ "BA",
-                                             state == "ES"~"ES",
-                                             state == "MA"~ "MA",
-                                             state == "NA" ~ as.character(NA),
-                                             state == "PA" ~ "PA",
-                                             state == "RJ" ~ "RJ",
-                                             state == "RS" ~ "RS",
-                                             state == "SP" ~ "SP"))%>%
       dplyr::mutate(product = dplyr::case_when(product == "ALU" ~ "Aluminum",
                                                product == "ACO"~ "Steel"))
     dat = dat %>%
@@ -490,7 +499,8 @@ if(param$dataset == "seeg_energy" & language == "eng"){
 
   }
 
-  if(param$dataset == "seeg_residuals" & language == "eng"){
+
+  if(param$dataset == "seeg_residuals" & param$language == "eng"){
 
     dat = dat %>%
       tidyr::pivot_longer(
@@ -578,7 +588,7 @@ if(param$dataset == "seeg_energy" & language == "eng"){
       dplyr::relocate(year, state, sector, emissions_category, emissions_generating_processes, activity, generating_processes_categories, economic_activity, product, value)
   }
 
-  if(param$dataset == "seeg_land" & language == "eng"){
+  if(param$dataset == "seeg_land" & param$language == "eng"){
 
     dat = dat %>%
       tidyr::pivot_longer(
@@ -661,7 +671,7 @@ if(param$dataset == "seeg_energy" & language == "eng"){
       dplyr::relocate(year, state, sector, emissions_generating_processes, economic_activity, biome, biome_area, transition_type, emission_removal_bunker)
   }
 
-  if(param$dataset == "seeg_farming" & language == "eng"){
+  if(param$dataset == "seeg_farming" & param$language == "eng"){
 
     dat = dat %>%
       tidyr::pivot_longer(
