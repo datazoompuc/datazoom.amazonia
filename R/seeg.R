@@ -35,7 +35,7 @@ load_seeg <- function(dataset = NULL, raw_data,
                       geo_level, language = "eng"){
 
 
-  survey <-link <- id_code <- x1970 <- x2019 <- nivel_1_setor <- nivel_2 <- nivel_3 <- nivel_4 <- nivel_5 <- nivel_6 <- produto <- atividade_economica <- Valor <- Ano <- estado <- setor <- processos_geradores_emissoes <- fonte_de_emissoes <- emissores <- gas <- emissao_remocao_bunker <- producao_emissores <- categorias_emissao <- atividade_geradora <- categorias_processos_geradores <- year <- state <- sector <- emitters_production <- emitters <- economic_activity <- product <- value <- emissions_category <- activity <- generating_processes_categories <- biome <- biome_area <- transition_type <- emission_removal_bunker <- emissions_sources <- emissions_type <- emissions_generating_processes <- NULL
+  survey <-link <- x2000 <- x2018 <- id_code <- tipo_de_emissao <- city <- territory  <- nivel_1 <- municipio <- territorio <-x1970 <- x2019 <- nivel_1_setor <- nivel_2 <- nivel_3 <- nivel_4 <- nivel_5 <- nivel_6 <- produto <- atividade_economica <- Valor <- Ano <- estado <- setor <- processos_geradores_emissoes <- fonte_de_emissoes <- emissores <- gas <- emissao_remocao_bunker <- producao_emissores <- categorias_emissao <- atividade_geradora <- categorias_processos_geradores <- year <- state <- sector <- emitters_production <- emitters <- economic_activity <- product <- value <- emissions_category <- activity <- generating_processes_categories <- biome <- biome_area <- transition_type <- emission_removal_bunker <- emissions_sources <- emissions_type <- emissions_generating_processes <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -94,7 +94,7 @@ load_seeg <- function(dataset = NULL, raw_data,
 
     dat = dat %>%
       tidyr::pivot_longer(
-        cols = x200:x2018,
+        cols = x2000:x2018,
         names_to = 'Ano',
         names_prefix = 'x',
         values_to = 'Valor'
@@ -1196,14 +1196,14 @@ if(param$dataset == "seeg_energy" & param$language == "eng"){
     ## Changing column name, filtering by the specific sector and harmonizing variables
     dat = dat %>%
       dplyr::filter(nivel_1 == "Agropecuaria") %>%
-      dplyr::rename(sector = nivel_1r, emissions_generating_processes = nivel_2,
+      dplyr::rename(sector = nivel_1, emissions_generating_processes = nivel_2,
                     emissions_type= nivel_4,
                     direct_indirect_emitters = nivel_3,
                     emissions_sources = nivel_5,
                     emitters = nivel_6,
                     economic_activity = atividade_economica,
                     product = produto,
-                    emission_removal_bunker = tipo_de_emissor,
+                    emission_removal_bunker = tipo_de_emissao,
                     city = municipio,
                     state = territorio)%>%
       dplyr::mutate(economic_activity = dplyr::case_when(economic_activity == "PEC" ~ "Farming",
