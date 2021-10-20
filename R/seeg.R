@@ -831,9 +831,9 @@ if(param$dataset == "seeg_energy" & param$geo_level %in% c("country", "state") &
                     emitters_production = nivel_3,
                     emitters = nivel_4,
                     emission_bunker = emissao_remocao_bunker,
-                    state = estado,
                     economic_activity = atividade_economica,
-                    product = produto)%>%
+                    product = produto,
+                    state = estado)%>%
       dplyr::select(-c(nivel_6, nivel_5)) %>%
       dplyr::mutate(sector = dplyr::case_when(sector == "Processos Industriais" ~ "Industrial Processes")) %>%
       dplyr::mutate(emissions_generating_processes = dplyr::case_when(emissions_generating_processes == "Emissoes de HFCs" ~ "HFC Emissions",
@@ -902,11 +902,13 @@ if(param$dataset == "seeg_energy" & param$geo_level %in% c("country", "state") &
                                                product == "ACO"~ "Steel"))
 
 
-      dplyr::mutate(state = dplyr::case_when(state == "NA" ~ NA_character_,
+      dat = dat %>%
+        dplyr::mutate(state = dplyr::case_when(state == "NA" ~ NA_character_,
                                              TRUE ~ state))
 
     dat = dat %>%
       dplyr::relocate(year, state, sector, emissions_generating_processes, emitters_production, emitters, economic_activity, gas, product, value)
+
 
   }
 
