@@ -118,10 +118,18 @@ load_seeg <- function(dataset = NULL, raw_data,
     dat = dat%>%
       dplyr::relocate(Ano, municipio, territorio, ibge, setor, processos_geradores_emissoes, fonte_de_emissoes, emissores, gas, atividade_economica, produto,
                       Valor)
+
+    dat = dat %>%
+      dplyr::mutate(municipio = dplyr::case_when(municipio == "NA" ~ NA_character_,
+                                              TRUE ~ municipio))  %>%
+      dplyr::mutate(territorio = dplyr::case_when(territorio == "NA" ~ NA_character_,
+                                              TRUE ~ territorio)) %>%
+      dplyr::mutate(ibge = dplyr::case_when(ibge == "NA" ~ NA_character_,
+                                              TRUE ~ ibge))
   }
 
 
-if (param$dataset == "seeg_farming" & param$language == "pt"){
+if (param$dataset == "seeg_farming" & param$geo_level %in% c("country", "state") & param$language == "pt"){
 
   ## Create Longer Data - Years as a Variable
 
@@ -151,6 +159,9 @@ if (param$dataset == "seeg_farming" & param$language == "pt"){
   dat = dat%>%
     dplyr::relocate(Ano, estado, setor, processos_geradores_emissoes, fonte_de_emissoes, emissores, gas, atividade_economica, produto,
                     Valor)
+  dat = dat %>%
+    dplyr::mutate(estado = dplyr::case_when(estado == "NA" ~ NA_character_,
+                                          TRUE ~ estado))
 }
 
 
@@ -180,11 +191,17 @@ if (param$dataset == "seeg_farming" & param$language == "pt"){
     dat = dat %>%
       dplyr::relocate(Ano, municipio, territorio, setor, processos_geradores_emissoes, producao_emissores, emissores, gas, atividade_economica, produto, Valor)
 
-
+    dat = dat %>%
+      dplyr::mutate(municipio = dplyr::case_when(municipio == "NA" ~ NA_character_,
+                                                 TRUE ~ municipio))  %>%
+      dplyr::mutate(territorio = dplyr::case_when(territorio == "NA" ~ NA_character_,
+                                                  TRUE ~ territorio)) %>%
+      dplyr::mutate(ibge = dplyr::case_when(ibge == "NA" ~ NA_character_,
+                                            TRUE ~ ibge))
   }
 
 
-if(param$dataset == "seeg_industry" & param$language == "pt"){
+if(param$dataset == "seeg_industry" & param$geo_level %in% c("country", "state") & param$language == "pt"){
 
   ## Create Longer Data - Years as a Variable
 
@@ -221,6 +238,9 @@ if(param$dataset == "seeg_industry" & param$language == "pt"){
   dat = dat %>%
     dplyr::relocate(Ano, estado, setor, processos_geradores_emissoes, producao_emissores, emissores, gas, atividade_economica, produto, Valor)
 
+  dat = dat %>%
+    dplyr::mutate(estado = dplyr::case_when(estado == "NA" ~ NA_character_,
+                                            TRUE ~ estado))
 
 }
 
@@ -250,10 +270,18 @@ if(param$dataset == "seeg_industry" & param$language == "pt"){
     dat = dat%>%
       dplyr::relocate(Ano, municipio, territorio, setor)
 
+    dat = dat %>%
+      dplyr::mutate(municipio = dplyr::case_when(municipio == "NA" ~ NA_character_,
+                                                 TRUE ~ municipio))  %>%
+      dplyr::mutate(territorio = dplyr::case_when(territorio == "NA" ~ NA_character_,
+                                                  TRUE ~ territorio)) %>%
+      dplyr::mutate(ibge = dplyr::case_when(ibge == "NA" ~ NA_character_,
+                                            TRUE ~ ibge))
+
   }
 
 
-if (param$dataset == "seeg_energy" & param$language == "pt"){
+if (param$dataset == "seeg_energy" & param$geo_level %in% c("country", "state") &  param$language == "pt"){
 
   ## Create Longer Data - Years as a Variable
 
@@ -277,8 +305,14 @@ if (param$dataset == "seeg_energy" & param$language == "pt"){
                                              produto == "ALU" ~ "Aluminio")) %>%
     dplyr::select(-atividade_economica)
 
+
+
   dat = dat%>%
     dplyr::relocate(Ano, estado, setor)
+
+  dat = dat %>%
+    dplyr::mutate(estado = dplyr::case_when(estado == "NA" ~ NA_character_,
+                                            TRUE ~ estado))
 
 }
 
@@ -308,9 +342,18 @@ if(param$dataset == "seeg_land" & param$geo_level == "municipality" & param$lang
 
   dat = dat %>%
     dplyr::relocate(Ano, municipio, territorio, setor, processos_geradores_emissoes, atividade_economica)
+
+  dat = dat %>%
+    dplyr::mutate(municipio = dplyr::case_when(municipio == "NA" ~ NA_character_,
+                                               TRUE ~ municipio))  %>%
+    dplyr::mutate(territorio = dplyr::case_when(territorio == "NA" ~ NA_character_,
+                                                TRUE ~ territorio)) %>%
+    dplyr::mutate(ibge = dplyr::case_when(ibge == "NA" ~ NA_character_,
+                                          TRUE ~ ibge))
+
 }
 
-if (param$dataset == "seeg_land"  & param$language == "pt"){
+if (param$dataset == "seeg_land" & param$geo_level %in% c("country", "state") &  param$language == "pt"){
   ## Create Longer Data - Years as a Variable
 
   dat = dat %>%
@@ -335,6 +378,10 @@ if (param$dataset == "seeg_land"  & param$language == "pt"){
 
   dat = dat %>%
     dplyr::relocate(Ano, estado, setor, processos_geradores_emissoes, atividade_economica)
+
+  dat = dat %>%
+    dplyr::mutate(estado = dplyr::case_when(estado == "NA" ~ NA_character_,
+                                            TRUE ~ estado))
 
 
 }
@@ -362,6 +409,14 @@ if (param$dataset == "seeg_land"  & param$language == "pt"){
                                                            atividade_economica == "SANEAMENTO" ~ "Saneamento"
       ))
 
+    dat = dat %>%
+      dplyr::mutate(municipio = dplyr::case_when(municipio == "NA" ~ NA_character_,
+                                                 TRUE ~ municipio))  %>%
+      dplyr::mutate(territorio = dplyr::case_when(territorio == "NA" ~ NA_character_,
+                                                  TRUE ~ territorio)) %>%
+      dplyr::mutate(ibge = dplyr::case_when(ibge == "NA" ~ NA_character_,
+                                            TRUE ~ ibge))
+
 
    dat = dat%>%
       dplyr::relocate(Ano, municipio, territorio, ibge, setor, categorias_emissao, processos_geradores_emissoes, atividade_geradora, categorias_processos_geradores, atividade_economica, produto, Valor)
@@ -370,7 +425,7 @@ if (param$dataset == "seeg_land"  & param$language == "pt"){
   }
 
 
-if (param$dataset == "seeg_residuals" & param$language == "pt"){
+if (param$dataset == "seeg_residuals" & param$geo_level %in% c("country", "state") &  param$language == "pt"){
 
   ## Create Longer Data - Years as a Variable
 
@@ -396,35 +451,8 @@ if (param$dataset == "seeg_residuals" & param$language == "pt"){
     )) %>%
     dplyr::mutate(produto = dplyr::case_when(produto == "ALIM_BEBIDAS" ~ "Alimentos/Bebidas",
                                              produto == "CAR" ~ "Carne")) %>%
-    dplyr::mutate(estado = dplyr::case_when(estado == "BA" ~ "BA",
-                                            estado == "ES"~"ES",
-                                            estado == "MA"~ "MA",
-                                            estado == "NA" ~ as.character(NA),
-                                            estado == "PA" ~ "PA",
-                                            estado == "RJ" ~ "RJ",
-                                            estado == "RS" ~ "RS",
-                                            estado == "SP" ~ "SP",
-                                            estado == "AC" ~ "AC",
-                                            estado == "AL" ~ "AL",
-                                            estado == "AP" ~ "AP",
-                                            estado == "CE" ~ "CE",
-                                            estado == "DF" ~ "DF",
-                                            estado == "ES" ~ "ES",
-                                            estado == "GO" ~ "GO",
-                                            estado == "MG" ~ "MG",
-                                            estado == "MS" ~ "MS",
-                                            estado == "MT" ~ "MT",
-                                            estado == "PB" ~ "PB",
-                                            estado == "PE" ~ "PE",
-                                            estado == "PI" ~ "PI",
-                                            estado == "PR" ~ "PR",
-                                            estado == "RN" ~ "RN",
-                                            estado == "RO" ~ "RO",
-                                            estado == "RR" ~ "RR",
-                                            estado == "SC" ~ "SC",
-                                            estado == "SE" ~ "SE",
-                                            estado == "TO" ~ "TO",
-                                            estado == "AM" ~ "AM"))
+    dplyr::mutate(estado = dplyr::case_when(estado == "NA" ~ NA_character_,
+                                            TRUE ~ estado))
 
   dat = dat%>%
     dplyr::relocate(Ano, estado, setor, categorias_emissao, processos_geradores_emissoes, atividade_geradora, categorias_processos_geradores, atividade_economica, produto, Valor)
@@ -552,9 +580,17 @@ if(param$dataset == "seeg_energy" & param$geo_level == "municipality" & param$la
 
   dat = dat %>%
     dplyr::relocate(year, city, state, sector)
+
+  dat = dat %>%
+    dplyr::mutate(city = dplyr::case_when(city == "NA" ~ NA_character_,
+                                          TRUE ~ city))  %>%
+    dplyr::mutate(state = dplyr::case_when(state == "NA" ~ NA_character_,
+                                           TRUE ~ state)) %>%
+    dplyr::mutate(ibge = dplyr::case_when(ibge == "NA" ~ NA_character_,
+                                          TRUE ~ ibge))
 }
 
-if(param$dataset == "seeg_energy" & param$language == "eng"){
+if(param$dataset == "seeg_energy" & param$geo_level %in% c("country", "state") &  param$language == "eng"){
 
   dat = dat %>%
     tidyr::pivot_longer(
@@ -672,6 +708,10 @@ if(param$dataset == "seeg_energy" & param$language == "eng"){
     dplyr::select(-atividade_economica)
 
   dat = dat %>%
+    dplyr::mutate(state = dplyr::case_when(state == "NA" ~ NA_character_,
+                                            TRUE ~ state))
+
+  dat = dat %>%
     dplyr::relocate(year, state, sector)
 }
 
@@ -758,15 +798,14 @@ if(param$dataset == "seeg_energy" & param$language == "eng"){
                                                          economic_activity == "ENE_ELET" ~ "Eletric Power Industry",
                                                          economic_activity == "MET" ~ "Metal Industry",
                                                          economic_activity == "Outra_IND" ~ "Other Industry",
-                                                         economic_activity == "HFC" ~ "HFC"))%>%
-      dplyr::mutate(estado = dplyr::case_when(state == "BA" ~ "BA",
-                                              state == "ES"~"ES",
-                                              state == "MA"~ "MA",
-                                              state == "NA" ~ as.character(NA),
-                                              state == "PA" ~ "PA",
-                                              state == "RJ" ~ "RJ",
-                                              state == "RS" ~ "RS",
-                                              state == "SP" ~ "SP"))%>%
+                                                         economic_activity == "HFC" ~ "HFC"))
+      dat = dat %>%
+      dplyr::mutate(city = dplyr::case_when(city == "NA" ~ NA_character_,
+                                            TRUE ~ city))  %>%
+      dplyr::mutate(state = dplyr::case_when(state == "NA" ~ NA_character_,
+                                             TRUE ~ state)) %>%
+      dplyr::mutate(ibge = dplyr::case_when(ibge == "NA" ~ NA_character_,
+                                            TRUE ~ ibge))%>%
       dplyr::mutate(product = dplyr::case_when(product == "ALU" ~ "Aluminum",
                                                product == "ACO"~ "Steel"))
     dat = dat %>%
@@ -776,7 +815,7 @@ if(param$dataset == "seeg_energy" & param$language == "eng"){
   }
 
 
-  if(param$dataset == "seeg_industry" & param$language == "eng"){
+  if(param$dataset == "seeg_industry" &  param$geo_level %in% c("country", "state") & param$language == "eng"){
 
     dat = dat %>%
       tidyr::pivot_longer(
@@ -861,6 +900,11 @@ if(param$dataset == "seeg_energy" & param$language == "eng"){
                                                           economic_activity == "HFC" ~ "HFC"))%>%
       dplyr::mutate(product = dplyr::case_when(product == "ALU" ~ "Aluminum",
                                                product == "ACO"~ "Steel"))
+
+
+      dplyr::mutate(state = dplyr::case_when(state == "NA" ~ NA_character_,
+                                             TRUE ~ state))
+
     dat = dat %>%
       dplyr::relocate(year, state, sector, emissions_generating_processes, emitters_production, emitters, economic_activity, gas, product, value)
 
@@ -921,42 +965,18 @@ if(param$dataset == "seeg_energy" & param$language == "eng"){
                                                                        generating_processes_categories == "NAO SE APLICA" ~ "Not Applicable",
                                                                        generating_processes_categories == "Residuos Solidos Urbanos" ~ "Urban Solid Waste")) %>%
       dplyr::mutate(emission_bunker = dplyr::case_when(emission_bunker == "Emissao" ~ "Emission")) %>%
-      dplyr::mutate(estado = dplyr::case_when(state == "BA" ~ "BA",
-                                              state == "ES"~"ES",
-                                              state == "MA"~ "MA",
-                                              state == "NA" ~ as.character(NA),
-                                              state == "PA" ~ "PA",
-                                              state == "RJ" ~ "RJ",
-                                              state == "RS" ~ "RS",
-                                              state == "SP" ~ "SP",
-                                              state == "AC" ~ "AC",
-                                              state == "AL" ~ "AL",
-                                              state == "AP" ~ "AP",
-                                              state == "CE" ~ "CE",
-                                              state == "DF" ~ "DF",
-                                              state == "ES" ~ "ES",
-                                              state == "GO" ~ "GO",
-                                              state == "MG" ~ "MG",
-                                              state == "MS" ~ "MS",
-                                              state == "MT" ~ "MT",
-                                              state == "PB" ~ "PB",
-                                              state == "PE" ~ "PE",
-                                              state == "PI" ~ "PI",
-                                              state == "PR" ~ "PR",
-                                              state == "RN" ~ "RN",
-                                              state == "RO" ~ "RO",
-                                              state == "RR" ~ "RR",
-                                              state == "SC" ~ "SC",
-                                              state == "SE" ~ "SE",
-                                              state == "TO" ~ "TO",
-                                              state == "AM" ~ "AM"))
-
+      dplyr::mutate(city = dplyr::case_when(city == "NA" ~ NA_character_,
+                                            TRUE ~ city))  %>%
+      dplyr::mutate(state = dplyr::case_when(state == "NA" ~ NA_character_,
+                                             TRUE ~ state)) %>%
+      dplyr::mutate(ibge = dplyr::case_when(ibge == "NA" ~ NA_character_,
+                                            TRUE ~ ibge))
     dat = dat%>%
       dplyr::relocate(year, city, state, sector, emissions_category, emissions_generating_processes, activity, generating_processes_categories, economic_activity, product, value)
   }
 
 
-  if(param$dataset == "seeg_residuals" & param$language == "eng"){
+  if(param$dataset == "seeg_residuals" & param$geo_level %in% c("country", "state") &  param$language == "eng"){
 
     dat = dat %>%
       tidyr::pivot_longer(
@@ -1039,6 +1059,10 @@ if(param$dataset == "seeg_energy" & param$language == "eng"){
                                                                        generating_processes_categories == "NAO SE APLICA" ~ "Not Applicable",
                                                                        generating_processes_categories == "Residuos Solidos Urbanos" ~ "Urban Solid Waste")) %>%
       dplyr::mutate(emission_bunker = dplyr::case_when(emission_bunker == "Emissao" ~ "Emission"))
+
+    dat = dat %>%
+      dplyr::mutate(state = dplyr::case_when(state == "NA" ~ NA_character_,
+                                         TRUE ~ state))
 
     dat = dat%>%
       dplyr::relocate(year, state, sector, emissions_category, emissions_generating_processes, activity, generating_processes_categories, economic_activity, product, value)
@@ -1126,10 +1150,18 @@ if(param$dataset == "seeg_energy" & param$language == "eng"){
       dplyr::select(-produto)
 
     dat = dat %>%
+      dplyr::mutate(city = dplyr::case_when(city == "NA" ~ NA_character_,
+                                            TRUE ~ city))  %>%
+      dplyr::mutate(state = dplyr::case_when(state == "NA" ~ NA_character_,
+                                             TRUE ~ state)) %>%
+      dplyr::mutate(ibge = dplyr::case_when(ibge == "NA" ~ NA_character_,
+                                            TRUE ~ ibge))
+
+    dat = dat %>%
       dplyr::relocate(year, city, state, sector, emissions_generating_processes, economic_activity, biome, biome_area, transition_type, emission_removal_bunker)
   }
 
-  if(param$dataset == "seeg_land" & param$language == "eng"){
+  if(param$dataset == "seeg_land" & param$geo_level %in% c("country", "state") &  param$language == "eng"){
 
     dat = dat %>%
       tidyr::pivot_longer(
@@ -1207,6 +1239,10 @@ if(param$dataset == "seeg_energy" & param$language == "eng"){
       dplyr::mutate(economic_activity = dplyr::case_when(economic_activity == "AGROPEC" ~ "Farming",
                                                          economic_activity  == "Conservacao" ~ "Conservation")) %>%
       dplyr::select(-produto)
+
+    dat = dat %>%
+      dplyr::mutate(state = dplyr::case_when(state == "NA" ~ NA_character_,
+                                             TRUE ~ state))
 
     dat = dat %>%
       dplyr::relocate(year, state, sector, emissions_generating_processes, economic_activity, biome, biome_area, transition_type, emission_removal_bunker)
@@ -1303,9 +1339,17 @@ if(param$dataset == "seeg_energy" & param$language == "eng"){
     dat = dat%>%
       dplyr::relocate(year, city, state, sector,emissions_generating_processes , emissions_sources, emitters, emissions_type, gas, economic_activity, product,
                       value)
+
+    dat = dat %>%
+      dplyr::mutate(city = dplyr::case_when(city == "NA" ~ NA_character_,
+                                                 TRUE ~ city))  %>%
+      dplyr::mutate(state = dplyr::case_when(state == "NA" ~ NA_character_,
+                                                  TRUE ~ state)) %>%
+      dplyr::mutate(ibge = dplyr::case_when(ibge == "NA" ~ NA_character_,
+                                            TRUE ~ ibge))
   }
 
-  if(param$dataset == "seeg_farming" & param$language == "eng"){
+  if(param$dataset == "seeg_farming" & param$geo_level %in% c("country", "state") &  param$language == "eng"){
 
     dat = dat %>%
       tidyr::pivot_longer(
@@ -1395,6 +1439,10 @@ if(param$dataset == "seeg_energy" & param$language == "eng"){
     dat = dat%>%
       dplyr::relocate(year, state, sector,emissions_generating_processes , emissions_sources, emitters, emissions_type, gas, economic_activity, product,
                       value)
+
+    dat = dat %>%
+      dplyr::mutate(state = dplyr::case_when(state == "NA" ~ NA_character_,
+                                            TRUE ~ state))
   }
 
 return(dat)
