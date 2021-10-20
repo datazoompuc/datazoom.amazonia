@@ -35,7 +35,7 @@ load_seeg <- function(dataset = NULL, raw_data,
                       geo_level, language = "eng"){
 
 
-  survey <-link <- x2000 <- x2018 <- id_code <- tipo_de_emissao <- city <- territory  <- nivel_1 <- municipio <- territorio <-x1970 <- x2019 <- nivel_1_setor <- nivel_2 <- nivel_3 <- nivel_4 <- nivel_5 <- nivel_6 <- produto <- atividade_economica <- Valor <- Ano <- estado <- setor <- processos_geradores_emissoes <- fonte_de_emissoes <- emissores <- gas <- emissao_remocao_bunker <- producao_emissores <- categorias_emissao <- atividade_geradora <- categorias_processos_geradores <- year <- state <- sector <- emitters_production <- emitters <- economic_activity <- product <- value <- emissions_category <- activity <- generating_processes_categories <- biome <- biome_area <- transition_type <- emission_removal_bunker <- emissions_sources <- emissions_type <- emissions_generating_processes <- NULL
+  survey <-link <- ibge <- x2000 <- x2018 <- id_code <- tipo_de_emissao <- city <- state  <- nivel_1 <- municipio <- territorio <-x1970 <- x2019 <- nivel_1_setor <- nivel_2 <- nivel_3 <- nivel_4 <- nivel_5 <- nivel_6 <- produto <- atividade_economica <- Valor <- Ano <- estado <- setor <- processos_geradores_emissoes <- fonte_de_emissoes <- emissores <- gas <- emissao_remocao_bunker <- producao_emissores <- categorias_emissao <- atividade_geradora <- categorias_processos_geradores <- year <- state <- sector <- emitters_production <- emitters <- economic_activity <- product <- value <- emissions_category <- activity <- generating_processes_categories <- biome <- biome_area <- transition_type <- emission_removal_bunker <- emissions_sources <- emissions_type <- emissions_generating_processes <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -116,7 +116,7 @@ load_seeg <- function(dataset = NULL, raw_data,
                                                produto == "CAR/LEI/ALIM_BEBIDAS" ~ "Carne/Leite/Alimentos/Bebidas",
                                                produto == "LEI" ~ "Leite"))
     dat = dat%>%
-      dplyr::relocate(Ano, municipio, territorio, setor, processos_geradores_emissoes, fonte_de_emissoes, emissores, gas, atividade_economica, produto,
+      dplyr::relocate(Ano, municipio, territorio, ibge, setor, processos_geradores_emissoes, fonte_de_emissoes, emissores, gas, atividade_economica, produto,
                       Valor)
   }
 
@@ -355,7 +355,7 @@ if (param$dataset == "seeg_land"  & param$language == "pt"){
                     processos_geradores_emissoes = nivel_3,
                     atividade_geradora = nivel_4,
                     categorias_processos_geradores = nivel_5,
-                    emissao_bunker = emissao_remocao_bunker) %>%
+                    emissao_bunker = tipo_de_emissao) %>%
       dplyr::select(-nivel_6) %>%
       dplyr::mutate(atividade_economica = dplyr::case_when(atividade_economica == "PEC" ~ "Pecuaria",
                                                            atividade_economica == "Outra_IND" ~ "Outra Industria",
@@ -364,7 +364,7 @@ if (param$dataset == "seeg_land"  & param$language == "pt"){
 
 
    dat = dat%>%
-      dplyr::relocate(Ano, municipio, territorio, setor, categorias_emissao, processos_geradores_emissoes, atividade_geradora, categorias_processos_geradores, atividade_economica, produto, Valor)
+      dplyr::relocate(Ano, municipio, territorio, ibge, setor, categorias_emissao, processos_geradores_emissoes, atividade_geradora, categorias_processos_geradores, atividade_economica, produto, Valor)
 
 
   }
@@ -442,7 +442,7 @@ if(param$dataset == "seeg_energy" & param$geo_level == "municipality" & param$la
 
   dat = dat %>%
     dplyr::filter(nivel_1 == "Energia")%>%
-    dplyr::rename(sector = nivel_1, state = estado,
+    dplyr::rename(sector = nivel_1,
                   emission_type = nivel_2,
                   emissions_generating_processes = nivel_3,
                   activity = nivel_4,
@@ -759,6 +759,14 @@ if(param$dataset == "seeg_energy" & param$language == "eng"){
                                                          economic_activity == "MET" ~ "Metal Industry",
                                                          economic_activity == "Outra_IND" ~ "Other Industry",
                                                          economic_activity == "HFC" ~ "HFC"))%>%
+      dplyr::mutate(estado = dplyr::case_when(state == "BA" ~ "BA",
+                                              state == "ES"~"ES",
+                                              state == "MA"~ "MA",
+                                              state == "NA" ~ as.character(NA),
+                                              state == "PA" ~ "PA",
+                                              state == "RJ" ~ "RJ",
+                                              state == "RS" ~ "RS",
+                                              state == "SP" ~ "SP"))%>%
       dplyr::mutate(product = dplyr::case_when(product == "ALU" ~ "Aluminum",
                                                product == "ACO"~ "Steel"))
     dat = dat %>%
@@ -912,10 +920,39 @@ if(param$dataset == "seeg_energy" & param$language == "eng"){
                                                                        generating_processes_categories == "Disposicao em Aterro Controlado ou Lixao" ~ "Disposal in Controlled Landfill or Landfill",
                                                                        generating_processes_categories == "NAO SE APLICA" ~ "Not Applicable",
                                                                        generating_processes_categories == "Residuos Solidos Urbanos" ~ "Urban Solid Waste")) %>%
-      dplyr::mutate(emission_bunker = dplyr::case_when(emission_bunker == "Emissao" ~ "Emission"))
+      dplyr::mutate(emission_bunker = dplyr::case_when(emission_bunker == "Emissao" ~ "Emission")) %>%
+      dplyr::mutate(estado = dplyr::case_when(state == "BA" ~ "BA",
+                                              state == "ES"~"ES",
+                                              state == "MA"~ "MA",
+                                              state == "NA" ~ as.character(NA),
+                                              state == "PA" ~ "PA",
+                                              state == "RJ" ~ "RJ",
+                                              state == "RS" ~ "RS",
+                                              state == "SP" ~ "SP",
+                                              state == "AC" ~ "AC",
+                                              state == "AL" ~ "AL",
+                                              state == "AP" ~ "AP",
+                                              state == "CE" ~ "CE",
+                                              state == "DF" ~ "DF",
+                                              state == "ES" ~ "ES",
+                                              state == "GO" ~ "GO",
+                                              state == "MG" ~ "MG",
+                                              state == "MS" ~ "MS",
+                                              state == "MT" ~ "MT",
+                                              state == "PB" ~ "PB",
+                                              state == "PE" ~ "PE",
+                                              state == "PI" ~ "PI",
+                                              state == "PR" ~ "PR",
+                                              state == "RN" ~ "RN",
+                                              state == "RO" ~ "RO",
+                                              state == "RR" ~ "RR",
+                                              state == "SC" ~ "SC",
+                                              state == "SE" ~ "SE",
+                                              state == "TO" ~ "TO",
+                                              state == "AM" ~ "AM"))
 
     dat = dat%>%
-      dplyr::relocate(year, city, territorio, sector, emissions_category, emissions_generating_processes, activity, generating_processes_categories, economic_activity, product, value)
+      dplyr::relocate(year, city, state, sector, emissions_category, emissions_generating_processes, activity, generating_processes_categories, economic_activity, product, value)
   }
 
 
@@ -1175,7 +1212,7 @@ if(param$dataset == "seeg_energy" & param$language == "eng"){
       dplyr::relocate(year, state, sector, emissions_generating_processes, economic_activity, biome, biome_area, transition_type, emission_removal_bunker)
   }
 
-  if(param$dataset == "seeg_land" & param$geo_level == "municipality" & param$language == "eng"){
+  if(param$dataset == "seeg_farming" & param$geo_level == "municipality" & param$language == "eng"){
 
     dat = dat %>%
       tidyr::pivot_longer(

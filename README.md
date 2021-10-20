@@ -498,7 +498,13 @@ for the Land Use Change Sector that has the series from 1990 to 2019.
 
     There are four parameters in this function:
       
-      1. dataset = "seeg"
+      1. dataset: There are ssix choices:
+      a. "seeg": provides all sectors in a same dataframe. Only works with raw_data = FALSE.
+      b. "seeg farming": provides treated farming sector data
+      c. "seeg_industry": provides treated industry sector data
+      d. "seeg_energy": provides treated energy sector data
+      e. "seeg_land": provides treated land sector data
+      f. "seeg_residuals": provides treated residuals sector data
       
       2. raw_data: there are two options:
       # TRUE: if you want the raw data.
