@@ -175,17 +175,8 @@ if (param$dataset == "seeg_farming" & param$language == "pt"){
                                                            atividade_economica == "ENE_ELET" ~ "Industria Energia Eletrica",
                                                            atividade_economica == "MET" ~ "Industria Metaleira",
                                                            atividade_economica == "Outra_IND" ~ "Outra Industria",
-                                                           atividade_economica == "HFC" ~ "HFC"))%>%
-      dplyr::mutate(estado = dplyr::case_when(estado== "BA" ~ "BA",
-                                              estado == "ES"~"ES",
-                                              estado == "MA"~ "MA",
-                                              estado == "NA" ~ as.character(NA),
-                                              estado == "PA" ~ "PA",
-                                              estado == "RJ" ~ "RJ",
-                                              estado == "RS" ~ "RS",
-                                              estado == "SP" ~ "SP"))%>%
-      dplyr::mutate(produto = dplyr::case_when(produto == "ALU" ~ "Aluminio",
-                                               produto == "ACO"~ "Aco"))
+                                                           atividade_economica == "HFC" ~ "HFC"))
+
     dat = dat %>%
       dplyr::relocate(Ano, municipio, territorio, setor, processos_geradores_emissoes, producao_emissores, emissores, gas, atividade_economica, produto, Valor)
 
