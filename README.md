@@ -36,13 +36,6 @@ datazoom.amazonia::datasets_link()
 #> # ... with 24 more rows
 ```
 
-The package is under development so the following functions still do not
-support pre-processing and language arguments, returning only the raw
-data:
-
-``` r
-load_seeg()
-```
 
 ## Installation
 
