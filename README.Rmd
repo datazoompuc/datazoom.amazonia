@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 [![CRAN version](https://www.r-pkg.org/badges/version/datazoom.amazonia?color=orange)](https://cran.r-project.org/package=datazoom.amazonia)
 [![CRAN downloads](https://cranlogs.r-pkg.org/badges/datazoom.amazonia?color=blue)](https://cran.r-project.org/package=datazoom.amazonia)
-[![R build status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions)
+<!-- [![R build status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions) -->
 <!-- badges: end -->
 
 The goal of datazoom.amazonia is to facilitate access to official data regarding the Amazon. The package provides functions that download and pre-process selected datasets. The function below provides a brief description of the available datasets:
@@ -580,34 +580,6 @@ data <- load_sigmine(dataset = 'sigmine_active', raw_data = TRUE)
 data <- load_sigmine(dataset = 'sigmine_active', 
                      raw_data = TRUE,
                      language = "pt")
-```
-
-
-# 8) PIBMUNIC
-Loads GDP data at current prices of the three large sectors of economic activity - Agriculture, Industry and Services - as well as taxes, net of subsidies, GDP and GDP per capita.
-
-```
-There are five parameters in this function:
-
-1. dataset = "pibmunic
-
-2. raw_data = TRUE (raw) or FALSE (treated)
-
-3. geo_level = "country", "state" or "municipality"
-
-4. time_period = 2002:2018
-
-5. language = "pt" (portuguese) or "eng" (english)
-
-```
-
-```{r}
-# Download Raw Data
-data = load_pibmunic(dataset = "pibmunic", raw_data = TRUE, geo_level = "state", time_period = 2012, language = "pt")
-
-# Download Treated Data
-data = load_pibmunic(dataset = "pibmunic", raw_data = FALSE, geo_level = "country", time_period = 2008, language = "eng")
-
 ```
 
 

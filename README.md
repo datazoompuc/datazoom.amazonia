@@ -9,8 +9,7 @@
 version](https://www.r-pkg.org/badges/version/datazoom.amazonia?color=orange)](https://cran.r-project.org/package=datazoom.amazonia)
 [![CRAN
 downloads](https://cranlogs.r-pkg.org/badges/datazoom.amazonia?color=blue)](https://cran.r-project.org/package=datazoom.amazonia)
-[![R build
-status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions)
+<!-- [![R build status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions) -->
 <!-- badges: end -->
 
 The goal of datazoom.amazonia is to facilitate access to official data
@@ -35,7 +34,6 @@ datazoom.amazonia::datasets_link()
 #> 10 PPM-IBGE ppm_animal~         74 1974-2019      Country, State,~ https://sidr~
 #> # ... with 24 more rows
 ```
-
 
 ## Installation
 
@@ -480,7 +478,7 @@ data <- load_ips(dataset = "ips", raw_data = FALSE,
 # 5) SEEG:
 
 Loads data of estimates of emission of greenhouse gases of Brazilian
-cities.
+cities and states.
 
 According to the “SEEG Brasil” website: all five sectors that are
 sources of emissions - Agriculture, Energy, Land Use Change, Industrial
@@ -491,13 +489,13 @@ for the Land Use Change Sector that has the series from 1990 to 2019.
 
     There are four parameters in this function:
       
-      1. dataset: There are ssix choices:
-      a. "seeg": provides all sectors in a same dataframe. Only works with raw_data = FALSE.
-      b. "seeg farming": provides treated farming sector data
-      c. "seeg_industry": provides treated industry sector data
-      d. "seeg_energy": provides treated energy sector data
-      e. "seeg_land": provides treated land sector data
-      f. "seeg_residuals": provides treated residuals sector data
+      1. dataset: There are six choices:
+      # "seeg": provides all sectors in a same dataframe. Only works with raw_data = TRUE.
+      # "seeg_farming"
+      # "seeg_industry"
+      # "seeg_energy"
+      # "seeg_land"
+      # "seeg_residuals"
       
       2. raw_data: there are two options:
       # TRUE: if you want the raw data.
@@ -516,6 +514,22 @@ data <- load_seeg(dataset = "seeg",
                   raw_data = TRUE,
                   geo_level = "municipality")
   
+
+# Download treated data (raw_data = FALSE) of industry greenhouse gases (dataset = "seeg_industry") by state (geo_level = "state")
+data <- load_seeg(dataset = "seeg_industry", 
+                  raw_data = FALSE,
+                  geo_level = "state")
+
+
+# Download treated data (raw_data = FALSE) of energy greenhouse gases (dataset = "seeg_energy") by state (geo_level = "state")
+data <- load_seeg(dataset = "seeg_energy", 
+                  raw_data = FALSE,
+                  geo_level = "state")
+
+# Download treated data (raw_data = FALSE) of land greenhouse gases (dataset = "seeg_land") by country (geo_level = "country")
+data <- load_seeg(dataset = "seeg_land", 
+                  raw_data = FALSE,
+                  geo_level = "country")
 
 # Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg") by state (geo_level = "state")
 data <- load_seeg(dataset = "seeg", 
@@ -585,40 +599,6 @@ data <- load_sigmine(dataset = 'sigmine_active', raw_data = TRUE)
 data <- load_sigmine(dataset = 'sigmine_active', 
                      raw_data = TRUE,
                      language = "pt")
-```
-
-# 8) PIBMUNIC
-
-Loads GDP data at current prices of the three large sectors of economic
-activity - Agriculture, Industry and Services - as well as taxes, net of
-subsidies, GDP and GDP per capita.
-
-    There are five parameters in this function:
-
-    1. dataset = "pibmunic
-
-    2. raw_data = TRUE (raw) or FALSE (treated)
-
-    3. geo_level = "country", "state" or "municipality"
-
-    4. time_period = 2002:2018
-
-    5. language = "pt" (portuguese) or "eng" (english)
-
-``` r
-# Download Raw Data
-data = load_pibmunic(dataset = "pibmunic", raw_data = TRUE, geo_level = "state", time_period = 2012, language = "pt")
-#> Downloading Data at the State level
-#> 
-#> Download Succesfully Completed!
-#> 
-
-# Download Treated Data
-data = load_pibmunic(dataset = "pibmunic", raw_data = FALSE, geo_level = "country", time_period = 2008, language = "eng")
-#> Downloading Data at the Brazil level
-#> 
-#> Download Succesfully Completed!
-#> 
 ```
 
 ## Credits
