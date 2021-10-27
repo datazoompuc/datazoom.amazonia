@@ -1,3 +1,7 @@
+# datazoom.amazonia 0.2.0
+
+* All functions supporting treated data download
+
 # datazoom.amazonia 0.1.0
 
 * All functions supporting raw data download
