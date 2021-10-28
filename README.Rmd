@@ -40,8 +40,7 @@ You can install the released version of `datazoom.amazonia` from
 install.packages("datazoom.amazonia")
 ```
 
-And the development version from
-[GitHub](https://github.com/datazoompuc/datazoom.amazonia) with:
+And the development version from GitHub with:
 
 ``` r
 # install.packages("devtools")
