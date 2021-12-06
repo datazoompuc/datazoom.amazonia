@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# datazoom.amazonia <img src="man/figures/logo.png" align="right" width="120" />
+# datazoom.amazonia <img src="man/logo.png" align="right" width="120" />
 
 <!-- badges: start -->
 
