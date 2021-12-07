@@ -385,7 +385,7 @@ The periodicity of the survey is annual. The geographic coverage is national, wi
 There are five parameters in this function:
   
   1. dataset: There are five possible choices. 
-  # 'ppm_livetock_inventory'
+  # 'ppm_livestock_inventory'
   # 'ppm_sheep_farming'
   # 'ppm_animal_orig_production' 
   # 'ppm_cow_farming'
@@ -403,7 +403,7 @@ There are five parameters in this function:
     
   4. time_period:
   
-  # For ppm_livetock_inventory, ppm_sheep_farming, ppm_animal_orig_production and ppm_cow_farming: data is avaiable from 1974 to 2019.
+  # For ppm_livestock_inventory, ppm_sheep_farming, ppm_animal_orig_production and ppm_cow_farming: data is avaiable from 1974 to 2019.
   # For ppm_aquaculture: data is avaiable from 2013 to 2019 
   
   5. language: you can choose between portuguese and english
