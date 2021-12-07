@@ -35,7 +35,7 @@ load_seeg <- function(dataset = NULL, raw_data,
                       geo_level, language = "eng"){
 
 
-  survey <-link <- ibge <- x2000 <- x2018 <- id_code <- tipo_de_emissao <- city <- state  <- nivel_1 <- municipio <- territorio <-x1970 <- x2019 <- nivel_1_setor <- nivel_2 <- nivel_3 <- nivel_4 <- nivel_5 <- nivel_6 <- produto <- atividade_economica <- Valor <- Ano <- estado <- setor <- processos_geradores_emissoes <- fonte_de_emissoes <- emissores <- gas <- emissao_remocao_bunker <- producao_emissores <- categorias_emissao <- atividade_geradora <- categorias_processos_geradores <- year <- state <- sector <- emitters_production <- emitters <- economic_activity <- product <- value <- emissions_category <- activity <- generating_processes_categories <- biome <- biome_area <- transition_type <- emission_removal_bunker <- emissions_sources <- emissions_type <- emissions_generating_processes <- NULL
+  survey <-link <- ibge  <- x2020<- x2000 <- x2018 <- id_code <- tipo_de_emissao <- city <- state  <- nivel_1 <- municipio <- territorio <-x1970 <- x2019 <- nivel_1_setor <- nivel_2 <- nivel_3 <- nivel_4 <- nivel_5 <- nivel_6 <- produto <- atividade_economica <- Valor <- Ano <- estado <- setor <- processos_geradores_emissoes <- fonte_de_emissoes <- emissores <- gas <- emissao_remocao_bunker <- producao_emissores <- categorias_emissao <- atividade_geradora <- categorias_processos_geradores <- year <- state <- sector <- emitters_production <- emitters <- economic_activity <- product <- value <- emissions_category <- activity <- generating_processes_categories <- biome <- biome_area <- transition_type <- emission_removal_bunker <- emissions_sources <- emissions_type <- emissions_generating_processes <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -135,7 +135,7 @@ if (param$dataset == "seeg_farming" & param$geo_level %in% c("country", "state")
 
   dat = dat %>%
     tidyr::pivot_longer(
-      cols = x1970:x2019,
+      cols = x1970:x2020,
       names_to = 'Ano',
       names_prefix = 'x',
       values_to = 'Valor'
@@ -207,7 +207,7 @@ if(param$dataset == "seeg_industry" & param$geo_level %in% c("country", "state")
 
   dat = dat %>%
     tidyr::pivot_longer(
-      cols = x1970:x2019,
+      cols = x1970:x2020,
       names_to = 'Ano',
       names_prefix = 'x',
       values_to = 'Valor'
@@ -287,7 +287,7 @@ if (param$dataset == "seeg_energy" & param$geo_level %in% c("country", "state") 
 
   dat = dat %>%
     tidyr::pivot_longer(
-      cols = x1970:x2019,
+      cols = x1970:x2020,
       names_to = 'Ano',
       names_prefix = 'x',
       values_to = 'Valor'
@@ -358,7 +358,7 @@ if (param$dataset == "seeg_land" & param$geo_level %in% c("country", "state") & 
 
   dat = dat %>%
     tidyr::pivot_longer(
-      cols = x1970:x2019,
+      cols = x1970:x2020,
       names_to = 'Ano',
       names_prefix = 'x',
       values_to = 'Valor'
@@ -431,7 +431,7 @@ if (param$dataset == "seeg_residuals" & param$geo_level %in% c("country", "state
 
   dat = dat %>%
     tidyr::pivot_longer(
-      cols = x1970:x2019,
+      cols = x1970:x2020,
       names_to = 'Ano',
       names_prefix = 'x',
       values_to = 'Valor'
@@ -594,7 +594,7 @@ if(param$dataset == "seeg_energy" & param$geo_level %in% c("country", "state") &
 
   dat = dat %>%
     tidyr::pivot_longer(
-      cols = x1970:x2019,
+      cols = x1970:x2020,
       names_to = 'year',
       names_prefix = 'x',
       values_to = 'value')
@@ -819,7 +819,7 @@ if(param$dataset == "seeg_energy" & param$geo_level %in% c("country", "state") &
 
     dat = dat %>%
       tidyr::pivot_longer(
-        cols = x1970:x2019,
+        cols = x1970:x2020,
         names_to = 'year',
         names_prefix = 'x',
         values_to = 'value'
@@ -982,7 +982,7 @@ if(param$dataset == "seeg_energy" & param$geo_level %in% c("country", "state") &
 
     dat = dat %>%
       tidyr::pivot_longer(
-        cols = x1970:x2019,
+        cols = x1970:x2020,
         names_to = 'year',
         names_prefix = 'x',
         values_to = 'value')
@@ -1167,7 +1167,7 @@ if(param$dataset == "seeg_energy" & param$geo_level %in% c("country", "state") &
 
     dat = dat %>%
       tidyr::pivot_longer(
-        cols = x1970:x2019,
+        cols = x1970:x2020,
         names_to = 'year',
         names_prefix = 'x',
         values_to = 'value'
@@ -1355,7 +1355,7 @@ if(param$dataset == "seeg_energy" & param$geo_level %in% c("country", "state") &
 
     dat = dat %>%
       tidyr::pivot_longer(
-        cols = x1970:x2019,
+        cols = x1970:x2020,
         names_to = 'year',
         names_prefix = 'x',
         values_to = 'value'
