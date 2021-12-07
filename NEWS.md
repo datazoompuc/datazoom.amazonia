@@ -38,3 +38,5 @@
 # datazoom.amazonia 0.12.0.9000
 * Added functions for IPS data 
 
+# datazoom.amazonia 0.13.0.9000
+* Added functiond for SEEG data
