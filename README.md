@@ -489,12 +489,12 @@ data <- load_ips(dataset = "ips", raw_data = FALSE,
 Loads data of estimates of emission of greenhouse gases of Brazilian
 cities.
 
-According to the “SEEG Brasil” website: all five sectors that are
+According to the SEEG Brasil website: all five sectors that are
 sources of emissions - Agriculture, Energy, Land Use Change, Industrial
 Processes and Waste with the same degree of detail contained in the
-emissions inventories are evaluated. The data provided in SEEG’s
-Collection 8 is a series covering the period from 1970 to 2019, except
-for the Land Use Change Sector that has the series from 1990 to 2019.
+emissions inventories are evaluated. The data provided in SEEGs
+Collection 9 is a series covering the period from 1970 to 2020, except
+for the Land Use Change Sector that has the series from 1990 to 2020.
 
     There are four parameters in this function:
       
