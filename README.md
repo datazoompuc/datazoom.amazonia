@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-<a href="https://github.com/datazoompuc/datazoom.amazonia"><img src="https://raw.githubusercontent.com/datazoompuc/datazoom.amazonia/master/logo.png?token=AU72KNQCGY4ZR6XLARTNSXLBXCPNG" align="left" width="100" hspace="10" vspace="6"></a>
+<a href="https://github.com/datazoompuc/datazoom.amazonia"><img src="https://https://raw.githubusercontent.com/datazoompuc/datazoom.amazonia/master/logo.jpg?token=AU72KNSVHXX6CFSOCSKTBJDBXH6RM" align="left" width="100" hspace="10" vspace="6"></a>
 
 
 [![CRAN
