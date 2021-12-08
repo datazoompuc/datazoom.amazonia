@@ -20,7 +20,7 @@ load_ips(dataset = "ips", raw_data, time_period, language = "eng")
 A \code{tibble} with the selected data.
 }
 \description{
-Loads information on the social and environmental performance of the Legal Amazon. Survey is done at the municipal level and data is available in 2014 and 2018. See \url{http://www.ipsamazonia.org.br/}
+Loads information on the social and environmental performance of the Legal Amazon. Survey is done at the municipal level and data is available in 2014 and 2018.
 }
 \examples{
 \dontrun{
