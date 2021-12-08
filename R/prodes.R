@@ -181,7 +181,7 @@ load_prodes <- function(dataset = "prodes", raw_data,
      return(df)
    }
 
-  dat_mod <- purrr::map(dat, ~treat_prodes_data(.x, param$language)) %>%
+  dat_mod <- purrr::map(list_dat, ~treat_prodes_data(.x, param$language)) %>%
     dplyr::bind_rows()
 
   return(dat_mod)
