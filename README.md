@@ -1,11 +1,11 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# datazoom.amazonia <img src="man/logo.png" align="right" width="120" />
+# datazoom.amazonia
 
 <!-- badges: start -->
 
-<img src= "man/figures/logo.png" align="left" width="100" hspace="10" vspace="6"/>
+<img src= "man/figures/logo.png" align="left" width="130" hspace="10" vspace="6"/>
 
 [![CRAN
 version](https://www.r-pkg.org/badges/version/datazoom.amazonia?color=orange)](https://cran.r-project.org/package=datazoom.amazonia)
