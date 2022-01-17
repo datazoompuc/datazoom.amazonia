@@ -1,4 +1,27 @@
-load_cipo <- function(dataset = "environmental_crimes",
+#' Title Plataforma CIPÓ - Mappings on environmental crimes
+#'
+#' @param dataset A dataset name ("brazilian_actors", "international_cooperation", "forest_governance")
+#' @param search A \code{string} that filters entries containing it.
+#'
+#' @return A \code{tibble} of the chosen CIPÓ spreadsheet.
+#'
+#' @encoding UTF-8
+#'
+#' @export
+#'
+#' @examples \dontrun{
+#' # download the spreacdsheet on Brazilian actors involved in fighting environmental crimes
+#' brazilian_actors <- load_cipo(dataset = "brazilian_actors")
+#'
+#' # searching only for entries containing IBAMA
+#' actors_ibama <- load_cipo(dataset = "brazilian_actors",
+#'                          search = "ibama")
+#'
+#' # entries containing IBAMA or FUNAI
+#' actors_ibama <- load_cipo(dataset = "brazilian_actors",
+#'                          search = "ibama|funai")
+#' }
+load_cipo <- function(dataset = "brazilian_actors",
                       search = ""){
 
 param <- list()
@@ -8,7 +31,7 @@ param$search <- clean_text(search)
 
 # spreadsheet embedded into the page is sourced from google sheets
 
-  if (dataset == "environmental_crimes"){
+  if (dataset == "brazilian_actors"){
     url <- "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpRIu-paL_8rtXLpiT-kCTJRa2Tf_jCCPZxZBc3sjCwMHL8mkrhG2eqVeeIdWkxLTUKPru5uYAWG6g/"
     skip_rows <- 2
   }
