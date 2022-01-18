@@ -62,7 +62,7 @@ url <- paste0(url, "pub?output=csv")
 df <- readr::read_csv(url, skip = skip_rows) %>%
   tidyr::unite(aux, sep = " ", remove = FALSE) %>%
   dplyr::mutate(dplyr::across(aux, clean_text)) %>%
-  dplyr::filter(dplyr::across(aux, ~ str_detect(., param$search))) %>%
+  dplyr::filter(dplyr::across(aux, ~ stringr::str_detect(., param$search))) %>%
   dplyr::select(-aux)
 
 df
