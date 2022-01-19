@@ -69,6 +69,7 @@ load_ibama <- function(dataset = "areas_embargadas",
                            source = 'ibama',
                            geo_level = param$geo_level)
 
+  list_dat = dat
 
   ## Filter for Legal Amazon
   if (legal_amazon_only) {
@@ -79,58 +80,81 @@ load_ibama <- function(dataset = "areas_embargadas",
   }
 
 
+  colnames(dat) = c("numero_TAD", "serie_TAD", "area_ha", "numero_A_I", "nome_ou_razao_social",
+                    "CPF_ou_CNPJ", "localizacao_do_imovel", "uf_infracao", "municipio_infracao",
+                    "municipio_infrator", "bairro", "endereco", "julgamento",
+                    "infracao", "data_insercao_lista")
+
+
   ## Return Raw Data
   if (raw_data == TRUE){return(dat)}
 
 
-  ## Aggregate to municipality-level
-  dat <- dat %>%
-    dplyr::select(
-      municipio_embargo, uf_embargo,
-      codigo_ibge_municipio_embargo, julgamento,
-      infracao, data_de_insercao_na_lista,
-      cpf_ou_cnpj
-    ) %>%
-    dplyr::mutate(
-      julgamento = ifelse(julgamento == "pendente de julgamento", FALSE, TRUE),
-      data_de_insercao_na_lista = lubridate::dmy(data_de_insercao_na_lista),
-      ano = lubridate::year(data_de_insercao_na_lista),
-      mes = lubridate::month(data_de_insercao_na_lista)
-    ) %>%
-    dplyr::rename(
-      municipio = municipio_embargo,
-      uf = uf_embargo,
-      cod_municipio = codigo_ibge_municipio_embargo
-    ) %>%
-    dplyr::mutate(cod_municipio = as.numeric(cod_municipio)) %>%
-    dplyr::group_by(cod_municipio, ano, mes) %>%
-    dplyr::summarise(
-      n_ja_julgado = sum(!is.na(julgamento), na.rm = TRUE),
-      n_infracoes = dplyr::n(),
-      n_cpf_cnpj_unicos = length(unique(cpf_ou_cnpj)),
-      .groups = "drop"
-    )
+  treat_ibama_data = function(df, language) {
 
-  if (param$language == 'pt'){
+    numero_TAD <- n_infringement <- n_unique_cpf_cnpj<- NULL
+    serie_TAD <- AMZ_LEGAL <- NULL
+    julgamento <- infracao <-localizacao_do_imovel <- data_insercao_lista <- NULL
+    CPF_ou_CNPJ <- ano <- mes <- area_ha <- numero_A_I <- bairro <- endereco <- NULL
+    month <- year <-n_already_judged<- n_infracoes <-nome_ou_razao_social <- n_ja_julgado <- NULL
+    n_CPF_CNPJ_unicos <- uf_infracao <- municipio_infracao <- municipio_infrator <- NULL
 
-    dat_mod = dat %>%
-      dplyr::select(ano, mes, cod_municipio,
-                    n_ja_julgado, n_infracoes, n_cpf_cnpj_unicos
+
+
+
+    ## Aggregate to year/month-level
+    df <- df %>%
+      dplyr::select(
+        municipio_infracao, uf_infracao,
+        julgamento,
+        infracao, data_insercao_lista,
+        CPF_ou_CNPJ
       ) %>%
-      dplyr::arrange(ano, mes, cod_municipio)
+      dplyr::mutate(
+        julgamento = ifelse(julgamento == "pendente de julgamento", FALSE, TRUE),
+        data_insercao_lista = lubridate::dmy(data_insercao_lista),
+        ano = lubridate::year(data_insercao_lista),
+        mes = lubridate::month(data_insercao_lista)
+      ) %>%
+      dplyr::group_by(ano, mes) %>%
+      dplyr::summarise(
+        n_ja_julgado = sum(!is.na(julgamento), na.rm = TRUE),
+        n_infracoes = dplyr::n(),
+        n_CPF_CNPJ_unicos = length(unique(CPF_ou_CNPJ)),
+        municipio_infracao,
+        .groups = "drop"
+      )
 
+    language = tolower(language)
+
+    if (language == "pt"){
+
+      df = df %>%
+        dplyr::select(ano, mes, municipio_infracao,
+                      n_ja_julgado, n_infracoes, n_CPF_CNPJ_unicos
+        ) %>%
+        dplyr::arrange(ano, mes)
+
+    }
+
+    if (language == "eng"){
+
+      df = df %>%
+        dplyr::select(year = ano, month = mes,
+                      n_already_judged = n_ja_julgado,
+                      n_infringement = n_infracoes,
+                      n_unique_cpf_cnpj = n_CPF_CNPJ_unicos,
+                      city = municipio_infracao
+        ) %>%
+        dplyr::arrange(year, month)
+
+    }
+
+    return(df)
   }
 
-  if (param$language == 'eng'){
+  dat_mod <- treat_ibama_data(dat, language)
 
-    dat_mod = dat %>%
-      dplyr::select(year = ano, month = mes, municipality_code = cod_municipio,
-                    n_already_judged = n_ja_julgado,
-                    n_infringement = n_infracoes,
-                    n_unique_cpf_cnpj = n_cpf_cnpj_unicos
-      ) %>%
-      dplyr::arrange(year, month, municipality_code)
-
-  }
+  return(dat_mod)
 
 }
