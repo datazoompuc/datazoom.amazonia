@@ -221,6 +221,8 @@ if(param$language == "eng") {
 
   if (param$dataset == 'mapbiomas_irrigation'){
 
+    if (cover_level == 1){dat$cover_level = dat$level_1}
+
     ## Create Longer Data - Years as a Variable
 
     dat = dat %>%
@@ -230,6 +232,29 @@ if(param$language == "eng") {
         names_prefix = 'x',
         values_to = 'value'
       )
+
+    if(param$language == "pt") {
+
+      dat = dat %>%
+        dplyr::rename(bioma = biome,
+                      uf = state) %>%
+        tidyr::pivot_wider(id_cols = c(bioma,uf,year),
+                           names_from = cover_level,
+                           values_from = value,
+                           values_fn = sum,
+                           values_fill = NA) %>%
+        dplyr::select(-c(4))}
+
+    if(param$language == "eng"){
+
+      dat = dat %>%
+        tidyr::pivot_wider(id_cols = c(biome,state,year),
+                         names_from = cover_level,
+                         values_from = value,
+                         values_fn = sum,
+                         values_fill = NA) %>%
+        dplyr::select(-c(4))
+    }
 
     ## Return Data
 
