@@ -10,9 +10,9 @@ load_mapbiomas = function(dataset = NULL,raw_data=NULL,geo_level = 'municipality
   ###########################
   ## Bind Global Variables ##
   ###########################
-  survey <- link <- x1985 <- x2019 <- NULL
-  territory_id <- municipality <- state <- year <- value <- NULL
-  x1985_to_1986 <- x2018_to_2019 <- x1988 <- x2017 <- x2000 <- x2010 <- x2018 <- biome <- level_1 <- NULL
+  survey <- link <- x1985 <- x2019 <- tipo_atividade <- objetivo_atividade <- resultado_final_atividade<- NULL
+  territory_id <- municipality <- state <- year <- value <- activity <- activity_type <- activity_segment <-activity_final_result <- NULL
+  x1985_to_1986 <- segmento_atividade<- id_municipio <- municipio <- ano <- estado <- atividade<- x2018_to_2019 <- x1988 <- x2017 <- x2000 <- x2010 <- x2018 <- biome <- level_1 <- NULL
 
 
   #############################
@@ -79,13 +79,35 @@ load_mapbiomas = function(dataset = NULL,raw_data=NULL,geo_level = 'municipality
     if (cover_level == 3){dat$cover_level = dat$level_3}
     if (cover_level == 4){dat$cover_level = dat$level_4}
 
+
+if(param$language == "eng") {
     dat = dat %>%
       tidyr::pivot_wider(id_cols = c(territory_id,municipality,state,year),
                          names_from = cover_level,
                          values_from = value,
                          values_fn = sum,
                          values_fill = NA) %>%
-      janitor::clean_names()
+      janitor::clean_names()}
+
+    if(param$language == "pt") {
+
+      dat = dat %>%
+        dplyr::rename(id_municipio = territory_id,
+               municipio = municipality,
+               estado = state) %>%
+        tidyr::pivot_wider(id_cols = c(id_municipio,municipio,estado,year),
+                           names_from = cover_level,
+                           values_from = value,
+                           values_fn = sum,
+                           values_fill = NA) %>%
+        dplyr::rename(ano = year,
+                      agropecuária = x3_farming,
+                     area_nao_vegetada = x4_non_vegetated_area,
+                      floresta = x1_forest,
+                      formacao_nao_natural_floresta = x2_non_forest_natural_formation,
+                      agua = x5_water,
+                      nao_observado = non_Observed) %>%
+        janitor::clean_names()}
 
     ## Adjusting Geo Level Names
 
