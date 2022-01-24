@@ -10,10 +10,14 @@ load_mapbiomas = function(dataset = NULL,raw_data=NULL,geo_level = 'municipality
   ###########################
   ## Bind Global Variables ##
   ###########################
-  survey <- link <- x1985 <- x2019 <- tipo_atividade <- objetivo_atividade <- resultado_final_atividade<- NULL
+  survey <- link <- x1985 <- x2019 <- tipo_atividade <- objetivo_atividade <- resultado_final_atividade<- bioma <- x1_floresta <- NULL
   territory_id <- municipality <- state <- year <- value <- activity <- activity_type <- activity_segment <-activity_final_result <- NULL
   x1985_to_1986 <- segmento_atividade<- id_municipio <- municipio <- ano <- estado <- atividade<- x2018_to_2019 <- x1988 <- x2017 <- x2000 <- x2010 <- x2018 <- biome <- level_1 <- NULL
-
+  agropecuaria <- area_nao_vegetada <- floresta <- formacao_nao_natural_floresta <- agua <- nao_observado <- NULL
+  x1_forest <- x2_non_forest_natural_formation <- x3_farming <- x4_non_vegetated_area <- x5_water <- non_observed <- NULL
+  uf <- farming <- x3_agropecuaria <-non_vegetated_area <-x4_area_nao_vegetada <-forest <- x1_floresta <- NULL
+  non_forest_natural_formation <- x2_formacao_nao_natural_florestal <- NULL
+  water <- x5_corpo_dagua <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -101,7 +105,7 @@ if(param$language == "eng") {
                            values_fn = sum,
                            values_fill = NA) %>%
         dplyr::rename(ano = year,
-                      agropecuária = x3_farming,
+                      agropecuaria = x3_farming,
                      area_nao_vegetada = x4_non_vegetated_area,
                       floresta = x1_forest,
                       formacao_nao_natural_floresta = x2_non_forest_natural_formation,
@@ -168,6 +172,11 @@ if(param$language == "eng") {
 
     ## Create Longer Data - Years as a Variable
 
+    if (cover_level == 1){dat$cover_level = dat$cobertura_nivel_1}
+    if (cover_level == 2){dat$cover_level = dat$cobertura_nivel_2}
+    if (cover_level == 3){dat$cover_level = dat$cobertura_nivel_3}
+    if (cover_level == 4){dat$cover_level = dat$cobertura_nivel_4}
+
     dat = dat %>%
       tidyr::pivot_longer(
         cols = x1988:x2017,
@@ -175,6 +184,34 @@ if(param$language == "eng") {
         names_prefix = 'x',
         values_to = 'value'
       )
+
+    if(param$language == "pt") {
+
+      dat = dat %>%
+        tidyr::pivot_wider(id_cols = c(id,bioma,uf,year),
+                           names_from = cover_level,
+                           values_from = value,
+                           values_fn = sum,
+                           values_fill = NA) %>%
+        janitor::clean_names()}
+
+    if(param$language == "eng"){
+
+      dat = dat %>%
+        tidyr::pivot_wider(id_cols = c(id,bioma,uf,year),
+                           names_from = cover_level,
+                           values_from = value,
+                           values_fn = sum,
+                           values_fill = NA) %>%
+        janitor::clean_names() %>%
+        dplyr::rename(biome = bioma, state = uf,
+                      farming = x3_agropecuaria,
+                      non_vegetated_area = x4_area_nao_vegetada,
+                      forest = x1_floresta,
+                      non_forest_natural_formation = x2_formacao_nao_natural_florestal,
+                      water = x5_corpo_dagua)
+    }
+
 
     ## Return Data
 
