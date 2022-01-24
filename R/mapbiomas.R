@@ -18,6 +18,7 @@ load_mapbiomas = function(dataset = NULL,raw_data=NULL,geo_level = 'municipality
   uf <- farming <- x3_agropecuaria <-non_vegetated_area <-x4_area_nao_vegetada <-forest <- x1_floresta <- NULL
   non_forest_natural_formation <- x2_formacao_nao_natural_florestal <- NULL
   water <- x5_corpo_dagua <- NULL
+  ausente <-absent <- baixo <- low <- medio <- medium <-forte <- strong <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -266,6 +267,9 @@ if(param$language == "eng") {
 
   if (param$dataset == 'mapbiomas_grazing_quality'){
 
+    if (cover_level == 1){dat$cover_level = dat$level_1}
+
+
     dat = dat %>%
       tidyr::pivot_longer(
         cols = x2010:x2018,
@@ -274,13 +278,32 @@ if(param$language == "eng") {
         values_to = 'value'
       )
 
+    if(param$language == "eng") {
+
     dat = dat %>%
       tidyr::pivot_wider(id_cols = c(biome,state,year),
-                         names_from = level_1,
+                         names_from = cover_level,
                          values_from = value,
                          values_fn = sum,
                          values_fill = NA) %>%
-      janitor::clean_names()
+      janitor::clean_names()}
+
+    if(param$language == "pt") {
+
+      dat = dat %>%
+      dplyr::rename(bioma = bioma,
+                    uf = state) %>%
+      tidyr::pivot_wider(id_cols = c(bioma,uf,year),
+                         names_from = cover_level,
+                         values_from = value,
+                         values_fn = sum,
+                         values_fill = NA) %>%
+        dplyr::rename(ano = year,
+                      ausente = absent,
+                      baixo = low,
+                      medio = medium,
+                      forte = strong)
+      janitor::clean_names()}
 
     ## Return Data
 
