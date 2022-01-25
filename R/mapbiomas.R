@@ -43,7 +43,7 @@ load_mapbiomas = function(dataset = NULL,raw_data=NULL,geo_level = 'municipality
   x1_forest <- x2_non_forest_natural_formation <- x3_farming <- x4_non_vegetated_area <- x5_water <- non_observed <- NULL
   uf <- farming <- x3_agropecuaria <-non_vegetated_area <-x4_area_nao_vegetada <-forest <- x1_floresta <- NULL
   non_forest_natural_formation <- x2_formacao_nao_natural_florestal <- NULL
-  water <- x5_corpo_dagua <- NULL
+  water <- x5_corpo_dagua <- id <- NULL
   ausente <-absent <- baixo <- low <- medio <- medium <-forte <- strong <- NULL
 
   #############################
@@ -137,7 +137,7 @@ if(param$language == "eng") {
                       floresta = x1_forest,
                       formacao_nao_natural_floresta = x2_non_forest_natural_formation,
                       agua = x5_water,
-                      nao_observado = non_Observed) %>%
+                      nao_observado = non_observed) %>%
         janitor::clean_names()}
 
     ## Adjusting Geo Level Names
