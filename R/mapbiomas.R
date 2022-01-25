@@ -164,21 +164,37 @@ if(param$language == "eng") {
         values_to = 'value'
       )
 
-    ## Aggregating by Cover Level
+    # Aggregating by Cover Level
 
-    # if (cover_level == 0){dat$cover_level = dat$level_0}
-    # if (cover_level == 1){dat$cover_level = dat$level_1}
-    # if (cover_level == 2){dat$cover_level = dat$level_2}
-    # if (cover_level == 3){dat$cover_level = dat$level_3}
-    # if (cover_level == 4){dat$cover_level = dat$level_4}
-    #
-    # dat = dat %>%
-    #   tidyr::pivot_wider(id_cols = c(territory_id,municipality,state,year),
-    #                      names_from = cover_level,
-    #                      values_from = value,
-    #                      values_fn = sum,
-    #                      values_fill = NA) %>%
-    #   janitor::clean_names()
+     if (cover_level == 0){dat$cover_level = dat$from_level_0}
+     if (cover_level == 1){dat$cover_level = dat$from_level_1}
+     if (cover_level == 2){dat$cover_level = dat$from_level_2}
+     if (cover_level == 3){dat$cover_level = dat$from_level_3}
+     if (cover_level == 4){dat$cover_level = dat$from_level_4}
+
+     if(param$language == "eng") {
+    dat = dat %>%
+       tidyr::pivot_wider(id_cols = c(territory_id,municipality,state,year),
+                          names_from = cover_level,
+                          values_from = value,
+                          values_fn = sum,
+                          values_fill = NA) %>%
+       janitor::clean_names()}
+
+
+    if(param$language = "pt"){
+
+      dat = dat %>%
+        dplyr::rename(id_municipio = territory_id,
+                      municipio = municipality,
+                      uf = state) %>%
+        tidyr::pivot_wider(id_cols = c(id_municipio,municipio,uf,year),
+                           names_from = cover_level,
+                           values_from = value,
+                           values_fn = sum,
+                           values_fill = NA) %>%
+        janitor::clean_names()
+    }
 
     ## Adjusting Geo Level Names
 
