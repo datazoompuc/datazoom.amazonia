@@ -25,4 +25,14 @@ Using the function is easy enough:
 
 ```{r, eval=FALSE}
 library(datazoom.amazonia)
+
+# Download treated data from Mapbiomas Cover in english
+data = load_mapbiomas(dataset = "mapbimas_cover",
+                      raw_data = FALSE, geo_level = "municipality",
+                      time_period = "all", language = "eng")
+
+# Download treated data from Mapbiomas Irrigation in portuguese
+data = load_mapbiomas(dataset = "mapbimas_irrigation",
+                      raw_data = FALSE, geo_level = "municipality",
+                      time_period = "all", language = "pt")
 ```
