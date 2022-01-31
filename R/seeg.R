@@ -232,7 +232,8 @@ if(param$dataset == "seeg_industry" & param$geo_level %in% c("country", "state")
                                             estado == "PA" ~ "PA",
                                             estado == "RJ" ~ "RJ",
                                             estado == "RS" ~ "RS",
-                                            estado == "SP" ~ "SP"))%>%
+                                            estado == "SP" ~ "SP",
+                                            TRUE ~ estado))%>%
     dplyr::mutate(produto = dplyr::case_when(produto == "ALU" ~ "Aluminio",
                                              produto == "ACO"~ "Aco"))
   dat = dat %>%
