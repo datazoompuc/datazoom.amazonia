@@ -89,10 +89,18 @@ sidra_download = function(sidra_code = NULL,year,geo_level = 'municipality',
     ## Download at the UF Level ##
     ##############################
 
+    # To speed up the downloads, we may skip the UFs that always return errors.
+    # As of 31/01/2022, those are
+    skip_ufs <- c("15", "17", "21", "22",
+                  "23", "24", "25", "26",
+                  "29", "31", "35", "41",
+                  "42", "43", "51", "52")
+
     uf_list = geo %>%
       dplyr::select(code_state) %>%
       unlist() %>%
       unique() %>%
+      {.[!(. %in% as.numeric(skip_ufs))]} %>%
       as.list()
 
     names(uf_list) = uf_list
@@ -125,6 +133,9 @@ sidra_download = function(sidra_code = NULL,year,geo_level = 'municipality',
     ###########################################
 
     missed_uf = dat_mod_uf[!unlist(lapply(dat_mod_uf,is.data.frame))] %>% names()
+
+    # Adding skipped UFs to the missed list
+    missed_uf <- c(missed_uf, skip_ufs)
 
     rm(dat_mod_uf)
 
