@@ -157,7 +157,7 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
     if (length(missed_uf) > 0) {
       base::message(base::cat(
         "Download at the State Level Completed!", length(missed_uf), "failed or skipped.\n",
-        "Attempting to Download at the MesoRegion Level...\n"
+        "Attempting to Download at the Mesoregion Level...\n"
       ))
     } else if (length(missed_uf) == 0) {
       base::message(base::cat("Download Succesfully Completed!"))
@@ -173,7 +173,7 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
     # As of 31/01/2022, those are
     skip_meso <- c("3112", "3110", "4301")
 
-    base::message(base::cat("Skipping Meso Region-level download for", length(skip_meso), "error-prone Meso Regions...\n"))
+    base::message(base::cat("Skipping Mesoregion-level download for", length(skip_meso), "error-prone Mesoregions...\n"))
 
     if (length(missed_uf) > 0) {
       geo_meso <- geo %>%
@@ -191,7 +191,7 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
       names(meso_reg_list) <- meso_reg_list
 
       dat_raw_meso <- purrr::map(meso_reg_list, function(meso_reg) {
-        base::message(base::cat(which(meso_reg == meso_reg_list), "in", length(meso_reg_list), "meso regions...\n"))
+        base::message(base::cat(which(meso_reg == meso_reg_list), "in", length(meso_reg_list), "mesoregions...\n"))
 
         base::suppressMessages(
           get_sidra_safe(
@@ -228,8 +228,8 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
 
       if (length(missed_meso) > 0) {
         base::message(base::cat(
-          "Download at the Meso Region Level Completed!", length(missed_meso), "failed or skipped.\n",
-          "Attempting to Download at the MicroRegion Level...\n"
+          "Download at the Mesoregion Level Completed!", length(missed_meso), "failed or skipped.\n",
+          "Attempting to Download at the Microregion Level...\n"
         ))
       } else if (length(missed_meso) == 0) {
         base::message(base::cat("Download Succesfully Completed!"))
@@ -254,7 +254,7 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
         names(micro_reg_list) <- micro_reg_list
 
         dat_raw_micro <- purrr::map(micro_reg_list, function(micro_reg) {
-          base::message(base::cat(which(micro_reg == micro_reg_list), "in", length(micro_reg_list), "micro regions...\n"))
+          base::message(base::cat(which(micro_reg == micro_reg_list), "in", length(micro_reg_list), "microregions...\n"))
 
           base::suppressMessages(
             get_sidra_safe(
@@ -289,7 +289,7 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
         if (length(missed_micro) > 0) {
           base::message(base::cat(
             length(missed_micro),
-            "missed API requests at the Micro Region level.
+            "missed API requests at the Microregion level.
                               Please report this problem to package developers..."
           ))
         }
