@@ -112,11 +112,9 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
 
     uf_list <- geo %>%
       dplyr::select(code_state) %>%
+      dplyr::filter(!(code_state %in% as.numeric(skip_ufs))) %>%
       unlist() %>%
       unique() %>%
-      {
-        .[!(. %in% as.numeric(skip_ufs))]
-      } %>%
       as.list()
 
     names(uf_list) <- uf_list
@@ -181,10 +179,8 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
 
       meso_reg_list <- geo_meso %>%
         dplyr::select(code_meso) %>%
+        dplyr::filter(!(code_meso %in% as.numeric(skip_meso))) %>%
         unlist() %>%
-        {
-          .[!(. %in% as.numeric(skip_meso))]
-        } %>%
         unique() %>%
         as.list()
 
