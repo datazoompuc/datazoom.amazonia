@@ -142,8 +142,8 @@ sidra_download = function(sidra_code = NULL,year,geo_level = 'municipality',
     rm(dat_mod_uf)
 
     if (length(missed_uf) > 0){
-      base::message(base::cat('Download at the State Level Completed!',length(missed_uf),'failed.\n',
-                              'Attempting to Download at the MesoRegion Level...'))
+      base::message(base::cat('Download at the State Level Completed!',length(missed_uf),'failed or skipped.\n',
+                              'Attempting to Download at the MesoRegion Level...\n'))
     } else if (length(missed_uf) == 0){
 
       base::message(base::cat('Download Succesfully Completed!'))
@@ -209,13 +209,13 @@ sidra_download = function(sidra_code = NULL,year,geo_level = 'municipality',
       missed_meso = dat_mod_meso[!unlist(lapply(dat_mod_meso,is.data.frame))] %>% names()
 
       # Adding skipped Mesos to the missed list
-      missed_uf <- c(missed_uf, skip_meso)
+      missed_meso <- c(missed_meso, skip_meso)
 
       rm(dat_mod_meso)
 
       if (length(missed_meso) > 0){
-        base::message(base::cat('Download at the Meso Region Level Completed!',length(missed_meso),'failed.\n',
-                                'Attempting to Download at the MicroRegion Level...'))
+        base::message(base::cat('Download at the Meso Region Level Completed!',length(missed_meso),'failed or skipped.\n',
+                                'Attempting to Download at the MicroRegion Level...\n'))
       } else if (length(missed_meso) == 0){
 
         base::message(base::cat('Download Succesfully Completed!'))
