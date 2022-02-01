@@ -96,6 +96,8 @@ sidra_download = function(sidra_code = NULL,year,geo_level = 'municipality',
                   "29", "31", "35", "41",
                   "42", "43", "51", "52")
 
+    base::message(base::cat('Skipping State-level download for', length(skip_ufs), 'error-prone States...\n'))
+
     uf_list = geo %>%
       dplyr::select(code_state) %>%
       unlist() %>%
@@ -154,6 +156,12 @@ sidra_download = function(sidra_code = NULL,year,geo_level = 'municipality',
     ## Meso Region ##
     #################
 
+    # To speed up the downloads, we may skip the Meso Regions that always return errors.
+    # As of 31/01/2022, those are
+    skip_meso <- c("3112", "3110", "4301")
+
+    base::message(base::cat('Skipping Meso Region-level download for', length(skip_meso), 'error-prone Meso Regions...\n'))
+
     if (length(missed_uf) > 0){
 
       geo_meso = geo %>%
@@ -162,6 +170,7 @@ sidra_download = function(sidra_code = NULL,year,geo_level = 'municipality',
       meso_reg_list = geo_meso %>%
         dplyr::select(code_meso) %>%
         unlist() %>%
+        {.[!(. %in% as.numeric(skip_meso))]} %>%
         unique() %>%
         as.list()
 
@@ -198,6 +207,9 @@ sidra_download = function(sidra_code = NULL,year,geo_level = 'municipality',
       ###########################################
 
       missed_meso = dat_mod_meso[!unlist(lapply(dat_mod_meso,is.data.frame))] %>% names()
+
+      # Adding skipped Mesos to the missed list
+      missed_uf <- c(missed_uf, skip_meso)
 
       rm(dat_mod_meso)
 
