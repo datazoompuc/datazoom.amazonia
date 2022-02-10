@@ -43,6 +43,10 @@ load_cipo <- function(dataset = "brazilian_actors",
   param$dataset <- dataset
   param$search <- clean_text(search)
 
+  ######################
+  ## Downloading Data ##
+  ######################
+
   # spreadsheet embedded into the page is sourced from google sheets
 
   if (param$dataset == "brazilian_actors") {
@@ -62,7 +66,15 @@ load_cipo <- function(dataset = "brazilian_actors",
 
   ## Dataset
 
-  df <- readr::read_csv(url, skip = skip_rows) %>%
+  df <- readr::read_csv(url, skip = skip_rows)
+
+  ######################
+  ## Data Engineering ##
+  ######################
+
+  # only modification is to filter rows that include the 'search' parameter
+
+  df <- df %>%
     tidyr::unite(aux, sep = " ", remove = FALSE) %>%
     dplyr::mutate(dplyr::across(aux, clean_text)) %>%
     dplyr::filter(dplyr::across(aux, ~ stringr::str_detect(., param$search))) %>%
