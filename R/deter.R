@@ -43,7 +43,7 @@ load_deter <- function(dataset = NULL, raw_data,
   quadrant <- .data <- abbrev_state <- name_state <- code_region <- NULL
   path_row <- name_region <- code_muni <- area <- geometry <- NULL
   sensor <- data <- cod_municipio <- class <- municipality_code <- NULL
-  satellite <- class_name <- classe <- NULL
+  satellite <- class_name <- classe <- municipio <- municipality <- NULL
   view_date <- NULL
   municipali <- NULL
   uc <- NULL
@@ -143,10 +143,20 @@ load_deter <- function(dataset = NULL, raw_data,
 
     dat_mod = dat %>%
       dplyr::select(data = view_date, cod_uf = code_state,
-                    cod_municipio = code_muni, sensor = sensor,
+                    municipio = municipali, sensor = sensor,
                     satelite = satellite, uc, classe = classname,
                     path_row, area, quadrante = quadrant, geometry) %>%
-      dplyr::arrange(data, cod_municipio, classe)
+      dplyr::arrange(data, municipio, classe)
+
+    dat_mod$classe = dat_mod$classe %>% dplyr::recode(
+        CICATRIZ_DE_QUEIMADA = "Cicatriz de Queimada",
+         CS_DESORDENADO = "Corte Seletivo Desordenado",
+         CS_GEOMETRICO = "Corte Seletivo Geometrico",
+         DEGRADACAO = "Degradacao",
+         DESMATAMENTO_CR = "Desmatamento Corte Raso",
+         DESMATAMENTO_VEG = "Desmatamento com Vegetacao",
+         MINERACAO = "Mineracao",
+         CORTE_SELETIVO = "Corte Seletivo")
 
   }
 
@@ -154,10 +164,22 @@ load_deter <- function(dataset = NULL, raw_data,
 
     dat_mod = dat %>%
       dplyr::select(date = view_date, state_code = code_state,
-                    municipality_code = code_muni, sensor = sensor,
+                    municipality = municipali, sensor = sensor,
                     satellite, uc, class_name = classname,
                     pathrow = path_row, area, quadrant, geometry) %>%
-      dplyr::arrange(date, municipality_code, class_name)
+      dplyr::arrange(date, municipality, class_name)
+
+    dat_mod$class_name = dat_mod$class_name %>% dplyr::recode(
+          "Cicatriz de Queimada" = "Fire Scar",
+           "Corte Seletivo Desordenado" = "Unorganized Selection Cutting",
+           "Corte Seletivo Geometrico" = "Geometric Selection Cutting",
+           "Degradacao" = "Degradation",
+           "Desmatamento Corte Raso" = "Clear Cut Deforestation",
+           "Desmatamento com Vegetacao" = "Vegetation Remains Deforestation",
+           "Mineracao" = "Mining",
+           "aviso" = "Warning",
+           "Corte Seletivo" = "Selection Cutting"
+         )
 
   }
   # df <- df %>%

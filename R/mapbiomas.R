@@ -1,3 +1,29 @@
+#' @title MAPBIOMAS - The Annual Land Cover and Use Mapping Project in Brazil
+#'
+#' @description Loads information about land cover and use
+#'
+#' @param dataset A dataset name ("mapbiomas_cover", "mapbiomas_transition", "mapbiomas_irrigation", "mapbiomas_deforestation_regeneration", "mapbiomas_grazing_quality")
+#' @param raw_data A \code{boolean} setting the return of raw or processed data
+#' @param geo_level A \code{string} that defines the geographic level of the data. Can be only "municipality".
+#' @param time_period A \code{numeric} indicating what years will the data be loaded. Can be only "all".
+#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported.
+#' @param time_id A \code {string} that indicates the time criteria for the data loaded. Can be "year" or "month". Defaults to year.
+#' @param cover_level A \code {numeric} that indicates the cover aggregation level. Can be "0", "1", "2", "3" or "4".
+#' @return A \code{tibble} with the selected data.
+#'
+#' @examples
+#' \dontrun{
+#' # download treated data from mapbiomas_grazing_quality
+#' treated_mapbiomas_grazing <- load_mapbiomas(dataset = "mapbiomas_grazing_quality",
+#'                             raw_data = FALSE, geo_level = "municipality",
+#'                             time_period = "all", language = "eng")
+#' }
+#'
+#' @importFrom magrittr %>%
+#' @export
+
+
+
 load_mapbiomas = function(dataset = NULL,raw_data=NULL,geo_level = 'municipality',
                time_period='all',language = 'eng',time_id = 'year',cover_level = 1){
 
@@ -10,10 +36,15 @@ load_mapbiomas = function(dataset = NULL,raw_data=NULL,geo_level = 'municipality
   ###########################
   ## Bind Global Variables ##
   ###########################
-  survey <- link <- x1985 <- x2019 <- NULL
-  territory_id <- municipality <- state <- year <- value <- NULL
-  x1985_to_1986 <- x2018_to_2019 <- x1988 <- x2017 <- x2000 <- x2010 <- x2018 <- biome <- level_1 <- NULL
-
+  survey <- link <- x1985 <- x2019 <- tipo_atividade <- objetivo_atividade <- resultado_final_atividade<- bioma <- x1_floresta <- NULL
+  territory_id <- municipality <- state <- year <- value <- activity <- activity_type <- activity_segment <-activity_final_result <- NULL
+  x1985_to_1986 <- segmento_atividade<- id_municipio <- municipio <- ano <- estado <- atividade<- x2018_to_2019 <- x1988 <- x2017 <- x2000 <- x2010 <- x2018 <- biome <- level_1 <- NULL
+  agropecuaria <- area_nao_vegetada <- floresta <- formacao_nao_natural_floresta <- agua <- nao_observado <- NULL
+  x1_forest <- x2_non_forest_natural_formation <- x3_farming <- x4_non_vegetated_area <- x5_water <- non_observed <- NULL
+  uf <- farming <- x3_agropecuaria <-non_vegetated_area <-x4_area_nao_vegetada <-forest <- x1_floresta <- NULL
+  non_forest_natural_formation <- x2_formacao_nao_natural_florestal <- NULL
+  water <- x5_corpo_dagua <- id <- NULL
+  ausente <-absent <- baixo <- low <- medio <- medium <-forte <- strong <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -79,13 +110,35 @@ load_mapbiomas = function(dataset = NULL,raw_data=NULL,geo_level = 'municipality
     if (cover_level == 3){dat$cover_level = dat$level_3}
     if (cover_level == 4){dat$cover_level = dat$level_4}
 
+
+if(param$language == "eng") {
     dat = dat %>%
       tidyr::pivot_wider(id_cols = c(territory_id,municipality,state,year),
                          names_from = cover_level,
                          values_from = value,
                          values_fn = sum,
                          values_fill = NA) %>%
-      janitor::clean_names()
+      janitor::clean_names()}
+
+    if(param$language == "pt") {
+
+      dat = dat %>%
+        dplyr::rename(id_municipio = territory_id,
+               municipio = municipality,
+               estado = state) %>%
+        tidyr::pivot_wider(id_cols = c(id_municipio,municipio,estado,year),
+                           names_from = cover_level,
+                           values_from = value,
+                           values_fn = sum,
+                           values_fill = NA) %>%
+        dplyr::rename(ano = year,
+                      agropecuaria = x3_farming,
+                     area_nao_vegetada = x4_non_vegetated_area,
+                      floresta = x1_forest,
+                      formacao_nao_natural_floresta = x2_non_forest_natural_formation,
+                      agua = x5_water,
+                      nao_observado = non_observed) %>%
+        janitor::clean_names()}
 
     ## Adjusting Geo Level Names
 
@@ -111,21 +164,37 @@ load_mapbiomas = function(dataset = NULL,raw_data=NULL,geo_level = 'municipality
         values_to = 'value'
       )
 
-    ## Aggregating by Cover Level
+    # Aggregating by Cover Level
 
-    # if (cover_level == 0){dat$cover_level = dat$level_0}
-    # if (cover_level == 1){dat$cover_level = dat$level_1}
-    # if (cover_level == 2){dat$cover_level = dat$level_2}
-    # if (cover_level == 3){dat$cover_level = dat$level_3}
-    # if (cover_level == 4){dat$cover_level = dat$level_4}
-    #
-    # dat = dat %>%
-    #   tidyr::pivot_wider(id_cols = c(territory_id,municipality,state,year),
-    #                      names_from = cover_level,
-    #                      values_from = value,
-    #                      values_fn = sum,
-    #                      values_fill = NA) %>%
-    #   janitor::clean_names()
+     if (cover_level == 0){dat$cover_level = dat$from_level_0}
+     if (cover_level == 1){dat$cover_level = dat$from_level_1}
+     if (cover_level == 2){dat$cover_level = dat$from_level_2}
+     if (cover_level == 3){dat$cover_level = dat$from_level_3}
+     if (cover_level == 4){dat$cover_level = dat$from_level_4}
+
+     if(param$language == "eng") {
+    dat = dat %>%
+       tidyr::pivot_wider(id_cols = c(territory_id,municipality,state,year),
+                          names_from = cover_level,
+                          values_from = value,
+                          values_fn = sum,
+                          values_fill = NA) %>%
+       janitor::clean_names()}
+
+
+    if(param$language == "pt"){
+
+      dat = dat %>%
+        dplyr::rename(id_municipio = territory_id,
+                      municipio = municipality,
+                      uf = state) %>%
+        tidyr::pivot_wider(id_cols = c(id_municipio,municipio,uf,year),
+                           names_from = cover_level,
+                           values_from = value,
+                           values_fn = sum,
+                           values_fill = NA) %>%
+        janitor::clean_names()
+    }
 
     ## Adjusting Geo Level Names
 
@@ -146,6 +215,11 @@ load_mapbiomas = function(dataset = NULL,raw_data=NULL,geo_level = 'municipality
 
     ## Create Longer Data - Years as a Variable
 
+    if (cover_level == 1){dat$cover_level = dat$cobertura_nivel_1}
+    if (cover_level == 2){dat$cover_level = dat$cobertura_nivel_2}
+    if (cover_level == 3){dat$cover_level = dat$cobertura_nivel_3}
+    if (cover_level == 4){dat$cover_level = dat$cobertura_nivel_4}
+
     dat = dat %>%
       tidyr::pivot_longer(
         cols = x1988:x2017,
@@ -154,6 +228,34 @@ load_mapbiomas = function(dataset = NULL,raw_data=NULL,geo_level = 'municipality
         values_to = 'value'
       )
 
+    if(param$language == "pt") {
+
+      dat = dat %>%
+        tidyr::pivot_wider(id_cols = c(id,bioma,uf,year),
+                           names_from = cover_level,
+                           values_from = value,
+                           values_fn = sum,
+                           values_fill = NA) %>%
+        janitor::clean_names()}
+
+    if(param$language == "eng"){
+
+      dat = dat %>%
+        tidyr::pivot_wider(id_cols = c(id,bioma,uf,year),
+                           names_from = cover_level,
+                           values_from = value,
+                           values_fn = sum,
+                           values_fill = NA) %>%
+        janitor::clean_names() %>%
+        dplyr::rename(biome = bioma, state = uf,
+                      farming = x3_agropecuaria,
+                      non_vegetated_area = x4_area_nao_vegetada,
+                      forest = x1_floresta,
+                      non_forest_natural_formation = x2_formacao_nao_natural_florestal,
+                      water = x5_corpo_dagua)
+    }
+
+
     ## Return Data
 
     return(dat)
@@ -161,6 +263,8 @@ load_mapbiomas = function(dataset = NULL,raw_data=NULL,geo_level = 'municipality
   }
 
   if (param$dataset == 'mapbiomas_irrigation'){
+
+    if (cover_level == 1){dat$cover_level = dat$level_1}
 
     ## Create Longer Data - Years as a Variable
 
@@ -172,6 +276,29 @@ load_mapbiomas = function(dataset = NULL,raw_data=NULL,geo_level = 'municipality
         values_to = 'value'
       )
 
+    if(param$language == "pt") {
+
+      dat = dat %>%
+        dplyr::rename(bioma = biome,
+                      uf = state) %>%
+        tidyr::pivot_wider(id_cols = c(bioma,uf,year),
+                           names_from = cover_level,
+                           values_from = value,
+                           values_fn = sum,
+                           values_fill = NA) %>%
+        dplyr::select(-c(4))}
+
+    if(param$language == "eng"){
+
+      dat = dat %>%
+        tidyr::pivot_wider(id_cols = c(biome,state,year),
+                         names_from = cover_level,
+                         values_from = value,
+                         values_fn = sum,
+                         values_fill = NA) %>%
+        dplyr::select(-c(4))
+    }
+
     ## Return Data
 
     return(dat)
@@ -182,6 +309,9 @@ load_mapbiomas = function(dataset = NULL,raw_data=NULL,geo_level = 'municipality
 
   if (param$dataset == 'mapbiomas_grazing_quality'){
 
+    if (cover_level == 1){dat$cover_level = dat$level_1}
+
+
     dat = dat %>%
       tidyr::pivot_longer(
         cols = x2010:x2018,
@@ -190,13 +320,32 @@ load_mapbiomas = function(dataset = NULL,raw_data=NULL,geo_level = 'municipality
         values_to = 'value'
       )
 
+    if(param$language == "eng") {
+
     dat = dat %>%
       tidyr::pivot_wider(id_cols = c(biome,state,year),
-                         names_from = level_1,
+                         names_from = cover_level,
                          values_from = value,
                          values_fn = sum,
                          values_fill = NA) %>%
-      janitor::clean_names()
+      janitor::clean_names()}
+
+    if(param$language == "pt") {
+
+      dat = dat %>%
+      dplyr::rename(bioma = bioma,
+                    uf = state) %>%
+      tidyr::pivot_wider(id_cols = c(bioma,uf,year),
+                         names_from = cover_level,
+                         values_from = value,
+                         values_fn = sum,
+                         values_fill = NA) %>%
+        dplyr::rename(ano = year,
+                      ausente = absent,
+                      baixo = low,
+                      medio = medium,
+                      forte = strong)
+      janitor::clean_names()}
 
     ## Return Data
 
@@ -207,174 +356,6 @@ load_mapbiomas = function(dataset = NULL,raw_data=NULL,geo_level = 'municipality
 
   }
 
-  #################################
-  ## Data Engineering - Covering ##
-  #################################
-
-  ## Adjust State Names
-
-  ## State Level
-
-  # if (space_aggregation == "state" | space_aggregation == "estado") {
-  #   a <- read_excel(path = p1f, sheet = 3)
-  #   a <- a[!(substring(a$biome, 1, 4) != "Amaz"), ]
-  #   a$state[a$state == "Acre"] <- "AC"
-  #   a$state[substring(a$state, 1, 4) == "Amap"] <- "AP"
-  #   a$state[a$state == "Amazonas"] <- "AM"
-  #   a$state[a$state == "Tocantins"] <- "TO"
-  #   a$state[a$state == "Mato Grosso"] <- "MT"
-  #   a$state[substring(a$state, 1, 6) == "Maranh"] <- "MA"
-  #   a$state[substring(a$state, 1, 4) == "Rond"] <- "RO"
-  #   a$state[a$state == "Roraima"] <- "RR"
-  #   a$state[substring(a$state, 1, 3) == "Par"] <- "PA"
-  #   retorno <- data.frame()
-  #   tab <- a
-  #   if (!is.null(covering)) {
-  #     tab <- tab[!(substring(tab$level_1, 1, 1) != covering), ]
-  #   }
-  #   for (i in years) {
-  #     ret <- c()
-  #     ret <- tab[, 1:7]
-  #     ano <- as.character(i)
-  #     ret <- cbind(ret, tab[, ano])
-  #     colnames(ret)[which(colnames(ret) == ano)] <- "Area"
-  #     num <- nrow(tab[, ano])
-  #     data <- rep(c(i), num)
-  #     ret <- cbind(ret, data)
-  #     retorno <- rbind(retorno, ret)
-  #   }
-  # } else if (space_aggregation == "municipality" | space_aggregation == "municipio") {
-  #
-  #   ## Municipality Level
-  #
-  #   b <- read_excel(path = p1f, sheet = 3)
-  #   tipos <- c("RR", "RO", "AC", "AM", "MA", "TO", "PA", "AP", "MT")
-  #   `%notin%` <- Negate(`%in%`)
-  #   b <- b[!(b$state %notin% as.vector(tipos)), ]
-  #   retorno <- data.frame()
-  #   tab <- b
-  #   if (!is.null(covering)) {
-  #     tab <- tab[!(substring(tab$level_1, 1, 1) != covering), ]
-  #   }
-  #   for (i in years) {
-  #     ret <- c()
-  #     ret <- tab[, 1:8]
-  #     ano <- as.character(i)
-  #     ret <- cbind(ret, tab[, ano])
-  #     colnames(ret)[which(colnames(ret) == ano)] <- "Area"
-  #     num <- nrow(tab[, ano])
-  #     data <- rep(c(i), num)
-  #     ret <- cbind(ret, data)
-  #     retorno <- rbind(retorno, ret)
-  #   }
-  # }
-  # return(retorno)
-
-  #################################################
-  ## Data Engineering - Transition - State Level ##
-  #################################################
-
-  # a<-a[!(substring(a$biome,1,4)!="Amaz"),]
-  # a$state[a$state == "Acre"] <- "AC"
-  # a$state[substring(a$state,1,4) == "Amap"] <- "AP"
-  # a$state[a$state == "Amazonas"] <- "AM"
-  # a$state[a$state == "Tocantins"] <- "TO"
-  # a$state[a$state == "Mato Grosso"] <- "MT"
-  # a$state[substring(a$state,1,6) == "Maranh"] <- "MA"
-  # a$state[substring(a$state,1,4) == "Rond"] <- "RO"
-  # a$state[a$state == "Roraima"] <- "RR"
-  # a$state[substring(a$state,1,3) == "Par"] <- "PA"
-  # retorno<-data.frame()
-  # tab<-a
-  # ncolu<-ncol(a)
-  # if(is.null(transition_interval)){
-  #   for(i in 15:ncolu){
-  #     ret<-c()
-  #     ret<-tab[,1:14]
-  #     nomecol<-colnames(a)[i]
-  #     anoi<-substring(nomecol,1,4)
-  #     anof<-substring(nomecol,8,12)
-  #     anoi<-as.integer(anoi)
-  #     anof<-as.integer(anof)
-  #     if(anof-anoi!=0){
-  #       ret<-cbind(ret,tab[,i])
-  #       colnames(ret)[which(colnames(ret) == nomecol)] <- 'Area'
-  #       num<-nrow(tab[,i])
-  #       Period<-rep(c(nomecol),num)
-  #       ret<-cbind(ret,Period)
-  #       retorno<-rbind(retorno,ret)
-  #     }
-  #   }
-  # }else if(!is.null(transition_interval)){
-  #   for(i in 15:ncolu){
-  #     ret<-c()
-  #     ret<-tab[,1:14]
-  #     nomecol<-colnames(a)[i]
-  #     anoi<-substring(nomecol,1,4)
-  #     anof<-substring(nomecol,8,12)
-  #     anoi<-as.integer(anoi)
-  #     anof<-as.integer(anof)
-  #     if(anof-anoi==transition_interval){
-  #       ret<-cbind(ret,tab[,i])
-  #       colnames(ret)[which(colnames(ret) == nomecol)] <- 'Area'
-  #       num<-nrow(tab[,i])
-  #       data<-rep(c(nomecol),num)
-  #       ret<-cbind(ret,data)
-  #       retorno<-rbind(retorno,ret)
-  #     }
-  #   }
-  # }
-  #
-
-  ########################################################
-  ## Data Engineering - Transition - Municipality Level ##
-  ########################################################
-
-#   retorno<-data.frame()
-#   tab<-a
-#   ncolu<-ncol(a)
-#   ret<-c()
-#   ret<-tab[,1:15]
-#   if(is.null(transition_interval)){
-#     for(i in 16:ncolu){
-#       ret<-c()
-#       ret<-tab[,1:15]
-#       nomecol<-colnames(a)[i]
-#       anoi<-substring(nomecol,1,4)
-#       anof<-substring(nomecol,8,12)
-#       anoi<-as.integer(anoi)
-#       anof<-as.integer(anof)
-#       if(anof-anoi!=0){
-#         ret<-cbind(ret,tab[,i])
-#         colnames(ret)[which(colnames(ret) == nomecol)] <- 'Area'
-#         num<-nrow(tab[,i])
-#         data<-rep(c(nomecol),num)
-#         ret<-cbind(ret,data)
-#         retorno<-rbind(retorno,ret)
-#       }
-#     }
-#   }else if(!is.null(transition_interval)){
-#     for(i in 16:ncolu){
-#       ret<-c()
-#       ret<-tab[,1:15]
-#       nomecol<-colnames(a)[i]
-#       anoi<-substring(nomecol,1,4)
-#       anof<-substring(nomecol,8,12)
-#       anoi<-as.integer(anoi)
-#       anof<-as.integer(anof)
-#       if(anof-anoi==transition_interval){
-#         ret<-cbind(ret,tab[,i])
-#         colnames(ret)[which(colnames(ret) == nomecol)] <- 'Area'
-#         num<-nrow(tab[,i])
-#         data<-rep(c(nomecol),num)
-#         ret<-cbind(ret,data)
-#         retorno<-rbind(retorno,ret)
-#       }
-#     }
-#   }
-#   retorno<-ret
-# }
-# return(retorno)
 
   return(dat)
 
