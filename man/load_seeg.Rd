@@ -8,7 +8,7 @@
 load_seeg(dataset = NULL, raw_data, geo_level, language = "eng")
 }
 \arguments{
-\item{dataset}{A dataset name ("seeg", "seeg_farming", "seeg_industry", "seeg_energy", "seeg_land", "seeg_residuals", on which "seeg" contains all five sectors and the others are filtered specifically).}
+\item{dataset}{A dataset name ("seeg", seeg_farming", "seeg_industry", "seeg_energy", "seeg_land", "seeg_residuals"). On which "seeg" contains all five sectors (only works with raw_data = TRUE) and the others are filtered specifically by a main source of emission. See \url{https://seeg8-brasil-municipios-site.herokuapp.com/notas-metodologicas}}
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
@@ -24,9 +24,19 @@ Loads data of estimates of emission of greenhouse gases
 }
 \examples{
 \dontrun{
-# download industry state raw data
+# download state raw data
 seeg <- load_seeg(dataset = 'seeg',
                   raw_data = TRUE,
-                  geo_level = "state")
+                  geo_level = 'state')
+
+# download country energy treated data
+ seeg1 <- load_seeg(dataset = 'seeg_energy',
+                   raw_data = FALSE,
+                   geo_level = 'country')
+
+ # download land municipality treated data
+ seeg2 = load_seeg(dataset = 'seeg_land',
+                  raw_data = FALSE,
+                  geo_level = 'municipality')
 }
 }
