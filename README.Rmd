@@ -87,6 +87,8 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 
 **[8 - MAPBIOMAS data](#8---mapbiomas)**
 
+**[9 - CIPÓ data](#9---cipó)**
+
 ## The Structure of our functions
 
 **[1 - The Structure of the functions](#the-structure-of-the-functions)**
@@ -431,7 +433,7 @@ The periodicity of the survey is annual. The geographic coverage is national, wi
 There are five parameters in this function:
   
   1. dataset: There are five possible choices. 
-  # 'ppm_livetock_inventory'
+  # 'ppm_livestock_inventory'
   # 'ppm_sheep_farming'
   # 'ppm_animal_orig_production' 
   # 'ppm_cow_farming'
@@ -449,7 +451,7 @@ There are five parameters in this function:
     
   4. time_period:
   
-  # For ppm_livetock_inventory, ppm_sheep_farming, ppm_animal_orig_production and ppm_cow_farming: data is avaiable from 1974 to 2019.
+  # For ppm_livestock_inventory, ppm_sheep_farming, ppm_animal_orig_production and ppm_cow_farming: data is avaiable from 1974 to 2019.
   # For ppm_aquaculture: data is avaiable from 2013 to 2019 
   
   5. language: you can choose between portuguese and english
@@ -508,7 +510,7 @@ data <- load_ips(dataset = "ips", raw_data = FALSE,
 
 Loads data of estimates of emission of greenhouse gases of Brazilian cities and states.
 
-According to the "SEEG Brasil" website: all five sectors that are sources of emissions - Agriculture, Energy, Land Use Change, Industrial Processes and Waste with the same degree of detail contained in the emissions inventories are evaluated. The data provided in SEEG's Collection 8 is a series covering the period from 1970 to 2019, except for the Land Use Change Sector that has the series from 1990 to 2019.
+According to the "SEEG Brasil" website: all five sectors that are sources of emissions - Agriculture, Energy, Land Use Change, Industrial Processes and Waste with the same degree of detail contained in the emissions inventories are evaluated. The data provided in SEEG's Collection 9 is a series covering the period from 1970 to 2020, except for the Land Use Change Sector that has the series from 1990 to 2020.
 
 ```
 There are four parameters in this function:
@@ -670,8 +672,36 @@ The MAPBIOMAS project gathers data reporting the type of land covering each year
                 # cover_level = 2 has categories such as: Agriculture, Aquaculture, Beach and Dune, Forest Plantation,  Pasture, River, Lake and Ocean                                # cover_level = 3 has categories such as: Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
                 # cover_level = 4 has categories such as: Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
 ```
+## 9 - CIPÓ
 
-# PART 2:
+Loads Plataforma CIPÓ's mappings on the organizations involved in combatting environmental crimes. Each mapping consists on a listing of actors or agreements along with attributions and many descriptions.
+
+```
+There are two parameters in this function:
+  
+  1. dataset: There are three choices:
+  # "brazilian_actors": mapping of Brazilian actors involved in preventing environmental crimes.
+  # "international_cooperation": mapping of international agreements, treaties and conventions.
+  # "forest_governance": mapping of forest governance arrangements.
+
+  2. search: Filters the dataset to the rows containing the chosen search parameter.
+  
+```  
+ 
+```{r eval=FALSE}
+# download the spreacdsheet on Brazilian actors involved in fighting environmental crimes
+brazilian_actors <- load_cipo(dataset = "brazilian_actors")
+
+# searching only for entries containing IBAMA
+actors_ibama <- load_cipo(dataset = "brazilian_actors",
+                          search = "ibama")
+
+# entries containing IBAMA or FUNAI
+actors_ibama <- load_cipo(dataset = "brazilian_actors",
+                          search = "ibama|funai")
+```
+
+
 
 ## The Structure of the functions
 
@@ -799,7 +829,6 @@ sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- ano <- ano_codi
 
 #  }
 ```
-
 
 
 
