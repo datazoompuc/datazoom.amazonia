@@ -857,7 +857,7 @@ these datasets we renamed some columns.
 #   }
 ```
 
-**6. Load Dictionary:**example from *load_pam()*. For functions with
+**6. Load Dictionary:** example from *load_pam()*. For functions with
 data from IBGE, we load the dictionary and then we convert the variable
 “var_code” to become a character. Finally we exclude the observations
 where var_code == “0”.
@@ -870,7 +870,7 @@ where var_code == “0”.
 #  types = types[types != "0"] 
 ```
 
-**7. Translation / add variables:**example from *load_degrad()*.This
+**7. Translation / add variables:** example from *load_degrad()*.This
 section translates the names of the columns of the original Data
 Frame.In this example, the original columns (variables) were in English
 and therefore we translated it to Portuguese in case the user chooses
