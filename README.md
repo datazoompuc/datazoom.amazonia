@@ -20,10 +20,7 @@ activities in the Brazilian Amazon.The package provides functions that
 download and pre-process selected datasets. Our users should know that
 our functions pull data from databases from other institutions and
 therefore if one of these institutions decides to stop sharing their
-data with the public then there’s nothing we can do about it. The
-document below can be divided in two parts: (i) a description of the
-available datasets and (ii) a description about how the functions were
-constructed.
+data with the public then there’s nothing we can do about it.
 
 ``` r
 datazoom.amazonia::datasets_link()

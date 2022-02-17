@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 <!-- [![R build status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions) -->
 <!-- badges: end -->
 
-The goal of package datazoom.amazonia is to facilitate access to official data about agriculture, deforestation, production and other activities in the Brazilian Amazon.The package provides functions that download and pre-process selected datasets. Our users should know that our functions pull data from databases from other institutions and therefore if one of these institutions decides to stop sharing their data with the public then there's nothing we can do about it. The document below can be divided in two parts: (i) a description of the available datasets and (ii) a description about how the functions were constructed.
+The goal of package datazoom.amazonia is to facilitate access to official data about agriculture, deforestation, production and other activities in the Brazilian Amazon.The package provides functions that download and pre-process selected datasets. Our users should know that our functions pull data from databases from other institutions and therefore if one of these institutions decides to stop sharing their data with the public then there's nothing we can do about it. 
 
 ```{r, echo=FALSE, message=FALSE}
 devtools::load_all()
