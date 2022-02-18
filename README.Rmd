@@ -56,9 +56,10 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 ```
 Before installing our development version, it is required to install first this package:
 ``` r
-# devtools::install_github("ipeaGIT/geobr", subdir = "r-package").
+devtools::install_github("ipeaGIT/geobr", subdir = "r-package").
 ```
-After installing it, it will be able to download our development version package.
+After installing it, you will be able to download our development version package.
+
 ## Datasets
 **[1 - INPE data:](#1---inpe-data)** 
 

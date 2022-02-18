@@ -1,5 +1,5 @@
 
-<a href="https://github.com/datazoompuc/datazoom.amazonia"><img src="https://github.com/datazoompuc/datazoom.amazonia/blob/master/logo.png?raw=true" align="left" width="250" hspace="10" vspace="6"></a>
+<a href="https://github.com/datazoompuc/datazoom.amazonia"><img src="https://raw.githubusercontent.com/datazoompuc/datazoom.amazonia/master/logo.png?token=AU72KNQCGY4ZR6XLARTNSXLBXCPNG" align="left" width="100" hspace="10" vspace="6"></a>
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -62,6 +62,16 @@ And the development version from GitHub with:
 # install.packages("devtools")
 devtools::install_github("datazoompuc/datazoom.amazonia")
 ```
+
+Before installing our development version, it is required to install
+first this package:
+
+``` r
+devtools::install_github("ipeaGIT/geobr", subdir = "r-package").
+```
+
+After installing it, you will be able to download our development
+version package.
 
 ## Datasets
 
