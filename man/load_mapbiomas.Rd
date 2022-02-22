@@ -40,7 +40,7 @@ Loads information about land cover and use
 # download treated data from mapbiomas_grazing_quality
 treated_mapbiomas_grazing <- load_mapbiomas(dataset = "mapbiomas_grazing_quality",
                             raw_data = FALSE, geo_level = "municipality",
-                            time_period = "all", language = "eng")
+                            time_period = "all", language = "pt")
 }
 
 }
