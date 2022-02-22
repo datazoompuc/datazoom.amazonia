@@ -25,9 +25,9 @@ load_mapbiomas(
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported.}
 
-\item{time_id}{A \code {string} that indicates the time criteria for the data loaded. Can be "year" or "month". Defaults to year.}
+\item{time_id}{A \code{string} that indicates the time criteria for the data loaded. Can be "year" or "month". Defaults to year.}
 
-\item{cover_level}{A \code {numeric} that indicates the cover aggregation level. Can be "0", "1", "2", "3" or "4".}
+\item{cover_level}{A \code{numeric} that indicates the cover aggregation level. Can be "0", "1", "2", "3" or "4".}
 }
 \value{
 A \code{tibble} with the selected data.
@@ -40,7 +40,7 @@ Loads information about land cover and use
 # download treated data from mapbiomas_grazing_quality
 treated_mapbiomas_grazing <- load_mapbiomas(dataset = "mapbiomas_grazing_quality",
                             raw_data = FALSE, geo_level = "municipality",
-                            time_period = "all", language = "eng")
+                            time_period = "all", language = "pt")
 }
 
 }

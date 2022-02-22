@@ -7,8 +7,8 @@
 #' @param geo_level A \code{string} that defines the geographic level of the data. Can be only "municipality".
 #' @param time_period A \code{numeric} indicating what years will the data be loaded. Can be only "all".
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported.
-#' @param time_id A \code {string} that indicates the time criteria for the data loaded. Can be "year" or "month". Defaults to year.
-#' @param cover_level A \code {numeric} that indicates the cover aggregation level. Can be "0", "1", "2", "3" or "4".
+#' @param time_id A \code{string} that indicates the time criteria for the data loaded. Can be "year" or "month". Defaults to year.
+#' @param cover_level A \code{numeric} that indicates the cover aggregation level. Can be "0", "1", "2", "3" or "4".
 #' @return A \code{tibble} with the selected data.
 #'
 #' @examples
@@ -16,7 +16,7 @@
 #' # download treated data from mapbiomas_grazing_quality
 #' treated_mapbiomas_grazing <- load_mapbiomas(dataset = "mapbiomas_grazing_quality",
 #'                             raw_data = FALSE, geo_level = "municipality",
-#'                             time_period = "all", language = "eng")
+#'                             time_period = "all", language = "pt")
 #' }
 #'
 #' @importFrom magrittr %>%
