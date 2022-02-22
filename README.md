@@ -710,6 +710,27 @@ during given years.
                     # cover_level = 2 has categories such as: Agriculture, Aquaculture, Beach and Dune, Forest Plantation,  Pasture, River, Lake and Ocean                                # cover_level = 3 has categories such as: Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
                     # cover_level = 4 has categories such as: Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
 
+``` r
+# download treated Mapbiomas Cover data in english
+data = load_mapbiomas(dataset = "mapbiomas_cover", raw_data = FALSE, time_period = "all",
+                      language = "eng")
+
+# download treated Mapbiomas Transition data in portuguese
+data = load_mapbiomas(dataset = "mapbiomas_transition", raw_data = FALSE, time_period = "all",
+                      language = "pt")
+
+# download treated Mapbiomas Grazing Quality data in portuguese
+data = load_mapbiomas(dataset = "mapbiomas_grazing_quality", raw_data = FALSE, time_period = "all", language = "pt")
+
+# download treated Mapbiomas Irrigation data in english
+
+data = load_mapbiomas(dataset = "mapbiomas_irrigation", raw_data = FALSE, time_period = "all", language = "eng")
+
+# download treated Mapbiomas deforestauon/regeneration data in portuguese
+
+data = load_mapbiomas(dataset = "mapbiomas_deforestation_regeneration", raw_data = FALSE, time_period = "all", language = "eng")
+```
+
 ## 9 - CIPÓ
 
 Loads Plataforma CIPÓ’s mappings on the organizations involved in

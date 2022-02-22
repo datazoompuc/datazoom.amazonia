@@ -697,7 +697,7 @@ data = load_mapbiomas(dataset = "mapbiomas_irrigation", raw_data = FALSE, time_p
 
 # download treated Mapbiomas deforestauon/regeneration data in portuguese
 
-data = load_mapbiomas(dataset = "mapbiomas_deforestation_regeneration", raw_data = FALSE, time_period = 2011, language = "eng")
+data = load_mapbiomas(dataset = "mapbiomas_deforestation_regeneration", raw_data = FALSE, time_period = "all", language = "eng")
 
 ```
 
