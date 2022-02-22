@@ -861,6 +861,79 @@ sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- ano <- ano_codi
 
 
 
+# 8) MAPBIOMAS
+
+The MAPBIOMAS project gathers data reporting the type of land covering each year by area, that is, for example, the area used for a temporary crop of soybeans. It also reports the transition between coverings during given years.
+
+```
+1. dataset: There are five possible choices.
+'mapbiomas_cover': type of land covering by biomes, states and municipalities.
+                  data is available from 1985 to 2020.
+'mapbiomas_transition': transition between coverings by biomes, states and municipalities.
+                        data is available from 1985 to 2020.
+'mapbiomas_deforestation_regeneration': deforestation and regeneration by biomes and states. 
+                                        data is available from 1988 to 2020.
+'mapbiomas_irrigation': data about irrigation area by biomes and states.
+                        data is available from 2000 to 2020
+'mapbiomas_grazing_quality': data about grazing quality by biome, state and municipality
+                             data is available from 2010 and 2018
+2. raw_data: there are two options:
+  # TRUE: if you want the data as it is in the mapbiomas's site.
+  # FALSE: if you want the treated (more organized) version of the data. 
+3. geo_level: 'state', 'municipality', 'biomes'
+               Read the details on the datasets because some of them don't have data for 'municipality'
+4. time_period: The data availability for each dataset is detailed above
+5. language: you can choose between portuguese ('pt') and english ('eng')
+6. time_id: 'year'
+7. cover_level: Five options: 
+                # cover_level = 0 has categories such as: Anthropic, Natural, Not Applied 
+                # cover_level = 1 has categories such as: Forest, Non Forest Natural Formation, Farming, Non Vegetated Area, Water, Non Observed
+                # cover_level = 2 has categories such as: Agriculture, Aquaculture, Beach and Dune, Forest Plantation,  Pasture, River, Lake and Ocean                                # cover_level = 3 has categories such as: Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
+                # cover_level = 4 has categories such as: Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
+```
+
+```{r eval=FALSE}
+# download treated Mapbiomas Cover data in english
+data = load_mapbiomas(dataset = "mapbiomas_cover", raw_data = FALSE, time_period = "all",
+                      language = "eng")
+# download treated Mapbiomas Transition data in portuguese
+data = load_mapbiomas(dataset = "mapbiomas_transition", raw_data = FALSE, time_period = "all",
+                      language = "pt")
+# download treated Mapbiomas Grazing Quality data in portuguese
+data = load_mapbiomas(dataset = "mapbiomas_grazing_quality", raw_data = FALSE, time_period = "all", language = "pt")
+# download treated Mapbiomas Irrigation data in english
+data = load_mapbiomas(dataset = "mapbiomas_irrigation", raw_data = FALSE, time_period = "all", language = "eng")
+# download treated Mapbiomas deforestauon/regeneration data in portuguese
+data = load_mapbiomas(dataset = "mapbiomas_deforestation_regeneration", raw_data = FALSE, time_period = "all", language = "pt")
+```
+
+# 9) CIPÓ
+
+Loads Plataforma CIPÓ's mappings on the organizations involved in combatting environmental crimes. Each mapping consists on a listing of actors or agreements along with attributions and many descriptions.
+
+```
+There are two parameters in this function:
+  
+  1. dataset: There are three choices:
+  # "brazilian_actors": mapping of Brazilian actors involved in preventing environmental crimes.
+  # "international_cooperation": mapping of international agreements, treaties and conventions.
+  # "forest_governance": mapping of forest governance arrangements.
+  2. search: Filters the dataset to the rows containing the chosen search parameter.
+  
+```  
+ 
+```{r eval=FALSE}
+# download the spreacdsheet on Brazilian actors involved in fighting environmental crimes
+brazilian_actors <- load_cipo(dataset = "brazilian_actors")
+# searching only for entries containing IBAMA
+actors_ibama <- load_cipo(dataset = "brazilian_actors",
+                          search = "ibama")
+# entries containing IBAMA or FUNAI
+actors_ibama <- load_cipo(dataset = "brazilian_actors",
+                          search = "ibama|funai")
+```
+
+
 ## Credits
 
 DataZoom is developed by a team at Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio), Department of Economics. Our official website is at: <http://www.econ.puc-rio.br/datazoom/>.
