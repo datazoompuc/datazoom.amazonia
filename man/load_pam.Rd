@@ -27,9 +27,11 @@ Loads information on the  temporary and permanent crops of the Country that are 
 \examples{
 \dontrun{
 # download state raw data from 2012 for all crops
-pam_all_crops <- load_pam(dataset = 'pam_all_crops',
-                          raw_data = TRUE,
-                          geo_level = 'state',
-                          time_period = 2012)
+pam_all_crops <- load_pam(
+  dataset = "pam_all_crops",
+  raw_data = TRUE,
+  geo_level = "state",
+  time_period = 2012
+)
 }
 }
