@@ -18,12 +18,8 @@ load_climate <- function(dataset, raw_data = FALSE,
   param$raw_data <- raw_data
   param$geo_level <- geo_level
   param$language <- language
-  param$initial_time <- time_period[1]
-  param$final_time <- time_period[2]
-
-  if (is.na(param$final_time)) {
-    param$final_time <- param$initial_time
-  }
+  param$initial_time <- min(time_period)
+  param$final_time <- max(time_period)
 
   ## Coordinates of rectangle around the Legal Amazon
 
@@ -158,16 +154,28 @@ load_climate <- function(dataset, raw_data = FALSE,
 
   ## Return Raw Data
 
-  if(raw_data == TRUE) {return(dat)}
+  if (param$raw_data == TRUE) {return(dat)}
 
   ######################
   ## Data Engineering ##
   ######################
 
-  ## Brazilian municipalities to merge
+  ## Brazilian municipalities/states/country to merge
 
-  mun <- geobr::read_municipality() %>%
+  map <- geobr::read_municipality() %>%
     sf::st_make_valid()
+
+  ## Filtering for Legal Amazon
+
+  if (legal_amazon_only){
+    legal_amazon <- datazoom.amazonia::legal_amazon %>%
+      filter(AMZ_LEGAL == 1)
+
+    map <- map %>%
+      filter(code_muni %in% legal_amazon$CD_MUN)
+  }
+
+  ## Performing merge
 
   points <- points %>%
     sf::st_transform(crs = terra::crs(mun)) # merge requires matching
