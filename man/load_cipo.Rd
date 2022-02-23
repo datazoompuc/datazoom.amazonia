@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{load_cipo}
 \alias{load_cipo}
-\title{Title Plataforma CIPÓ - Mappings on environmental crimes}
+\title{Plataforma CIPÓ - Mappings on environmental crimes}
 \usage{
 load_cipo(dataset = "brazilian_actors", search = "")
 }
@@ -16,7 +16,7 @@ load_cipo(dataset = "brazilian_actors", search = "")
 A \code{tibble} of the chosen CIPÓ spreadsheet.
 }
 \description{
-Title Plataforma CIPÓ - Mappings on environmental crimes
+Plataforma CIPÓ - Mappings on environmental crimes
 }
 \examples{
 \dontrun{
@@ -24,11 +24,15 @@ Title Plataforma CIPÓ - Mappings on environmental crimes
 brazilian_actors <- load_cipo(dataset = "brazilian_actors")
 
 # searching only for entries containing IBAMA
-actors_ibama <- load_cipo(dataset = "brazilian_actors",
-                         search = "ibama")
+actors_ibama <- load_cipo(
+  dataset = "brazilian_actors",
+  search = "ibama"
+)
 
 # entries containing IBAMA or FUNAI
-actors_ibama <- load_cipo(dataset = "brazilian_actors",
-                         search = "ibama|funai")
+actors_ibama <- load_cipo(
+  dataset = "brazilian_actors",
+  search = "ibama|funai"
+)
 }
 }

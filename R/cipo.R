@@ -1,4 +1,4 @@
-#' Title Plataforma CIPÓ - Mappings on environmental crimes
+#' Plataforma CIPÓ - Mappings on environmental crimes
 #'
 #' @param dataset A dataset name ("brazilian_actors", "international_cooperation", "forest_governance")
 #' @param search A \code{string} that filters entries containing it.
