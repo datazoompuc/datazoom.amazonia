@@ -1,12 +1,29 @@
+#' TerraClimate
+#'
+#' @param dataset A dataset name
+#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
+#' @param time_period A \code{numeric} or \code{date} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
+#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
+#' @param legal_amazon_only A \code{boolean} setting the return of Legal Amazon Data (\code{TRUE}) or Country's Data (\code{FALSE}). Defaults to \code{FALSE}
+#'
+#' @examples
+#' \dontrun{
+#' load_climate()
+#' }
+#'
+#' @return A \code{tibble}
+#' @export
+
 load_climate <- function(dataset, raw_data = FALSE,
-                         geo_level = "municipality",
                          time_period,
                          language = "eng",
-                         legal_amazon_only = TRUE){
+                         legal_amazon_only = FALSE){
 
   ##############################
   ## Binding Global Variables ##
   ##############################
+
+  AMZ_LEGAL <- code_muni <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -16,7 +33,6 @@ load_climate <- function(dataset, raw_data = FALSE,
 
   param$dataset_name <- dataset
   param$raw_data <- raw_data
-  param$geo_level <- geo_level
   param$language <- language
   param$initial_time <- min(time_period)
   param$final_time <- max(time_period)
@@ -59,7 +75,7 @@ load_climate <- function(dataset, raw_data = FALSE,
   )
 
   param$dataset_code <- param$dataset_name %>%
-    recode(!!!dataset_names)
+    dplyr::recode(!!!dataset_names)
 
   # tmax - Maximum 2-m Temperature; air_temperature (degC)
   # tmin - Minimum 2-m Temperature; air_temperature (degC)
@@ -168,20 +184,20 @@ load_climate <- function(dataset, raw_data = FALSE,
   ## Filtering for Legal Amazon
 
   if (legal_amazon_only){
-    legal_amazon <- datazoom.amazonia::legal_amazon %>%
-      filter(AMZ_LEGAL == 1)
+    legal_amazon <- legal_amazon %>%
+      dplyr::filter(AMZ_LEGAL == 1)
 
     map <- map %>%
-      filter(code_muni %in% legal_amazon$CD_MUN)
+      dplyr::filter(code_muni %in% legal_amazon$CD_MUN)
   }
 
   ## Performing merge
 
   points <- points %>%
-    sf::st_transform(crs = terra::crs(mun)) # merge requires matching
+    sf::st_transform(crs = terra::crs(map)) # merge requires matching
                                             # coordinate systems
 
-  dat <- sf::st_join(mun, points)
+  dat <- sf::st_join(map, points)
 
   ## Converting to Tibble
 
@@ -190,7 +206,7 @@ load_climate <- function(dataset, raw_data = FALSE,
   ## Reshaping data
 
   dat <- dat %>%
-    pivot_longer(starts_with(param$dataset_code),
+    tidyr::pivot_longer(dplyr::starts_with(param$dataset_code),
                  names_prefix = paste0(param$dataset_code, "_"),
                  names_to = "date",
                  values_to = param$dataset_name)
@@ -198,8 +214,8 @@ load_climate <- function(dataset, raw_data = FALSE,
   ## Restoring correct dates
 
   dat <- dat %>%
-    mutate(
-      date = recode(date, !!!time)
+    dplyr::mutate(
+      date = dplyr::recode(date, !!!time)
     )
 
   ################################
@@ -208,7 +224,7 @@ load_climate <- function(dataset, raw_data = FALSE,
 
   if (param$language == "eng"){
     dat <- dat %>%
-      rename(
+      dplyr::rename(
         "municipality_code" = "code_muni",
         "municipality" = "name_muni",
         "state_code" = "code_state"
@@ -216,7 +232,7 @@ load_climate <- function(dataset, raw_data = FALSE,
   }
   if (param$language == "pt"){
     dat <- dat %>%
-      rename(
+      dplyr::rename(
         "cod_municipio" = "code_muni",
         "municipio" = "name_muni",
         "cod_uf" = "code_state"
