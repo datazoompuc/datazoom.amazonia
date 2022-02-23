@@ -18,6 +18,7 @@ knitr::opts_chunk$set(
 
 The Amazon Social Progress Index, an initiative from Imazon with support from 
 the Social Progress Imperative is an index that measures the social and environmental progress of its locations. Namely, the 772 municipalities in the Amazon region.
+For more information, check the [initiative's website](http://www.ipsamazonia.org.br/conheca-o-ips).
 
 
 ## Usage

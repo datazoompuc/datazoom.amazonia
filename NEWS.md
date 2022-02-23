@@ -44,6 +44,3 @@
 
 # datazoom.amazonia 0.13.0.9000
 * Added functions for SEEG data
-
-# datazoom.amazonia 0.14.0.9000
-* Added SEEG 2020 data

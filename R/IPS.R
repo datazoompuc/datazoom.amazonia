@@ -1,6 +1,6 @@
 #' @title IPS - Amazon Social Progress Index
 #'
-#' @description Loads information on the social and environmental performance of the Legal Amazon. Survey is done at the municipal level and data is available in 2014 and 2018.
+#' @description Loads information on the social and environmental performance of the Legal Amazon. Survey is done at the municipal level and data is available in 2014 and 2018. See \url{http://www.ipsamazonia.org.br/}
 #'
 #' @param dataset A dataset name ("ips")
 #' @param raw_data A \code{boolean} setting the return of raw or processed data

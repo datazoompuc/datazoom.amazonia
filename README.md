@@ -1,11 +1,11 @@
 
+<a href="https://github.com/datazoompuc/datazoom.amazonia"><img src="https://raw.githubusercontent.com/datazoompuc/datazoom.amazonia/master/logo.png?token=AU72KNQCGY4ZR6XLARTNSXLBXCPNG" align="left" width="100" hspace="10" vspace="6"></a>
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # datazoom.amazonia
 
 <!-- badges: start -->
-
-<img src= "man/figures/logo.png" align="left" width="130" hspace="10" vspace="6"/>
 
 [![CRAN
 version](https://www.r-pkg.org/badges/version/datazoom.amazonia?color=orange)](https://cran.r-project.org/package=datazoom.amazonia)
@@ -14,10 +14,13 @@ downloads](https://cranlogs.r-pkg.org/badges/datazoom.amazonia?color=blue)](http
 <!-- [![R build status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions) -->
 <!-- badges: end -->
 
-The goal of datazoom.amazonia is to facilitate access to official data
-regarding the Amazon. The package provides functions that download and
-pre-process selected datasets. The function below provides a brief
-description of the available datasets:
+The goal of package datazoom.amazonia is to facilitate access to
+official data about agriculture, deforestation, production and other
+activities in the Brazilian Amazon.The package provides functions that
+download and pre-process selected datasets. Our users should know that
+our functions pull data from databases from other institutions and
+therefore if one of these institutions decides to stop sharing their
+data with the public then there’s nothing we can do about it.
 
 ``` r
 datazoom.amazonia::datasets_link()
@@ -37,6 +40,13 @@ datazoom.amazonia::datasets_link()
 #> # ... with 24 more rows
 ```
 
+### Content:
+
+-   [Part 1 - Installation](#installation)
+-   [Part 2 - Datasets](#datasets)
+-   [Part 3 - The Structure of the
+    functions](#the-structure-of-our-functions)
+
 ## Installation
 
 You can install the released version of `datazoom.amazonia` from
@@ -53,9 +63,62 @@ And the development version from GitHub with:
 devtools::install_github("datazoompuc/datazoom.amazonia")
 ```
 
-# 1) INPE data:
+Before installing our development version, it is required to install
+first this package:
 
-## 1.1) PRODES:
+``` r
+devtools::install_github("ipeaGIT/geobr", subdir = "r-package").
+```
+
+After installing it, you will be able to download our development
+version package.
+
+## Datasets
+
+**[1 - INPE data:](#1---inpe-data)**
+
+-   [1.1 - PRODES](#prodes)
+
+-   [1.2 - DETER](#deter)
+
+-   [1.3 - DEGRAD](#degrad)
+
+**[2 - COMEX data](#2---comex-data)**
+
+**[3 - IBGE data:](#3---ibge-data)**
+
+-   [3.1 - PIB-Munic](#pib-munic)
+
+-   [3.2 - CEMPRE](#cempre)
+
+-   [3.3 - PAM](#pam)
+
+-   [3.4 - PEVS](#pevs)
+
+-   [3.5 - PPM](#ppm)
+
+**[4 - IPS data](#4---ips)**
+
+**[5 - SEEG data](#5---seeg)**
+
+**[6 - IBAMA data](#6---ibama)**
+
+**[7 - SIGMINE data](#7---sigmine)**
+
+**[8 - MAPBIOMAS data](#8---mapbiomas)**
+
+**[9 - CIPÓ data](#9---cipó)**
+
+## The Structure of our functions
+
+**[1 - The Structure of the
+functions](#the-structure-of-the-functions)**
+
+**[2 - Examples](#examples)**
+
+## 1 - INPE data
+
+### PRODES
 
 Loads information on clearcut deforestation in the Legal Amazon and
 annual deforestation rates in the region. Data is available from 2000 to
@@ -87,7 +150,7 @@ data <- load_prodes(dataset = "prodes",
                     language = 'pt')  
 ```
 
-## 1.2) DETER:
+### DETER:
 
 Loads information on change in forest cover in the Amazon.
 
@@ -115,7 +178,7 @@ deter_cer <- load_deter(dataset = 'deter_cerrado',
                         language = "pt")
 ```
 
-## 1.3) DEGRAD:
+### DEGRAD:
 
 Loads information on forest degradation in the Brazilian Amazon,
 replaced by DETER-B in December 2016. Data is available from 2007 to
@@ -146,7 +209,7 @@ data <- load_degrad(dataset = 'degrad',
                     language = 'pt')
 ```
 
-# 2) COMEX data:
+## 2 - COMEX data
 
 The Comex dataset gathers data extracted from Siscomex (Integrated
 System of Foreign Trade), which is a database containing information
@@ -192,9 +255,9 @@ data <- load_br_trade(dataset = "comex_import_mun",
                       time_period = 1997:2021)
 ```
 
-# 3) IBGE data:
+## 3 - IBGE data
 
-## 3.1) PIB-Munic:
+### PIB-Munic
 
 Loads information on gross domestic product at current prices, taxes,
 net of subsidies, on products at current prices and gross value added at
@@ -242,7 +305,7 @@ data <- load_pibmunic(dataset = 'pibmunic',
                       legal_amazon_only = TRUE)
 ```
 
-## 3.2) CEMPRE:
+### CEMPRE
 
 Loads information on companies and other organizations and their
 respective formally constituted local units, registered with the CNPJ -
@@ -289,7 +352,7 @@ data <- load_cempre(dataset = "cempre",
                     legal_amazon_only = TRUE) 
 ```
 
-## 3.3) PAM:
+### PAM
 
 Municipal Agricultural Production (PAM, in Portuguese) is a nationwide
 annual survey conducted by IBGE (Brazilian Institute of Geography and
@@ -350,7 +413,7 @@ data <- load_pam(dataset = 'pam_corn',
                  language = "pt")
 ```
 
-## 3.4) PEVS:
+### PEVS
 
 Loads information on the amount and value of the production of the
 exploitation of native plant resources and planted forest massifs, as
@@ -394,7 +457,7 @@ data <- load_pevs(dataset = 'pevs_forest_crops',
                   language = "eng")
 ```
 
-## 3.5) PPM:
+### PPM
 
 Downloads data from PPM (“Pesquisa da Pecuária Municipal”). This survey
 contains information of the livestock inventories (e.g:cattle, pigs and
@@ -409,7 +472,7 @@ Units, Mesoregions, Microregions and Municipalities.
     There are five parameters in this function:
       
       1. dataset: There are five possible choices. 
-      # 'ppm_livetock_inventory'
+      # 'ppm_livestock_inventory'
       # 'ppm_sheep_farming'
       # 'ppm_animal_orig_production' 
       # 'ppm_cow_farming'
@@ -427,7 +490,7 @@ Units, Mesoregions, Microregions and Municipalities.
         
       4. time_period:
       
-      # For ppm_livetock_inventory, ppm_sheep_farming, ppm_animal_orig_production and ppm_cow_farming: data is avaiable from 1974 to 2019.
+      # For ppm_livestock_inventory, ppm_sheep_farming, ppm_animal_orig_production and ppm_cow_farming: data is avaiable from 1974 to 2019.
       # For ppm_aquaculture: data is avaiable from 2013 to 2019 
       
       5. language: you can choose between portuguese and english
@@ -448,7 +511,7 @@ data <- load_ppm(dataset = 'ppm_sheep_farming',
                  language = "pt")
 ```
 
-# 4) IPS:
+## 4 - IPS
 
 Loads information on the social and environmental performance of the
 Legal Amazon. Survey is done at the municipal level and data is
@@ -476,15 +539,15 @@ data <- load_ips(dataset = "ips", raw_data = FALSE,
                  time_period = 2018, language = 'pt')
 ```
 
-# 5) SEEG:
+## 5 - SEEG
 
 Loads data of estimates of emission of greenhouse gases of Brazilian
 cities and states.
 
-According to the SEEG Brasil website: all five sectors that are
+According to the “SEEG Brasil” website: all five sectors that are
 sources of emissions - Agriculture, Energy, Land Use Change, Industrial
 Processes and Waste with the same degree of detail contained in the
-emissions inventories are evaluated. The data provided in SEEGs
+emissions inventories are evaluated. The data provided in SEEG’s
 Collection 9 is a series covering the period from 1970 to 2020, except
 for the Land Use Change Sector that has the series from 1990 to 2020.
 
@@ -538,7 +601,7 @@ data <- load_seeg(dataset = "seeg",
                   geo_level = "state")
 ```
 
-# 6) IBAMA:
+## 6 - IBAMA
 
 Downloads and compiles data on environmental fines at the municipality
 or state levels considering the Amazon region.
@@ -574,7 +637,7 @@ data <- load_ibama(dataset = "areas_embargadas", raw_data = TRUE,
                    legal_amazon_only = TRUE)
 ```
 
-# 7) SIGMINE:
+## 7 - SIGMINE
 
 Loads information the mines being explored legally in Brazil, including
 their location, status, product being mined and area in square meters
@@ -600,6 +663,262 @@ data <- load_sigmine(dataset = 'sigmine_active', raw_data = TRUE)
 data <- load_sigmine(dataset = 'sigmine_active', 
                      raw_data = FALSE,
                      language = "pt")
+```
+
+## 8 - MAPBIOMAS
+
+The MAPBIOMAS project gathers data reporting the type of land covering
+each year by area, that is, for example, the area used for a temporary
+crop of soybeans. It also reports the transition between coverings
+during given years.
+
+    1. dataset: There are five possible choices.
+
+    'mapbiomas_cover': type of land covering by biomes, states and municipalities.
+                      data is available from 1985 to 2020.
+
+    'mapbiomas_transition': transition between coverings by biomes, states and municipalities.
+                            data is available from 1985 to 2020.
+
+
+    'mapbiomas_deforestation_regeneration': deforestation and regeneration by biomes and states. 
+                                            data is available from 1988 to 2020.
+
+    'mapbiomas_irrigation': data about irrigation area by biomes and states.
+                            data is available from 2000 to 2020
+
+    'mapbiomas_grazing_quality': data about grazing quality by biome, state and municipality
+                                 data is available from 2010 and 2018
+
+
+    2. raw_data: there are two options:
+      # TRUE: if you want the data as it is in the mapbiomas's site.
+      # FALSE: if you want the treated (more organized) version of the data. 
+
+    3. geo_level: 'state', 'municipality', 'biomes'
+                   Read the details on the datasets because some of them don't have data for 'municipality'
+
+    4. time_period: The data availability for each dataset is detailed above
+
+    5. language: you can choose between portuguese ('pt') and english ('eng')
+
+    6. time_id: 'year'
+
+    7. cover_level: Five options: 
+                    # cover_level = 0 has categories such as: Anthropic, Natural, Not Applied 
+                    # cover_level = 1 has categories such as: Forest, Non Forest Natural Formation, Farming, Non Vegetated Area, Water, Non Observed
+                    # cover_level = 2 has categories such as: Agriculture, Aquaculture, Beach and Dune, Forest Plantation,  Pasture, River, Lake and Ocean                                # cover_level = 3 has categories such as: Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
+                    # cover_level = 4 has categories such as: Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
+
+``` r
+# download treated Mapbiomas Cover data in english
+data = load_mapbiomas(dataset = "mapbiomas_cover", raw_data = FALSE, time_period = "all",
+                      language = "eng")
+
+# download treated Mapbiomas Transition data in portuguese
+data = load_mapbiomas(dataset = "mapbiomas_transition", raw_data = FALSE, time_period = "all",
+                      language = "pt")
+
+# download treated Mapbiomas Grazing Quality data in portuguese
+data = load_mapbiomas(dataset = "mapbiomas_grazing_quality", raw_data = FALSE, time_period = "all", language = "pt")
+
+# download treated Mapbiomas Irrigation data in english
+
+data = load_mapbiomas(dataset = "mapbiomas_irrigation", raw_data = FALSE, time_period = "all", language = "eng")
+
+# download treated Mapbiomas deforestauon/regeneration data in portuguese
+
+data = load_mapbiomas(dataset = "mapbiomas_deforestation_regeneration", raw_data = FALSE, time_period = "all", language = "eng")
+```
+
+## 9 - CIPÓ
+
+Loads Plataforma CIPÓ’s mappings on the organizations involved in
+combatting environmental crimes. Each mapping consists on a listing of
+actors or agreements along with attributions and many descriptions.
+
+    There are two parameters in this function:
+      
+      1. dataset: There are three choices:
+      # "brazilian_actors": mapping of Brazilian actors involved in preventing environmental crimes.
+      # "international_cooperation": mapping of international agreements, treaties and conventions.
+      # "forest_governance": mapping of forest governance arrangements.
+
+      2. search: Filters the dataset to the rows containing the chosen search parameter.
+      
+
+``` r
+# download the spreacdsheet on Brazilian actors involved in fighting environmental crimes
+brazilian_actors <- load_cipo(dataset = "brazilian_actors")
+
+# searching only for entries containing IBAMA
+actors_ibama <- load_cipo(dataset = "brazilian_actors",
+                          search = "ibama")
+
+# entries containing IBAMA or FUNAI
+actors_ibama <- load_cipo(dataset = "brazilian_actors",
+                          search = "ibama|funai")
+```
+
+## The Structure of the functions
+
+**1. Bind Global Variables:** The goal is to ensure that all the
+variables in the function were initialized to some value. We also do
+this to avoid errors when we check the function.
+
+**2. Define Basic Parameters:** Create a list with all the parameters
+from the function. The list *param* will be an organized list with all
+the parameters of interest.
+
+**3. Download Data:** In the majority of our functions, we download data
+by using external_download(). However, when we download data from IBGE,
+we use a function called sidra_download(). Both of these functions can
+be found in the “download.R” file.
+
+**4. Data Engineering:** In this section of the code, we (i) exclude
+variables that we judge not to be relevant;(ii) sometimes we change the
+class of some variables; (iii) sometimes we change data to be organized
+in the long format or in the wide format depending on what we want; (iv)
+generally speaking, it’s in this part of the code that we make the most
+changes in the original Data Frame.
+
+**5. Harmonizing Variable Names:** Rename columns with better names.
+
+**6. Load Dictionary:** In the functions that work with IBGE’s data, we
+use the function “load_dictionary()”. This function creates an organized
+correspondence between the code of each product, its name, its unit of
+measure and other attributes.
+
+**7. Translation / add variables:** After having organized the Data
+Frame, we then translate it. In some functions, the translation will
+start in a section called “Labelling” and data from the “dictionary.R”
+file will be used. In other functions, you will see the names of the
+columns being translated first and then each line of the original Data
+Frame will be translated.
+
+**8. Return Data Frame:** In the structure of our functions, you will
+see **(raw_data == TRUE){return(dat)}** right after “Downloading Data”.
+All the changes explained in this document will only happen in case the
+user specifies **(raw_data == FALSE)**.
+
+## Examples
+
+**1. Bind Global Variables:** example from *load_cempre()*
+
+``` r
+sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- ano <- ano_codigo <- classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo <- geo_id <- id_code <- nivel_territorial <- nivel_territorial_codigo <- valor <- variavel <- unidade_de_medida <- unidade_de_medida_codigo <- NULL
+```
+
+**2. Define Basic Parameters:** example from *load_deter()*
+
+``` r
+# param=list()
+#  param$dataset = dataset
+#  param$time_period = time_period
+#  param$language = language
+#  param$raw_data = raw_data
+
+#  param$survey_name = datasets_link() %>%
+#    dplyr::filter(dataset == param$dataset) %>%
+#    dplyr::select(survey) %>%
+#    unlist()
+
+#  param$url = datasets_link() %>%
+#    dplyr::filter(dataset == param$dataset) %>%
+#    dplyr::select(link) %>%
+#    unlist()
+```
+
+**3. Download Data:** example from *load_degrad()*. It uses the
+*external_download()* function.
+
+``` r
+# dat = suppressWarnings(as.list(param$time_period) %>%
+#      purrr::map(
+#        function(t){external_download(dataset = param$dataset,
+#                                      source='degrad', year = t) %>%
+#            janitor::clean_names()
+#        }
+#      ))
+```
+
+**4. Data Engineering**: example from *load_pam()*. In this process, we
+decided to exclude some columns and convert the variable “valor” to
+become numeric. After that we excluded all the lines with **NA**.
+
+``` r
+# dat = dat %>%
+#           janitor::clean_names() %>%
+#           dplyr::mutate_all(function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")})# %>%
+          # dplyr::mutate_all(clean_custom)
+
+
+#   dat = dat %>%
+#     dplyr::select(-c(nivel_territorial_codigo,nivel_territorial,ano_codigo)) %>%
+#     dplyr::mutate(valor=as.numeric(valor))
+
+
+
+#   dat = dat %>%
+#     dplyr::filter(!is.na(valor))
+```
+
+**5. Harmonizing Variable Names:** example from *load_pam()*. We
+localize some datasets by using their numerical codes and within each of
+these datasets we renamed some columns.
+
+``` r
+# if (param$code == 5457){
+#     dat = dat %>%
+#       dplyr::rename(produto_das_lavouras_codigo = produto_das_lavouras_temporarias_e_permanentes_codigo,
+#                     produto_das_lavouras = produto_das_lavouras_temporarias_e_permanentes)
+#   }
+
+#   if (param$code == 1613){
+#     dat = dat %>%
+#       dplyr::rename(produto_das_lavouras_codigo = # produto_das_lavouras_permanentes_codigo,
+#                     produto_das_lavouras = produto_das_lavouras_permanentes)
+#   }
+
+
+#   if (param$code %in% c(839,1000,1001,1002,1612)){
+#     dat = dat %>%
+#       dplyr::rename(produto_das_lavouras_codigo = # produto_das_lavouras_temporarias_codigo,
+#                   produto_das_lavouras = produto_das_lavouras_temporarias)
+#   }
+```
+
+**6. Load Dictionary:** example from *load_pam()*. For functions with
+data from IBGE, we load the dictionary and then we convert the variable
+“var_code” to become a character. Finally we exclude the observations
+where var_code == “0”.
+
+``` r
+# dic = load_dictionary(param$dataset)
+
+#  types = as.character(dic$var_code)
+
+#  types = types[types != "0"] 
+```
+
+**7. Translation / add variables:** example from *load_degrad()*.This
+section translates the names of the columns of the original Data
+Frame.In this example, the original columns (variables) were in English
+and therefore we translated it to Portuguese in case the user chooses
+it.
+
+``` r
+# if (param$language == 'pt'){
+
+#    dat_mod = dat %>%
+#      dplyr::select(ano = year, linkcolumn, scene_id,
+#                    cod_uf = code_state, cod_municipio = code_muni,
+#                    classe = class_name, pathrow, area, data = view_date,
+#                    julday, geometry
+#      ) %>%
+#      dplyr::arrange(ano, cod_municipio, classe)
+
+#  }
 ```
 
 ## Credits
