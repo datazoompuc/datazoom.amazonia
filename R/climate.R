@@ -194,7 +194,7 @@ load_climate <- function(dataset, raw_data = FALSE,
   ## Performing merge
 
   points <- points %>%
-    sf::st_transform(crs = terra::crs(map)) # merge requires matching
+    sf::st_transform(crs = sf::st_crs(map)) # merge requires matching
                                             # coordinate systems
 
   dat <- sf::st_join(map, points)

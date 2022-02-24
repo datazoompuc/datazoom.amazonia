@@ -814,7 +814,32 @@ datasets_link = function(){
 
    # https://sidra.ibge.gov.br/pesquisa/censo-demografico/series-temporais/series-temporais/
 
+   ##########
+   ## CIPÓ ##
+   ##########
 
+   'CIPO', 'brazilian_actors', NA, NA, NA, 'https://plataformacipo.org/mapa-crimes-ambientais/',
+   'CIPO', 'international_cooperation', NA, NA, NA, 'https://plataformacipo.org/mapeamento-cooperacao-internacional/',
+   'CIPO', 'forest_governance', NA, NA, NA, 'https://plataformacipo.org/arranjos-globais-de-governanca-florestal/',
+
+   ##################
+   ## TerraClimate ##
+   ##################
+
+   'TerraClimate', 'max_temperature', NA, '1958-2020', 'Municipality', 'https://www.climatologylab.org/terraclimate.html',
+   'TerraClimate', 'min_temperature', NA, '1958-2020', 'Municipality', 'https://www.climatologylab.org/terraclimate.html',
+   'TerraClimate', 'wind_speed', NA, '1958-2020', 'Municipality', 'https://www.climatologylab.org/terraclimate.html',
+   'TerraClimate', 'vapor_pressure_deficit', NA, '1958-2020', 'Municipality', 'https://www.climatologylab.org/terraclimate.html',
+   'TerraClimate', 'vapor_pressure', NA, '1958-2020', 'Municipality', 'https://www.climatologylab.org/terraclimate.html',
+   'TerraClimate', 'snow_water_equivalent', NA, '1958-2020', 'Municipality', 'https://www.climatologylab.org/terraclimate.html',
+   'TerraClimate', 'shortwave_radiation_flux', NA, '1958-2020', 'Municipality', 'https://www.climatologylab.org/terraclimate.html',
+   'TerraClimate', 'soil_moisture', NA, '1958-2020', 'Municipality', 'https://www.climatologylab.org/terraclimate.html',
+   'TerraClimate', 'runoff', NA, '1958-2020', 'Municipality', 'https://www.climatologylab.org/terraclimate.html',
+   'TerraClimate', 'precipitation', NA, '1958-2020', 'Municipality', 'https://www.climatologylab.org/terraclimate.html',
+   'TerraClimate', 'potential_evaporation', NA, '1958-2020', 'Municipality', 'https://www.climatologylab.org/terraclimate.html',
+   'TerraClimate', 'climatic_water_deficit', NA, '1958-2020', 'Municipality', 'https://www.climatologylab.org/terraclimate.html',
+   'TerraClimate', 'water_evaporation', NA, '1958-2020', 'Municipality', 'https://www.climatologylab.org/terraclimate.html',
+   'TerraClimate', 'palmer_drought_severity_index', NA, '1958-2020', 'Municipality', 'https://www.climatologylab.org/terraclimate.html'
 
   )
 
