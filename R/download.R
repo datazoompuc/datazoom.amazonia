@@ -665,9 +665,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL, geo_le
       dataset <- XML::readHTMLTable(tableNode[[1]])
 
 
-      colnames(dataset) <- dataset[6, ]
+      colnames(dataset) <- dataset[5, ]
 
-      dat <- dataset[-c(1:6), ] %>%
+      dat <- dataset[-c(1:5), ] %>%
         janitor::clean_names() %>%
         tibble::as_tibble()
     }
