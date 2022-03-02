@@ -34,6 +34,8 @@ load_ibama <- function(dataset = "areas_embargadas",
   cpf_ou_cnpj <- cod_municipio <- ano <- mes <- NULL
   month <- year <- municipality_code <- n_infracoes <- n_ja_julgado <- NULL
   n_cpf_cnpj_unicos <- NULL
+  municipio_infracao <- uf_infracao <- uf <- NULL
+  municipio <- NM_MUN <- CD_MUN <- municipality <- NULL
 
   #############################
   ## Define Basic Parameters ##
