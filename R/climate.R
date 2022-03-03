@@ -168,10 +168,6 @@ load_climate <- function(dataset, raw_data = FALSE,
     terra::as.points() %>%
     sf::st_as_sf()
 
-  ## Return Raw Data
-
-  if (param$raw_data == TRUE) {return(dat)}
-
   ######################
   ## Data Engineering ##
   ######################
@@ -199,9 +195,13 @@ load_climate <- function(dataset, raw_data = FALSE,
 
   dat <- sf::st_join(map, points)
 
+  ## Return Raw Data
+
+  if (param$raw_data == TRUE) {return(dat)}
+
   ## Converting to Tibble
 
-  dat <- sf::st_drop_geometry(dat)
+  #dat <- sf::st_drop_geometry(dat)
 
   ## Reshaping data
 
@@ -218,32 +218,44 @@ load_climate <- function(dataset, raw_data = FALSE,
       date = dplyr::recode(date, !!!time)
     )
 
+  ######################
+  ## Aggregating Data ##
+  ######################
+
+  #dat <- dat %>%
+    #dplyr::group_by(code_muni, name_muni, code_state, date) %>%
+    #dplyr::summarise(across(param$dataset_name, ~ mean(., na.rm = TRUE)))
+
   ################################
   ## Harmonizing Variable Names ##
   ################################
 
   if (param$language == "eng"){
-    dat <- dat %>%
+    dat_mod <- dat %>%
       dplyr::rename(
         "municipality_code" = "code_muni",
         "municipality" = "name_muni",
-        "state_code" = "code_state"
+        "state" = "abbrev_state",
+        "state_code" = "code_state",
+        "geometry" = "geom"
     )
   }
   if (param$language == "pt"){
-    dat <- dat %>%
+    dat_mod <- dat %>%
       dplyr::rename(
         "cod_municipio" = "code_muni",
         "municipio" = "name_muni",
-        "cod_uf" = "code_state"
+        "uf" = "abbrev_state",
+        "cod_uf" = "code_state",
+        "geometry" = "geom"
       )
   }
 
-  ######################
-  ## Aggregating Data ##
-  ######################
+  ####################
+  ## Returning Data ##
+  ####################
 
-  dat
+  return(dat_mod)
 
 }
 
