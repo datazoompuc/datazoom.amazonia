@@ -44,6 +44,15 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
     param$geo_reg <- "City"
   }
 
+  # Determining data source for skipping
+
+  if (param$sidra_code %in% c(839, 1000:1002, 1612:1613, 5457)){
+    param$source <- "pam"
+  }
+  else{
+    param$source <- ""
+  }
+
   ##################################
   ## Get Geographical Information ##
   ##################################
@@ -99,16 +108,22 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
     ## Download at the UF Level ##
     ##############################
 
-    # To speed up the downloads, we may skip the UFs that always return errors.
-    # As of 31/01/2022, those are
-    skip_ufs <- c(
-      "15", "17", "21", "22",
-      "23", "24", "25", "26",
-      "29", "31", "35", "41",
-      "42", "43", "51", "52"
-    )
+    if (param$source == "pam"){
+      # PAM has consistent download errors
+      # To speed up the downloads, we may skip the UFs that always return errors.
+      # As of 31/01/2022, those are
+      skip_ufs <- c(
+        "15", "17", "21", "22",
+        "23", "24", "25", "26",
+        "29", "31", "35", "41",
+        "42", "43", "51", "52"
+      )
 
-    base::message(base::cat("Skipping State-level download for", length(skip_ufs), "error-prone States...\n"))
+      base::message(base::cat("Skipping State-level download for", length(skip_ufs), "error-prone States...\n"))
+    }
+    else{
+      skip_ufs <- ""
+    }
 
     uf_list <- geo %>%
       dplyr::select(code_state) %>%
@@ -167,11 +182,16 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
     ## Meso Region ##
     #################
 
-    # To speed up the downloads, we may skip the Meso Regions that always return errors.
-    # As of 31/01/2022, those are
-    skip_meso <- c("3112", "3110", "4301")
+    if (param$source == "pam"){
+      # To speed up the downloads, we may skip the Meso Regions that always return errors.
+      # As of 31/01/2022, those are
+      skip_meso <- c("3112", "3110", "4301")
 
-    base::message(base::cat("Skipping Mesoregion-level download for", length(skip_meso), "error-prone Mesoregions...\n"))
+      base::message(base::cat("Skipping Mesoregion-level download for", length(skip_meso), "error-prone Mesoregions...\n"))
+    }
+    else{
+      skip_meso <- ""
+    }
 
     if (length(missed_uf) > 0) {
       geo_meso <- geo %>%
