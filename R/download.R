@@ -44,15 +44,6 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
     param$geo_reg <- "City"
   }
 
-  # Determining data source for skipping
-
-  if (param$sidra_code %in% c(839, 1000:1002, 1612:1613, 5457)){
-    param$source <- "pam"
-  }
-  else{
-    param$source <- ""
-  }
-
   ##################################
   ## Get Geographical Information ##
   ##################################
@@ -108,26 +99,8 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
     ## Download at the UF Level ##
     ##############################
 
-    if (param$source == "pam"){
-      # PAM has consistent download errors
-      # To speed up the downloads, we may skip the UFs that always return errors.
-      # As of 31/01/2022, those are
-      skip_ufs <- c(
-        "15", "17", "21", "22",
-        "23", "24", "25", "26",
-        "29", "31", "35", "41",
-        "42", "43", "51", "52"
-      )
-
-      base::message(base::cat("Skipping State-level download for", length(skip_ufs), "error-prone States...\n"))
-    }
-    else{
-      skip_ufs <- ""
-    }
-
     uf_list <- geo %>%
       dplyr::select(code_state) %>%
-      dplyr::filter(!(code_state %in% as.numeric(skip_ufs))) %>%
       unlist() %>%
       unique() %>%
       as.list()
@@ -162,15 +135,12 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
 
     missed_uf <- dat_mod_uf[!unlist(lapply(dat_mod_uf, is.data.frame))] %>% names()
 
-    # Adding skipped UFs to the missed list
-    missed_uf <- c(missed_uf, skip_ufs)
-
     rm(dat_mod_uf)
 
     if (length(missed_uf) > 0) {
       base::message(base::cat(
-        "Download at the State Level Completed!", length(missed_uf), "failed or skipped.\n",
-        "Attempting to Download at the Mesoregion Level...\n"
+        "Download at the State Level Completed!", length(missed_uf), "failed.\n",
+        "Attempting to Download at the Mesoregion Level..."
       ))
     } else if (length(missed_uf) == 0) {
       base::message(base::cat("Download Succesfully Completed!"))
@@ -182,24 +152,12 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
     ## Meso Region ##
     #################
 
-    if (param$source == "pam"){
-      # To speed up the downloads, we may skip the Meso Regions that always return errors.
-      # As of 31/01/2022, those are
-      skip_meso <- c("3112", "3110", "4301")
-
-      base::message(base::cat("Skipping Mesoregion-level download for", length(skip_meso), "error-prone Mesoregions...\n"))
-    }
-    else{
-      skip_meso <- ""
-    }
-
     if (length(missed_uf) > 0) {
       geo_meso <- geo %>%
         dplyr::filter(code_state %in% missed_uf)
 
       meso_reg_list <- geo_meso %>%
         dplyr::select(code_meso) %>%
-        dplyr::filter(!(code_meso %in% as.numeric(skip_meso))) %>%
         unlist() %>%
         unique() %>%
         as.list()
@@ -237,14 +195,11 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
 
       missed_meso <- dat_mod_meso[!unlist(lapply(dat_mod_meso, is.data.frame))] %>% names()
 
-      # Adding skipped Mesos to the missed list
-      missed_meso <- c(missed_meso, skip_meso)
-
       rm(dat_mod_meso)
 
       if (length(missed_meso) > 0) {
         base::message(base::cat(
-          "Download at the Mesoregion Level Completed!", length(missed_meso), "failed or skipped.\n",
+          "Download at the Mesoregion Level Completed!", length(missed_meso), "failed.\n",
           "Attempting to Download at the Microregion Level...\n"
         ))
       } else if (length(missed_meso) == 0) {
