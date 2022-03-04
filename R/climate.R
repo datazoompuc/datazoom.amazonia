@@ -109,62 +109,25 @@ load_climate <- function(dataset, raw_data = FALSE,
   ## Downloading Data ##
   ######################
 
-  ncssPath="http://thredds.northwestknowledge.net:8080/thredds/ncss"
 
-  filename <- paste0(
-    "agg_terraclimate_",
-    param$dataset_code,
-    "_1958_CurrentYear_GLOBE.nc"
+  dat <- external_download(
+    source = "terraclimate",
+    dataset = param$dataset_name,
+    dataset_code = param$dataset_code,
+    coords = list("lat_min" = LAT_MIN,
+                  "lat_max" = LAT_MAX,
+                  "lon_min" = LON_MIN,
+                  "lon_max" = LON_MAX),
+    year = list("initial_time" = param$initial_time,
+                "final_time" = param$final_time)
   )
 
-  queryString <- paste0(
-    ncssPath,
-    "/",
-    filename,
-    "?",
-    "&var=",
-    param$dataset_code,
-
-    "&south=",
-    LAT_MIN,
-    "&north=",
-    LAT_MAX,
-    "&west=",
-    LON_MIN,
-    "&east=",
-    LON_MAX,
-    "&horizStride=1",
-
-    "&time_start=",
-    param$initial_time,
-    "&time_end=",
-    param$final_time,
-    "&timeStride=1",
-
-    "&disableProjSubset=on&addLatLon=true&accept=netcdf"
-  )
-
-  dir = tempdir()
-  temp = tempfile(fileext = ".nc", tmpdir = dir)
-
-  utils::download.file(
-    queryString,
-    destfile = temp,
-    method = "curl"
-  )
-
-  ##################
-  ## Reading Data ##
-  ##################
-
-  r <- terra::rast(temp)
-
-  time <- terra::time(r) %>%
+  time <- terra::time(dat) %>%
     as.Date()
 
   names(time) <- 1:length(time)
 
-  points <- r %>%
+  points <- dat %>%
     terra::as.points() %>%
     sf::st_as_sf()
 
