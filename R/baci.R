@@ -91,7 +91,7 @@ load_baci = function(dataset = 'HS92', raw_data, time_period,
                                                   exportador == 52 ~ "Barbados",
                                                   exportador == 56 ~ "Belgica",
                                                   exportador == 60 ~ "Belgica-Luxemburgo",
-                                                  exportador == 64 ~ "Butão",
+                                                  exportador == 64 ~ "Butao",
                                                   exportador == 68 ~ "Bolivia",
                                                   exportador == 70 ~ "Bosnia",
                                                   exportador == 72 ~ "Botsuana",
@@ -328,7 +328,7 @@ load_baci = function(dataset = 'HS92', raw_data, time_period,
                                                   importador == 52 ~ "Barbados",
                                                   importador == 56 ~ "Belgica",
                                                   importador == 60 ~ "Belgica-Luxemburgo",
-                                                  importador == 64 ~ "Butão",
+                                                  importador == 64 ~ "Butao",
                                                   importador == 68 ~ "Bolivia",
                                                   importador == 70 ~ "Bosnia",
                                                   importador == 72 ~ "Botsuana",
@@ -567,6 +567,20 @@ load_baci = function(dataset = 'HS92', raw_data, time_period,
     dat = dat %>%
       dplyr::rename(cod_produto = co_sh6,
                     nome_produto = no_sh6)
+
+
+    dat = dat %>%
+      dplyr::mutate(nome_produto = case_when(cod_produto == "080130" ~
+      "Nozes comestiveis: castanhas de caju, frescas ou secas, mesmo descascadas ou peladas",
+      cod_produto == "844350" ~ "Maquinas de impressao: do tipo NES na posicao 8443",
+      cod_produto == "854380" ~ "Maquinas e aparelhos eletricos: com funcao propria, NES na posicao 8543",
+      cod_produto == "847120" ~ "Maquinas para processamento de dados: automaticas digitais, contendo no mesmo involucro pelo menos uma unidade central de processamento e uma unidade de entrada e saida, combinadas ou nao",
+      cod_produto == "903081" ~ "Instrumentos e aparelhos: com dispositivo de gravacao, especialmente concebido para telecomunicacoes",
+      cod_produto == "560300" ~ "Falsos tecidos: mesmo impregnados, revestidos, recobertos ou estratificados",
+      cod_produto == "847193" ~ "Maquinas de processamento de dados: unidades de armazenamento, apresentadas ou nao com o resto de um sistema",
+      cod_produto == "852490" ~ "Midia gravadas: NES na posicao 8524 para fenomenos de gravacao de som ou similar, incluindo matrizes e mestres para a producao de registros",
+      cod_produto == "080110" ~ "Nozes comestiveis: cocos, frescos ou secos, mesmo descascados ou pelados",
+      cod_produto == "080710" ~ "Frutas comestiveis: meloes (incluindo melancias), frescos"))
 
   }
 
