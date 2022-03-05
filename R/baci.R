@@ -569,6 +569,9 @@ load_baci = function(dataset = 'HS92', raw_data, time_period,
                     nome_produto = no_sh6)
 
     dat = dat %>%
+      dplyr::mutate(valor = as.numeric(valor))
+
+    dat = dat %>%
       dplyr::mutate(nome_produto = dplyr::case_when(cod_produto == "080130" ~
       "Nozes comestiveis: castanhas de caju, frescas ou secas, mesmo descascadas ou peladas",
       cod_produto == "844350" ~ "Maquinas de impressao: do tipo NES na posicao 8443",
