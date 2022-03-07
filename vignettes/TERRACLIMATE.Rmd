@@ -1,0 +1,56 @@
+---
+title: "TerraClimate"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{TERRACLIMATE}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## The Dataset
+
+Spatial data on several climate variables, extracted from Climatology Lab's [TerraClimate](https://www.climatologylab.org/terraclimate.html). The table below shows all possible variables to be extracted, which are chosen through the "dataset" parameter. Data ranges from 1958 to 2020.
+
+| Dataset | Code | Description | Units |
+|:--------|:----:|:------------|:-----:|
+| max_temperature | tmax | Maximum 2-m Temperature | degC |
+| min_temperature | tmin | Minimum 2-m Temperature | degC |
+| wind_speed | ws   | Wind Speed at 10-m | m/s |
+| vapor_pressure_deficit | vpd  | Vapor Pressure Deficit | kPa |
+| vapor_pressure | vap | 2-m Vapor Pressure | kPa |
+| snow_water_equivalent | swe  | Snow Water Equivalent at End of Month | mm |
+| shortwave_radiation_flux | srad | Downward Shortwave Radiation Flux at the Surface | W/m^2 |
+| soil_moisture | soil | Soil Moisture at End of Month | mm
+| runoff | q    | Runoff | mm |
+| precipitation | ppt  | Accumulated Precipitation | mm |
+| potential_evaporation | pet  | Reference Evapotranspiration | mm |
+| climatic_water_deficit | def  | Climatic Water Deficit | mm |
+| water_evaporation | aet  | Actual Evapotranspiration | mm |
+| palmer_drought_severity_index | PDSI | Palmer Drought Severity Index | unitless |
+
+Netcdf files are downloaded from the [THREDDS](http://thredds.northwestknowledge.net:8080/thredds/terraclimate_catalog.html) web server, as recommended for rectangular subsets of the global data.
+
+## Usage
+
+Using the function is easy enough:
+
+```{r, eval=FALSE}
+library(datazoom.amazonia)
+
+# Downloading maximum temperature data from 2000 to 2020
+
+max_temp <- load_climate(dataset = "max_temperature", time_period = 2000:2020)
+
+# Downloading precipitation data only for the legal Amazon in 2010
+
+amz_precipitation <- load_climate(dataset = "precipitation",
+                                  time_period = 2010,
+                                  legal_amazon_only = TRUE)
+```
