@@ -777,7 +777,7 @@ datasets_link <- function() {
     # PRODES Completo - http://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/PDigital2000_2020_AMZ_raster_v20210521.zip
     # Nao Floresta - http://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/vector/cloud.zip
 
-    "PRODES-INPE", "prodes", NA, "2000-2021", NA, "http://www.dpi.inpe.br/prodesdigital",
+    "PRODES-INPE", "prodes", NA, "2000-2020", NA, "http://www.dpi.inpe.br/prodesdigital",
     # 'PRODES-INPE','prodes_accum_deforestation',NA,'1988-2007',NA,'http://terrabrasilis.dpi.inpe.br/download/dataset',
     # 'PRODES-INPE','prodes_forest',NA,'2016-2019',NA,'http://terrabrasilis.dpi.inpe.br/download/dataset',
     # 'PRODES-INPE','prodes_hydrography',NA,NA,NA,'http://terrabrasilis.dpi.inpe.br/download/dataset',
