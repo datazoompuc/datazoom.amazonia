@@ -41,14 +41,14 @@ Imports:
     readxl,
     XML,
     RCurl,
-    Hmisc,
-    googledrive,
-    terra
+    Hmisc
 URL: http://www.econ.puc-rio.br/datazoom/
 Suggests: 
     knitr,
     rmarkdown,
-    ggplot2
+    ggplot2,
+    googledrive,
+    terra
 VignetteBuilder: knitr
 Depends: 
     R (>= 4.0)

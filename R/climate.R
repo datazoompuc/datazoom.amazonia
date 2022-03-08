@@ -19,6 +19,15 @@ load_climate <- function(dataset, raw_data = FALSE,
                          language = "eng",
                          legal_amazon_only = FALSE){
 
+  # Checking for terra package (in Suggests)
+
+  if (!requireNamespace("terra", quietly = TRUE)) {
+    stop(
+      "Package \"terra\" must be installed to use this function.",
+      call. = FALSE
+    )
+  }
+
   ##############################
   ## Binding Global Variables ##
   ##############################
