@@ -74,10 +74,10 @@ load_ibama <- function(dataset = "areas_embargadas",
 
   ## Filter for Legal Amazon
   if (legal_amazon_only) {
-    legal_amazon_filtered <- legal_amazon %>% dplyr::filter(AMZ_LEGAL == 1)
+    legal_amazon_filtered <- municipalities %>% dplyr::filter(legal_amazon == 1)
 
     dat <- dat %>%
-      dplyr::filter(municipio_infracao %in% unique(legal_amazon_filtered$NM_MUN))
+      dplyr::filter(municipio_infracao %in% unique(legal_amazon_filtered$name_muni))
   }
 
 
@@ -112,9 +112,9 @@ load_ibama <- function(dataset = "areas_embargadas",
 
   ## Adding IBGE municipality codes
 
-  municipalities <- legal_amazon %>%
-    dplyr::select(municipio = NM_MUN,
-           cod_municipio = CD_MUN)
+  municipalities <- municipalities %>%
+    dplyr::select(municipio = name_muni,
+           cod_municipio = code_muni)
 
   dat <- dat %>%
     dplyr::left_join(municipalities, by = "municipio")

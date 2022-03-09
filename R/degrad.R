@@ -176,10 +176,10 @@ load_degrad <- function(dataset = 'degrad', raw_data,
   geo_br <- geobr::read_municipality(year = 2019, simplified = FALSE) # 2019 relates to the definition of legal_amazon
 
   # legal_amazon belongs to package's sysdata.rda and filters for municipalities in legal amazon
-  amazon_municipalities <- dplyr::filter(legal_amazon, .data$AMZ_LEGAL == 1)
+  amazon_municipalities <- dplyr::filter(municipalities, .data$legal_amazon == 1)
 
   # Filters geobr shapefiles to legal amazon municipalities
-  geo_amazon <- dplyr::filter(geo_br, .data$code_muni %in% amazon_municipalities$CD_MUN)
+  geo_amazon <- dplyr::filter(geo_br, .data$code_muni %in% amazon_municipalities$code_muni)
 
   ###################
   ## Harmonize CRS ##
