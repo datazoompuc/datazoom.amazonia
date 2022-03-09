@@ -35,6 +35,16 @@ load_degrad <- function(dataset = 'degrad', raw_data,
                         time_period,
                         language = 'eng') {
 
+  # Checking for geobr package (in Suggests)
+
+  if (!requireNamespace("geobr", quietly = TRUE)) {
+    stop(
+      "Package \"geobr\" must be installed to use this function.",
+      call. = FALSE
+    )
+  }
+
+
   # ,all_events = FALSE
 
   ## To-Do:
