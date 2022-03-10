@@ -46,8 +46,7 @@ URL: http://www.econ.puc-rio.br/datazoom/
 Suggests: 
     knitr,
     rmarkdown,
-    ggplot2,
-    geobr
+    ggplot2
 VignetteBuilder: knitr
 Depends: 
     R (>= 4.0)
