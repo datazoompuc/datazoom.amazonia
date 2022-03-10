@@ -41,13 +41,13 @@ Imports:
     XML,
     RCurl,
     Hmisc,
-    googledrive
+    googledrive,
+    geobr
 URL: http://www.econ.puc-rio.br/datazoom/
 Suggests: 
     knitr,
     rmarkdown,
-    ggplot2,
-    geobr
+    ggplot2
 Remotes:
     ipeaGIT/geobr
 VignetteBuilder: knitr
