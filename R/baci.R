@@ -583,7 +583,7 @@ load_baci = function(dataset = 'HS92', raw_data, time_period,
       cod_produto == "852490" ~ "Midia gravadas: NES na posicao 8524 para fenomenos de gravacao de som ou similar, incluindo matrizes e mestres para a producao de registros",
       cod_produto == "080110" ~ "Nozes comestiveis: cocos, frescos ou secos, mesmo descascados ou pelados",
       cod_produto == "080710" ~ "Frutas comestiveis: meloes (incluindo melancias), frescos",
-    TRUE ~ cod_produto))
+    TRUE ~ nome_produto))
 
   }
 
