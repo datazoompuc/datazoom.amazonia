@@ -35,7 +35,6 @@ Imports:
     stats,
     lubridate,
     stringi,
-    geobr,
     sf,
     utils,
     readxl,
@@ -47,7 +46,10 @@ URL: http://www.econ.puc-rio.br/datazoom/
 Suggests: 
     knitr,
     rmarkdown,
-    ggplot2
+    ggplot2,
+    geobr
+Remotes:
+    ipeaGIT/geobr/r-package
 VignetteBuilder: knitr
 Depends: 
     R (>= 4.0)

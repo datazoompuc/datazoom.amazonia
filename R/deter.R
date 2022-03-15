@@ -31,6 +31,16 @@
 load_deter <- function(dataset = NULL, raw_data,
                        language = 'eng') {
 
+  # Checking for geobr package (in Suggests)
+
+  if (!requireNamespace("geobr", quietly = TRUE)) {
+    stop(
+      "Package \"geobr\" must be installed to use this function.",
+      call. = FALSE
+    )
+  }
+
+
   ## Dataset can be either Amazonia or Cerrado
   # Default is all time-periods
 

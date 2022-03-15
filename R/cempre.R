@@ -33,7 +33,7 @@ load_cempre <- function(dataset = "cempre", raw_data,
                         legal_amazon_only = FALSE) {
 
 
-  sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- ano <- ano_codigo <- classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo <- geo_id <- id_code <- nivel_territorial <- nivel_territorial_codigo <- valor <- variavel <- unidade_de_medida <- unidade_de_medida_codigo <- NULL
+  sidra_code <- available_time <- legal_amazon <- municipio_codigo <- ano <- ano_codigo <- classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo <- geo_id <- id_code <- nivel_territorial <- nivel_territorial_codigo <- valor <- variavel <- unidade_de_medida <- unidade_de_medida_codigo <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -126,10 +126,10 @@ load_cempre <- function(dataset = "cempre", raw_data,
 
   ## Filter for Legal Amazon
   if (legal_amazon_only) {
-    legal_amazon_filtered <- legal_amazon %>% dplyr::filter(AMZ_LEGAL == 1)
+    legal_amazon_filtered <- municipalities %>% dplyr::filter(legal_amazon == 1)
 
     dat <- dat %>%
-      dplyr::filter(municipio_codigo %in% unique(legal_amazon_filtered$CD_MUN))
+      dplyr::filter(municipio_codigo %in% unique(legal_amazon_filtered$code_muni))
   }
 
 
