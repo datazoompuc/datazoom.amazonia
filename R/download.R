@@ -48,7 +48,8 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
   ## Get Geographical Information ##
   ##################################
 
-  geo <- municipalities
+  geo <- municipalities %>%
+    tidyr::drop_na() # 5 municipalities have no micro code
 
   # uf = list('RO' = 11,'AC' = 12,'AM' = 13,'RR' = 14,'PA' = 15,'AP' = 16,'TO' = 17,
   #           'MA' = 21,'PI' = 22,'CE' = 23,'RN' = 24,'PB' = 25,'PE' = 26,'AL' = 27,'SE' = 28,'BA' = 29,
