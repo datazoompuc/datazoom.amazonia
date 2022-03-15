@@ -30,6 +30,14 @@ municipalities <- municipalities %>%
     )
   )
 
+## Using lookup_muni to add micro and mesoregion codes
+
+look <- geobr::lookup_muni("all") %>%
+  select(-c(name_muni, code_state, name_state))
+
+municipalities <- municipalities %>%
+  full_join(look, by = "code_muni")
+
 ## Adding to sysdata
 
 usethis::use_data(
