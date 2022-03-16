@@ -439,7 +439,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL, geo_le
   #########
 
   if (source == "ips") {
-    path <- paste(param$url, "/assets/IPS_Tabela_Completa-8bb3b841e46c8fb17b0331d8ea92bef3.xlsx", sep = "")
+    path <- paste(param$url, "/assets/IPS_Tabela_Completa-1df30fcea79209e3c7e8634a586f95e6.xlsx", sep = "")
   }
 
   ###########
@@ -562,7 +562,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL, geo_le
         dat <- readxl::read_excel(temp, sheet = "IPS 2014")
       }
       if (param$year == 2018) {
-        dat <- readxl::read_excel(temp, sheet = 1)
+        dat <- readxl::read_excel(temp, sheet = "IPS 2018 ")
+      }
+      if(param$year == 2021){
+        dat <- readxl::read_excel(temp, sheet = "IPS 2021")
       }
     }
 
@@ -837,7 +840,7 @@ datasets_link <- function() {
 
     #  http://www.ipsamazonia.org.br/assets/IPS_Tabela_Completa-8bb3b841e46c8fb17b0331d8ea92bef3.xlsx
 
-    "IPS", "ips", NA, "2014 and/or 2018", NA, "http://www.ipsamazonia.org.br",
+    "IPS", "ips", NA, "2014 and/or 2018 and/or 2021", NA, "http://www.ipsamazonia.org.br",
 
     ###########
     ## IBAMA ##
