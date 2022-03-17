@@ -217,7 +217,7 @@ load_ips = function(dataset = "ips", raw_data,
         .data$`Codigo IBGE do municipio`, .data$Municipio,
         .data$Estado, .data$Ano, dplyr::everything()
       ) %>%
-      dplyr::filter(.data$`Codigo IBGE do municipio` %in% legal_amazon$CD_MUN)
+      dplyr::filter(.data$`Codigo IBGE do municipio` %in% municipalities$code_muni)
 
   } else {
 
@@ -230,7 +230,7 @@ load_ips = function(dataset = "ips", raw_data,
         .data$`Codigo IBGE do municipio`, .data$Municipio,
         .data$Estado, .data$Ano, dplyr::everything()
       ) %>%
-      dplyr::filter(.data$`Codigo IBGE do municipio` %in% legal_amazon$CD_MUN)
+      dplyr::filter(.data$`Codigo IBGE do municipio` %in% municipalities$code_muni)
   }
 
   if (language == "pt") {

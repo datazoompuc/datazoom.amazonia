@@ -48,7 +48,8 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
   ## Get Geographical Information ##
   ##################################
 
-  geo <- base::suppressMessages(geobr::lookup_muni("all"))
+  geo <- municipalities %>%
+    tidyr::drop_na() # 5 municipalities have no micro code
 
   # uf = list('RO' = 11,'AC' = 12,'AM' = 13,'RR' = 14,'PA' = 15,'AP' = 16,'TO' = 17,
   #           'MA' = 21,'PI' = 22,'CE' = 23,'RN' = 24,'PB' = 25,'PE' = 26,'AL' = 27,'SE' = 28,'BA' = 29,
@@ -743,13 +744,13 @@ datasets_link <- function() {
 
     # Agriculture
 
-    "PAM-IBGE", "pam_all_crops", 5457, "1974-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "pam_permanent_crops", 1613, "1974-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "pam_temporary_crops", 1612, "1974-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "pam_corn", 839, "2003-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "pam_potato", 1001, "2003-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "pam_peanut", 1000, "2003-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "pam_beans", 1002, "2003-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "pam_all_crops", 5457, "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "pam_permanent_crops", 1613, "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "pam_temporary_crops", 1612, "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "pam_corn", 839, "2003-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "pam_potato", 1001, "2003-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "pam_peanut", 1000, "2003-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "pam_beans", 1002, "2003-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
 
     #########
     ## PPM ##
@@ -757,11 +758,11 @@ datasets_link <- function() {
 
     # Livestock
 
-    "PPM-IBGE", "ppm_livestock_inventory", 3939, "1974-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019",
-    "PPM-IBGE", "ppm_sheep_farming", 95, "1974-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019",
-    "PPM-IBGE", "ppm_animal_origin_production", 74, "1974-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019",
-    "PPM-IBGE", "ppm_cow_farming", 94, "1974-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019",
-    "PPM-IBGE", "ppm_aquaculture", 3940, "2013-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019",
+    "PPM-IBGE", "ppm_livestock_inventory", 3939, "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019",
+    "PPM-IBGE", "ppm_sheep_farming", 95, "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019",
+    "PPM-IBGE", "ppm_animal_origin_production", 74, "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019",
+    "PPM-IBGE", "ppm_cow_farming", 94, "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019",
+    "PPM-IBGE", "ppm_aquaculture", 3940, "2013-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019",
 
     ##########
     ## PEVS ##
@@ -769,9 +770,9 @@ datasets_link <- function() {
 
     ## Vegetal Extraction
 
-    "PEVS-IBGE", "pevs_forest_crops", 289, "1986-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
-    "PEVS-IBGE", "pevs_silviculture", 291, "1986-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
-    "PEVS-IBGE", "pevs_silviculture_area", 5930, "2013-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
+    "PEVS-IBGE", "pevs_forest_crops", 289, "1986-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
+    "PEVS-IBGE", "pevs_silviculture", 291, "1986-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
+    "PEVS-IBGE", "pevs_silviculture_area", 5930, "2013-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
 
     ###########
     ## COMEX ##
@@ -909,7 +910,7 @@ datasets_link <- function() {
 
     ## Municipal GDP ##
 
-    "PIB_MUNIC-IBGE", "pibmunic", 5938, "2002-2018", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pib-munic/tabelas",
+    "PIB_MUNIC-IBGE", "pibmunic", 5938, "2002-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pib-munic/tabelas",
 
     ## Estimated Population ##
 
