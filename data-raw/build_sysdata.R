@@ -44,7 +44,10 @@ municipalities <- municipalities %>%
 
 usethis::use_data(
   municipalities,
-  geo_municipalities,
   internal = TRUE,
   overwrite = TRUE
 )
+
+## Writing shapefile to /data-raw/
+
+write_rds(geo_municipalities, "./data-raw/geo_municipalities.rds", compress = "bz2")

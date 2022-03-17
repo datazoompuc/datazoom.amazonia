@@ -46,10 +46,8 @@ URL: http://www.econ.puc-rio.br/datazoom/
 Suggests: 
     knitr,
     rmarkdown,
-    ggplot2,
-    geobr
-Remotes:
-    ipeaGIT/geobr/r-package
+    ggplot2
 VignetteBuilder: knitr
 Depends: 
     R (>= 4.0)
+LazyData: true
