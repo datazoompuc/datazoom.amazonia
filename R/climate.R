@@ -101,6 +101,9 @@ load_climate <- function(dataset, raw_data = FALSE,
   # aet - Actual Evapotranspiration; water_evaporation_amount (mm)
   # PDSI - Palmer Drought Severity Index; palmer_drought_severity_index (unitless)
 
+  if (param$dataset_name == param$dataset_code){
+    base::stop("Invalid dataset")
+  }
 
   #time range choices - 1958-01 to 2017-01
   param$initial_time <- ifelse(
@@ -146,8 +149,8 @@ load_climate <- function(dataset, raw_data = FALSE,
 
   ## Brazilian municipalities/states/country to merge
 
-  map <- geobr::read_municipality() %>%
-    sf::st_make_valid()
+  map <- external_download(dataset = "geo_municipalities",
+                           source = "internal")
 
   ## Filtering for Legal Amazon
 

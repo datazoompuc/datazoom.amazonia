@@ -532,6 +532,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   }
   if (source == "terraclimate"){
     file_extension <- ".nc"
+  }
   if (source == "internal"){
     file_extension <- ".rds"
   }
@@ -591,6 +592,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   }
   if (file_extension == ".nc"){
     dat <- terra::rast(temp)
+  }
   if (file_extension == ".rds"){
     dat <- readr::read_rds(temp)
   }

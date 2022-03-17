@@ -22,7 +22,7 @@ load_ppm(dataset = NULL, raw_data, geo_level, time_period, language = "eng")
 A \code{tibble} consisting of geographic units that present positive values for any of the variables in the dataset.
 }
 \description{
-Loads information on animal farming inventories and livestock products (IBGE). Survey is done at the municipal level and data is available from 1974 to 2019 for most datasets. See \url{https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/17353-municipal-livestock-production.html?=&t=o-que-e}
+Loads information on animal farming inventories and livestock products (IBGE). Survey is done at the municipal level and data is available from 1974 to 2020 for most datasets. See \url{https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/17353-municipal-livestock-production.html?=&t=o-que-e}
 }
 \examples{
 \dontrun{
