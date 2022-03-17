@@ -31,16 +31,6 @@
 load_deter <- function(dataset = NULL, raw_data,
                        language = 'eng') {
 
-  # Checking for geobr package (in Suggests)
-
-  if (!requireNamespace("geobr", quietly = TRUE)) {
-    stop(
-      "Package \"geobr\" must be installed to use this function.",
-      call. = FALSE
-    )
-  }
-
-
   ## Dataset can be either Amazonia or Cerrado
   # Default is all time-periods
 
@@ -112,12 +102,10 @@ load_deter <- function(dataset = NULL, raw_data,
   ######################
   ## Data Engineering ##
   ######################
-  # Downloading municipal map from geobr filtered to legl amazon municipalities
 
-  message("Downloading map data.")
-
-  # Downloading municipal map from geobr
-  geo_br <- geobr::read_municipality(year = 2019, simplified = FALSE)
+  # Loading municipal map data
+  geo_br <- external_download(dataset = "geo_municipalities",
+                              source = "internal")
 
   ###################
   ## Harmonize CRS ##

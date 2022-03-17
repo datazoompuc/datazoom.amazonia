@@ -452,6 +452,16 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL, geo_le
     }
   }
 
+  #####################
+  ## GeoBR Shapefile ##
+  #####################
+
+  if (source == "internal"){
+    if (dataset == "geo_municipalities"){
+      path <- param$url
+    }
+  }
+
 
   #######################
   ## Initiate Download ##
@@ -477,6 +487,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL, geo_le
   }
   if (source == "ibama") {
     file_extension <- ".zip"
+  }
+  if (source == "internal"){
+    file_extension <- ".rds"
   }
 
   # !!!  We should Change This to a Curl Process
@@ -527,6 +540,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL, geo_le
     dat <- readr::read_csv(temp, locale = readr::locale(encoding = "latin1")) %>%
       janitor::clean_names() %>%
       tibble::as_tibble()
+  }
+  if (file_extension == ".rds"){
+    dat <- readr::read_rds(temp)
   }
   if (file_extension == ".xlsx") {
     if (param$dataset == "mapbiomas_cover") {
@@ -869,6 +885,10 @@ datasets_link <- function() {
     ## Demographic Info ##
 
     # https://sidra.ibge.gov.br/pesquisa/censo-demografico/series-temporais/series-temporais/
+
+    ## Shapefile from github repository
+
+    "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds"
   )
 
   return(link)
