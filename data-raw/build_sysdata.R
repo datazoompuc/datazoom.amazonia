@@ -2,8 +2,10 @@ library(tidyverse)
 
 ## Importing all municipalities
 
-municipalities <- geobr::read_municipality(year = 2020,
-                                               simplified = FALSE) %>%
+geo_municipalities <- geobr::read_municipality(year = 2020,
+                                               simplified = T)
+
+municipalities <- geo_municipalities %>%
   sf::st_drop_geometry()
 
 ## Importing Legal Amazon municipalities
@@ -42,6 +44,7 @@ municipalities <- municipalities %>%
 
 usethis::use_data(
   municipalities,
+  geo_municipalities,
   internal = TRUE,
   overwrite = TRUE
 )
