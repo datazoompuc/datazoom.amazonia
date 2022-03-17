@@ -45,7 +45,6 @@ URL: http://www.econ.puc-rio.br/datazoom/
 Suggests: 
     knitr,
     rmarkdown,
-    ggplot2,
     googledrive,
     terra
 VignetteBuilder: knitr

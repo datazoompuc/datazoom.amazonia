@@ -495,6 +495,16 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     )
   }
 
+  #####################
+  ## GeoBR Shapefile ##
+  #####################
+
+  if (source == "internal"){
+    if (dataset == "geo_municipalities"){
+      path <- param$url
+    }
+  }
+
   #######################
   ## Initiate Download ##
   #######################
@@ -522,6 +532,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   }
   if (source == "terraclimate"){
     file_extension <- ".nc"
+  if (source == "internal"){
+    file_extension <- ".rds"
   }
 
   # !!!  We should Change This to a Curl Process
@@ -579,6 +591,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   }
   if (file_extension == ".nc"){
     dat <- terra::rast(temp)
+  if (file_extension == ".rds"){
+    dat <- readr::read_rds(temp)
   }
   if (file_extension == ".xlsx") {
     if (param$dataset == "mapbiomas_cover") {
@@ -949,7 +963,12 @@ datasets_link <- function() {
     'TerraClimate', 'potential_evaporation', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
     'TerraClimate', 'climatic_water_deficit', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
     'TerraClimate', 'water_evaporation', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'palmer_drought_severity_index', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss'
+    'TerraClimate', 'palmer_drought_severity_index', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
+
+    ## Shapefile from github repository
+
+    "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds"
+
   )
 
   return(link)

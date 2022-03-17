@@ -35,16 +35,6 @@ load_degrad <- function(dataset = 'degrad', raw_data,
                         time_period,
                         language = 'eng') {
 
-  # Checking for geobr package (in Suggests)
-
-  if (!requireNamespace("geobr", quietly = TRUE)) {
-    stop(
-      "Package \"geobr\" must be installed to use this function.",
-      call. = FALSE
-    )
-  }
-
-
   # ,all_events = FALSE
 
   ## To-Do:
@@ -178,12 +168,9 @@ load_degrad <- function(dataset = 'degrad', raw_data,
 
   ## Selecting Municipalities in the Legal Amazon
 
-  # Downloading municipal map from geobr filtered to legl amazon municipalities
-
-  message("Downloading map data.")
-
-  # Downloading municipal map from geobr
-  geo_br <- geobr::read_municipality(year = 2019, simplified = FALSE) # 2019 relates to the definition of legal_amazon
+  # Loading municipal map data
+  geo_br <- external_download(dataset = "geo_municipalities",
+                              source = "internal")
 
   # legal_amazon belongs to package's sysdata.rda and filters for municipalities in legal amazon
   amazon_municipalities <- dplyr::filter(municipalities, .data$legal_amazon == 1)

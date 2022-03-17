@@ -2,8 +2,10 @@ library(tidyverse)
 
 ## Importing all municipalities
 
-municipalities <- geobr::read_municipality(year = 2020,
-                                               simplified = FALSE) %>%
+geo_municipalities <- geobr::read_municipality(year = 2020,
+                                               simplified = T)
+
+municipalities <- geo_municipalities %>%
   sf::st_drop_geometry()
 
 ## Importing Legal Amazon municipalities
@@ -45,3 +47,7 @@ usethis::use_data(
   internal = TRUE,
   overwrite = TRUE
 )
+
+## Writing shapefile to /data-raw/
+
+write_rds(geo_municipalities, "./data-raw/geo_municipalities.rds", compress = "bz2")
