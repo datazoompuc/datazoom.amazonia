@@ -170,7 +170,7 @@ load_degrad <- function(dataset = 'degrad', raw_data,
 
   # Loading municipal map data
   geo_br <- external_download(dataset = "geo_municipalities",
-                              source = "geobr")
+                              source = "internal")
 
   # legal_amazon belongs to package's sysdata.rda and filters for municipalities in legal amazon
   amazon_municipalities <- dplyr::filter(municipalities, .data$legal_amazon == 1)

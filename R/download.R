@@ -456,7 +456,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL, geo_le
   ## GeoBR Shapefile ##
   #####################
 
-  if (source == "geobr"){
+  if (source == "internal"){
     if (dataset == "geo_municipalities"){
       path <- param$url
     }
@@ -488,7 +488,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL, geo_le
   if (source == "ibama") {
     file_extension <- ".zip"
   }
-  if (source == "geobr"){
+  if (source == "internal"){
     file_extension <- ".rds"
   }
 
@@ -888,7 +888,7 @@ datasets_link <- function() {
 
     ## Shapefile from github repository
 
-    "geobr", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds"
+    "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds"
   )
 
   return(link)

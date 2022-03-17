@@ -105,7 +105,7 @@ load_deter <- function(dataset = NULL, raw_data,
 
   # Loading municipal map data
   geo_br <- external_download(dataset = "geo_municipalities",
-                              source = "geobr")
+                              source = "internal")
 
   ###################
   ## Harmonize CRS ##
