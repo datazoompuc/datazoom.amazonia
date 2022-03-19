@@ -24,20 +24,20 @@ data with the public then there’s nothing we can do about it.
 
 ``` r
 datazoom.amazonia::datasets_link()
-#> # A tibble: 34 x 6
-#>    survey   dataset     sidra_code available_time available_geo    link         
-#>    <chr>    <chr>            <dbl> <chr>          <chr>            <chr>        
-#>  1 PAM-IBGE pam_all_cr~       5457 1974-2019      Country, State,~ https://sidr~
-#>  2 PAM-IBGE pam_perman~       1613 1974-2019      Country, State,~ https://sidr~
-#>  3 PAM-IBGE pam_tempor~       1612 1974-2019      Country, State,~ https://sidr~
-#>  4 PAM-IBGE pam_corn           839 2003-2019      Country, State,~ https://sidr~
-#>  5 PAM-IBGE pam_potato        1001 2003-2019      Country, State,~ https://sidr~
-#>  6 PAM-IBGE pam_peanut        1000 2003-2019      Country, State,~ https://sidr~
-#>  7 PAM-IBGE pam_beans         1002 2003-2019      Country, State,~ https://sidr~
-#>  8 PPM-IBGE ppm_livest~       3939 1974-2019      Country, State,~ https://sidr~
-#>  9 PPM-IBGE ppm_sheep_~         95 1974-2019      Country, State,~ https://sidr~
-#> 10 PPM-IBGE ppm_animal~         74 1974-2019      Country, State,~ https://sidr~
-#> # ... with 24 more rows
+#> # A tibble: 51 x 6
+#>    survey   dataset                sidra_code available_time available_geo link 
+#>    <chr>    <chr>                       <dbl> <chr>          <chr>         <chr>
+#>  1 PAM-IBGE pam_all_crops                5457 1974-2019      Country, Sta~ http~
+#>  2 PAM-IBGE pam_permanent_crops          1613 1974-2019      Country, Sta~ http~
+#>  3 PAM-IBGE pam_temporary_crops          1612 1974-2019      Country, Sta~ http~
+#>  4 PAM-IBGE pam_corn                      839 2003-2019      Country, Sta~ http~
+#>  5 PAM-IBGE pam_potato                   1001 2003-2019      Country, Sta~ http~
+#>  6 PAM-IBGE pam_peanut                   1000 2003-2019      Country, Sta~ http~
+#>  7 PAM-IBGE pam_beans                    1002 2003-2019      Country, Sta~ http~
+#>  8 PPM-IBGE ppm_livestock_invento~       3939 1974-2019      Country, Sta~ http~
+#>  9 PPM-IBGE ppm_sheep_farming              95 1974-2019      Country, Sta~ http~
+#> 10 PPM-IBGE ppm_animal_origin_pro~         74 1974-2019      Country, Sta~ http~
+#> # ... with 41 more rows
 ```
 
 ### Content:
@@ -108,6 +108,8 @@ version package.
 **[8 - MAPBIOMAS data](#8---mapbiomas)**
 
 **[9 - CIPÓ data](#9---cipó)**
+
+**[10 - TerraClimate data](#10---terraclimate)**
 
 ## The Structure of our functions
 
@@ -760,6 +762,58 @@ actors_ibama <- load_cipo(dataset = "brazilian_actors",
                           search = "ibama|funai")
 ```
 
+## 10 - TerraClimate
+
+Loads TerraClimate data by [Climatology
+Lab](https://www.climatologylab.org), on many avaliable climate
+variables. Data is avaliable from 1958 to 2020.
+
+    There are five parameters in this function:
+      
+      1. dataset: picks the variable to be read. Possible options are shown in the table below.
+
+      2. raw_data: there are two options:
+      # TRUE: if you want the data with fewer manipulations.
+      # FALSE: if you want the treated (more organized) version of the data. 
+      
+      3. time_period: avaliable from 1958 to 2020
+      
+      4. language: you can choose between portuguese ('pt') and english ('eng')
+      
+      5. legal_amazon_only: setting the return of Legal Amazon Data (legal_amazon_only = TRUE) or Country´s Data (legal_amazon_only = FALSE)
+      
+
+Possible dataset choices:
+
+| Dataset                          | Code | Description                                      |  Units   |
+|:---------------------------------|:----:|:-------------------------------------------------|:--------:|
+| max\_temperature                 | tmax | Maximum 2-m Temperature                          |   degC   |
+| min\_temperature                 | tmin | Minimum 2-m Temperature                          |   degC   |
+| wind\_speed                      |  ws  | Wind Speed at 10-m                               |   m/s    |
+| vapor\_pressure\_deficit         | vpd  | Vapor Pressure Deficit                           |   kPa    |
+| vapor\_pressure                  | vap  | 2-m Vapor Pressure                               |   kPa    |
+| snow\_water\_equivalent          | swe  | Snow Water Equivalent at End of Month            |    mm    |
+| shortwave\_radiation\_flux       | srad | Downward Shortwave Radiation Flux at the Surface |  W/m^2   |
+| soil\_moisture                   | soil | Soil Moisture at End of Month                    |    mm    |
+| runoff                           |  q   | Runoff                                           |    mm    |
+| precipitation                    | ppt  | Accumulated Precipitation                        |    mm    |
+| potential\_evaporation           | pet  | Reference Evapotranspiration                     |    mm    |
+| climatic\_water\_deficit         | def  | Climatic Water Deficit                           |    mm    |
+| water\_evaporation               | aet  | Actual Evapotranspiration                        |    mm    |
+| palmer\_drought\_severity\_index | PDSI | Palmer Drought Severity Index                    | unitless |
+
+``` r
+# Downloading maximum temperature data from 2000 to 2020
+
+max_temp <- load_climate(dataset = "max_temperature", time_period = 2000:2020)
+
+# Downloading precipitation data only for the legal Amazon in 2010
+
+amz_precipitation <- load_climate(dataset = "precipitation",
+                                  time_period = 2010,
+                                  legal_amazon_only = TRUE)
+```
+
 ## The Structure of the functions
 
 **1. Bind Global Variables:** The goal is to ensure that all the
@@ -771,8 +825,8 @@ from the function. The list *param* will be an organized list with all
 the parameters of interest.
 
 **3. Download Data:** In the majority of our functions, we download data
-by using external_download(). However, when we download data from IBGE,
-we use a function called sidra_download(). Both of these functions can
+by using external\_download(). However, when we download data from IBGE,
+we use a function called sidra\_download(). Both of these functions can
 be found in the “download.R” file.
 
 **4. Data Engineering:** In this section of the code, we (i) exclude
@@ -785,9 +839,9 @@ changes in the original Data Frame.
 **5. Harmonizing Variable Names:** Rename columns with better names.
 
 **6. Load Dictionary:** In the functions that work with IBGE’s data, we
-use the function “load_dictionary()”. This function creates an organized
-correspondence between the code of each product, its name, its unit of
-measure and other attributes.
+use the function “load\_dictionary()”. This function creates an
+organized correspondence between the code of each product, its name, its
+unit of measure and other attributes.
 
 **7. Translation / add variables:** After having organized the Data
 Frame, we then translate it. In some functions, the translation will
@@ -797,19 +851,19 @@ columns being translated first and then each line of the original Data
 Frame will be translated.
 
 **8. Return Data Frame:** In the structure of our functions, you will
-see **(raw_data == TRUE){return(dat)}** right after “Downloading Data”.
+see **(raw\_data == TRUE){return(dat)}** right after “Downloading Data”.
 All the changes explained in this document will only happen in case the
-user specifies **(raw_data == FALSE)**.
+user specifies **(raw\_data == FALSE)**.
 
 ## Examples
 
-**1. Bind Global Variables:** example from *load_cempre()*
+**1. Bind Global Variables:** example from *load\_cempre()*
 
 ``` r
 sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- ano <- ano_codigo <- classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo <- geo_id <- id_code <- nivel_territorial <- nivel_territorial_codigo <- valor <- variavel <- unidade_de_medida <- unidade_de_medida_codigo <- NULL
 ```
 
-**2. Define Basic Parameters:** example from *load_deter()*
+**2. Define Basic Parameters:** example from *load\_deter()*
 
 ``` r
 # param=list()
@@ -829,8 +883,8 @@ sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- ano <- ano_codi
 #    unlist()
 ```
 
-**3. Download Data:** example from *load_degrad()*. It uses the
-*external_download()* function.
+**3. Download Data:** example from *load\_degrad()*. It uses the
+*external\_download()* function.
 
 ``` r
 # dat = suppressWarnings(as.list(param$time_period) %>%
@@ -842,7 +896,7 @@ sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- ano <- ano_codi
 #      ))
 ```
 
-**4. Data Engineering**: example from *load_pam()*. In this process, we
+**4. Data Engineering**: example from *load\_pam()*. In this process, we
 decided to exclude some columns and convert the variable “valor” to
 become numeric. After that we excluded all the lines with **NA**.
 
@@ -863,7 +917,7 @@ become numeric. After that we excluded all the lines with **NA**.
 #     dplyr::filter(!is.na(valor))
 ```
 
-**5. Harmonizing Variable Names:** example from *load_pam()*. We
+**5. Harmonizing Variable Names:** example from *load\_pam()*. We
 localize some datasets by using their numerical codes and within each of
 these datasets we renamed some columns.
 
@@ -888,10 +942,10 @@ these datasets we renamed some columns.
 #   }
 ```
 
-**6. Load Dictionary:** example from *load_pam()*. For functions with
+**6. Load Dictionary:** example from *load\_pam()*. For functions with
 data from IBGE, we load the dictionary and then we convert the variable
-“var_code” to become a character. Finally we exclude the observations
-where var_code == “0”.
+“var\_code” to become a character. Finally we exclude the observations
+where var\_code == “0”.
 
 ``` r
 # dic = load_dictionary(param$dataset)
@@ -901,7 +955,7 @@ where var_code == “0”.
 #  types = types[types != "0"] 
 ```
 
-**7. Translation / add variables:** example from *load_degrad()*.This
+**7. Translation / add variables:** example from *load\_degrad()*.This
 section translates the names of the columns of the original Data
 Frame.In this example, the original columns (variables) were in English
 and therefore we translated it to Portuguese in case the user chooses

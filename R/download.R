@@ -275,7 +275,8 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
   } # End of If - Download at the Municipality Level
 }
 
-external_download <- function(dataset = NULL, source = NULL, year = NULL, geo_level = NULL) {
+external_download <- function(dataset = NULL, source = NULL, year = NULL,
+                              geo_level = NULL, coords = NULL, dataset_code = NULL) {
 
   ## Bind GLobal Variables
 
@@ -295,6 +296,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL, geo_le
   param$source <- source
   param$year <- year # This may not make sense if data is downloaded for all time periods together
   param$geo_level <- geo_level # This could also not make sense
+  param$coords <- coords
+  param$dataset_code <- dataset_code
 
   # if (param$geo_level == 'legal_amazon' & param$source == 'prodes'){param$geo_level = 'legal-amz-prodes'}
   # if (param$geo_level == 'amazon_biome' & param$source == 'prodes'){param$geo_level = 'amz-prodes'}
@@ -452,6 +455,46 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL, geo_le
     }
   }
 
+  ##################
+  ## TerraClimate ##
+  ##################
+
+  if (source == "terraclimate"){
+
+    filename <- paste0(
+      "agg_terraclimate_",
+      param$dataset_code,
+      "_1958_CurrentYear_GLOBE.nc"
+    )
+
+    path <- paste0(
+      param$url,
+      "/",
+      filename,
+      "?",
+      "&var=",
+      param$dataset_code,
+
+      "&south=",
+      param$coords$lat_min,
+      "&north=",
+      param$coords$lat_max,
+      "&west=",
+      param$coords$lon_min,
+      "&east=",
+      param$coords$lon_max,
+      "&horizStride=1",
+
+      "&time_start=",
+      param$year$initial_time,
+      "&time_end=",
+      param$year$final_time,
+      "&timeStride=1",
+
+      "&disableProjSubset=on&addLatLon=true&accept=netcdf"
+    )
+  }
+
   #####################
   ## GeoBR Shapefile ##
   #####################
@@ -461,7 +504,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL, geo_le
       path <- param$url
     }
   }
-
 
   #######################
   ## Initiate Download ##
@@ -488,6 +530,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL, geo_le
   if (source == "ibama") {
     file_extension <- ".zip"
   }
+  if (source == "terraclimate"){
+    file_extension <- ".nc"
+  }
   if (source == "internal"){
     file_extension <- ".rds"
   }
@@ -502,7 +547,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL, geo_le
   ## Extraction through Curl Requests
   ## Investigate a bit more on how Curl Requests work
 
-  if (!(source %in% c("deter", "seeg"))) {
+  if (!(source %in% c("deter", "seeg", "terraclimate"))) {
     utils::download.file(url = path, destfile = temp, mode = "wb")
   }
   if (source == "deter") {
@@ -517,6 +562,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL, geo_le
     if (geo_level == "municipality") {
       googledrive::drive_download(path, path = temp, overwrite = TRUE)
     }
+  }
+  if (source == "terraclimate"){
+    utils::download.file(url = path, destfile = temp, method = "curl"
+    )
   }
 
   ## This Data Opening Part Should Include the .Shp, not DBF
@@ -540,6 +589,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL, geo_le
     dat <- readr::read_csv(temp, locale = readr::locale(encoding = "latin1")) %>%
       janitor::clean_names() %>%
       tibble::as_tibble()
+  }
+  if (file_extension == ".nc"){
+    dat <- terra::rast(temp)
   }
   if (file_extension == ".rds"){
     dat <- readr::read_rds(temp)
@@ -676,7 +728,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL, geo_le
 
   # Folder is kept
 
-  unlink(temp)
+  if (file_extension != ".nc") {
+    unlink(temp)
+    }
 
   ####################
   ## Pre-Processing ##
@@ -886,9 +940,37 @@ datasets_link <- function() {
 
     # https://sidra.ibge.gov.br/pesquisa/censo-demografico/series-temporais/series-temporais/
 
+    ##########
+    ## CIPÓ ##
+    ##########
+
+    'CIPO', 'brazilian_actors', NA, NA, NA, 'https://plataformacipo.org/mapa-crimes-ambientais/',
+    'CIPO', 'international_cooperation', NA, NA, NA, 'https://plataformacipo.org/mapeamento-cooperacao-internacional/',
+    'CIPO', 'forest_governance', NA, NA, NA, 'https://plataformacipo.org/arranjos-globais-de-governanca-florestal/',
+
+    ##################
+    ## TerraClimate ##
+    ##################
+
+    'TerraClimate', 'max_temperature', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
+    'TerraClimate', 'min_temperature', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
+    'TerraClimate', 'wind_speed', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
+    'TerraClimate', 'vapor_pressure_deficit', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
+    'TerraClimate', 'vapor_pressure', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
+    'TerraClimate', 'snow_water_equivalent', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
+    'TerraClimate', 'shortwave_radiation_flux', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
+    'TerraClimate', 'soil_moisture', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
+    'TerraClimate', 'runoff', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
+    'TerraClimate', 'precipitation', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
+    'TerraClimate', 'potential_evaporation', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
+    'TerraClimate', 'climatic_water_deficit', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
+    'TerraClimate', 'water_evaporation', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
+    'TerraClimate', 'palmer_drought_severity_index', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
+
     ## Shapefile from github repository
 
     "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds"
+
   )
 
   return(link)
