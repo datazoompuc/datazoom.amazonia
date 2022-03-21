@@ -993,3 +993,14 @@ datasets_seeg <- function() {
   )
   return(link)
 }
+
+
+datasets_baci = function() {
+
+  link <- tibble::tribble(
+    ~survey, ~dataset, ~available_time, ~link,
+
+    "BACI", "HS92", "1995-2020", "http://www.cepii.fr/DATA_DOWNLOAD/baci/data",
+  )
+  return(link)
+}
