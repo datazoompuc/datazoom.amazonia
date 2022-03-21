@@ -95,7 +95,10 @@ After installing it, you will be able to download our development version packag
 
 **[9 - CIPÓ data](#9---cipó)**
 
-**[10 - BACI data](#9---baci)**
+**[10 - TerraClimate data](#10---terraclimate)**
+
+**[11 - BACI data](#11---baci)**
+>>>>>>> master
 
 ## The Structure of our functions
 
@@ -732,8 +735,58 @@ actors_ibama <- load_cipo(dataset = "brazilian_actors",
                           search = "ibama|funai")
 ```
 
+## 10 - TerraClimate
 
-## 10 - BACI
+Loads TerraClimate data by [Climatology Lab](https://www.climatologylab.org), on many avaliable climate variables. Data is avaliable from 1958 to 2020.
+
+```
+There are five parameters in this function:
+  
+  1. dataset: picks the variable to be read. Possible options are shown in the table below.
+
+  2. raw_data: there are two options:
+  # TRUE: if you want the data with fewer manipulations.
+  # FALSE: if you want the treated (more organized) version of the data. 
+  
+  3. time_period: avaliable from 1958 to 2020
+  
+  4. language: you can choose between portuguese ('pt') and english ('eng')
+  
+  5. legal_amazon_only: setting the return of Legal Amazon Data (legal_amazon_only = TRUE) or Country´s Data (legal_amazon_only = FALSE)
+  
+```  
+Possible dataset choices:
+
+| Dataset | Code | Description | Units |
+|:--------|:----:|:------------|:-----:|
+| max_temperature | tmax | Maximum 2-m Temperature | degC |
+| min_temperature | tmin | Minimum 2-m Temperature | degC |
+| wind_speed | ws   | Wind Speed at 10-m | m/s |
+| vapor_pressure_deficit | vpd  | Vapor Pressure Deficit | kPa |
+| vapor_pressure | vap | 2-m Vapor Pressure | kPa |
+| snow_water_equivalent | swe  | Snow Water Equivalent at End of Month | mm |
+| shortwave_radiation_flux | srad | Downward Shortwave Radiation Flux at the Surface | W/m^2 |
+| soil_moisture | soil | Soil Moisture at End of Month | mm
+| runoff | q    | Runoff | mm |
+| precipitation | ppt  | Accumulated Precipitation | mm |
+| potential_evaporation | pet  | Reference Evapotranspiration | mm |
+| climatic_water_deficit | def  | Climatic Water Deficit | mm |
+| water_evaporation | aet  | Actual Evapotranspiration | mm |
+| palmer_drought_severity_index | PDSI | Palmer Drought Severity Index | unitless |
+ 
+```{r eval=FALSE}
+# Downloading maximum temperature data from 2000 to 2020
+
+max_temp <- load_climate(dataset = "max_temperature", time_period = 2000:2020)
+
+# Downloading precipitation data only for the legal Amazon in 2010
+
+amz_precipitation <- load_climate(dataset = "precipitation",
+                                  time_period = 2010,
+                                  legal_amazon_only = TRUE)
+```
+
+## 11 - BACI
 
 Loads disaggregated data on bilateral trade flows for more than 5000 products and 200 countries. 
 
