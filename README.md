@@ -148,7 +148,6 @@ annual deforestation rates in the region. Data is available from 2000 to
 data <- load_prodes(dataset = "prodes", 
                     raw_data = TRUE,
                     time_period = 2000:2005) 
-
 # Download treated data (raw_data = FALSE) from 2010 (time_period = 2010) 
 # in portuguese (language = 'pt').
 data <- load_prodes(dataset = "prodes", 
@@ -177,7 +176,6 @@ Loads information on change in forest cover in the Amazon.
 # Download raw data (raw_data = TRUE) from Amazonia (dataset = "deter_amz")
 deter_amz <- load_deter(dataset = 'deter_amz',
                         raw_data = TRUE)
-
 # Download treated data (raw_data = FALSE) from Cerrado (dataset = "deter_cerrado")
 # in portuguese (language = 'pt')
 deter_cer <- load_deter(dataset = 'deter_cerrado',
@@ -194,13 +192,11 @@ replaced by DETER-B in December 2016. Data is available from 2007 to
     There are four parameters in this function:
       
       1. dataset = "degrad"
-
       2. raw_data: there are two options:
       # TRUE: if you want the raw data.
       # FALSE: if you want the processed version of the data. 
       
       3. time_period: data is available from 2007 to 2016
-
       4. language: you can choose between portuguese and english
 
 ``` r
@@ -208,7 +204,6 @@ replaced by DETER-B in December 2016. Data is available from 2007 to
 data <- load_degrad(dataset = 'degrad', 
                     raw_data = TRUE,
                     time_period = 2010:2012)
-
 # download treated data (raw_data = FALSE) related to forest degradation from 2013 (time_period = 2013) in portuguese (language = "pt").
 data <- load_degrad(dataset = 'degrad', 
                     raw_data = FALSE,
@@ -246,7 +241,6 @@ website
       # FALSE: if you want the processed version of the data. 
       
      3. time_period: available starting from the year 1989
-
      4. language: you can choose between portuguese and english
      
 
@@ -255,7 +249,6 @@ website
 data <- load_br_trade(dataset = "comex_export_mun", 
                       raw_data = FALSE, 
                       time_period = 1997:2021)
-
 # download treated(raw_data = FALSE) imports data by municipality (dataset = "comex_import_mun") from 1997 to 2021 (time_period = 1997:2021) 
 data <- load_br_trade(dataset = "comex_import_mun",
                       raw_data = FALSE, 
@@ -301,7 +294,6 @@ data <- load_pibmunic(dataset = 'pibmunic',
                       geo_level = 'state',
                       time_period = 2012,
                       legal_amazon_only = FALSE)
-
 # Download treated data (raw_data = FALSE) on gross domestic product 
 # (dataset = 'pibmunic') from the Legal Amazon (legal_amazon_only = TRUE) 
 # by municipality (geo_level = 'municipality') from 2012 (time_period = 2012).  
@@ -326,15 +318,12 @@ National Register of Legal Entities. Data is available from 2006 to
       2. raw_data: there are two options:
       # TRUE: if you want the raw data.
       # FALSE: if you want the processed version of the data.
-
       3. geo_level: "country", "state" or "municipality"
       
       4. time_period: data is available from 2006 to 2019
-
       5. language: you can choose between portuguese and english
      
       6. sectors: defines if the data will be return separated by sectors (sectors = TRUE) or not (sectors = FALSE)
-
       7. legal_amazon_only: setting the return of Legal Amazon Data (legal_amazon_only = TRUE) or Country´s Data (legal_amazon_only = FALSE)
       
 
@@ -347,7 +336,6 @@ data <- load_cempre(dataset = "cempre",
                     time_period = 2008:2010,
                     sectors = FALSE,
                     legal_amazon_only = FALSE) 
-
 # Download treted data (raw_data = FALSE) by state (geo_level = "state") from 2008 to 2010 (time_period = 2008:2010) in portuguese (language = "pt").. 
 # In this example, the user wanted to visualize data by sector (sectors = TRUE) and the user also wanted the data to be restricted to the Legal Amazon area (legal_amazon_only = TRUE).
 data <- load_cempre(dataset = "cempre", 
@@ -376,7 +364,6 @@ or if output exceeds one tonne.
     There are five parameters in this function:
       
       1. dataset: There are seven possible choices. 
-
       These datasets contain statistics such as quantity produced, area planted and harvested, average quantity of output and monetary value of such output. 
       
       # 'pam_all_crops': it selects data about agricultural products divided in permanent and temporary farmed land. 
@@ -386,17 +373,14 @@ or if output exceeds one tonne.
       # 'pam_potato': it selects the data from the first, the second and the third harvests of potato.
       # 'pam_peanut': it selects the data from the first and the second harvests of peanut.
       # 'pam_beans':  it selects the data from the first, the second and the third harvests of bean.
-
       2. raw_data: there are two options:
       # TRUE: if you want the data as it is in the IBGE's site.
       # FALSE: if you want the treated (more organized) version of the data. 
-
       3. geo_level: there are four options:
       # "country"
       # "region"
       # "state" 
       # "municipality"
-
       4. time_period:
       # For pam_all_crops, pam_permanent_crops and pam_temporary_crops, data is available from 1974 to 2019.
       # For pam_corn, pam_potato, pam_peanut and pam_beans, data is avaiable from 2003 to 2019.
@@ -411,7 +395,6 @@ data <- load_pam(dataset = 'pam_all_crops',
                  geo_level = "state", 
                  time_period = 1980:1990, 
                  language = "eng")
-
 # Download raw data (raw_data = TRUE) related to the corn production (dataset = 'pam_corn') by municipality (geo_level = "municipality") from 2010 to 2012 (time_period = 2010:2012) in portuguese (language = "pt").
 data <- load_pam(dataset = 'pam_corn', 
                  raw_data = TRUE, 
@@ -445,7 +428,6 @@ done at the municipal level and data is available from 1986 to 2019.
       # "municipality"
       
       4. time_period: data goes from 1986 to 2019, except for the pevs_silviculture_area dataset where data is available from 2013 to 2019.
-
       5. language: you can choose between portuguese and english
 
 ``` r
@@ -455,7 +437,6 @@ data <- load_pevs(dataset = 'pevs_silviculture',
                   geo_level = 'state', 
                   time_period = 2012, 
                   language = "pt")
-
 # Download raw (raw_data = TRUE) forest crops data (dataset = 'pevs_forest_crops') by municipality (geo_level = 'municipality') from 2012 to 2013 (time_period = 2012:2013) in english (language = "eng")
 data <- load_pevs(dataset = 'pevs_forest_crops', 
                   raw_data = TRUE, 
@@ -484,11 +465,9 @@ Units, Mesoregions, Microregions and Municipalities.
       # 'ppm_animal_orig_production' 
       # 'ppm_cow_farming'
       # 'ppm_aquaculture' 
-
       2. raw_data: there are two options:
       # TRUE: if you want the data as it is in the IBGE's site.
       # FALSE: if you want the treated (more organized) version of the data. 
-
       3. geo_level: there are four options:
       # "country"
       # "region"
@@ -509,7 +488,6 @@ data <- load_ppm(dataset = 'ppm_aquaculture',
                  geo_level = "country", 
                  time_period = 2013:2015, 
                  language = "eng")
-
 # Download raw data (raw_data = TRUE) about sheep farming (dataset = 'ppm_sheep_farming') by state (geo_level = "state") from 1980 to 1995 (time_period = 1980:1995) in portuguese (language = "pt")
 data <- load_ppm(dataset = 'ppm_sheep_farming', 
                  raw_data = TRUE, 
@@ -527,19 +505,16 @@ available in 2014 and 2018.
     There are four parameters in this function:
       
       1. dataset = "ips"
-
       2. raw_data: there are two options:
       # TRUE: if you want the raw data.
       # FALSE: if you want the processed version of the data. 
       
       3. time_period: data is available in 2014 and 2018.
-
       4. language: you can choose between portuguese and english
 
 ``` r
 # Download raw data (raw_data = TRUE) from 2014 (time_period = 2014)
 data <- load_ips(dataset = "ips", raw_data = TRUE, time_period = 2014)
-
 # Download treated data (raw_data = FALSE) from 2018 
 # (time_period = 2018) in portuguese (language = 'pt')
 data <- load_ips(dataset = "ips", raw_data = FALSE,
@@ -585,23 +560,18 @@ data <- load_seeg(dataset = "seeg",
                   raw_data = TRUE,
                   geo_level = "municipality")
   
-
 # Download treated data (raw_data = FALSE) of industry greenhouse gases (dataset = "seeg_industry") by state (geo_level = "state")
 data <- load_seeg(dataset = "seeg_industry", 
                   raw_data = FALSE,
                   geo_level = "state")
-
-
 # Download treated data (raw_data = FALSE) of energy greenhouse gases (dataset = "seeg_energy") by state (geo_level = "state")
 data <- load_seeg(dataset = "seeg_energy", 
                   raw_data = FALSE,
                   geo_level = "state")
-
 # Download treated data (raw_data = FALSE) of land greenhouse gases (dataset = "seeg_land") by country (geo_level = "country")
 data <- load_seeg(dataset = "seeg_land", 
                   raw_data = FALSE,
                   geo_level = "country")
-
 # Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg") by state (geo_level = "state")
 data <- load_seeg(dataset = "seeg", 
                   raw_data = TRUE,
@@ -619,7 +589,6 @@ of infractions, infractions that already went to trial, and number of
 unique perpetrators of infractions.
 
     There are five parameters in this function:
-
       1. dataset = "areas_embargadas"
       
       2. raw_data: there are two options:
@@ -637,7 +606,6 @@ unique perpetrators of infractions.
 # (legal_amazon_only = FALSE) in english (language = "eng")
 data <- load_ibama(dataset = "areas_embargadas", raw_data = FALSE, 
                    language = "eng", legal_amazon_only = FALSE)
-
 # Download raw data (raw_data = TRUE) from Legal Amazon region 
 # (legal_amazon_only = TRUE)
 data <- load_ibama(dataset = "areas_embargadas", raw_data = TRUE, 
@@ -654,18 +622,15 @@ Agency (ANM) is responsible for this survey.
     There are three parameters in this function:
       
       1. dataset = 'sigmine_active'
-
       2. raw_data: there are two options:
       # TRUE: if you want the raw data.
       # FALSE: if you want the processed data. 
-
       3. language: you can choose between portuguese and english
       
 
 ``` r
 # Download raw data (raw_data = TRUE).
 data <- load_sigmine(dataset = 'sigmine_active', raw_data = TRUE)
-
 # Download treated data (raw_data = FALSE) in portuguese (language = "pt").
 data <- load_sigmine(dataset = 'sigmine_active', 
                      raw_data = FALSE,
@@ -680,37 +645,24 @@ crop of soybeans. It also reports the transition between coverings
 during given years.
 
     1. dataset: There are five possible choices.
-
     'mapbiomas_cover': type of land covering by biomes, states and municipalities.
                       data is available from 1985 to 2020.
-
     'mapbiomas_transition': transition between coverings by biomes, states and municipalities.
                             data is available from 1985 to 2020.
-
-
     'mapbiomas_deforestation_regeneration': deforestation and regeneration by biomes and states. 
                                             data is available from 1988 to 2020.
-
     'mapbiomas_irrigation': data about irrigation area by biomes and states.
                             data is available from 2000 to 2020
-
     'mapbiomas_grazing_quality': data about grazing quality by biome, state and municipality
                                  data is available from 2010 and 2018
-
-
     2. raw_data: there are two options:
       # TRUE: if you want the data as it is in the mapbiomas's site.
       # FALSE: if you want the treated (more organized) version of the data. 
-
     3. geo_level: 'state', 'municipality', 'biomes'
                    Read the details on the datasets because some of them don't have data for 'municipality'
-
     4. time_period: The data availability for each dataset is detailed above
-
     5. language: you can choose between portuguese ('pt') and english ('eng')
-
     6. time_id: 'year'
-
     7. cover_level: Five options: 
                     # cover_level = 0 has categories such as: Anthropic, Natural, Not Applied 
                     # cover_level = 1 has categories such as: Forest, Non Forest Natural Formation, Farming, Non Vegetated Area, Water, Non Observed
@@ -721,20 +673,14 @@ during given years.
 # download treated Mapbiomas Cover data in english
 data = load_mapbiomas(dataset = "mapbiomas_cover", raw_data = FALSE, time_period = "all",
                       language = "eng")
-
 # download treated Mapbiomas Transition data in portuguese
 data = load_mapbiomas(dataset = "mapbiomas_transition", raw_data = FALSE, time_period = "all",
                       language = "pt")
-
 # download treated Mapbiomas Grazing Quality data in portuguese
 data = load_mapbiomas(dataset = "mapbiomas_grazing_quality", raw_data = FALSE, time_period = "all", language = "pt")
-
 # download treated Mapbiomas Irrigation data in english
-
 data = load_mapbiomas(dataset = "mapbiomas_irrigation", raw_data = FALSE, time_period = "all", language = "eng")
-
 # download treated Mapbiomas deforestauon/regeneration data in portuguese
-
 data = load_mapbiomas(dataset = "mapbiomas_deforestation_regeneration", raw_data = FALSE, time_period = "all", language = "eng")
 ```
 
@@ -750,18 +696,15 @@ actors or agreements along with attributions and many descriptions.
       # "brazilian_actors": mapping of Brazilian actors involved in preventing environmental crimes.
       # "international_cooperation": mapping of international agreements, treaties and conventions.
       # "forest_governance": mapping of forest governance arrangements.
-
       2. search: Filters the dataset to the rows containing the chosen search parameter.
       
 
 ``` r
 # download the spreacdsheet on Brazilian actors involved in fighting environmental crimes
 brazilian_actors <- load_cipo(dataset = "brazilian_actors")
-
 # searching only for entries containing IBAMA
 actors_ibama <- load_cipo(dataset = "brazilian_actors",
                           search = "ibama")
-
 # entries containing IBAMA or FUNAI
 actors_ibama <- load_cipo(dataset = "brazilian_actors",
                           search = "ibama|funai")
@@ -776,7 +719,6 @@ variables. Data is avaliable from 1958 to 2020.
     There are five parameters in this function:
       
       1. dataset: picks the variable to be read. Possible options are shown in the table below.
-
       2. raw_data: there are two options:
       # TRUE: if you want the data with fewer manipulations.
       # FALSE: if you want the treated (more organized) version of the data. 
@@ -809,11 +751,8 @@ Possible dataset choices:
 
 ``` r
 # Downloading maximum temperature data from 2000 to 2020
-
 max_temp <- load_climate(dataset = "max_temperature", time_period = 2000:2020)
-
 # Downloading precipitation data only for the legal Amazon in 2010
-
 amz_precipitation <- load_climate(dataset = "precipitation",
                                   time_period = 2010,
                                   legal_amazon_only = TRUE)
@@ -904,12 +843,10 @@ sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- ano <- ano_codi
 #  param$time_period = time_period
 #  param$language = language
 #  param$raw_data = raw_data
-
 #  param$survey_name = datasets_link() %>%
 #    dplyr::filter(dataset == param$dataset) %>%
 #    dplyr::select(survey) %>%
 #    unlist()
-
 #  param$url = datasets_link() %>%
 #    dplyr::filter(dataset == param$dataset) %>%
 #    dplyr::select(link) %>%
@@ -938,14 +875,9 @@ become numeric. After that we excluded all the lines with **NA**.
 #           janitor::clean_names() %>%
 #           dplyr::mutate_all(function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")})# %>%
           # dplyr::mutate_all(clean_custom)
-
-
 #   dat = dat %>%
 #     dplyr::select(-c(nivel_territorial_codigo,nivel_territorial,ano_codigo)) %>%
 #     dplyr::mutate(valor=as.numeric(valor))
-
-
-
 #   dat = dat %>%
 #     dplyr::filter(!is.na(valor))
 ```
@@ -960,14 +892,11 @@ these datasets we renamed some columns.
 #       dplyr::rename(produto_das_lavouras_codigo = produto_das_lavouras_temporarias_e_permanentes_codigo,
 #                     produto_das_lavouras = produto_das_lavouras_temporarias_e_permanentes)
 #   }
-
 #   if (param$code == 1613){
 #     dat = dat %>%
 #       dplyr::rename(produto_das_lavouras_codigo = # produto_das_lavouras_permanentes_codigo,
 #                     produto_das_lavouras = produto_das_lavouras_permanentes)
 #   }
-
-
 #   if (param$code %in% c(839,1000,1001,1002,1612)){
 #     dat = dat %>%
 #       dplyr::rename(produto_das_lavouras_codigo = # produto_das_lavouras_temporarias_codigo,
@@ -982,9 +911,7 @@ where var_code == “0”.
 
 ``` r
 # dic = load_dictionary(param$dataset)
-
 #  types = as.character(dic$var_code)
-
 #  types = types[types != "0"] 
 ```
 
@@ -996,7 +923,6 @@ it.
 
 ``` r
 # if (param$language == 'pt'){
-
 #    dat_mod = dat %>%
 #      dplyr::select(ano = year, linkcolumn, scene_id,
 #                    cod_uf = code_state, cod_municipio = code_muni,
@@ -1004,7 +930,6 @@ it.
 #                    julday, geometry
 #      ) %>%
 #      dplyr::arrange(ano, cod_municipio, classe)
-
 #  }
 ```
 
