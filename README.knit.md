@@ -6,14 +6,7 @@ output: github_document
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%"
-)
-```
+
 
 # datazoom.amazonia
 
@@ -25,12 +18,25 @@ knitr::opts_chunk$set(
 
 The goal of package datazoom.amazonia is to facilitate access to official data about agriculture, deforestation, production and other activities in the Brazilian Amazon.The package provides functions that download and pre-process selected datasets. Our users should know that our functions pull data from databases from other institutions and therefore if one of these institutions decides to stop sharing their data with the public then there's nothing we can do about it. 
 
-```{r, echo=FALSE, message=FALSE}
-devtools::load_all()
-```
 
-```{r,eval=TRUE}
+
+
+```r
 datazoom.amazonia::datasets_link()
+#> # A tibble: 52 x 6
+#>    survey   dataset                sidra_code available_time available_geo link 
+#>    <chr>    <chr>                       <dbl> <chr>          <chr>         <chr>
+#>  1 PAM-IBGE pam_all_crops                5457 1974-2020      Country, Sta~ http~
+#>  2 PAM-IBGE pam_permanent_crops          1613 1974-2020      Country, Sta~ http~
+#>  3 PAM-IBGE pam_temporary_crops          1612 1974-2020      Country, Sta~ http~
+#>  4 PAM-IBGE pam_corn                      839 2003-2020      Country, Sta~ http~
+#>  5 PAM-IBGE pam_potato                   1001 2003-2020      Country, Sta~ http~
+#>  6 PAM-IBGE pam_peanut                   1000 2003-2020      Country, Sta~ http~
+#>  7 PAM-IBGE pam_beans                    1002 2003-2020      Country, Sta~ http~
+#>  8 PPM-IBGE ppm_livestock_invento~       3939 1974-2020      Country, Sta~ http~
+#>  9 PPM-IBGE ppm_sheep_farming              95 1974-2020      Country, Sta~ http~
+#> 10 PPM-IBGE ppm_animal_origin_pro~         74 1974-2020      Country, Sta~ http~
+#> # ... with 42 more rows
 ```
 
 ### Content:
@@ -124,7 +130,8 @@ There are four parameters in this function:
   4. language: you can choose between portuguese and english
 ```
 
-```{r,eval=FALSE}
+
+```r
 # Download raw data (raw_data = TRUE) from 2000 to 2005 (time_period = 2000:2005).
 data <- load_prodes(dataset = "prodes", 
                     raw_data = TRUE,
@@ -155,7 +162,8 @@ There are four parameters in this function:
   3. language: you can choose between portuguese and english
 ```
 
-```{r,eval=FALSE}
+
+```r
 # Download raw data (raw_data = TRUE) from Amazonia (dataset = "deter_amz")
 deter_amz <- load_deter(dataset = 'deter_amz',
                         raw_data = TRUE)
@@ -181,7 +189,8 @@ There are four parameters in this function:
   4. language: you can choose between portuguese and english
 ```
 
-```{r, eval = FALSE}
+
+```r
 # download raw data (raw_data = TRUE) related to forest degradation from 2010 to 2012 (time_period = 2010:2012). 
 data <- load_degrad(dataset = 'degrad', 
                     raw_data = TRUE,
@@ -219,7 +228,8 @@ There are four parameters in this function:
  
 ```
 
-```{r, eval = FALSE}
+
+```r
 # download treated (raw_data = FALSE) exports data by municipality (dataset = "comex_export_mun") from 1997 to 2021 (time_period = 1997:2021)
 data <- load_br_trade(dataset = "comex_export_mun", 
                       raw_data = FALSE, 
@@ -259,7 +269,8 @@ There are six parameters in this function:
   
 ```
 
-```{r, eval = FALSE}
+
+```r
 # Download raw data (raw_data = TRUE) on gross domestic product 
 # (dataset = 'pibmunic') from the entire country (legal_amazon_only = FALSE) 
 # by state (geo_level = 'state') from 2012 (time_period = 2012)
@@ -301,7 +312,8 @@ There are seven parameters in this function:
   
 ```
 
-```{r, eval = FALSE}
+
+```r
 # Download raw data (raw_data = TRUE) with the aggregation level being the country ( geo_level = "country") from 2008 to 2010 (time_period = 2008:2010). 
 # In this example, the user did not want to visualize data by sector (sectors = FALSE) and the user also did not want the data to be restricted to the Legal Amazon area (legal_amazon_only = FALSE).
 data <- load_cempre(dataset = "cempre", 
@@ -354,7 +366,8 @@ There are five parameters in this function:
   
 ```
 
-```{r eval=FALSE}
+
+```r
 # Download treated (raw_data = FALSE) data related to the production from permanent and temporary farmed lands (dataset = 'pam_all_crops') by state (geo_level = "state") from 1980 to 1990 (time_period = 1980:1990) in english (language = "eng").
 data <- load_pam(dataset = 'pam_all_crops', 
                  raw_data = FALSE, 
@@ -396,7 +409,8 @@ There are five parameters in this function:
   5. language: you can choose between portuguese and english
 ```
 
-```{r eval=FALSE}
+
+```r
 # Download treated (raw_data = FALSE) silviculture data (dataset = 'pevs_silviculture') by state (geo_level = 'state') from 2012 (time_period =  2012) in portuguese (language = "pt")
 data <- load_pevs(dataset = 'pevs_silviculture', 
                   raw_data = FALSE,
@@ -443,7 +457,8 @@ There are five parameters in this function:
   5. language: you can choose between portuguese and english
 ```  
 
-```{r eval=FALSE}
+
+```r
 # Download treated data (raw_data = FALSE) about aquaculture (dataset = 'ppm_aquaculture') from 2013 to 2015 (time_period = 2013:2015) in english (language = "eng") with the level of aggregation being the country (geo_level = "country"). 
 data <- load_ppm(dataset = 'ppm_aquaculture', 
                  raw_data = FALSE, 
@@ -477,7 +492,8 @@ There are four parameters in this function:
 ```
 
   
-```{r, eval = FALSE}
+
+```r
 # Download raw data (raw_data = TRUE) from 2014 (time_period = 2014)
 data <- load_ips(dataset = "ips", raw_data = TRUE, time_period = 2014)
 # Download treated data (raw_data = FALSE) from 2018 
@@ -517,7 +533,8 @@ There are four parameters in this function:
 ```
 
   
-```{r eval=FALSE}
+
+```r
 # Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg") by municipality (geo_level = "municipality")
 data <- load_seeg(dataset = "seeg", 
                   raw_data = TRUE,
@@ -565,7 +582,8 @@ There are five parameters in this function:
   5. legal_amazon_only: setting the return of Legal Amazon Data (legal_amazon_only = TRUE) or Country´s Data (legal_amazon_only = FALSE)
 ```
   
-```{r eval=FALSE}
+
+```r
 # Download treated data (raw_data = FALSE) from the entire country 
 # (legal_amazon_only = FALSE) in english (language = "eng")
 data <- load_ibama(dataset = "areas_embargadas", raw_data = FALSE, 
@@ -591,7 +609,8 @@ There are three parameters in this function:
   
 ```
  
-```{r eval=FALSE}
+
+```r
 # Download raw data (raw_data = TRUE).
 data <- load_sigmine(dataset = 'sigmine_active', raw_data = TRUE)
 # Download treated data (raw_data = FALSE) in portuguese (language = "pt").
@@ -631,7 +650,8 @@ The MAPBIOMAS project gathers data reporting the type of land covering each year
                 # cover_level = 4 has categories such as: Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
 ```
  
-```{r eval=FALSE}
+
+```r
 # download treated Mapbiomas Cover data in english
 data = load_mapbiomas(dataset = "mapbiomas_cover", raw_data = FALSE, time_period = "all",
                       language = "eng")
@@ -661,7 +681,8 @@ There are two parameters in this function:
   
 ```  
  
-```{r eval=FALSE}
+
+```r
 # download the spreacdsheet on Brazilian actors involved in fighting environmental crimes
 brazilian_actors <- load_cipo(dataset = "brazilian_actors")
 # searching only for entries containing IBAMA
@@ -710,7 +731,8 @@ Possible dataset choices:
 | water_evaporation | aet  | Actual Evapotranspiration | mm |
 | palmer_drought_severity_index | PDSI | Palmer Drought Severity Index | unitless |
  
-```{r eval=FALSE}
+
+```r
 # Downloading maximum temperature data from 2000 to 2020
 max_temp <- load_climate(dataset = "max_temperature", time_period = 2000:2020)
 # Downloading precipitation data only for the legal Amazon in 2010
@@ -740,7 +762,8 @@ There are four parameters in this function:
   
   ```
   
-```{r eval=FALSE}
+
+```r
 # download raw data
 raw_baci <- load_baci(dataset = "HS92", raw_data = TRUE, time_period = 2016)
 
@@ -772,13 +795,15 @@ clean_baci <- load_baci(dataset = "HS92", raw_data = FALSE, time_period = 2016,
 
 **1. Bind Global Variables:** example from *load_cempre()*
 
-```{r}
+
+```r
 sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- ano <- ano_codigo <- classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo <- geo_id <- id_code <- nivel_territorial <- nivel_territorial_codigo <- valor <- variavel <- unidade_de_medida <- unidade_de_medida_codigo <- NULL
 ```
 
 **2. Define Basic Parameters:** example from *load_deter()*
 
-```{r}
+
+```r
 # param=list()
 #  param$dataset = dataset
 #  param$time_period = time_period
@@ -796,7 +821,8 @@ sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- ano <- ano_codi
 
 **3. Download Data:** example from *load_degrad()*. It uses the *external_download()* function.
 
-```{r}
+
+```r
 # dat = suppressWarnings(as.list(param$time_period) %>%
 #      purrr::map(
 #        function(t){external_download(dataset = param$dataset,
@@ -808,7 +834,8 @@ sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- ano <- ano_codi
 
 **4. Data Engineering**: example from *load_pam()*. In this process, we decided to exclude some columns and convert the variable "valor" to become numeric. After that we excluded all the lines with **NA**. 
 
-```{r}
+
+```r
 # dat = dat %>%
 #           janitor::clean_names() %>%
 #           dplyr::mutate_all(function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")})# %>%
@@ -822,7 +849,8 @@ sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- ano <- ano_codi
 
 **5. Harmonizing Variable Names:** example from *load_pam()*. We localize some datasets by using their numerical codes and within each of these datasets we renamed some columns.
 
-```{r}
+
+```r
 # if (param$code == 5457){
 #     dat = dat %>%
 #       dplyr::rename(produto_das_lavouras_codigo = produto_das_lavouras_temporarias_e_permanentes_codigo,
@@ -842,7 +870,8 @@ sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- ano <- ano_codi
 
 **6. Load Dictionary:** example from *load_pam()*. For functions with data from IBGE, we load the dictionary and then we convert the variable "var_code" to become a character. Finally we exclude the observations where var_code == "0".
 
-```{r}
+
+```r
 # dic = load_dictionary(param$dataset)
 #  types = as.character(dic$var_code)
 #  types = types[types != "0"] 
@@ -850,7 +879,8 @@ sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- ano <- ano_codi
 
 **7. Translation / add variables:** example from *load_degrad()*.This section translates the names of the columns of the original Data Frame.In this example, the original columns (variables) were in English and therefore we translated it to Portuguese in case the user chooses it.
 
-```{r}
+
+```r
 # if (param$language == 'pt'){
 #    dat_mod = dat %>%
 #      dplyr::select(ano = year, linkcolumn, scene_id,
