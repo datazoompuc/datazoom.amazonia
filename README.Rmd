@@ -780,11 +780,11 @@ max_temp <- load_climate(dataset = "max_temperature", time_period = 2000:2020)
 
 # Downloading precipitation data only for the legal Amazon in 2010
 
-
 amz_precipitation <- load_climate(dataset = "precipitation",
                                   time_period = 2010,
                                   legal_amazon_only = TRUE)
 ```
+
 
 ## 11 - BACI
 
@@ -948,3 +948,4 @@ sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- ano <- ano_codi
 ## Credits
 
 DataZoom is developed by a team at Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio), Department of Economics. Our official website is at: <http://www.econ.puc-rio.br/datazoom/>.
+
