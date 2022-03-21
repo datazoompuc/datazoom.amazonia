@@ -98,7 +98,7 @@ After installing it, you will be able to download our development version packag
 **[10 - TerraClimate data](#10---terraclimate)**
 
 **[11 - BACI data](#11---baci)**
->>>>>>> master
+
 
 ## The Structure of our functions
 

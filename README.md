@@ -114,7 +114,7 @@ version package.
 
 **[10 - TerraClimate data](#10---terraclimate)**
 
-**[11 - BACI data](#11---baci)** \>\>\>\>\>\>\> master
+**[11 - BACI data](#11---baci)**
 
 ## The Structure of our functions
 
