@@ -25,18 +25,18 @@ data with the public then there’s nothing we can do about it.
 ``` r
 datazoom.amazonia::datasets_link()
 #> # A tibble: 34 x 6
-#>    survey   dataset     sidra_code available_time available_geo    link         
-#>    <chr>    <chr>            <dbl> <chr>          <chr>            <chr>        
-#>  1 PAM-IBGE pam_all_cr~       5457 1974-2019      Country, State,~ https://sidr~
-#>  2 PAM-IBGE pam_perman~       1613 1974-2019      Country, State,~ https://sidr~
-#>  3 PAM-IBGE pam_tempor~       1612 1974-2019      Country, State,~ https://sidr~
-#>  4 PAM-IBGE pam_corn           839 2003-2019      Country, State,~ https://sidr~
-#>  5 PAM-IBGE pam_potato        1001 2003-2019      Country, State,~ https://sidr~
-#>  6 PAM-IBGE pam_peanut        1000 2003-2019      Country, State,~ https://sidr~
-#>  7 PAM-IBGE pam_beans         1002 2003-2019      Country, State,~ https://sidr~
-#>  8 PPM-IBGE ppm_livest~       3939 1974-2019      Country, State,~ https://sidr~
-#>  9 PPM-IBGE ppm_sheep_~         95 1974-2019      Country, State,~ https://sidr~
-#> 10 PPM-IBGE ppm_animal~         74 1974-2019      Country, State,~ https://sidr~
+#>    survey   dataset                sidra_code available_time available_geo link 
+#>    <chr>    <chr>                       <dbl> <chr>          <chr>         <chr>
+#>  1 PAM-IBGE pam_all_crops                5457 1974-2019      Country, Sta~ http~
+#>  2 PAM-IBGE pam_permanent_crops          1613 1974-2019      Country, Sta~ http~
+#>  3 PAM-IBGE pam_temporary_crops          1612 1974-2019      Country, Sta~ http~
+#>  4 PAM-IBGE pam_corn                      839 2003-2019      Country, Sta~ http~
+#>  5 PAM-IBGE pam_potato                   1001 2003-2019      Country, Sta~ http~
+#>  6 PAM-IBGE pam_peanut                   1000 2003-2019      Country, Sta~ http~
+#>  7 PAM-IBGE pam_beans                    1002 2003-2019      Country, Sta~ http~
+#>  8 PPM-IBGE ppm_livestock_invento~       3939 1974-2019      Country, Sta~ http~
+#>  9 PPM-IBGE ppm_sheep_farming              95 1974-2019      Country, Sta~ http~
+#> 10 PPM-IBGE ppm_animal_origin_pro~         74 1974-2019      Country, Sta~ http~
 #> # ... with 24 more rows
 ```
 
@@ -108,6 +108,8 @@ version package.
 **[8 - MAPBIOMAS data](#8---mapbiomas)**
 
 **[9 - CIPÓ data](#9---cipó)**
+
+**[10 - BACI data](#9---baci)**
 
 ## The Structure of our functions
 
@@ -758,6 +760,34 @@ actors_ibama <- load_cipo(dataset = "brazilian_actors",
 # entries containing IBAMA or FUNAI
 actors_ibama <- load_cipo(dataset = "brazilian_actors",
                           search = "ibama|funai")
+```
+
+## 10 - BACI
+
+Loads disaggregated data on bilateral trade flows for more than 5000
+products and 200 countries.
+
+    There are four parameters in this function:
+      
+      1. dataset: There is one choice:
+      # "HS92" which follows the Harmonized System method
+
+      2. raw_data: there are two options:
+      # TRUE: if you want the data as it is in the mapbiomas's site.
+      # FALSE: if you want the treated (more organized) version of the data. 
+      
+      3. time_period: The data availability for each dataset is detailed above
+
+    4. language: you can choose between portuguese ('pt') and english ('eng')
+      
+
+``` r
+# download raw data
+raw_baci <- load_baci(dataset = "HS92", raw_data = TRUE, time_period = 2016)
+
+# download treated data
+clean_baci <- load_baci(dataset = "HS92", raw_data = FALSE, time_period = 2016,
+                        language = "pt")
 ```
 
 ## The Structure of the functions

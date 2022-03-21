@@ -95,6 +95,8 @@ After installing it, you will be able to download our development version packag
 
 **[9 - CIPÓ data](#9---cipó)**
 
+**[10 - BACI data](#9---baci)**
+
 ## The Structure of our functions
 
 **[1 - The Structure of the functions](#the-structure-of-the-functions)**
@@ -731,6 +733,35 @@ actors_ibama <- load_cipo(dataset = "brazilian_actors",
 ```
 
 
+## 10 - BACI
+
+Loads disaggregated data on bilateral trade flows for more than 5000 products and 200 countries. 
+
+```
+There are four parameters in this function:
+  
+  1. dataset: There is one choice:
+  # "HS92" which follows the Harmonized System method
+
+  2. raw_data: there are two options:
+  # TRUE: if you want the data as it is in the mapbiomas's site.
+  # FALSE: if you want the treated (more organized) version of the data. 
+  
+  3. time_period: The data availability for each dataset is detailed above
+
+4. language: you can choose between portuguese ('pt') and english ('eng')
+  
+  ```
+  
+```{r eval=FALSE}
+# download raw data
+raw_baci <- load_baci(dataset = "HS92", raw_data = TRUE, time_period = 2016)
+
+# download treated data
+clean_baci <- load_baci(dataset = "HS92", raw_data = FALSE, time_period = 2016,
+                        language = "pt")
+```
+  
 
 ## The Structure of the functions
 

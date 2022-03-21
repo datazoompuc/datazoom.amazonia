@@ -1,0 +1,34 @@
+---
+title: "BACI"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{BACI}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## The Dataset
+
+The dataset is originally from the CEPII Research and Expertise on the World Economy. The database is built from data directly reported by each country to the United Nations Statistical Division (Comtrade)
+
+## Usage
+
+`load_baci` provides disaggregated data on bilateral trade flows for more than 5000 products and 200 countries. 
+
+The function returns either the raw data or a data frame with aggregates considering the exporter, the importer, the country and the product.
+
+```{r, eval = FALSE}
+library(datazoom.amazonia)
+
+# Download treated trade data in portuguese
+
+baci = load_baci(dataset = "HS92", raw_data = FALSE, time_period = 2018,
+                 language = "pt")
+```
