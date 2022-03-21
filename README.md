@@ -766,7 +766,7 @@ products and 200 countries.
       # "HS92" which follows the Harmonized System method
 
       2. raw_data: there are two options:
-      # TRUE: if you want the data as it is in the mapbiomas's site.
+      # TRUE: if you want the data as it is in the CEPII site.
       # FALSE: if you want the treated (more organized) version of the data. 
       
       3. time_period: The data availability for each dataset is detailed above
