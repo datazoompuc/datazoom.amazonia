@@ -56,26 +56,26 @@ load_ips = function(dataset = "ips", raw_data,
   if (is.null(param$dataset)){stop('Missing Dataset!')}
   if (is.null(param$raw_data)){stop('Missing TRUE/FALSE for Raw Data')}
 
+  ##TEMPORARY!! WHILE RAW_DATA= FALSE IS BEING FIXED
+  if (raw_data == FALSE){stop('raw_data = FALSE argument for IPS is being improved at the moment!')}
+
+
   ##############
   ## Download ##
   ##############
 
   dat = as.list(param$time_period) %>%
-    purrr::map(
-      function(t){external_download(dataset = param$dataset,source='ips',year = t) %>%
-          dplyr::mutate(ano = t)}
-    )
+     purrr::map(
+        function(t){external_download(dataset = param$dataset,source='ips',year = t)}
+     )
 
   raw <- dat
-
-  dat <- dat %>%
-    dplyr::bind_rows() %>%
-    tibble::as_tibble()
 
 
   ## Return Raw Data
 
   if (raw_data == TRUE){return(dat)}
+
 
 
   ## Data May Have Different Names, we Need to be careful
