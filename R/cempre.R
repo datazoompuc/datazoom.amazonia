@@ -442,13 +442,13 @@ load_cempre <- function(dataset = "cempre", raw_data,
 
 
   if (language == "eng") {
-    for (i in 1:length(types)) {
+    for (i in seq_along(types)) {
       dat <- label_data_eng(dat, cols = types[i], dic = dic)
     }
   }
 
   if (language == "pt") {
-    for (i in 1:length(types)) {
+    for (i in seq_along(types)) {
       dat <- label_data_pt(dat, cols = types[i], dic = dic)
     }
   }

@@ -83,7 +83,7 @@ load_baci <- function(dataset = "HS92", raw_data, time_period,
   temp <- tempfile()
   download.file(url, temp, mode = "wb")
   dat <- read.table(unz(temp, paste0("BACI_HS92_Y", param$time_period, "_V202201.csv")),
-    fill = T, header = F, sep = ","
+    fill = TRUE, header = FALSE, sep = ","
   )
   unlink(temp)
 
@@ -708,7 +708,7 @@ load_trade_dic_eng <- function(type) {
     temp <- tempfile()
     download.file(url, temp, mode = "wb")
     dic <- read.table(unz(temp, paste0("product_codes_HS92_V202201.csv")),
-      fill = T, header = F, sep = ","
+      fill = TRUE, header = FALSE, sep = ","
     )
   }
 

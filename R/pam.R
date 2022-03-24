@@ -318,13 +318,13 @@ load_pam <- function(dataset = NULL, raw_data,
     #                    ~ labelled::set_variable_labels(. = as.character(dic[dic$var_code == types[1],'var_eng']))
     #   )
 
-    for (i in 1:length(types)) {
+    for (i in seq_along(types)) {
       dat <- label_data_eng(dat, cols = types[i], dic = dic)
     }
   }
 
   if (language == "pt") {
-    for (i in 1:length(types)) {
+    for (i in seq_along(types)) {
       dat <- label_data_pt(dat, cols = types[i], dic = dic)
     }
   }

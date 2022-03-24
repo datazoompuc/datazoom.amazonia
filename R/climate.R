@@ -141,7 +141,7 @@ load_climate <- function(dataset, raw_data = FALSE,
   time <- terra::time(dat) %>%
     as.Date()
 
-  names(time) <- 1:length(time)
+  names(time) <- seq_along(time)
 
   points <- dat %>%
     terra::as.points() %>%
