@@ -710,7 +710,7 @@ actors_ibama <- load_cipo(dataset = "brazilian_actors",
 ## 10 - TerraClimate
 
 Loads TerraClimate data by [Climatology
-Lab](https://www.climatologylab.org), on many avaliable climate
+Lab](https://www.climatologylab.org), on many available climate
 variables. Data is avaliable from 1958 to 2020.
 
     There are five parameters in this function:

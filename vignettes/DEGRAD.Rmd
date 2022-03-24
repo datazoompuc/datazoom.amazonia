@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 This dataset in currently under development.
 
 ## The Dataset
-The DEGRAD project uses sattelites to monitor degradation of forest areas. Raw data is available as simple features (sf) objects, read from shapefiles. The project was substituted in 2016 by DETER-B. Accordingly, data is available from 2007 up to 2016.
+The DEGRAD project uses satellites to monitor degradation of forest areas. Raw data is available as simple features (sf) objects, read from shapefiles. The project was substituted in 2016 by DETER-B. Accordingly, data is available from 2007 up to 2016.
 
 Original documentation for this data is very scarce, users beware. Some things to keep in mind are:
 

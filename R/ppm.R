@@ -2,7 +2,7 @@
 #'
 #' @description Loads information on animal farming inventories and livestock products (IBGE). Survey is done at the municipal level and data is available from 1974 to 2020 for most datasets. See \url{https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/17353-municipal-livestock-production.html?=&t=o-que-e}
 #'
-#' @param dataset A dataset name ("ppm_livetock_inventory", "ppm_sheep_farming", "ppm_animal_orig_production", "ppm_cow_farming" or "ppm_aquaculture". You can also use SIDRA codes (see \url{https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019})
+#' @param dataset A dataset name ("ppm_livestock_inventory", "ppm_sheep_farming", "ppm_animal_orig_production", "ppm_cow_farming" or "ppm_aquaculture". You can also use SIDRA codes (see \url{https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019})
 #' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
 #' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state" or "municipality". See documentation of \code{sidrar}.
 #' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.

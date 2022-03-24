@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 
 The Comex dataset gathers data extracted from Siscomex (Integrated System of Foreign Trade), which is a database containing information from all products that are imported to or exported from Brazil. Using data reported from the companies which are responsible for the process of transporting the products, the system adheres to internationally standardized nomenclatures, such as the Harmonized System and the Mercosul Common Nomenclature (which pertains to members of the Mercosul organization). 
 
-The data has a monthly frequency and is available starting from the year 1989. From 1989 to 1996, a different system of nomenclatures was adopted, but all conversions are available on a dictionary in the Comex website (https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta/). Systems of nomenclature vary in the degree of detail in terms of the product involved, as well as other carachteristics, such as unit and granularity of location. 
+The data has a monthly frequency and is available starting from the year 1989. From 1989 to 1996, a different system of nomenclatures was adopted, but all conversions are available on a dictionary in the Comex website (https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta/). Systems of nomenclature vary in the degree of detail in terms of the product involved, as well as other characteristics, such as unit and granularity of location. 
 
 ## Usage
 

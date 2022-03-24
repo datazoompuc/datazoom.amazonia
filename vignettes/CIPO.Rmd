@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 ## The Dataset
 
-Mappings by [Plataforma CIPÓ](https://plataformacipo.org/) on environmental crimes. Each dataset avaliable is a spreadsheet pertaining to a different aspect of environmental crimes, namely: the Brazilian institutions and organization involved in their prevention (the `"brazilian_actors"` dataset); the international agreements, treaties and conventions related to the subject (the `"international_cooperation"` dataset); and the arrangements regarding forest governance (the `"forest_governance"` dataset).
+Mappings by [Plataforma CIPÓ](https://plataformacipo.org/) on environmental crimes. Each dataset available is a spreadsheet pertaining to a different aspect of environmental crimes, namely: the Brazilian institutions and organization involved in their prevention (the `"brazilian_actors"` dataset); the international agreements, treaties and conventions related to the subject (the `"international_cooperation"` dataset); and the arrangements regarding forest governance (the `"forest_governance"` dataset).
 
 ## Usage
 
