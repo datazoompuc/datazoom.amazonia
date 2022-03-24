@@ -1,3 +1,19 @@
+# datazoom.amazonia 0.3.0
+  
+## New functions
+  
+  * Plataforma CIPÓ data
+  * TerraClimate data
+  * BACI data for global trade
+  
+## Improvements
+  
+  * Documentation for `load_mapbiomas`
+  * Bug fixes for PRODES, SEEG, and Ibama
+  * Supports new IPS data format
+  * Supports many more PAM datasets
+  * No longer dependent on packages not published in CRAN
+
 # datazoom.amazonia 0.2.0
 
 * All functions supporting treated data download
