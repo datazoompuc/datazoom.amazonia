@@ -23,7 +23,6 @@ NULL
 #' The components, in turn, are composed of the raw indicators, whose columns are indexed
 #' by "V"
 #' @examples
-#'
 #' \dontrun{
 #' load_IPS(
 #'   download_directory = "./Desktop",

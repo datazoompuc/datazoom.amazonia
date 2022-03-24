@@ -27,16 +27,14 @@ load_amazon_gdp <- function(years, space_aggregation = "municipality", language 
       dplyr::summarize_if(is.numeric, sum, na.rm = TRUE) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(PIBpc = .data$PIB / .data$Pop * 1000)
-  }
-  else if (space_aggregation != "municipality") {
+  } else if (space_aggregation != "municipality") {
     warning("Selected spatial aggregation is not supported. Proceeding with Municipality.")
   }
 
   language <- tolower(language)
   if (language == "eng") {
     df <- translate_munics_to_english(df)
-  }
-  else if (language != "pt") {
+  } else if (language != "pt") {
     warning("Selected language is not supported. Proceeding with Portuguese.")
   }
 
@@ -135,8 +133,7 @@ load_gdp <- function(years, space_aggregation = "municipality", language = "eng"
 
   if (language == "eng") {
     df <- translate_munics_to_english(df)
-  }
-  else if (language != "pt") {
+  } else if (language != "pt") {
     warning("Selected language is not supported. Proceeding with Portuguese.")
   }
 
@@ -179,8 +176,7 @@ load_amazon_employment <- function(years, sectors = FALSE, space_aggregation = "
       dplyr::group_by(.data$Estado, .data$CodIBGE, .data$Ano) %>%
       dplyr::summarize_if(is.numeric, sum, na.rm = TRUE) %>%
       dplyr::ungroup()
-  }
-  else if (space_aggregation != "municipality") {
+  } else if (space_aggregation != "municipality") {
     warning("Selected spatial aggregation is not supported. Proceeding with Municipality.")
   }
 
@@ -191,8 +187,7 @@ load_amazon_employment <- function(years, sectors = FALSE, space_aggregation = "
   language <- tolower(language)
   if (language == "eng") {
     df <- translate_munics_to_english(df)
-  }
-  else if (language != "pt") {
+  } else if (language != "pt") {
     warning("Selected language is not supported. Proceeding with Portuguese.")
   }
 
@@ -227,8 +222,7 @@ load_employment <- function(years, sectors = FALSE, space_aggregation = "municip
 
   if (sectors) {
     cnaes <- list("117897", "116830", "116880", "116910", "117296", "117307", "117329", "117363", "117484", "117543", "117555", "117608", "117666", "117673", "117714", "117774", "117788", "117810", "117838", "117861", "117888", "117892")
-  }
-  else {
+  } else {
     cnaes <- list("117897")
   }
 
@@ -334,8 +328,7 @@ load_employment <- function(years, sectors = FALSE, space_aggregation = "municip
 
   if (language == "eng") {
     df <- translate_munics_to_english(df)
-  }
-  else if (language != "pt") {
+  } else if (language != "pt") {
     warning("Selected language is not supported. Proceeding with Portuguese.")
   }
 
@@ -379,8 +372,7 @@ load_amazon_income <- function(years, space_aggregation = "municipality", langua
       dplyr::mutate(Renda_media = .data$Renda / .data$Ocupados) %>%
       dplyr::ungroup() %>%
       dplyr::select(-c("Renda"))
-  }
-  else if (space_aggregation != "municipality") {
+  } else if (space_aggregation != "municipality") {
     warning("Selected spatial aggregation is not supported. Proceeding with Municipality.")
   }
 
@@ -391,8 +383,7 @@ load_amazon_income <- function(years, space_aggregation = "municipality", langua
   language <- tolower(language)
   if (language == "eng") {
     df <- translate_munics_to_english(df)
-  }
-  else if (language != "pt") {
+  } else if (language != "pt") {
     warning("Selected language is not supported. Proceeding with Portuguese.")
   }
 
@@ -508,8 +499,7 @@ load_income <- function(years, space_aggregation = "municipality", language = "e
 
   if (language == "eng") {
     df <- translate_munics_to_english(df)
-  }
-  else if (language != "pt") {
+  } else if (language != "pt") {
     warning("Selected language is not supported. Proceeding with Portuguese.")
   }
 

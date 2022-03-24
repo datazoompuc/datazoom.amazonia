@@ -8,7 +8,7 @@
 load_seeg(dataset = NULL, raw_data, geo_level, language = "eng")
 }
 \arguments{
-\item{dataset}{A dataset name ("seeg", seeg_farming", "seeg_industry", "seeg_energy", "seeg_land", "seeg_residuals"). On which "seeg" contains all five sectors (only works with raw_data = TRUE) and the others are filtered specifically by a main source of emission. See \url{https://seeg8-brasil-municipios-site.herokuapp.com/notas-metodologicas}}
+\item{dataset}{A dataset name ("seeg", seeg_farming", "seeg_industry", "seeg_energy", "seeg_land", "seeg_residuals"). On which "seeg" contains all five sectors (only works with raw_data = TRUE) and the others are filtered specifically by a main source of emission. See \url{http://seeg.eco.br/notas-metodologicas/}}
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 

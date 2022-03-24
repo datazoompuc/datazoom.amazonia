@@ -30,8 +30,7 @@ NULL
 #' number of unique perpetrators of infractions on the given place-time period.
 #'
 #' @examples
-#'
-#'  \dontrun{
+#' \dontrun{
 #' load_ibama(
 #'   download_directory = getwd(),
 #'   time_aggregation = "year",
@@ -85,27 +84,20 @@ load_ibama <- function(download_data = TRUE,
 
 
 aggregate_fines <- function(dataset, t = c("year", "month"), g = "municipality",
-                           y = 2005:2021, lan = "eng") {
-
+                            y = 2005:2021, lan = "eng") {
   if ("municipality" %in% g | "municipio" %in% g) {
-
-    if(lan == 'eng'){
-
-    grp <- c(g, "municipality_code")
-
-    } else{
-
-    grp <- c(g, "cod_municipio")
-
+    if (lan == "eng") {
+      grp <- c(g, "municipality_code")
+    } else {
+      grp <- c(g, "cod_municipio")
     }
-
   } else {
     grp <- g
   }
 
   df <- dataset %>%
     dplyr::filter(
-      .data$codigo_ibge_municipio_embargo %in% legal_amazon[legal_amazon$AMZ_LEGAL == 1,]$CD_MUN
+      .data$codigo_ibge_municipio_embargo %in% legal_amazon[legal_amazon$AMZ_LEGAL == 1, ]$CD_MUN
     ) %>%
     dplyr::select(
       .data$municipio_embargo, .data$uf_embargo,
@@ -135,7 +127,6 @@ aggregate_fines <- function(dataset, t = c("year", "month"), g = "municipality",
         month = .data$mes,
         year = .data$ano,
         municipality_code = .data$cod_municipio
-
       )
   }
 
@@ -168,13 +159,12 @@ aggregate_fines <- function(dataset, t = c("year", "month"), g = "municipality",
 
 
 download_ibama <- function(download_dir) {
-
   utils::download.file(
     url = "https://servicos.ibama.gov.br/ctf/publico/areasembargadas/downloadListaAreasEmbargadas.php",
     destfile = file.path(download_dir, "fines.rar"),
-    mode = 'wb',
-    method = 'curl',
-    extra = '-k -s'
+    mode = "wb",
+    method = "curl",
+    extra = "-k -s"
   )
 
   utils::unzip(

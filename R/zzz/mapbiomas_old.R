@@ -138,149 +138,145 @@ load_mapbiomas_covering <- function(space_aggregation = c("municipality", "state
 #' @export
 #'
 #' @examples
-#' load_mapbiomas_transition(space_aggregation = 'state', path = NULL, transition_interval = 5)
-
-
-
-load_mapbiomas_transition<-function(space_aggregation = c('municipality', 'state','municipio','estado'), path = NULL, transition_interval = NULL){
+#' load_mapbiomas_transition(space_aggregation = "state", path = NULL, transition_interval = 5)
+load_mapbiomas_transition <- function(space_aggregation = c("municipality", "state", "municipio", "estado"), path = NULL, transition_interval = NULL) {
 
   ## 1 ## STATE LEVEL
 
-  if(space_aggregation=='state' | space_aggregation=='estado'){
+  if (space_aggregation == "state" | space_aggregation == "estado") {
 
     ##############
     ## Download ##
     ##############
 
-    if(is.null(path)){
-      url1<-'https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Dados_Transicao_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx'
+    if (is.null(path)) {
+      url1 <- "https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Dados_Transicao_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx"
       p1f <- tempfile()
-      download.file(url1, p1f, mode="wb")
-    }else{
-      p1f<-paste0(path,'/Dados_Transicao_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx')
+      download.file(url1, p1f, mode = "wb")
+    } else {
+      p1f <- paste0(path, "/Dados_Transicao_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx")
     }
 
-    a<-read_excel(path = p1f, sheet = 3)
+    a <- read_excel(path = p1f, sheet = 3)
 
     ######################
     ## Data Engineering ##
     ######################
 
-    a<-a[!(substring(a$biome,1,4)!="Amaz"),]
+    a <- a[!(substring(a$biome, 1, 4) != "Amaz"), ]
     a$state[a$state == "Acre"] <- "AC"
-    a$state[substring(a$state,1,4) == "Amap"] <- "AP"
+    a$state[substring(a$state, 1, 4) == "Amap"] <- "AP"
     a$state[a$state == "Amazonas"] <- "AM"
     a$state[a$state == "Tocantins"] <- "TO"
     a$state[a$state == "Mato Grosso"] <- "MT"
-    a$state[substring(a$state,1,6) == "Maranh"] <- "MA"
-    a$state[substring(a$state,1,4) == "Rond"] <- "RO"
+    a$state[substring(a$state, 1, 6) == "Maranh"] <- "MA"
+    a$state[substring(a$state, 1, 4) == "Rond"] <- "RO"
     a$state[a$state == "Roraima"] <- "RR"
-    a$state[substring(a$state,1,3) == "Par"] <- "PA"
-    retorno<-data.frame()
-    tab<-a
-    ncolu<-ncol(a)
-    if(is.null(transition_interval)){
-      for(i in 15:ncolu){
-        ret<-c()
-        ret<-tab[,1:14]
-        nomecol<-colnames(a)[i]
-        anoi<-substring(nomecol,1,4)
-        anof<-substring(nomecol,8,12)
-        anoi<-as.integer(anoi)
-        anof<-as.integer(anof)
-        if(anof-anoi!=0){
-          ret<-cbind(ret,tab[,i])
-          colnames(ret)[which(colnames(ret) == nomecol)] <- 'Area'
-          num<-nrow(tab[,i])
-          Period<-rep(c(nomecol),num)
-          ret<-cbind(ret,Period)
-          retorno<-rbind(retorno,ret)
+    a$state[substring(a$state, 1, 3) == "Par"] <- "PA"
+    retorno <- data.frame()
+    tab <- a
+    ncolu <- ncol(a)
+    if (is.null(transition_interval)) {
+      for (i in 15:ncolu) {
+        ret <- c()
+        ret <- tab[, 1:14]
+        nomecol <- colnames(a)[i]
+        anoi <- substring(nomecol, 1, 4)
+        anof <- substring(nomecol, 8, 12)
+        anoi <- as.integer(anoi)
+        anof <- as.integer(anof)
+        if (anof - anoi != 0) {
+          ret <- cbind(ret, tab[, i])
+          colnames(ret)[which(colnames(ret) == nomecol)] <- "Area"
+          num <- nrow(tab[, i])
+          Period <- rep(c(nomecol), num)
+          ret <- cbind(ret, Period)
+          retorno <- rbind(retorno, ret)
         }
       }
-    }else if(!is.null(transition_interval)){
-      for(i in 15:ncolu){
-        ret<-c()
-        ret<-tab[,1:14]
-        nomecol<-colnames(a)[i]
-        anoi<-substring(nomecol,1,4)
-        anof<-substring(nomecol,8,12)
-        anoi<-as.integer(anoi)
-        anof<-as.integer(anof)
-        if(anof-anoi==transition_interval){
-          ret<-cbind(ret,tab[,i])
-          colnames(ret)[which(colnames(ret) == nomecol)] <- 'Area'
-          num<-nrow(tab[,i])
-          data<-rep(c(nomecol),num)
-          ret<-cbind(ret,data)
-          retorno<-rbind(retorno,ret)
+    } else if (!is.null(transition_interval)) {
+      for (i in 15:ncolu) {
+        ret <- c()
+        ret <- tab[, 1:14]
+        nomecol <- colnames(a)[i]
+        anoi <- substring(nomecol, 1, 4)
+        anof <- substring(nomecol, 8, 12)
+        anoi <- as.integer(anoi)
+        anof <- as.integer(anof)
+        if (anof - anoi == transition_interval) {
+          ret <- cbind(ret, tab[, i])
+          colnames(ret)[which(colnames(ret) == nomecol)] <- "Area"
+          num <- nrow(tab[, i])
+          data <- rep(c(nomecol), num)
+          ret <- cbind(ret, data)
+          retorno <- rbind(retorno, ret)
         }
       }
     }
 
-  ## 2 ## Municipality
-
-  }else if(space_aggregation=='municipality' | space_aggregation=='municipio'){
+    ## 2 ## Municipality
+  } else if (space_aggregation == "municipality" | space_aggregation == "municipio") {
 
     ##############
     ## Download ##
     ##############
 
-    if(is.null(path)){
-      url1<-'https://storage.googleapis.com/mapbiomas-public/COLECAO/5/DOWNLOADS/ESTATISTICAS/Dados_Transicao_MapBiomas_5.0_UF-MUN_SITE_v2.xlsx'
+    if (is.null(path)) {
+      url1 <- "https://storage.googleapis.com/mapbiomas-public/COLECAO/5/DOWNLOADS/ESTATISTICAS/Dados_Transicao_MapBiomas_5.0_UF-MUN_SITE_v2.xlsx"
       p1f <- tempfile()
-      download.file(url1, p1f, mode="wb")
-    }else{
-      p1f<-paste0(path,'/Dados_Transicao_MapBiomas_5.0_UF-MUN_SITE_v2.xlsx')
+      download.file(url1, p1f, mode = "wb")
+    } else {
+      p1f <- paste0(path, "/Dados_Transicao_MapBiomas_5.0_UF-MUN_SITE_v2.xlsx")
     }
-    a<-read_excel(path = p1f, sheet = 3)
+    a <- read_excel(path = p1f, sheet = 3)
 
     ######################
     ## Data Engineering ##
     ######################
 
-    retorno<-data.frame()
-    tab<-a
-    ncolu<-ncol(a)
-    ret<-c()
-    ret<-tab[,1:15]
-    if(is.null(transition_interval)){
-      for(i in 16:ncolu){
-        ret<-c()
-        ret<-tab[,1:15]
-        nomecol<-colnames(a)[i]
-        anoi<-substring(nomecol,1,4)
-        anof<-substring(nomecol,8,12)
-        anoi<-as.integer(anoi)
-        anof<-as.integer(anof)
-        if(anof-anoi!=0){
-          ret<-cbind(ret,tab[,i])
-          colnames(ret)[which(colnames(ret) == nomecol)] <- 'Area'
-          num<-nrow(tab[,i])
-          data<-rep(c(nomecol),num)
-          ret<-cbind(ret,data)
-          retorno<-rbind(retorno,ret)
+    retorno <- data.frame()
+    tab <- a
+    ncolu <- ncol(a)
+    ret <- c()
+    ret <- tab[, 1:15]
+    if (is.null(transition_interval)) {
+      for (i in 16:ncolu) {
+        ret <- c()
+        ret <- tab[, 1:15]
+        nomecol <- colnames(a)[i]
+        anoi <- substring(nomecol, 1, 4)
+        anof <- substring(nomecol, 8, 12)
+        anoi <- as.integer(anoi)
+        anof <- as.integer(anof)
+        if (anof - anoi != 0) {
+          ret <- cbind(ret, tab[, i])
+          colnames(ret)[which(colnames(ret) == nomecol)] <- "Area"
+          num <- nrow(tab[, i])
+          data <- rep(c(nomecol), num)
+          ret <- cbind(ret, data)
+          retorno <- rbind(retorno, ret)
         }
       }
-    }else if(!is.null(transition_interval)){
-      for(i in 16:ncolu){
-        ret<-c()
-        ret<-tab[,1:15]
-        nomecol<-colnames(a)[i]
-        anoi<-substring(nomecol,1,4)
-        anof<-substring(nomecol,8,12)
-        anoi<-as.integer(anoi)
-        anof<-as.integer(anof)
-        if(anof-anoi==transition_interval){
-          ret<-cbind(ret,tab[,i])
-          colnames(ret)[which(colnames(ret) == nomecol)] <- 'Area'
-          num<-nrow(tab[,i])
-          data<-rep(c(nomecol),num)
-          ret<-cbind(ret,data)
-          retorno<-rbind(retorno,ret)
+    } else if (!is.null(transition_interval)) {
+      for (i in 16:ncolu) {
+        ret <- c()
+        ret <- tab[, 1:15]
+        nomecol <- colnames(a)[i]
+        anoi <- substring(nomecol, 1, 4)
+        anof <- substring(nomecol, 8, 12)
+        anoi <- as.integer(anoi)
+        anof <- as.integer(anof)
+        if (anof - anoi == transition_interval) {
+          ret <- cbind(ret, tab[, i])
+          colnames(ret)[which(colnames(ret) == nomecol)] <- "Area"
+          num <- nrow(tab[, i])
+          data <- rep(c(nomecol), num)
+          ret <- cbind(ret, data)
+          retorno <- rbind(retorno, ret)
         }
       }
     }
-    retorno<-ret
+    retorno <- ret
   }
   return(retorno)
 }

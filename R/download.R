@@ -459,8 +459,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## TerraClimate ##
   ##################
 
-  if (source == "terraclimate"){
-
+  if (source == "terraclimate") {
     filename <- paste0(
       "agg_terraclimate_",
       param$dataset_code,
@@ -474,7 +473,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       "?",
       "&var=",
       param$dataset_code,
-
       "&south=",
       param$coords$lat_min,
       "&north=",
@@ -484,13 +482,11 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       "&east=",
       param$coords$lon_max,
       "&horizStride=1",
-
       "&time_start=",
       param$year$initial_time,
       "&time_end=",
       param$year$final_time,
       "&timeStride=1",
-
       "&disableProjSubset=on&addLatLon=true&accept=netcdf"
     )
   }
@@ -499,8 +495,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## GeoBR Shapefile ##
   #####################
 
-  if (source == "internal"){
-    if (dataset == "geo_municipalities"){
+  if (source == "internal") {
+    if (dataset == "geo_municipalities") {
       path <- param$url
     }
   }
@@ -530,10 +526,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source == "ibama") {
     file_extension <- ".zip"
   }
-  if (source == "terraclimate"){
+  if (source == "terraclimate") {
     file_extension <- ".nc"
   }
-  if (source == "internal"){
+  if (source == "internal") {
     file_extension <- ".rds"
   }
 
@@ -563,9 +559,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       googledrive::drive_download(path, path = temp, overwrite = TRUE)
     }
   }
-  if (source == "terraclimate"){
-    utils::download.file(url = path, destfile = temp, method = "curl"
-    )
+  if (source == "terraclimate") {
+    utils::download.file(url = path, destfile = temp, method = "curl")
   }
 
   ## This Data Opening Part Should Include the .Shp, not DBF
@@ -590,10 +585,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       janitor::clean_names() %>%
       tibble::as_tibble()
   }
-  if (file_extension == ".nc"){
+  if (file_extension == ".nc") {
     dat <- terra::rast(temp)
   }
-  if (file_extension == ".rds"){
+  if (file_extension == ".rds") {
     dat <- readr::read_rds(temp)
   }
   if (file_extension == ".xlsx") {
@@ -632,7 +627,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       if (param$year == 2018) {
         dat <- readxl::read_excel(temp, sheet = "IPS 2018 ")
       }
-      if(param$year == 2021){
+      if (param$year == 2021) {
         dat <- readxl::read_excel(temp, sheet = "IPS 2021")
       }
     }
@@ -733,7 +728,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   if (file_extension != ".nc") {
     unlink(temp)
-    }
+  }
 
   ####################
   ## Pre-Processing ##
@@ -947,33 +942,32 @@ datasets_link <- function() {
     ## CIPÓ ##
     ##########
 
-    'CIPO', 'brazilian_actors', NA, NA, NA, 'https://plataformacipo.org/mapa-crimes-ambientais/',
-    'CIPO', 'international_cooperation', NA, NA, NA, 'https://plataformacipo.org/mapeamento-cooperacao-internacional/',
-    'CIPO', 'forest_governance', NA, NA, NA, 'https://plataformacipo.org/arranjos-globais-de-governanca-florestal/',
+    "CIPO", "brazilian_actors", NA, NA, NA, "https://plataformacipo.org/mapa-crimes-ambientais/",
+    "CIPO", "international_cooperation", NA, NA, NA, "https://plataformacipo.org/mapeamento-cooperacao-internacional/",
+    "CIPO", "forest_governance", NA, NA, NA, "https://plataformacipo.org/arranjos-globais-de-governanca-florestal/",
 
     ##################
     ## TerraClimate ##
     ##################
 
-    'TerraClimate', 'max_temperature', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'min_temperature', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'wind_speed', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'vapor_pressure_deficit', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'vapor_pressure', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'snow_water_equivalent', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'shortwave_radiation_flux', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'soil_moisture', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'runoff', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'precipitation', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'potential_evaporation', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'climatic_water_deficit', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'water_evaporation', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'palmer_drought_severity_index', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
+    "TerraClimate", "max_temperature", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "min_temperature", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "wind_speed", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "vapor_pressure_deficit", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "vapor_pressure", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "snow_water_equivalent", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "shortwave_radiation_flux", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "soil_moisture", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "runoff", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "precipitation", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "potential_evaporation", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "climatic_water_deficit", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "water_evaporation", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "palmer_drought_severity_index", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
 
     ## Shapefile from github repository
 
     "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds"
-
   )
 
   return(link)
@@ -995,11 +989,9 @@ datasets_seeg <- function() {
 }
 
 
-datasets_baci = function() {
-
+datasets_baci <- function() {
   link <- tibble::tribble(
     ~survey, ~dataset, ~available_time, ~link,
-
     "BACI", "HS92", "1995-2020", "http://www.cepii.fr/DATA_DOWNLOAD/baci/data",
   )
   return(link)

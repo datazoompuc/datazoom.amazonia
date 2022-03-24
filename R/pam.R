@@ -125,7 +125,7 @@ load_pam <- function(dataset = NULL, raw_data,
 
   dat <- as.list(as.character(param$time_period)) %>%
     purrr::map(function(year_num) {
-      base::message(base::cat('Dowloading', year_num, 'data'))
+      base::message(base::cat("Dowloading", year_num, "data"))
       # suppressMessages(
       sidra_download(sidra_code = param$code, year = year_num, geo_level = param$geo_level)
       # )
