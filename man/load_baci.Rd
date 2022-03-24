@@ -25,10 +25,10 @@ provides disaggregated data on bilateral trade flows for more than 5000 products
 \examples{
 \dontrun{
 # download treated trade data from 2018
-exp_mun <- load_br_trade(dataset = "HS92",
-                         raw_data = FALSE, time_period = 2018)
-
-
+exp_mun <- load_br_trade(
+  dataset = "HS92",
+  raw_data = FALSE, time_period = 2018
+)
 }
 
 }

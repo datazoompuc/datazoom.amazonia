@@ -27,9 +27,11 @@ Loads information on animal farming inventories and livestock products (IBGE). S
 \examples{
 \dontrun{
 # download state raw data from 2012 for animal origin production
-ppm_aop <- load_ppm(dataset = 'ppm_animal_origin_production',
-                    raw_data = TRUE,
-                    geo_level = 'state',
-                    time_period = 2012)
+ppm_aop <- load_ppm(
+  dataset = "ppm_animal_origin_production",
+  raw_data = TRUE,
+  geo_level = "state",
+  time_period = 2012
+)
 }
 }

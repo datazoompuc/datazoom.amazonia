@@ -25,18 +25,24 @@ Loads data of estimates of emission of greenhouse gases
 \examples{
 \dontrun{
 # download state raw data
-seeg <- load_seeg(dataset = 'seeg',
-                  raw_data = TRUE,
-                  geo_level = 'state')
+seeg <- load_seeg(
+  dataset = "seeg",
+  raw_data = TRUE,
+  geo_level = "state"
+)
 
 # download country energy treated data
- seeg1 <- load_seeg(dataset = 'seeg_energy',
-                   raw_data = FALSE,
-                   geo_level = 'country')
+seeg1 <- load_seeg(
+  dataset = "seeg_energy",
+  raw_data = FALSE,
+  geo_level = "country"
+)
 
- # download land municipality treated data
- seeg2 = load_seeg(dataset = 'seeg_land',
-                  raw_data = FALSE,
-                  geo_level = 'municipality')
+# download land municipality treated data
+seeg2 <- load_seeg(
+  dataset = "seeg_land",
+  raw_data = FALSE,
+  geo_level = "municipality"
+)
 }
 }

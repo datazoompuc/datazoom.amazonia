@@ -27,9 +27,11 @@ Loads information on the amount and value of the production of the exploitation 
 \examples{
 \dontrun{
 # download state raw data from 2012 for silviculture
-pevs_silvi <- load_pevs(dataset = 'pevs_silviculture',
-                        raw_data = TRUE,
-                        geo_level = 'state',
-                        time_period = 2012)
+pevs_silvi <- load_pevs(
+  dataset = "pevs_silviculture",
+  raw_data = TRUE,
+  geo_level = "state",
+  time_period = 2012
+)
 }
 }
