@@ -49,29 +49,12 @@ datazoom.amazonia::datasets_link()
 
 ## Installation
 
-You can install the released version of `datazoom.amazonia` from
-[CRAN](https://CRAN.R-project.org/package=datazoom.amazonia) with:
-
-``` r
-install.packages("datazoom.amazonia")
-```
-
-And the development version from GitHub with:
+You can install the development version from GitHub with:
 
 ``` r
 # install.packages("devtools")
 devtools::install_github("datazoompuc/datazoom.amazonia")
 ```
-
-Before installing our development version, it is required to install
-first this package:
-
-``` r
-devtools::install_github("ipeaGIT/geobr", subdir = "r-package").
-```
-
-After installing it, you will be able to download our development
-version package.
 
 ## Datasets
 
@@ -112,13 +95,6 @@ version package.
 **[10 - TerraClimate data](#10---terraclimate)**
 
 **[11 - BACI data](#11---baci)**
-
-## The Structure of our functions
-
-**[1 - The Structure of the
-functions](#the-structure-of-the-functions)**
-
-**[2 - Examples](#examples)**
 
 ## 1 - INPE data
 
@@ -782,6 +758,13 @@ raw_baci <- load_baci(dataset = "HS92", raw_data = TRUE, time_period = 2016)
 clean_baci <- load_baci(dataset = "HS92", raw_data = FALSE, time_period = 2016,
                         language = "pt")
 ```
+
+## The Structure of our functions
+
+**[1 - The Structure of the
+functions](#the-structure-of-the-functions)**
+
+**[2 - Examples](#examples)**
 
 ## The Structure of the functions
 
