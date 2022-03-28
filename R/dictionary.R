@@ -237,7 +237,7 @@ load_dictionary <- function(dataset) {
   #######
 
 
-  if (dataset == "pam_temporary_crops") {
+  if (dataset == "temporary_crops") {
     harmonization_dat <- tibble::tribble(
       ~var_code, ~var_pt, ~var_eng, ~unit_value, ~unit_quantity, ~unit_area, ~available_period,
       2688, "Abacaxi", "Pineapple", "1K BRL", "Tons", "Hectares", NA,
@@ -277,7 +277,7 @@ load_dictionary <- function(dataset) {
     )
   }
 
-  if (dataset == "pam_permanent_crops") {
+  if (dataset == "permanent_crops") {
     harmonization_dat <- tibble::tribble(
       ~var_code, ~var_pt, ~var_eng, ~unit_value, ~unit_quantity, ~unit_area, ~available_period,
       2717, "Abacate", "Avocado", "1K BRL", "Tons", "Hectares", NA,
@@ -318,11 +318,11 @@ load_dictionary <- function(dataset) {
       2746, "Tungue (Fruto Seco)", "Tung (Dry Fruit)", "1K BRL", "Tons", "Hectares", NA,
       2747, "Urucum (Semente)", "Annatto (Seed)", "1K BRL", "Tons", "Hectares", NA,
       2748, "Uva", "Grape", "1K BRL", "Tons", "Hectares", NA,
-      0, "Total", "Total", "1K BRL", "Tons", "Hectares", NA
+      '0', "Total", "Total", "1K BRL", "Tons", "Hectares", NA
     )
   }
 
-  if (dataset == "pam_all_crops") {
+  if (dataset == "all_crops") {
     harmonization_dat <- tibble::tribble(
       ~var_code, ~var_pt, ~var_eng, ~unit_value, ~unit_quantity, ~unit_area, ~available_period,
       40129, "Abacate", "Avocado", "1K BRL", "Tons", "Hectares", NA,
@@ -396,13 +396,13 @@ load_dictionary <- function(dataset) {
       40272, "Tungue (Fruto Seco)", "Tung (Dry Fruit)", "1K BRL", "Tons", "Hectares", NA,
       40273, "Urucum (Semente)", "Annatto (Seed)", "1K BRL", "Tons", "Hectares", NA,
       40274, "Uva", "Grape", "1K BRL", "Tons", "Hectares", NA,
-      0, "Total", "Total", "1K BRL", "Tons", "Hectares", NA
+      '0', "Total", "Total", "1K BRL", "Tons", "Hectares", NA
     )
   }
 
   # Crops with more than one harvest (Corn, Potato, Peanut or Beans)
 
-  if (dataset == "pam_corn") {
+  if (dataset == "corn") {
     harmonization_dat <- tibble::tribble(
       ~var_code, ~var_pt, ~var_eng, ~unit_value, ~unit_quantity, ~unit_area, ~available_period,
       114253, "Milho em Grao (Primeira Safra)", "Corn in Grain (First Crop)", "None", "Tons", "Hectares", NA,
@@ -411,7 +411,7 @@ load_dictionary <- function(dataset) {
     )
   }
 
-  if (dataset == "pam_potato") {
+  if (dataset == "potato") {
     harmonization_dat <- tibble::tribble(
       ~var_code, ~var_pt, ~var_eng, ~unit_value, ~unit_quantity, ~unit_area, ~available_period,
       117989, "Batata Inglesa (Primeira Safra)", "English Potato (First Crop)", "None", "Tons", "Hectares", NA,
@@ -421,7 +421,7 @@ load_dictionary <- function(dataset) {
     )
   }
 
-  if (dataset == "pam_peanut") {
+  if (dataset == "peanut") {
     harmonization_dat <- tibble::tribble(
       ~var_code, ~var_pt, ~var_eng, ~unit_value, ~unit_quantity, ~unit_area, ~available_period,
       117987, "Amendoim em Casca (Primeira Safra)", "Peanuts in Shell (First Crop)", "None", "Tons", "Hectares", NA,
@@ -430,7 +430,7 @@ load_dictionary <- function(dataset) {
     )
   }
 
-  if (dataset == "pam_beans") {
+  if (dataset == "beans") {
     harmonization_dat <- tibble::tribble(
       ~var_code, ~var_pt, ~var_eng, ~unit_value, ~unit_quantity, ~unit_area, ~available_period,
       117991, "Feijao em Grao (Primeira Safra)", "Beans in Grain (First Crop)", "None", "Tons", "Hectares", NA,
@@ -562,31 +562,31 @@ load_dictionary <- function(dataset) {
       513, "Valor adicionado bruto a precos correntes da agropecuaria", "Gross value added at current prices in farming", "1K BRL", NA,
       516, "Participacao do valor adicionado bruto a precos correntes da agropecuaria no valor adicionado bruto a precos correntes total", "Share of gross value added at current prices of the farming sector in total gross value added at current prices", NA, "%",
       557, "Participacao do valor adicionado bruto a precos correntes da agropecuaria no valor adicionado bruto a precos correntes da agropecuaria da microrregiao geografica", "Share of gross value added at current prices of the farming sector in gross value added at current prices in farming the geographic microregion", NA, "%",
-      556, "Participacao do valor adicionado bruto a precos correntes da agropecuaria no valor adicionado bruto a precos correntes da agropecuaria da mesorregiao geografica", "Share of gross value added at current prices of the farming sector in gross value added at current prices in farming the geographic mesoregion", NA, "%",
-      515, "Participacao do valor adicionado bruto a precos correntes da agropecuaria no valor adicionado bruto a precos correntes da agropecuaria da unidade da federacao", "Share of gross value added at current prices of the farming sector in gross value added at current prices in farming in the federation unit", NA, "%",
-      547, "Participacao do valor adicionado bruto a precos correntes da agropecuaria no valor adicionado bruto a precos correntes da agropecuaria da grande regiao", "Share of gross value added at current prices of the farming sector in gross value added at current prices in farming in the wider region", NA, "%",
-      514, "Participacao do valor adicionado bruto a precos correntes da agropecuaria no valor adicionado bruto a precos correntes da agropecuaria do Brasil", "Share of gross value added at current prices of the farming sector in the gross value added at current prices in farming sector in Brazil", NA, "%",
-      517, "Valor adicionado bruto a precos correntes da industria", "Gross value added at current prices in industry", "1K BRL", NA,
-      520, "Participacao do valor adicionado bruto a precos correntes da industria no valor adicionado bruto a precos correntes total", "Share of gross value added at current prices of the industrial sector in total gross value added at current prices", NA, "%",
-      559, "Participacao do valor adicionado bruto a precos correntes da industria no valor adicionado bruto a precos correntes da industria da microrregiao geografica", "Share of gross value added at current prices of the industrial sector in the gross value added at current prices of the industrial sector of the geographic microregion", NA, "%",
-      558, "Participacao do valor adicionado bruto a precos correntes da industria no valor adicionado bruto a precos correntes da industria da mesorregiao geografica", "Share of the gross value added at current prices of the industrial sector in the gross value added at current prices of the industrial sector of the geographical mesoregion", NA, "%",
-      519, "Participacao do valor adicionado bruto a precos correntes da industria no valor adicionado bruto a precos correntes da industria da unidade da federacao", "Share of the gross value added at current prices of the industrial sector in the gross value added at current prices of the industrial sector of the federation unit", NA, "%",
-      548, "Participacao do valor adicionado bruto a precos correntes da industria no valor adicionado bruto a precos correntes da industria da grande regiao", "Share of gross value added at current industry prices in gross value added at current industry prices in the wider region", NA, "%",
-      518, "Participacao do valor adicionado bruto a precos correntes da industria no valor adicionado bruto a precos correntes da industria do Brasil", "Share of gross value added at current prices in the industrial sector in the gross value added at current prices in the industrial sector in Brazil", NA, "%",
-      6575, "Valor adicionado bruto a precos correntes dos servicos, exclusive administracao, defesa, educacao e saude publica e seguridade social", "Gross value added at current prices in services, excluding administration, defense, education, public health and Social Security", "1K BRL", NA,
-      6574, "Participacao do valor adicionado bruto a precos correntes dos servicos, exclusive administracao, defesa, educacao e saude publicas e seguridade social, no valor adicionado bruto a precos correntes total", "Share of the gross value added at current prices of the services sector, excluding administration, defense, education, public health and Social Security, in total gross value added at current prices", NA, "%",
-      6571, "Participacao do valor adicionado bruto a precos correntes dos servicos, exclusive administracao, defesa, educacao e saude publicas e seguridade social, no valor adicionado bruto a precos correntes dos servicos, exclusive administracao, defesa, educacao e saude publica e seguridade social da microrregiao geografica", "Share of the gross value added at current prices of the services sector, excluding administration, defense, education, public health and Social Security, in total gross value added at current prices of services sector,excluding administration, defense, education, public health and Social Security of the microregion", NA, "%",
-      6570, "Participacao do valor adicionado bruto a precos correntes dos servicos, exclusive administracao, defesa, educacao e saude publicas e seguridade social, no valor adicionado bruto a precos correntes dos servicos, exclusive administracao, defesa, educacao e saude publica e seguridade social da mesorregiao geografica", "Share of the gross value added at current prices of the services sector, excluding administration, defense, education, public health and Social Security, in total gross value added at current prices of services sector,excluding administration, defense, education, public health and Social Security of the mesoregion", NA, "%",
-      6572, "Participacao do valor adicionado bruto a precos correntes dos servicos, exclusive administracao, defesa, educacao e saude publicas e seguridade social, no valor adicionado bruto a precos correntes dos servicos, exclusive administracao, defesa, educacao e saude publica e seguridade social da unidade da federacao", "Share of the gross value added at current prices of the services sector, excluding administration, defense, education, public health and Social Security, in total gross value added at current prices of services sector,excluding administration, defense, education, public health and Social Security of the federation unit", NA, "%",
-      6569, "Participacao do valor adicionado bruto a precos correntes dos servicos, exclusive administracao, defesa, educacao e saude publicas e seguridade social, no valor adicionado bruto a precos correntes dos servicos, exclusive administracao, defesa, educacao e saude publica e seguridade social da grande regiao", "Share of the gross value added at current prices of the services sector, excluding administration, defense, education, public health and Social Security, in total gross value added at current prices of services sector,excluding administration, defense, education, public health and Social Security of the wider region", NA, "%",
-      6573, "Participacao do valor adicionado bruto a precos correntes dos servicos, exclusive administracao, defesa, educacao e saude publicas e seguridade social, no valor adicionado bruto a precos correntes dos servicos, exclusive administracao, defesa, educacao e saude publica e seguridade social do Brasil", "Share of the gross value added at current prices of the services sector, excluding administration, defense, education, public health and Social Security, in total gross value added at current prices of services sector,excluding administration, defense, education, public health and Social Security of Brazil", NA, "%",
-      525, "Valor adicionado bruto a precos correntes da administracao, defesa, educacao, saude publicas e seguridade social", "Gross added value at current prices of administration, defense, education, public health and Social Security", "1K BRL", NA,
-      528, "Participacao do valor adicionado bruto a precos correntes da administracao, defesa, educacao e saude publicas e seguridade social no valor adicionado bruto a precos correntes total", "Share of gross value added at current prices for public administration, defense, education and health and social security in total gross value added at current prices", NA, "%",
-      563, "Participacao do valor adicionado bruto a precos correntes da administracao, defesa, educacao e saude publicas e seguridade social no valor adicionado bruto a precos correntes da administracao, defesa, educacao e saude publicas e seguridade social da microrregiao geografica", "Share of gross value added at current prices of public administration, defense, education and health and social security in the gross value added at current prices of public administration, defense, education and health and social security of the microregion", NA, "%",
-      562, "Participacao do valor adicionado bruto a precos correntes da administracao, defesa, educacao e saude publicas e seguridade social no valor adicionado bruto a precos correntes da administracao, defesa, educacao e saude publicas e seguridade social da mesorregiao geografica", "Share of gross value added at current prices of public administration, defense, education and health and social security in the gross value added at current prices of public administration, defense, education and health and social security of the mesoregion", NA, "%",
-      527, "Participacao do valor adicionado bruto a precos correntes da administracao, defesa, educacao e saude publicas e seguridade social no valor adicionado bruto a precos correntes da administracao, defesa, educacao e saude publicas e seguridade social da unidade da federacao", "Share of gross value added at current prices of administration, defense, education and public health and social security in the gross value added at current prices of administration, defense, education and public health and social security of the federation unit", NA, "%",
-      550, "Participacao do valor adicionado bruto a precos correntes da administracao, defesa, educacao e saude publicas e seguridade social no valor adicionado bruto a precos correntes da administracao, defesa, educacao e saude publicas e seguridade social da grande regiao", "Share of gross value added at current prices for public administration, defense, education and health and social security in the gross value added at current prices for public administration, defense, education and health and social security in the wider region", NA, "%",
-      526, "Participacao do valor adicionado bruto a precos correntes da administracao, defesa, educacao e saude publicas e seguridade social no valor adicionado bruto a precos correntes da administracao, defesa, educacao e saude publicas e seguridade social do Brasil", "Share of gross value added at current prices for public administration, defense, education and health and social security in the gross value added at current prices for public administration, defense, education and health and social security in Brazil", NA, "%",
+      '556', "Participacao do valor adicionado bruto a precos correntes da agropecuaria no valor adicionado bruto a precos correntes da agropecuaria da mesorregiao geografica", "Share of gross value added at current prices of the farming sector in gross value added at current prices in farming the geographic mesoregion", NA, "%",
+      '515', "Participacao do valor adicionado bruto a precos correntes da agropecuaria no valor adicionado bruto a precos correntes da agropecuaria da unidade da federacao", "Share of gross value added at current prices of the farming sector in gross value added at current prices in farming in the federation unit", NA, "%",
+      '547', "Participacao do valor adicionado bruto a precos correntes da agropecuaria no valor adicionado bruto a precos correntes da agropecuaria da grande regiao", "Share of gross value added at current prices of the farming sector in gross value added at current prices in farming in the wider region", NA, "%",
+      '514', "Participacao do valor adicionado bruto a precos correntes da agropecuaria no valor adicionado bruto a precos correntes da agropecuaria do Brasil", "Share of gross value added at current prices of the farming sector in the gross value added at current prices in farming sector in Brazil", NA, "%",
+      '517', "Valor adicionado bruto a precos correntes da industria", "Gross value added at current prices in industry", "1K BRL", NA,
+      '520', "Participacao do valor adicionado bruto a precos correntes da industria no valor adicionado bruto a precos correntes total", "Share of gross value added at current prices of the industrial sector in total gross value added at current prices", NA, "%",
+      '559', "Participacao do valor adicionado bruto a precos correntes da industria no valor adicionado bruto a precos correntes da industria da microrregiao geografica", "Share of gross value added at current prices of the industrial sector in the gross value added at current prices of the industrial sector of the geographic microregion", NA, "%",
+      '558', "Participacao do valor adicionado bruto a precos correntes da industria no valor adicionado bruto a precos correntes da industria da mesorregiao geografica", "Share of the gross value added at current prices of the industrial sector in the gross value added at current prices of the industrial sector of the geographical mesoregion", NA, "%",
+      '519', "Participacao do valor adicionado bruto a precos correntes da industria no valor adicionado bruto a precos correntes da industria da unidade da federacao", "Share of the gross value added at current prices of the industrial sector in the gross value added at current prices of the industrial sector of the federation unit", NA, "%",
+      '548', "Participacao do valor adicionado bruto a precos correntes da industria no valor adicionado bruto a precos correntes da industria da grande regiao", "Share of gross value added at current industry prices in gross value added at current industry prices in the wider region", NA, "%",
+      '518', "Participacao do valor adicionado bruto a precos correntes da industria no valor adicionado bruto a precos correntes da industria do Brasil", "Share of gross value added at current prices in the industrial sector in the gross value added at current prices in the industrial sector in Brazil", NA, "%",
+      '6575', "Valor adicionado bruto a precos correntes dos servicos, exclusive administracao, defesa, educacao e saude publica e seguridade social", "Gross value added at current prices in services, excluding administration, defense, education, public health and Social Security", "1K BRL", NA,
+      '6574', "Participacao do valor adicionado bruto a precos correntes dos servicos, exclusive administracao, defesa, educacao e saude publicas e seguridade social, no valor adicionado bruto a precos correntes total", "Share of the gross value added at current prices of the services sector, excluding administration, defense, education, public health and Social Security, in total gross value added at current prices", NA, "%",
+      '6571', "Participacao do valor adicionado bruto a precos correntes dos servicos, exclusive administracao, defesa, educacao e saude publicas e seguridade social, no valor adicionado bruto a precos correntes dos servicos, exclusive administracao, defesa, educacao e saude publica e seguridade social da microrregiao geografica", "Share of the gross value added at current prices of the services sector, excluding administration, defense, education, public health and Social Security, in total gross value added at current prices of services sector,excluding administration, defense, education, public health and Social Security of the microregion", NA, "%",
+      '6570', "Participacao do valor adicionado bruto a precos correntes dos servicos, exclusive administracao, defesa, educacao e saude publicas e seguridade social, no valor adicionado bruto a precos correntes dos servicos, exclusive administracao, defesa, educacao e saude publica e seguridade social da mesorregiao geografica", "Share of the gross value added at current prices of the services sector, excluding administration, defense, education, public health and Social Security, in total gross value added at current prices of services sector,excluding administration, defense, education, public health and Social Security of the mesoregion", NA, "%",
+      '6572', "Participacao do valor adicionado bruto a precos correntes dos servicos, exclusive administracao, defesa, educacao e saude publicas e seguridade social, no valor adicionado bruto a precos correntes dos servicos, exclusive administracao, defesa, educacao e saude publica e seguridade social da unidade da federacao", "Share of the gross value added at current prices of the services sector, excluding administration, defense, education, public health and Social Security, in total gross value added at current prices of services sector,excluding administration, defense, education, public health and Social Security of the federation unit", NA, "%",
+      '6569', "Participacao do valor adicionado bruto a precos correntes dos servicos, exclusive administracao, defesa, educacao e saude publicas e seguridade social, no valor adicionado bruto a precos correntes dos servicos, exclusive administracao, defesa, educacao e saude publica e seguridade social da grande regiao", "Share of the gross value added at current prices of the services sector, excluding administration, defense, education, public health and Social Security, in total gross value added at current prices of services sector,excluding administration, defense, education, public health and Social Security of the wider region", NA, "%",
+      '6573', "Participacao do valor adicionado bruto a precos correntes dos servicos, exclusive administracao, defesa, educacao e saude publicas e seguridade social, no valor adicionado bruto a precos correntes dos servicos, exclusive administracao, defesa, educacao e saude publica e seguridade social do Brasil", "Share of the gross value added at current prices of the services sector, excluding administration, defense, education, public health and Social Security, in total gross value added at current prices of services sector,excluding administration, defense, education, public health and Social Security of Brazil", NA, "%",
+      '525', "Valor adicionado bruto a precos correntes da administracao, defesa, educacao, saude publicas e seguridade social", "Gross added value at current prices of administration, defense, education, public health and Social Security", "1K BRL", NA,
+      '528', "Participacao do valor adicionado bruto a precos correntes da administracao, defesa, educacao e saude publicas e seguridade social no valor adicionado bruto a precos correntes total", "Share of gross value added at current prices for public administration, defense, education and health and social security in total gross value added at current prices", NA, "%",
+      '563', "Participacao do valor adicionado bruto a precos correntes da administracao, defesa, educacao e saude publicas e seguridade social no valor adicionado bruto a precos correntes da administracao, defesa, educacao e saude publicas e seguridade social da microrregiao geografica", "Share of gross value added at current prices of public administration, defense, education and health and social security in the gross value added at current prices of public administration, defense, education and health and social security of the microregion", NA, "%",
+      '562', "Participacao do valor adicionado bruto a precos correntes da administracao, defesa, educacao e saude publicas e seguridade social no valor adicionado bruto a precos correntes da administracao, defesa, educacao e saude publicas e seguridade social da mesorregiao geografica", "Share of gross value added at current prices of public administration, defense, education and health and social security in the gross value added at current prices of public administration, defense, education and health and social security of the mesoregion", NA, "%",
+      '527', "Participacao do valor adicionado bruto a precos correntes da administracao, defesa, educacao e saude publicas e seguridade social no valor adicionado bruto a precos correntes da administracao, defesa, educacao e saude publicas e seguridade social da unidade da federacao", "Share of gross value added at current prices of administration, defense, education and public health and social security in the gross value added at current prices of administration, defense, education and public health and social security of the federation unit", NA, "%",
+      '550', "Participacao do valor adicionado bruto a precos correntes da administracao, defesa, educacao e saude publicas e seguridade social no valor adicionado bruto a precos correntes da administracao, defesa, educacao e saude publicas e seguridade social da grande regiao", "Share of gross value added at current prices for public administration, defense, education and health and social security in the gross value added at current prices for public administration, defense, education and health and social security in the wider region", NA, "%",
+      '526', "Participacao do valor adicionado bruto a precos correntes da administracao, defesa, educacao e saude publicas e seguridade social no valor adicionado bruto a precos correntes da administracao, defesa, educacao e saude publicas e seguridade social do Brasil", "Share of gross value added at current prices for public administration, defense, education and health and social security in the gross value added at current prices for public administration, defense, education and health and social security in Brazil", NA, "%",
     )
   }
 
