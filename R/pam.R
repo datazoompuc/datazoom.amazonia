@@ -61,6 +61,14 @@ load_pam = function(dataset = NULL, raw_data,
   param$time_period = time_period
   param$language = language
 
+  if (!is.numeric(param$dataset)){
+    sidra_info = datasets_link() %>%
+      dplyr::filter(dataset == param$dataset) %>%
+      dplyr::select(sidra_code) %>%
+      unlist() %>%
+      stringr::str_split("/")
+  } else {param$code = param$dataset}
+
   # dataset
 
   if (!is.numeric(param$dataset)){
