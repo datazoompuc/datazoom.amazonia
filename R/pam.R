@@ -61,40 +61,20 @@ load_pam = function(dataset = NULL, raw_data,
   param$time_period = time_period
   param$language = language
 
+  # Extracting sidra info in the form code/classific/category
+
   if (!is.numeric(param$dataset)){
     sidra_info = datasets_link() %>%
       dplyr::filter(dataset == param$dataset) %>%
       dplyr::select(sidra_code) %>%
       unlist() %>%
-      stringr::str_split("/")
+      stringr::str_split("/") %>%
+      unlist()
   } else {param$code = param$dataset}
 
-  # dataset
-
-  if (!is.numeric(param$dataset)){
-    param$code = datasets_link() %>%
-      dplyr::filter(dataset == param$dataset) %>%
-      dplyr::select(sidra_code) %>%
-      unlist() %>%
-      as.numeric()
-  } else {param$code = param$dataset}
-
-  # classific
-
-  param$classific = datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(classific) %>%
-    unlist()%>%
-    as.list()
-
-  # category
-
-  param$classific = datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(category) %>%
-    unlist()%>%
-    as.list()
-
+  param$code <- sidra_info[1]
+  param$classific <- sidra_info[2]
+  param$category <- sidra_info[3]
 
  ## Check if year is acceptable
 
@@ -107,9 +87,6 @@ load_pam = function(dataset = NULL, raw_data,
 
   if (min(time_period) < year_check[1]){stop('Provided time period less than supported. Check documentation for time availability.')}
   if (max(time_period) > year_check[2]){stop('Provided time period greater than supported. Check documentation for time availability.')}
-
-
-
 
   ## Dataset
 
@@ -142,7 +119,11 @@ load_pam = function(dataset = NULL, raw_data,
   dat = as.list(as.character(param$time_period)) %>%
     purrr::map(function(year_num){
       #suppressMessages(
-        sidra_download(sidra_code = param$code, classific = param$classific, category = param$category, year = year_num,geo_level = param$geo_level)
+        sidra_download(sidra_code = param$code,
+                       classific = param$classific,
+                       category = list(param$category),
+                       year = year_num,
+                       geo_level = param$geo_level)
         #)
       }) %>%
     dplyr::bind_rows() %>%
