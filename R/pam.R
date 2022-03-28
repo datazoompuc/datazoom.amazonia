@@ -61,6 +61,8 @@ load_pam = function(dataset = NULL, raw_data,
   param$time_period = time_period
   param$language = language
 
+  # dataset
+
   if (!is.numeric(param$dataset)){
     param$code = datasets_link() %>%
       dplyr::filter(dataset == param$dataset) %>%
@@ -69,7 +71,24 @@ load_pam = function(dataset = NULL, raw_data,
       as.numeric()
   } else {param$code = param$dataset}
 
-  ## Check if year is acceptable
+  # classific
+
+  param$classific = datasets_link() %>%
+    dplyr::filter(dataset == param$dataset) %>%
+    dplyr::select(classific) %>%
+    unlist()%>%
+    as.list()
+
+  # category
+
+  param$classific = datasets_link() %>%
+    dplyr::filter(dataset == param$dataset) %>%
+    dplyr::select(category) %>%
+    unlist()%>%
+    as.list()
+
+
+ ## Check if year is acceptable
 
   year_check = datasets_link() %>%
     dplyr::filter(dataset == param$dataset) %>%
@@ -115,51 +134,12 @@ load_pam = function(dataset = NULL, raw_data,
   dat = as.list(as.character(param$time_period)) %>%
     purrr::map(function(year_num){
       #suppressMessages(
-        sidra_download(sidra_code = param$code,year = year_num,geo_level = param$geo_level)
+        sidra_download(sidra_code = param$code, classific = param$classific, category = param$category, year = year_num,geo_level = param$geo_level)
         #)
       }) %>%
     dplyr::bind_rows() %>%
     tibble::as_tibble()
 
-  if(dataset %in% c('pam_all_crops', 'pam_permanent_crops', 'pam_temporary_crops',
-                    'pam_corn', 'pam_potato', 'pam_peanut', 'pam_beans')){
-    dat <- dat
-  }
-
-
-  ###
-
-  # permanent production: (ainda nao fiz pra temporaria porque quero ter certeza que esse vai ser o metodo)
-
-  permanent <- list("Total", "Abacate","Algodão arbóreo (em caroço)", "Açaí",
-                    "Azeitona", "Banana (cacho)", "Borracha (látex coagulado)",  "Borracha (látex líquido)",
-                    "Cacau (em amêndoa)","Café (em grão) Total" ,"Café (em grão) Arábica","Café (em grão) Canephora",
-                    "Caju" , "Caqui","Castanha de caju","Chá-da-índia (folha verde)",
-                    "Coco-da-baía*","Dendê (cacho de coco)" , "Erva-mate (folha verde)","Figo",
-                    "Goiaba", "Guaraná (semente)",  "Laranja", "Limão",
-                    "Maçã" , "Mamão", "Manga", "Maracujá",
-                    "Marmelo", "Noz (fruto seco)","Palmito",  "Pera",
-                    "Pêssego", "Pimenta-do-reino","Sisal ou agave (fibra)", "Tangerina",
-                    "Tungue (fruto seco)", "Urucum (semente)","Uva")
-
-  code_permanent <- c(0,2717,718,45981,2719,2720,2721,40472,
-                      2722,2723,31619,31620,40473,2724,2725,
-                      2726,2727,2728,2729,2730,2731,2732,
-                      2733,2734,2735,2736,2737,2738,2739,
-                      2740,90001,2741,2742,2743,2744,
-                      2745,2746,2747,2748)
-
-  names(code_permanent) <- permanent
-
-  position <- grep(dataset, unlist(permanent))
-
-  if(dataset %in% names(code_permanent)){
-
-    dat <- dat %>%
-      filter(produto_das_lavouras_permanentes_codigo == code_permanent[position])
-  }
-
-  ## Return Raw Data
 
   if (raw_data == TRUE){return(dat)}
 
