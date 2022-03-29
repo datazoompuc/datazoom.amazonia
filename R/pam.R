@@ -340,6 +340,14 @@ load_pam <- function(dataset = NULL, raw_data,
     }
   }
 
+  # Labelling the code 0 (total)
+
+  dat <- dat %>%
+    dplyr::mutate(
+      dplyr::across(ends_with("_v0"),
+             ~ labelled(., "Total"))
+    )
+
   ##########################
   ## Returning Data Frame ##
   ##########################
