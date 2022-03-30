@@ -344,7 +344,7 @@ load_pam <- function(dataset = NULL, raw_data,
 
   dat <- dat %>%
     dplyr::mutate(
-      dplyr::across(ends_with("_v0"),
+      dplyr::across(dplyr::ends_with("_v0"),
              ~ labelled(., "Total"))
     )
 

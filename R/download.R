@@ -795,6 +795,8 @@ datasets_link <- function() {
     "PAM-IBGE", "wheat", "1612/c81/2716", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
     "PAM-IBGE", "triticale", "1612/c81/109180", "2005-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
 
+    ### Categories within permanent crops
+
     "PAM-IBGE", "permanent_total", "1613/c82/0", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
     "PAM-IBGE", "avocado", "1613/c82/2717", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
     "PAM-IBGE", "cotton", "1613/c82/2718", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
