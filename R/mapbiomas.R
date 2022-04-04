@@ -71,7 +71,7 @@ load_mapbiomas = function(dataset = NULL,raw_data=NULL,geo_level = 'municipality
   ## Downloading ##
   #################
 
-  dat = external_download(dataset = param$dataset,source = 'mapbiomas')
+  dat = external_download(dataset = param$dataset,source = 'mapbiomas', geo_level = param$geo_level)
 
   dat = dat %>%
     janitor::clean_names() %>%
@@ -230,6 +230,61 @@ load_mapbiomas = function(dataset = NULL,raw_data=NULL,geo_level = 'municipality
 
 
 
+  }
+
+  if(param$dataset == "mapbiomas_mining" & param$geo_level == "country" & param$language == "pt"){
+
+      ## Create Longer Data - Years as a Variable
+
+      dat = dat %>%
+        tidyr::pivot_longer(
+          cols = x1985:x2020,
+          names_to = 'year',
+          names_prefix = 'x',
+          values_to = 'value'
+        )
+
+      dat = dat %>%
+        dplyr::select(-c(category))
+
+      dat = dat %>%
+      dplyr::rename(id = feature_id,
+                    pais = name_pt_br,
+                    id_classe = class_id,
+                    grupo = group,
+                    tipo_mineracao = level_1,
+                    categoria_mineracao = level_2,
+                    produtos_mineracao = level_3,
+                    ano = year,
+                    valor = value)
+
+      dat = dat %>%
+        dplyr::relocate(ano, pais, id)
+  }
+
+  if(param$dataset == "mapbiomas_mining" & param$geo_level == "country" & param$language == "eng"){
+
+    ## Create Longer Data - Years as a Variable
+
+    dat = dat %>%
+      tidyr::pivot_longer(
+        cols = x1985:x2020,
+        names_to = 'year',
+        names_prefix = 'x',
+        values_to = 'value'
+      )
+
+    dat = dat %>%
+      dplyr::select(-c(category))
+
+    dat = dat %>%
+      dplyr::rename(country = name_pt_br,
+                    mining_type = level_1,
+                    mining_category = level_2,
+                    mining_products = level_3)
+
+    dat = dat %>%
+      dplyr::relocate(year, country, feature_id)
   }
 
   #################################

@@ -412,6 +412,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     if (dataset == "mapbiomas_grazing_quality") {
       path <- paste(param$url, "Estat%C3%ADsticas/MapBIomas_COL5_QUALIDADE_PASTAGEM-biomas-estados-SITE.xlsx", sep = "")
     }
+    if(dataset == "mapbiomas_mining"){
+      path = paste(param$url, "Estat%C3%ADsticas/Cole%C3%A7%C3.xlsx", sep = "")
+    }
   }
 
   #############
@@ -611,6 +614,26 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
     if (param$dataset == "mapbiomas_grazing_quality") {
       dat <- readxl::read_excel(temp, sheet = "BD_Qualidade")
+    }
+    if(param$dataset == "mapbiomas_mining" & geo_level == "country"){
+
+      dat = readxl::read_excel(temp, sheet = "BR")
+    }
+    if(param$dataset == "mapbiomas_mining" & geo_level == "state") {
+
+      dat = readxl::read_excel(temp, sheet = "UF")
+    }
+    if(param$dataset == "mapbiomas_mining" & geo_level == "biome"){
+
+      dat =  readxl::read_excel(temp, sheet = "BIOME")
+    }
+    if(param$dataset == "mapbiomas_mining" & geo_level == "municipality"){
+
+      dat = readxl::read_excel(temp, sheet = "MUN")
+    }
+    if(param$dataset == "mapbiomas_mining" & geo_level == "indigenous"){
+
+      dat = readxl::read_excel(temp, sheet = "TI")
     }
 
     if (param$source == "seeg") {
@@ -868,6 +891,7 @@ datasets_link <- function() {
     "MAPBIOMAS", "mapbiomas_deforestation_regeneration", NA, "1988-2017", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
     "MAPBIOMAS", "mapbiomas_irrigation", NA, "2000-2019", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
     "MAPBIOMAS", "mapbiomas_grazing_quality", NA, "2010 & 2018", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
+    "MAPBIOMAS", "mapbiomas_mining", NA, "1985-2020", "country, state, municipality, biome, indigenous", "https://mapbiomas-br-site.s3.amazonaws.com/",
 
     #############
     ## SIGMINE ##
