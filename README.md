@@ -24,7 +24,7 @@ data with the public then there’s nothing we can do about it.
 
 ``` r
 datazoom.amazonia::datasets_link()
-#> # A tibble: 52 x 6
+#> # A tibble: 53 x 6
 #>    survey   dataset                sidra_code available_time available_geo link 
 #>    <chr>    <chr>                       <dbl> <chr>          <chr>         <chr>
 #>  1 PAM-IBGE pam_all_crops                5457 1974-2020      Country, Sta~ http~
@@ -37,7 +37,7 @@ datazoom.amazonia::datasets_link()
 #>  8 PPM-IBGE ppm_livestock_invento~       3939 1974-2020      Country, Sta~ http~
 #>  9 PPM-IBGE ppm_sheep_farming              95 1974-2020      Country, Sta~ http~
 #> 10 PPM-IBGE ppm_animal_origin_pro~         74 1974-2020      Country, Sta~ http~
-#> # ... with 42 more rows
+#> # ... with 43 more rows
 ```
 
 ### Content:
@@ -49,12 +49,29 @@ datazoom.amazonia::datasets_link()
 
 ## Installation
 
-You can install the development version from GitHub with:
+You can install the released version of `datazoom.amazonia` from
+[CRAN](https://CRAN.R-project.org/package=datazoom.amazonia) with:
+
+``` r
+install.packages("datazoom.amazonia")
+```
+
+And the development version from GitHub with:
 
 ``` r
 # install.packages("devtools")
 devtools::install_github("datazoompuc/datazoom.amazonia")
 ```
+
+Before installing our development version, it is required to install
+first this package:
+
+``` r
+devtools::install_github("ipeaGIT/geobr", subdir = "r-package").
+```
+
+After installing it, you will be able to download our development
+version package.
 
 ## Datasets
 
@@ -95,6 +112,13 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 **[10 - TerraClimate data](#10---terraclimate)**
 
 **[11 - BACI data](#11---baci)**
+
+## The Structure of our functions
+
+**[1 - The Structure of the
+functions](#the-structure-of-the-functions)**
+
+**[2 - Examples](#examples)**
 
 ## 1 - INPE data
 
@@ -617,7 +641,7 @@ each year by area, that is, for example, the area used for a temporary
 crop of soybeans. It also reports the transition between coverings
 during given years.
 
-    1. dataset: There are five possible choices.
+    1. dataset: There are six possible choices.
     'mapbiomas_cover': type of land covering by biomes, states and municipalities.
                       data is available from 1985 to 2020.
     'mapbiomas_transition': transition between coverings by biomes, states and municipalities.
@@ -628,18 +652,21 @@ during given years.
                             data is available from 2000 to 2020
     'mapbiomas_grazing_quality': data about grazing quality by biome, state and municipality
                                  data is available from 2010 and 2018
+    'mapbiomas_mining': data about mining areas by biome, state, country, municipality and indigenous lands.
+                                 data is available from 1985 to 2020
     2. raw_data: there are two options:
       # TRUE: if you want the data as it is in the mapbiomas's site.
       # FALSE: if you want the treated (more organized) version of the data. 
-    3. geo_level: 'state', 'municipality', 'biomes'
-                   Read the details on the datasets because some of them don't have data for 'municipality'
+    3. geo_level: 'state', 'municipality', 'biomes', 'biome', 'country', 'indigenous_lands'
+                   Read the details on the datasets because some of them don't have data for 'municipality' and mapbiomas_mining accepts 'biome', 'country', 'indigenous_lands'.
     4. time_period: The data availability for each dataset is detailed above
     5. language: you can choose between portuguese ('pt') and english ('eng')
     6. time_id: 'year'
     7. cover_level: Five options: 
                     # cover_level = 0 has categories such as: Anthropic, Natural, Not Applied 
                     # cover_level = 1 has categories such as: Forest, Non Forest Natural Formation, Farming, Non Vegetated Area, Water, Non Observed
-                    # cover_level = 2 has categories such as: Agriculture, Aquaculture, Beach and Dune, Forest Plantation,  Pasture, River, Lake and Ocean                                # cover_level = 3 has categories such as: Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
+                    # cover_level = 2 has categories such as: Agriculture, Aquaculture, Beach and Dune, Forest Plantation,  Pasture, River, Lake and Ocean                                
+                    # cover_level = 3 has categories such as: Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
                     # cover_level = 4 has categories such as: Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
 
 ``` r
@@ -655,6 +682,8 @@ data = load_mapbiomas(dataset = "mapbiomas_grazing_quality", raw_data = FALSE, t
 data = load_mapbiomas(dataset = "mapbiomas_irrigation", raw_data = FALSE, time_period = "all", language = "eng")
 # download treated Mapbiomas deforestauon/regeneration data in portuguese
 data = load_mapbiomas(dataset = "mapbiomas_deforestation_regeneration", raw_data = FALSE, time_period = "all", language = "eng")
+# download treated indigenous lands data in portuguese
+data = load_mapbiomas("mapbiomas_mining", raw_data = FALSE, geo_level = "indigenous", language = "pt")
 ```
 
 ## 9 - CIPÓ
@@ -758,13 +787,6 @@ raw_baci <- load_baci(dataset = "HS92", raw_data = TRUE, time_period = 2016)
 clean_baci <- load_baci(dataset = "HS92", raw_data = FALSE, time_period = 2016,
                         language = "pt")
 ```
-
-## The Structure of our functions
-
-**[1 - The Structure of the
-functions](#the-structure-of-the-functions)**
-
-**[2 - Examples](#examples)**
 
 ## The Structure of the functions
 

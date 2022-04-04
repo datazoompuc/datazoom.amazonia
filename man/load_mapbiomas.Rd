@@ -15,11 +15,11 @@ load_mapbiomas(
 )
 }
 \arguments{
-\item{dataset}{A dataset name ("mapbiomas_cover", "mapbiomas_transition", "mapbiomas_irrigation", "mapbiomas_deforestation_regeneration", "mapbiomas_grazing_quality")}
+\item{dataset}{A dataset name ("mapbiomas_cover", "mapbiomas_transition", "mapbiomas_irrigation", "mapbiomas_deforestation_regeneration", "mapbiomas_grazing_quality" or "mapbiomas_mining")}
 
 \item{raw_data}{A \code{boolean} setting the return of raw or processed data}
 
-\item{geo_level}{A \code{string} that defines the geographic level of the data. Can be only "municipality".}
+\item{geo_level}{A \code{string} that defines the geographic level of the data. Can be only "municipality", except "mapbiomas_mining" which accepts more options}
 
 \item{time_period}{A \code{numeric} indicating what years will the data be loaded. Can be only "all".}
 
