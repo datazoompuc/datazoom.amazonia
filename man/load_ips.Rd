@@ -25,6 +25,6 @@ Loads information on the social and environmental performance of the Legal Amazo
 \examples{
 \dontrun{
 # download raw data from 2014
-ips <- load_ips(dataset = 'ips', raw_data = TRUE, time_period = 2014)
+ips <- load_ips(dataset = "ips", raw_data = TRUE, time_period = 2014)
 }
 }

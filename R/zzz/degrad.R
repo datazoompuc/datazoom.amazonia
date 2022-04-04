@@ -158,7 +158,7 @@ treat_degrad_data <- function(df, geo_aggregation, time_period, language, geo_am
   # But returns a zero vector if the name is already "DEGRAD", and a vector of numbers (of the rows) elsewhere
   # Then, the name of all of those is padronized to "DEGRAD"
   rows_degradation <- grep(df$class_name, pattern = "degrad[^_]", ignore.case = TRUE)
-  if(length(rows_degradation) != 0){
+  if (length(rows_degradation) != 0) {
     df[rows_degradation, ]$class_name <- "DEGRAD"
   }
 
@@ -196,8 +196,7 @@ treat_degrad_data <- function(df, geo_aggregation, time_period, language, geo_am
       dplyr::rename(Estado = .data$abbrev_state, Evento = .data$class_name) %>%
       # Removes useless columns
       dplyr::select(-c("code_muni", "code_state"))
-  }
-  else {
+  } else {
     if (geo_aggregation != "municipality") {
       warning("Spatial aggregation level not supported. Proceeding with Municipality.")
     }
@@ -215,8 +214,7 @@ treat_degrad_data <- function(df, geo_aggregation, time_period, language, geo_am
   # WE NEED TO LOOK AT THIS A LITTLE BIT FURTHER AND THOROUGHLY EXPLAIN TO THE USER
   if (time_period == "month") {
     df <- dplyr::group_by(df, .data$Mes, .add = TRUE)
-  }
-  else if (time_period != "year") {
+  } else if (time_period != "year") {
     warning("Temporal aggregation level not supported. Proceeding with Year.")
   }
 
@@ -235,8 +233,7 @@ treat_degrad_data <- function(df, geo_aggregation, time_period, language, geo_am
   language <- tolower(language)
   if (language == "eng") {
     df <- translate_degrad_to_english(df)
-  }
-  else if (language != "pt") {
+  } else if (language != "pt") {
     warning("Selected language is not supported. Proceeding with Portuguese.")
   }
 

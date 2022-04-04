@@ -16,87 +16,102 @@
 #' \dontrun{
 #' # download raw data (raw_data = TRUE) related to forest degradation
 #' # from 2010 to 2012 (time_period = 2010:2012).
-#' data <- load_degrad(dataset = 'degrad',
-#'                     raw_data = TRUE,
-#'                     time_period = 2010:2012)
+#' data <- load_degrad(
+#'   dataset = "degrad",
+#'   raw_data = TRUE,
+#'   time_period = 2010:2012
+#' )
 #'
 #' # download treated data (raw_data = FALSE) related to forest degradation
 #' # from 2013 (time_period = 2013) in portuguese (language = "pt").
-#' data <- load_degrad(dataset = 'degrad',
-#'                     raw_data = FALSE,
-#'                     time_period = 2013,
-#'                     language = 'pt')
+#' data <- load_degrad(
+#'   dataset = "degrad",
+#'   raw_data = FALSE,
+#'   time_period = 2013,
+#'   language = "pt"
+#' )
 #' }
 #'
 #' @importFrom magrittr %>%
 #' @export
 
-load_degrad <- function(dataset = 'degrad', raw_data,
+load_degrad <- function(dataset = "degrad", raw_data,
                         time_period,
-                        language = 'eng') {
+                        language = "eng") {
 
   # ,all_events = FALSE
 
   ## To-Do:
-    # Include Safety Download and Message if any Error Occurs
-    # Harmonize Columns Names, Create Panel and Deliver Raw Data
+  # Include Safety Download and Message if any Error Occurs
+  # Harmonize Columns Names, Create Panel and Deliver Raw Data
 
-  survey <- link <- .data <- abbrev_state <- ano <- area <-  NULL
+  survey <- link <- .data <- abbrev_state <- ano <- area <- NULL
   areameters <- areametros <- class_name <- classe <- cod_municipio <- NULL
   code_muni <- code_state <- codigouf <- geometry <- julday <- linkcolumn <- NULL
   municipality_code <- name_muni <- name_region <- name_state <- nome <- NULL
   pathrow <- code_region <- scene_id <- sigla <- uf <- view_date <- year <- NULL
-  geo_amazon = NULL
+  geo_amazon <- NULL
 
   #############################
   ## Define Basic Parameters ##
   #############################
 
-  param=list()
-  param$dataset = dataset
-  param$time_period = time_period
-  param$language = language
-  param$raw_data = raw_data
+  param <- list()
+  param$dataset <- dataset
+  param$time_period <- time_period
+  param$language <- language
+  param$raw_data <- raw_data
 
-  param$survey_name = datasets_link() %>%
+  param$survey_name <- datasets_link() %>%
     dplyr::filter(dataset == param$dataset) %>%
     dplyr::select(survey) %>%
     unlist()
 
-  param$url = datasets_link() %>%
+  param$url <- datasets_link() %>%
     dplyr::filter(dataset == param$dataset) %>%
     dplyr::select(link) %>%
     unlist()
 
   ## Dataset
 
-  if (is.null(param$dataset)){stop('Missing Dataset!')}
-  if (is.null(param$raw_data)){stop('Missing TRUE/FALSE for Raw Data')}
+  if (is.null(param$dataset)) {
+    stop("Missing Dataset!")
+  }
+  if (is.null(param$raw_data)) {
+    stop("Missing TRUE/FALSE for Raw Data")
+  }
 
 
   ######################
   ## Downloading Data ##
   ######################
 
-  dat = suppressWarnings(as.list(param$time_period) %>%
-      purrr::map(
-        function(t){external_download(dataset = param$dataset,
-                                      source='degrad', year = t) %>%
-            janitor::clean_names()
-        }
-      ))
+  dat <- suppressWarnings(as.list(param$time_period) %>%
+    purrr::map(
+      function(t) {
+        external_download(
+          dataset = param$dataset,
+          source = "degrad", year = t
+        ) %>%
+          janitor::clean_names()
+      }
+    ))
 
   ## Return Raw Data
 
-  if (raw_data == TRUE){return(dat)}
+  if (raw_data == TRUE) {
+    return(dat)
+  }
 
   # Join all tables
-  temp <- tibble::tribble(~linkcolumn, ~scene_id, ~class_name, ~pathrow, ~uf,
-                          ~area, ~geometry, ~year, ~con_ai_id, ~julday,
-                          ~ano, ~objet_id_3, ~cell_oid, ~view_date,
-                          ~codigouf, ~nome, ~inter_oid, ~areametros, ~areameters)
+  temp <- tibble::tribble(
+    ~linkcolumn, ~scene_id, ~class_name, ~pathrow, ~uf,
+    ~area, ~geometry, ~year, ~con_ai_id, ~julday,
+    ~ano, ~objet_id_3, ~cell_oid, ~view_date,
+    ~codigouf, ~nome, ~inter_oid, ~areametros, ~areameters
+  )
 
-  dat = c(dat, list(temp)) %>%
+  dat <- c(dat, list(temp)) %>%
     dplyr::bind_rows() %>%
     tibble::as_tibble()
 
@@ -133,7 +148,8 @@ load_degrad <- function(dataset = 'degrad', raw_data,
     "SP", 35,
     "SE", 28,
     "TO", 17,
-    "DF", 53)
+    "DF", 53
+  )
 
 
   dat <- dat %>%
@@ -145,8 +161,10 @@ load_degrad <- function(dataset = 'degrad', raw_data,
 
 
   # Clean geometry
-  dat$geometry <- sf::st_set_crs(dat$geometry,
-                                 "+proj=longlat +ellps=aust_SA +towgs84=-66.8700,4.3700,-38.5200,0.0,0.0,0.0,0.0 +no_defs")
+  dat$geometry <- sf::st_set_crs(
+    dat$geometry,
+    "+proj=longlat +ellps=aust_SA +towgs84=-66.8700,4.3700,-38.5200,0.0,0.0,0.0,0.0 +no_defs"
+  )
 
   dat$geometry <- dat$geometry %>%
     sf::st_make_valid()
@@ -159,8 +177,8 @@ load_degrad <- function(dataset = 'degrad', raw_data,
   # The name of all of those is padronized to "DEGRAD"
   dat <- dat %>%
     dplyr::mutate(class_name = ifelse(stringr::str_detect(class_name, "DEGRAD"),
-                                      "DEGRAD", class_name)
-                  )
+      "DEGRAD", class_name
+    ))
 
   ###################################
   ## Filter Legal Amazon Geography ##
@@ -169,8 +187,10 @@ load_degrad <- function(dataset = 'degrad', raw_data,
   ## Selecting Municipalities in the Legal Amazon
 
   # Loading municipal map data
-  geo_br <- external_download(dataset = "geo_municipalities",
-                              source = "internal")
+  geo_br <- external_download(
+    dataset = "geo_municipalities",
+    source = "internal"
+  )
 
   # legal_amazon belongs to package's sysdata.rda and filters for municipalities in legal amazon
   amazon_municipalities <- dplyr::filter(municipalities, .data$legal_amazon == 1)
@@ -198,15 +218,19 @@ load_degrad <- function(dataset = 'degrad', raw_data,
   sf::st_geometry(geo_amazon) <- geo_amazon$geom
 
   dat <- suppressWarnings(sf::st_intersection(dat, geo_amazon)) %>%
-     dplyr::mutate(area = sf::st_area(.data$geometry))
+    dplyr::mutate(area = sf::st_area(.data$geometry))
 
   dat <- dat %>%
-    dplyr::select(-name_muni, -abbrev_state, -name_state,
-                  -code_region, -name_region)
+    dplyr::select(
+      -name_muni, -abbrev_state, -name_state,
+      -code_region, -name_region
+    )
 
   dat <- dat %>%
-    dplyr::select(year, linkcolumn, scene_id, code_state, code_muni,
-                  class_name, pathrow, area, view_date, julday, geometry)
+    dplyr::select(
+      year, linkcolumn, scene_id, code_state, code_muni,
+      class_name, pathrow, area, view_date, julday, geometry
+    )
 
   # # Set aggregation level
   # geo_level <- tolower(geo_level)
@@ -237,28 +261,25 @@ load_degrad <- function(dataset = 'degrad', raw_data,
   ## Translation ##
   #################
 
-  if (param$language == 'pt'){
-
-    dat_mod = dat %>%
-      dplyr::select(ano = year, linkcolumn, scene_id,
-                    cod_uf = code_state, cod_municipio = code_muni,
-                    classe = class_name, pathrow, area, data = view_date,
-                    julday, geometry
+  if (param$language == "pt") {
+    dat_mod <- dat %>%
+      dplyr::select(
+        ano = year, linkcolumn, scene_id,
+        cod_uf = code_state, cod_municipio = code_muni,
+        classe = class_name, pathrow, area, data = view_date,
+        julday, geometry
       ) %>%
       dplyr::arrange(ano, cod_municipio, classe)
-
   }
 
-  if (param$language == 'eng'){
-
-    dat_mod = dat %>%
+  if (param$language == "eng") {
+    dat_mod <- dat %>%
       dplyr::select(year, linkcolumn, scene_id,
-                    state_code = code_state, municipality_code = code_muni,
-                    class_name, pathrow, area, date = view_date,
-                    julday, geometry
+        state_code = code_state, municipality_code = code_muni,
+        class_name, pathrow, area, date = view_date,
+        julday, geometry
       ) %>%
       dplyr::arrange(year, municipality_code, class_name)
-
   }
 
   ####################
@@ -266,8 +287,4 @@ load_degrad <- function(dataset = 'degrad', raw_data,
   ####################
 
   return(dat_mod)
-
 }
-
-
-

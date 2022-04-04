@@ -14,3 +14,4 @@
 ^R/zzz$
 ^logo\.png$
 ^data-raw/geo_municipalities\.rds$
+^cran-comments\.md$

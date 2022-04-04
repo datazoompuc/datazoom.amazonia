@@ -15,54 +15,58 @@
 #'
 #' @examples \dontrun{
 #' # download state raw data
-#' sigmine_active <- load_sigmine(dataset = 'sigmine_active',
-#'                                raw_data = TRUE)
+#' sigmine_active <- load_sigmine(
+#'   dataset = "sigmine_active",
+#'   raw_data = TRUE
+#' )
 #' }
-
-
-load_sigmine = function(dataset = 'sigmine_active',
-                        raw_data,
-                        language = 'eng'){
-
-
+load_sigmine <- function(dataset = "sigmine_active",
+                         raw_data,
+                         language = "eng") {
   survey <- link <- nome <- uf <- NULL
 
   #############################
   ## Define Basic Parameters ##
   #############################
 
-  param=list()
-  param$dataset = dataset
-  #param$geo_level = geo_level
-  #param$time_period = time_period
-  param$language = language
-  #param$time_id = time_id
-  param$raw_data = raw_data
+  param <- list()
+  param$dataset <- dataset
+  # param$geo_level = geo_level
+  # param$time_period = time_period
+  param$language <- language
+  # param$time_id = time_id
+  param$raw_data <- raw_data
 
-  param$survey_name = datasets_link() %>%
+  param$survey_name <- datasets_link() %>%
     dplyr::filter(dataset == param$dataset) %>%
     dplyr::select(survey) %>%
     unlist()
 
-  param$url = datasets_link() %>%
+  param$url <- datasets_link() %>%
     dplyr::filter(dataset == param$dataset) %>%
     dplyr::select(link) %>%
     unlist()
 
   ## Dataset
 
-  if (is.null(param$dataset)){stop('Missing Dataset!')}
-  if (is.null(param$raw_data)){stop('Missing TRUE/FALSE for Raw Data')}
+  if (is.null(param$dataset)) {
+    stop("Missing Dataset!")
+  }
+  if (is.null(param$raw_data)) {
+    stop("Missing TRUE/FALSE for Raw Data")
+  }
 
   ######################
   ## Downloading Data ##
   ######################
 
-  dat = external_download(dataset = param$dataset,source='sigmine') %>%
-          janitor::clean_names()
+  dat <- external_download(dataset = param$dataset, source = "sigmine") %>%
+    janitor::clean_names()
 
   ## Return Raw Data
-  if (raw_data == TRUE){return(dat)}
+  if (raw_data == TRUE) {
+    return(dat)
+  }
 
 
   ######################
@@ -70,23 +74,21 @@ load_sigmine = function(dataset = 'sigmine_active',
   ######################
 
   a <- dat %>%
-    dplyr::mutate(dplyr::across(nome:uf,
-                  ~ ifelse(stringr::str_detect(.x, "DADO N.O CADASTRADO"),
-                           NA, .x)
-                                )
-                  )
+    dplyr::mutate(dplyr::across(
+      nome:uf,
+      ~ ifelse(stringr::str_detect(.x, "DADO N.O CADASTRADO"),
+        NA, .x
+      )
+    ))
 
   if (language == "pt") {
-
     a$area_ha <- a$area_ha * 10000
     names(a)[names(a) == "ult_evento"] <- "ultimo_evento"
     names(a)[names(a) == "nome"] <- "empresa"
     names(a)[names(a) == "subs"] <- "mineral"
     names(a)[names(a) == "uso"] <- "uso"
     names(a)[names(a) == "area_ha"] <- "area_m2"
-
   } else if (language == "eng") {
-
     a$area_ha <- a$area_ha * 10000
     names(a)[names(a) == "numero"] <- "number"
     names(a)[names(a) == "ult_evento"] <- "last_event"
@@ -99,9 +101,7 @@ load_sigmine = function(dataset = 'sigmine_active',
     names(a)[names(a) == "subs"] <- "mineral"
     names(a)[names(a) == "uso"] <- "use"
     names(a)[names(a) == "area_ha"] <- "area_m2"
-
   }
 
   return(a)
-
 }

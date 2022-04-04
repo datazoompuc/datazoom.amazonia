@@ -17,9 +17,11 @@
 #'
 #' @examples
 #' \dontrun{
-#' load_sigmine(space_aggregation = "municipality",
+#' load_sigmine(
+#'   space_aggregation = "municipality",
 #'   source = NULL,
-#'   language = "pt")
+#'   language = "pt"
+#' )
 #' }
 #'
 load_sigmine <- function(space_aggregation = c("municipality", "state", "municipio", "estado"), source = NULL, language = c("eng", "pt")) {
@@ -85,7 +87,6 @@ load_sigmine <- function(space_aggregation = c("municipality", "state", "municip
     ret <- a
 
     ## Municipality Level Data
-
   } else if (space_aggregation == "municipality" | space_aggregation == "municipio") {
     geo_amazon <- geobr::read_municipality(year = 2019, simplified = TRUE)
     operation_crs <- sf::st_crs("+proj=poly +lat_0=0 +lon_0=-54 +x_0=5000000 +y_0=10000000 +ellps=aust_SA +units=m +no_defs")
@@ -142,5 +143,3 @@ load_sigmine <- function(space_aggregation = c("municipality", "state", "municip
 
   return(ret)
 }
-
-

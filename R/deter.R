@@ -16,20 +16,22 @@
 #' @examples
 #' \dontrun{
 #' # Download raw data (raw_data = TRUE) from Amazonia (dataset = "deter_amz")
-#' deter_amz <- load_deter(dataset = 'deter_amz',
-#'                         raw_data = TRUE)
+#' deter_amz <- load_deter(
+#'   dataset = "deter_amz",
+#'   raw_data = TRUE
+#' )
 #'
 #' # Download treated data (raw_data = FALSE) from Cerrado (dataset = "deter_cerrado")
 #' # in portuguese (language = 'pt')
-#' deter_cer <- load_deter(dataset = 'deter_cerrado',
-#'                         raw_data = FALSE,
-#'                         language = "pt")
-#'
+#' deter_cer <- load_deter(
+#'   dataset = "deter_cerrado",
+#'   raw_data = FALSE,
+#'   language = "pt"
+#' )
 #' }
-
-
+#'
 load_deter <- function(dataset = NULL, raw_data,
-                       language = 'eng') {
+                       language = "eng") {
 
   ## Dataset can be either Amazonia or Cerrado
   # Default is all time-periods
@@ -64,48 +66,58 @@ load_deter <- function(dataset = NULL, raw_data,
   ## Define Basic Parameters ##
   #############################
 
-  param=list()
-  param$dataset = dataset
-  param$time_period = time_period
-  param$language = language
-  param$raw_data = raw_data
+  param <- list()
+  param$dataset <- dataset
+  param$time_period <- time_period
+  param$language <- language
+  param$raw_data <- raw_data
 
-  param$survey_name = datasets_link() %>%
+  param$survey_name <- datasets_link() %>%
     dplyr::filter(dataset == param$dataset) %>%
     dplyr::select(survey) %>%
     unlist()
 
-  param$url = datasets_link() %>%
+  param$url <- datasets_link() %>%
     dplyr::filter(dataset == param$dataset) %>%
     dplyr::select(link) %>%
     unlist()
 
   ## Dataset
 
-  if (is.null(param$dataset)){stop('Missing Dataset!')}
-  if (is.null(param$raw_data)){stop('Missing TRUE/FALSE for Raw Data')}
+  if (is.null(param$dataset)) {
+    stop("Missing Dataset!")
+  }
+  if (is.null(param$raw_data)) {
+    stop("Missing TRUE/FALSE for Raw Data")
+  }
 
   #################
   ## Downloading ##
   #################
 
-  dat = external_download(dataset = param$dataset,source = 'deter')
+  dat <- external_download(dataset = param$dataset, source = "deter")
 
-  dat = dat %>%
-    dplyr::mutate_if(is.character,function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")})
+  dat <- dat %>%
+    dplyr::mutate_if(is.character, function(var) {
+      stringi::stri_trans_general(str = var, id = "Latin-ASCII")
+    })
 
 
   ## Return Raw Data
 
-  if (raw_data == TRUE){return(dat)}
+  if (raw_data == TRUE) {
+    return(dat)
+  }
 
   ######################
   ## Data Engineering ##
   ######################
 
   # Loading municipal map data
-  geo_br <- external_download(dataset = "geo_municipalities",
-                              source = "internal")
+  geo_br <- external_download(
+    dataset = "geo_municipalities",
+    source = "internal"
+  )
 
   ###################
   ## Harmonize CRS ##
@@ -126,37 +138,41 @@ load_deter <- function(dataset = NULL, raw_data,
     dplyr::mutate(area = sf::st_area(.data$geometry))
 
   dat <- dat %>%
-    dplyr::select(-name_muni, -abbrev_state, -name_state,
-                  -code_region, -name_region)
+    dplyr::select(
+      -name_muni, -abbrev_state, -name_state,
+      -code_region, -name_region
+    )
 
   dat <- dat %>%
-    dplyr::select(view_date, code_state, code_muni, sensor, satellite, uc,
-                  classname, path_row, area, quadrant, geometry)
+    dplyr::select(
+      view_date, code_state, code_muni, sensor, satellite, uc,
+      classname, path_row, area, quadrant, geometry
+    )
 
   ################### ### -------------------- Need to Work
   ## Renaming Data ##
   ###################
 
-  if (param$language == 'pt'){
-
-    dat_mod = dat %>%
-      dplyr::select(data = view_date, cod_uf = code_state,
-                    cod_municipio = code_muni, sensor = sensor,
-                    satelite = satellite, uc, classe = classname,
-                    path_row, area, quadrante = quadrant, geometry) %>%
+  if (param$language == "pt") {
+    dat_mod <- dat %>%
+      dplyr::select(
+        data = view_date, cod_uf = code_state,
+        cod_municipio = code_muni, sensor = sensor,
+        satelite = satellite, uc, classe = classname,
+        path_row, area, quadrante = quadrant, geometry
+      ) %>%
       dplyr::arrange(data, cod_municipio, classe)
-
   }
 
-  if (param$language == 'eng'){
-
-    dat_mod = dat %>%
-      dplyr::select(date = view_date, state_code = code_state,
-                    municipality_code = code_muni, sensor = sensor,
-                    satellite, uc, class_name = classname,
-                    pathrow = path_row, area, quadrant, geometry) %>%
+  if (param$language == "eng") {
+    dat_mod <- dat %>%
+      dplyr::select(
+        date = view_date, state_code = code_state,
+        municipality_code = code_muni, sensor = sensor,
+        satellite, uc, class_name = classname,
+        pathrow = path_row, area, quadrant, geometry
+      ) %>%
       dplyr::arrange(date, municipality_code, class_name)
-
   }
   # df <- df %>%
   #   dplyr::rename_with(dplyr::recode,
@@ -222,7 +238,4 @@ load_deter <- function(dataset = NULL, raw_data,
   #################
 
   return(dat_mod)
-
 }
-
-
