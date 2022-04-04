@@ -763,7 +763,7 @@ datasets_link <- function() {
     "PAM-IBGE", "temporary_total", "1612/c81/0", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
     "PAM-IBGE", "pineapple", "1612/c81/2688", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
     "PAM-IBGE", "alfafa", "1612/c81/40471", "1974-1987", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "cotton", "1612/c81/2689", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "cotton_herbaceous", "1612/c81/2689", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
     "PAM-IBGE", "garlic", "1612/c81/2690", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
     "PAM-IBGE", "peanut_temporary", "1612/c81/2691", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
     "PAM-IBGE", "rice", "1612/c81/2692", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
@@ -799,7 +799,7 @@ datasets_link <- function() {
 
     "PAM-IBGE", "permanent_total", "1613/c82/0", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
     "PAM-IBGE", "avocado", "1613/c82/2717", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "cotton", "1613/c82/2718", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "cotton_arboreo", "1613/c82/2718", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
     "PAM-IBGE", "acai", "1613/c82/45981", "2015-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
     "PAM-IBGE", "olive", "1613/c82/2719", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
     "PAM-IBGE", "banana", "1613/c82/2720", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",

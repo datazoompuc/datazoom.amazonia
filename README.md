@@ -24,20 +24,20 @@ data with the public then there’s nothing we can do about it.
 
 ``` r
 datazoom.amazonia::datasets_link()
-#> # A tibble: 52 x 6
-#>    survey   dataset                sidra_code available_time available_geo link 
-#>    <chr>    <chr>                       <dbl> <chr>          <chr>         <chr>
-#>  1 PAM-IBGE pam_all_crops                5457 1974-2020      Country, Sta~ http~
-#>  2 PAM-IBGE pam_permanent_crops          1613 1974-2020      Country, Sta~ http~
-#>  3 PAM-IBGE pam_temporary_crops          1612 1974-2020      Country, Sta~ http~
-#>  4 PAM-IBGE pam_corn                      839 2003-2020      Country, Sta~ http~
-#>  5 PAM-IBGE pam_potato                   1001 2003-2020      Country, Sta~ http~
-#>  6 PAM-IBGE pam_peanut                   1000 2003-2020      Country, Sta~ http~
-#>  7 PAM-IBGE pam_beans                    1002 2003-2020      Country, Sta~ http~
-#>  8 PPM-IBGE ppm_livestock_invento~       3939 1974-2020      Country, Sta~ http~
-#>  9 PPM-IBGE ppm_sheep_farming              95 1974-2020      Country, Sta~ http~
-#> 10 PPM-IBGE ppm_animal_origin_pro~         74 1974-2020      Country, Sta~ http~
-#> # ... with 42 more rows
+#> # A tibble: 125 x 6
+#>    survey   dataset         sidra_code     available_time available_geo    link 
+#>    <chr>    <chr>           <chr>          <chr>          <chr>            <chr>
+#>  1 PAM-IBGE all_crops       5457/all/all   1974-2020      Country, State,~ http~
+#>  2 PAM-IBGE permanent_crops 1613/all/all   1974-2020      Country, State,~ http~
+#>  3 PAM-IBGE temporary_crops 1612/all/all   1974-2020      Country, State,~ http~
+#>  4 PAM-IBGE corn            839/all/all    2003-2020      Country, State,~ http~
+#>  5 PAM-IBGE potato          1001/all/all   2003-2020      Country, State,~ http~
+#>  6 PAM-IBGE peanut          1000/all/all   2003-2020      Country, State,~ http~
+#>  7 PAM-IBGE beans           1002/all/all   2003-2020      Country, State,~ http~
+#>  8 PAM-IBGE temporary_total 1612/c81/0     1974-2020      Country, State,~ http~
+#>  9 PAM-IBGE pineapple       1612/c81/2688  1974-2020      Country, State,~ http~
+#> 10 PAM-IBGE alfafa          1612/c81/40471 1974-1987      Country, State,~ http~
+#> # ... with 115 more rows
 ```
 
 ### Content:
@@ -49,12 +49,29 @@ datazoom.amazonia::datasets_link()
 
 ## Installation
 
-You can install the development version from GitHub with:
+You can install the released version of `datazoom.amazonia` from
+[CRAN](https://CRAN.R-project.org/package=datazoom.amazonia) with:
+
+``` r
+install.packages("datazoom.amazonia")
+```
+
+And the development version from GitHub with:
 
 ``` r
 # install.packages("devtools")
 devtools::install_github("datazoompuc/datazoom.amazonia")
 ```
+
+Before installing our development version, it is required to install
+first this package:
+
+``` r
+devtools::install_github("ipeaGIT/geobr", subdir = "r-package").
+```
+
+After installing it, you will be able to download our development
+version package.
 
 ## Datasets
 
@@ -95,6 +112,13 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 **[10 - TerraClimate data](#10---terraclimate)**
 
 **[11 - BACI data](#11---baci)**
+
+## The Structure of our functions
+
+**[1 - The Structure of the
+functions](#the-structure-of-the-functions)**
+
+**[2 - Examples](#examples)**
 
 ## 1 - INPE data
 
@@ -361,15 +385,113 @@ or if output exceeds one tonne.
       5. language: you can choose between portuguese and english
       
 
+The datasets supported are shown in the tables below, made up of both
+the original databases and their narrower subsets. Note that downloading
+only specific crops is considerably faster. First, the datasets provided
+by IBGE in their entirety:
+
+| dataset          |
+|:-----------------|
+| all\_crops       |
+| temporary\_crops |
+| permanent\_crops |
+| corn             |
+| potato           |
+| peanut           |
+| beans            |
+
+Datasets generated from Temporary Crops:
+
+| dataset            |          Name (pt)           |          Name (eng)           |
+|:-------------------|:----------------------------:|:-----------------------------:|
+| pineapple          |           Abacaxi            |           Pineapple           |
+| alfafa             |        Alfafa Fenada         |         Alfafa Fenada         |
+| cotton\_herbaceous | Algodao Herbaceo (em Caroco) | Herbaceous Cotton (in Caroco) |
+| garlic             |             Alho             |            Garlic             |
+| peanut\_temporary  |     Amendoim (em Casca)      |      Peanuts (in Shell)       |
+| rice               |       Arroz (em Casca)       |        Rice (in husk)         |
+| oats               |       Aveia (em Grao)        |        Oats (in grain)        |
+| sweet\_potato      |         Batata Doce          |         Sweet potato          |
+| potato\_temporary  |        Batata Inglesa        |        English potato         |
+| sugar\_cane        |        Cana de Acucar        |          Sugar cane           |
+| forage\_cane       |      Cana para Forragem      |          Forage cane          |
+| onion              |            Cebola            |             Onion             |
+| rye                |      Centeio (em Grao)       |        Rye (in grain)         |
+| barley             |       Cevada (em Grao)       |       Barley (in Grain)       |
+| pea                |      Ervilha (em Grao)       |        Pea (in Grain)         |
+| broad\_bean        |        Fava (em Grao)        |     Broad Bean (in Grain)     |
+| beans\_temporary   |       Feijao (em Grao)       |       Beans (in Grain)        |
+| tobacco            |       Fumo (em Folha)        |       Smoke (in Sheet)        |
+| sunflower\_seeds   |      Girassol (em Grao)      |     Sunflower (in Grain)      |
+| jute\_fiber        |         Juta (Fibra)         |         Jute (Fiber)          |
+| linen\_seeds       |       Linho (Semente)        |         Linen (Seed)          |
+| malva\_fiber       |        Malva (Fibra)         |         Malva (Fiber)         |
+| castor\_bean       |        Mamona (Baga)         |      Castor bean (Berry)      |
+| cassava            |           Mandioca           |            Cassava            |
+| watermelon         |           Melancia           |          watermelon           |
+| melon              |            Melao             |             Melon             |
+| corn\_temporary    |       Milho (em Grao)        |        corn (in grain)        |
+| ramie\_fiber       |         Rami (Fibra)         |         Ramie (Fiber)         |
+| soybean            |        Soja (em Grao)        |      Soybean (in grain)       |
+| sorghum            |       Sorgo (em Grao)        |      Sorghum (in Grain)       |
+| tomato             |            Tomate            |            Tomato             |
+| wheat              |       Trigo (em Grao)        |        Wheat in grain)        |
+| triticale          |     Triticale (em Grao)      |     Triticale (in grain)      |
+| temporary\_total   |            Total             |             Total             |
+
+Datasets generated from Permanent Crops:
+
+| dataset                   |          Name (pt)          |         Name (eng)         |
+|:--------------------------|:---------------------------:|:--------------------------:|
+| avocado                   |           Abacate           |          Avocado           |
+| cotton\_arboreo           | Algodao Arboreo (em Caroco) | Arboreo cotton (in Caroco) |
+| acai                      |            Acai             |            Acai            |
+| olive                     |          Azeitona           |           Olive            |
+| banana                    |       Banana (Cacho)        |       Banana (Bunch)       |
+| rubber\_coagulated\_latex | Borracha (Latex Coagulado)  | Rubber (Coagulated Latex)  |
+| rubber\_liquid\_latex     |  Borracha (Latex Liquido)   |   Rubber (Liquid Latex)    |
+| cocoa\_beans              |     Cacau (em Amendoa)      |     Cocoa (in Almonds)     |
+| coffee\_total             |    Cafe (em Grao) Total     |  Coffee (in Grain) Total   |
+| coffee\_arabica           |   Cafe (em Grao) Arabica    |   Cafe (in Grao) Arabica   |
+| coffee\_canephora         |  Cafe (em Grao) Canephora   | Cafe (in Grain) Canephora  |
+| cashew                    |            Caju             |           Cashew           |
+| khaki                     |            Caqui            |           Khaki            |
+| cashew\_nut               |      Castanha de Caju       |        Cashew Nuts         |
+| india\_tea                | Cha da India (Folha Verde)  |      India Tea (Leaf)      |
+| coconut                   |        Coco da Baia         |          Coconut           |
+| coconut\_bunch            |    Dende (Cacho de Coco)    |       Coconut Bunch        |
+| yerba\_mate               |   Erva Mate (Folha Verde)   |      Mate Herb (Leaf)      |
+| fig                       |            Figo             |            Fig             |
+| guava                     |           Goiaba            |           Guava            |
+| guarana\_seeds            |      Guarana (Semente)      |       Guarana (Seed)       |
+| orange                    |           Laranja           |           Orange           |
+| lemon                     |            Limao            |           Lemon            |
+| apple                     |            Maca             |           Apple            |
+| papaya                    |            Mamao            |           Papaya           |
+| mango                     |            Manga            |           Mango            |
+| passion\_fruit            |          Maracuja           |       Passion fruit        |
+| quince                    |           Marmelo           |           Quince           |
+| walnut                    |      Noz (Fruto Seco)       |     Walnut (Dry Fruit)     |
+| heart\_of\_palm           |           Palmito           |         Palm heart         |
+| pear                      |            Pera             |            Pear            |
+| peach                     |           Pessego           |           Peach            |
+| black\_pepper             |      Pimenta do Reino       |        Black pepper        |
+| sisal\_or\_agave          |   Sisal ou Agave (Fibra)    |   Sisal or Agave (Fiber)   |
+| tangerine                 |          Tangerina          |         Tangerine          |
+| tung                      |     Tungue (Fruto Seco)     |      Tung (Dry Fruit)      |
+| annatto\_seeds            |      Urucum (Semente)       |       Annatto (Seed)       |
+| grape                     |             Uva             |           Grape            |
+| permanent\_total          |            Total            |           Total            |
+
 ``` r
 # Download treated (raw_data = FALSE) data related to the production from permanent and temporary farmed lands (dataset = 'pam_all_crops') by state (geo_level = "state") from 1980 to 1990 (time_period = 1980:1990) in english (language = "eng").
-data <- load_pam(dataset = 'pam_all_crops', 
+data <- load_pam(dataset = 'all_crops', 
                  raw_data = FALSE, 
                  geo_level = "state", 
                  time_period = 1980:1990, 
                  language = "eng")
 # Download raw data (raw_data = TRUE) related to the corn production (dataset = 'pam_corn') by municipality (geo_level = "municipality") from 2010 to 2012 (time_period = 2010:2012) in portuguese (language = "pt").
-data <- load_pam(dataset = 'pam_corn', 
+data <- load_pam(dataset = 'corn', 
                  raw_data = TRUE, 
                  geo_level = "municipality", 
                  time_period = 2010:2012, 
@@ -557,7 +679,7 @@ Downloads and compiles data on environmental fines at the municipality
 or state levels considering the Amazon region.
 
 The function returns either the raw data or a data frame with aggregates
-considering, for eachtime-location period, counts for total the number
+considering, for each time-location period, counts for total the number
 of infractions, infractions that already went to trial, and number of
 unique perpetrators of infractions.
 
@@ -639,7 +761,8 @@ during given years.
     7. cover_level: Five options: 
                     # cover_level = 0 has categories such as: Anthropic, Natural, Not Applied 
                     # cover_level = 1 has categories such as: Forest, Non Forest Natural Formation, Farming, Non Vegetated Area, Water, Non Observed
-                    # cover_level = 2 has categories such as: Agriculture, Aquaculture, Beach and Dune, Forest Plantation,  Pasture, River, Lake and Ocean                                # cover_level = 3 has categories such as: Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
+                    # cover_level = 2 has categories such as: Agriculture, Aquaculture, Beach and Dune, Forest Plantation,  Pasture, River, Lake and Ocean                                
+                    # cover_level = 3 has categories such as: Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
                     # cover_level = 4 has categories such as: Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
 
 ``` r
@@ -660,7 +783,7 @@ data = load_mapbiomas(dataset = "mapbiomas_deforestation_regeneration", raw_data
 ## 9 - CIPÓ
 
 Loads Plataforma CIPÓ’s mappings on the organizations involved in
-combatting environmental crimes. Each mapping consists on a listing of
+combating environmental crimes. Each mapping consists on a listing of
 actors or agreements along with attributions and many descriptions.
 
     There are two parameters in this function:
@@ -705,22 +828,22 @@ variables. Data is avaliable from 1958 to 2020.
 
 Possible dataset choices:
 
-| Dataset                       | Code | Description                                      |  Units   |
-|:------------------------------|:----:|:-------------------------------------------------|:--------:|
-| max_temperature               | tmax | Maximum 2-m Temperature                          |   degC   |
-| min_temperature               | tmin | Minimum 2-m Temperature                          |   degC   |
-| wind_speed                    |  ws  | Wind Speed at 10-m                               |   m/s    |
-| vapor_pressure_deficit        | vpd  | Vapor Pressure Deficit                           |   kPa    |
-| vapor_pressure                | vap  | 2-m Vapor Pressure                               |   kPa    |
-| snow_water_equivalent         | swe  | Snow Water Equivalent at End of Month            |    mm    |
-| shortwave_radiation_flux      | srad | Downward Shortwave Radiation Flux at the Surface |  W/m^2   |
-| soil_moisture                 | soil | Soil Moisture at End of Month                    |    mm    |
-| runoff                        |  q   | Runoff                                           |    mm    |
-| precipitation                 | ppt  | Accumulated Precipitation                        |    mm    |
-| potential_evaporation         | pet  | Reference Evapotranspiration                     |    mm    |
-| climatic_water_deficit        | def  | Climatic Water Deficit                           |    mm    |
-| water_evaporation             | aet  | Actual Evapotranspiration                        |    mm    |
-| palmer_drought_severity_index | PDSI | Palmer Drought Severity Index                    | unitless |
+| Dataset                          | Code | Description                                      |  Units   |
+|:---------------------------------|:----:|:-------------------------------------------------|:--------:|
+| max\_temperature                 | tmax | Maximum 2-m Temperature                          |   degC   |
+| min\_temperature                 | tmin | Minimum 2-m Temperature                          |   degC   |
+| wind\_speed                      |  ws  | Wind Speed at 10-m                               |   m/s    |
+| vapor\_pressure\_deficit         | vpd  | Vapor Pressure Deficit                           |   kPa    |
+| vapor\_pressure                  | vap  | 2-m Vapor Pressure                               |   kPa    |
+| snow\_water\_equivalent          | swe  | Snow Water Equivalent at End of Month            |    mm    |
+| shortwave\_radiation\_flux       | srad | Downward Shortwave Radiation Flux at the Surface |  W/m^2   |
+| soil\_moisture                   | soil | Soil Moisture at End of Month                    |    mm    |
+| runoff                           |  q   | Runoff                                           |    mm    |
+| precipitation                    | ppt  | Accumulated Precipitation                        |    mm    |
+| potential\_evaporation           | pet  | Reference Evapotranspiration                     |    mm    |
+| climatic\_water\_deficit         | def  | Climatic Water Deficit                           |    mm    |
+| water\_evaporation               | aet  | Actual Evapotranspiration                        |    mm    |
+| palmer\_drought\_severity\_index | PDSI | Palmer Drought Severity Index                    | unitless |
 
 ``` r
 # Downloading maximum temperature data from 2000 to 2020
@@ -759,13 +882,6 @@ clean_baci <- load_baci(dataset = "HS92", raw_data = FALSE, time_period = 2016,
                         language = "pt")
 ```
 
-## The Structure of our functions
-
-**[1 - The Structure of the
-functions](#the-structure-of-the-functions)**
-
-**[2 - Examples](#examples)**
-
 ## The Structure of the functions
 
 **1. Bind Global Variables:** The goal is to ensure that all the
@@ -777,8 +893,8 @@ from the function. The list *param* will be an organized list with all
 the parameters of interest.
 
 **3. Download Data:** In the majority of our functions, we download data
-by using external_download(). However, when we download data from IBGE,
-we use a function called sidra_download(). Both of these functions can
+by using external\_download(). However, when we download data from IBGE,
+we use a function called sidra\_download(). Both of these functions can
 be found in the “download.R” file.
 
 **4. Data Engineering:** In this section of the code, we (i) exclude
@@ -791,9 +907,9 @@ changes in the original Data Frame.
 **5. Harmonizing Variable Names:** Rename columns with better names.
 
 **6. Load Dictionary:** In the functions that work with IBGE’s data, we
-use the function “load_dictionary()”. This function creates an organized
-correspondence between the code of each product, its name, its unit of
-measure and other attributes.
+use the function “load\_dictionary()”. This function creates an
+organized correspondence between the code of each product, its name, its
+unit of measure and other attributes.
 
 **7. Translation / add variables:** After having organized the Data
 Frame, we then translate it. In some functions, the translation will
@@ -803,19 +919,19 @@ columns being translated first and then each line of the original Data
 Frame will be translated.
 
 **8. Return Data Frame:** In the structure of our functions, you will
-see **(raw_data == TRUE){return(dat)}** right after “Downloading Data”.
+see **(raw\_data == TRUE){return(dat)}** right after “Downloading Data”.
 All the changes explained in this document will only happen in case the
-user specifies **(raw_data == FALSE)**.
+user specifies **(raw\_data == FALSE)**.
 
 ## Examples
 
-**1. Bind Global Variables:** example from *load_cempre()*
+**1. Bind Global Variables:** example from *load\_cempre()*
 
 ``` r
 sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- ano <- ano_codigo <- classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo <- geo_id <- id_code <- nivel_territorial <- nivel_territorial_codigo <- valor <- variavel <- unidade_de_medida <- unidade_de_medida_codigo <- NULL
 ```
 
-**2. Define Basic Parameters:** example from *load_deter()*
+**2. Define Basic Parameters:** example from *load\_deter()*
 
 ``` r
 # param=list()
@@ -833,8 +949,8 @@ sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- ano <- ano_codi
 #    unlist()
 ```
 
-**3. Download Data:** example from *load_degrad()*. It uses the
-*external_download()* function.
+**3. Download Data:** example from *load\_degrad()*. It uses the
+*external\_download()* function.
 
 ``` r
 # dat = suppressWarnings(as.list(param$time_period) %>%
@@ -846,7 +962,7 @@ sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- ano <- ano_codi
 #      ))
 ```
 
-**4. Data Engineering**: example from *load_pam()*. In this process, we
+**4. Data Engineering**: example from *load\_pam()*. In this process, we
 decided to exclude some columns and convert the variable “valor” to
 become numeric. After that we excluded all the lines with **NA**.
 
@@ -862,7 +978,7 @@ become numeric. After that we excluded all the lines with **NA**.
 #     dplyr::filter(!is.na(valor))
 ```
 
-**5. Harmonizing Variable Names:** example from *load_pam()*. We
+**5. Harmonizing Variable Names:** example from *load\_pam()*. We
 localize some datasets by using their numerical codes and within each of
 these datasets we renamed some columns.
 
@@ -884,10 +1000,10 @@ these datasets we renamed some columns.
 #   }
 ```
 
-**6. Load Dictionary:** example from *load_pam()*. For functions with
+**6. Load Dictionary:** example from *load\_pam()*. For functions with
 data from IBGE, we load the dictionary and then we convert the variable
-“var_code” to become a character. Finally we exclude the observations
-where var_code == “0”.
+“var\_code” to become a character. Finally we exclude the observations
+where var\_code == “0”.
 
 ``` r
 # dic = load_dictionary(param$dataset)
@@ -895,7 +1011,7 @@ where var_code == “0”.
 #  types = types[types != "0"] 
 ```
 
-**7. Translation / add variables:** example from *load_degrad()*.This
+**7. Translation / add variables:** example from *load\_degrad()*.This
 section translates the names of the columns of the original Data
 Frame.In this example, the original columns (variables) were in English
 and therefore we translated it to Portuguese in case the user chooses

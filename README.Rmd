@@ -354,15 +354,110 @@ There are five parameters in this function:
   
 ```
 
+The datasets supported are shown in the tables below, made up of both the original databases and their narrower subsets. Note that downloading only specific crops is considerably faster. First, the datasets provided by IBGE in their entirety:
+
+| dataset |
+|:--------|
+|all_crops|
+|temporary_crops|
+|permanent_crops|
+|corn|
+|potato|
+|peanut|
+|beans|
+
+Datasets generated from Temporary Crops:
+
+| dataset | Name (pt) | Name (eng) |
+|:--------|:---------:|:----------:|
+| pineapple | Abacaxi |  Pineapple |
+| alfafa | Alfafa Fenada | Alfafa Fenada |
+| cotton_herbaceous |Algodao Herbaceo (em Caroco)| Herbaceous Cotton (in Caroco)|
+| garlic |Alho| Garlic|
+| peanut_temporary |Amendoim (em Casca)| Peanuts (in Shell)|
+| rice |Arroz (em Casca)| Rice (in husk)|
+| oats |Aveia (em Grao)| Oats (in grain)|
+| sweet_potato |Batata Doce| Sweet potato|
+| potato_temporary |Batata Inglesa| English potato|
+| sugar_cane |Cana de Acucar| Sugar cane|
+| forage_cane |Cana para Forragem| Forage cane|
+| onion |Cebola| Onion|
+| rye |Centeio (em Grao)| Rye (in grain)|
+| barley |Cevada (em Grao)| Barley (in Grain)|
+| pea |Ervilha (em Grao)| Pea (in Grain)|
+| broad_bean |Fava (em Grao)| Broad Bean (in Grain)|
+| beans_temporary |Feijao (em Grao)| Beans (in Grain)|
+| tobacco |Fumo (em Folha)| Smoke (in Sheet)|
+| sunflower_seeds |Girassol (em Grao)| Sunflower (in Grain)|
+| jute_fiber |Juta (Fibra)| Jute (Fiber)|
+| linen_seeds |Linho (Semente)| Linen (Seed)|
+| malva_fiber |Malva (Fibra)| Malva (Fiber)|
+| castor_bean |Mamona (Baga)| Castor bean (Berry)|
+| cassava |Mandioca| Cassava|
+| watermelon |Melancia| watermelon|
+| melon |Melao| Melon|
+| corn_temporary |Milho (em Grao)| corn (in grain)|
+| ramie_fiber |Rami (Fibra)| Ramie (Fiber)|
+| soybean |Soja (em Grao)| Soybean (in grain)|
+| sorghum |Sorgo (em Grao)| Sorghum (in Grain)|
+| tomato |Tomate| Tomato|
+| wheat |Trigo (em Grao)| Wheat in grain)|
+| triticale |Triticale (em Grao)| Triticale (in grain)|
+| temporary_total |Total| Total|
+
+Datasets generated from Permanent Crops:
+
+| dataset | Name (pt) | Name (eng) |
+|:--------|:---------:|:----------:|
+| avocado |Abacate|Avocado| 
+| cotton_arboreo |Algodao Arboreo (em Caroco)| Arboreo cotton (in Caroco)| 
+| acai |Acai|Acai| 
+| olive |Azeitona|Olive| 
+| banana |Banana (Cacho)|Banana (Bunch)| 
+| rubber_coagulated_latex |Borracha (Latex Coagulado)|Rubber (Coagulated Latex)| 
+| rubber_liquid_latex |Borracha (Latex Liquido)|Rubber (Liquid Latex)| 
+| cocoa_beans |Cacau (em Amendoa)|Cocoa (in Almonds)| 
+| coffee_total |Cafe (em Grao) Total|Coffee (in Grain) Total| 
+| coffee_arabica |Cafe (em Grao) Arabica|Cafe (in Grao) Arabica| 
+| coffee_canephora |Cafe (em Grao) Canephora|Cafe (in Grain) Canephora| 
+| cashew |Caju|Cashew| 
+| khaki |Caqui|Khaki| 
+| cashew_nut |Castanha de Caju|Cashew Nuts| 
+| india_tea |Cha da India (Folha Verde)|India Tea (Leaf)| 
+| coconut |Coco da Baia|Coconut| 
+| coconut_bunch |Dende (Cacho de Coco)|Coconut Bunch| 
+| yerba_mate |Erva Mate (Folha Verde)|Mate Herb (Leaf)| 
+| fig |Figo|Fig| 
+| guava |Goiaba|Guava| 
+| guarana_seeds |Guarana (Semente)|Guarana (Seed)| 
+| orange |Laranja|Orange| 
+| lemon |Limao|Lemon| 
+| apple |Maca|Apple| 
+| papaya |Mamao|Papaya| 
+| mango |Manga|Mango| 
+| passion_fruit |Maracuja|Passion fruit| 
+| quince |Marmelo|Quince| 
+| walnut |Noz (Fruto Seco)|Walnut (Dry Fruit)| 
+| heart_of_palm |Palmito|Palm heart| 
+| pear |Pera|Pear| 
+| peach |Pessego|Peach| 
+| black_pepper |Pimenta do Reino|Black pepper| 
+| sisal_or_agave |Sisal ou Agave (Fibra)|Sisal or Agave (Fiber)| 
+| tangerine |Tangerina|Tangerine| 
+| tung |Tungue (Fruto Seco)|Tung (Dry Fruit)| 
+| annatto_seeds |Urucum (Semente)|Annatto (Seed)| 
+| grape |Uva|Grape| 
+| permanent_total |Total|Total|
+
 ```{r eval=FALSE}
 # Download treated (raw_data = FALSE) data related to the production from permanent and temporary farmed lands (dataset = 'pam_all_crops') by state (geo_level = "state") from 1980 to 1990 (time_period = 1980:1990) in english (language = "eng").
-data <- load_pam(dataset = 'pam_all_crops', 
+data <- load_pam(dataset = 'all_crops', 
                  raw_data = FALSE, 
                  geo_level = "state", 
                  time_period = 1980:1990, 
                  language = "eng")
 # Download raw data (raw_data = TRUE) related to the corn production (dataset = 'pam_corn') by municipality (geo_level = "municipality") from 2010 to 2012 (time_period = 2010:2012) in portuguese (language = "pt").
-data <- load_pam(dataset = 'pam_corn', 
+data <- load_pam(dataset = 'corn', 
                  raw_data = TRUE, 
                  geo_level = "municipality", 
                  time_period = 2010:2012, 
