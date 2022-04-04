@@ -115,7 +115,6 @@ load_pam <- function(dataset = NULL, raw_data,
 
   if (param$code == 5457) {
     param$data_name <- "All Crops (Lavouras)"
-
   }
 
 
@@ -344,8 +343,10 @@ load_pam <- function(dataset = NULL, raw_data,
 
   dat <- dat %>%
     dplyr::mutate(
-      dplyr::across(dplyr::ends_with("_v0"),
-             ~ labelled(., "Total"))
+      dplyr::across(
+        dplyr::ends_with("_v0"),
+        ~ labelled(., "Total")
+      )
     )
 
   ##########################

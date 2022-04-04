@@ -2,7 +2,7 @@ Package: datazoom.amazonia
 Title: Simplify Access to Data from the Amazon Region
 Version: 0.3.0
 Authors@R: c(
-    person("Francisco", "de Lima Cavalcanti", , "datazoom@econ.puc-rio.br", role = c("aut", "cre")),
+    person("Francisco", "de Lima Cavalcanti", , "francisco.lima.cavalcanti@gmail.com", role = c("aut", "cre")),
     person("DataZoom (PUC-Rio)", , , "datazoom@econ.puc-rio.br", role = "fnd"),
     person("Guilherme", "Jardim", , "gnjardim1@gmail.com", role = "aut"),
     person("Daniel", "AC Barbosa", , "daniel.adrianocb@gmail.com", role = "aut"),
