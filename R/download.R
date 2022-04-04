@@ -413,7 +413,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       path <- paste(param$url, "Estat%C3%ADsticas/MapBIomas_COL5_QUALIDADE_PASTAGEM-biomas-estados-SITE.xlsx", sep = "")
     }
     if(dataset == "mapbiomas_mining"){
-      path = paste(param$url, "Estat%C3%ADsticas/Cole%C3%A7%C3.xlsx", sep = "")
+      path = paste(param$url, "Estat%C3%ADsticas/Cole%C3%A7%C3%A3o%206/Colecao_6_Mining_BR_UF_Biome_Mun_TI_SITE.xlsx", sep = "")
     }
   }
 
@@ -615,23 +615,23 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     if (param$dataset == "mapbiomas_grazing_quality") {
       dat <- readxl::read_excel(temp, sheet = "BD_Qualidade")
     }
-    if(param$dataset == "mapbiomas_mining" & geo_level == "country"){
+    if(param$dataset == "mapbiomas_mining" & param$geo_level == "country"){
 
       dat = readxl::read_excel(temp, sheet = "BR")
     }
-    if(param$dataset == "mapbiomas_mining" & geo_level == "state") {
+    if(param$dataset == "mapbiomas_mining" & param$geo_level == "state") {
 
       dat = readxl::read_excel(temp, sheet = "UF")
     }
-    if(param$dataset == "mapbiomas_mining" & geo_level == "biome"){
+    if(param$dataset == "mapbiomas_mining" & param$geo_level == "biome"){
 
       dat =  readxl::read_excel(temp, sheet = "BIOME")
     }
-    if(param$dataset == "mapbiomas_mining" & geo_level == "municipality"){
+    if(param$dataset == "mapbiomas_mining" & param$geo_level == "municipality"){
 
       dat = readxl::read_excel(temp, sheet = "MUN")
     }
-    if(param$dataset == "mapbiomas_mining" & geo_level == "indigenous"){
+    if(param$dataset == "mapbiomas_mining" & param$geo_level == "indigenous"){
 
       dat = readxl::read_excel(temp, sheet = "TI")
     }
