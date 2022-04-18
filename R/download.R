@@ -276,7 +276,8 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
 }
 
 external_download <- function(dataset = NULL, source = NULL, year = NULL,
-                              geo_level = NULL, coords = NULL, dataset_code = NULL) {
+                              geo_level = NULL, coords = NULL, dataset_code = NULL,
+                              skip_rows = NULL, file_name = NULL) {
 
   ## Bind GLobal Variables
 
@@ -298,6 +299,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   param$geo_level <- geo_level # This could also not make sense
   param$coords <- coords
   param$dataset_code <- dataset_code
+  param$skip_rows <- skip_rows
+  param$file_name <- file_name
 
   # if (param$geo_level == 'legal_amazon' & param$source == 'prodes'){param$geo_level = 'legal-amz-prodes'}
   # if (param$geo_level == 'amazon_biome' & param$source == 'prodes'){param$geo_level = 'amz-prodes'}
@@ -489,6 +492,19 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       "&timeStride=1",
       "&disableProjSubset=on&addLatLon=true&accept=netcdf"
     )
+  }
+
+  #################
+  ## Health Data ##
+  #################
+
+  if (source == "health"){
+    if (dataset == "life_expectancy"){
+      path <- param$url
+    }
+    if (dataset == "mortality"){
+      path <- paste0(param$url, param$file_name)
+    }
   }
 
   #####################
@@ -713,6 +729,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
         janitor::clean_names() %>%
         tibble::as_tibble()
     }
+  }
+  if (file_extension == ".dbc"){
+    dat <- read.dbc::read.dbc(temp)
   }
 
   # if (source == 'prodes'){
@@ -1033,6 +1052,13 @@ datasets_link <- function() {
     "TerraClimate", "climatic_water_deficit", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
     "TerraClimate", "water_evaporation", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
     "TerraClimate", "palmer_drought_severity_index", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+
+    #####################
+    ## Health Datasets ##
+    #####################
+
+    "IBGE", "life_expectancy", NA, "2020", "Country", "https://ftp.ibge.gov.br/Tabuas_Completas_de_Mortalidade/Tabuas_Completas_de_Mortalidade_2020/xls/ambos_os_sexos.xls",
+    "DATASUS", "mortality", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DORES/",
 
     ## Shapefile from github repository
 

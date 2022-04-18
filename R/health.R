@@ -2,6 +2,13 @@ load_health <- function(dataset,
                         raw_data = FALSE,
                         language = "eng"){
 
+  if (!requireNamespace("read.dbc", quietly = TRUE)) {
+    stop(
+      "Package \"read.dbc\" must be installed to use this function.",
+      call. = FALSE
+    )
+  }
+
   ## TODO
   # i) Tábuas de mortalidade do IBGE, por UF e Ano
   # ii) Microdados do SIM/Datasus
@@ -27,6 +34,12 @@ load_health <- function(dataset,
   ######################
   ## Downloading Data ##
   ######################
+
+  dat <- external_download(
+    source = "health",
+    dataset = param$dataset,
+    year = year
+  )
 
   if (dataset == "mortality_table"){
     path <- url <- "https://ftp.ibge.gov.br/Tabuas_Completas_de_Mortalidade/Tabuas_Completas_de_Mortalidade_2020/xls/ambos_os_sexos.xls"
@@ -56,28 +69,21 @@ load_health <- function(dataset,
 
     path <- url <- "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DORES/"
 
-    h = new_handle(dirlistonly=TRUE)
-    con = curl(url, "r", h)
-    tbl = read.table(con, stringsAsFactors=TRUE, fill=TRUE) %>%
-      unlist() %>%
-      as.character() %>%
-      paste0(url, .)
+    filenames <- RCurl::getURL(path, ftp.use.epsv = TRUE, dirlistonly = TRUE) %>%
+      stringr::str_split("\r*\n") %>%
+      unlist()
 
-    proc <- RCurl::CFILE(temp, mode = "wb")
-    RCurl::curlPerform(url = path, writedata = proc@ref, noprogress = FALSE)
-    RCurl::close(proc)
+    # Filtering for the year
+    path <- path[stringr::str_detect(path, as.character(param$year))]
 
-    tbl <- RCurl::getURL(path,  dirlistonly = TRUE) %>%
-      unlist(strsplit(., '\r'))
-
-    tbl %>%
+    filenames %>%
       map_dfr(
         function(filename){
 
           dir <- tempdir()
           temp <- tempfile(fileext = ".dbc", tmpdir = dir)
 
-          utils::download.file(url = filename, destfile = temp, method = "libcurl")
+          utils::download.file(url = filename, destfile = temp, mode = "wb")
 
           dat <- read.dbc::read.dbc(temp)
 
