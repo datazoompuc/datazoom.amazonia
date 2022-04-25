@@ -499,10 +499,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   #################
 
   if (source == "health"){
-    if (dataset == "life_expectancy"){
+    if (dataset == "ibge_mortality_table"){
       path <- param$url
     }
-    if (dataset == "mortality"){
+    if (stringr::str_detect(dataset, "datasus")){
       path <- paste0(param$url, param$file_name)
     }
   }
@@ -548,6 +548,11 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source == "internal") {
     file_extension <- ".rds"
   }
+  if (source == "health"){
+    if (stringr::str_detect(dataset, "datasus")){
+      file_extension <- ".dbc"
+    }
+  }
 
   # !!!  We should Change This to a Curl Process
 
@@ -559,7 +564,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## Extraction through Curl Requests
   ## Investigate a bit more on how Curl Requests work
 
-  if (!(source %in% c("deter", "seeg", "terraclimate"))) {
+  if (source %in% c("comex", "degrad", "internal", "ibama", "ips", "mapbiomas", 'prodes', "sigmine")){
     utils::download.file(url = path, destfile = temp, mode = "wb")
   }
   if (source == "deter") {
@@ -577,6 +582,14 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   }
   if (source == "terraclimate") {
     utils::download.file(url = path, destfile = temp, method = "curl")
+  }
+  if (source == "health"){
+    if (stringr::str_detect(dataset, "datasus")){
+      utils::download.file(url = path, destfile = temp, method = "curl", quiet = TRUE)
+    }
+    else{
+      utils::download.file(url = path, destfile = temp, mode = "wb")
+    }
   }
 
   ## This Data Opening Part Should Include the .Shp, not DBF
@@ -1057,8 +1070,25 @@ datasets_link <- function() {
     ## Health Datasets ##
     #####################
 
-    "IBGE", "life_expectancy", NA, "2020", "Country", "https://ftp.ibge.gov.br/Tabuas_Completas_de_Mortalidade/Tabuas_Completas_de_Mortalidade_2020/xls/ambos_os_sexos.xls",
-    "DATASUS", "mortality", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DORES/",
+    "IBGE", "ibge_mortality_table", NA, "2020", "Country", "https://ftp.ibge.gov.br/Tabuas_Completas_de_Mortalidade/Tabuas_Completas_de_Mortalidade_2020/xls/ambos_os_sexos.xls",
+    "DATASUS", "datasus_sim_do", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DORES/",
+    "DATASUS", "datasus_sim_dofet", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DOFET/",
+    "DATASUS", "datasus_sim_doext", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DOFET/",
+    "DATASUS", "datasus_sim_doinf", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DOFET/",
+    "DATASUS", "datasus_sim_domat", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DOFET/",
+    "DATASUS", "datasus_cnes_lt", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/LT/",
+    "DATASUS", "datasus_cnes_st", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/ST/",
+    "DATASUS", "datasus_cnes_dc", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/DC/",
+    "DATASUS", "datasus_cnes_eq", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/EQ/",
+    "DATASUS", "datasus_cnes_sr", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/SR/",
+    "DATASUS", "datasus_cnes_hb", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/HB/",
+    "DATASUS", "datasus_cnes_pf", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/PF/",
+    "DATASUS", "datasus_cnes_ep", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/EP/",
+    "DATASUS", "datasus_cnes_rc", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/RC/",
+    "DATASUS", "datasus_cnes_in", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/IN/",
+    "DATASUS", "datasus_cnes_ee", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/EE",
+    "DATASUS", "datasus_cnes_ef", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/EF/",
+    "DATASUS", "datasus_cnes_gm", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/GM/",
 
     ## Shapefile from github repository
 
