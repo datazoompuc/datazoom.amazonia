@@ -1,3 +1,7 @@
+# datazoom.amazonia 0.4.0.9000
+
+  * Added new Mapbiomas Mining dataset 
+
 # datazoom.amazonia 0.3.0
   
 ## New functions

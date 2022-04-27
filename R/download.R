@@ -276,7 +276,8 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
 }
 
 external_download <- function(dataset = NULL, source = NULL, year = NULL,
-                              geo_level = NULL, coords = NULL, dataset_code = NULL) {
+                              geo_level = NULL, coords = NULL, dataset_code = NULL,
+                              sheet = NULL) {
 
   ## Bind GLobal Variables
 
@@ -298,6 +299,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   param$geo_level <- geo_level # This could also not make sense
   param$coords <- coords
   param$dataset_code <- dataset_code
+  param$sheet <- sheet
 
   # if (param$geo_level == 'legal_amazon' & param$source == 'prodes'){param$geo_level = 'legal-amz-prodes'}
   # if (param$geo_level == 'amazon_biome' & param$source == 'prodes'){param$geo_level = 'amz-prodes'}
@@ -412,8 +414,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     if (dataset == "mapbiomas_grazing_quality") {
       path <- paste(param$url, "Estat%C3%ADsticas/MapBIomas_COL5_QUALIDADE_PASTAGEM-biomas-estados-SITE.xlsx", sep = "")
     }
-    if(dataset == "mapbiomas_mining"){
-      path = paste(param$url, "Estat%C3%ADsticas/Cole%C3%A7%C3%A3o%206/Colecao_6_Mining_BR_UF_Biome_Mun_TI_SITE.xlsx", sep = "")
+    if (dataset == "mapbiomas_mining") {
+      path <- paste(param$url, "Estat%C3%ADsticas/Cole%C3%A7%C3%A3o%206/Colecao_6_Mining_BR_UF_Biome_Mun_TI_SITE.xlsx", sep = "")
     }
   }
 
@@ -595,41 +597,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     dat <- readr::read_rds(temp)
   }
   if (file_extension == ".xlsx") {
-    if (param$dataset == "mapbiomas_cover") {
-      dat <- readxl::read_excel(temp, sheet = "LAND COVER - BIOMAS e UF")
-    } ## HA
-    if (param$dataset == "mapbiomas_transition") {
-      dat <- readxl::read_excel(temp, sheet = "BD_TRANSICAO_BIOMA-UF")
-    }
-    if (param$dataset == "mapbiomas_deforestation_regeneration") {
-      dat <- readxl::read_excel(temp, sheet = "BD Colecao 5.0(h) - Hectares")
-    }
-    if (param$dataset == "mapbiomas_irrigation") {
-      dat <- readxl::read_excel(temp, sheet = "BD_IRRIGACAO")
-    }
-    if (param$dataset == "mapbiomas_grazing_quality") {
-      dat <- readxl::read_excel(temp, sheet = "BD_Qualidade")
-    }
-    if(param$dataset == "mapbiomas_mining" & param$geo_level == "country"){
-
-      dat = readxl::read_excel(temp, sheet = "BR")
-    }
-    if(param$dataset == "mapbiomas_mining" & param$geo_level == "state") {
-
-      dat = readxl::read_excel(temp, sheet = "UF")
-    }
-    if(param$dataset == "mapbiomas_mining" & param$geo_level == "biome"){
-
-      dat =  readxl::read_excel(temp, sheet = "BIOME")
-    }
-    if(param$dataset == "mapbiomas_mining" & param$geo_level == "municipality"){
-
-      dat = readxl::read_excel(temp, sheet = "MUN")
-    }
-    if(param$dataset == "mapbiomas_mining" & param$geo_level == "indigenous"){
-
-      dat = readxl::read_excel(temp, sheet = "TI")
-    }
+    dat <- readxl::read_xlsx(temp, sheet = param$sheet)
 
     if (param$source == "seeg") {
       if (geo_level == "country") {

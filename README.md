@@ -24,20 +24,20 @@ data with the public then there’s nothing we can do about it.
 
 ``` r
 datazoom.amazonia::datasets_link()
-#> # A tibble: 53 x 6
-#>    survey   dataset                sidra_code available_time available_geo link 
-#>    <chr>    <chr>                       <dbl> <chr>          <chr>         <chr>
-#>  1 PAM-IBGE pam_all_crops                5457 1974-2020      Country, Sta~ http~
-#>  2 PAM-IBGE pam_permanent_crops          1613 1974-2020      Country, Sta~ http~
-#>  3 PAM-IBGE pam_temporary_crops          1612 1974-2020      Country, Sta~ http~
-#>  4 PAM-IBGE pam_corn                      839 2003-2020      Country, Sta~ http~
-#>  5 PAM-IBGE pam_potato                   1001 2003-2020      Country, Sta~ http~
-#>  6 PAM-IBGE pam_peanut                   1000 2003-2020      Country, Sta~ http~
-#>  7 PAM-IBGE pam_beans                    1002 2003-2020      Country, Sta~ http~
-#>  8 PPM-IBGE ppm_livestock_invento~       3939 1974-2020      Country, Sta~ http~
-#>  9 PPM-IBGE ppm_sheep_farming              95 1974-2020      Country, Sta~ http~
-#> 10 PPM-IBGE ppm_animal_origin_pro~         74 1974-2020      Country, Sta~ http~
-#> # ... with 43 more rows
+#> # A tibble: 126 x 6
+#>    survey   dataset         sidra_code     available_time available_geo    link 
+#>    <chr>    <chr>           <chr>          <chr>          <chr>            <chr>
+#>  1 PAM-IBGE all_crops       5457/all/all   1974-2020      Country, State,~ http~
+#>  2 PAM-IBGE permanent_crops 1613/all/all   1974-2020      Country, State,~ http~
+#>  3 PAM-IBGE temporary_crops 1612/all/all   1974-2020      Country, State,~ http~
+#>  4 PAM-IBGE corn            839/all/all    2003-2020      Country, State,~ http~
+#>  5 PAM-IBGE potato          1001/all/all   2003-2020      Country, State,~ http~
+#>  6 PAM-IBGE peanut          1000/all/all   2003-2020      Country, State,~ http~
+#>  7 PAM-IBGE beans           1002/all/all   2003-2020      Country, State,~ http~
+#>  8 PAM-IBGE temporary_total 1612/c81/0     1974-2020      Country, State,~ http~
+#>  9 PAM-IBGE pineapple       1612/c81/2688  1974-2020      Country, State,~ http~
+#> 10 PAM-IBGE alfafa          1612/c81/40471 1974-1987      Country, State,~ http~
+#> # ... with 116 more rows
 ```
 
 ### Content:
@@ -385,15 +385,113 @@ or if output exceeds one tonne.
       5. language: you can choose between portuguese and english
       
 
+The datasets supported are shown in the tables below, made up of both
+the original databases and their narrower subsets. Note that downloading
+only specific crops is considerably faster. First, the datasets provided
+by IBGE in their entirety:
+
+| dataset         |
+|:----------------|
+| all_crops       |
+| temporary_crops |
+| permanent_crops |
+| corn            |
+| potato          |
+| peanut          |
+| beans           |
+
+Datasets generated from Temporary Crops:
+
+| dataset           |          Name (pt)           |          Name (eng)           |
+|:------------------|:----------------------------:|:-----------------------------:|
+| pineapple         |           Abacaxi            |           Pineapple           |
+| alfafa            |        Alfafa Fenada         |         Alfafa Fenada         |
+| cotton_herbaceous | Algodao Herbaceo (em Caroco) | Herbaceous Cotton (in Caroco) |
+| garlic            |             Alho             |            Garlic             |
+| peanut_temporary  |     Amendoim (em Casca)      |      Peanuts (in Shell)       |
+| rice              |       Arroz (em Casca)       |        Rice (in husk)         |
+| oats              |       Aveia (em Grao)        |        Oats (in grain)        |
+| sweet_potato      |         Batata Doce          |         Sweet potato          |
+| potato_temporary  |        Batata Inglesa        |        English potato         |
+| sugar_cane        |        Cana de Acucar        |          Sugar cane           |
+| forage_cane       |      Cana para Forragem      |          Forage cane          |
+| onion             |            Cebola            |             Onion             |
+| rye               |      Centeio (em Grao)       |        Rye (in grain)         |
+| barley            |       Cevada (em Grao)       |       Barley (in Grain)       |
+| pea               |      Ervilha (em Grao)       |        Pea (in Grain)         |
+| broad_bean        |        Fava (em Grao)        |     Broad Bean (in Grain)     |
+| beans_temporary   |       Feijao (em Grao)       |       Beans (in Grain)        |
+| tobacco           |       Fumo (em Folha)        |       Smoke (in Sheet)        |
+| sunflower_seeds   |      Girassol (em Grao)      |     Sunflower (in Grain)      |
+| jute_fiber        |         Juta (Fibra)         |         Jute (Fiber)          |
+| linen_seeds       |       Linho (Semente)        |         Linen (Seed)          |
+| malva_fiber       |        Malva (Fibra)         |         Malva (Fiber)         |
+| castor_bean       |        Mamona (Baga)         |      Castor bean (Berry)      |
+| cassava           |           Mandioca           |            Cassava            |
+| watermelon        |           Melancia           |          watermelon           |
+| melon             |            Melao             |             Melon             |
+| corn_temporary    |       Milho (em Grao)        |        corn (in grain)        |
+| ramie_fiber       |         Rami (Fibra)         |         Ramie (Fiber)         |
+| soybean           |        Soja (em Grao)        |      Soybean (in grain)       |
+| sorghum           |       Sorgo (em Grao)        |      Sorghum (in Grain)       |
+| tomato            |            Tomate            |            Tomato             |
+| wheat             |       Trigo (em Grao)        |        Wheat in grain)        |
+| triticale         |     Triticale (em Grao)      |     Triticale (in grain)      |
+| temporary_total   |            Total             |             Total             |
+
+Datasets generated from Permanent Crops:
+
+| dataset                 |          Name (pt)          |         Name (eng)         |
+|:------------------------|:---------------------------:|:--------------------------:|
+| avocado                 |           Abacate           |          Avocado           |
+| cotton_arboreo          | Algodao Arboreo (em Caroco) | Arboreo cotton (in Caroco) |
+| acai                    |            Acai             |            Acai            |
+| olive                   |          Azeitona           |           Olive            |
+| banana                  |       Banana (Cacho)        |       Banana (Bunch)       |
+| rubber_coagulated_latex | Borracha (Latex Coagulado)  | Rubber (Coagulated Latex)  |
+| rubber_liquid_latex     |  Borracha (Latex Liquido)   |   Rubber (Liquid Latex)    |
+| cocoa_beans             |     Cacau (em Amendoa)      |     Cocoa (in Almonds)     |
+| coffee_total            |    Cafe (em Grao) Total     |  Coffee (in Grain) Total   |
+| coffee_arabica          |   Cafe (em Grao) Arabica    |   Cafe (in Grao) Arabica   |
+| coffee_canephora        |  Cafe (em Grao) Canephora   | Cafe (in Grain) Canephora  |
+| cashew                  |            Caju             |           Cashew           |
+| khaki                   |            Caqui            |           Khaki            |
+| cashew_nut              |      Castanha de Caju       |        Cashew Nuts         |
+| india_tea               | Cha da India (Folha Verde)  |      India Tea (Leaf)      |
+| coconut                 |        Coco da Baia         |          Coconut           |
+| coconut_bunch           |    Dende (Cacho de Coco)    |       Coconut Bunch        |
+| yerba_mate              |   Erva Mate (Folha Verde)   |      Mate Herb (Leaf)      |
+| fig                     |            Figo             |            Fig             |
+| guava                   |           Goiaba            |           Guava            |
+| guarana_seeds           |      Guarana (Semente)      |       Guarana (Seed)       |
+| orange                  |           Laranja           |           Orange           |
+| lemon                   |            Limao            |           Lemon            |
+| apple                   |            Maca             |           Apple            |
+| papaya                  |            Mamao            |           Papaya           |
+| mango                   |            Manga            |           Mango            |
+| passion_fruit           |          Maracuja           |       Passion fruit        |
+| quince                  |           Marmelo           |           Quince           |
+| walnut                  |      Noz (Fruto Seco)       |     Walnut (Dry Fruit)     |
+| heart_of_palm           |           Palmito           |         Palm heart         |
+| pear                    |            Pera             |            Pear            |
+| peach                   |           Pessego           |           Peach            |
+| black_pepper            |      Pimenta do Reino       |        Black pepper        |
+| sisal_or_agave          |   Sisal ou Agave (Fibra)    |   Sisal or Agave (Fiber)   |
+| tangerine               |          Tangerina          |         Tangerine          |
+| tung                    |     Tungue (Fruto Seco)     |      Tung (Dry Fruit)      |
+| annatto_seeds           |      Urucum (Semente)       |       Annatto (Seed)       |
+| grape                   |             Uva             |           Grape            |
+| permanent_total         |            Total            |           Total            |
+
 ``` r
 # Download treated (raw_data = FALSE) data related to the production from permanent and temporary farmed lands (dataset = 'pam_all_crops') by state (geo_level = "state") from 1980 to 1990 (time_period = 1980:1990) in english (language = "eng").
-data <- load_pam(dataset = 'pam_all_crops', 
+data <- load_pam(dataset = 'all_crops', 
                  raw_data = FALSE, 
                  geo_level = "state", 
                  time_period = 1980:1990, 
                  language = "eng")
 # Download raw data (raw_data = TRUE) related to the corn production (dataset = 'pam_corn') by municipality (geo_level = "municipality") from 2010 to 2012 (time_period = 2010:2012) in portuguese (language = "pt").
-data <- load_pam(dataset = 'pam_corn', 
+data <- load_pam(dataset = 'corn', 
                  raw_data = TRUE, 
                  geo_level = "municipality", 
                  time_period = 2010:2012, 
@@ -581,7 +679,7 @@ Downloads and compiles data on environmental fines at the municipality
 or state levels considering the Amazon region.
 
 The function returns either the raw data or a data frame with aggregates
-considering, for eachtime-location period, counts for total the number
+considering, for each time-location period, counts for total the number
 of infractions, infractions that already went to trial, and number of
 unique perpetrators of infractions.
 
@@ -689,7 +787,7 @@ data = load_mapbiomas("mapbiomas_mining", raw_data = FALSE, geo_level = "indigen
 ## 9 - CIPÓ
 
 Loads Plataforma CIPÓ’s mappings on the organizations involved in
-combatting environmental crimes. Each mapping consists on a listing of
+combating environmental crimes. Each mapping consists on a listing of
 actors or agreements along with attributions and many descriptions.
 
     There are two parameters in this function:
@@ -715,7 +813,7 @@ actors_ibama <- load_cipo(dataset = "brazilian_actors",
 ## 10 - TerraClimate
 
 Loads TerraClimate data by [Climatology
-Lab](https://www.climatologylab.org), on many avaliable climate
+Lab](https://www.climatologylab.org), on many available climate
 variables. Data is avaliable from 1958 to 2020.
 
     There are five parameters in this function:
