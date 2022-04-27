@@ -15,16 +15,22 @@
 #' @examples
 #' \dontrun{
 #' # download treated exports data by municipality from 1997 to 2021
-#' exp_mun <- load_br_trade(dataset = "comex_export_mun",
-#'                          raw_data = FALSE, time_period = 1997:2021)
+#' exp_mun <- load_br_trade(
+#'   dataset = "comex_export_mun",
+#'   raw_data = FALSE, time_period = 1997:2021
+#' )
 #'
 #' # download raw imports data by municipality from 1997 to 2021
-#' raw_imp_mun <- load_br_trade(dataset = "comex_import_mun",
-#'                              raw_data = TRUE, time_period = 1997:2021)
+#' raw_imp_mun <- load_br_trade(
+#'   dataset = "comex_import_mun",
+#'   raw_data = TRUE, time_period = 1997:2021
+#' )
 #'
 #' # download treated imports data by ncm from 1997 to 2021
-#' imp_prod <- load_br_trade(dataset = "comex_import_prod",
-#'                           raw_data = FALSE, time_period = 1997:2021)
+#' imp_prod <- load_br_trade(
+#'   dataset = "comex_import_prod",
+#'   raw_data = FALSE, time_period = 1997:2021
+#' )
 #' }
 #'
 #' @importFrom magrittr %>%
@@ -32,7 +38,7 @@
 #' @export
 
 load_br_trade <- function(dataset = NULL, raw_data,
-                          time_period, language = 'eng'){
+                          time_period, language = "eng") {
 
   ## We want to download both imports and exports data
 
@@ -51,7 +57,7 @@ load_br_trade <- function(dataset = NULL, raw_data,
 
 
   ## To-Do:
-    ## Include Labels
+  ## Include Labels
 
   ###########################
   ## Bind Global Variables ##
@@ -68,34 +74,38 @@ load_br_trade <- function(dataset = NULL, raw_data,
 
 
   ## There are two main dissagregated data levels in the COMEX website:
-    ## 1 - Dissagregated by Classification: NCM
-    ## 2 - Disagreggated by Exporter/Importer Municipality
+  ## 1 - Dissagregated by Classification: NCM
+  ## 2 - Disagreggated by Exporter/Importer Municipality
 
   #############################
   ## Define Basic Parameters ##
   #############################
 
-  param=list()
-  param$dataset = dataset
-  param$geo_level = geo_level
-  param$time_period = time_period
-  param$language = language
-  param$raw_data = raw_data
+  param <- list()
+  param$dataset <- dataset
+  param$geo_level <- geo_level
+  param$time_period <- time_period
+  param$language <- language
+  param$raw_data <- raw_data
 
-  param$survey_name = datasets_link() %>%
-      dplyr::filter(dataset == param$dataset) %>%
-      dplyr::select(survey) %>%
-      unlist()
+  param$survey_name <- datasets_link() %>%
+    dplyr::filter(dataset == param$dataset) %>%
+    dplyr::select(survey) %>%
+    unlist()
 
-  param$url = datasets_link() %>%
+  param$url <- datasets_link() %>%
     dplyr::filter(dataset == param$dataset) %>%
     dplyr::select(link) %>%
     unlist()
 
   ## Dataset
 
-  if (is.null(param$dataset)){stop('Missing Dataset!')}
-  if (is.null(param$raw_data)){stop('Missing TRUE/FALSE for Raw Data')}
+  if (is.null(param$dataset)) {
+    stop("Missing Dataset!")
+  }
+  if (is.null(param$raw_data)) {
+    stop("Missing TRUE/FALSE for Raw Data")
+  }
 
   # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/EXP_2012_MUN.csv
   # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/IMP_2021_MUN.csv
@@ -106,15 +116,18 @@ load_br_trade <- function(dataset = NULL, raw_data,
   ## Download ##
   ##############
 
-  dat = as.list(param$time_period) %>%
+  dat <- as.list(param$time_period) %>%
     purrr::map(
-      function(t){external_download(dataset = param$dataset,
-                                    source='comex',year = t,
-                                    geo_level = param$geo_level)
+      function(t) {
+        external_download(
+          dataset = param$dataset,
+          source = "comex", year = t,
+          geo_level = param$geo_level
+        )
       }
     )
 
-  dat = dat %>%
+  dat <- dat %>%
     dplyr::bind_rows() %>%
     tibble::as_tibble()
 
@@ -122,20 +135,24 @@ load_br_trade <- function(dataset = NULL, raw_data,
   ## Data Engineering ##
   ######################
 
-  dat = dat %>%
+  dat <- dat %>%
     janitor::clean_names() %>%
-    dplyr::mutate_if(is.character,function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")})
+    dplyr::mutate_if(is.character, function(var) {
+      stringi::stri_trans_general(str = var, id = "Latin-ASCII")
+    })
 
   ## Change Data Type
 
-  dat = dat %>%
-    dplyr::mutate_if(is.numeric,as.double)
+  dat <- dat %>%
+    dplyr::mutate_if(is.numeric, as.double)
 
   ## Returning Raw Data
 
-    ## Just Add Translation
+  ## Just Add Translation
 
-  if (param$raw_data == TRUE){return(dat)}
+  if (param$raw_data == TRUE) {
+    return(dat)
+  }
 
   ## ---------------------------------------------------------------------------##
 
@@ -145,162 +162,158 @@ load_br_trade <- function(dataset = NULL, raw_data,
 
   ## This Needs to Load the Dictionary Depending on param$prod_class
 
-    # HS (2,4,6) - https://balanca.economia.gov.br/balanca/bd/tabelas/NCM_SH.csv
-    # NCM - https://balanca.economia.gov.br/balanca/bd/tabelas/NCM.csv
+  # HS (2,4,6) - https://balanca.economia.gov.br/balanca/bd/tabelas/NCM_SH.csv
+  # NCM - https://balanca.economia.gov.br/balanca/bd/tabelas/NCM.csv
 
   if (param$dataset == "comex_export_mun" | param$dataset == "comex_import_mun") {
+    dic <- suppressMessages(load_trade_dic(type = "hs"))
 
-    dic = suppressMessages(load_trade_dic(type = "hs"))
-
-    if (param$language == 'pt'){
-      dic = dic %>%
+    if (param$language == "pt") {
+      dic <- dic %>%
         dplyr::select(co_sh4, no_sh4 = no_sh4_por)
     }
-    if (param$language == 'eng'){
-      dic = dic %>%
+    if (param$language == "eng") {
+      dic <- dic %>%
         dplyr::select(co_sh4, no_sh4 = no_sh4_ing)
     }
 
-    non_dup = !duplicated(dic)
+    non_dup <- !duplicated(dic)
 
-    dic = dic %>%
+    dic <- dic %>%
       dplyr::filter(non_dup)
 
     #######################
     ## Add Variable Name ##
     #######################
 
-    dat = dat %>%
+    dat <- dat %>%
       dplyr::rename(co_sh4 = sh4) %>%
       dplyr::mutate(co_sh4 = formatC(co_sh4, width = 4, format = "d", flag = "0")) %>%
-      dplyr::left_join(dic,by='co_sh4')
+      dplyr::left_join(dic, by = "co_sh4")
 
 
     ## Translation
 
-    if (param$language == 'pt'){
-
-      dat_mod = dat %>%
-        dplyr::select(ano = co_ano, mes = co_mes,
-                      cod_pais = co_pais, uf = sg_uf_mun,
-                      cod_municipio = co_mun,
-                      cod_sh4 = co_sh4, nome_sh4 = no_sh4,
-                      kg_liquido, valor_fob = vl_fob
+    if (param$language == "pt") {
+      dat_mod <- dat %>%
+        dplyr::select(
+          ano = co_ano, mes = co_mes,
+          cod_pais = co_pais, uf = sg_uf_mun,
+          cod_municipio = co_mun,
+          cod_sh4 = co_sh4, nome_sh4 = no_sh4,
+          kg_liquido, valor_fob = vl_fob
         ) %>%
         dplyr::arrange(ano, mes, cod_municipio, cod_pais, nome_sh4)
-
     }
 
-    if (param$language == 'eng'){
-
-      dat_mod = dat %>%
-        dplyr::select(year = co_ano, month = co_mes,
-                      country_code = co_pais, state = sg_uf_mun,
-                      municipality_code = co_mun,
-                      hs4_code = co_sh4, hs4_name = no_sh4,
-                      kg_net = kg_liquido, value_fob = vl_fob
+    if (param$language == "eng") {
+      dat_mod <- dat %>%
+        dplyr::select(
+          year = co_ano, month = co_mes,
+          country_code = co_pais, state = sg_uf_mun,
+          municipality_code = co_mun,
+          hs4_code = co_sh4, hs4_name = no_sh4,
+          kg_net = kg_liquido, value_fob = vl_fob
         ) %>%
         dplyr::arrange(year, month, municipality_code, country_code, hs4_name)
-
     }
   }
 
   if (param$dataset == "comex_export_prod" | param$dataset == "comex_import_prod") {
+    dic <- suppressMessages(load_trade_dic(type = "ncm"))
 
-    dic = suppressMessages(load_trade_dic(type = "ncm"))
-
-    if (param$language == 'pt'){
-      dic = dic %>%
+    if (param$language == "pt") {
+      dic <- dic %>%
         dplyr::select(co_ncm, no_ncm = no_ncm_por)
     }
-    if (param$language == 'eng'){
-      dic = dic %>%
+    if (param$language == "eng") {
+      dic <- dic %>%
         dplyr::select(co_ncm, no_ncm = no_ncm_ing)
     }
 
-    non_dup = !duplicated(dic)
+    non_dup <- !duplicated(dic)
 
-    dic = dic %>%
+    dic <- dic %>%
       dplyr::filter(non_dup)
 
     #######################
     ## Add Variable Name ##
     #######################
 
-    dat = dat %>%
+    dat <- dat %>%
       dplyr::mutate(co_ncm = formatC(co_ncm, width = 8, format = "d", flag = "0")) %>%
-      dplyr::left_join(dic,by='co_ncm')
+      dplyr::left_join(dic, by = "co_ncm")
 
 
     ## Translation
 
-    if (param$language == 'pt'){
-
-      dat_mod = dat %>%
-        dplyr::select(ano = co_ano, mes = co_mes,
-                      cod_pais = co_pais, uf = sg_uf_ncm,
-                      cod_ncm = co_ncm, nome_ncm = no_ncm,
-                      cod_transporte = co_via, cod_unidade = co_unid,
-                      cod_urf = co_urf, qtd_estatistica = qt_estat,
-                      kg_liquido, valor_fob = vl_fob
+    if (param$language == "pt") {
+      dat_mod <- dat %>%
+        dplyr::select(
+          ano = co_ano, mes = co_mes,
+          cod_pais = co_pais, uf = sg_uf_ncm,
+          cod_ncm = co_ncm, nome_ncm = no_ncm,
+          cod_transporte = co_via, cod_unidade = co_unid,
+          cod_urf = co_urf, qtd_estatistica = qt_estat,
+          kg_liquido, valor_fob = vl_fob
         ) %>%
         dplyr::arrange(ano, mes, uf, cod_pais, nome_ncm)
-
     }
 
-    if (param$language == 'eng'){
-
-      dat_mod = dat %>%
-        dplyr::select(year = co_ano, month = co_mes,
-                      country_code = co_pais, state = sg_uf_ncm,
-                      ncm_code = co_ncm, ncm_name = no_ncm,
-                      transport_code = co_via, unit_code = co_unid,
-                      urf_code = co_urf, statistical_qt = qt_estat,
-                      kg_net = kg_liquido, value_fob = vl_fob
+    if (param$language == "eng") {
+      dat_mod <- dat %>%
+        dplyr::select(
+          year = co_ano, month = co_mes,
+          country_code = co_pais, state = sg_uf_ncm,
+          ncm_code = co_ncm, ncm_name = no_ncm,
+          transport_code = co_via, unit_code = co_unid,
+          urf_code = co_urf, statistical_qt = qt_estat,
+          kg_net = kg_liquido, value_fob = vl_fob
         ) %>%
         dplyr::arrange(year, month, state, country_code, ncm_name)
-
-
     }
   }
 
   return(dat_mod)
-
 }
 
 
-load_trade_dic <- function(type){
+load_trade_dic <- function(type) {
 
   # Bind Global Variables
 
-  locale <-co_sh6 <-co_sh4 <-co_sh2 <-co_ncm_secrom <-no_sh6_ing <-no_sh4_ing <-no_sh2_ing <-no_sec_ing <- NULL
+  locale <- co_sh6 <- co_sh4 <- co_sh2 <- co_ncm_secrom <- no_sh6_ing <- no_sh4_ing <- no_sh2_ing <- no_sec_ing <- NULL
 
   #########################
   ## Download Dictionary ##
   #########################
 
-  path = 'https://balanca.economia.gov.br/balanca/bd/'
+  path <- "https://balanca.economia.gov.br/balanca/bd/"
 
-  if (type == 'hs'){final = paste(path,'tabelas/NCM_SH.csv',sep='')} # Harmonized System
-  if (type == 'ncm'){final = paste(path,'tabelas/NCM.csv',sep='')}
-  #if (type == 'cuci'){final = paste(path,'tabelas/NCM_CUCI.csv',sep='')}
-  #if (type == 'isic'){final = paste(path,'tabelas/NCM_ISIC.csv',sep='')}
-  #if (type == 'cgce'){final = paste(path,'tabelas/NCM_CGCE.csv',sep='')}
+  if (type == "hs") {
+    final <- paste(path, "tabelas/NCM_SH.csv", sep = "")
+  } # Harmonized System
+  if (type == "ncm") {
+    final <- paste(path, "tabelas/NCM.csv", sep = "")
+  }
+  # if (type == 'cuci'){final = paste(path,'tabelas/NCM_CUCI.csv',sep='')}
+  # if (type == 'isic'){final = paste(path,'tabelas/NCM_ISIC.csv',sep='')}
+  # if (type == 'cgce'){final = paste(path,'tabelas/NCM_CGCE.csv',sep='')}
   # if (type == 'aggreg'){final = paste(path,'tabelas/NCM_FAT_AGREG.csv',sep='')}
   # if (type == 'ppe'){final = paste(path,'tabelas/NCM_PPE.csv',sep='')}
   # if (type == 'ppi'){final = paste(path,'tabelas/NCM_PPI.csv',sep='')}
 
-  dic = readr::read_delim(final,delim=';',locale = readr::locale(encoding='Latin1'),progress=TRUE)
+  dic <- readr::read_delim(final, delim = ";", locale = readr::locale(encoding = "Latin1"), progress = TRUE)
 
   #####################
   ## Data Processing ##
   #####################
 
-  dic = dic %>%
-    dplyr::mutate_if(is.character,function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")}) %>%
+  dic <- dic %>%
+    dplyr::mutate_if(is.character, function(var) {
+      stringi::stri_trans_general(str = var, id = "Latin-ASCII")
+    }) %>%
     janitor::clean_names()
 
   return(dic)
-
-
 }

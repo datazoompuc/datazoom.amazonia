@@ -36,10 +36,12 @@ Loads information on gross domestic product at current prices, taxes, net of sub
 \examples{
 \dontrun{
 # download state raw data from 2012 for all country
-pibmunic <- load_pibmunic(dataset = 'pibmunic',
-                          raw_data = TRUE,
-                          geo_level = 'state',
-                          time_period = 2012,
-                          legal_amazon_only = FALSE)
+pibmunic <- load_pibmunic(
+  dataset = "pibmunic",
+  raw_data = TRUE,
+  geo_level = "state",
+  time_period = 2012,
+  legal_amazon_only = FALSE
+)
 }
 }

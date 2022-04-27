@@ -23,7 +23,9 @@ Loads information the mines being explored legally in Brazil, including their lo
 \examples{
 \dontrun{
 # download state raw data
-sigmine_active <- load_sigmine(dataset = 'sigmine_active',
-                               raw_data = TRUE)
+sigmine_active <- load_sigmine(
+  dataset = "sigmine_active",
+  raw_data = TRUE
+)
 }
 }

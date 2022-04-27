@@ -462,8 +462,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## TerraClimate ##
   ##################
 
-  if (source == "terraclimate"){
-
+  if (source == "terraclimate") {
     filename <- paste0(
       "agg_terraclimate_",
       param$dataset_code,
@@ -477,7 +476,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       "?",
       "&var=",
       param$dataset_code,
-
       "&south=",
       param$coords$lat_min,
       "&north=",
@@ -487,13 +485,11 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       "&east=",
       param$coords$lon_max,
       "&horizStride=1",
-
       "&time_start=",
       param$year$initial_time,
       "&time_end=",
       param$year$final_time,
       "&timeStride=1",
-
       "&disableProjSubset=on&addLatLon=true&accept=netcdf"
     )
   }
@@ -502,8 +498,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## GeoBR Shapefile ##
   #####################
 
-  if (source == "internal"){
-    if (dataset == "geo_municipalities"){
+  if (source == "internal") {
+    if (dataset == "geo_municipalities") {
       path <- param$url
     }
   }
@@ -533,10 +529,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source == "ibama") {
     file_extension <- ".zip"
   }
-  if (source == "terraclimate"){
+  if (source == "terraclimate") {
     file_extension <- ".nc"
   }
-  if (source == "internal"){
+  if (source == "internal") {
     file_extension <- ".rds"
   }
 
@@ -566,9 +562,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       googledrive::drive_download(path, path = temp, overwrite = TRUE)
     }
   }
-  if (source == "terraclimate"){
-    utils::download.file(url = path, destfile = temp, method = "curl"
-    )
+  if (source == "terraclimate") {
+    utils::download.file(url = path, destfile = temp, method = "curl")
   }
 
   ## This Data Opening Part Should Include the .Shp, not DBF
@@ -593,10 +588,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       janitor::clean_names() %>%
       tibble::as_tibble()
   }
-  if (file_extension == ".nc"){
+  if (file_extension == ".nc") {
     dat <- terra::rast(temp)
   }
-  if (file_extension == ".rds"){
+  if (file_extension == ".rds") {
     dat <- readr::read_rds(temp)
   }
   if (file_extension == ".xlsx") {
@@ -655,7 +650,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       if (param$year == 2018) {
         dat <- readxl::read_excel(temp, sheet = "IPS 2018 ")
       }
-      if(param$year == 2021){
+      if (param$year == 2021) {
         dat <- readxl::read_excel(temp, sheet = "IPS 2021")
       }
     }
@@ -756,7 +751,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   if (file_extension != ".nc") {
     unlink(temp)
-    }
+  }
 
   ####################
   ## Pre-Processing ##
@@ -778,21 +773,92 @@ datasets_link <- function() {
 
   link <- tibble::tribble(
     ~survey, ~dataset, ~sidra_code, ~available_time, ~available_geo, ~link,
+    "PAM-IBGE", "all_crops", "5457/all/all", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "permanent_crops", "1613/all/all", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "temporary_crops", "1612/all/all", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "corn", "839/all/all", "2003-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "potato", "1001/all/all", "2003-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "peanut", "1000/all/all", "2003-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "beans", "1002/all/all", "2003-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
 
+    ### Categories within temporary crops
 
-    #########
-    ## PAM ##
-    #########
+    "PAM-IBGE", "temporary_total", "1612/c81/0", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "pineapple", "1612/c81/2688", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "alfafa", "1612/c81/40471", "1974-1987", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "cotton_herbaceous", "1612/c81/2689", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "garlic", "1612/c81/2690", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "peanut_temporary", "1612/c81/2691", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "rice", "1612/c81/2692", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "oats", "1612/c81/2693", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "sweet_potato", "1612/c81/2694", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "potato_temporary", "1612/c81/2695", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "sugar_cane", "1612/c81/2696", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "forage_cane", "1612/c81/40470", "1974-1987", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "onion", "1612/c81/2697", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "rye", "1612/c81/2698", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "barley", "1612/c81/2699", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "pea", "1612/c81/2700", "1988-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "broad_bean", "1612/c81/2701", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "beans_temporary", "1612/c81/2702", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "tobacco", "1612/c81/2703", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "sunflower_seeds", "1612/c81/109179", "2005-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "jute_fiber", "1612/c81/2704", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "linen_seeds", "1612/c81/2705", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "malva_fiber", "1612/c81/2706", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "castor_bean", "1612/c81/2707", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "cassava", "1612/c81/2708", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "watermelon", "1612/c81/2709", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "melon", "1612/c81/2710", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "corn_temporary", "1612/c81/2711", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "ramie_fiber", "1612/c81/2712", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "soybean", "1612/c81/2713", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "sorghum", "1612/c81/2714", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "tomato", "1612/c81/2715", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "wheat", "1612/c81/2716", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "triticale", "1612/c81/109180", "2005-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
 
-    # Agriculture
+    ### Categories within permanent crops
 
-    "PAM-IBGE", "pam_all_crops", 5457, "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "pam_permanent_crops", 1613, "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "pam_temporary_crops", 1612, "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "pam_corn", 839, "2003-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "pam_potato", 1001, "2003-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "pam_peanut", 1000, "2003-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "pam_beans", 1002, "2003-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "permanent_total", "1613/c82/0", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "avocado", "1613/c82/2717", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "cotton_arboreo", "1613/c82/2718", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "acai", "1613/c82/45981", "2015-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "olive", "1613/c82/2719", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "banana", "1613/c82/2720", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "rubber_coagulated_latex", "1613/c82/2721", "1981-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "rubber_liquid_latex", "1613/c82/40472", "1981-1987", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "cocoa_beans", "1613/c82/2722", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "coffee_total", "1613/c82/2723", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "coffee_arabica", "1613/c82/31619", "2012-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "coffee_canephora", "1613/c82/31620", "2012-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "cashew", "1613/c82/40473", "1974-1987", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "khaki", "1613/c82/2724", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "cashew_nut", "1613/c82/2725", "1988-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "india_tea", "1613/c82/2726", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "coconut", "1613/c82/2727", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "coconut_bunch", "1613/c82/2728", "1988-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "yerba_mate", "1613/c82/2729", "1981-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "fig", "1613/c82/2730", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "guava", "1613/c82/2731", "1988-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "guarana_seeds", "1613/c82/2732", "1981-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "orange", "1613/c82/2733", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "lemon", "1613/c82/2734", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "apple", "1613/c82/2735", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "papaya", "1613/c82/2736", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "mango", "1613/c82/2737", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "passion_fruit", "1613/c82/2738", "1988-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "quince", "1613/c82/2739", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "walnut", "1613/c82/2740", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "heart_of_palm", "1613/c82/90001", "1981-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "pear", "1613/c82/2741", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "peach", "1613/c82/2742", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "black_pepper", "1613/c82/2743", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "sisal_or_agave", "1613/c82/2744", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "tangerine", "1613/c82/2745", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "tung", "1613/c82/2746", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "annatto_seeds", "1613/c82/2747", "1981-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "PAM-IBGE", "grape", "1613/c82/2748", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
 
     #########
     ## PPM ##
@@ -800,11 +866,11 @@ datasets_link <- function() {
 
     # Livestock
 
-    "PPM-IBGE", "ppm_livestock_inventory", 3939, "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019",
-    "PPM-IBGE", "ppm_sheep_farming", 95, "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019",
-    "PPM-IBGE", "ppm_animal_origin_production", 74, "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019",
-    "PPM-IBGE", "ppm_cow_farming", 94, "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019",
-    "PPM-IBGE", "ppm_aquaculture", 3940, "2013-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019",
+    "PPM-IBGE", "ppm_livestock_inventory", "3939", "1974-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019",
+    "PPM-IBGE", "ppm_sheep_farming", "95", "1974-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019",
+    "PPM-IBGE", "ppm_animal_origin_production", "74", "1974-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019",
+    "PPM-IBGE", "ppm_cow_farming", "94", "1974-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019",
+    "PPM-IBGE", "ppm_aquaculture", "3940", "2013-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019",
 
     ##########
     ## PEVS ##
@@ -812,9 +878,9 @@ datasets_link <- function() {
 
     ## Vegetal Extraction
 
-    "PEVS-IBGE", "pevs_forest_crops", 289, "1986-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
-    "PEVS-IBGE", "pevs_silviculture", 291, "1986-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
-    "PEVS-IBGE", "pevs_silviculture_area", 5930, "2013-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
+    "PEVS-IBGE", "pevs_forest_crops", "289", "1986-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
+    "PEVS-IBGE", "pevs_silviculture", "291", "1986-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
+    "PEVS-IBGE", "pevs_silviculture_area", "5930", "2013-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
 
     ###########
     ## COMEX ##
@@ -826,7 +892,6 @@ datasets_link <- function() {
     "COMEX-IMP-PROD_NCM", "comex_import_prod", NA, "1997-2021", NA, "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm",
     "COMEX-EXP-MUNIC_FIRM", "comex_export_mun", NA, "1997-2021", NA, "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun",
     "COMEX-IMP-MUNIC_FIRM", "comex_import_mun", NA, "1997-2021", NA, "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun",
-
 
     ##########
     ## INPE ##
@@ -950,10 +1015,9 @@ datasets_link <- function() {
     ## Other Economics Datasets IBGE - GDP Munic, Employment, Wage ##
     #################################################################
 
-
     ## Municipal GDP ##
 
-    "PIB_MUNIC-IBGE", "pibmunic", 5938, "2002-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pib-munic/tabelas",
+    "PIB_MUNIC-IBGE", "pibmunic", "5938", "2002-2018", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pib-munic/tabelas",
 
     ## Estimated Population ##
 
@@ -961,7 +1025,7 @@ datasets_link <- function() {
 
     ## Labor Market Info ##
 
-    "CEMPRE-IBGE", "cempre", 6449, "2006-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/cempre/tabelas",
+    "CEMPRE-IBGE", "cempre", "6449", "2006-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/cempre/tabelas",
 
     ## Demographic Info ##
 
@@ -971,33 +1035,32 @@ datasets_link <- function() {
     ## CIPÓ ##
     ##########
 
-    'CIPO', 'brazilian_actors', NA, NA, NA, 'https://plataformacipo.org/mapa-crimes-ambientais/',
-    'CIPO', 'international_cooperation', NA, NA, NA, 'https://plataformacipo.org/mapeamento-cooperacao-internacional/',
-    'CIPO', 'forest_governance', NA, NA, NA, 'https://plataformacipo.org/arranjos-globais-de-governanca-florestal/',
+    "CIPO", "brazilian_actors", NA, NA, NA, "https://plataformacipo.org/mapa-crimes-ambientais/",
+    "CIPO", "international_cooperation", NA, NA, NA, "https://plataformacipo.org/mapeamento-cooperacao-internacional/",
+    "CIPO", "forest_governance", NA, NA, NA, "https://plataformacipo.org/arranjos-globais-de-governanca-florestal/",
 
     ##################
     ## TerraClimate ##
     ##################
 
-    'TerraClimate', 'max_temperature', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'min_temperature', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'wind_speed', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'vapor_pressure_deficit', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'vapor_pressure', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'snow_water_equivalent', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'shortwave_radiation_flux', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'soil_moisture', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'runoff', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'precipitation', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'potential_evaporation', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'climatic_water_deficit', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'water_evaporation', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
-    'TerraClimate', 'palmer_drought_severity_index', NA, '1958-2020', 'Municipality', 'http://thredds.northwestknowledge.net:8080/thredds/ncss',
+    "TerraClimate", "max_temperature", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "min_temperature", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "wind_speed", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "vapor_pressure_deficit", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "vapor_pressure", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "snow_water_equivalent", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "shortwave_radiation_flux", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "soil_moisture", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "runoff", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "precipitation", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "potential_evaporation", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "climatic_water_deficit", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "water_evaporation", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "palmer_drought_severity_index", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
 
     ## Shapefile from github repository
 
     "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds"
-
   )
 
   return(link)
@@ -1019,11 +1082,9 @@ datasets_seeg <- function() {
 }
 
 
-datasets_baci = function() {
-
+datasets_baci <- function() {
   link <- tibble::tribble(
     ~survey, ~dataset, ~available_time, ~link,
-
     "BACI", "HS92", "1995-2020", "http://www.cepii.fr/DATA_DOWNLOAD/baci/data",
   )
   return(link)

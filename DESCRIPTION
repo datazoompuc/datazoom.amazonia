@@ -1,52 +1,54 @@
 Package: datazoom.amazonia
 Title: Simplify Access to Data from the Amazon Region
-Version: 0.2.0
+Version: 0.3.0
 Authors@R: c(
-    person("DataZoom (PUC-Rio)", role = c("aut", "cre"), email = "datazoom@econ.puc-rio.br"),
-    person("Francisco", "de Lima Cavalcanti", role = c("aut"), email = "francisco.lima.cavalcanti@gmail.com"),
-    person("Guilherme", "Jardim", role = c("aut"), email = "gnjardim1@gmail.com"),
-    person("Daniel", "AC Barbosa", role = c("aut"), email = "daniel.adrianocb@gmail.com"),
-    person("Bruno", "Alcantara Duarte", role = c("aut"), email = "brunoalcanduarte@gmail.com"),
-    person("Fredie", "Didier", role = c("aut"), email = "fdidier@terra.com.br"),
-    person("Tito", "Bruni", role = c("aut")),
-    person("Victor", "Aliende da Matta", role = c("aut"), email = "victor.al.matta@gmail.com"),
-    person("Anna Carolina", "Dutra Saraiva", role = c("aut"), email = "annadutrasaraiva@gmail.com"),
-    person("Arthur", "Carvalho Brito", role = c("aut"), email = "arthurcbps@gmail.com"), 
-    person("Igor", "Rigolon Veiga", role = c("aut"), email = "igor.rilave@hotmail.com"),
-    person("Maria", "Mittelbach", role = c("aut"), email = "mariamittelbach@gmail.com")
-    )
-Description: Functions to download and treat data regarding the Brazilian Amazon region from a variety of official sources.
+    person("Francisco", "de Lima Cavalcanti", , "francisco.lima.cavalcanti@gmail.com", role = c("aut", "cre")),
+    person("DataZoom (PUC-Rio)", , , "datazoom@econ.puc-rio.br", role = "fnd"),
+    person("Guilherme", "Jardim", , "gnjardim1@gmail.com", role = "aut"),
+    person("Daniel", "AC Barbosa", , "daniel.adrianocb@gmail.com", role = "aut"),
+    person("Bruno", "Alcantara Duarte", , "brunoalcanduarte@gmail.com", role = "aut"),
+    person("Fredie", "Didier", , "fdidier@terra.com.br", role = "aut"),
+    person("Tito", "Bruni", role = "aut"),
+    person("Victor", "Aliende da Matta", , "victor.al.matta@gmail.com", role = "aut"),
+    person("Anna Carolina", "Dutra Saraiva", , "annadutrasaraiva@gmail.com", role = "aut"),
+    person("Arthur", "Carvalho Brito", , "arthurcbps@gmail.com", role = "aut"),
+    person("Igor", "Rigolon Veiga", , "igor.rilave@hotmail.com", role = "aut"),
+    person("Maria", "Mittelbach", , "mariamittelbach@gmail.com", role = "aut")
+  )
+Description: Functions to download and treat data regarding the Brazilian
+    Amazon region from a variety of official sources.
 License: MIT + file LICENSE
+URL: http://www.econ.puc-rio.br/datazoom/
+Depends: 
+    R (>= 4.0)
+Imports:
+    data.table,
+    dplyr,
+    Hmisc,
+    janitor,
+    labelled,
+    lubridate,
+    magrittr,
+    purrr,
+    RCurl,
+    readr,
+    readxl,
+    sf,
+    sidrar,
+    stats,
+    stringi,
+    stringr,
+    tibble,
+    tidyr,
+    utils,
+    XML
+Suggests: 
+    googledrive,
+    knitr,
+    rmarkdown,
+    terra
+VignetteBuilder: 
+    knitr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
-Imports:
-    dplyr,
-    data.table,
-    stringr,
-    readr,
-    tidyr,
-    janitor,
-    labelled,
-    purrr,
-    sidrar,
-    magrittr,
-    tibble,
-    stats,
-    lubridate,
-    stringi,
-    sf,
-    utils,
-    readxl,
-    XML,
-    RCurl,
-    Hmisc
-URL: http://www.econ.puc-rio.br/datazoom/
-Suggests: 
-    knitr,
-    rmarkdown,
-    googledrive,
-    terra
-VignetteBuilder: knitr
-Depends: 
-    R (>= 4.0)

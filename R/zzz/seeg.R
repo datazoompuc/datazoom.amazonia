@@ -2,7 +2,7 @@
 #'
 #' Loads data of estimates of emission of greenhouse gases of Brazilian cities
 #'
-#'@param language A \code{string} that indicates in which language the data will be returned. The default is "pt", so your data will be returned in Portuguese. Currently, only Portuguese and English are supported.
+#' @param language A \code{string} that indicates in which language the data will be returned. The default is "pt", so your data will be returned in Portuguese. Currently, only Portuguese and English are supported.
 #'
 #' @return A \code{data frame}.
 #'
@@ -12,15 +12,16 @@
 #'
 #' @export load_seeg
 #'
-#' @examples \dontrun{datazoom.amazonia::load_seeg()}
+#' @examples \dontrun{
+#' datazoom.amazonia::load_seeg()
+#' }
 #'
-
-load_seeg <- function(language = "pt"){
+load_seeg <- function(language = "pt") {
 
   # Adicionar suporte para agregaçao a nivel do Estado
 
 
- # message("Function requires download of large file, so it may take time to run")
+  # message("Function requires download of large file, so it may take time to run")
 
   # if (language != "pt" && language != "eng"){
   #   warning("Language selected not supported! Proceding with Portuguese")
@@ -42,7 +43,7 @@ load_seeg <- function(language = "pt"){
   ## Recode Non-Ascii Characters ##
   #################################
 
-  #stringi::stri_escape_unicode()
+  # stringi::stri_escape_unicode()
   # df <- as.data.frame(gsub("\u00ed", "i", as.matrix(df)))
   # df <- as.data.frame(gsub("\u00f5", "o", as.matrix(df)))
   # df <- as.data.frame(gsub("\u00e1", "a", as.matrix(df)))

@@ -13,9 +13,11 @@
 #' @examples
 #' \dontrun{
 #' # download raw data from all country
-#' raw_ibama_all <- load_ibama(dataset = "areas_embargadas",
-#'                             raw_data = TRUE,
-#'                             legal_amazon_only = FALSE)
+#' raw_ibama_all <- load_ibama(
+#'   dataset = "areas_embargadas",
+#'   raw_data = TRUE,
+#'   legal_amazon_only = FALSE
+#' )
 #' }
 #'
 #' @importFrom magrittr %>%
@@ -26,9 +28,7 @@ load_ibama <- function(dataset = "areas_embargadas",
                        raw_data,
                        geo_level = "municipality",
                        language = "eng",
-                       legal_amazon_only = FALSE){
-
-
+                       legal_amazon_only = FALSE) {
   survey <- link <- legal_amazon <- codigo_ibge_municipio_embargo <- NULL
   municipio_embargo <- uf_embargo <- julgamento <- infracao <- data_de_insercao_na_lista <- NULL
   cpf_ou_cnpj <- cod_municipio <- ano <- mes <- NULL
@@ -41,35 +41,41 @@ load_ibama <- function(dataset = "areas_embargadas",
   ## Define Basic Parameters ##
   #############################
 
-  param=list()
-  param$dataset = dataset
-  param$geo_level = geo_level
-  param$language = language
-  param$raw_data = raw_data
+  param <- list()
+  param$dataset <- dataset
+  param$geo_level <- geo_level
+  param$language <- language
+  param$raw_data <- raw_data
 
-  param$survey_name = datasets_link() %>%
+  param$survey_name <- datasets_link() %>%
     dplyr::filter(dataset == param$dataset) %>%
     dplyr::select(survey) %>%
     unlist()
 
-  param$url = datasets_link() %>%
+  param$url <- datasets_link() %>%
     dplyr::filter(dataset == param$dataset) %>%
     dplyr::select(link) %>%
     unlist()
 
   ## Dataset
 
-  if (is.null(param$dataset)){stop('Missing Dataset!')}
-  if (is.null(param$raw_data)){stop('Missing TRUE/FALSE for Raw Data')}
+  if (is.null(param$dataset)) {
+    stop("Missing Dataset!")
+  }
+  if (is.null(param$raw_data)) {
+    stop("Missing TRUE/FALSE for Raw Data")
+  }
 
 
   ##############
   ## Download ##
   ##############
 
-  dat <- external_download(dataset = param$dataset,
-                           source = 'ibama',
-                           geo_level = param$geo_level)
+  dat <- external_download(
+    dataset = param$dataset,
+    source = "ibama",
+    geo_level = param$geo_level
+  )
 
 
   ## Filter for Legal Amazon
@@ -82,7 +88,9 @@ load_ibama <- function(dataset = "areas_embargadas",
 
 
   ## Return Raw Data
-  if (raw_data == TRUE){return(dat)}
+  if (raw_data == TRUE) {
+    return(dat)
+  }
 
 
   ## Aggregate to municipality-level
@@ -113,35 +121,35 @@ load_ibama <- function(dataset = "areas_embargadas",
   ## Adding IBGE municipality codes
 
   municipalities <- municipalities %>%
-    dplyr::select(municipio = name_muni,
-           cod_municipio = code_muni)
+    dplyr::select(
+      municipio = name_muni,
+      cod_municipio = code_muni
+    )
 
   dat <- dat %>%
     dplyr::left_join(municipalities, by = "municipio")
 
   ## Final variables and translation
 
-  if (param$language == 'pt'){
-
-    dat_mod = dat %>%
-      dplyr::select(ano, mes, uf, municipio, cod_municipio,
-                    n_ja_julgado, n_infracoes, n_cpf_cnpj_unicos
+  if (param$language == "pt") {
+    dat_mod <- dat %>%
+      dplyr::select(
+        ano, mes, uf, municipio, cod_municipio,
+        n_ja_julgado, n_infracoes, n_cpf_cnpj_unicos
       ) %>%
       dplyr::arrange(ano, mes, municipio)
-
   }
 
-  if (param$language == 'eng'){
-
-    dat_mod = dat %>%
-      dplyr::select(year = ano, month = mes, state = uf,
-                    municipality = municipio, municipality_code = cod_municipio,
-                    n_already_judged = n_ja_julgado,
-                    n_infringement = n_infracoes,
-                    n_unique_cpf_cnpj = n_cpf_cnpj_unicos
+  if (param$language == "eng") {
+    dat_mod <- dat %>%
+      dplyr::select(
+        year = ano, month = mes, state = uf,
+        municipality = municipio, municipality_code = cod_municipio,
+        n_already_judged = n_ja_julgado,
+        n_infringement = n_infracoes,
+        n_unique_cpf_cnpj = n_cpf_cnpj_unicos
       ) %>%
       dplyr::arrange(year, month, municipality)
-
   }
 
   ####################
@@ -149,5 +157,4 @@ load_ibama <- function(dataset = "areas_embargadas",
   ####################
 
   return(dat_mod)
-
 }

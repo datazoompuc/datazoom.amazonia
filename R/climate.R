@@ -17,7 +17,7 @@
 load_climate <- function(dataset, raw_data = FALSE,
                          time_period,
                          language = "eng",
-                         legal_amazon_only = FALSE){
+                         legal_amazon_only = FALSE) {
 
   # Checking for terra package (in Suggests)
 
@@ -48,23 +48,23 @@ load_climate <- function(dataset, raw_data = FALSE,
 
   ## Coordinates of rectangle around the Legal Amazon
 
-  #latitude bounding box -90.0 to 90.0 (North is positive, South is negative)
+  # latitude bounding box -90.0 to 90.0 (North is positive, South is negative)
   LAT_MIN <- "-18.04177"
   LAT_MAX <- "5.272225"
 
-  #longitude bounding box: -180.0 to 180.0 (East is positive, West is negative)
+  # longitude bounding box: -180.0 to 180.0 (East is positive, West is negative)
   LON_MIN <- "-73.99094"
   LON_MAX <- "-44"
 
-  if (!legal_amazon_only){
+  if (!legal_amazon_only) {
     LAT_MIN <- "-33.75208"
     LAT_MAX <- "5.271841"
     LON_MIN <- "-73.99045"
     LON_MAX <- "-28.83609"
   }
 
-  #variable choices: tmax,tmin,ws,vpd,vap,swe,srad,soil,q,ppt,pet,def,aet,PDSI
-  #VARIABLES=("tmax" "tmin" "ws" "vpd" "vap" "swe" "srad" "soil" "q" "ppt" "pet" "def" "aet" "PDSI")
+  # variable choices: tmax,tmin,ws,vpd,vap,swe,srad,soil,q,ppt,pet,def,aet,PDSI
+  # VARIABLES=("tmax" "tmin" "ws" "vpd" "vap" "swe" "srad" "soil" "q" "ppt" "pet" "def" "aet" "PDSI")
 
   dataset_names <- c(
     "max_temperature" = "tmax",
@@ -101,11 +101,11 @@ load_climate <- function(dataset, raw_data = FALSE,
   # aet - Actual Evapotranspiration; water_evaporation_amount (mm)
   # PDSI - Palmer Drought Severity Index; palmer_drought_severity_index (unitless)
 
-  if (param$dataset_name == param$dataset_code){
+  if (param$dataset_name == param$dataset_code) {
     base::stop("Invalid dataset")
   }
 
-  #time range choices - 1958-01 to 2017-01
+  # time range choices - 1958-01 to 2017-01
   param$initial_time <- ifelse(
     nchar(param$initial_time) == 4,
     paste0(param$initial_time, "-01-01T00%3A00%3A00Z"),
@@ -126,18 +126,22 @@ load_climate <- function(dataset, raw_data = FALSE,
     source = "terraclimate",
     dataset = param$dataset_name,
     dataset_code = param$dataset_code,
-    coords = list("lat_min" = LAT_MIN,
-                  "lat_max" = LAT_MAX,
-                  "lon_min" = LON_MIN,
-                  "lon_max" = LON_MAX),
-    year = list("initial_time" = param$initial_time,
-                "final_time" = param$final_time)
+    coords = list(
+      "lat_min" = LAT_MIN,
+      "lat_max" = LAT_MAX,
+      "lon_min" = LON_MIN,
+      "lon_max" = LON_MAX
+    ),
+    year = list(
+      "initial_time" = param$initial_time,
+      "final_time" = param$final_time
+    )
   )
 
   time <- terra::time(dat) %>%
     as.Date()
 
-  names(time) <- 1:length(time)
+  names(time) <- seq_along(time)
 
   points <- dat %>%
     terra::as.points() %>%
@@ -149,12 +153,14 @@ load_climate <- function(dataset, raw_data = FALSE,
 
   ## Brazilian municipalities/states/country to merge
 
-  map <- external_download(dataset = "geo_municipalities",
-                           source = "internal")
+  map <- external_download(
+    dataset = "geo_municipalities",
+    source = "internal"
+  )
 
   ## Filtering for Legal Amazon
 
-  if (legal_amazon_only){
+  if (legal_amazon_only) {
     legal_amazon <- legal_amazon %>%
       dplyr::filter(AMZ_LEGAL == 1)
 
@@ -166,25 +172,28 @@ load_climate <- function(dataset, raw_data = FALSE,
 
   points <- points %>%
     sf::st_transform(crs = sf::st_crs(map)) # merge requires matching
-                                            # coordinate systems
+  # coordinate systems
 
   dat <- sf::st_join(map, points)
 
   ## Return Raw Data
 
-  if (param$raw_data == TRUE) {return(dat)}
+  if (param$raw_data == TRUE) {
+    return(dat)
+  }
 
   ## Converting to Tibble
 
-  #dat <- sf::st_drop_geometry(dat)
+  # dat <- sf::st_drop_geometry(dat)
 
   ## Reshaping data
 
   dat <- dat %>%
     tidyr::pivot_longer(dplyr::starts_with(param$dataset_code),
-                 names_prefix = paste0(param$dataset_code, "_"),
-                 names_to = "date",
-                 values_to = param$dataset_name)
+      names_prefix = paste0(param$dataset_code, "_"),
+      names_to = "date",
+      values_to = param$dataset_name
+    )
 
   ## Restoring correct dates
 
@@ -197,15 +206,15 @@ load_climate <- function(dataset, raw_data = FALSE,
   ## Aggregating Data ##
   ######################
 
-  #dat <- dat %>%
-    #dplyr::group_by(code_muni, name_muni, code_state, date) %>%
-    #dplyr::summarise(across(param$dataset_name, ~ mean(., na.rm = TRUE)))
+  # dat <- dat %>%
+  # dplyr::group_by(code_muni, name_muni, code_state, date) %>%
+  # dplyr::summarise(across(param$dataset_name, ~ mean(., na.rm = TRUE)))
 
   ################################
   ## Harmonizing Variable Names ##
   ################################
 
-  if (param$language == "eng"){
+  if (param$language == "eng") {
     dat_mod <- dat %>%
       dplyr::rename(
         "municipality_code" = "code_muni",
@@ -213,9 +222,9 @@ load_climate <- function(dataset, raw_data = FALSE,
         "state" = "abbrev_state",
         "state_code" = "code_state",
         "geometry" = "geom"
-    )
+      )
   }
-  if (param$language == "pt"){
+  if (param$language == "pt") {
     dat_mod <- dat %>%
       dplyr::rename(
         "cod_municipio" = "code_muni",
@@ -231,6 +240,4 @@ load_climate <- function(dataset, raw_data = FALSE,
   ####################
 
   return(dat_mod)
-
 }
-

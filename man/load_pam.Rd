@@ -8,7 +8,7 @@
 load_pam(dataset = NULL, raw_data, geo_level, time_period, language = "eng")
 }
 \arguments{
-\item{dataset}{A dataset name ("pam_all_crops", "pam_permanent_crops", "pam_temporary_crops" or "pam_xx", in which xx needs to be corn, potato, peanut or beans). You can also use SIDRA codes (see \url{https://sidra.ibge.gov.br/pesquisa/pam/tabelas})}
+\item{dataset}{A dataset name ("all_crops", "permanent_crops", "temporary_crops" or many individual crop possibilities (see \code{vignette(load_pam)})). You can also use SIDRA codes (see \url{https://sidra.ibge.gov.br/pesquisa/pam/tabelas})}
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
@@ -28,7 +28,7 @@ Loads information on the  temporary and permanent crops of the Country that are 
 \dontrun{
 # download state raw data from 2012 for all crops
 pam_all_crops <- load_pam(
-  dataset = "pam_all_crops",
+  dataset = "all_crops",
   raw_data = TRUE,
   geo_level = "state",
   time_period = 2012

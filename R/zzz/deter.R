@@ -115,10 +115,7 @@ load_deter_raw <- function(source = "amazonia") {
     Encoding(df$MUNICIPALI) <- "UTF-8"
 
     return(df)
-  }
-
-
-  else {
+  } else {
     warning("Invalid source.")
   }
 }
@@ -189,8 +186,7 @@ treat_deter_data <- function(df, space_aggregation, time_aggregation, language) 
       dplyr::group_by(.data$CLASSNAME, .add = TRUE) %>%
       dplyr::summarise(dplyr::across(-c(.data$Mes, .data$AREAUCKM, .data$AREAMUNKM)), AREAUCKM = sum(.data$AREAUCKM), AREAMUNKM = sum(.data$AREAMUNKM)) %>%
       dplyr::distinct()
-  }
-  else if (time_aggregation != "month") {
+  } else if (time_aggregation != "month") {
     warning("Invalid time aggregation, grouping by month.")
   }
 
@@ -218,8 +214,7 @@ treat_deter_data <- function(df, space_aggregation, time_aggregation, language) 
 
   if (language == "eng") {
     df <- translate_deter_to_english(df)
-  }
-  else if (language != "pt") {
+  } else if (language != "pt") {
     warning("Selected language not supported. Proceeding with Portuguese.")
   }
 

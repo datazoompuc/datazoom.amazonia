@@ -22,7 +22,7 @@ The dataset is originally from the Brazilian Institute of Environment and Renewa
 
 `load_ibama` downloads and compiles data on environmental fines at the municipality level considering the Amazon region. 
 
-The function returns either the raw data or a data frame with aggregates considering, for eachtime-location period, counts for total the number of infractions, infractions that already went to trial, and number of unique perpetrators of infractions.
+The function returns either the raw data or a data frame with aggregates considering, for each time-location period, counts for total the number of infractions, infractions that already went to trial, and number of unique perpetrators of infractions.
 
 ```{r, eval = FALSE}
 library(datazoom.amazonia)

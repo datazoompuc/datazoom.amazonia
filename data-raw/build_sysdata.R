@@ -2,8 +2,10 @@ library(tidyverse)
 
 ## Importing all municipalities
 
-geo_municipalities <- geobr::read_municipality(year = 2020,
-                                               simplified = T)
+geo_municipalities <- geobr::read_municipality(
+  year = 2020,
+  simplified = T
+)
 
 municipalities <- geo_municipalities %>%
   sf::st_drop_geometry()

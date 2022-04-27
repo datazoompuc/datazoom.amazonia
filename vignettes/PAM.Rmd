@@ -24,6 +24,101 @@ The data also has multiple aggregation levels, such as nationwide, by region, me
 
 The data available has a yearly frequency and is available from 1974 to the present, with the exception of the four multiple-harvest products, which are only available from 2003. More information can be found on this link (only in Portuguese): https://www.ibge.gov.br/estatisticas/economicas/agricultura-e-pecuaria/9117-producao-agricola-municipal-culturas-temporarias-e-permanentes.html#:~:text=A%20pesquisa%20Produ%C3%A7%C3%A3o%20Agr%C3%ADcola%20Municipal,s%C3%A3o%20da%20cesta%20b%C3%A1sica%20do 
 
+The datasets supported are shown in the tables below, made up of both the original databases and their narrower subsets. Note that downloading only specific crops is considerably faster. First, the datasets provided by IBGE in their entirety:
+
+| dataset |
+|:--------|
+|all_crops|
+|temporary_crops|
+|permanent_crops|
+|corn|
+|potato|
+|peanut|
+|beans|
+
+Datasets generated from Temporary Crops:
+
+| dataset | Name (pt) | Name (eng) |
+|:--------|:---------:|:----------:|
+| pineapple | Abacaxi |  Pineapple |
+| alfafa | Alfafa Fenada | Alfafa Fenada |
+| cotton_herbaceous |Algodao Herbaceo (em Caroco)| Herbaceous Cotton (in Caroco)|
+| garlic |Alho| Garlic|
+| peanut_temporary |Amendoim (em Casca)| Peanuts (in Shell)|
+| rice |Arroz (em Casca)| Rice (in husk)|
+| oats |Aveia (em Grao)| Oats (in grain)|
+| sweet_potato |Batata Doce| Sweet potato|
+| potato_temporary |Batata Inglesa| English potato|
+| sugar_cane |Cana de Acucar| Sugar cane|
+| forage_cane |Cana para Forragem| Forage cane|
+| onion |Cebola| Onion|
+| rye |Centeio (em Grao)| Rye (in grain)|
+| barley |Cevada (em Grao)| Barley (in Grain)|
+| pea |Ervilha (em Grao)| Pea (in Grain)|
+| broad_bean |Fava (em Grao)| Broad Bean (in Grain)|
+| beans_temporary |Feijao (em Grao)| Beans (in Grain)|
+| tobacco |Fumo (em Folha)| Smoke (in Sheet)|
+| sunflower_seeds |Girassol (em Grao)| Sunflower (in Grain)|
+| jute_fiber |Juta (Fibra)| Jute (Fiber)|
+| linen_seeds |Linho (Semente)| Linen (Seed)|
+| malva_fiber |Malva (Fibra)| Malva (Fiber)|
+| castor_bean |Mamona (Baga)| Castor bean (Berry)|
+| cassava |Mandioca| Cassava|
+| watermelon |Melancia| watermelon|
+| melon |Melao| Melon|
+| corn_temporary |Milho (em Grao)| corn (in grain)|
+| ramie_fiber |Rami (Fibra)| Ramie (Fiber)|
+| soybean |Soja (em Grao)| Soybean (in grain)|
+| sorghum |Sorgo (em Grao)| Sorghum (in Grain)|
+| tomato |Tomate| Tomato|
+| wheat |Trigo (em Grao)| Wheat in grain)|
+| triticale |Triticale (em Grao)| Triticale (in grain)|
+| temporary_total |Total| Total|
+
+Datasets generated from Permanent Crops:
+
+| dataset | Name (pt) | Name (eng) |
+|:--------|:---------:|:----------:|
+| avocado |Abacate|Avocado| 
+| cotton_arboreo |Algodao Arboreo (em Caroco)| Arboreo cotton (in Caroco)| 
+| acai |Acai|Acai| 
+| olive |Azeitona|Olive| 
+| banana |Banana (Cacho)|Banana (Bunch)| 
+| rubber_coagulated_latex |Borracha (Latex Coagulado)|Rubber (Coagulated Latex)| 
+| rubber_liquid_latex |Borracha (Latex Liquido)|Rubber (Liquid Latex)| 
+| cocoa_beans |Cacau (em Amendoa)|Cocoa (in Almonds)| 
+| coffee_total |Cafe (em Grao) Total|Coffee (in Grain) Total| 
+| coffee_arabica |Cafe (em Grao) Arabica|Cafe (in Grao) Arabica| 
+| coffee_canephora |Cafe (em Grao) Canephora|Cafe (in Grain) Canephora| 
+| cashew |Caju|Cashew| 
+| khaki |Caqui|Khaki| 
+| cashew_nut |Castanha de Caju|Cashew Nuts| 
+| india_tea |Cha da India (Folha Verde)|India Tea (Leaf)| 
+| coconut |Coco da Baia|Coconut| 
+| coconut_bunch |Dende (Cacho de Coco)|Coconut Bunch| 
+| yerba_mate |Erva Mate (Folha Verde)|Mate Herb (Leaf)| 
+| fig |Figo|Fig| 
+| guava |Goiaba|Guava| 
+| guarana_seeds |Guarana (Semente)|Guarana (Seed)| 
+| orange |Laranja|Orange| 
+| lemon |Limao|Lemon| 
+| apple |Maca|Apple| 
+| papaya |Mamao|Papaya| 
+| mango |Manga|Mango| 
+| passion_fruit |Maracuja|Passion fruit| 
+| quince |Marmelo|Quince| 
+| walnut |Noz (Fruto Seco)|Walnut (Dry Fruit)| 
+| heart_of_palm |Palmito|Palm heart| 
+| pear |Pera|Pear| 
+| peach |Pessego|Peach| 
+| black_pepper |Pimenta do Reino|Black pepper| 
+| sisal_or_agave |Sisal ou Agave (Fibra)|Sisal or Agave (Fiber)| 
+| tangerine |Tangerina|Tangerine| 
+| tung |Tungue (Fruto Seco)|Tung (Dry Fruit)| 
+| annatto_seeds |Urucum (Semente)|Annatto (Seed)| 
+| grape |Uva|Grape| 
+| permanent_total |Total|Total|
+
 ## Usage
 
 <!-- The package contains of three function: \code{load_pam_permanent}, \code{load_pam_temporary} and \code{load_pam_main} which extract data from the API of the IBGE database website. The first one extracts the data from products of permanent tillage, the second one from products of temporary tillage and the last one encompasses specifically the four products that yield multiple harvests per year (corn, potato, bean and peanut). All of them allow the user to input the years he would like the data to encompass, the geographical aggregation level desired, as well as choosing the language of the data (currently only Portuguese and English are supported). These functions also offer the option to output the data in the long format, in which separate tables are created for each variable and each product becomes a column (whereas previously both were lines of one single larger data frame). -->

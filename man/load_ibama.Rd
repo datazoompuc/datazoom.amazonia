@@ -32,9 +32,11 @@ Loads information on on environmental fines at the municipality or state levels 
 \examples{
 \dontrun{
 # download raw data from all country
-raw_ibama_all <- load_ibama(dataset = "areas_embargadas",
-                            raw_data = TRUE,
-                            legal_amazon_only = FALSE)
+raw_ibama_all <- load_ibama(
+  dataset = "areas_embargadas",
+  raw_data = TRUE,
+  legal_amazon_only = FALSE
+)
 }
 
 }

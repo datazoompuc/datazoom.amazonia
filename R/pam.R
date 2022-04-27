@@ -2,7 +2,7 @@
 #'
 #' @description Loads information on the  temporary and permanent crops of the Country that are characterized not only by their great economic importance in the export agenda, but also by their social relevance, since its components are on the Brazilian table (IBGE). Survey is done at the municipal level and data is available from 1974 to 2020 for most datasets. See \url{https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/16773-municipal-agricultural-production-temporary-and-permanent-crops.html?=&t=o-que-e}
 #'
-#' @param dataset A dataset name ("pam_all_crops", "pam_permanent_crops", "pam_temporary_crops" or "pam_xx", in which xx needs to be corn, potato, peanut or beans). You can also use SIDRA codes (see \url{https://sidra.ibge.gov.br/pesquisa/pam/tabelas})
+#' @param dataset A dataset name ("all_crops", "permanent_crops", "temporary_crops" or many individual crop possibilities (see \code{vignette(load_pam)})). You can also use SIDRA codes (see \url{https://sidra.ibge.gov.br/pesquisa/pam/tabelas})
 #' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
 #' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state" or "municipality". See documentation of \code{sidrar}.
 #' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
@@ -17,7 +17,7 @@
 #' @examples \dontrun{
 #' # download state raw data from 2012 for all crops
 #' pam_all_crops <- load_pam(
-#'   dataset = "pam_all_crops",
+#'   dataset = "all_crops",
 #'   raw_data = TRUE,
 #'   geo_level = "state",
 #'   time_period = 2012
@@ -62,15 +62,22 @@ load_pam <- function(dataset = NULL, raw_data,
   param$time_period <- time_period
   param$language <- language
 
+  # Extracting sidra info in the form code/classific/category
+
   if (!is.numeric(param$dataset)) {
-    param$code <- datasets_link() %>%
+    sidra_info <- datasets_link() %>%
       dplyr::filter(dataset == param$dataset) %>%
       dplyr::select(sidra_code) %>%
       unlist() %>%
-      as.numeric()
+      stringr::str_split("/") %>%
+      unlist()
   } else {
     param$code <- param$dataset
   }
+
+  param$code <- sidra_info[1]
+  param$classific <- sidra_info[2]
+  param$category <- sidra_info[3]
 
   ## Check if year is acceptable
 
@@ -90,9 +97,6 @@ load_pam <- function(dataset = NULL, raw_data,
     stop("Provided time period greater than supported. Check documentation for time availability.")
   }
 
-
-
-
   ## Dataset
 
   if (is.null(dataset)) {
@@ -101,10 +105,12 @@ load_pam <- function(dataset = NULL, raw_data,
 
   if (param$code == 1612) { ## This is a subset of all crops
     param$data_name <- "Temporary Crops (Lavouras Temporarias)"
+    param$dataset <- "temporary_crops"
   }
 
   if (param$code == 1613) { ## This is a subset of all crops
     param$data_name <- "Permanent Crops (Lavouras Permanente)"
+    param$dataset <- "permanent_crops"
   }
 
   if (param$code == 5457) {
@@ -125,15 +131,19 @@ load_pam <- function(dataset = NULL, raw_data,
 
   dat <- as.list(as.character(param$time_period)) %>%
     purrr::map(function(year_num) {
-      base::message(base::cat('Dowloading', year_num, 'data'))
       # suppressMessages(
-      sidra_download(sidra_code = param$code, year = year_num, geo_level = param$geo_level)
+      sidra_download(
+        sidra_code = param$code,
+        classific = param$classific,
+        category = list(param$category),
+        year = year_num,
+        geo_level = param$geo_level
+      )
       # )
     }) %>%
     dplyr::bind_rows() %>%
     tibble::as_tibble()
 
-  ## Return Raw Data
 
   if (raw_data == TRUE) {
     return(dat)
@@ -318,16 +328,26 @@ load_pam <- function(dataset = NULL, raw_data,
     #                    ~ labelled::set_variable_labels(. = as.character(dic[dic$var_code == types[1],'var_eng']))
     #   )
 
-    for (i in 1:length(types)) {
+    for (i in seq_along(types)) {
       dat <- label_data_eng(dat, cols = types[i], dic = dic)
     }
   }
 
   if (language == "pt") {
-    for (i in 1:length(types)) {
+    for (i in seq_along(types)) {
       dat <- label_data_pt(dat, cols = types[i], dic = dic)
     }
   }
+
+  # Labelling the code 0 (total)
+
+  dat <- dat %>%
+    dplyr::mutate(
+      dplyr::across(
+        dplyr::ends_with("_v0"),
+        ~ labelled(., "Total")
+      )
+    )
 
   ##########################
   ## Returning Data Frame ##

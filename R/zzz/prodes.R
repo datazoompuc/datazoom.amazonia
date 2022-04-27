@@ -89,7 +89,6 @@ load_prodes <- function(source, geo_aggregation = "municipality", language = "en
 #' )
 #' }
 #'
-#'
 load_prodes_raw <- function(source) {
   # If source is a list of numbers (years), we construct the URLs to download data
   if (is.numeric(source)) {
@@ -107,11 +106,10 @@ load_prodes_raw <- function(source) {
   csv_types <- readr::cols("d", "d", "d", "c", "c", "c", "c", "c", "d", "d", "d", "d", "d", "d", "d", "d", "d")
 
   # Reads the csvs containing the data
-  source = lapply(source, readr::read_csv, col_types = csv_types, locale = readr::locale(encoding = "latin1"))
+  source <- lapply(source, readr::read_csv, col_types = csv_types, locale = readr::locale(encoding = "latin1"))
 
   return(source)
-
-  }
+}
 
 treat_prodes_data <- function(df, geo_aggregation, language) {
   geo_aggregation <- tolower(geo_aggregation)
@@ -125,11 +123,9 @@ treat_prodes_data <- function(df, geo_aggregation, language) {
       dplyr::group_by(.data$Estado, .data$CodIBGE) %>%
       # Collapses data by state
       dplyr::summarize_if(is.numeric, sum, na.rm = TRUE)
-  }
-  else if (geo_aggregation == "municipality") {
+  } else if (geo_aggregation == "municipality") {
     df <- dplyr::mutate(df, CodIBGE = as.factor(.data$CodIbge)) %>% dplyr::select(-c("CodIbge"))
-  }
-  else {
+  } else {
     warning("Aggregation level not supported. Proceeding with Municipality.")
   }
 
@@ -149,8 +145,7 @@ treat_prodes_data <- function(df, geo_aggregation, language) {
   language <- tolower(language)
   if (language == "eng") {
     df <- translate_prodes_to_english(df)
-  }
-  else if (language != "pt") {
+  } else if (language != "pt") {
     warning("Selected language is not supported. Proceeding with Portuguese.")
   }
 

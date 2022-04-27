@@ -25,10 +25,11 @@ Loads information on clearcut deforestation in the Legal Amazon and annual defor
 \examples{
 \dontrun{
 # download raw data from 2000 to 2020
-raw_prodes_all <- load_prodes(dataset = "prodes",
-                              raw_data = TRUE,
-                              time_period = 2000:2020)
+raw_prodes_all <- load_prodes(
+  dataset = "prodes",
+  raw_data = TRUE,
+  time_period = 2000:2020
+)
 }
-
 
 }
