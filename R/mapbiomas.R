@@ -8,7 +8,7 @@
 #' @param time_period A \code{numeric} indicating what years will the data be loaded. Can be only "all".
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported.
 #' @param time_id A \code{string} that indicates the time criteria for the data loaded. Can be "year" or "month". Defaults to year.
-#' @param cover_level A \code{numeric} that indicates the cover aggregation level. Can be "0", "1", "2", "3" or "4".
+#' @param cover_level A \code{numeric} or \code{string} that indicates the cover aggregation level. Can be "0", "1", "2", "3", "4", or "none", which means no aggregation. Aggregation only supported for "mapbiomas_cover" and "mapbiomas_grazing_quality" datasets.
 #' @return A \code{tibble} with the selected data.
 #'
 #' @examples
@@ -55,6 +55,7 @@ load_mapbiomas <- function(dataset = NULL, raw_data = NULL, geo_level = "municip
   param$language <- language
   param$time_id <- time_id
   param$raw_data <- raw_data
+  param$cover_level <- cover_level
 
   param$survey_name <- datasets_link() %>%
     dplyr::filter(dataset == param$dataset) %>%
@@ -133,33 +134,24 @@ load_mapbiomas <- function(dataset = NULL, raw_data = NULL, geo_level = "municip
       values_to = "value"
     )
 
-  if (param$dataset %in% c("mapbiomas_cover", "mapbiomas_transition")) {
+  # Testing cover_level support
+  if (param$dataset == "mapbiomas_grazing_quality" & !(param$cover_level %in% c(1, "1", "none"))) {
+    base::message("The \"mapbiomas_grazing_quality\" dataset only supports cover_level 1 or \"none\"")
+    param$cover_level <- 1
+  }
+
+  if (param$dataset %in% c("mapbiomas_cover", "mapbiomas_grazing_quality") & param$cover_level != "none") {
 
     ## Aggregating by Cover Level
-
-    if (cover_level == 0) {
-      dat$cover_level <- dat$level_0
-    }
-    if (cover_level == 1) {
-      dat$cover_level <- dat$level_1
-    }
-    if (cover_level == 2) {
-      dat$cover_level <- dat$level_2
-    }
-    if (cover_level == 3) {
-      dat$cover_level <- dat$level_3
-    }
-    if (cover_level == 4) {
-      dat$cover_level <- dat$level_4
-    }
 
     dat <- dat %>%
       tidyr::pivot_wider(
         id_cols = dplyr::any_of(c(
-          territory_id, municipality, state, year,
-          biome, state, year
+          "territory_id", "municipality",
+          "state", "year",
+          "biome", "state"
         )),
-        names_from = cover_level,
+        names_from = paste0("level_", param$cover_level),
         values_from = value,
         values_fn = sum,
         values_fill = NA
@@ -195,7 +187,26 @@ load_mapbiomas <- function(dataset = NULL, raw_data = NULL, geo_level = "municip
         "state" = "estado",
         "municipality" = "municipio",
         "biome" = "bioma",
-        "indigenous_land" = "terra_indigena"
+        "indigenous_land" = "terra_indigena",
+      )
+  }
+
+  # Dataset "mapbiomas_deforestation_regeneration" vem em pt
+  if (param$language == "eng") {
+    dat_mod <- dat_mod %>%
+      dplyr::rename_with(dplyr::recode,
+        "codigobioma" = "biome_code",
+        "bioma" = "biome",
+        "uf" = "state",
+        "cod_tipo_mudanca_n1" = "code_type_change_l1",
+        "cod_tipo_mudanca_n2" = "code_type_change_l2",
+        "cod_classe_des_ou_reg" = "code_class_def_or_reg",
+        "tipo_mudanca_nivel1" = "type_change_level_1",
+        "tipo_mudanca_nivel2" = "type_change_level_2",
+        "cobertura_nivel_1" = "cover_level_1",
+        "cobertura_nivel_2" = "cover_level_2",
+        "cobertura_nivel_3" = "cover_level_3",
+        "cobertura_nivel_4" = "cover_level_4"
       )
   }
 
