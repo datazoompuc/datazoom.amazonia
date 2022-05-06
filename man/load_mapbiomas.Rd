@@ -15,11 +15,11 @@ load_mapbiomas(
 )
 }
 \arguments{
-\item{dataset}{A dataset name ("mapbiomas_cover", "mapbiomas_transition", "mapbiomas_irrigation", "mapbiomas_deforestation_regeneration", "mapbiomas_grazing_quality")}
+\item{dataset}{A dataset name ("mapbiomas_cover", "mapbiomas_transition", "mapbiomas_irrigation", "mapbiomas_deforestation_regeneration", "mapbiomas_grazing_quality" or "mapbiomas_mining")}
 
 \item{raw_data}{A \code{boolean} setting the return of raw or processed data}
 
-\item{geo_level}{A \code{string} that defines the geographic level of the data. Can be only "municipality".}
+\item{geo_level}{A \code{string} that defines the geographic level of the data. Can be only "municipality", except "mapbiomas_mining" which accepts more options ("biome", "indigenous_land")}
 
 \item{time_period}{A \code{numeric} indicating what years will the data be loaded. Can be only "all".}
 
@@ -27,7 +27,7 @@ load_mapbiomas(
 
 \item{time_id}{A \code{string} that indicates the time criteria for the data loaded. Can be "year" or "month". Defaults to year.}
 
-\item{cover_level}{A \code{numeric} that indicates the cover aggregation level. Can be "0", "1", "2", "3" or "4".}
+\item{cover_level}{A \code{numeric} or \code{string} that indicates the cover aggregation level. Can be "0", "1", "2", "3", "4", or "none", which means no aggregation. Aggregation only supported for "mapbiomas_cover" and "mapbiomas_grazing_quality" datasets.}
 }
 \value{
 A \code{tibble} with the selected data.
