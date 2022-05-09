@@ -1089,6 +1089,7 @@ datasets_link <- function() {
     "DATASUS", "datasus_cnes_ee", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/EE",
     "DATASUS", "datasus_cnes_ef", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/EF/",
     "DATASUS", "datasus_cnes_gm", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/GM/",
+    "DATASUS", "datasus_sih", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIHSUS/200801_/dados/",
 
     ## Shapefile from github repository
 

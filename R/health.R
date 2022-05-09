@@ -88,7 +88,7 @@ load_health <- function(dataset,
 
     filenames <- filenames[stringr::str_detect(filenames, time_filter)]
   }
-  if (stringr::str_detect(param$dataset, "datasus_cnes")){
+  if (stringr::str_detect(param$dataset, "datasus_cnes|datasus_sih")){
     filenames <- filenames[substr(filenames, 5, 6) %in% param$time_period_yy]
   }
 
@@ -99,7 +99,9 @@ load_health <- function(dataset,
 
     filenames <- filenames[stringr::str_detect(filenames, uf_filter)]
   }
-
+  if (param$dataset == "datasus_sih"){
+    filenames <- filenames[substr(filenames, 3, 4) %in% states]
+  }
   # Filtering for the chosen dataset
   if (param$dataset %in% c("datasus_sim_doext", "datasus_sim_doinf", "datasus_sim_domat", "datasus_sim_dofet")){
     suffix <- stringr::str_remove(param$dataset, "datasus_sim_") %>%
@@ -113,7 +115,7 @@ load_health <- function(dataset,
   # Downloading each file in filenames
 
   dat <- param$filenames %>%
-    imap(
+    purrr::imap(
       function(file_name, iteration){
         base::message(paste0("Downloading file ", file_name, " (", iteration, " out of ", length(filenames), ")"))
 
@@ -155,8 +157,76 @@ load_health <- function(dataset,
 
   if (stringr::str_detect(param$dataset, "datasus")){
     dat <- dat %>%
-      imap(~ dplyr::mutate(.x, file_name = .y)) %>%
-      bind_rows()
+      purrr::imap(~ dplyr::mutate(.x, file_name = .y)) %>%
+      dplyr::bind_rows() %>%
+      janitor::clean_names()
+  }
+
+  if (stringr::str_detect(param$dataset, "datasus_sim")){
+    dat <- dat %>%
+      dplyr::select(
+        data = "dtobito",
+        hora = "horaobito",
+        nome_uf = "file_name",
+        cod_mun = "codmunocor",
+        cod_bairro = "codbaiocor",
+
+        nascimento = "dtnasc",
+        idade,
+        sexo,
+        raca_cor = "racacor",
+        escolaridade = "esc",
+
+        idade_mae = "idademae",
+        peso_ao_nascer = "peso",
+
+        obito_fetal = "tipobito",
+        causa_basica = "causabas",
+        tipo_obito = "circobito",
+        acidente_trabalho = "acidtrab"
+      ) %>%
+      dplyr::mutate(
+        data = as.Date(data, format = "%d%m%Y"),
+        nome_uf = substr(nome_uf, 3, 4),
+        nascimento = as.Date(nascimento, format = "%d%m%Y"),
+
+        idade_anos = dplyr::case_when(
+          substr(idade, 1, 1) == "0" ~ NA_character_,
+          substr(idade, 1, 1) %in% as.character(1:3) ~ "0",
+          substr(idade, 1, 1) == "4" ~ substr(idade, 2, 3),
+          substr(idade, 1, 1) == "5" ~ paste0(1, substr(idade, 2, 3))
+        ),
+
+        letra_cid = substr(causa_basica, 1, 1),
+        numero_cid = sub(".", "", causa_basica) %>% as.numeric(),
+
+        m_total = 1,
+        m_diabetes = case_when(
+          letra_cid == "E" & numero_cid >= 10 & numero_cid <= 14 ~ 1
+          ),
+        m_neoplasias = case_when(
+          letra_cid == "C" ~ 1,
+          letra_cid == "D" & numero_cid <= 48 ~ 1
+          ),
+        m_causas_externas = case_when(
+          letra_cid == "V" & numero_cid >= 1 ~ 1,
+          letra_cid %in% c("W", "X") ~ 1,
+          letra_cid == "Y" & numero_cid <= 98 ~ 1
+        ),
+        m_acidentes_transporte = case_when(
+          letra_cid == "V" & numero_cid >= 1 & numero_cid <= 99 ~ 1
+        ),
+        m_agressoes = case_when(
+          letra_cid == "X" & numero_cid >= 85 ~ 1,
+          letra_cid == "Y" & numero_cid <= 9 ~ 1
+        ),
+        m_malaria = case_when(
+          letra_cid == "B" & numero_cid >= 50 & numero_cid <= 54 ~ 1
+        )
+
+      ) %>%
+      group_by(cod_mun) %>%
+      dplyr::summarise(across(starts_with("m_"), ~ sum(., na.rm = TRUE)))
   }
 
   ################################
