@@ -91,7 +91,7 @@ load_ips <- function(dataset = "all", raw_data,
         
         colnames(dat[[j]]) = colnames(dat[[j]]) %>%
           
-          stringr::str_remove_all(year_char[i])
+          str_remove_all(year_char[i])
         
       }
       
@@ -114,7 +114,7 @@ load_ips <- function(dataset = "all", raw_data,
       
       dat_eng[[i]] <- dat_eng[[i]] %>%
         
-        dplyr::rename(
+        rename(
           
           c(code_ibge = codigo_ibge,
             municipality = municipio,
@@ -199,7 +199,7 @@ load_ips <- function(dataset = "all", raw_data,
     if(dataset == "life_quality"){
       
       dat[[i]] <- dat[[i]] %>%
-        dplyr::select("codigo_ibge",
+        select("codigo_ibge",
                "municipio",
                "estado",
                "necessidades_humanas_basicas",
@@ -226,7 +226,7 @@ load_ips <- function(dataset = "all", raw_data,
     if(dataset == "sanit_habit"){
       
       dat[[i]] <- dat[[i]] %>%
-        dplyr::select("codigo_ibge",
+        select("codigo_ibge",
                "municipio",
                "estado",
                "nutricao_e_cuidados_medicos_basicos",
@@ -241,7 +241,7 @@ load_ips <- function(dataset = "all", raw_data,
     if(dataset == "violence"){
       
       dat[[i]] <- dat[[i]] %>%
-        dplyr::select("codigo_ibge",
+        select("codigo_ibge",
                "municipio",
                "estado",
                str_subset(colnames(dat[[i]]), 'assassinatos'),
@@ -252,7 +252,7 @@ load_ips <- function(dataset = "all", raw_data,
     if(dataset == "educ"){
       
       dat[[i]] <- dat[[i]] %>%
-        dplyr::select("codigo_ibge",
+        select("codigo_ibge",
                "municipio",
                "estado",
                "acesso_ao_conhecimento_basico",
@@ -262,7 +262,7 @@ load_ips <- function(dataset = "all", raw_data,
     if(dataset == "communic"){
       
       dat[[i]] <- dat[[i]] %>%
-        dplyr::select("codigo_ibge",
+        select("codigo_ibge",
                "municipio",
                "estado",
                str_subset(colnames(dat[[i]]), 'densidade'),
@@ -272,7 +272,7 @@ load_ips <- function(dataset = "all", raw_data,
     if(dataset == "mortality"){
       
       dat[[i]] <- dat[[i]] %>%
-        dplyr::select("codigo_ibge",
+        select("codigo_ibge",
                "municipio",
                "estado",
                str_subset(colnames(dat[[i]]), 'mortalidade'),
@@ -283,7 +283,7 @@ load_ips <- function(dataset = "all", raw_data,
     if(dataset == "deforest"){
       
       dat[[i]] <- dat[[i]] %>%
-        dplyr::select("codigo_ibge",
+        select("codigo_ibge",
                "municipio",
                "estado",
                "qualidade_do_meio_ambiente",
