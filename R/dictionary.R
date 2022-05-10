@@ -590,9 +590,9 @@ load_dictionary <- function(dataset) {
     )
   }
 
-  if (stringr::str_detect(dataset, "datasus")) {
+  if (dataset == "datasus") {
     harmonization_dat <- tibble::tribble(
-      ~cid_codes, ~var_pt, ~var_eng,
+      ~cid_code, ~var_pt, ~var_eng,
       # 22 CID-10 Chapters
       "A000-B990", "Algumas doencas infecciosas e parasitarias", "Certain infectious and parasitic diseases",
       "C000-D480", "Neoplasias [tumores]", "Neoplasms",
@@ -620,15 +620,15 @@ load_dictionary <- function(dataset) {
       # Particular variables
       "A000-U990", "Total", "Total",
       "A000-B990, G000-G040, N700-N730, J000-J060, J100-J180, J200-J220, H650-H660, O000-O990, P000-P960, E000-E020, E400-E460, E500, D500-D530, D649, E510-E640", "Doencas comunicaveis", "Communicable diseases",
-      "C000-C970, D000–D480, D550-D648, D650–D890, E030-E070, E100-E160, E200-E340, E650-E880, F010-F990, G060-G980, H000-H610, H680-H930, I000-I990, J300-J980, K000-K920, N000-N640, N750-N980, L000-L980, M000-M990, Q000-Q990", "Doencas nao-comunicaveis", "Non-communicable diseases",
+      "C000-C970, D000-D480, D550-D648, D650-D890, E030-E070, E100-E160, E200-E340, E650-E880, F010-F990, G060-G980, H000-H610, H680-H930, I000-I990, J300-J980, K000-K920, N000-N640, N750-N980, L000-L980, M000-M990, Q000-Q990", "Doencas nao-comunicaveis", "Non-communicable diseases",
       "E100-E140", "Diabetes mellitus", "Diabetes mellitus",
       "V010-V990", "Acidentes de transporte", "Transport accidents",
       "X600-X840", "Lesoes autoprovocadas voluntariamente", "Intentional self-harm",
       "X850-Y090", "Agressoes", "Assault",
       "V010-X590", "Acidentes", "Accidents",
-      "V010-V090", "Pedestrian injured in transport accident",
-      "V100-V190", "Pedal cyclist injured in transport accident",
-      "V200-V290", "Motorcycle rider injured in transport accident",
+      "V010-V090", "Pedestre ferido em acidente de transporte", "Pedestrian injured in transport accident",
+      "V100-V190", "Ciclista ferido em acidente de transporte", "Pedal cyclist injured in transport accident",
+      "V200-V290", "Motociclista ferido em acidente de transporte", "Motorcycle rider injured in transport accident",
       "B500-B540", "Malaria", "Malaria",
       "B200-B240", "Doença pelo virus da imunodeficiência humana [HIV]", "Human immunodeficiency virus [HIV] disease",
       "C500", "Neoplasia maligna da mama", "Malignant neoplasm of breast",

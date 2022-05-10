@@ -1,4 +1,4 @@
-load_health <- function(dataset,
+load_datasus <- function(dataset,
                         time_period,
                         states = "all",
                         raw_data = FALSE,
@@ -49,29 +49,21 @@ load_health <- function(dataset,
 
   # For each dataset, a filenames object is generated with the list of file names to be pasted at the end of each URL
 
-  if (param$dataset == "ibge_mortality_table"){
-    param$skip_rows <- 5
-    filenames <- ""
-  }
+  # Get dataset source URL
 
-  if (stringr::str_detect(param$dataset, "datasus")){
+  dat_url <- datasets_link()
 
-    # Get dataset source URL
+  url <- dat_url %>%
+    dplyr::filter(dataset == param$dataset) %>%
+    dplyr::select(link) %>%
+    base::unlist() %>%
+    as.character()
 
-    dat_url <- datasets_link()
+  # Use RCurl to extract the names of all files stored in the server
 
-    url <- dat_url %>%
-      dplyr::filter(dataset == param$dataset) %>%
-      dplyr::select(link) %>%
-      base::unlist() %>%
-      as.character()
-
-    # Use RCurl to extract the names of all files stored in the server
-
-    filenames <- RCurl::getURL(url, ftp.use.epsv = TRUE, dirlistonly = TRUE) %>%
-      stringr::str_split("\r*\n") %>%
-      unlist()
-  }
+  filenames <- RCurl::getURL(url, ftp.use.epsv = TRUE, dirlistonly = TRUE) %>%
+    stringr::str_split("\r*\n") %>%
+    unlist()
 
   # Filtering for chosen years
   if (param$dataset == "datasus_sim_do"){
@@ -139,94 +131,42 @@ load_health <- function(dataset,
   ## Data Engineering ##
   ######################
 
-  if (dataset == "ibge_mortality_table"){
 
-    # Names as they are in the original sheet
-    names(dat) <- c("Idades Exatas (X)",
-                    "Probabilidade de Morte entre Duas Idades Exatas Q(X,N) (Por Mil)",
-                    "Óbitos D (X, N)",
-                    "I(X)",
-                    "L(X, N)",
-                    "T(X)",
-                    "Expectativa de Vida à Idade X E(X)")
+  dat <- dat %>%
+    purrr::imap(~ dplyr::mutate(.x, file_name = .y)) %>%
+    dplyr::bind_rows() %>%
+    janitor::clean_names()
 
-    dat <- dat %>%
-      tidyr::drop_na() %>%
-      dplyr::slice(-41)
-  }
-
-  if (stringr::str_detect(param$dataset, "datasus")){
-    dat <- dat %>%
-      purrr::imap(~ dplyr::mutate(.x, file_name = .y)) %>%
-      dplyr::bind_rows() %>%
-      janitor::clean_names()
-  }
 
   if (stringr::str_detect(param$dataset, "datasus_sim")){
     dat <- dat %>%
-      dplyr::select(
-        data = "dtobito",
-        hora = "horaobito",
-        nome_uf = "file_name",
-        cod_mun = "codmunocor",
-        cod_bairro = "codbaiocor",
-
-        nascimento = "dtnasc",
-        idade,
-        sexo,
-        raca_cor = "racacor",
-        escolaridade = "esc",
-
-        idade_mae = "idademae",
-        peso_ao_nascer = "peso",
-
-        obito_fetal = "tipobito",
-        causa_basica = "causabas",
-        tipo_obito = "circobito",
-        acidente_trabalho = "acidtrab"
-      ) %>%
       dplyr::mutate(
         data = as.Date(data, format = "%d%m%Y"),
-        nome_uf = substr(nome_uf, 3, 4),
-        nascimento = as.Date(nascimento, format = "%d%m%Y"),
 
         idade_anos = dplyr::case_when(
           substr(idade, 1, 1) == "0" ~ NA_character_,
           substr(idade, 1, 1) %in% as.character(1:3) ~ "0",
           substr(idade, 1, 1) == "4" ~ substr(idade, 2, 3),
           substr(idade, 1, 1) == "5" ~ paste0(1, substr(idade, 2, 3))
-        ),
-
-        letra_cid = substr(causa_basica, 1, 1),
-        numero_cid = sub(".", "", causa_basica) %>% as.numeric(),
-
-        m_total = 1,
-        m_diabetes = case_when(
-          letra_cid == "E" & numero_cid >= 10 & numero_cid <= 14 ~ 1
-          ),
-        m_neoplasias = case_when(
-          letra_cid == "C" ~ 1,
-          letra_cid == "D" & numero_cid <= 48 ~ 1
-          ),
-        m_causas_externas = case_when(
-          letra_cid == "V" & numero_cid >= 1 ~ 1,
-          letra_cid %in% c("W", "X") ~ 1,
-          letra_cid == "Y" & numero_cid <= 98 ~ 1
-        ),
-        m_acidentes_transporte = case_when(
-          letra_cid == "V" & numero_cid >= 1 & numero_cid <= 99 ~ 1
-        ),
-        m_agressoes = case_when(
-          letra_cid == "X" & numero_cid >= 85 ~ 1,
-          letra_cid == "Y" & numero_cid <= 9 ~ 1
-        ),
-        m_malaria = case_when(
-          letra_cid == "B" & numero_cid >= 50 & numero_cid <= 54 ~ 1
         )
+      )
 
+    dat <- load_dictionary("datasus") %>%
+      purrr::transpose() %>%
+
+      purrr::map_dfc(
+        function(dic_row){
+          dat %>%
+            dplyr::mutate(value = dplyr::case_when(
+                causabas %in% expand_cid_code(dic_row$cid_code) ~ 1
+              )
+            ) %>%
+            dplyr::select(value) %>%
+            dplyr::rename_with(~ dic_row$cid_code)
+        }
       ) %>%
-      group_by(cod_mun) %>%
-      dplyr::summarise(across(starts_with("m_"), ~ sum(., na.rm = TRUE)))
+      bind_cols(dat, .)
+
   }
 
   ################################
@@ -241,6 +181,76 @@ load_health <- function(dataset,
 
   return(dat_mod)
 
+}
 
+
+expand_cid_code <- function(cid){
+  # Turns a character "A050-B010" into an expanded vector c("A050", "A051", ..., "B010")
+  # Also turns "A001, B001-B002" into c("A001", "B001", "B002")
+
+  if (!(stringr::str_detect(cid, ",|-"))) return(cid)
+
+  # Splitting sections separated by commas into a list
+  cid <- cid %>%
+    stringr::str_split(",", simplify = TRUE) %>%
+    as.list()
+
+  # Each element of the list becomes a vector with the initial and final value, separated by "-"
+  cid <- cid %>%
+    purrr::map(
+      function(string){
+        string %>%
+          stringr::str_split("-") %>%
+          unlist() %>%
+          stringr::str_remove_all(" ")
+      }
+    )
+
+  letter_to_number <- seq_along(letters)
+  names(letter_to_number) <- toupper(letters)
+
+  # Converting letters to numbers
+  cid <- cid %>%
+    purrr::map(
+      function(code){
+        letter <- stringr::str_extract(code, "[A-Z]") %>%
+          dplyr::recode(!!!letter_to_number)
+
+        code %>%
+          stringr::str_remove("[A-Z]") %>%
+          paste0(letter, .) %>%
+          as.numeric()
+      }
+    )
+
+  # Filling in sequence ex: A001-A005
+  cid <- cid %>%
+    purrr::map(
+      ~ if (length(.x) == 2) .x[1]:.x[2]
+    )
+
+  # Converting back to letters
+
+  number_to_letter <- names(letter_to_number)
+  names(number_to_letter) <- seq_along(letters)
+
+  cid <- cid %>%
+    purrr::map(
+      function(code){
+        letter <- as.integer(code/1000)
+        number <- code - 1000*letter
+
+        letter <- letter %>%
+          dplyr::recode(!!!number_to_letter)
+
+        number <- paste0("00", number) %>%
+          stringr::str_sub(start = -3)
+
+        paste0(letter, number)
+      }
+    )
+
+  cid %>%
+    unlist()
 
 }
