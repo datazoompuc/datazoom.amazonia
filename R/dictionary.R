@@ -590,6 +590,61 @@ load_dictionary <- function(dataset) {
     )
   }
 
+  if (stringr::str_detect(dataset, "datasus")) {
+    harmonization_dat <- tibble::tribble(
+      ~cid_codes, ~var_pt, ~var_eng,
+      # 22 CID-10 Chapters
+      "A000-B990", "Algumas doencas infecciosas e parasitarias", "Certain infectious and parasitic diseases",
+      "C000-D480", "Neoplasias [tumores]", "Neoplasms",
+      "D500-D890", "Doencas do sangue e dos orgaos hematopoeticos e alguns transtornos imunitarios", "Diseases of the blood and blood-forming organs and certain disorders involving the immune mechanism",
+      "E000-E900", "Doenças endócrinas, nutricionais e metabolicas", "Endocrine, nutritional and metabolic diseases",
+      "F000-F990", "Transtornos mentais e comportamentais", "Mental and behavioural disorders",
+      "G000-G990", "Doencas do sistema nervoso", "Diseases of the nervous system",
+      "H000-H590", "Doencas do olho e anexos", "Diseases of the eye and adnexa",
+      "H600-H950", "Doencas do ouvido e da apófise mastoide", "Diseases of the ear and mastoid process",
+      "I000-I990", "Doencas do aparelho circulatorio", "Diseases of the circulatory system",
+      "J000-J990", "Doencas do aparelho respiratorio", "Diseases of the respiratory system",
+      "K000-K930", "Doencas do aparelho digestivo", "Diseases of the digestive system",
+      "L000-L990", "Doencas da pele e do tecido subcutaneo", "Diseases of the skin and subcutaneous tissue",
+      "M000-M990", "Doencas do sistema osteomuscular e do tecido conjuntivo", "Diseases of the musculoskeletal system and connective tissue",
+      "N000-N990", "Doencas do aparelho geniturinario", "Diseases of the genitourinary system",
+      "O000-O990", "Gravidez, parto e puerperio", "Pregnancy, childbirth and the puerperium",
+      "P000-P960", "Algumas afeccoes originadas no período perinatal", "Certain conditions originating in the perinatal period",
+      "Q000-Q990", "Malformações congenitas, deformidades e anomalias cromossomicas", "Congenital malformations, deformations and chromosomal abnormalities",
+      "R000-R990", "Sintomas, sinais e achados anormais de exames clínicos e de laboratorio, não classificados em outra parte", "Symptoms, signs and abnormal clinical and laboratory findings, not elsewhere classified",
+      "S000-T980", "Lesoes, envenenamentos e algumas outras consequências de causas externas", "Injury, poisoning and certain other consequences of external causes",
+      "V010-Y980", "Causas externas de morbidade e de mortalidade", "External causes of morbidity and mortality",
+      "Z000-Z990", "Fatores que exercem influencia sobre o estado de saude e o contato com serviços de saude", "Factors influencing health status and contact with health services",
+      "U000-U990", "Codigos para propositos especiais", "Codes for special purposes",
+
+      # Particular variables
+      "A000-U990", "Total", "Total",
+      "A000-B990, G000-G040, N700-N730, J000-J060, J100-J180, J200-J220, H650-H660, O000-O990, P000-P960, E000-E020, E400-E460, E500, D500-D530, D649, E510-E640", "Doencas comunicaveis", "Communicable diseases",
+      "C000-C970, D000–D480, D550-D648, D650–D890, E030-E070, E100-E160, E200-E340, E650-E880, F010-F990, G060-G980, H000-H610, H680-H930, I000-I990, J300-J980, K000-K920, N000-N640, N750-N980, L000-L980, M000-M990, Q000-Q990", "Doencas nao-comunicaveis", "Non-communicable diseases",
+      "E100-E140", "Diabetes mellitus", "Diabetes mellitus",
+      "V010-V990", "Acidentes de transporte", "Transport accidents",
+      "X600-X840", "Lesoes autoprovocadas voluntariamente", "Intentional self-harm",
+      "X850-Y090", "Agressoes", "Assault",
+      "V010-X590", "Acidentes", "Accidents",
+      "V010-V090", "Pedestrian injured in transport accident",
+      "V100-V190", "Pedal cyclist injured in transport accident",
+      "V200-V290", "Motorcycle rider injured in transport accident",
+      "B500-B540", "Malaria", "Malaria",
+      "B200-B240", "Doença pelo virus da imunodeficiência humana [HIV]", "Human immunodeficiency virus [HIV] disease",
+      "C500", "Neoplasia maligna da mama", "Malignant neoplasm of breast",
+      "C530", "Neoplasia maligna do colo do utero", "Malignant neoplasm of cervix uteri",
+
+
+
+      # Faltam:
+      # Mortes nao envolvendo moto
+      # Doencas de veiculacao hidrica
+
+
+
+    )
+  }
+
   ############
   ## Return ##
   ############
