@@ -439,11 +439,34 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   #########
   ## IPS ##
-  #########
+  ######### 
 
   if (source == "ips") {
-    path <- paste(param$url, "/assets/IPS_Tabela_Completa-1df30fcea79209e3c7e8634a586f95e6.xlsx", sep = "")
-  }
+    if(dataset == "all"){
+      path <- paste(param$url, "/assets/IPS_Tabela_Completa-1df30fcea79209e3c7e8634a586f95e6.xlsx", sep = "")
+      }
+    if(dataset == "life_quality"){
+      path <- paste(param$url, "/assets/IPS_Tabela_Completa-1df30fcea79209e3c7e8634a586f95e6.xlsx", sep = "")
+      }
+    if(dataset == "sanit_habit"){
+      path <- paste(param$url, "/assets/IPS_Tabela_Completa-1df30fcea79209e3c7e8634a586f95e6.xlsx", sep = "")
+      }
+    if(dataset == "violence"){
+      path <- paste(param$url, "/assets/IPS_Tabela_Completa-1df30fcea79209e3c7e8634a586f95e6.xlsx", sep = "")
+      }
+    if(dataset == "educ"){
+      path <- paste(param$url, "/assets/IPS_Tabela_Completa-1df30fcea79209e3c7e8634a586f95e6.xlsx", sep = "")
+      }
+    if(dataset == "communic"){
+      path <- paste(param$url, "/assets/IPS_Tabela_Completa-1df30fcea79209e3c7e8634a586f95e6.xlsx", sep = "")
+      }
+    if(dataset == "mortality"){
+      path <- paste(param$url, "/assets/IPS_Tabela_Completa-1df30fcea79209e3c7e8634a586f95e6.xlsx", sep = "")
+      }
+    if(dataset == "deforest"){
+      path <- paste(param$url, "/assets/IPS_Tabela_Completa-1df30fcea79209e3c7e8634a586f95e6.xlsx", sep = "")
+      }
+    }
 
   ###########
   ## IBAMA ##

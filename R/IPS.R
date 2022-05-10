@@ -71,7 +71,7 @@ load_ips <- function(dataset = "ips", raw_data,
   dat <- as.list(param$time_period) %>%
     purrr::map(
       function(t) {
-        external_download(dataset = "ips", source = "ips", year = t)
+        external_download(dataset = param$dataset, source = "ips", year = t)
       }
     )
 
