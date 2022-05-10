@@ -621,7 +621,7 @@ load_baci <- function(dataset = "HS92", raw_data, time_period,
     dat <- dat %>%
       dplyr::mutate(nome_produto = dplyr::case_when(
         cod_produto == "080130" ~
-        "Nozes comestiveis: castanhas de caju, frescas ou secas, mesmo descascadas ou peladas",
+          "Nozes comestiveis: castanhas de caju, frescas ou secas, mesmo descascadas ou peladas",
         cod_produto == "844350" ~ "Maquinas de impressao: do tipo NES na posicao 8443",
         cod_produto == "854380" ~ "Maquinas e aparelhos eletricos: com funcao propria, NES na posicao 8543",
         cod_produto == "847120" ~ "Maquinas para processamento de dados: automaticas digitais, contendo no mesmo involucro pelo menos uma unidade central de processamento e uma unidade de entrada e saida, combinadas ou nao",
