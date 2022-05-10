@@ -1,8 +1,8 @@
 #' @title IPS - Amazon Social Progress Index
 #'
-#' @description Loads information on the social and environmental performance of the Legal Amazon. Survey is done at the municipal level and data is available in 2014 and 2018. See \url{http://www.ipsamazonia.org.br/}
+#' @description Loads information on the social and environmental performance of the Legal Amazon. Survey is done at the municipal level and data is available in 2014, 2018 and 2021. See \url{http://www.ipsamazonia.org.br/}
 #'
-#' @param dataset A dataset name ("ips")
+#' @param dataset There are multiple datasets ("all", "life_quality", "sanit_habit", "violence", "educ", "communic", "mortality", "deforest")
 #' @param raw_data A \code{boolean} setting the return of raw or processed data
 #' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY.
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese and English are supported.
@@ -17,244 +17,347 @@
 #'
 #' @examples \dontrun{
 #' # download raw data from 2014
-#' ips <- load_ips(dataset = "ips", raw_data = TRUE, time_period = 2014)
+#' ips <- load_ips(dataset = "all", raw_data = TRUE, time_period = 2014)
 #' }
-load_ips <- function(dataset = "ips", raw_data,
+load_ips <- function(dataset = "all", raw_data,
                      time_period, language = "eng") {
-
+  
   ###########################
   ## Bind Global Variables ##
   ###########################
   survey <- link <- .data <- NULL
-
-
+  
+  
   #############################
   ## Define Basic Parameters ##
   #############################
-
+  
   param <- list()
   param$dataset <- dataset
   param$time_period <- time_period
   param$language <- language
   # param$time_id = time_id
   param$raw_data <- raw_data
-
+  
   param$survey_name <- datasets_link() %>%
     dplyr::filter(dataset == param$dataset) %>%
     dplyr::select(survey) %>%
     unlist()
-
+  
   param$url <- datasets_link() %>%
     dplyr::filter(dataset == param$dataset) %>%
     dplyr::select(link) %>%
     unlist()
-
+  
   ## Dataset
-
+  
   if (is.null(param$dataset)) {
     stop("Missing Dataset!")
   }
   if (is.null(param$raw_data)) {
     stop("Missing TRUE/FALSE for Raw Data")
   }
-
-  ## TEMPORARY!! WHILE RAW_DATA= FALSE IS BEING FIXED
-  if (raw_data == FALSE) {
-    stop("raw_data = FALSE argument for IPS is being improved at the moment!")
+  
+  ##
+  if (raw_data == TRUE & language == "eng") {
+    stop("raw_data == TRUE only available in portuguese")
   }
-
-
+  
+  
   ##############
   ## Download ##
   ##############
-
+  
   dat <- as.list(param$time_period) %>%
     purrr::map(
       function(t) {
-        external_download(dataset = param$dataset, source = "ips", year = t)
+        external_download(dataset = "ips", source = "ips", year = t)
       }
     )
-
-  raw <- dat
-
-
-  ## Return Raw Data
-
-  if (raw_data == TRUE) {
-    return(dat)
+  
+  
+  
+  ####################
+  # language = 'pt' ##
+  ####################
+  
+  if(raw_data == FALSE){
+    
+    year_char <- c("_2012","_2013","_2014","_2015","_2016","_2017","_2018","_2019", "_2020","_2021")
+    
+    for (j in 1:length(time_period)) {
+      
+      for (i in 1:length(year_char)) {
+        
+        colnames(dat[[j]]) = colnames(dat[[j]]) %>%
+          
+          str_remove_all(year_char[i])
+        
+      }
+      
+    }
+    
+    dat_pt = dat
+    
   }
-
-
-
-  ## Data May Have Different Names, we Need to be careful
-
-  col.names <- data.frame(
-    portuguese = c(
-      "cod_municipio", "municipio", "uf", "ano", "IPS",
-      "D1", "D2", "D3",
-      paste0("C", 1:12),
-      paste0("V", 1:43)
-    ),
-    english = c(
-      "municipality_code", "municipality", "state", "year", "SPI",
-      "D1", "D2", "D3",
-      paste0("C", 1:12),
-      paste0("V", 1:43)
-    )
-  )
-  ########
-  labels <- tibble::tribble(
-    ~original_name, ~new_pt.br, ~new_eng,
-    "Codigo IBGE do municipio", "Codigo IBGE do municipio", "IBGE city code",
-    "Municipio", "", "Municipality",
-    "Estado", "UF", "State",
-    "IPS", "Indice de Progresso Social", "Social Progress Index",
-    "Necessidades Humanas Basicas", "", "Basic human needs",
-    "Fundamentos para o Bem-Estar", "", "Well-being fundamentals",
-    "Oportunidades", "", "Opportunities",
-    "Nutricao e cuidados medicos basicos", "", "Nutrition and basic medical care",
-    "Agua e saneamento", "", "Water and sanitation",
-    "Moradia", "", "Habitation",
-    "Seguranca pessoal", "", "Personal safety",
-    "Acesso ao conhecimento basico", "", "Access to basic knowledge",
-    "Acesso a informacao e comunicacao", "", "Access to information and communication",
-    "Saude e bem-estar", "", "Health and well-being",
-    "Qualidade do meio ambiente", "", "Environment quality",
-    "Direitos individuais", "", "Individual rights",
-    "Liberdade individual e de escolha", "", "Individual freedom of choice",
-    "Tolerancia e inclusao", "", "Tolerance and inclusion",
-    "Acesso a educacao superior", "", "Access to higher education",
-    "Mortalidade infantil ate 5 anos (Obitos por mil nascidos vivos)", "",
-    "Infant mortality - until 5 years (Deaths per thousand live births)",
-    "Mortalidade materna (Obitos maternos por 100 mil nascidos vivos)", "",
-    "Maternal mortality (Maternal deaths per 100.000 live births)",
-    "Mortalidade por desnutricao (Obitos por 100 mil habitantes)", "",
-    "Malnutrition mortality (Deaths per 100.000 people)",
-    "Mortalidade por doencas infecciosas (Obitos por 100 mil habitantes)", "",
-    "Infeccious diseases mortality (Deaths per 100.000 people)",
-    "Subnutricao (% da populacao)", "", "Malnutrition (% of population)",
-    "Abastecimento de agua (% da populacao)", "", "Water supply (% of population)",
-    "Esgotamento sanitario  (% da populacao)", "", "Sewage (% of population)",
-    "Saneamento rural (diferenca entre a % da pop.
-  Rural com acesso a agua em relacao a urbana)",
-    "", "Rural sanitation (difference between % of rural pop. with access to water relative
-  to urban population)",
-    "Acesso a energia eletrica (% da populacao)", "", "Access to electricity (% da populacao)",
-    "Coleta de lixo (% da populacao)", "", "Garbage collection (% of population)",
-    "Moradia adequada (% da populacao)", "", "Adequate habitation (% of population)",
-    "Assassinatos de jovens (Obitos por 100 mil habitantes de 15 a 24 anos).
-  Pontuados em uma escala de 1-6: 1 = 0 2 = 1 - 6 3 = 6 - 10 4 = 10 - 20 5 = 20 - 40 6 > 40)",
-    "", "Youth murders (Deaths per 100.000 people aged 15 to 24. Scored on a 1-6 scale:
-  1 = 0; 2 = 1-6; 3 = 6-10; 4 = 10-10; 5 = 20-40; 6 = > 40",
-    "Homicidios", "",
-    "Homicides (Deaths per 100.000 people). Scored on a 1-6 scale:
-  1 = 0; 2 = 1-6; 3 = 6-10; 4 = 10-10; 5 = 20-40; 6 = > 40",
-    "Mortes por acidente no transito (Obitos por 100 mil habitantes)", "",
-    "Traffic accident deaths (Deaths per 100.000 people)",
-    "Acesso ao ensino fundamental (% de frequencia liquida ao ensino fundamental)",
-    "", "Access to elementary school (% of net frequency in elementary school)",
-    "Acesso ao ensino medio (% de frequencia liquida ao ensino medio)",
-    "", "Access to high school (% of net frequency in middle school)",
-    "Analfabetismo (% da populacao de 15 anos ou mais)", "",
-    "Illiteracy (% of 15+ population)",
-    "Qualidade da educacao Ideb (escala de 0-10)", "", "Education quality Ideb (0-10 scale)",
-    "% de conexao efetuadas com sucesso. Pontuados em uma escala de 0-5.
-  0 = 2% 1 = 2% - 79% 2 = 80% - 96% 3 = 96% - 98% 4 = 98% - 99% 5 = 99% - 100",
-    "", "% of successful connections. Scored on a 0-5 scale. 0 = 2%; 1 = 2%-79%;
-  2 = 80%-96%; 3 = 96%-98%; 4 = 98%-99%; 5 = 99%-100%",
-    "Conexao de voz (% de ligacoes realizadas com sucesso. Pontuados em uma escala de
-  1-5. 1 = 49% - 79% 2 = 80% - 96% 3 = 96% - 98% 4 = 98% - 99% 5 = 99% - 100)", "",
-    "Voice connections (% of successful calls. Scored on a 1-5 scale. 1 = 49%-79%;
-  2 = 80%-96%; 3 = 96%-98%; 4 = 98%-99%; 5 = 99%-100%",
-    "Expectativa de vida ao nascer (numero de anos)", "", "Life expectancy at birth (years)",
-    "Mortalidade por doencas crOnicas (Obitos por 100 mil habitantes)", "",
-    "Infeccious diseases mortality (Deaths per 100.000 people)",
-    "Mortalidade por doencas respiratOrias (Obitos por 100 mil habitantes)",
-    "", "Respiratory diseases mortality (Deaths per 100.000 people)",
-    "Obesidade (% da populacao)", "", "Obesity (% of population)",
-    "Suicidio (Obitos por 100 mil habitantes)", "",
-    "Suicides (Deaths per 100.000 people)",
-    "area degradada (%)", "", "Degraded area (%)",
-    "areas protegidas (%)", "", "Protected area (%)",
-    "Desmatamento acumulado (%)", "", "Accumulated deforestation (%)",
-    "Desmatamento recente (% do desmatamento de 2015, 2016, 2017 em relacao ao total)",
-    "", "Recent deforestation",
-    "Desperdicio de agua (%)", "", "Water waste (%)",
-    "Diversidade partidaria (%)", "", "Partisan diversity (%)",
-    "Mobilidade urbana (numero de Onibus por mil habitantes)",
-    "", "Urban mobility (buses per thousand people)",
-    "Pessoas ameacadas (numero de ameacados de morte por 100 mil habitantes)", "",
-    "Threatened people (number of people threatened with death per thousand people)",
-    "Acesso a cultura, lazer e esporte (CategOrica. Pontuado em:
-  0 = nenhuma estrutura; 1 = uma; 2 = duas; 3 = tres; 4 = todas as estruturas)",
-    "", "Access to culture, leisure, and sports (Cathegorical. Scored by:
-  0 = no structure; 1 = one; 2 = two; 3 = three; 4 = all structures",
-    "Gravidez na infancia e adolescencia (% de mulheres de 15 a 17 anos que tiveram filhos)",
-    "", "Child of adolescence pregnancy (% of women aged 15-17 with children)",
-    "Trabalho infantil (% da populacao entre 10 e 14 anos de idade)", "",
-    "Child labor (% of population aged 10-14)",
-    "Vulnerabilidade familia (% de maes)", "", "Family vulnerability (% of mothers)",
-    "Desigualdade racial na educacao (% da populacao com 15 anos ou mais)", "",
-    "Racial inequality in education (% da populacao com 15 anos e mais)",
-    "Violencia contra a mulher (casos por 100 mil mulheres)", "",
-    "Violence against women (cases per 100.000 women)",
-    "Violencia contra indigena (casos por mil indigenas.
-  Pontuados em uma escala de 1-3. 1 = 0 - 20  2 = 21 - 40  3 > 40)", "",
-    "Violence against indigenous people (cases by thousand indigenous people.
-  Scored on a 1-3 scale. 1 = 0-20; 2 = 21-40; 3 = > 40)",
-    "Educacao feminina (% da populacao feminina com 15 anos ou mais)", "",
-    "Female education (% of female population aged 15 or more)",
-    "Frequencia ao ensino superior (% da populacao entre 18-24 anos)", "",
-    "Attendance to higher education (% of population aged 18-24)",
-    "Pessoas com ensino superior (% da populacao com mais de 25 anos)", "",
-    "People with higher education (% of population aged 25+)",
-    "Ano", "Ano", "Year",
-  )
-
-  #######
-  if (length(time_period) > 1) {
-    colnames(raw[[1]]) <- labels$original_name
-    colnames(raw[[2]]) <- labels$original_name
-
-    df <- dplyr::bind_rows(
-      raw[[1]],
-      raw[[2]]
-    ) %>%
-      dplyr::relocate(
-        .data$`Codigo IBGE do municipio`, .data$Municipio,
-        .data$Estado, .data$Ano, dplyr::everything()
-      ) %>%
-      dplyr::filter(.data$`Codigo IBGE do municipio` %in% municipalities$code_muni)
-  } else {
-    colnames(raw[[1]]) <- labels$original_name
-
-    df <- dplyr::bind_rows(
-      raw[[1]],
-    ) %>%
-      dplyr::relocate(
-        .data$`Codigo IBGE do municipio`, .data$Municipio,
-        .data$Estado, .data$Ano, dplyr::everything()
-      ) %>%
-      dplyr::filter(.data$`Codigo IBGE do municipio` %in% municipalities$code_muni)
+  
+  
+  #####################
+  # language = 'eng' ##
+  #####################
+  
+  if(raw_data == FALSE & language == 'eng'){
+    
+    dat_eng = dat
+    
+    for (i in 1:length(time_period)) {
+      
+      dat_eng[[i]] <- dat_eng[[i]] %>%
+        
+        rename(
+          
+          c(code_ibge = codigo_ibge,
+            municipality = municipio,
+            state = estado,
+            ips_amazon = ips_amazonia,
+            basic_human_needs = necessidades_humanas_basicas,
+            well_being_fundamentals = fundamentos_para_o_bem_estar,
+            oportunities = oportunidades,
+            nutrition_and_basic_medical_care = nutricao_e_cuidados_medicos_basicos,
+            water_and_sanitation = agua_e_saneamento,
+            habitation = moradia,
+            personal_safety = seguranca_pessoal,
+            access_to_basic_knowledge = acesso_ao_conhecimento_basico,
+            access_to_info_and_comunication = acesso_a_informacao_e_comunicacao,
+            health_and_well_being = saude_e_bem_estar,
+            environment_quality = qualidade_do_meio_ambiente,
+            individual_rights = direitos_individuais,
+            individual_freedom_of_choice = liberdade_individual_e_de_escolha,
+            tolerance_and_inclusion = tolerancia_e_inclusao,
+            higher_education_access = acesso_a_educacao_superior,
+            infant_mortality_until_5_years_deaths_1_000_live_births = mortalidade_infantil_ate_5_anos_obitos_1_000_nasc_vivos,
+            maternal_mortality_deaths_100_000_live_births = mortalidade_materna_obitos_maternos_100_000_nascidos_vivos,
+            malnutrition_mortality_death_100_000_people = mortalidade_por_desnutricao_obitos_100_000_habitantes,
+            infeccious_diseases_mortality_deaths_100_000_people = mortalidade_por_doencas_infecciosas_obitos_100_000_habitantes,
+            malnutrition_percent_population = subnutricao_percent_da_populacao,
+            adaquate_water_supply_percent_population = abastecimento_de_agua_adequado_percent_da_populacao,
+            adaquate_sewage_percent_population = esgoto_adequado_percent_da_populacao,
+            index_water_services_percent_population = indice_atendimento_de_agua_percent_da_populacao,
+            adaquate_garbage_collection_percent_houses = coleta_de_lixo_adequada_percent_de_domicilios,
+            habitation_with_adequate_illumination_percent =  moradias_com_iluminacao_adequada_percent_de_domicilios,
+            habitation_with_adequate_walls_percent = moradias_com_parede_adequada_percent_de_domicilios,
+            habitation_with_adequate_floor_percent = moradias_com_piso_adequado_percent_de_domicilios,
+            youth_murders_deaths_100_000_people_15_to_29_years_old = assassinatos_de_jovens_obitos_100_000_habitantes_de_15_a_29_anos,
+            youth_murders_scored_on_1_to_6_scale_1_0_2_1_6_3_6_10_4_10_20_5_20_40_6_40_plus = assassinatos_de_jovens_taxa_pontuada_em_uma_escala_de_1_6_1_0_2_1_6_3_6_10_4_10_20_5_20_40_6_40,
+            homicides_deaths_100_000_people = homicidios_obitos_100_000_habitantes,
+            homicides_scored_on_1_to_6_scale_1_0_2_1_6_3_6_10_4_10_20_5_20_40_6_40_plus = homicidios_categorico_taxa_pontuada_em_uma_escala_de_1_6_1_0_2_1_6_3_6_10_4_10_20_5_20_40_6_40,
+            traffic_accidents_deaths_100_000_people = mortes_por_acidente_no_transito_obitos_100_000_habitantes,
+            elementary_school_dropout_percent_students = abandono_escolar_ensino_fundamental_percent_de_alunos,
+            elementary_school_age_grade_distortion_percent_students = distorcao_idade_serie_ensino_fundamental_percent_de_alunos,
+            high_school_age_grade_distortion_percent_students = distorcao_idade_serie_ensino_medio_percent_de_alunos,
+            elementary_education_quality_ideb_0_to_10_scale = qualidade_da_educacao_ideb_ensino_fundamental,
+            students_failing_elementary_school_percent = reprovacao_escolar_ensino_fundamental_percent_de_alunos,
+            broadband_internet_acesses_per_100_houses = densidade_internet_banda_larga_no_de_acessos_100_domicilios,
+            landline_telephone_accesses_per_100_houses = densidade_telefonia_fixa_no_de_acessos_100_domicilios,
+            mobile_phone_access_per_100_people = densidade_telefonia_movel_no_de_acessos_100_habitantes,
+            houses_with_cable_TV_for_each_100_houses = densidade_tv_por_assinatura_no_de_acessos_100_domicilios,
+            deaths_by_diabetes_mellitus_per_100_000_people = mortalidade_por_diabetes_mellitus_obitos_100_000_habitantes,
+            deaths_by_cancer_per_100_000_people = mortalidade_por_cancer_obitos_100_000_habitantes,
+            deaths_by_circulatory_diseases_per_100_000_people = mortalidade_por_doencas_circulatorias_obitos_100_000_habitantes,
+            deaths_by_respiratory_desiases_per_100_000_people = mortalidade_por_doencas_respiratorias_obitos_100_000_habitantes,
+            suicide_deaths_per_100_000_people = mortalidade_por_suicidios_obitos_100_000_habitantes,
+            protected_areas_percent_municipality_area = areas_protegidas_percent_area_total_do_municipio,
+            accumulated_deforestation_percent_municipality_area =  desmatamento_acumulado_percent_area_total_do_municipio,
+            recent_deforestation_percent_municipality_area = desmatamento_recente_percent_area_total_do_municipio,
+            co2_emission_ton_of_co2_per_inhabitant = emissoes_co2_ton_co2_habitante,
+            number_of_hotspots_per_1_000_inhabitant = focos_de_calor_na_de_focos_1_000_habitantes,
+            partisan_diversity_percent_of_councilman_from_different_parties = diversidade_partidaria_percent_vereadores_eleitos_partidos_diferentes,
+            public_transport_buses_per_1_000_inhabitants =  transporte_publico_no_de_onibus_e_micro_onibus_1_000_habitantes,
+            access_culture_sport_leisure_categorical_1_to_10 = acesso_a_cultura_esporte_e_lazer_categorica_1_10,
+            child_of_adolescence_pregnancy_percent_of_children_from_mom_aged_up_to_19_years_old = gravidez_na_infancia_e_adolescencia_percent_de_filhos_de_maes_com_ate_19_anos,
+            child_labor_number_families_with_at_least_one_kid_working_per_1_000_families =  trabalho_infantil_no_de_familias_com_ao_menos_1_membro_em_trabalho_infantil_1_000_familias,
+            family_vulnerability_percent_of_kids_raised_by_single_mothers = vulnerabilidade_familiar_percent_de_filhos_de_maes_solteiras,
+            violence_against_indigenous_people_cases_by_1_000_indigenous_people = violencia_contra_indigenas_no_de_casos_1_000_indigenas,
+            violence_against_indigenous_people_scale_from_1_to_5 = violencia_contra_indigenas_taxa_pontuada_em_uma_escala_de_1_5_1_0_2_0_1_2_7_3_2_7_8_8_4_8_8_20_8_5_20_8,
+            violence_against_women_per_100_000_women = violencia_contra_mulheres_no_de_casos_100_000_mulheres,
+            violence_against_child_number_of_cases_per_100_000_kids_between_0_and_14_years_old = violencia_infantil_no_de_casos_100_000_pessoas_de_0_14_anos,
+            violence_against_child_1_to_5_scale = violencia_infantil_taxa_pontuada_em_uma_escala_de_1_5_1_0_2_1_1_40_1_3_40_1_133_1_4_133_1_496_0_5_496_0,
+            higher_education_jobs_percent_compared_to_total_jobs = empregos_ensino_superior_percent_de_empregos_em_relacao_ao_total,
+            women_in_higher_education_jobs_percent_in_relation_to_total_jobs = mulheres_com_empregos_ensino_superior_percent_de_empregos_em_relacao_ao_total
+          ))
+    }
+    
   }
-
-  if (language == "pt") {
-    labels_key <- as.list(colnames(df)) %>%
-      stats::setNames(colnames(df))
-
-    df <- df %>%
-      labelled::set_variable_labels(.labels = labels_key)
-
-    colnames(df) <- col.names$portuguese
-  } else {
-    labels_key <- as.list(labels$new_eng) %>%
-      stats::setNames(labels$original_name)
-
-    df <- df %>%
-      labelled::set_variable_labels(.labels = labels_key)
-
-    colnames(df) <- col.names$english
+  
+  ###############
+  ##  datasets ##
+  ###############
+  
+  
+  for (i in 1:length(time_period)) {
+    
+    if(dataset == "life_quality"){
+      
+      dat[[i]] <- dat[[i]] %>%
+        select("codigo_ibge",
+               "municipio",
+               "estado",
+               "necessidades_humanas_basicas",
+               "fundamentos_para_o_bem_estar",
+               "oportunidades",
+               "nutricao_e_cuidados_medicos_basicos",
+               "agua_e_saneamento",
+               "moradia",
+               "seguranca_pessoal",
+               "acesso_ao_conhecimento_basico",
+               "saude_e_bem_estar",
+               "qualidade_do_meio_ambiente",
+               "direitos_individuais",
+               "liberdade_individual_e_de_escolha",
+               "tolerancia_e_inclusao",
+               str_subset(colnames(dat[[i]]), 'diversidade_partidaria'),
+               str_subset(colnames(dat[[i]]), 'transporte_publico'),
+               "acesso_a_cultura_esporte_e_lazer_categorica_1_10",
+               str_subset(colnames(dat[[i]]), 'gravidez_na_infancia'),
+               str_subset(colnames(dat[[i]]), 'trabalho_infantil'),
+               str_subset(colnames(dat[[i]]), 'vulnerabilidade_familiar'))
+    }
+    
+    if(dataset == "sanit_habit"){
+      
+      dat[[i]] <- dat[[i]] %>%
+        select("codigo_ibge",
+               "municipio",
+               "estado",
+               "nutricao_e_cuidados_medicos_basicos",
+               "saude_e_bem_estar",
+               str_subset(colnames(dat[[i]]), 'agua'),
+               str_subset(colnames(dat[[i]]), 'esgoto'),
+               str_subset(colnames(dat[[i]]), 'indice_atendimento_de_agua'),
+               str_subset(colnames(dat[[i]]), 'coleta_de_lixo'),
+               str_subset(colnames(dat[[i]]), 'moradia'))
+    }
+    
+    if(dataset == "violence"){
+      
+      dat[[i]] <- dat[[i]] %>%
+        select("codigo_ibge",
+               "municipio",
+               "estado",
+               str_subset(colnames(dat[[i]]), 'assassinatos'),
+               str_subset(colnames(dat[[i]]), 'homicidios'),
+               "mortes_por_acidente_no_transito_obitos_100_000_habitantes")
+    }
+    
+    if(dataset == "educ"){
+      
+      dat[[i]] <- dat[[i]] %>%
+        select("codigo_ibge",
+               "municipio",
+               "estado",
+               "acesso_ao_conhecimento_basico",
+               str_subset(colnames(dat[[i]]), 'ensino'))
+    }
+    
+    if(dataset == "communic"){
+      
+      dat[[i]] <- dat[[i]] %>%
+        select("codigo_ibge",
+               "municipio",
+               "estado",
+               str_subset(colnames(dat[[i]]), 'densidade'),
+               "acesso_a_informacao_e_comunicacao")
+    }
+    
+    if(dataset == "mortality"){
+      
+      dat[[i]] <- dat[[i]] %>%
+        select("codigo_ibge",
+               "municipio",
+               "estado",
+               str_subset(colnames(dat[[i]]), 'mortalidade'),
+               str_subset(colnames(dat[[i]]), 'subnutricao'))
+    }
+    
+    
+    if(dataset == "deforest"){
+      
+      dat[[i]] <- dat[[i]] %>%
+        select("codigo_ibge",
+               "municipio",
+               "estado",
+               "qualidade_do_meio_ambiente",
+               str_subset(colnames(dat[[i]]), 'areas_protegidas'),
+               str_subset(colnames(dat[[i]]), 'desmatamento'),
+               str_subset(colnames(dat[[i]]), 'emissoes'),
+               str_subset(colnames(dat[[i]]), 'focos_de_calor'))
+    }
   }
-
-  return(df)
+  
+  if(raw_data == TRUE){return(dat)}
+  
+  ###################################################################################
+  # getting the indexes from the columns selected from the 'pt' data frame and     ##
+  # using these indexes to select the equivalent columns from the 'eng' data frame ##
+  ###################################################################################
+  
+  if(raw_data == FALSE & language == 'eng'){
+    
+    col_index <- match(colnames(dat[[i]]),colnames(dat_pt[[i]]))
+    
+    for (i in 1:length(time_period)) {
+      
+      dat_eng[[i]] <- dat_eng[[i]][,col_index]
+      
+    }
+    
+    dat = dat_eng
+  }
+  
+  ##########################################################################################################################
+  # organizing the data: bind columns from the different data frames in the list 'dat' and create column indicating years ##
+  ##########################################################################################################################
+  
+  if(raw_data == FALSE){
+    
+    if(length(time_period) == 3) {
+      
+      df <- dplyr::bind_rows(dat[[1]],dat[[2]], dat[[3]])
+      
+      year <- c(rep(time_period[1], nrow(dat[[1]])),
+                rep(time_period[2], nrow(dat[[2]])),
+                rep(time_period[3], nrow(dat[[3]]))) %>%
+        as.data.frame()
+    }
+    
+    
+    if (length(time_period) == 2) {
+      
+      
+      df <- dplyr::bind_rows(dat[[1]],dat[[2]])
+      
+      year <- c(rep(time_period[1], nrow(dat[[1]])),
+                rep(time_period[2], nrow(dat[[2]]))) %>%
+        as.data.frame()
+      
+    } else {
+      
+      df <- dplyr::bind_rows(
+        dat[[1]],
+      )
+      
+      year <- c(rep(time_period, nrow(dat[[1]]))) %>%
+        as.data.frame()
+      
+    }
+    
+    colnames(year) <- 'year'
+    df <- bind_cols(year,df)
+    
+    return(df)
+  }
 }
+
+
+
+
