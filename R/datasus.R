@@ -4,6 +4,34 @@ load_datasus <- function(dataset,
                         raw_data = FALSE,
                         language = "eng"){
 
+  #######################
+  ## Combined Datasets ##
+  ############$##########
+
+  if (dataset == "datasus_sim") {
+    dat <- list(
+      "datasus_sim_do",
+      "datasus_sim_dofet",
+      "datasus_sim_doext",
+      "datasus_sim_doinf",
+      "datasus_sim_domat"
+    ) %>%
+      purrr::map(~ load_datasus(
+        dataset = .,
+        time_period = time_period,
+        states = states,
+        raw_data = raw_data,
+        language = language)
+      ) %>%
+      dplyr::bind_rows()
+
+    return(dat)
+  }
+
+  ###################
+  ## Function Body ##
+  ###################
+
   if (!requireNamespace("read.dbc", quietly = TRUE)) {
     stop(
       "Package \"read.dbc\" must be installed to use this function.",
@@ -141,7 +169,9 @@ load_datasus <- function(dataset,
   if (stringr::str_detect(param$dataset, "datasus_sim")){
     dat <- dat %>%
       dplyr::mutate(
-        data = as.Date(data, format = "%d%m%Y"),
+        codmunres = as.numeric(as.character(codmunres)),
+
+        dtobito = as.Date(dtobito, format = "%d%m%Y"),
 
         idade_anos = dplyr::case_when(
           substr(idade, 1, 1) == "0" ~ NA_character_,
@@ -151,29 +181,109 @@ load_datasus <- function(dataset,
         )
       )
 
-    dat <- load_dictionary("datasus") %>%
+    dic_cid_codes <- load_dictionary("datasus") %>%
+      dplyr::filter(is_cid_code)
+
+    dat <- dic_cid_codes %>%
       purrr::transpose() %>%
 
       purrr::map_dfc(
         function(dic_row){
           dat %>%
             dplyr::mutate(value = dplyr::case_when(
-                causabas %in% expand_cid_code(dic_row$cid_code) ~ 1
+                causabas %in% expand_cid_code(dic_row$var_code) ~ 1
               )
             ) %>%
             dplyr::select(value) %>%
-            dplyr::rename_with(~ dic_row$cid_code)
+            dplyr::rename_with(~ dic_row$var_code)
         }
       ) %>%
-      bind_cols(dat, .)
+      dplyr::bind_cols(dat)
+
+    # Adding municipality data
+
+    geo <- municipalities %>%
+      dplyr::select(code_muni,
+             name_muni,
+             code_state,
+             abbrev_state,
+             legal_amazon)
+
+    # Original data only has 6 IBGE digits instead of 7
+
+    geo <- geo %>%
+      dplyr::mutate(codmunres = as.integer(code_muni/10)) %>%
+      dplyr::distinct(codmunres, .keep_all = TRUE) # Only keeps municipalities uniquely identified by the 6 digits
+
+    dat <- dat %>%
+      dplyr::left_join(geo, by = "codmunres")
 
   }
+
+  ###############
+  ## Labelling ##
+  ###############
+
+  dic <- load_dictionary("datasus")
+
+  row_numbers <- match(names(dat), dic$var_code)
+
+  if (param$language == "pt") {
+    dic <- dic %>%
+      dplyr::select(label_pt)
+  }
+  if (param$language == "eng"){
+    dic <- dic %>%
+      dplyr::select(label_eng)
+  }
+
+  labels <- dic %>%
+    dplyr::slice(row_numbers) %>%
+    unlist()
+
+  # Making sure 'labels' is the same length as the number of columns
+
+  labels_full <- character(length = ncol(dat))
+
+  labels_full[which(!is.na(row_numbers))] <- labels
+
+  Hmisc::label(dat) <- as.list(labels_full)
+
+  #################
+  ## Aggregating ##
+  #################
+
+  # Obtaining the mortality variables
+
+  cid_vars <- load_dictionary("datasus") %>%
+    dplyr::filter(is_cid_code) %>%
+    dplyr::select(var_code) %>%
+    unlist()
 
   ################################
   ## Harmonizing Variable Names ##
   ################################
 
-  dat_mod <- dat
+  dat_mod <- dat %>%
+    dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, dtobito) %>%
+    tibble::as_tibble()
+
+  dic <- load_dictionary("datasus")
+
+  if (param$language == "pt") {
+    var_names <- dic$name_pt
+  }
+  if (param$language == "eng"){
+    var_names <- dic$name_eng
+  }
+
+  names(var_names) <- dic$var_code
+
+  dat_mod <- dat_mod %>%
+    dplyr::rename_with(
+      ~ dplyr::recode(., !!!var_names)
+    )
+
 
   ####################
   ## Returning Data ##
