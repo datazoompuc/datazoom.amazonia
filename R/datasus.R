@@ -1,6 +1,7 @@
 load_datasus <- function(dataset,
                         time_period,
                         states = "all",
+                        level = "municipality",
                         raw_data = FALSE,
                         language = "eng"){
 
@@ -24,6 +25,12 @@ load_datasus <- function(dataset,
         language = language)
       ) %>%
       dplyr::bind_rows()
+
+    if (level == "municipality") {
+      dat <- dat %>%
+        dplyr::group_by(codmunocor, code_muni, name_muni, code_state, abbrev_state, dtobito) %>%
+        dplyr::summarise(dplyr::across(dplyr::starts_with("t_"), ~ sum(., na.rm = TRUE)))
+    }
 
     return(dat)
   }
@@ -60,6 +67,7 @@ load_datasus <- function(dataset,
   param$dataset <- dataset
   param$raw_data <- raw_data
   param$language <- language
+  param$level <- level
 
   param$time_period <- paste0(time_period, collapse = "|")
   param$time_period_yy <- substr(time_period, 3, 4)
@@ -119,9 +127,13 @@ load_datasus <- function(dataset,
 
     filenames <- filenames[stringr::str_detect(filenames, uf_filter)]
   }
-  if (param$dataset == "datasus_sih"){
-    filenames <- filenames[substr(filenames, 3, 4) %in% states]
+  else if (param$dataset == "datasus_sih"){
+    filenames <- filenames[substr(filenames, 3, 4) %in% param$states]
   }
+  else if (param$states != "all") {
+    base::message("Filtering by state not supported for all datasets. Data for other states may be included.")
+  }
+
   # Filtering for the chosen dataset
   if (param$dataset %in% c("datasus_sim_doext", "datasus_sim_doinf", "datasus_sim_domat", "datasus_sim_dofet")){
     suffix <- stringr::str_remove(param$dataset, "datasus_sim_") %>%
@@ -159,7 +171,6 @@ load_datasus <- function(dataset,
   ## Data Engineering ##
   ######################
 
-
   dat <- dat %>%
     purrr::imap(~ dplyr::mutate(.x, file_name = .y)) %>%
     dplyr::bind_rows() %>%
@@ -169,7 +180,7 @@ load_datasus <- function(dataset,
   if (stringr::str_detect(param$dataset, "datasus_sim")){
     dat <- dat %>%
       dplyr::mutate(
-        codmunres = as.numeric(as.character(codmunres)),
+        codmunocor = as.numeric(as.character(codmunocor)),
 
         dtobito = as.Date(dtobito, format = "%d%m%Y"),
 
@@ -200,24 +211,58 @@ load_datasus <- function(dataset,
       ) %>%
       dplyr::bind_cols(dat)
 
-    # Adding municipality data
+      dat <- dat %>%
+        dplyr::rename("code_muni_6" = "codmunocor")
+  }
 
-    geo <- municipalities %>%
-      dplyr::select(code_muni,
-             name_muni,
-             code_state,
-             abbrev_state,
-             legal_amazon)
+  if (param$dataset == "datazoom_sih"){
 
-    # Original data only has 6 IBGE digits instead of 7
+  }
 
-    geo <- geo %>%
-      dplyr::mutate(codmunres = as.integer(code_muni/10)) %>%
-      dplyr::distinct(codmunres, .keep_all = TRUE) # Only keeps municipalities uniquely identified by the 6 digits
-
+  if (stringr::str_detect(param$dataset, "datasus_cnes")){
     dat <- dat %>%
-      dplyr::left_join(geo, by = "codmunres")
+      dplyr::mutate(codufmun = as.numeric(as.character(codufmun))) %>%
+      dplyr::rename("code_muni_6" = "codufmun")
+  }
 
+  # Adding municipality data
+
+  geo <- municipalities %>%
+    dplyr::select(code_muni,
+                  name_muni,
+                  code_state,
+                  abbrev_state,
+                  legal_amazon)
+
+  # Original data only has 6 IBGE digits instead of 7
+
+  geo <- geo %>%
+    dplyr::mutate(code_muni_6 = as.integer(code_muni/10)) %>%
+    dplyr::distinct(code_muni_6, .keep_all = TRUE) # Only keeps municipalities uniquely identified by the 6 digits
+
+  dat <- dat %>%
+    dplyr::left_join(geo, by = "code_muni_6")
+
+  #################
+  ## Aggregating ##
+  #################
+
+  if (stringr::str_detect(param$dataset, "datasus_sim")){
+
+    # Obtaining the mortality variables
+
+    cid_vars <- load_dictionary("datasus") %>%
+      dplyr::filter(is_cid_code) %>%
+      dplyr::select(var_code) %>%
+      unlist()
+
+    names(cid_vars) <- NULL # To stop summarise from renaming the variables
+
+    if (param$level == "municipality") {
+      dat <- dat %>%
+        dplyr::group_by(codmunocor, code_muni, name_muni, code_state, abbrev_state, dtobito) %>%
+        dplyr::summarise(dplyr::across(dplyr::any_of(cid_vars), ~ sum(., na.rm = TRUE)))
+    }
   }
 
   ###############
@@ -249,24 +294,20 @@ load_datasus <- function(dataset,
 
   Hmisc::label(dat) <- as.list(labels_full)
 
-  #################
-  ## Aggregating ##
-  #################
-
-  # Obtaining the mortality variables
-
-  cid_vars <- load_dictionary("datasus") %>%
-    dplyr::filter(is_cid_code) %>%
-    dplyr::select(var_code) %>%
-    unlist()
-
   ################################
   ## Harmonizing Variable Names ##
   ################################
 
-  dat_mod <- dat %>%
-    dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, dtobito) %>%
-    tibble::as_tibble()
+  if (stringr::str_detect(param$dataset, "datasus_sim")){
+    dat_mod <- dat %>%
+      dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, dtobito) %>%
+      tibble::as_tibble()
+  }
+  if (stringr::str_detect(param$dataset, "datasus_cnes")){
+    dat_mod <- dat %>%
+      dplyr::relocate(code_muni, name_muni, code_state, abbrev_state) %>%
+      tibble::as_tibble()
+  }
 
   dic <- load_dictionary("datasus")
 
