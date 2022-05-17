@@ -17,12 +17,17 @@ load_datasus <- function(dataset,
       "datasus_sim_doinf",
       "datasus_sim_domat"
     ) %>%
-      purrr::map(~ load_datasus(
-        dataset = .,
-        time_period = time_period,
-        states = states,
-        raw_data = raw_data,
-        language = language)
+      purrr::map(
+        function(dataset){
+          base::message(paste0("    ", dataset))
+          load_datasus(
+            dataset = dataset,
+            time_period = time_period,
+            states = states,
+            raw_data = raw_data,
+            language = language
+          )
+        }
       ) %>%
       dplyr::bind_rows()
 
@@ -31,6 +36,36 @@ load_datasus <- function(dataset,
         dplyr::group_by(codmunocor, code_muni, name_muni, code_state, abbrev_state, dtobito) %>%
         dplyr::summarise(dplyr::across(dplyr::starts_with("t_"), ~ sum(., na.rm = TRUE)))
     }
+  }
+    if (dataset == "datasus_cnes") {
+      dat <- list(
+        "datasus_cnes_lt",
+        "datasus_cnes_st",
+        "datasus_cnes_dc",
+        "datasus_cnes_eq",
+        "datasus_cnes_sr",
+        "datasus_cnes_hb",
+        "datasus_cnes_pf",
+        "datasus_cnes_ep",
+        "datasus_cnes_rc",
+        "datasus_cnes_in",
+        "datasus_cnes_ee",
+        "datasus_cnes_ef",
+        "datasus_cnes_gm"
+      ) %>%
+        purrr::map(
+          function(dataset){
+            base::message(paste0("    ", dataset))
+            load_datasus(
+              dataset = dataset,
+              time_period = time_period,
+              states = states,
+              raw_data = raw_data,
+              language = language
+            )
+          }
+        ) %>%
+        dplyr::bind_rows()
 
     return(dat)
   }
