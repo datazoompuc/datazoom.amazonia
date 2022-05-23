@@ -21,101 +21,150 @@
 #' }
 load_ips <- function(dataset = "all", raw_data,
                      time_period, language = "eng") {
-  
+
   ###########################
   ## Bind Global Variables ##
   ###########################
   survey <- link <- .data <- NULL
-  
-  
+
+
   #############################
   ## Define Basic Parameters ##
   #############################
-  
+
   param <- list()
   param$dataset <- dataset
   param$time_period <- time_period
   param$language <- language
   # param$time_id = time_id
   param$raw_data <- raw_data
-  
+
   param$survey_name <- datasets_link() %>%
     dplyr::filter(dataset == param$dataset) %>%
     dplyr::select(survey) %>%
     unlist()
-  
+
   param$url <- datasets_link() %>%
     dplyr::filter(dataset == param$dataset) %>%
     dplyr::select(link) %>%
     unlist()
-  
+
+  codigo_ibge <- municipio <- estado <- ips_amazonia <- NULL
+  necessidades_humanas_basicas <- fundamentos_para_o_bem_estar <- NULL
+  oportunidades <- agua_e_saneamento <- moradia <- seguranca_pessoal <- NULL
+  acesso_ao_conhecimento_basico <- acesso_a_informacao_e_comunicacao <- NULL
+  saude_e_bem_estar <- qualidade_do_meio_ambiente <- direitos_individuais <- NULL
+  liberdade_individual_e_de_escolha <- tolerancia_e_inclusao <- acesso_a_educacao_superior <- NULL
+  mortalidade_infantil_ate_5_anos_obitos_1_000_nasc_vivos <- NULL
+  mortalidade_materna_obitos_maternos_100_000_nascidos_vivos <- NULL
+  mortalidade_por_desnutricao_obitos_100_000_habitantes <- NULL
+  mortalidade_por_doencas_infecciosas_obitos_100_000_habitantes <- NULL
+  subnutricao_percent_da_populacao <- abastecimento_de_agua_adequado_percent_da_populacao <- NULL
+  esgoto_adequado_percent_da_populacao <- indice_atendimento_de_agua_percent_da_populacao <- NULL
+  coleta_de_lixo_adequada_percent_de_domicilios <- moradias_com_iluminacao_adequada_percent_de_domicilios <- NULL
+  moradias_com_parede_adequada_percent_de_domicilios <- NULL
+  moradias_com_piso_adequado_percent_de_domicilios <- NULL
+  assassinatos_de_jovens_obitos_100_000_habitantes_de_15_a_29_anos <- NULL
+  assassinatos_de_jovens_taxa_pontuada_em_uma_escala_de_1_6_1_0_2_1_6_3_6_10_4_10_20_5_20_40_6_40 <- NULL
+  homicidios_obitos_100_000_habitantes <- homicidios_categorico_taxa_pontuada_em_uma_escala_de_1_6_1_0_2_1_6_3_6_10_4_10_20_5_20_40_6_40 <- NULL
+  mortes_por_acidente_no_transito_obitos_100_000_habitantes <- abandono_escolar_ensino_fundamental_percent_de_alunos <- NULL
+  distorcao_idade_serie_ensino_fundamental_percent_de_alunos <- distorcao_idade_serie_ensino_medio_percent_de_alunos <- NULL
+  qualidade_da_educacao_ideb_ensino_fundamental <- reprovacao_escolar_ensino_fundamental_percent_de_alunos <- NULL
+  densidade_internet_banda_larga_no_de_acessos_100_domicilios <- NULL
+  densidade_telefonia_fixa_no_de_acessos_100_domicilios <- NULL
+  densidade_telefonia_movel_no_de_acessos_100_habitantes <- NULL
+  densidade_tv_por_assinatura_no_de_acessos_100_domicilios <- NULL
+  mortalidade_por_diabetes_mellitus_obitos_100_000_habitantes <- NULL
+  mortalidade_por_cancer_obitos_100_000_habitantes <- NULL
+  mortalidade_por_doencas_circulatorias_obitos_100_000_habitantes <- NULL
+  mortalidade_por_doencas_respiratorias_obitos_100_000_habitantes <- NULL
+  mortalidade_por_suicidios_obitos_100_000_habitantes <- NULL
+  areas_protegidas_percent_area_total_do_municipio <- NULL
+  desmatamento_acumulado_percent_area_total_do_municipio <- NULL
+  desmatamento_recente_percent_area_total_do_municipio <- NULL
+  emissoes_co2_ton_co2_habitante <- focos_de_calor_na_de_focos_1_000_habitantes <- NULL
+  diversidade_partidaria_percent_vereadores_eleitos_partidos_diferentes <- NULL
+  transporte_publico_no_de_onibus_e_micro_onibus_1_000_habitantes <- NULL
+  acesso_a_cultura_esporte_e_lazer_categorica_1_10 <- NULL
+  gravidez_na_infancia_e_adolescencia_percent_de_filhos_de_maes_com_ate_19_anos <- NULL
+  trabalho_infantil_no_de_familias_com_ao_menos_1_membro_em_trabalho_infantil_1_000_familias <- NULL
+  vulnerabilidade_familiar_percent_de_filhos_de_maes_solteiras <- NULL
+  violencia_contra_indigenas_no_de_casos_1_000_indigenas <- NULL
+  violencia_contra_indigenas_taxa_pontuada_em_uma_escala_de_1_5_1_0_2_0_1_2_7_3_2_7_8_8_4_8_8_20_8_5_20_8 <- NULL
+  violencia_contra_mulheres_no_de_casos_100_000_mulheres <- NULL
+  violencia_infantil_no_de_casos_100_000_pessoas_de_0_14_anos <- NULL
+  violencia_infantil_taxa_pontuada_em_uma_escala_de_1_5_1_0_2_1_1_40_1_3_40_1_133_1_4_133_1_496_0_5_496_0 <- NULL
+  empregos_ensino_superior_percent_de_empregos_em_relacao_ao_total <- NULL
+  mulheres_com_empregos_ensino_superior_percent_de_empregos_em_relacao_ao_total <- NULL
+  nutricao_e_cuidados_medicos_basicos <- NULL
+
   ## Dataset
-  
+
   if (is.null(param$dataset)) {
     stop("Missing Dataset!")
   }
   if (is.null(param$raw_data)) {
     stop("Missing TRUE/FALSE for Raw Data")
   }
-  
+
   ##
   if (raw_data == TRUE & language == "eng") {
     stop("raw_data == TRUE only available in portuguese")
   }
-  
-  
+
+
   ##############
   ## Download ##
   ##############
-  
+
   dat <- as.list(param$time_period) %>%
     purrr::map(
       function(t) {
         external_download(dataset = "ips", source = "ips", year = t)
       }
     )
-  
-  
-  
+
+
+
   ####################
   # language = 'pt' ##
   ####################
-  
+
   if(raw_data == FALSE){
-    
+
     year_char <- c("_2012","_2013","_2014","_2015","_2016","_2017","_2018","_2019", "_2020","_2021")
-    
+
     for (j in 1:length(time_period)) {
-      
+
       for (i in 1:length(year_char)) {
-        
+
         colnames(dat[[j]]) = colnames(dat[[j]]) %>%
-          
+
           stringr::str_remove_all(year_char[i])
-        
+
       }
-      
+
     }
-    
+
     dat_pt = dat
-    
+
   }
-  
-  
+
+
   #####################
   # language = 'eng' ##
   #####################
-  
+
   if(raw_data == FALSE & language == 'eng'){
-    
+
     dat_eng = dat
-    
+
     for (i in 1:length(time_period)) {
-      
+
       dat_eng[[i]] <- dat_eng[[i]] %>%
-        
+
         dplyr::rename(
-          
+
           c(code_ibge = codigo_ibge,
             municipality = municipio,
             state = estado,
@@ -186,18 +235,18 @@ load_ips <- function(dataset = "all", raw_data,
             women_in_higher_education_jobs_percent_in_relation_to_total_jobs = mulheres_com_empregos_ensino_superior_percent_de_empregos_em_relacao_ao_total
           ))
     }
-    
+
   }
-  
+
   ###############
   ##  datasets ##
   ###############
-  
-  
+
+
   for (i in 1:length(time_period)) {
-    
+
     if(dataset == "life_quality"){
-      
+
       dat[[i]] <- dat[[i]] %>%
         dplyr::select("codigo_ibge",
                "municipio",
@@ -215,145 +264,145 @@ load_ips <- function(dataset = "all", raw_data,
                "direitos_individuais",
                "liberdade_individual_e_de_escolha",
                "tolerancia_e_inclusao",
-               str_subset(colnames(dat[[i]]), 'diversidade_partidaria'),
-               str_subset(colnames(dat[[i]]), 'transporte_publico'),
+               stringr::str_subset(colnames(dat[[i]]), 'diversidade_partidaria'),
+               stringr::str_subset(colnames(dat[[i]]), 'transporte_publico'),
                "acesso_a_cultura_esporte_e_lazer_categorica_1_10",
-               str_subset(colnames(dat[[i]]), 'gravidez_na_infancia'),
-               str_subset(colnames(dat[[i]]), 'trabalho_infantil'),
-               str_subset(colnames(dat[[i]]), 'vulnerabilidade_familiar'))
+               stringr::str_subset(colnames(dat[[i]]), 'gravidez_na_infancia'),
+               stringr::str_subset(colnames(dat[[i]]), 'trabalho_infantil'),
+               stringr::str_subset(colnames(dat[[i]]), 'vulnerabilidade_familiar'))
     }
-    
+
     if(dataset == "sanit_habit"){
-      
+
       dat[[i]] <- dat[[i]] %>%
         dplyr::select("codigo_ibge",
                "municipio",
                "estado",
                "nutricao_e_cuidados_medicos_basicos",
                "saude_e_bem_estar",
-               str_subset(colnames(dat[[i]]), 'agua'),
-               str_subset(colnames(dat[[i]]), 'esgoto'),
-               str_subset(colnames(dat[[i]]), 'indice_atendimento_de_agua'),
-               str_subset(colnames(dat[[i]]), 'coleta_de_lixo'),
-               str_subset(colnames(dat[[i]]), 'moradia'))
+               stringr::str_subset(colnames(dat[[i]]), 'agua'),
+               stringr::str_subset(colnames(dat[[i]]), 'esgoto'),
+               stringr::str_subset(colnames(dat[[i]]), 'indice_atendimento_de_agua'),
+               stringr::str_subset(colnames(dat[[i]]), 'coleta_de_lixo'),
+               stringr::str_subset(colnames(dat[[i]]), 'moradia'))
     }
-    
+
     if(dataset == "violence"){
-      
+
       dat[[i]] <- dat[[i]] %>%
         dplyr::select("codigo_ibge",
                "municipio",
                "estado",
-               str_subset(colnames(dat[[i]]), 'assassinatos'),
-               str_subset(colnames(dat[[i]]), 'homicidios'),
+               stringr::str_subset(colnames(dat[[i]]), 'assassinatos'),
+               stringr::str_subset(colnames(dat[[i]]), 'homicidios'),
                "mortes_por_acidente_no_transito_obitos_100_000_habitantes")
     }
-    
+
     if(dataset == "educ"){
-      
+
       dat[[i]] <- dat[[i]] %>%
         dplyr::select("codigo_ibge",
                "municipio",
                "estado",
                "acesso_ao_conhecimento_basico",
-               str_subset(colnames(dat[[i]]), 'ensino'))
+               stringr::str_subset(colnames(dat[[i]]), 'ensino'))
     }
-    
+
     if(dataset == "communic"){
-      
+
       dat[[i]] <- dat[[i]] %>%
         dplyr::select("codigo_ibge",
                "municipio",
                "estado",
-               str_subset(colnames(dat[[i]]), 'densidade'),
+               stringr::str_subset(colnames(dat[[i]]), 'densidade'),
                "acesso_a_informacao_e_comunicacao")
     }
-    
+
     if(dataset == "mortality"){
-      
+
       dat[[i]] <- dat[[i]] %>%
         dplyr::select("codigo_ibge",
                "municipio",
                "estado",
-               str_subset(colnames(dat[[i]]), 'mortalidade'),
-               str_subset(colnames(dat[[i]]), 'subnutricao'))
+               stringr::str_subset(colnames(dat[[i]]), 'mortalidade'),
+               stringr::str_subset(colnames(dat[[i]]), 'subnutricao'))
     }
-    
-    
+
+
     if(dataset == "deforest"){
-      
+
       dat[[i]] <- dat[[i]] %>%
         dplyr::select("codigo_ibge",
                "municipio",
                "estado",
                "qualidade_do_meio_ambiente",
-               str_subset(colnames(dat[[i]]), 'areas_protegidas'),
-               str_subset(colnames(dat[[i]]), 'desmatamento'),
-               str_subset(colnames(dat[[i]]), 'emissoes'),
-               str_subset(colnames(dat[[i]]), 'focos_de_calor'))
+               stringr::str_subset(colnames(dat[[i]]), 'areas_protegidas'),
+               stringr::str_subset(colnames(dat[[i]]), 'desmatamento'),
+               stringr::str_subset(colnames(dat[[i]]), 'emissoes'),
+               stringr::str_subset(colnames(dat[[i]]), 'focos_de_calor'))
     }
   }
-  
+
   if(raw_data == TRUE){return(dat)}
-  
+
   ###################################################################################
   # getting the indexes from the columns selected from the 'pt' data frame and     ##
   # using these indexes to select the equivalent columns from the 'eng' data frame ##
   ###################################################################################
-  
+
   if(raw_data == FALSE & language == 'eng'){
-    
+
     col_index <- match(colnames(dat[[i]]),colnames(dat_pt[[i]]))
-    
+
     for (i in 1:length(time_period)) {
-      
+
       dat_eng[[i]] <- dat_eng[[i]][,col_index]
-      
+
     }
-    
+
     dat = dat_eng
   }
-  
+
   ##########################################################################################################################
   # organizing the data: bind columns from the different data frames in the list 'dat' and create column indicating years ##
   ##########################################################################################################################
-  
+
   if(raw_data == FALSE){
-    
+
     if(length(time_period) == 3) {
-      
+
       df <- dplyr::bind_rows(dat[[1]],dat[[2]], dat[[3]])
-      
+
       year <- c(rep(time_period[1], nrow(dat[[1]])),
                 rep(time_period[2], nrow(dat[[2]])),
                 rep(time_period[3], nrow(dat[[3]]))) %>%
         as.data.frame()
     }
-    
-    
+
+
     if (length(time_period) == 2) {
-      
-      
+
+
       df <- dplyr::bind_rows(dat[[1]],dat[[2]])
-      
+
       year <- c(rep(time_period[1], nrow(dat[[1]])),
                 rep(time_period[2], nrow(dat[[2]]))) %>%
         as.data.frame()
-      
+
     } else {
-      
+
       df <- dplyr::bind_rows(
         dat[[1]],
       )
-      
+
       year <- c(rep(time_period, nrow(dat[[1]]))) %>%
         as.data.frame()
-      
+
     }
-    
+
     colnames(year) <- 'year'
-    df <- bind_cols(year,df)
-    
+    df <- dplyr::bind_cols(year,df)
+
     return(df)
   }
 }

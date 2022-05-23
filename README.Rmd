@@ -562,7 +562,7 @@ Loads information on the social and environmental performance of the Legal Amazo
 ```
 There are four parameters in this function:
   
-  1. dataset = "ips"
+  1. dataset = ("all", "life_quality", "sanit_habit", "violence", "educ", "communic", "mortality", "deforest")
   2. raw_data: there are two options:
   # TRUE: if you want the raw data.
   # FALSE: if you want the processed version of the data. 
@@ -574,10 +574,10 @@ There are four parameters in this function:
   
 ```{r, eval = FALSE}
 # Download raw data (raw_data = TRUE) from 2014 (time_period = 2014)
-data <- load_ips(dataset = "ips", raw_data = TRUE, time_period = 2014)
-# Download treated data (raw_data = FALSE) from 2018 
-# (time_period = 2018) in portuguese (language = 'pt')
-data <- load_ips(dataset = "ips", raw_data = FALSE,
+data <- load_ips(dataset = "all", raw_data = TRUE, time_period = 2014)
+
+# Download treated deforest data (raw_data = FALSE) from 2018 in portuguese
+data <- load_ips(dataset = "deforest", raw_data = FALSE,
                  time_period = 2018, language = 'pt')
 ```
 

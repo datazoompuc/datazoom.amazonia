@@ -1,3 +1,7 @@
+# datazoom.amazonia 0.5.0.9000
+
+* Added new IPS datasets 
+
 # datazoom.amazonia 0.4.0.9000
 
   * Added new Mapbiomas Mining dataset 
