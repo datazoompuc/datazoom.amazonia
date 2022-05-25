@@ -1,3 +1,18 @@
+#' DATASUS
+#'
+#' @param dataset A dataset name, can be one of ("datasus_sim", "satasus_sih", "datasus_cnes"), or subsets thereof. For more details, try \code{vignette("DATASUS")}.
+#' @param time_period A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.
+#' @param states A \code{string} specifying for which states to download the data. It is "all" by default, but can be a single state such as "AC" or any vector such as c("AC", "AM").
+#' @param level A \code{string} choosing whether to aggregate the data by "municipality" or to keep all the "individual" variables.
+#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
+#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
+#'
+#' @examples\dontrun{
+#' mortality_rj <- load_datasus(dataset = "datasus_sim", time_period = 2010, states = "RJ")
+#' }
+#'
+#' @return A \code{tibble}
+#' @export
 load_datasus <- function(dataset,
                         time_period,
                         states = "all",
@@ -7,7 +22,7 @@ load_datasus <- function(dataset,
 
   #######################
   ## Combined Datasets ##
-  ############$##########
+  #######################
 
   if (dataset == "datasus_sim") {
     dat <- list(
@@ -295,7 +310,7 @@ load_datasus <- function(dataset,
 
     if (param$level == "municipality") {
       dat <- dat %>%
-        dplyr::group_by(codmunocor, code_muni, name_muni, code_state, abbrev_state, dtobito) %>%
+        dplyr::group_by(code_muni_6, code_muni, name_muni, code_state, abbrev_state, dtobito) %>%
         dplyr::summarise(dplyr::across(dplyr::any_of(cid_vars), ~ sum(., na.rm = TRUE)))
     }
   }
