@@ -151,40 +151,52 @@ load_datasus <- function(dataset,
     stringr::str_split("\r*\n") %>%
     unlist()
 
-  # Filtering for chosen years
+  ### Filtering by year
+
+  file_years <- NULL
+  file_years_yy <- NULL
+
   if (param$dataset == "datasus_sim_do"){
-
-    # time_period is turned into a character such as "2012|2013|2014" to be used in str_detect
-    time_filter <- param$time_period %>%
-      paste0(collapse = "|")
-
-    filenames <- filenames[stringr::str_detect(filenames, time_filter)]
+    file_years <- filenames %>%
+      substr(5, 8)
   }
   if (param$dataset %in% c("datasus_sim_doext", "datasus_sim_doinf", "datasus_sim_domat", "datasus_sim_dofet")) {
-    time_filter <- param$time_period_yy %>%
-      paste0(collapse = "|")
-
-    filenames <- filenames[stringr::str_detect(filenames, time_filter)]
+     file_years_yy <- filenames %>%
+       stringr::str_extract("\\d+")
+     # In this case, the position varies
   }
   if (stringr::str_detect(param$dataset, "datasus_cnes|datasus_sih")){
-    filenames <- filenames[substr(filenames, 5, 6) %in% param$time_period_yy]
+    file_years_yy <- filenames %>%
+      substr(5, 6)
   }
 
-  # Filtering for chosen states when possible
-  if (param$dataset %in% c("datasus_sim_do") | stringr::str_detect(param$dataset, "datasus_cnes")){
-    uf_filter <- param$states %>%
-      paste0(collapse = "|")
-
-    filenames <- filenames[stringr::str_detect(filenames, uf_filter)]
+  # Only files whose name's year matches a chosen one are kept
+  if (!is.null(file_years)) {
+    filenames <- filenames[file_years %in% param$time_period]
   }
-  else if (param$dataset == "datasus_sih"){
-    filenames <- filenames[substr(filenames, 3, 4) %in% param$states]
+  if (!is.null(file_years_yy)) {
+    filenames <- filenames[file_years_yy %in% param$time_period_yy]
+  }
+
+
+  ### Filtering for chosen states when possible
+
+  file_state <- NULL
+
+  if (param$dataset %in% c("datasus_sim_do", "datasus_sih") | stringr::str_detect(param$dataset, "datasus_cnes")){
+    file_state <- filenames %>%
+      substr(3, 4)
   }
   else if (param$states != "all") {
-    base::message("Filtering by state not supported for all datasets. Data for other states may be included.")
+    base::message("Filtering by state not supported for all datasets. Data for other states will be included.")
   }
 
-  # Filtering for the chosen dataset
+  if (!is.null(file_state)) {
+    filenames <- filenames[file_state %in% param$states]
+  }
+
+  ### Filtering for the chosen dataset (they come clumped together in the same folder)
+
   if (param$dataset %in% c("datasus_sim_doext", "datasus_sim_doinf", "datasus_sim_domat", "datasus_sim_dofet")){
     suffix <- stringr::str_remove(param$dataset, "datasus_sim_") %>%
       toupper()
@@ -194,7 +206,7 @@ load_datasus <- function(dataset,
 
   param$filenames <- filenames
 
-  # Downloading each file in filenames
+  ### Downloading each file in filenames
 
   dat <- param$filenames %>%
     purrr::imap(
