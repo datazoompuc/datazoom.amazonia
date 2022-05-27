@@ -590,7 +590,7 @@ load_dictionary <- function(dataset) {
     )
   }
 
-  if (dataset == "datasus") {
+  if (stringr::str_detect(dataset, "datasus_sim")) {
     harmonization_dat <- tibble::tribble(
       ~var_code, ~name_pt, ~name_eng, ~label_pt, ~label_eng, ~is_cid_code,
       # 22 CID-10 Chapters
@@ -694,6 +694,40 @@ load_dictionary <- function(dataset) {
       "cb_pre", "cb_pre", "cb_pre", "Causa selecionada sem re-seleçao (novo SCB)", "", FALSE
 
     )
+  }
+
+  if (stringr::str_detect(dataset, "datasus_cnes")) {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~name_pt, ~name_eng, ~label_pt, ~label_eng,
+      "cnes", "cnes", "cnes", "Código Nacional do Estabelecimento de Saude", "National Health Establishment Code",
+      "codufmun", "codufmun", "codufmun", "Codigo do Municipio", "Municipality Code",
+      "regsaude", "regsaude", "regsaude", "Codigo da Regiao de Saude", "Health Region Code",
+      "micr_reg", "micr_reg", "micr_reg", "Codigo da Microregiao de Saude", "Health Microregion Code",
+      "distrsan", "distrsan", "distrsan", "Codigo de Distrito Sanitario", "Sanitary District Code",
+      "distradm", "distradm", "distradm", "Codigo do Modulo Assistencial", "Administrative District Code",
+      "tpgestao", "tpgestao", "tpgestao", "Tipo de Gestao: M - Municipal, E - Estadual, D - Dupla, S - Sem Gestao", "Type of Management: M - Municipality, E - State, D - Double (both), S - None",
+      "pf_pj", "pf_pj", "pf_pj", "Indica se e Pessoa Fisica ou Juridica: 1 - Pessoa Fisica, 2 - Pessoa Juridica", "1 - Physical Person, 3 - Physical Person",
+      "cpf_cnpj", "cpf_cnpj", "cpf_cnpj", "CPF ou CNPJ do Estabelecimento", "Establishment CPF or CNPJ Code",
+      "niv_dep", "niv_dep", "niv_dep", "Identificador da Situacao do Estabelecimento: 1 - Individual, 3 - Mantido", "Situation of Establishment: 1 - Individual, 3 - Mantained",
+      "cnpj_man", "cnpj_man", "cnpj_man", "CNPJ da Mantenedora", "Maintainer CNPJ",
+      "esfera_a", "esfera_a", "esfera_a", "Codigo da Esfera Administrativa", "Administrative Sphere Code",
+      "atividad", "atividad", "atividad", "", "",
+      "retencao", "retencao", "retencao", "", "",
+      "natureza", "natureza", "natureza", "Codigo da Natureza Juridica", "Legal Nature Code",
+      "clientel", "clientel", "clientel", "Codigo de Fluxo da Clientela", "Customer Flux Code",
+      "tp_unid", "tp_unid", "tp_unid", "Código do Tipo de Estabelecimento", "Type of Establishment Code",
+      "turno_at", "turno_atendimento", "turno_atendimento", "Codigo do Turno de Atendimento", "",
+      "niv_hier", "niv_hier", "niv_hier", "", "",
+      "terceiro", "terceiro", "terceito", "", "",
+      "tp_leito", "tipo_leito", "tipo_leito", "Codigo do Tipo de Leito", "",
+      "codleito", "cod_leito", "cod_leito", "Codigo do Leito", "",
+      "qt_exist", "n_leitos_existentes", "n_existing_beds", "Leitos Existentes", "Number of existing beds",
+      "qt_contr", "qt_contr", "qt_contr", "", "",
+      "qt_sus", "n_leitos_sus", "n_beds_sus", "Leitos Disponiveis para o SUS (Para os estabelecimentos vinculados ao SUS)", "Beds avaliable to SUS",
+      "qt_nsus", "n_leitos_nao_sus", "n_beds_not_sus", "Leitos Nao Disponiveis para o SUS", "Beds not avaliable to SUS",
+      "competen", "competencia", "competence", "Competencia", "Competence",
+    )
+
   }
 
   ############

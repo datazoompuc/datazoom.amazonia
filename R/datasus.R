@@ -178,7 +178,6 @@ load_datasus <- function(dataset,
     filenames <- filenames[file_years_yy %in% param$time_period_yy]
   }
 
-
   ### Filtering for chosen states when possible
 
   file_state <- NULL
@@ -331,7 +330,7 @@ load_datasus <- function(dataset,
   ## Labelling ##
   ###############
 
-  dic <- load_dictionary("datasus")
+  dic <- load_dictionary(param$dataset)
 
   row_numbers <- match(names(dat), dic$var_code)
 
@@ -371,7 +370,7 @@ load_datasus <- function(dataset,
       tibble::as_tibble()
   }
 
-  dic <- load_dictionary("datasus")
+  dic <- load_dictionary(param$dataset)
 
   if (param$language == "pt") {
     var_names <- dic$name_pt
