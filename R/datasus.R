@@ -284,6 +284,14 @@ load_datasus <- function(dataset,
     dat <- dat %>%
       dplyr::mutate(codufmun = as.numeric(as.character(codufmun))) %>%
       dplyr::rename("code_muni_6" = "codufmun")
+
+    # Creating year and month variables
+
+    dat <- dat %>%
+      dplyr::mutate(
+        year = as.numeric(paste0("20", substr(file_name, 5, 6))),
+        month = as.numeric(substr(file_name, 7, 8))
+      )
   }
 
   # Adding municipality data
@@ -323,6 +331,14 @@ load_datasus <- function(dataset,
       dat <- dat %>%
         dplyr::group_by(code_muni_6, code_muni, name_muni, code_state, abbrev_state, dtobito) %>%
         dplyr::summarise(dplyr::across(dplyr::any_of(cid_vars), ~ sum(., na.rm = TRUE)))
+    }
+  }
+
+  if (param$dataset == "datasus_cnes_lt") {
+    if (param$level == "municipality"){
+      dat <- dat %>%
+        dplyr::group_by(code_muni_6, code_muni, name_muni, code_state, abbrev_state, year, month) %>%
+        dplyr::summarise(dplyr::across(c(qt_exist, qt_sus, qt_nsus)))
     }
   }
 
