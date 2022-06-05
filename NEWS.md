@@ -1,7 +1,10 @@
+# datazoom.amazonia 0.6.0.9000
+
+  * Added new `load_datasus` function for health data
 
 # datazoom.amazonia 0.5.0.9000
 
-* Added new IPS datasets 
+  * Added new IPS datasets 
 
 # datazoom.amazonia 0.4.0.9000
 

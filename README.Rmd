@@ -99,6 +99,8 @@ After installing it, you will be able to download our development version packag
 
 **[11 - BACI data](#11---baci)**
 
+**[12 - DATASUS data](#12---datasus)**
+
 ## The Structure of our functions
 
 **[1 - The Structure of the functions](#the-structure-of-the-functions)**
@@ -849,6 +851,50 @@ clean_baci <- load_baci(dataset = "HS92", raw_data = FALSE, time_period = 2016,
                         language = "pt")
 ```
   
+## 12 - DATASUS
+
+Loads data on mortality, hospitalizations, and hospital bed avaliability from DATASUS. 
+
+```
+There are six parameters in this function:
+  
+  1. dataset:
+  # "datasus_sim_do" has SIM-DO mortality data
+  # Possible subsets of SIM-DO are "datasus_sim_dofet" (Fetal), "datasus_sim_doext" (External causes), "datasus_sim_doinf" (Children), "datasus_sim_domat (Maternal)"
+  # "datasus_sih" has SIH hospitalization data.
+  # "datasus_cnes_lt" has data on the number of hospital beds.
+  # further subsets of CNES are listed in the vignette, but those only allow for the download of raw data.
+
+  2. raw_data: there are two options:
+  # TRUE: if you want the data in its original form (returns a list of dataframes)
+  # FALSE: if you want the treated (more organized) version of the data. Only effective for SIM-DO and subsets, SIH, and CNES-LT. 
+  
+  3. keep_all: only applies when raw_data is FALSE. There are two options:
+  # TRUE: keeps all original variables, adding variable labels and possibly constructing extra variables.
+  # FALSE: aggregates data at the municipality, thereby losing individual-level data, and only keeping aggregate measures.
+  
+  4. time_period
+  
+  5. states: a vector of states by which to filter the data. Only works for datasets whose data is provided in separate files by state.
+  
+  6. language: you can choose between portuguese ('pt') and english ('eng')
+  
+  ```
+  
+```{r eval=FALSE}
+# download raw SIH data
+raw_sih <- load_baci(dataset = "datasus_sih",
+                      raw_data = TRUE,
+                      time_period = 2016)
+
+# download treated mortality data for the states of AM and AP at the municipality level
+clean_sim <- load_baci(dataset = "datasus_sim_do",
+                        raw_data = FALSE,
+                        keep_all = FALSE,
+                        time_period = 2016,
+                        states = c("AM", "AP"),
+                        language = "pt")
+```
 
 ## The Structure of the functions
 
