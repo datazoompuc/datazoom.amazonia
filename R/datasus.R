@@ -5,7 +5,7 @@
 #' @param states A \code{string} specifying for which states to download the data. It is "all" by default, but can be a single state such as "AC" or any vector such as c("AC", "AM").
 #' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
 #' @param keep_all A \code{boolean} choosing whether to aggregate the data by municipality, in turn losing individual-level variables (\code{FALSE}) or to keep all the original variables. Only applies when raw_data is \code{TRUE}.
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
+#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng", but some datasets have no translated variable labels.
 #'
 #' @examples\dontrun{
 #' mortality_rj <- load_datasus(dataset = "datasus_sim", time_period = 2010, states = "RJ")
@@ -226,6 +226,7 @@ load_datasus <- function(dataset,
       )
   }
 
+  if (param$dataset != "datasus_sih"){
   # Adding municipality data
 
   geo <- municipalities %>%
@@ -243,6 +244,7 @@ load_datasus <- function(dataset,
 
   dat <- dat %>%
     dplyr::left_join(geo, by = "code_muni_6")
+  }
 
   #################
   ## Aggregating ##
@@ -312,6 +314,10 @@ load_datasus <- function(dataset,
   if (stringr::str_detect(param$dataset, "datasus_cnes")){
     dat_mod <- dat %>%
       dplyr::relocate(code_muni, name_muni, code_state, abbrev_state) %>%
+      tibble::as_tibble()
+  }
+  if (param$dataset == "datasus_sih"){
+    dat_mod <- dat %>%
       tibble::as_tibble()
   }
 
