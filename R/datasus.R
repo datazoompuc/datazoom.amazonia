@@ -39,6 +39,11 @@ load_datasus <- function(dataset,
   ## Binding Global Variables ##
   ##############################
 
+  . <- abbrev_state <- code_muni <- code_muni_6 <- code_state <- codmunocor <- NULL
+  codufmun <- dtobito <- file_name <- is_cid_code <- label_eng <- label_pt <- NULL
+  legal_amazon <- link <- month <- name_muni <- qt_exist <- qt_nsus <- value <- NULL
+  var_code <- year <- qt_sus <- NULL
+
   #############################
   ## Define Basic Parameters ##
   #############################
@@ -350,6 +355,8 @@ load_datasus <- function(dataset,
 expand_cid_code <- function(cid){
   # Turns a character "A050-B010" into an expanded vector c("A050", "A051", ..., "B010")
   # Also turns "A001, B001-B002" into c("A001", "B001", "B002")
+
+  . <- NULL
 
   if (!(stringr::str_detect(cid, ",|-"))) return(cid)
 

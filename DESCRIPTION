@@ -46,7 +46,8 @@ Suggests:
     googledrive,
     knitr,
     rmarkdown,
-    terra
+    terra,
+    read.dbc
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
