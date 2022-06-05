@@ -562,7 +562,7 @@ Loads information on the social and environmental performance of the Legal Amazo
 ```
 There are four parameters in this function:
   
-  1. dataset = "ips"
+  1. dataset = ("all", "life_quality", "sanit_habit", "violence", "educ", "communic", "mortality", "deforest")
   2. raw_data: there are two options:
   # TRUE: if you want the raw data.
   # FALSE: if you want the processed version of the data. 
@@ -573,11 +573,11 @@ There are four parameters in this function:
 
   
 ```{r, eval = FALSE}
-# Download raw data (raw_data = TRUE) from 2014 (time_period = 2014)
-data <- load_ips(dataset = "ips", raw_data = TRUE, time_period = 2014)
-# Download treated data (raw_data = FALSE) from 2018 
-# (time_period = 2018) in portuguese (language = 'pt')
-data <- load_ips(dataset = "ips", raw_data = FALSE,
+# Download raw data from 2014 
+data <- load_ips(dataset = "all", raw_data = TRUE, time_period = 2014)
+
+# Download treated deforest data from 2018 in portuguese
+data <- load_ips(dataset = "deforest", raw_data = FALSE,
                  time_period = 2018, language = 'pt')
 ```
 
@@ -700,7 +700,7 @@ data <- load_sigmine(dataset = 'sigmine_active',
 The MAPBIOMAS project gathers data reporting the type of land covering each year by area, that is, for example, the area used for a temporary crop of soybeans. It also reports the transition between coverings during given years.
 
 ```
-1. dataset: There are five possible choices.
+1. dataset: There are six possible choices.
 'mapbiomas_cover': type of land covering by biomes, states and municipalities.
                   data is available from 1985 to 2020.
 'mapbiomas_transition': transition between coverings by biomes, states and municipalities.
@@ -711,11 +711,13 @@ The MAPBIOMAS project gathers data reporting the type of land covering each year
                         data is available from 2000 to 2020
 'mapbiomas_grazing_quality': data about grazing quality by biome, state and municipality
                              data is available from 2010 and 2018
+'mapbiomas_mining': data about mining areas by biome, state, country, municipality and indigenous lands.
+                             data is available from 1985 to 2020
 2. raw_data: there are two options:
   # TRUE: if you want the data as it is in the mapbiomas's site.
   # FALSE: if you want the treated (more organized) version of the data. 
-3. geo_level: 'state', 'municipality', 'biomes'
-               Read the details on the datasets because some of them don't have data for 'municipality'
+3. geo_level: 'state', 'municipality', 'biomes', 'biome', 'country', 'indigenous_lands'
+               Read the details on the datasets because some of them don't have data for 'municipality' and mapbiomas_mining accepts 'biome', 'country', 'indigenous_lands'.
 4. time_period: The data availability for each dataset is detailed above
 5. language: you can choose between portuguese ('pt') and english ('eng')
 6. time_id: 'year'
@@ -740,6 +742,8 @@ data = load_mapbiomas(dataset = "mapbiomas_grazing_quality", raw_data = FALSE, t
 data = load_mapbiomas(dataset = "mapbiomas_irrigation", raw_data = FALSE, time_period = "all", language = "eng")
 # download treated Mapbiomas deforestauon/regeneration data in portuguese
 data = load_mapbiomas(dataset = "mapbiomas_deforestation_regeneration", raw_data = FALSE, time_period = "all", language = "eng")
+# download treated indigenous lands data in portuguese
+data = load_mapbiomas("mapbiomas_mining", raw_data = FALSE, geo_level = "indigenous", language = "pt")
 ```
 
 ## 9 - CIPÓ

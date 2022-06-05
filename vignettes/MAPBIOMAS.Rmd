@@ -44,4 +44,10 @@ data = load_mapbiomas(dataset = "mapbiomas_irrigation", raw_data = FALSE, time_p
 # download treated Mapbiomas deforestauon/regeneration data in portuguese
 
 data = load_mapbiomas(dataset = "mapbiomas_deforestation_regeneration", raw_data = FALSE, time_period = 2011, language = "eng")
+
+# download treated country mining data in english
+data = load_mapbiomas(dataset = "mapbiomas_mining", raw_data = FALSE, geo_level = "country", time_period = "all", language = "eng")
+
+# download treated biome mining data in english
+data = load_mapbiomas(dataset = "mapbiomas_mining", raw_data = FALSE, geo_level = "biome", time_period = "all", language = "eng")
 ```
