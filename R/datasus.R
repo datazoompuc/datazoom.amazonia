@@ -3,8 +3,8 @@
 #' @param dataset A dataset name, can be one of ("datasus_sim", "satasus_sih", "datasus_cnes"), or subsets thereof. For more details, try \code{vignette("DATASUS")}.
 #' @param time_period A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.
 #' @param states A \code{string} specifying for which states to download the data. It is "all" by default, but can be a single state such as "AC" or any vector such as c("AC", "AM").
-#' @param level A \code{string} choosing whether to aggregate the data by "municipality" or to keep all the "individual" variables.
 #' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
+#' @param keep_all A \code{boolean} choosing whether to aggregate the data by municipality, in turn losing individual-level variables (\code{FALSE}) or to keep all the original variables. Only applies when raw_data is \code{TRUE}.
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
 #'
 #' @examples\dontrun{
@@ -16,8 +16,8 @@
 load_datasus <- function(dataset,
                         time_period,
                         states = "all",
-                        level = "municipality",
                         raw_data = FALSE,
+                        keep_all = FALSE,
                         language = "eng"){
 
   #######################
@@ -40,6 +40,7 @@ load_datasus <- function(dataset,
             time_period = time_period,
             states = states,
             raw_data = raw_data,
+            keep_all = keep_all,
             language = language
           )
         }
@@ -76,6 +77,7 @@ load_datasus <- function(dataset,
               time_period = time_period,
               states = states,
               raw_data = raw_data,
+              keep_all = keep_all,
               language = language
             )
           }
@@ -117,7 +119,7 @@ load_datasus <- function(dataset,
   param$dataset <- dataset
   param$raw_data <- raw_data
   param$language <- language
-  param$level <- level
+  param$keep_all <- keep_all
 
   param$time_period <- paste0(time_period, collapse = "|")
   param$time_period_yy <- substr(time_period, 3, 4)
@@ -316,7 +318,7 @@ load_datasus <- function(dataset,
   ## Aggregating ##
   #################
 
-  if (stringr::str_detect(param$dataset, "datasus_sim")){
+  if (stringr::str_detect(param$dataset, "datasus_sim") & !param$keep_all){
 
     # Obtaining the mortality variables
 
@@ -327,19 +329,16 @@ load_datasus <- function(dataset,
 
     names(cid_vars) <- NULL # To stop summarise from renaming the variables
 
-    if (param$level == "municipality") {
-      dat <- dat %>%
-        dplyr::group_by(code_muni_6, code_muni, name_muni, code_state, abbrev_state, dtobito) %>%
-        dplyr::summarise(dplyr::across(dplyr::any_of(cid_vars), ~ sum(., na.rm = TRUE)))
-    }
+    dat <- dat %>%
+      dplyr::group_by(code_muni_6, code_muni, name_muni, code_state, abbrev_state, dtobito) %>%
+      dplyr::summarise(dplyr::across(dplyr::any_of(cid_vars), ~ sum(., na.rm = TRUE)))
+
   }
 
-  if (param$dataset == "datasus_cnes_lt") {
-    if (param$level == "municipality"){
-      dat <- dat %>%
-        dplyr::group_by(code_muni_6, code_muni, name_muni, code_state, abbrev_state, year, month) %>%
-        dplyr::summarise(dplyr::across(c(qt_exist, qt_sus, qt_nsus)))
-    }
+  if (param$dataset == "datasus_cnes_lt" & !param$keep_all) {
+    dat <- dat %>%
+      dplyr::group_by(code_muni_6, code_muni, name_muni, code_state, abbrev_state, year, month) %>%
+      dplyr::summarise(dplyr::across(c(qt_exist, qt_sus, qt_nsus)))
   }
 
   ###############

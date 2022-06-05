@@ -1,0 +1,73 @@
+---
+title: "DATASUS"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{DATASUS}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## The Dataset
+DATASUS is the IT department of SUS -- the Brazilian Unified Health System. They provide data on health establishments, mortality, access to health services and several health indicators nationwide. This function allows for an easy download of several DATASUS raw datasets, and also cleans the data in a couple of datasets. The sections below explains each avaliable dataset.
+
+### DATASUS - SIM (System of Mortality Information)
+Each original SIM data file contains rows corresponding to a death, and columns with several characteristics of the person, the place of death, and the cause of death. The data comes from 5 separate datasets: SIM-DO, SIM-DOFET, SIM-DOMAT, SIM-DOINF, and SIM-DOEXT, with corresponding dataset options `"datasus_sim_do", "datasus_sim_dofet", "datasus_sim_domat", "datasus_sim_doinf", "datasus_sim_doext"`. Using the option `dataset = "datasus_sim"`, data is pulled from all of the those datasets. Note that only SIM-DO provides separate files for each state, so all other dataset options always contain data from all states.
+
+Below is an example of downloading the raw data, and also using the `raw_data = FALSE` option to obtain treated data. When this option is selected, we create several variables for deaths from each cause, which are encoded by their CID-10 codes. The function then returns, by default, the aggregated data of mortality sources at the municipality level. In this process, all the individual information such as age, sex, race, and schooling are lost, so we also offer the option of `keep_all = TRUE`, which creates all the indicator variables for cause of death, adds variable labels, and does not aggregate, thereby keeping all individual-level variables.
+
+```{r, eval = FALSE}
+library(datazoom.amazonia)
+
+# download raw data for the year 2010 in the state of AM. 
+data <- load_datasus(dataset = "datasus_sim",
+                     time_period = 2010,
+                     states = "AM")
+
+# download treated data with the number of deaths by cause in AM and PA.
+data <- load_datasus(dataset = "datasus_sim",
+                    time_period = 2010,
+                    states = c("AM", "PA"),
+                    raw_data = FALSE)
+
+# download treated data with the number of deaths by cause in AM and PA, keeping all individual variables.
+data <- load_datasus(dataset = "datasus_sim",
+                    time_period = 2010,
+                    states = c("AM", "PA"),
+                    raw_data = FALSE,
+                    keep_all = TRUE)
+```
+
+## The Dataset
+The DEGRAD project uses satellites to monitor degradation of forest areas. Raw data is available as simple features (sf) objects, read from shapefiles. The project was substituted in 2016 by DETER-B. Accordingly, data is available from 2007 up to 2016.
+
+Original documentation for this data is very scarce, users beware. Some things to keep in mind are:
+
+Event data is organized through yearly editions (DEGRAD 2007-2016). Inside a given edition however, there may be data from different years (events that happened in 2015 inside DEGRAD 2016 for example). 
+
+This package provides degradation data with municipality identification. It does this by intersecting DEGRAD geometries with IBGE's municipality geometries from the year 2019. CRS metadata however is missing from the original data source. A best effort approach is used and a CRS is assumed (proj4string: "+proj=longlat +ellps=aust_SA +towgs84=-66.8700,4.3700,-38.5200,0.0,0.0,0.0,0.0 +no_defs").
+
+## Usage
+
+Using the package is easy enough:
+
+```{r, eval = FALSE}
+library(datazoom.amazonia)
+
+# download raw data (raw_data = TRUE) related to forest degradation from 2010 to 2012 (time_period = 2010:2012). 
+data <- load_degrad(dataset = 'degrad', 
+                    raw_data = TRUE,
+                    time_period = 2010:2012)
+
+# download treated data (raw_data = FALSE) related to forest degradation from 2013 (time_period = 2013) in portuguese (language = "pt").
+data <- load_degrad(dataset = 'degrad', 
+                    raw_data = FALSE,
+                    time_period = 2013,
+                    language = 'pt')
+```

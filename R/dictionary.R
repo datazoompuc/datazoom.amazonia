@@ -699,6 +699,9 @@ load_dictionary <- function(dataset) {
   if (stringr::str_detect(dataset, "datasus_cnes")) {
     harmonization_dat <- tibble::tribble(
       ~var_code, ~name_pt, ~name_eng, ~label_pt, ~label_eng,
+
+      # CNES LT (Leitos)
+
       "cnes", "cnes", "cnes", "Código Nacional do Estabelecimento de Saude", "National Health Establishment Code",
       "codufmun", "codufmun", "codufmun", "Codigo do Municipio", "Municipality Code",
       "regsaude", "regsaude", "regsaude", "Codigo da Regiao de Saude", "Health Region Code",
@@ -726,6 +729,7 @@ load_dictionary <- function(dataset) {
       "qt_sus", "n_leitos_sus", "n_beds_sus", "Leitos Disponiveis para o SUS (Para os estabelecimentos vinculados ao SUS)", "Beds avaliable to SUS",
       "qt_nsus", "n_leitos_nao_sus", "n_beds_not_sus", "Leitos Nao Disponiveis para o SUS", "Beds not avaliable to SUS",
       "competen", "competencia", "competence", "Competencia", "Competence",
+
     )
 
   }
