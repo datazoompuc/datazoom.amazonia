@@ -1,6 +1,6 @@
 #' DATASUS
 #'
-#' @param dataset A dataset name, can be one of ("datasus_sim", "satasus_sih", "datasus_cnes"), or subsets thereof. For more details, try \code{vignette("DATASUS")}.
+#' @param dataset A dataset name, can be one of ("datasus_sim_do", "datasus_sih", "datasus_cnes"), or subsets thereof. For more details, try \code{vignette("DATASUS")}.
 #' @param time_period A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.
 #' @param states A \code{string} specifying for which states to download the data. It is "all" by default, but can be a single state such as "AC" or any vector such as c("AC", "AM").
 #' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
@@ -19,77 +19,6 @@ load_datasus <- function(dataset,
                         raw_data = FALSE,
                         keep_all = FALSE,
                         language = "eng"){
-
-  #######################
-  ## Combined Datasets ##
-  #######################
-
-  if (dataset == "datasus_sim") {
-    dat <- list(
-      "datasus_sim_do",
-      "datasus_sim_dofet",
-      "datasus_sim_doext",
-      "datasus_sim_doinf",
-      "datasus_sim_domat"
-    ) %>%
-      purrr::map(
-        function(dataset){
-          base::message(paste0("    ", dataset))
-          load_datasus(
-            dataset = dataset,
-            time_period = time_period,
-            states = states,
-            raw_data = raw_data,
-            keep_all = keep_all,
-            language = language
-          )
-        }
-      ) %>%
-      dplyr::bind_rows()
-
-    if (level == "municipality") {
-      dat <- dat %>%
-        dplyr::group_by(codmunocor, code_muni, name_muni, code_state, abbrev_state, dtobito) %>%
-        dplyr::summarise(dplyr::across(dplyr::starts_with("t_"), ~ sum(., na.rm = TRUE)))
-    }
-  }
-    if (dataset == "datasus_cnes") {
-      dat <- list(
-        "datasus_cnes_lt",
-        "datasus_cnes_st",
-        "datasus_cnes_dc",
-        "datasus_cnes_eq",
-        "datasus_cnes_sr",
-        "datasus_cnes_hb",
-        "datasus_cnes_pf",
-        "datasus_cnes_ep",
-        "datasus_cnes_rc",
-        "datasus_cnes_in",
-        "datasus_cnes_ee",
-        "datasus_cnes_ef",
-        "datasus_cnes_gm"
-      ) %>%
-        purrr::map(
-          function(dataset){
-            base::message(paste0("    ", dataset))
-            load_datasus(
-              dataset = dataset,
-              time_period = time_period,
-              states = states,
-              raw_data = raw_data,
-              keep_all = keep_all,
-              language = language
-            )
-          }
-        ) %>%
-        dplyr::bind_rows()
-
-    return(dat)
-  }
-
-  ###################
-  ## Function Body ##
-  ###################
 
   if (!requireNamespace("read.dbc", quietly = TRUE)) {
     stop(
@@ -255,7 +184,7 @@ load_datasus <- function(dataset,
         )
       )
 
-    dic_cid_codes <- load_dictionary("datasus") %>%
+    dic_cid_codes <- load_dictionary(param$dataset) %>%
       dplyr::filter(is_cid_code)
 
     dat <- dic_cid_codes %>%
@@ -265,7 +194,8 @@ load_datasus <- function(dataset,
         function(dic_row){
           dat %>%
             dplyr::mutate(value = dplyr::case_when(
-                causabas %in% expand_cid_code(dic_row$var_code) ~ 1
+                causabas %in% expand_cid_code(dic_row$var_code) ~ 1,
+                TRUE ~ 0
               )
             ) %>%
             dplyr::select(value) %>%
@@ -322,7 +252,7 @@ load_datasus <- function(dataset,
 
     # Obtaining the mortality variables
 
-    cid_vars <- load_dictionary("datasus") %>%
+    cid_vars <- load_dictionary(param$dataset) %>%
       dplyr::filter(is_cid_code) %>%
       dplyr::select(var_code) %>%
       unlist()
@@ -331,7 +261,7 @@ load_datasus <- function(dataset,
 
     dat <- dat %>%
       dplyr::group_by(code_muni_6, code_muni, name_muni, code_state, abbrev_state, dtobito) %>%
-      dplyr::summarise(dplyr::across(dplyr::any_of(cid_vars), ~ sum(., na.rm = TRUE)))
+      dplyr::summarise(dplyr::across(dplyr::any_of(cid_vars), sum))
 
   }
 
