@@ -55,7 +55,7 @@ load_datasus <- function(dataset,
   param$language <- language
   param$keep_all <- keep_all
 
-  param$time_period <- paste0(time_period, collapse = "|")
+  param$time_period <- time_period
   param$time_period_yy <- substr(time_period, 3, 4)
 
   param$states <- ifelse(states == "all", "", toupper(states))
