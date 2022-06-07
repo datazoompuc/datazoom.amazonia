@@ -126,7 +126,7 @@ load_datasus <- function(dataset,
     base::message("Filtering by state not supported for all datasets. Data for other states will be included.")
   }
 
-  if (!is.null(file_state)) {
+  if (!is.null(file_state) & paste0(param$states, collapse = "") != "all") {
     filenames <- filenames[file_state %in% param$states]
   }
 
@@ -178,6 +178,7 @@ load_datasus <- function(dataset,
     dat <- dat %>%
       dplyr::mutate(
         codmunocor = as.numeric(as.character(codmunocor)),
+        causabas = as.character(causabas),
 
         dtobito = as.Date(dtobito, format = "%d%m%Y"),
 
@@ -186,6 +187,20 @@ load_datasus <- function(dataset,
           substr(idade, 1, 1) %in% as.character(1:3) ~ "0",
           substr(idade, 1, 1) == "4" ~ substr(idade, 2, 3),
           substr(idade, 1, 1) == "5" ~ paste0(1, substr(idade, 2, 3))
+        )
+      )
+
+    # The cid codes have no leading 0 when the numbers are only two digits
+
+    dat <- dat %>%
+      mutate(
+        causabas = case_when(
+          nchar(causabas) == 4 ~ causabas,
+          nchar(causabas) == 3 ~ paste0(
+            stringr::str_extract(causabas, "[a-zA-Z]"),
+            0,
+            stringr::str_extract(causabas, "\\d+")
+          )
         )
       )
 

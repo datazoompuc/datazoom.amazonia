@@ -618,7 +618,7 @@ load_dictionary <- function(dataset) {
       "U000-U990", "t_especial", "t_special", "Codigos para propositos especiais", "Codes for special purposes", TRUE,
 
       # Particular variables
-      "A000-U990", "t_total", "t_total", "Total", "Total", TRUE,
+      "A000-Z999", "t_total", "t_total", "Total", "Total", TRUE,
       "A000-B990, G000-G040, N700-N730, J000-J060, J100-J180, J200-J220, H650-H660, O000-O990, P000-P960, E000-E020, E400-E460, E500, D500-D530, D649, E510-E640", "t_comunicaveis", "t_communicable", "Doencas comunicaveis", "Communicable diseases", TRUE,
       "C000-C970, D000-D480, D550-D648, D650-D890, E030-E070, E100-E160, E200-E340, E650-E880, F010-F990, G060-G980, H000-H610, H680-H930, I000-I990, J300-J980, K000-K920, N000-N640, N750-N980, L000-L980, M000-M990, Q000-Q990", "t_nao_comunicaveis", "t_non_communicable", "Doencas nao-comunicaveis", "Non-communicable diseases", TRUE,
       "E100-E140", "t_diabetes", "t_diabetes", "Diabetes mellitus", "Diabetes mellitus", TRUE,
