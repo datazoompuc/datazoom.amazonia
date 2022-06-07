@@ -122,7 +122,7 @@ load_datasus <- function(dataset,
     file_state <- filenames %>%
       substr(3, 4)
   }
-  else if (param$states != "all") {
+  else if (paste0(param$states, collapse = "") != "all") {
     base::message("Filtering by state not supported for all datasets. Data for other states will be included.")
   }
 
@@ -267,14 +267,14 @@ load_datasus <- function(dataset,
     names(cid_vars) <- NULL # To stop summarise from renaming the variables
 
     dat <- dat %>%
-      dplyr::group_by(code_muni_6, code_muni, name_muni, code_state, abbrev_state, dtobito) %>%
+      dplyr::group_by(code_muni_6, code_muni, name_muni, code_state, abbrev_state, legal_amazon, dtobito) %>%
       dplyr::summarise(dplyr::across(dplyr::any_of(cid_vars), sum))
 
   }
 
   if (param$dataset == "datasus_cnes_lt" & !param$keep_all) {
     dat <- dat %>%
-      dplyr::group_by(code_muni_6, code_muni, name_muni, code_state, abbrev_state, year, month) %>%
+      dplyr::group_by(code_muni_6, code_muni, name_muni, code_state, abbrev_state, legal_amazon, year, month) %>%
       dplyr::summarise(dplyr::across(c(qt_exist, qt_sus, qt_nsus)))
   }
 
@@ -313,12 +313,12 @@ load_datasus <- function(dataset,
 
   if (stringr::str_detect(param$dataset, "datasus_sim")){
     dat_mod <- dat %>%
-      dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, dtobito) %>%
+      dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, legal_amazon, dtobito) %>%
       tibble::as_tibble()
   }
   if (stringr::str_detect(param$dataset, "datasus_cnes")){
     dat_mod <- dat %>%
-      dplyr::relocate(code_muni, name_muni, code_state, abbrev_state) %>%
+      dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
       tibble::as_tibble()
   }
   if (param$dataset == "datasus_sih"){
