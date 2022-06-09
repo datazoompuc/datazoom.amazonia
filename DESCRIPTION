@@ -41,13 +41,13 @@ Imports:
     tibble,
     tidyr,
     utils,
-    XML
+    XML,
+    read.dbc
 Suggests: 
     googledrive,
     knitr,
     rmarkdown,
-    terra,
-    read.dbc
+    terra
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
