@@ -42,7 +42,8 @@ Imports:
     tidyr,
     utils,
     XML,
-    read.dbc
+    read.dbc,
+    Rcpp
 Suggests: 
     googledrive,
     knitr,
@@ -53,3 +54,6 @@ VignetteBuilder:
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
+LinkingTo: 
+    Rcpp,
+    read.dbc

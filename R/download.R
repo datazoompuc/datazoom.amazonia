@@ -734,7 +734,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
   }
   if (file_extension == ".dbc"){
-    dat <- read.dbc::read.dbc(temp)
+    dat <- read.dbc(temp)
   }
 
   # if (source == 'prodes'){
