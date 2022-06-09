@@ -32,7 +32,7 @@
 #include <stdint.h>
 #include <R.h>
 
-#include <blast.h>
+#include "blast.h"
 
 #define CHUNK 4096
 
