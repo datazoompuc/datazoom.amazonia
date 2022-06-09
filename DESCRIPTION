@@ -47,7 +47,8 @@ Suggests:
     googledrive,
     knitr,
     rmarkdown,
-    terra
+    terra,
+    foreign
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
