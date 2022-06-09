@@ -26,7 +26,6 @@ Imports:
     dplyr,
     Hmisc,
     janitor,
-    labelled,
     lubridate,
     magrittr,
     purrr,
@@ -35,14 +34,12 @@ Imports:
     readxl,
     sf,
     sidrar,
-    stats,
     stringi,
     stringr,
     tibble,
     tidyr,
     utils,
-    XML,
-    Rcpp
+    XML
 Suggests: 
     googledrive,
     knitr,
@@ -53,6 +50,6 @@ VignetteBuilder:
     knitr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 LinkingTo: 
     Rcpp

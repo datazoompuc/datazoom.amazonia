@@ -28,7 +28,7 @@
 #' The internal C code for \code{dbc2dbf} is based on \code{blast} decompressor and \code{blast-dbf} (see \emph{References}).
 #' @keywords dbc dbf
 #' @export
-#' @useDynLib read.dbc
+#' @useDynLib datazoom.amazonia
 #' @author Daniela Petruzalek, \email{daniela.petruzalek@gmail.com}
 #' @seealso \code{\link{read.dbc}}
 #' @examples
@@ -54,6 +54,6 @@
 dbc2dbf <- function(input.file, output.file) {
   if( !file.exists(input.file) )
     stop("Input file does not exist.")
-  out <- .C(getNativeSymbolInfo("dbc2dbf"), input = as.character(path.expand(input.file)), output = as.character(path.expand(output.file)))
+  out <- .C("dbc2dbf", input = as.character(path.expand(input.file)), output = as.character(path.expand(output.file)), PACKAGE = "datazoom.amazonia")
   file.exists(output.file)
 }
