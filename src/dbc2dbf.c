@@ -32,7 +32,7 @@
 #include <stdint.h>
 #include <R.h>
 
-#include "blast.h"
+#include <blast.h>
 
 #define CHUNK 4096
 
@@ -98,7 +98,7 @@ void dbc2dbf(char** input_file, char** output_file) {
 
     /* Platform independent code (header is stored in little endian format) */
     header = rawHeader[0] + (rawHeader[1] << 8);
-    
+
     /* Reset file pointer */
     rewind(input);
 

@@ -42,7 +42,6 @@ Imports:
     tidyr,
     utils,
     XML,
-    read.dbc,
     Rcpp
 Suggests: 
     googledrive,
