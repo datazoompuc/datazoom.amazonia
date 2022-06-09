@@ -9,7 +9,7 @@ read.dbc(file, ...)
 \arguments{
 \item{file}{The name of the DBC file (including extension)}
 
-\item{...}{Further arguments to be passed to \code{\link{read.dbf}}}
+\item{...}{Further arguments to be passed to \code{read.dbf}}
 }
 \value{
 A data.frame of the data from the DBC file.
@@ -19,9 +19,9 @@ This function allows you to read a DBC (compressed DBF) file into a data frame. 
 }
 \details{
 DBC is the extension for compressed DBF files (from the 'XBASE' family of databases). This is a proprietary file format used by the brazilian government to make available public healthcare datasets (by it's agency called DATASUS).
-\code{read.dbc} relies on the \code{\link{dbc2dbf}} function to decompress the DBC into a temporary DBF file.
+\code{read.dbc} relies on the \code{dbc2dbf} function to decompress the DBC into a temporary DBF file.
 
-After decompressing, it reads the temporary DBF file into a \code{data.frame} using \code{\link{read.dbf}} from the \code{foreign} package.
+After decompressing, it reads the temporary DBF file into a \code{data.frame} using \code{read.dbf} from the \code{foreign} package.
 }
 \note{
 DATASUS is the name of the Department of Informatics of the Brazilian Health System and is resposible for publishing public healthcare data. Besides the DATASUS, the Brazilian National Agency for Supplementary Health (ANS) also uses this file format for its public data.
@@ -31,6 +31,7 @@ This function was tested using files from both DATASUS and ANS to ensure complia
 As a final note, neither this project, nor its author, has any association with the brazilian government.
 }
 \examples{
+\dontrun{
 # The 'sids.dbc' file is the compressed version of 'sids.dbf' from the "foreign" package.
 x <- read.dbc(system.file("files/sids.dbc", package="read.dbc"))
 str(x)
@@ -52,8 +53,9 @@ head(dopr)
 str(dopr)
 }
 }
+}
 \seealso{
-\code{\link{dbc2dbf}}
+\code{dbc2dbf}
 }
 \author{
 Daniela Petruzalek, \email{daniela.petruzalek@gmail.com}

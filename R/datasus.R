@@ -20,9 +20,9 @@ load_datasus <- function(dataset,
                         keep_all = FALSE,
                         language = "eng"){
 
-  if (!requireNamespace("read.dbc", quietly = TRUE)) {
+  if (!requireNamespace("foreign", quietly = TRUE)) {
     stop(
-      "Package \"read.dbc\" must be installed to use this function.",
+      "Package \"foreign\" must be installed to use this function.",
       call. = FALSE
     )
   }
@@ -42,7 +42,7 @@ load_datasus <- function(dataset,
   . <- abbrev_state <- code_muni <- code_muni_6 <- code_state <- codmunocor <- NULL
   codufmun <- dtobito <- file_name <- is_cid_code <- label_eng <- label_pt <- NULL
   legal_amazon <- link <- month <- name_muni <- qt_exist <- qt_nsus <- value <- NULL
-  var_code <- year <- qt_sus <- NULL
+  var_code <- year <- qt_sus <- causabas <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -193,8 +193,8 @@ load_datasus <- function(dataset,
     # The cid codes have no leading 0 when the numbers are only two digits
 
     dat <- dat %>%
-      mutate(
-        causabas = case_when(
+      dplyr::mutate(
+        causabas = dplyr::case_when(
           nchar(causabas) == 4 ~ causabas,
           nchar(causabas) == 3 ~ paste0(
             stringr::str_extract(causabas, "[a-zA-Z]"),

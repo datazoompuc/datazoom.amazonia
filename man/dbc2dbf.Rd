@@ -26,6 +26,7 @@ DBC is the extension for compressed DBF files (from the 'XBASE' family of databa
 It uses internally the PKWare's Data Compression Library (DCL) "implode" compression algorithm. When decompressed, it becomes a regular DBF file.
 }
 \examples{
+\dontrun{
 # Input file name
 in.f  <- system.file("files/sids.dbc", package = "read.dbc")
 
@@ -37,6 +38,7 @@ if( dbc2dbf(input.file = in.f, output.file = out.f) ) {
      print("File decompressed!")
      file.remove(out.f)
 }
+}
 
 }
 \references{
@@ -47,7 +49,7 @@ The PKWare ZIP file format documentation (contains the "implode" algorithm speci
 \code{blast-dbf}, DBC to DBF command-line decompression tool: \url{https://github.com/eaglebh/blast-dbf}
 }
 \seealso{
-\code{\link{read.dbc}}
+\code{read.dbc}
 }
 \author{
 Daniela Petruzalek, \email{daniela.petruzalek@gmail.com}

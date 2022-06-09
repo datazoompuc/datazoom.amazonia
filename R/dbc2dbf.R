@@ -27,11 +27,10 @@
 #' @source
 #' The internal C code for \code{dbc2dbf} is based on \code{blast} decompressor and \code{blast-dbf} (see \emph{References}).
 #' @keywords dbc dbf
-#' @export
-#' @useDynLib datazoom.amazonia
 #' @author Daniela Petruzalek, \email{daniela.petruzalek@gmail.com}
-#' @seealso \code{\link{read.dbc}}
+#' @seealso \code{read.dbc}
 #' @examples
+#' \dontrun{
 #' # Input file name
 #' in.f  <- system.file("files/sids.dbc", package = "read.dbc")
 #'
@@ -42,6 +41,7 @@
 #' if( dbc2dbf(input.file = in.f, output.file = out.f) ) {
 #'      print("File decompressed!")
 #'      file.remove(out.f)
+#' }
 #' }
 #'
 #' @references
