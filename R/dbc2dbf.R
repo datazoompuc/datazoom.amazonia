@@ -28,6 +28,7 @@
 #' The internal C code for \code{dbc2dbf} is based on \code{blast} decompressor and \code{blast-dbf} (see \emph{References}).
 #' @keywords dbc dbf
 #' @author Daniela Petruzalek, \email{daniela.petruzalek@gmail.com}
+#' @useDynLib datazoom.amazonia
 #' @seealso \code{read.dbc}
 #' @examples
 #' \dontrun{

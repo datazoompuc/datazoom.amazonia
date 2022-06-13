@@ -58,7 +58,7 @@ load_datasus <- function(dataset,
   param$time_period <- time_period
   param$time_period_yy <- substr(time_period, 3, 4)
 
-  param$states <- ifelse(states == "all", "", toupper(states))
+  param$states <- ifelse(states == "all", "all", toupper(states))
 
   # Auxiliary parameters to be passed to external_download
 
