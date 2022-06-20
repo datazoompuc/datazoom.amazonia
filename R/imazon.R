@@ -2,11 +2,14 @@ library(sf)
 library(tidyverse)
 library(googledrive)
 
+#seeg tem google drive
+#degrad, deter e terra climate tem shp
+
 imazon_sf= read_sf("C:\\Users\\lugui\\Desktop\\DataZoom\\IMAZON\\Fronteiras_Amazonia\\Fronteiras_Amazonia_2020.shp")
 
 
-load_imazon= function(dataset = NULL, raw_data,
-                      geo_level, language = "eng"){
+load_imazon= function(dataset = 'imazon', raw_data,
+                      geo_level = 'municipality', language = "eng"){
 
 
 # Checking for googledrive package (in Suggests)
@@ -28,5 +31,7 @@ dat <- external_download(
   source = "imazon",
   geo_level = param$geo_level
 )
+
+
 
 }

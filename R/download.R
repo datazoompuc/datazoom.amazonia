@@ -496,6 +496,15 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     )
   }
 
+  ############
+  ## IMAZON ##
+  ############
+
+  if (source == "imazon") {
+    if (geo_level == "municipality") {
+      path <- "https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd"
+    }
+
   #####################
   ## GeoBR Shapefile ##
   #####################
