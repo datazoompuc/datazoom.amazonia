@@ -502,8 +502,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   if (source == "imazon") {
     if (geo_level == "municipality") {
-      path <- "https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd"
+      path <- "https://docs.google.com/uc?export=download&id=1JHc2J_U8VXHVuWVsi8wVBnNzZ37y1ehv"
     }
+  }
 
   #####################
   ## GeoBR Shapefile ##
@@ -546,6 +547,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source == "internal") {
     file_extension <- ".rds"
   }
+  if (source == "imazon") {
+    file_extension <- ".rds"
+  }
 
   # !!!  We should Change This to a Curl Process
 
@@ -573,6 +577,13 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       googledrive::drive_download(path, path = temp, overwrite = TRUE)
     }
   }
+
+  if (source == "imazon") {
+    if (geo_level == "municipality") {
+      googledrive::drive_download(path, path = temp, overwrite = TRUE)
+    }
+  }
+
   if (source == "terraclimate") {
     utils::download.file(url = path, destfile = temp, method = "curl")
   }

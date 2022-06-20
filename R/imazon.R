@@ -5,14 +5,10 @@ library(googledrive)
 #seeg tem google drive
 #degrad, deter e terra climate tem shp
 
-imazon_sf= read_sf("C:\\Users\\lugui\\Desktop\\DataZoom\\IMAZON\\Fronteiras_Amazonia\\Fronteiras_Amazonia_2020.shp")
+load_imazon= function(dataset = 'imazon', raw_data = TRUE,
+                      geo_level = 'municipality', language = "pt_br"){
 
-
-load_imazon= function(dataset = 'imazon', raw_data,
-                      geo_level = 'municipality', language = "eng"){
-
-
-# Checking for googledrive package (in Suggests)
+  # Checking for googledrive package (in Suggests)
 
   if (!requireNamespace("googledrive", quietly = TRUE)) {
     stop(
@@ -21,10 +17,26 @@ load_imazon= function(dataset = 'imazon', raw_data,
     )
   }
 
+  #############################
+  ## Define Basic Parameters ##
+  #############################
+
+  param <- list()
+  param$dataset <- dataset
+  param$geo_level <- geo_level
+  param$language <- language
+  param$raw_data <- raw_data
+
+
+
+  if (param$geo_level == "state" | param$raw_data == FALSE) {
+    stop("This dataset is only available for geo_level = 'municipality' and raw_data = TRUE")
+  }
 
   if (param$geo_level == "municipality") {
   message("Please follow the steps from `googledrive` package to download the data. This may take a while.")
   }
+
 
 dat <- external_download(
   dataset = param$dataset,
@@ -32,6 +44,6 @@ dat <- external_download(
   geo_level = param$geo_level
 )
 
-
+return(dat)
 
 }
