@@ -500,7 +500,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## IMAZON ##
   ############
 
-  if (source == "imazon") {
+  if (source == "imazon_shp") {
     if (geo_level == "municipality") {
       path <- "https://docs.google.com/uc?export=download&id=1JHc2J_U8VXHVuWVsi8wVBnNzZ37y1ehv"
     }
@@ -547,7 +547,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source == "internal") {
     file_extension <- ".rds"
   }
-  if (source == "imazon") {
+  if (source == "imazon_shp") {
     file_extension <- ".rds"
   }
 
@@ -578,7 +578,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
   }
 
-  if (source == "imazon") {
+  if (source == "imazon_shp") {
     if (geo_level == "municipality") {
       googledrive::drive_download(path, path = temp, overwrite = TRUE)
     }
@@ -1048,8 +1048,13 @@ datasets_link <- function() {
 
     ## Shapefile from github repository
 
-    "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds"
-  )
+    "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds",
+
+    ############
+    ## IMAZON ##
+    ############
+    "Imazon", "imazon_shp", NA, "2020", "Municipality", "https://drive.google.com/drive/u/1/folders/1EAOABo1GVKT3YsYkhtgJI9ckB3RULJSC"
+     )
 
   return(link)
 }

@@ -1,11 +1,11 @@
-library(sf)
-library(tidyverse)
-library(googledrive)
+# library(sf)
+# library(tidyverse)
+# library(googledrive)
 
 #seeg tem google drive
 #degrad, deter e terra climate tem shp
 
-load_imazon= function(dataset = 'imazon', raw_data = TRUE,
+load_imazon= function(dataset = 'imazon_shp', raw_data = TRUE,
                       geo_level = 'municipality', language = "pt_br"){
 
   # Checking for googledrive package (in Suggests)
