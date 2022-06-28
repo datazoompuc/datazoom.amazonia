@@ -277,9 +277,9 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
 
 external_download <- function(dataset = NULL, source = NULL, year = NULL,
                               geo_level = NULL, coords = NULL, dataset_code = NULL,
-                              sheet = NULL) {
+                              sheet = NULL, skip_rows = NULL, file_name = NULL) {
 
-  ## Bind GLobal Variables
+  ## Bind Global Variables
 
   link <- NULL
 
@@ -299,6 +299,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   param$geo_level <- geo_level # This could also not make sense
   param$coords <- coords
   param$dataset_code <- dataset_code
+  param$skip_rows <- skip_rows
+  param$file_name <- file_name
   param$sheet <- sheet
 
   # if (param$geo_level == 'legal_amazon' & param$source == 'prodes'){param$geo_level = 'legal-amz-prodes'}
@@ -496,13 +498,16 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     )
   }
 
-  ############
-  ## IMAZON ##
-  ############
+  #################
+  ## Health Data ##
+  #################
 
-  if (source == "imazon_shp") {
-    if (geo_level == "municipality") {
-      path <- "https://docs.google.com/uc?export=download&id=1JHc2J_U8VXHVuWVsi8wVBnNzZ37y1ehv"
+  if (source == "health"){
+    if (dataset == "ibge_mortality_table"){
+      path <- param$url
+    }
+    if (stringr::str_detect(dataset, "datasus")){
+      path <- paste0(param$url, param$file_name)
     }
   }
 
@@ -547,8 +552,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source == "internal") {
     file_extension <- ".rds"
   }
-  if (source == "imazon_shp") {
-    file_extension <- ".rds"
+  if (source == "health"){
+    if (stringr::str_detect(dataset, "datasus")){
+      file_extension <- ".dbc"
+    }
   }
 
   # !!!  We should Change This to a Curl Process
@@ -561,7 +568,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## Extraction through Curl Requests
   ## Investigate a bit more on how Curl Requests work
 
-  if (!(source %in% c("deter", "seeg", "terraclimate"))) {
+  if (source %in% c("comex", "degrad", "internal", "ibama", "ips", "mapbiomas", 'prodes', "sigmine")){
     utils::download.file(url = path, destfile = temp, mode = "wb")
   }
   if (source == "deter") {
@@ -577,15 +584,16 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       googledrive::drive_download(path, path = temp, overwrite = TRUE)
     }
   }
-
-  if (source == "imazon_shp") {
-    if (geo_level == "municipality") {
-      googledrive::drive_download(path, path = temp, overwrite = TRUE)
-    }
-  }
-
   if (source == "terraclimate") {
     utils::download.file(url = path, destfile = temp, method = "curl")
+  }
+  if (source == "health"){
+    if (stringr::str_detect(dataset, "datasus")){
+      utils::download.file(url = path, destfile = temp, method = "curl", quiet = TRUE)
+    }
+    else{
+      utils::download.file(url = path, destfile = temp, mode = "wb")
+    }
   }
 
   ## This Data Opening Part Should Include the .Shp, not DBF
@@ -724,6 +732,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
         janitor::clean_names() %>%
         tibble::as_tibble()
     }
+  }
+  if (file_extension == ".dbc"){
+    dat <- read.dbc(temp)
   }
 
   # if (source == 'prodes'){
@@ -1046,15 +1057,34 @@ datasets_link <- function() {
     "TerraClimate", "water_evaporation", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
     "TerraClimate", "palmer_drought_severity_index", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
 
+    #####################
+    ## Health Datasets ##
+    #####################
+
+    "DATASUS", "datasus_sim_do", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DORES/",
+    "DATASUS", "datasus_sim_dofet", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DOFET/",
+    "DATASUS", "datasus_sim_doext", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DOFET/",
+    "DATASUS", "datasus_sim_doinf", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DOFET/",
+    "DATASUS", "datasus_sim_domat", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DOFET/",
+    "DATASUS", "datasus_cnes_lt", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/LT/",
+    "DATASUS", "datasus_cnes_st", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/ST/",
+    "DATASUS", "datasus_cnes_dc", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/DC/",
+    "DATASUS", "datasus_cnes_eq", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/EQ/",
+    "DATASUS", "datasus_cnes_sr", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/SR/",
+    "DATASUS", "datasus_cnes_hb", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/HB/",
+    "DATASUS", "datasus_cnes_pf", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/PF/",
+    "DATASUS", "datasus_cnes_ep", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/EP/",
+    "DATASUS", "datasus_cnes_rc", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/RC/",
+    "DATASUS", "datasus_cnes_in", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/IN/",
+    "DATASUS", "datasus_cnes_ee", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/EE",
+    "DATASUS", "datasus_cnes_ef", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/EF/",
+    "DATASUS", "datasus_cnes_gm", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/GM/",
+    "DATASUS", "datasus_sih", NA, "2008-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIHSUS/200801_/dados/",
+
     ## Shapefile from github repository
 
-    "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds",
-
-    ############
-    ## IMAZON ##
-    ############
-    "Imazon", "imazon_shp", NA, "2020", "Municipality", "https://drive.google.com/drive/u/1/folders/1EAOABo1GVKT3YsYkhtgJI9ckB3RULJSC"
-     )
+    "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds"
+  )
 
   return(link)
 }

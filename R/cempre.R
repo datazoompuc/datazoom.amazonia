@@ -1,6 +1,5 @@
 #' @title CEMPRE - Central Register of Companies
 #'
-#'
 #' @description Loads information on companies and other organizations and their respective formally constituted local units, registered with the CNPJ - National Register of Legal Entities. Data is available from 2006 to 2019. See \url{https://sidra.ibge.gov.br/pesquisa/cempre/tabelas}
 #'
 #' @encoding UTF-8
