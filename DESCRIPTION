@@ -1,6 +1,6 @@
 Package: datazoom.amazonia
 Title: Simplify Access to Data from the Amazon Region
-Version: 0.5.0.9000
+Version: 0.6.0.9000
 Authors@R: c(
     person("Francisco", "de Lima Cavalcanti", , "francisco.lima.cavalcanti@gmail.com", role = c("aut", "cre")),
     person("DataZoom (PUC-Rio)", , , "datazoom@econ.puc-rio.br", role = "fnd"),
@@ -26,7 +26,6 @@ Imports:
     dplyr,
     Hmisc,
     janitor,
-    labelled,
     lubridate,
     magrittr,
     purrr,
@@ -35,7 +34,6 @@ Imports:
     readxl,
     sf,
     sidrar,
-    stats,
     stringi,
     stringr,
     tibble,
@@ -46,9 +44,12 @@ Suggests:
     googledrive,
     knitr,
     rmarkdown,
-    terra
+    terra,
+    foreign
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
+LinkingTo: 
+    Rcpp
