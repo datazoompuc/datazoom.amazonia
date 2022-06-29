@@ -1,6 +1,6 @@
 #' @title IBAMA - Brazilian Institute for the Environment and Renewable Natural Resources
 #'
-#' @description Loads information on on environmental fines at the municipality or state levels considering the Amazon region
+#' @description Loads information on environmental fines at the municipality or state levels considering the Amazon region
 #'
 #' @param dataset A dataset name ("areas_embargadas")
 #' @param raw_data A \code{boolean} setting the return of raw or processed data
