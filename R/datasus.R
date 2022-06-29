@@ -1,6 +1,6 @@
 #' DATASUS
 #'
-#' @param dataset A dataset name, can be one of ("datasus_sim_do", "datasus_sih", "datasus_cnes"), or subsets thereof. For more details, try \code{vignette("DATASUS")}.
+#' @param dataset A dataset name, can be one of ("datasus_sim_do", "datasus_sih", "datasus_cnes_lt"), or more. For more details, try \code{vignette("DATASUS")}.
 #' @param time_period A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.
 #' @param states A \code{string} specifying for which states to download the data. It is "all" by default, but can be a single state such as "AC" or any vector such as c("AC", "AM").
 #' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.

@@ -634,6 +634,15 @@ load_dictionary <- function(dataset) {
       "C500", "t_cancer_mama", "t_breast_cancer", "Neoplasia maligna da mama", "Malignant neoplasm of breast", TRUE,
       "C530", "t_cancer_colo_do_utero", "t_cervix_cancer", "Neoplasia maligna do colo do utero", "Malignant neoplasm of cervix uteri", TRUE,
 
+      # Special causes
+      "U049", "t_srag", "t_sars", "S\u00edndrome respirat\u00f3ria aguda grave", "Severe acute respiratory syndrome", TRUE,
+      "U070", "t_cigarro_eletronico", "t_vaping", "Transtorno relacionados a uso de vaporizador ou cigarro eletr\u00f4nico", "Vaping-related disorder", TRUE,
+      "U071", "t_covid_identificada", "t_covid_identified", "COVID-19, v\u00edrus identificado", "COVID-19, virus identified", TRUE,
+      "U072", "t_covid_nao_identificada", "t_covid_not_identified", "COVID-19, v\u00edrus n\u00e3o identificado", "COVID-19, virus not identified", TRUE,
+      "U089", "t_covid_historico", "t_covid_history", "Hist\u00f3rico pessoal de COVID-19", "Personal history of COVID-19", TRUE,
+      "U099", "t_pos_covid", "t_post_covid", "Condi\u00e7\u00e3o p\u00f3s-COVID", "Post-COVID condition", TRUE,
+      "U109", "t_inflamacao_covid", "t_covid_inflammation", "S\u00edndrome inflamat\u00f3ria multissist\u00eamica associada a COVID-19", "Multisystem inflammatory syndrome associated with COVID-19", TRUE,
+
       # Faltam:
       # Mortes nao envolvendo moto
       # Doencas de veiculacao hidrica

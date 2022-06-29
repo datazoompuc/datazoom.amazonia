@@ -14,7 +14,7 @@ load_datasus(
 )
 }
 \arguments{
-\item{dataset}{A dataset name, can be one of ("datasus_sim_do", "datasus_sih", "datasus_cnes"), or subsets thereof. For more details, try \code{vignette("DATASUS")}.}
+\item{dataset}{A dataset name, can be one of ("datasus_sim_do", "datasus_sih", "datasus_cnes_lt"), or more. For more details, try \code{vignette("DATASUS")}.}
 
 \item{time_period}{A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.}
 
