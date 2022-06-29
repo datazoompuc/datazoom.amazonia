@@ -40,7 +40,7 @@ load_imazon= function(dataset = 'imazon_shp', raw_data = TRUE,
 
 dat <- external_download(
   dataset = param$dataset,
-  source = "imazon",
+  source = "imazon_shp",
   geo_level = param$geo_level
 )
 
