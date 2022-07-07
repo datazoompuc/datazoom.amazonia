@@ -23,83 +23,78 @@
 #' @export
 
 
-load_iema = function(dataset = "iema", raw_data = FALSE,
-                     geo_level = "municipality", language = "pt") {
-
-
-
+load_iema <- function(dataset = "iema", raw_data = FALSE,
+                      geo_level = "municipality", language = "pt") {
   survey <- link <- municipio <- uf <- populacao_nao_atendida <- NULL
-#############################
-## Define Basic Parameters ##
-#############################
+  #############################
+  ## Define Basic Parameters ##
+  #############################
 
-param <- list()
-param$dataset <- dataset
-param$geo_level <- geo_level
-param$language <- language
-param$raw_data <- raw_data
+  param <- list()
+  param$dataset <- dataset
+  param$geo_level <- geo_level
+  param$language <- language
+  param$raw_data <- raw_data
 
-param$survey_name <- datasets_link() %>%
-  dplyr::filter(dataset == param$dataset) %>%
-  dplyr::select(survey) %>%
-  unlist()
+  param$survey_name <- datasets_link() %>%
+    dplyr::filter(dataset == param$dataset) %>%
+    dplyr::select(survey) %>%
+    unlist()
 
-param$url <- datasets_link() %>%
-  dplyr::filter(dataset == param$dataset) %>%
-  dplyr::select(link) %>%
-  unlist()
-
-
-##############
-## Download ##
-##############
-
-dat <- external_download(
-  dataset = param$dataset,
-  source = "iema",
-  geo_level = param$geo_level
-)
+  param$url <- datasets_link() %>%
+    dplyr::filter(dataset == param$dataset) %>%
+    dplyr::select(link) %>%
+    unlist()
 
 
-##############
-## Cleaning ##
-##############
+  ##############
+  ## Download ##
+  ##############
 
-dat = dat %>%
-  janitor::clean_names() %>%
-  dplyr::mutate(
-    dplyr::across(municipio, ~ stringi::stri_trans_general(., id = "Latin-ASCII"))
-  ) %>%
-  dplyr::mutate(dplyr::across(municipio, tolower))
-
-dat = dat %>%
-  dplyr::mutate(uf = stringr::str_extract(municipio, "(?<=\\().+?(?=\\))")) %>%
-  dplyr::mutate(uf = toupper(uf)) %>%
-  tidyr::drop_na(uf)
-
-dat = dat %>%
-  dplyr::mutate(
-    dplyr::across(municipio, ~ stringr::str_remove(., "\\([^()]+\\)")),
-    dplyr::across(municipio, ~ stringr::str_trim(.))
+  dat <- external_download(
+    dataset = param$dataset,
+    source = "iema",
+    geo_level = param$geo_level
   )
 
 
-##################
-### Language #####
-##################
+  ##############
+  ## Cleaning ##
+  ##############
+
+  dat <- dat %>%
+    janitor::clean_names() %>%
+    dplyr::mutate(
+      dplyr::across(municipio, ~ stringi::stri_trans_general(., id = "Latin-ASCII"))
+    ) %>%
+    dplyr::mutate(dplyr::across(municipio, tolower))
+
+  dat <- dat %>%
+    dplyr::mutate(uf = stringr::str_extract(municipio, "(?<=\\().+?(?=\\))")) %>%
+    dplyr::mutate(uf = toupper(uf)) %>%
+    tidyr::drop_na(uf)
+
+  dat <- dat %>%
+    dplyr::mutate(
+      dplyr::across(municipio, ~ stringr::str_remove(., "\\([^()]+\\)")),
+      dplyr::across(municipio, ~ stringr::str_trim(.))
+    )
 
 
-if(param$language == "eng"){
+  ##################
+  ### Language #####
+  ##################
 
-  dat = dat %>%
-    dplyr::rename(city = municipio,
-                  population_without_electric_energy = populacao_nao_atendida,
-                  state = uf)
+
+  if (param$language == "eng") {
+    dat <- dat %>%
+      dplyr::rename(
+        city = municipio,
+        population_without_electric_energy = populacao_nao_atendida,
+        state = uf
+      )
+  }
+
+
+  return(dat)
 }
-
-
-return(dat)
-
-}
-
-
