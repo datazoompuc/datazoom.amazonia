@@ -1,3 +1,7 @@
+# datazoom.amazonia 0.6.1.9000
+
+  * Fixing SSL verification error in download for `load_ibama`
+
 # datazoom.amazonia 0.6.0.9000
 
   * Added new `load_datasus` function for health data
