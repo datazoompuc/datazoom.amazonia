@@ -568,7 +568,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## Extraction through Curl Requests
   ## Investigate a bit more on how Curl Requests work
 
-  if (source %in% c("comex", "degrad", "internal", "ibama", "ips", "mapbiomas", 'prodes', "sigmine")){
+  if (source %in% c("comex", "degrad", "internal", "ips", "mapbiomas", 'prodes', "sigmine")){
     utils::download.file(url = path, destfile = temp, mode = "wb")
   }
   if (source == "deter") {
@@ -584,7 +584,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       googledrive::drive_download(path, path = temp, overwrite = TRUE)
     }
   }
-  if (source == "terraclimate") {
+  if (source %in% c("terraclimate", "ibama")) {
     utils::download.file(url = path, destfile = temp, method = "curl")
   }
   if (source == "health"){
