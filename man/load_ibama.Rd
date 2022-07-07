@@ -27,7 +27,7 @@ load_ibama(
 A \code{tibble} with the selected data.
 }
 \description{
-Loads information on on environmental fines at the municipality or state levels considering the Amazon region
+Loads information on environmental fines at the municipality or state levels considering the Amazon region
 }
 \examples{
 \dontrun{
