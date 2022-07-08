@@ -502,11 +502,11 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## Health Data ##
   #################
 
-  if (source == "health"){
-    if (dataset == "ibge_mortality_table"){
+  if (source == "health") {
+    if (dataset == "ibge_mortality_table") {
       path <- param$url
     }
-    if (stringr::str_detect(dataset, "datasus")){
+    if (stringr::str_detect(dataset, "datasus")) {
       path <- paste0(param$url, param$file_name)
     }
   }
@@ -517,6 +517,17 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   if (source == "internal") {
     if (dataset == "geo_municipalities") {
+      path <- param$url
+    }
+  }
+
+
+  #####################
+  ## IEMA            ##
+  #####################
+
+  if (source == "iema") {
+    if (dataset == "iema") {
       path <- param$url
     }
   }
@@ -552,10 +563,14 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source == "internal") {
     file_extension <- ".rds"
   }
-  if (source == "health"){
-    if (stringr::str_detect(dataset, "datasus")){
+  if (source == "health") {
+    if (stringr::str_detect(dataset, "datasus")) {
       file_extension <- ".dbc"
     }
+  }
+
+  if (source == "iema") {
+    file_extension <- ".xlsx"
   }
 
   # !!!  We should Change This to a Curl Process
@@ -568,9 +583,14 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## Extraction through Curl Requests
   ## Investigate a bit more on how Curl Requests work
 
-  if (source %in% c("comex", "degrad", "internal", "ibama", "ips", "mapbiomas", 'prodes', "sigmine")){
+  if (source %in% c("comex", "degrad", "internal", "ibama", "ips", "mapbiomas", "prodes", "sigmine")) {
     utils::download.file(url = path, destfile = temp, mode = "wb")
   }
+
+  if (source == "iema") {
+    googledrive::drive_download(path, path = temp, overwrite = TRUE)
+  }
+
   if (source == "deter") {
     proc <- RCurl::CFILE(temp, mode = "wb")
     RCurl::curlPerform(url = path, writedata = proc@ref, noprogress = FALSE)
@@ -587,11 +607,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source == "terraclimate") {
     utils::download.file(url = path, destfile = temp, method = "curl")
   }
-  if (source == "health"){
-    if (stringr::str_detect(dataset, "datasus")){
+  if (source == "health") {
+    if (stringr::str_detect(dataset, "datasus")) {
       utils::download.file(url = path, destfile = temp, method = "curl", quiet = TRUE)
-    }
-    else{
+    } else {
       utils::download.file(url = path, destfile = temp, mode = "wb")
     }
   }
@@ -733,7 +752,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
         tibble::as_tibble()
     }
   }
-  if (file_extension == ".dbc"){
+  if (file_extension == ".dbc") {
     dat <- read.dbc(temp)
   }
 
@@ -1083,8 +1102,11 @@ datasets_link <- function() {
 
     ## Shapefile from github repository
 
-    "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds"
+    "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds",
+    "IEMA", "iema", NA, "2018", "Municipality", "https://drive.google.com/uc?export=download&id=10JMRtzu3k95vl8cQmHkVMQ9nJovvIeNl",
   )
+
+
 
   return(link)
 }
