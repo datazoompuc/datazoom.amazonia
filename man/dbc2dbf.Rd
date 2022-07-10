@@ -28,15 +28,15 @@ It uses internally the PKWare's Data Compression Library (DCL) "implode" compres
 \examples{
 \dontrun{
 # Input file name
-in.f  <- system.file("files/sids.dbc", package = "read.dbc")
+in.f <- system.file("files/sids.dbc", package = "read.dbc")
 
 # Output file name
 out.f <- tempfile(fileext = ".dbc")
 
 # The call return logi = TRUE on success
-if( dbc2dbf(input.file = in.f, output.file = out.f) ) {
-     print("File decompressed!")
-     file.remove(out.f)
+if (dbc2dbf(input.file = in.f, output.file = out.f)) {
+  print("File decompressed!")
+  file.remove(out.f)
 }
 }
 

@@ -25,8 +25,13 @@
 
 load_iema <- function(dataset = "iema", raw_data = FALSE,
                       geo_level = "municipality", language = "pt") {
-  survey <- link <- municipio <- uf <- populacao_nao_atendida <- NULL
-  code_muni <- name_muni <- code_state <- abbrev_state <- legal_amazon <- code_muni_6 <- NULL
+
+  ##############################
+  ## Binding Global Variables ##
+  ##############################
+
+  municipio <- uf <- populacao_nao_atendida <- NULL
+  code_muni <- name_muni <- code_state <- abbrev_state <- legal_amazon <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -38,17 +43,6 @@ load_iema <- function(dataset = "iema", raw_data = FALSE,
   param$language <- language
   param$raw_data <- raw_data
 
-  param$survey_name <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(survey) %>%
-    unlist()
-
-  param$url <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(link) %>%
-    unlist()
-
-
   ##############
   ## Download ##
   ##############
@@ -59,6 +53,10 @@ load_iema <- function(dataset = "iema", raw_data = FALSE,
     geo_level = param$geo_level
   )
 
+  ## Return Raw Data
+  if (param$raw_data) {
+    return(dat)
+  }
 
   ##############
   ## Cleaning ##
@@ -66,18 +64,21 @@ load_iema <- function(dataset = "iema", raw_data = FALSE,
 
   dat <- dat %>%
     janitor::clean_names() %>%
-    dplyr::mutate(
+    dplyr::mutate( # removing accents from municipality names
       dplyr::across(municipio, ~ stringi::stri_trans_general(., id = "Latin-ASCII"))
     ) %>%
-    dplyr::mutate(dplyr::across(municipio, tolower))
+    dplyr::mutate(dplyr::across(municipio, tolower)) # making all municipality names lowercase
+
+  # All cities in the municipio column come in the form "city name (uf)"
 
   dat <- dat %>%
+    # UFs come between parentheses e.g. (RJ), this grabs all strings in that form
     dplyr::mutate(uf = stringr::str_extract(municipio, "(?<=\\().+?(?=\\))")) %>%
-    dplyr::mutate(uf = toupper(uf)) %>%
+    dplyr::mutate(uf = toupper(uf)) %>% # making them uppercase again
     tidyr::drop_na(uf)
 
   dat <- dat %>%
-    dplyr::mutate(
+    dplyr::mutate( # removing those "(uf)" bits
       dplyr::across(municipio, ~ stringr::str_remove(., "\\([^()]+\\)")),
       dplyr::across(municipio, ~ stringr::str_trim(.))
     )
@@ -87,67 +88,63 @@ load_iema <- function(dataset = "iema", raw_data = FALSE,
       code_muni,
       name_muni,
       code_state,
-      abbrev_state,
+      "uf" = abbrev_state,
       legal_amazon
     )
 
-  geo <- geo %>%
-    dplyr::mutate(code_muni_6 = as.integer(code_muni / 10)) %>%
-    dplyr::distinct(code_muni_6, .keep_all = TRUE) %>%
-    janitor::clean_names() %>%
-    dplyr::mutate_all(function(var) {
-      stringi::stri_trans_general(str = var, id = "Latin-ASCII")
-    }) %>%
-    dplyr::mutate(
-      dplyr::across(name_muni, tolower)
-    ) %>%
-    dplyr::mutate(municipio = name_muni) %>%
-    dplyr::select(-c(name_muni, abbrev_state, code_muni_6))
+  # Removing accents from the dataset with IBGE codes to make the city names compatible and merge
 
+  geo <- geo %>%
+    dplyr::mutate(
+      dplyr::across(
+        name_muni,
+        ~ stringi::stri_trans_general(., id = "Latin-ASCII"),
+        .names = "municipio"
+      )
+    ) %>%
+    dplyr::mutate(dplyr::across(municipio, tolower))
+
+  # Merging IEMA with IBGE municipalities
 
   dat <- dat %>%
-    dplyr::left_join(geo, by = "municipio") %>%
+    dplyr::left_join(geo, by = c("municipio", "uf"))
+
+  ################################
+  ## Harmonizing Variable Names ##
+  ################################
+
+  # Removing lowercase municipalities
+  dat <- dat %>%
+    dplyr::select(-municipio)
+
+  # Column positions
+  dat <- dat %>%
     dplyr::relocate(
-      uf, code_state, code_muni,
-      legal_amazon, municipio
+      code_muni, name_muni, uf, code_state, legal_amazon, populacao_nao_atendida
     )
 
-
-  dat <- dat[c(-7, -8, -10, -30, -43, -53, -71, -109), ]
-
-  dat <- dat[c(
-    -102, -115, -137, -141, -147, -148, -149, -154,
-    -155, -156, -177, -218, -261
-  ), ]
-
-  dat <- dat[c(-258, -284, -285, -290, -297, -307, -310, -338), ]
-
-
-
-  ##################
-  ### Language #####
-  ##################
-
-
   if (param$language == "pt") {
-    dat <- dat %>%
+    dat_mod <- dat %>%
       dplyr::rename(
-        cod_municipio = code_muni,
-        cod_uf = code_state,
-        amazonia_legal = legal_amazon
+        "cod_municipio" = code_muni,
+        "municipio" = name_muni,
+        "cod_uf" = code_state,
+        "amazonia_legal" = legal_amazon
       )
   }
 
 
   if (param$language == "eng") {
-    dat <- dat %>%
+    dat_mod <- dat %>%
       dplyr::rename(
-        city = municipio,
-        population_without_electric_energy = populacao_nao_atendida,
-        state = uf
+        "municipality_code" = code_muni,
+        "municipality" = name_muni,
+        "state" = uf,
+        "state_code" = code_state,
+        "population_without_electricity" = populacao_nao_atendida
       )
   }
 
 
-  return(dat)
+  return(dat_mod)
 }
