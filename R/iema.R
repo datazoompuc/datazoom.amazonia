@@ -26,6 +26,8 @@
 load_iema <- function(dataset = "iema", raw_data = FALSE,
                       geo_level = "municipality", language = "pt") {
   survey <- link <- municipio <- uf <- populacao_nao_atendida <- NULL
+  code_muni <- name_muni <- code_state <- abbrev_state <- legal_amazon <- code_muni_6 <- NULL
+
   #############################
   ## Define Basic Parameters ##
   #############################
@@ -80,10 +82,61 @@ load_iema <- function(dataset = "iema", raw_data = FALSE,
       dplyr::across(municipio, ~ stringr::str_trim(.))
     )
 
+  geo <- municipalities %>%
+    dplyr::select(
+      code_muni,
+      name_muni,
+      code_state,
+      abbrev_state,
+      legal_amazon
+    )
+
+  geo <- geo %>%
+    dplyr::mutate(code_muni_6 = as.integer(code_muni / 10)) %>%
+    dplyr::distinct(code_muni_6, .keep_all = TRUE) %>%
+    janitor::clean_names() %>%
+    dplyr::mutate_all(function(var) {
+      stringi::stri_trans_general(str = var, id = "Latin-ASCII")
+    }) %>%
+    dplyr::mutate(
+      dplyr::across(name_muni, tolower)
+    ) %>%
+    dplyr::mutate(municipio = name_muni) %>%
+    dplyr::select(-c(name_muni, abbrev_state, code_muni_6))
+
+
+  dat <- dat %>%
+    dplyr::left_join(geo, by = "municipio") %>%
+    dplyr::relocate(
+      uf, code_state, code_muni,
+      legal_amazon, municipio
+    )
+
+
+  dat <- dat[c(-7, -8, -10, -30, -43, -53, -71, -109), ]
+
+  dat <- dat[c(
+    -102, -115, -137, -141, -147, -148, -149, -154,
+    -155, -156, -177, -218, -261
+  ), ]
+
+  dat <- dat[c(-258, -284, -285, -290, -297, -307, -310, -338), ]
+
+
 
   ##################
   ### Language #####
   ##################
+
+
+  if (param$language == "pt") {
+    dat <- dat %>%
+      dplyr::rename(
+        cod_municipio = code_muni,
+        cod_uf = code_state,
+        amazonia_legal = legal_amazon
+      )
+  }
 
 
   if (param$language == "eng") {
