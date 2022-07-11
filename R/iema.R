@@ -25,7 +25,14 @@
 
 load_iema <- function(dataset = "iema", raw_data = FALSE,
                       geo_level = "municipality", language = "pt") {
-  survey <- link <- municipio <- uf <- populacao_nao_atendida <- NULL
+
+  ##############################
+  ## Binding Global Variables ##
+  ##############################
+
+  municipio <- uf <- populacao_nao_atendida <- NULL
+  code_muni <- name_muni <- code_state <- abbrev_state <- legal_amazon <- NULL
+
   #############################
   ## Define Basic Parameters ##
   #############################
@@ -35,17 +42,6 @@ load_iema <- function(dataset = "iema", raw_data = FALSE,
   param$geo_level <- geo_level
   param$language <- language
   param$raw_data <- raw_data
-
-  param$survey_name <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(survey) %>%
-    unlist()
-
-  param$url <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(link) %>%
-    unlist()
-
 
   ##############
   ## Download ##
@@ -57,6 +53,10 @@ load_iema <- function(dataset = "iema", raw_data = FALSE,
     geo_level = param$geo_level
   )
 
+  ## Return Raw Data
+  if (param$raw_data) {
+    return(dat)
+  }
 
   ##############
   ## Cleaning ##
@@ -64,37 +64,87 @@ load_iema <- function(dataset = "iema", raw_data = FALSE,
 
   dat <- dat %>%
     janitor::clean_names() %>%
-    dplyr::mutate(
+    dplyr::mutate( # removing accents from municipality names
       dplyr::across(municipio, ~ stringi::stri_trans_general(., id = "Latin-ASCII"))
     ) %>%
-    dplyr::mutate(dplyr::across(municipio, tolower))
+    dplyr::mutate(dplyr::across(municipio, tolower)) # making all municipality names lowercase
+
+  # All cities in the municipio column come in the form "city name (uf)"
 
   dat <- dat %>%
+    # UFs come between parentheses e.g. (RJ), this grabs all strings in that form
     dplyr::mutate(uf = stringr::str_extract(municipio, "(?<=\\().+?(?=\\))")) %>%
-    dplyr::mutate(uf = toupper(uf)) %>%
+    dplyr::mutate(uf = toupper(uf)) %>% # making them uppercase again
     tidyr::drop_na(uf)
 
   dat <- dat %>%
-    dplyr::mutate(
+    dplyr::mutate( # removing those "(uf)" bits
       dplyr::across(municipio, ~ stringr::str_remove(., "\\([^()]+\\)")),
       dplyr::across(municipio, ~ stringr::str_trim(.))
     )
 
+  geo <- municipalities %>%
+    dplyr::select(
+      code_muni,
+      name_muni,
+      code_state,
+      "uf" = abbrev_state,
+      legal_amazon
+    )
 
-  ##################
-  ### Language #####
-  ##################
+  # Removing accents from the dataset with IBGE codes to make the city names compatible and merge
 
+  geo <- geo %>%
+    dplyr::mutate(
+      dplyr::across(
+        name_muni,
+        ~ stringi::stri_trans_general(., id = "Latin-ASCII"),
+        .names = "municipio"
+      )
+    ) %>%
+    dplyr::mutate(dplyr::across(municipio, tolower))
 
-  if (param$language == "eng") {
-    dat <- dat %>%
+  # Merging IEMA with IBGE municipalities
+
+  dat <- dat %>%
+    dplyr::left_join(geo, by = c("municipio", "uf"))
+
+  ################################
+  ## Harmonizing Variable Names ##
+  ################################
+
+  # Removing lowercase municipalities
+  dat <- dat %>%
+    dplyr::select(-municipio)
+
+  # Column positions
+  dat <- dat %>%
+    dplyr::relocate(
+      code_muni, name_muni, uf, code_state, legal_amazon, populacao_nao_atendida
+    )
+
+  if (param$language == "pt") {
+    dat_mod <- dat %>%
       dplyr::rename(
-        city = municipio,
-        population_without_electric_energy = populacao_nao_atendida,
-        state = uf
+        "cod_municipio" = code_muni,
+        "municipio" = name_muni,
+        "cod_uf" = code_state,
+        "amazonia_legal" = legal_amazon
       )
   }
 
 
-  return(dat)
+  if (param$language == "eng") {
+    dat_mod <- dat %>%
+      dplyr::rename(
+        "municipality_code" = code_muni,
+        "municipality" = name_muni,
+        "state" = uf,
+        "state_code" = code_state,
+        "population_without_electricity" = populacao_nao_atendida
+      )
+  }
+
+
+  return(dat_mod)
 }

@@ -1,3 +1,7 @@
+# datazoom.amazonia 0.7.1.9000
+
+* Added municipalities code into `load_iema` function for energy data
+
 # datazoom.amazonia 0.7.0.9000
 
 * Added new `load_iema` function for energy data

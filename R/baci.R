@@ -717,4 +717,6 @@ load_trade_dic_eng <- function(type) {
       stringi::stri_trans_general(str = var, id = "Latin-ASCII")
     }) %>%
     janitor::clean_names()
+
+  return(dic)
 }
