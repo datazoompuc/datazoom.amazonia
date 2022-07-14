@@ -1,6 +1,6 @@
-# datazoom.amazonia 0.6.1.9000
+# datazoom.amazonia 0.7.0.9000
 
-  * Fixing SSL verification error in download for `load_ibama`
+* Added new `load_iema` function for energy data
 
 # datazoom.amazonia 0.6.0.9000
 

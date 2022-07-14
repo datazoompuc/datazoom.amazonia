@@ -651,9 +651,9 @@ load_dictionary <- function(dataset) {
 
       "tipobito", "tipobito", "tipobito", "1: obito fetal\n2: obito nao fetal", "", FALSE,
       "dtobito", "dtobito", "dtobito", "Data do obito, no formato ddmmaaaa", "", FALSE,
-      "horaobito", "horaobito","horaobito", "Hora do falecimento", "", FALSE,
-      "natural", "natural","natural", "Naturalidade, conforme a tabela de paises. Se for brasileiro, porem, o primeiro digito contem 8 e os demais o codigo da UF de naturalidade","", FALSE,
-      "dtnasc", "dtnasc","dtnasc", "Data de nascimento do falecido", "", FALSE,
+      "horaobito", "horaobito", "horaobito", "Hora do falecimento", "", FALSE,
+      "natural", "natural", "natural", "Naturalidade, conforme a tabela de paises. Se for brasileiro, porem, o primeiro digito contem 8 e os demais o codigo da UF de naturalidade", "", FALSE,
+      "dtnasc", "dtnasc", "dtnasc", "Data de nascimento do falecido", "", FALSE,
       "idade", "idade", "idade", "Idade, composto de dois subcampos. O primeiro, de 1\ndigito, indica a unidade da idade, conforme a tabela a\nseguir. O segundo, de dois digitos, indica a quantidade de\nunidades:\n0: Idade ignorada, o segundo subcampo e\n1: Horas, o segundo subcampo varia de 01 a 23\n2: Dias, o segundo subcampo varia de 01 a 29\n3: Meses, o segundo subcampo varia de 01 a 11\n4: Anos, o segundo subcampo varia de 00 a 99\n5: Anos (mais de 100 anos), o segundo subcampo varia de\n0 a 99", "", FALSE,
       "sexo", "sexo", "sexo", "Sexo:\n0: Ignorado\n1: Masculino\n2: Feminino", "", FALSE,
       "racacor", "racacor", "racacor", "Raca/Cor:\n1:Branca\n2:Preta\n3:Amarela\n4: Parda\n5: Indigena", "", FALSE,
@@ -701,7 +701,6 @@ load_dictionary <- function(dataset) {
       "dtrecebim", "dtrecebim", "dtrecebim", "Data de recebimento no nivel central, data da ultima atualizacao do registro", "", FALSE,
       "ufinform", "ufinform", "ufinform", "Codigo da UF que informou o registro", "", FALSE,
       "cb_pre", "cb_pre", "cb_pre", "Causa selecionada sem re-selecao (novo SCB)", "", FALSE
-
     )
   }
 
@@ -738,7 +737,6 @@ load_dictionary <- function(dataset) {
       "qt_sus", "n_leitos_sus", "n_beds_sus", "Leitos Disponiveis para o SUS (Para os estabelecimentos vinculados ao SUS)", "Beds avaliable to SUS",
       "qt_nsus", "n_leitos_nao_sus", "n_beds_not_sus", "Leitos Nao Disponiveis para o SUS", "Beds not avaliable to SUS",
       "competen", "competencia", "competence", "Competencia", "Competence",
-
     )
   }
 
@@ -832,7 +830,7 @@ load_dictionary <- function(dataset) {
       "etnia", "etnia", "etnia", "Etnia do paciente, se raca/cor for indigena", "",
       "sequencia", "sequencia", "sequencia", "Sequencial da AIH na remessa", "",
       "remessa", "remessa", "remessa", "Numero da remessa", "",
-      "aud_just", "aud_just", "aud_just","Justificativa do auditor para aceitacao da AIH sem o numero do Cartao Nacional de Saude", "",
+      "aud_just", "aud_just", "aud_just", "Justificativa do auditor para aceitacao da AIH sem o numero do Cartao Nacional de Saude", "",
       "sis_just", "sis_just", "sis_just", "Justificativa do estabelecimento para aceitacao da AIH sem o numero do cartao nacional de saude", "",
       "val_sh_fed", "val_sh_fed", "val_sh_fed", "Valor do complemento federal de servicos hospitalares", "",
       "val_sp_fed", "val_sp_fed", "val_sp_fed", "Valor do complemento federal de servicos profissionais", "",

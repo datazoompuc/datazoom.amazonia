@@ -101,6 +101,8 @@ After installing it, you will be able to download our development version packag
 
 **[12 - DATASUS data](#12---datasus)**
 
+**[13 - IEMA data](#13---iema)**
+
 ## The Structure of our functions
 
 **[1 - The Structure of the functions](#the-structure-of-the-functions)**
@@ -895,6 +897,38 @@ clean_sim <- load_baci(dataset = "datasus_sim_do",
                         states = c("AM", "AP"),
                         language = "pt")
 ```
+
+
+## 13 - IEMA
+
+Loads data on the population without access to eletric energy at the municipality level, considering the Amazon region.
+
+```
+There are four parameters in this function:
+  
+  1. dataset:
+  # "iema" has population without energy access data
+
+  2. raw_data: there are one option:
+  # FALSE: if you want the treated (more organized) version of the data.
+  
+  3. geo_level:
+  # "municipality". The data is only available at the municipality level.
+  
+  4. language: you can choose between portuguese ('pt') and english ('eng')
+  
+  ```
+  
+```{r eval=FALSE}
+# Download treated data (raw_data = FALSE)
+data <- load_iema(dataset = "iema", raw_data = FALSE,
+                     geo_level = "municipality", language = "pt")
+
+# Download treated data in english
+data <- load_iema(dataset = "iema", raw_data = FALSE,
+                     geo_level = "municipality", language = "eng")
+```
+
 
 ## The Structure of the functions
 

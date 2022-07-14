@@ -33,15 +33,15 @@
 #' @examples
 #' \dontrun{
 #' # Input file name
-#' in.f  <- system.file("files/sids.dbc", package = "read.dbc")
+#' in.f <- system.file("files/sids.dbc", package = "read.dbc")
 #'
 #' # Output file name
 #' out.f <- tempfile(fileext = ".dbc")
 #'
 #' # The call return logi = TRUE on success
-#' if( dbc2dbf(input.file = in.f, output.file = out.f) ) {
-#'      print("File decompressed!")
-#'      file.remove(out.f)
+#' if (dbc2dbf(input.file = in.f, output.file = out.f)) {
+#'   print("File decompressed!")
+#'   file.remove(out.f)
 #' }
 #' }
 #'
@@ -53,8 +53,9 @@
 #' \code{blast-dbf}, DBC to DBF command-line decompression tool: \url{https://github.com/eaglebh/blast-dbf}
 #'
 dbc2dbf <- function(input.file, output.file) {
-  if( !file.exists(input.file) )
+  if (!file.exists(input.file)) {
     stop("Input file does not exist.")
+  }
   out <- .C("dbc2dbf", input = as.character(path.expand(input.file)), output = as.character(path.expand(output.file)), PACKAGE = "datazoom.amazonia")
   file.exists(output.file)
 }
