@@ -512,6 +512,16 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   }
 
   #####################
+  ## IEMA            ##
+  #####################
+
+  if (source == "iema") {
+    if (dataset == "iema") {
+      path <- param$url
+    }
+  }
+
+  #####################
   ## GeoBR Shapefile ##
   #####################
 
@@ -557,6 +567,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       file_extension <- ".dbc"
     }
   }
+  if (source == "iema") {
+    file_extension <- ".xlsx"
+  }
 
   # !!!  We should Change This to a Curl Process
 
@@ -570,6 +583,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   if (source %in% c("comex", "degrad", "internal", "ips", "mapbiomas", "prodes", "sigmine")) {
     utils::download.file(url = path, destfile = temp, mode = "wb")
+  }
+  if (source == "iema") {
+    googledrive::drive_download(path, path = temp, overwrite = TRUE)
   }
   if (source == "deter") {
     proc <- RCurl::CFILE(temp, mode = "wb")
@@ -1082,7 +1098,8 @@ datasets_link <- function() {
 
     ## Shapefile from github repository
 
-    "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds"
+    "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds",
+    "IEMA", "iema", NA, "2018", "Municipality", "https://drive.google.com/uc?export=download&id=10JMRtzu3k95vl8cQmHkVMQ9nJovvIeNl",
   )
 
   return(link)
