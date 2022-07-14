@@ -502,11 +502,11 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## Health Data ##
   #################
 
-  if (source == "health"){
-    if (dataset == "ibge_mortality_table"){
+  if (source == "health") {
+    if (dataset == "ibge_mortality_table") {
       path <- param$url
     }
-    if (stringr::str_detect(dataset, "datasus")){
+    if (stringr::str_detect(dataset, "datasus")) {
       path <- paste0(param$url, param$file_name)
     }
   }
@@ -552,8 +552,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source == "internal") {
     file_extension <- ".rds"
   }
-  if (source == "health"){
-    if (stringr::str_detect(dataset, "datasus")){
+  if (source == "health") {
+    if (stringr::str_detect(dataset, "datasus")) {
       file_extension <- ".dbc"
     }
   }
@@ -568,7 +568,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## Extraction through Curl Requests
   ## Investigate a bit more on how Curl Requests work
 
-  if (source %in% c("comex", "degrad", "internal", "ips", "mapbiomas", 'prodes', "sigmine")){
+  if (source %in% c("comex", "degrad", "internal", "ips", "mapbiomas", "prodes", "sigmine")) {
     utils::download.file(url = path, destfile = temp, mode = "wb")
   }
   if (source == "deter") {
@@ -587,11 +587,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source %in% c("terraclimate", "ibama")) {
     utils::download.file(url = path, destfile = temp, method = "curl")
   }
-  if (source == "health"){
-    if (stringr::str_detect(dataset, "datasus")){
+  if (source == "health") {
+    if (stringr::str_detect(dataset, "datasus")) {
       utils::download.file(url = path, destfile = temp, method = "curl", quiet = TRUE)
-    }
-    else{
+    } else {
       utils::download.file(url = path, destfile = temp, mode = "wb")
     }
   }
@@ -733,7 +732,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
         tibble::as_tibble()
     }
   }
-  if (file_extension == ".dbc"){
+  if (file_extension == ".dbc") {
     dat <- read.dbc(temp)
   }
 
