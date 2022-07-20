@@ -277,7 +277,8 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
 
 external_download <- function(dataset = NULL, source = NULL, year = NULL,
                               geo_level = NULL, coords = NULL, dataset_code = NULL,
-                              sheet = NULL, skip_rows = NULL, file_name = NULL) {
+                              sheet = NULL, skip_rows = NULL, file_name = NULL,
+                              uf = NULL) {
 
   ## Bind Global Variables
 
@@ -302,6 +303,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   param$skip_rows <- skip_rows
   param$file_name <- file_name
   param$sheet <- sheet
+  param$uf = uf
 
   # if (param$geo_level == 'legal_amazon' & param$source == 'prodes'){param$geo_level = 'legal-amz-prodes'}
   # if (param$geo_level == 'amazon_biome' & param$source == 'prodes'){param$geo_level = 'amz-prodes'}
@@ -462,6 +464,16 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
   }
 
+  if(source == "ibama_multas"){
+    if(param$dataset == "distributed_fines"){
+      path <- paste0(param$url, param$uf, "/Quantidade/multasDistribuidasBensTutelados.csv")
+    }
+
+    if(param$dataset == "collected_fines"){
+      path <- paste0(param$url, param$uf, "/Arrecadacao/arrecadacaobenstutelados.csv")
+    }
+  }
+
   ##################
   ## TerraClimate ##
   ##################
@@ -557,6 +569,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source == "ibama") {
     file_extension <- ".zip"
   }
+  if(source == "ibama_multas"){
+    file_extension <- ".csv"
+  }
   if (source == "terraclimate") {
     file_extension <- ".nc"
   }
@@ -583,7 +598,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## Extraction through Curl Requests
   ## Investigate a bit more on how Curl Requests work
 
-  if (source %in% c("comex", "degrad", "internal", "ibama", "ips", "mapbiomas", "prodes", "sigmine")) {
+  if (source %in% c("comex", "degrad", "internal", "ibama", "ips", "mapbiomas", "prodes", "sigmine",
+                    "ibama_multas")) {
     utils::download.file(url = path, destfile = temp, mode = "wb")
   }
 
@@ -1104,6 +1120,8 @@ datasets_link <- function() {
 
     "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds",
     "IEMA", "iema", NA, "2018", "Municipality", "https://drive.google.com/uc?export=download&id=10JMRtzu3k95vl8cQmHkVMQ9nJovvIeNl",
+    "Ibama_multas", "distributed_fines", NA, NA, "Municipality", "https://dadosabertos.ibama.gov.br/dados/SICAFI/",
+    "Ibama_multas", "collected_fines", NA, NA, "Municipality", "https://dadosabertos.ibama.gov.br/dados/SICAFI/",
   )
 
 
