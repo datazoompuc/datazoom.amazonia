@@ -26,10 +26,8 @@
 
 
 load_ibama_multas <- function(dataset = NULL, raw_data = FALSE,
-                     geo_level = "municipality",
-                     uf = NULL, language = "pt") {
-
-
+                              geo_level = "municipality",
+                              uf = NULL, language = "pt") {
   abbrev_state <- code_muni <- code_state <- data_auto <- data_pagamento <- NULL
   data_penalidade <- enquadramento_legal <- link <- moeda <- municipio <- name_muni <- NULL
   nome_ou_razao_social <- parcela <- quantidade_de_parcelas <- survey <- tipo_auto <- NULL
@@ -44,7 +42,7 @@ load_ibama_multas <- function(dataset = NULL, raw_data = FALSE,
   param$geo_level <- geo_level
   param$language <- language
   param$raw_data <- raw_data
-  param$uf = uf
+  param$uf <- uf
 
   param$survey_name <- datasets_link() %>%
     dplyr::filter(dataset == param$dataset) %>%
@@ -112,34 +110,35 @@ load_ibama_multas <- function(dataset = NULL, raw_data = FALSE,
   ## Cleaning ##
   ##############
 
-  dat = dat %>%
-    dplyr::rename(penalidade = tipo_auto,
-                  data_penalidade = data_auto,
-                  valor_da_penalidade = valor_do_auto) %>%
+  dat <- dat %>%
+    dplyr::rename(
+      penalidade = tipo_auto,
+      data_penalidade = data_auto,
+      valor_da_penalidade = valor_do_auto
+    ) %>%
     dplyr::relocate(uf, municipio, data_penalidade)
 
 
 
-  if(param$dataset %in% c("collected_fines", "distributed_fines") & param$language == "eng"){
-
-    dat = dat %>%
-      dplyr::rename(penalty = tipo_auto,
-                    penalty_date = data_auto,
-                    penaly_value = valor_do_auto,
-                    state = uf,
-                    city = municipio,
-                    name_or_corportate_name = nome_ou_razao_social,
-                    violation_type = tipo_infracao,
-                    legal_framework = enquadramento_legal,
-                    currency = moeda,
-                    installment = parcela,
-                    installments_amount = quantidade_de_parcelas,
-                    base_installment_value = valor_base_da_parcela,
-                    paid_value = valor_pago,
-                    payment_date = data_pagamento,
-                    report_last_update = ultima_atualizacao_relatorio)
-
-
+  if (param$dataset %in% c("collected_fines", "distributed_fines") & param$language == "eng") {
+    dat <- dat %>%
+      dplyr::rename(
+        penalty = tipo_auto,
+        penalty_date = data_auto,
+        penaly_value = valor_do_auto,
+        state = uf,
+        city = municipio,
+        name_or_corportate_name = nome_ou_razao_social,
+        violation_type = tipo_infracao,
+        legal_framework = enquadramento_legal,
+        currency = moeda,
+        installment = parcela,
+        installments_amount = quantidade_de_parcelas,
+        base_installment_value = valor_base_da_parcela,
+        paid_value = valor_pago,
+        payment_date = data_pagamento,
+        report_last_update = ultima_atualizacao_relatorio
+      )
   }
-return(dat)
+  return(dat)
 }

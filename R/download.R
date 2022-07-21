@@ -303,7 +303,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   param$skip_rows <- skip_rows
   param$file_name <- file_name
   param$sheet <- sheet
-  param$uf = uf
+  param$uf <- uf
 
   # if (param$geo_level == 'legal_amazon' & param$source == 'prodes'){param$geo_level = 'legal-amz-prodes'}
   # if (param$geo_level == 'amazon_biome' & param$source == 'prodes'){param$geo_level = 'amz-prodes'}
@@ -464,12 +464,12 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
   }
 
-  if(source == "ibama_multas"){
-    if(param$dataset == "distributed_fines"){
+  if (source == "ibama_multas") {
+    if (param$dataset == "distributed_fines") {
       path <- paste0(param$url, param$uf, "/Quantidade/multasDistribuidasBensTutelados.csv")
     }
 
-    if(param$dataset == "collected_fines"){
+    if (param$dataset == "collected_fines") {
       path <- paste0(param$url, param$uf, "/Arrecadacao/arrecadacaobenstutelados.csv")
     }
   }
@@ -569,7 +569,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source == "ibama") {
     file_extension <- ".zip"
   }
-  if(source == "ibama_multas"){
+  if (source == "ibama_multas") {
     file_extension <- ".csv"
   }
   if (source == "terraclimate") {
@@ -598,8 +598,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## Extraction through Curl Requests
   ## Investigate a bit more on how Curl Requests work
 
-  if (source %in% c("comex", "degrad", "internal", "ibama", "ips", "mapbiomas", "prodes", "sigmine",
-                    "ibama_multas")) {
+  if (source %in% c(
+    "comex", "degrad", "internal", "ibama", "ips", "mapbiomas", "prodes", "sigmine",
+    "ibama_multas"
+  )) {
     utils::download.file(url = path, destfile = temp, mode = "wb")
   }
 
