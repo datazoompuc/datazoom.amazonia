@@ -1,3 +1,8 @@
+
+# datazoom.amazonia 0.8.0.9000
+
+* Added new `load_ibama_multas` function for environmental distributed and collected fines
+
 # datazoom.amazonia 0.7.1.9000
 
 * Added municipalities code into `load_iema` function for energy data

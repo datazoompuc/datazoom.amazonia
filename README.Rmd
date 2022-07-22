@@ -103,6 +103,8 @@ After installing it, you will be able to download our development version packag
 
 **[13 - IEMA data](#13---iema)**
 
+**[14 - IBAMA MULTAS data](#14---ibama_multas)**
+
 ## The Structure of our functions
 
 **[1 - The Structure of the functions](#the-structure-of-the-functions)**
@@ -929,6 +931,30 @@ data <- load_iema(dataset = "iema", raw_data = FALSE,
                      geo_level = "municipality", language = "eng")
 ```
 
+
+## 14 - IBAMA MULTAS
+
+Loads data on environmental distributed and collected fines at the municipality/state level considering all regions. 
+
+```
+There are five parameters in this function:
+  
+  1. dataset:
+  # "distributed_fines" has data on fines that have not been paid
+
+  2. raw_data: there are two options:
+  # TRUE: data on its original form.
+  # FALSE: if you want the treated (more organized) version of the data.
+  
+  3. geo_level:
+  # "municipality". The data is only available at the municipality level.
+  
+  4. uf:
+  # Here, you select the Brazilian state on which you wish to find information. It can be for example "BA" for Bahia State or "RJ" for Rio de Janeiro State. Always follows this two-letter pattern.
+  
+  5. language: you can choose between portuguese ('pt') and english ('eng')
+  
+  ```
 
 ## The Structure of the functions
 

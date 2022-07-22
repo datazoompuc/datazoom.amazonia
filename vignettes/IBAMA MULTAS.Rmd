@@ -1,0 +1,37 @@
+---
+title: "IBAMA MULTAS"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{IBAMA}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## The Dataset
+
+The dataset is originally from the Brazilian Institute of Environment and Renewable  Natural Resources (Ibama), documenting environmental distributed and collected fines at the individual and corporate level from 1994 to the present day.
+
+## Usage
+
+`load_ibama_multas` downloads and compiles data on environmental distributed and collected fines at the municipality/state level considering all regions. 
+
+The function returns either the raw data or a processed data frame, with a more organized structure, considering debt value, corporate and/or individual information, penalty type etc.
+
+```{r, eval = FALSE}
+library(datazoom.amazonia)
+
+# Download treated collected fines data (raw_data = FALSE) from state "BA"
+data <- load_ibama_multas(dataset = "collected_fines", raw_data = FALSE, 
+                   uf = "BA", language = "eng")
+
+# Download raw distibuted fines data (raw_data = TRUE) from state "RJ"
+data <- load_ibama_multas(dataset = "distributed_fines", raw_data = FALSE, 
+                   uf = "BA", language = "pt")
+```
