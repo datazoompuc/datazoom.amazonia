@@ -33,16 +33,15 @@ As a final note, neither this project, nor its author, has any association with 
 \examples{
 \dontrun{
 # The 'sids.dbc' file is the compressed version of 'sids.dbf' from the "foreign" package.
-x <- read.dbc(system.file("files/sids.dbc", package="read.dbc"))
+x <- read.dbc(system.file("files/sids.dbc", package = "read.dbc"))
 str(x)
 summary(x)
 
 # This is a small subset of U.S. NOAA storm database.
-storm <- read.dbc(system.file("files/storm.dbc", package="read.dbc"))
+storm <- read.dbc(system.file("files/storm.dbc", package = "read.dbc"))
 head(x)
 str(x)
 
-\donttest{
 ## Don't run!
 ## The following code will download data from the "Declarations of Death" database for
 ## the Brazilian state of Parana, year 2013. Source: DATASUS / Brazilian Ministry of Health
@@ -51,7 +50,6 @@ download.file(url, destfile = "DOPR2013.dbc")
 dopr <- read.dbc("DOPR2013.dbc")
 head(dopr)
 str(dopr)
-}
 }
 }
 \seealso{
