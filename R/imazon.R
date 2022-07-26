@@ -1,10 +1,24 @@
-# library(sf)
-# library(tidyverse)
-# library(googledrive)
-
-#seeg tem google drive
-#degrad, deter e terra climate tem shp
-
+#' @title IMAZON
+#'
+#' @description Loads information on ...  See \url{http://www.ipsamazonia.org.br/}
+#'
+#' @param dataset There is one dataset available ("imazon_shp")
+#' @param raw_data A \code{boolean} setting the return of raw or processed data
+#' @param geo_level A \code{string} that defines the geographic level of the data. Only "municipality" available.
+#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese is supported.
+#'
+#' @return A \code{tibble} with the selected data.
+#'
+#' @encoding UTF-8
+#'
+#' @importFrom magrittr %>%
+#'
+#' @export
+#'
+#' @examples \dontrun{
+#' # download raw data from 2014
+#' imazon <- load_imazon(dataset = "imazon_shp", raw_data = TRUE, geo_level = 'municipality', language = "pt_br")
+#' }
 load_imazon= function(dataset = 'imazon_shp', raw_data = TRUE,
                       geo_level = 'municipality', language = "pt_br"){
 
