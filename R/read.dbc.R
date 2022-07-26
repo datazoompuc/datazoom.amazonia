@@ -38,16 +38,15 @@
 #' @examples
 #' \dontrun{
 #' # The 'sids.dbc' file is the compressed version of 'sids.dbf' from the "foreign" package.
-#' x <- read.dbc(system.file("files/sids.dbc", package="read.dbc"))
+#' x <- read.dbc(system.file("files/sids.dbc", package = "read.dbc"))
 #' str(x)
 #' summary(x)
 #'
 #' # This is a small subset of U.S. NOAA storm database.
-#' storm <- read.dbc(system.file("files/storm.dbc", package="read.dbc"))
+#' storm <- read.dbc(system.file("files/storm.dbc", package = "read.dbc"))
 #' head(x)
 #' str(x)
 #'
-#' \donttest{
 #' ## Don't run!
 #' ## The following code will download data from the "Declarations of Death" database for
 #' ## the Brazilian state of Parana, year 2013. Source: DATASUS / Brazilian Ministry of Health
@@ -57,13 +56,12 @@
 #' head(dopr)
 #' str(dopr)
 #' }
-#' }
 read.dbc <- function(file, ...) {
   # Output file name
   out <- tempfile(fileext = ".dbf")
 
   # Decompress the dbc file using the blast library wrapper.
-  if( dbc2dbf(file, out) ) {
+  if (dbc2dbf(file, out)) {
     # Use read.dbf from foreing package to read the uncompressed file
     df <- foreign::read.dbf(out, ...)
 
