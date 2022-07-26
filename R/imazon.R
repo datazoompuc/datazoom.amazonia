@@ -17,7 +17,7 @@
 #'
 #' @examples \dontrun{
 #' # download raw data from 2014
-#' imazon <- load_imazon(dataset = "imazon_shp", raw_data = TRUE, geo_level = 'municipality', language = "pt_br")
+#' imazon <- load_imazon(dataset = "imazon_shp")
 #' }
 load_imazon= function(dataset = 'imazon_shp', raw_data = TRUE,
                       geo_level = 'municipality', language = "pt_br"){
