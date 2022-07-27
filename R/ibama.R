@@ -6,7 +6,7 @@
 #' @param raw_data A \code{boolean} setting the return of raw or processed data
 #' @param states A \code{string} specifying for which states to download the data. It is "all" by default, but can be a single state such as "AC" or any vector such as c("AC", "AM"). Does not apply to the "areas_embargadas" dataset.
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported.
-#' @param legal_amazon_only A \code{boolean} setting the return of Legal Amazon Data or not
+#'
 #'
 #' @return A \code{tibble} with the selected data.
 #'
@@ -15,8 +15,7 @@
 #' # download raw data from all country
 #' raw_ibama_all <- load_ibama(
 #'   dataset = "areas_embargadas",
-#'   raw_data = TRUE,
-#'   legal_amazon_only = FALSE
+#'   raw_data = TRUE
 #' )
 #' }
 #'
@@ -40,6 +39,7 @@ load_ibama <- function(dataset,
   n_cpf_cnpj_unicos <- NULL
   municipio_infracao <- uf_infracao <- uf <- NULL
   municipio <- name_muni <- code_muni <- municipality <- NULL
+  data_auto <- abbrev_state <- ultima_atualizacao_relatorio <- tipo_auto <- valor_do_auto <- NULL
 
   #############################
   ## Define Basic Parameters ##
