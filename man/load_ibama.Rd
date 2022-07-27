@@ -4,20 +4,14 @@
 \alias{load_ibama}
 \title{IBAMA - Brazilian Institute for the Environment and Renewable Natural Resources}
 \usage{
-load_ibama(
-  dataset = "areas_embargadas",
-  raw_data,
-  geo_level = "municipality",
-  language = "eng",
-  legal_amazon_only = FALSE
-)
+load_ibama(dataset, raw_data, states = "all", language = "eng")
 }
 \arguments{
-\item{dataset}{A dataset name ("areas_embargadas")}
+\item{dataset}{A dataset name ("areas_embargadas", "distributed_fines", "collected_fines")}
 
 \item{raw_data}{A \code{boolean} setting the return of raw or processed data}
 
-\item{geo_level}{A \code{string} that defines the geographic level of the data. Can be only "municipality".}
+\item{states}{A \code{string} specifying for which states to download the data. It is "all" by default, but can be a single state such as "AC" or any vector such as c("AC", "AM"). Does not apply to the "areas_embargadas" dataset.}
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported.}
 
