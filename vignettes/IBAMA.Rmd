@@ -16,13 +16,14 @@ knitr::opts_chunk$set(
 
 ## The Dataset
 
-The dataset is originally from the Brazilian Institute of Environment and Renewable  Natural Resources (Ibama), documenting environmental embargoes and fines at the individual level from 2005 to the present day.
+The dataset is originally from the Brazilian Institute of Environment and Renewable  Natural Resources (Ibama), documenting environmental embargoes and fines at the individual level from 2005 to the present day. In addition, it is possible to download distributed and collected fines from 1994 until the present day.
 
 ## Usage
 
 `load_ibama` downloads and compiles data on environmental fines at the municipality level considering the Amazon region. 
 
-The function returns either the raw data or a data frame with aggregates considering, for each time-location period, counts for total the number of infractions, infractions that already went to trial, and number of unique perpetrators of infractions.
+The function returns either the raw data or a data frame with aggregates considering, for each time-location period, counts for total the number of infractions, infractions that already went to trial, and number of unique perpetrators of infractions. There are also two data frames regarding distributed and collected fines across municipalities
+
 
 ```{r, eval = FALSE}
 library(datazoom.amazonia)
@@ -36,4 +37,13 @@ data <- load_ibama(dataset = "areas_embargadas", raw_data = FALSE,
 # (legal_amazon_only = TRUE)
 data <- load_ibama(dataset = "areas_embargadas", raw_data = TRUE, 
                    legal_amazon_only = TRUE)
+
+# Download treated collected fines data from "BA"
+data <- load_ibama(dataset = "collected_fines", raw_data = FALSE,
+                   states = "BA", language = "pt")
+
+# Download treated distributed fines data from "BA" and "RJ"
+data <- load_ibama(dataset = "collected_fines", raw_data = FALSE,
+                   states = c("BA", "RJ", language = "eng")
+
 ```
