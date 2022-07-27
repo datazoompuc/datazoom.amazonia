@@ -1,3 +1,7 @@
+# datazoom.amazonia 0.8.0.9000
+
+  * Added new datasets to `load_ibama` for environmental distributed and collected fines
+
 # datazoom.amazonia 0.7.2.9000
 
   * Fixing SSL verification error in download for `load_ibama`
