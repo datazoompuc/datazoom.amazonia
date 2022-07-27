@@ -101,7 +101,7 @@ After installing it, you will be able to download our development version packag
 
 **[12 - DATASUS data](#12---datasus)**
 
-**[13 - IEMA data](#13---iema)*
+**[13 - IEMA data](#13---iema)**
 
 ## The Structure of our functions
 

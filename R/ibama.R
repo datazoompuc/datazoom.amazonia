@@ -50,10 +50,10 @@ load_ibama <- function(dataset,
   param$language <- language
   param$raw_data <- raw_data
 
-  if (states == "all"){
+  if (states == "all") {
     param$states <- c("RO", "AC", "AM", "RR", "PA", "AP", "TO", "MA", "PI", "CE", "RN", "PB", "PE", "AL", "SE", "BA", "MG", "ES", "RJ", "SP", "PR", "SC", "RS", "MS", "MT", "GO", "DF")
   }
-  if (dataset == "areas_embargadas"){
+  if (dataset == "areas_embargadas") {
     param$states <- "all"
   }
 
@@ -112,14 +112,14 @@ load_ibama <- function(dataset,
     dplyr::bind_rows() %>%
     janitor::clean_names()
 
-  if (dataset %in% c("collected_fines", "distributed_fines")){
+  if (dataset %in% c("collected_fines", "distributed_fines")) {
 
     # data come without municipality codes, only their names. +so we turn everything lowercase and remove accents to try and match.
 
     dat <- dat %>%
       dplyr::mutate( # removing accents from municipality names
-      dplyr::across(municipio, ~ stringi::stri_trans_general(., id = "Latin-ASCII"))
-    ) %>%
+        dplyr::across(municipio, ~ stringi::stri_trans_general(., id = "Latin-ASCII"))
+      ) %>%
       dplyr::mutate(dplyr::across(municipio, tolower)) # making all municipality names lowercase
 
     geo <- municipalities %>%
@@ -193,8 +193,7 @@ load_ibama <- function(dataset,
       dplyr::mutate(uf = dplyr::case_when(
         municipio == "ponte alta do norte" & uf == "GO" ~ "SC",
         TRUE ~ uf
-      )
-    )
+      ))
 
     # Changing dates to date format
 
@@ -207,41 +206,40 @@ load_ibama <- function(dataset,
       )
   }
 
-  if (dataset == "areas_embargadas"){
+  if (dataset == "areas_embargadas") {
 
-  ## Aggregate to municipality-level
-  dat <- dat %>%
-    dplyr::select(
-      municipio_infracao, uf_infracao, julgamento,
-      infracao, data_de_insercao_na_lista,
-      cpf_ou_cnpj
-    ) %>%
-    dplyr::mutate(
-      julgamento = ifelse(julgamento == "pendente de julgamento", FALSE, TRUE),
-      data_de_insercao_na_lista = lubridate::dmy(data_de_insercao_na_lista),
-      ano = lubridate::year(data_de_insercao_na_lista),
-      mes = lubridate::month(data_de_insercao_na_lista)
-    ) %>%
-    dplyr::rename(
-      municipio = municipio_infracao,
-      uf = uf_infracao
-    ) %>%
-    dplyr::group_by(uf, municipio, ano, mes) %>%
-    dplyr::summarise(
-      n_ja_julgado = sum(!is.na(julgamento), na.rm = TRUE),
-      n_infracoes = dplyr::n(),
-      n_cpf_cnpj_unicos = length(unique(cpf_ou_cnpj)),
-      .groups = "drop"
-    )
+    ## Aggregate to municipality-level
+    dat <- dat %>%
+      dplyr::select(
+        municipio_infracao, uf_infracao, julgamento,
+        infracao, data_de_insercao_na_lista,
+        cpf_ou_cnpj
+      ) %>%
+      dplyr::mutate(
+        julgamento = ifelse(julgamento == "pendente de julgamento", FALSE, TRUE),
+        data_de_insercao_na_lista = lubridate::dmy(data_de_insercao_na_lista),
+        ano = lubridate::year(data_de_insercao_na_lista),
+        mes = lubridate::month(data_de_insercao_na_lista)
+      ) %>%
+      dplyr::rename(
+        municipio = municipio_infracao,
+        uf = uf_infracao
+      ) %>%
+      dplyr::group_by(uf, municipio, ano, mes) %>%
+      dplyr::summarise(
+        n_ja_julgado = sum(!is.na(julgamento), na.rm = TRUE),
+        n_infracoes = dplyr::n(),
+        n_cpf_cnpj_unicos = length(unique(cpf_ou_cnpj)),
+        .groups = "drop"
+      )
 
-  geo <- municipalities %>%
-    dplyr::select(
-      code_muni,
-      "municipio" = name_muni,
-      "uf" = abbrev_state,
-      legal_amazon
-    )
-
+    geo <- municipalities %>%
+      dplyr::select(
+        code_muni,
+        "municipio" = name_muni,
+        "uf" = abbrev_state,
+        legal_amazon
+      )
   }
 
   ## Adding IBGE municipality codes
@@ -261,31 +259,30 @@ load_ibama <- function(dataset,
   ## Harmonizing Variable Names ##
   ################################
 
-  if (dataset == "areas_embargadas"){
-  if (param$language == "pt") {
-    dat_mod <- dat %>%
-      dplyr::select(
-        ano, mes, uf, municipio, cod_municipio,
-        n_ja_julgado, n_infracoes, n_cpf_cnpj_unicos
-      ) %>%
-      dplyr::arrange(ano, mes, municipio)
+  if (dataset == "areas_embargadas") {
+    if (param$language == "pt") {
+      dat_mod <- dat %>%
+        dplyr::select(
+          ano, mes, uf, municipio, cod_municipio,
+          n_ja_julgado, n_infracoes, n_cpf_cnpj_unicos
+        ) %>%
+        dplyr::arrange(ano, mes, municipio)
+    }
+
+    if (param$language == "eng") {
+      dat_mod <- dat %>%
+        dplyr::select(
+          year = ano, month = mes, state = uf,
+          municipality = municipio, municipality_code = cod_municipio,
+          n_already_judged = n_ja_julgado,
+          n_infringement = n_infracoes,
+          n_unique_cpf_cnpj = n_cpf_cnpj_unicos
+        ) %>%
+        dplyr::arrange(year, month, municipality)
+    }
   }
 
-  if (param$language == "eng") {
-    dat_mod <- dat %>%
-      dplyr::select(
-        year = ano, month = mes, state = uf,
-        municipality = municipio, municipality_code = cod_municipio,
-        n_already_judged = n_ja_julgado,
-        n_infringement = n_infracoes,
-        n_unique_cpf_cnpj = n_cpf_cnpj_unicos
-      ) %>%
-      dplyr::arrange(year, month, municipality)
-  }
-  }
-
-  if (dataset %in% c("collected_fines", "distributed_fines")){
-
+  if (dataset %in% c("collected_fines", "distributed_fines")) {
     dat <- dat %>%
       dplyr::select(-municipio) %>%
       dplyr::relocate(code_muni, name_muni, uf, data_auto)
@@ -303,27 +300,27 @@ load_ibama <- function(dataset,
     }
 
     if (param$language == "eng") {
-        dat_mod <- dat %>%
-          dplyr::rename_with(dplyr::recode,
-            code_muni = "municipality_code",
-            name_muni = "municipality",
-            uf = "state",
-            data_auto = "penalty_date",
-            no_ai = "report_number",
-            nome_ou_razao_social = "name_or_corporate_name",
-            status_debito = "debt_status",
-            tipo_auto = "penalty",
-            tipo_infracao = "infraction",
-            enquadramento_legal = "legal_framework",
-            valor_do_auto = "penalty_value",
-            moeda = "currency",
-            parcela = "installment",
-            quantidade_de_parcelas = "number_of_installments",
-            valor_base_da_parcela = "base_installment_value",
-            valor_pago = "value_paid",
-            data_pagamento = "payment_date",
-            ultima_atualizacao_relatorio = "report_last_update"
-          )
+      dat_mod <- dat %>%
+        dplyr::rename_with(dplyr::recode,
+          code_muni = "municipality_code",
+          name_muni = "municipality",
+          uf = "state",
+          data_auto = "penalty_date",
+          no_ai = "report_number",
+          nome_ou_razao_social = "name_or_corporate_name",
+          status_debito = "debt_status",
+          tipo_auto = "penalty",
+          tipo_infracao = "infraction",
+          enquadramento_legal = "legal_framework",
+          valor_do_auto = "penalty_value",
+          moeda = "currency",
+          parcela = "installment",
+          quantidade_de_parcelas = "number_of_installments",
+          valor_base_da_parcela = "base_installment_value",
+          valor_pago = "value_paid",
+          data_pagamento = "payment_date",
+          ultima_atualizacao_relatorio = "report_last_update"
+        )
     }
   }
 

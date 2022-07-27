@@ -461,11 +461,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source == "ibama") {
     if (dataset == "areas_embargadas") {
       path <- param$url
-    }
-    else if (dataset == "distributed_fines"){
+    } else if (dataset == "distributed_fines") {
       path <- paste0(param$url, param$state, "/Quantidade/multasDistribuidasBensTutelados.csv")
-    }
-    else if (dataset == "collected_fines"){
+    } else if (dataset == "collected_fines") {
       path <- paste0(param$url, param$state, "/Arrecadacao/arrecadacaobenstutelados.csv")
     }
   }
@@ -562,10 +560,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     file_extension <- ".xlsx"
   }
   if (source == "ibama") {
-    if (dataset == "areas_embargadas"){
+    if (dataset == "areas_embargadas") {
       file_extension <- ".zip"
-    }
-    else{
+    } else {
       file_extension <- ".csv"
     }
   }
