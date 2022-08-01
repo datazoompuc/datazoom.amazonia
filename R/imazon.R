@@ -20,7 +20,7 @@
 #' imazon <- load_imazon(dataset = "imazon_shp")
 #' }
 load_imazon= function(dataset = 'imazon_shp', raw_data = TRUE,
-                      geo_level = 'municipality', language = "pt_br"){
+                      geo_level = 'municipality', language = "pt"){
 
   # Checking for googledrive package (in Suggests)
 
