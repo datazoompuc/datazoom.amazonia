@@ -45,7 +45,7 @@ load_baci <- function(dataset = "HS92", raw_data, time_period,
 
   ## Check if year is acceptable
 
-  year_check <- datasets_baci() %>%
+  year_check <- datasets_link() %>%
     dplyr::select(available_time) %>%
     unlist() %>%
     as.character() %>%

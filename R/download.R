@@ -1112,31 +1112,20 @@ datasets_link <- function() {
 
     "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds",
     "IEMA", "iema", NA, "2018", "Municipality", "https://drive.google.com/uc?export=download&id=10JMRtzu3k95vl8cQmHkVMQ9nJovvIeNl",
+
+    ## SEEG
+
+    "SEEG", "seeg_farming", NA, "1970-2019","Country, State, Municipality","http://seeg.eco.br/download",
+    "SEEG", "seeg_industry", NA,"1970-2019","Country, State, Municipality","http://seeg.eco.br/download",
+    "SEEG", "seeg_energy", NA,"1970-2019","Country, State, Municipality","http://seeg.eco.br/download",
+    "SEEG", "seeg_land", NA,"1970-2019","Country, State, Municipality","http://seeg.eco.br/download",
+    "SEEG", "seeg_residuals", NA, "1970-2019","Country, State, Municipality","http://seeg.eco.br/download",
+
+    ## BACI
+
+    "BACI", "HS92", NA, "1995-2020", "Country", "http://www.cepii.fr/DATA_DOWNLOAD/baci/data",
   )
 
   return(link)
 }
 
-datasets_seeg <- function() {
-
-  ## Add file type at the end in order to set the Curl Process
-
-  link <- tibble::tribble(
-    ~survey, ~dataset, ~id_code, ~link,
-    "SEEG", "seeg_farming", 100, "http://seeg.eco.br/download",
-    "SEEG", "seeg_industry", 101, "http://seeg.eco.br/download",
-    "SEEG", "seeg_energy", 102, "http://seeg.eco.br/download",
-    "SEEG", "seeg_land", 103, "http://seeg.eco.br/download",
-    "SEEG", "seeg_residuals", 104, "http://seeg.eco.br/download",
-  )
-  return(link)
-}
-
-
-datasets_baci <- function() {
-  link <- tibble::tribble(
-    ~survey, ~dataset, ~available_time, ~link,
-    "BACI", "HS92", "1995-2020", "http://www.cepii.fr/DATA_DOWNLOAD/baci/data",
-  )
-  return(link)
-}

@@ -62,11 +62,10 @@ load_seeg <- function(dataset = NULL, raw_data,
   param$raw_data <- raw_data
 
   if (!is.numeric(param$dataset)) {
-    param$code <- datasets_seeg() %>%
+    param$code <- datasets_link() %>%
       dplyr::filter(dataset == param$dataset) %>%
-      dplyr::select(id_code) %>%
-      unlist() %>%
-      as.numeric()
+      dplyr::select(link) %>%
+      unlist()
   } else {
     param$code <- param$dataset
   }
