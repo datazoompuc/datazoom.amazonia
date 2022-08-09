@@ -2,7 +2,7 @@
 title: "IMAZON"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{IEMA}
+  %\VignetteIndexEntry{IMAZON}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
