@@ -1,0 +1,37 @@
+---
+title: "IMAZON"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{IEMA}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## The Dataset
+
+Loads data containing the municipality's categorization according to imazon's categories. There are four categories that correspond to the level of deforestation pressure faced by the place.
+
+## Usage
+
+`load_imazon` downloads and compiles data that categorizes the level of deforestation of all the municipalities from the legal amazon region.
+
+The function only offers the raw_data, as imazon already delivers the organized data.
+
+```{r, eval = FALSE}
+library(datazoom.amazonia)
+
+# Download treated data (raw_data = FALSE)
+data <- load_imazon(dataset = "imazon_shp", raw_data = FALSE,
+                     geo_level = "municipality", language = "pt")
+
+# Download treated data in english
+data <- load_iema(dataset = "iema", raw_data = FALSE,
+                     geo_level = "municipality", language = "eng")
+```
