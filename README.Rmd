@@ -939,13 +939,21 @@ There are four parameters in this function:
 ```
   1. dataset:
   # "imazon_shp" includes the municipalities shapefiles and the deforestation category according to imazon
-  2. raw_data: there are one option:
-  # FALSE: if you want the treated (more organized) version of the data.
+  2. raw_data: there is one option:
+  # TRUE, as imazon already delivers the organized data.
   
   3. geo_level:
   # "municipality". The data is only available at the municipality level.
   
   4. language: you can choose between portuguese ('pt') and english ('eng')
+  
+  
+```
+
+```{r eval=FALSE}
+# Download data
+data <- load_imazon(dataset = "imazon_shp", raw_data = TRUE,
+                     geo_level = "municipality", language = "pt")
 ```
 
 ## The Structure of the functions
