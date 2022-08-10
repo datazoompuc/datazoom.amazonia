@@ -728,7 +728,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
 
     if (param$source == "deter") {
-      dat <- sf::read_sf(file.path(dir, "deter_public.shp", sep = "\\")) %>%
+      dat <- sf::read_sf(file.path(dir, "deter_public.shp")) %>%
         janitor::clean_names() %>%
         tibble::as_tibble()
     }
