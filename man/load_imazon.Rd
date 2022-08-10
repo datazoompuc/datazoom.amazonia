@@ -9,7 +9,7 @@ load_imazon(
   dataset = "imazon_shp",
   raw_data = TRUE,
   geo_level = "municipality",
-  language = "pt_br"
+  language = "pt"
 )
 }
 \arguments{
