@@ -11,7 +11,6 @@
 #' @encoding UTF-8
 #'
 #' @export
-#' @importFrom magrittr %>%
 #'
 #' @examples
 #' \dontrun{
@@ -30,11 +29,8 @@
 #' )
 #' }
 #'
-load_deter <- function(dataset = NULL, raw_data,
+load_deter <- function(dataset, raw_data = FALSE,
                        language = "eng") {
-
-  ## Dataset can be either Amazonia or Cerrado
-  # Default is all time-periods
 
   ###########################
   ## Bind Global Variables ##
@@ -42,25 +38,7 @@ load_deter <- function(dataset = NULL, raw_data,
 
   ## Bind Global Variables
 
-  quadrant <- .data <- abbrev_state <- name_state <- code_region <- NULL
-  path_row <- name_region <- code_muni <- area <- geometry <- NULL
-  sensor <- data <- cod_municipio <- class <- municipality_code <- NULL
-  satellite <- class_name <- classe <- NULL
-  view_date <- NULL
-  municipali <- NULL
-  uc <- NULL
-  uf <- NULL
-  ano <- NULL
-  mes <- NULL
-  classname <- NULL
-  areauckm <- NULL
-  areamunkm <- NULL
-  name_muni <- NULL
-  code_state <- NULL
-  area_uc_km <- NULL
-  area_geo_km <- NULL
-  survey <- link <- NULL
-  time_period <- NULL
+
 
   #############################
   ## Define Basic Parameters ##
@@ -68,40 +46,17 @@ load_deter <- function(dataset = NULL, raw_data,
 
   param <- list()
   param$dataset <- dataset
-  param$time_period <- time_period
   param$language <- language
   param$raw_data <- raw_data
-
-  param$survey_name <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(survey) %>%
-    unlist()
-
-  param$url <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(link) %>%
-    unlist()
-
-  ## Dataset
-
-  if (is.null(param$dataset)) {
-    stop("Missing Dataset!")
-  }
-  if (is.null(param$raw_data)) {
-    stop("Missing TRUE/FALSE for Raw Data")
-  }
 
   #################
   ## Downloading ##
   #################
 
-  dat <- external_download(dataset = param$dataset, source = "deter")
-
-  dat <- dat %>%
-    dplyr::mutate_if(is.character, function(var) {
-      stringi::stri_trans_general(str = var, id = "Latin-ASCII")
-    })
-
+  dat <- external_download(
+    dataset = param$dataset,
+    source = "deter"
+    )
 
   ## Return Raw Data
 
@@ -112,6 +67,15 @@ load_deter <- function(dataset = NULL, raw_data,
   ######################
   ## Data Engineering ##
   ######################
+
+  dat <- dat %>%
+    janitor::clean_names() %>%
+    dplyr::mutate(
+      dplyr::across(
+        where(is.character),
+        ~ stringi::stri_trans_general(., id = "Latin-ASCII")
+      )
+    )
 
   # Loading municipal map data
   geo_br <- external_download(
@@ -139,99 +103,36 @@ load_deter <- function(dataset = NULL, raw_data,
 
   dat <- dat %>%
     dplyr::select(
-      -name_muni, -abbrev_state, -name_state,
-      -code_region, -name_region
-    )
-
-  dat <- dat %>%
-    dplyr::select(
-      view_date, code_state, code_muni, sensor, satellite, uc,
+      view_date, name_muni, code_muni, sensor, satellite, uc,
       classname, path_row, area, quadrant, geometry
     )
 
-  ################### ### -------------------- Need to Work
+  ###################
   ## Renaming Data ##
   ###################
 
   if (param$language == "pt") {
     dat_mod <- dat %>%
-      dplyr::select(
-        data = view_date, cod_uf = code_state,
-        cod_municipio = code_muni, sensor = sensor,
-        satelite = satellite, uc, classe = classname,
-        path_row, area, quadrante = quadrant, geometry
-      ) %>%
-      dplyr::arrange(data, cod_municipio, classe)
+      dplyr::rename(
+        "data" = view_date,
+        "municipio" = name_muni,
+        "cod_municipio" = code_muni,
+        "satelite" = satellite,
+        "classe" = classname,
+        "quadrante" = quadrant
+      )
   }
 
   if (param$language == "eng") {
     dat_mod <- dat %>%
-      dplyr::select(
-        date = view_date, state_code = code_state,
-        municipality_code = code_muni, sensor = sensor,
-        satellite, uc, class_name = classname,
-        pathrow = path_row, area, quadrant, geometry
-      ) %>%
-      dplyr::arrange(date, municipality_code, class_name)
+      dplyr::rename(
+        "date" = view_date,
+        "municipality" = name_muni,
+        "municipality_code" = code_muni,
+        class_name = classname,
+        pathrow = path_row
+      )
   }
-  # df <- df %>%
-  #   dplyr::rename_with(dplyr::recode,
-  #                      CLASSNAME = "Classe",
-  #                      AREAUCKM = "Area_em_UC_km2",
-  #                      AREAMUNKM = "Area_em_Municipio_km2",
-  #                      MUNICIPALI = "Municipio",
-  #   )
-  #
-  # df$Classe <- df$Classe %>% dplyr::recode(
-  #   CICATRIZ_DE_QUEIMADA = "Cicatriz de Queimada",
-  #   CS_DESORDENADO = "Corte Seletivo Desordenado",
-  #   CS_GEOMETRICO = "Corte Seletivo Geometrico",
-  #   DEGRADACAO = "Degradacao",
-  #   DESMATAMENTO_CR = "Desmatamento Corte Raso",
-  #   DESMATAMENTO_VEG = "Desmatamento com Vegetacao",
-  #   MINERACAO = "Mineracao",
-  #   CORTE_SELETIVO = "Corte Seletivo"
-  # )
-
-  ###########################
-  ## Translating Variables ##
-  ###########################
-
-  # language <- tolower(language)
-  #
-  # if (language == "eng") {
-  #
-  #   ## Translate
-  #
-  #   df$Classe <- df$Classe %>% dplyr::recode(
-  #     "Cicatriz de Queimada" = "Fire Scar",
-  #     "Corte Seletivo Desordenado" = "Unorganized Selection Cutting",
-  #     "Corte Seletivo Geometrico" = "Geometric Selection Cutting",
-  #     "Degradacao" = "Degradation",
-  #     "Desmatamento Corte Raso" = "Clear Cut Deforestation",
-  #     "Desmatamento com Vegetacao" = "Vegetation Remains Deforestation",
-  #     "Mineracao" = "Mining",
-  #     "aviso" = "Warning",
-  #     "Corte Seletivo" = "Selection Cutting"
-  #   )
-  #
-  #   ## Data Engineering
-  #
-  #   df <- df %>%
-  #     dplyr::rename_with(dplyr::recode,
-  #                        Classe = "Class",
-  #                        UC = "ConservationUnit",
-  #                        Area_em_UC_km2 = "Area_in_CU_km2",
-  #                        Area_em_Municipio_km2 = "Area_in_Municipality_km2",
-  #                        Municipio = "Municipality",
-  #                        Mes = "Month",
-  #                        Ano = "Year"
-  #     )
-  #
-  # }
-  # else if (language != "pt") {
-  #   warning("Selected language not supported. Proceeding with Portuguese.")
-  # }
 
   #################
   ## Return Data ##
