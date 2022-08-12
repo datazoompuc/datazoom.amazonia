@@ -6,7 +6,7 @@
 #' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
 #'
-#' @return A \code{tibble} with the selected data.
+#' @return A \code{tibble} (if \code{raw_data} = \code{TRUE}) or a \code{sf} object (if \code{raw_data} = \code{FALSE}).
 #'
 #' @encoding UTF-8
 #'
@@ -69,7 +69,6 @@ load_deter <- function(dataset, raw_data = FALSE,
   ######################
 
   dat <- dat %>%
-    janitor::clean_names() %>%
     dplyr::mutate(
       dplyr::across(
         where(is.character),
@@ -82,6 +81,11 @@ load_deter <- function(dataset, raw_data = FALSE,
     dataset = "geo_municipalities",
     source = "internal"
   )
+
+  # Adding alert_id variable to preserve the information of which rows belong to the same alert
+
+  dat <- dat %>%
+    dplyr::mutate(id_alerta = dplyr::row_number())
 
   ###################
   ## Harmonize CRS ##
@@ -103,8 +107,8 @@ load_deter <- function(dataset, raw_data = FALSE,
 
   dat <- dat %>%
     dplyr::select(
-      view_date, name_muni, code_muni, sensor, satellite, uc,
-      classname, path_row, area, quadrant, geometry
+      view_date, name_muni, code_muni, sensor, satellite,
+      classname, path_row, area, quadrant, id_alerta, geometry
     )
 
   ###################
@@ -129,8 +133,8 @@ load_deter <- function(dataset, raw_data = FALSE,
         "date" = view_date,
         "municipality" = name_muni,
         "municipality_code" = code_muni,
-        class_name = classname,
-        pathrow = path_row
+        "class_name" = classname,
+        "alert_id" = id_alerta
       )
   }
 
