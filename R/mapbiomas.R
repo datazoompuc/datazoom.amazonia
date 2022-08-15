@@ -81,8 +81,8 @@ load_mapbiomas <- function(dataset = NULL, raw_data = NULL, geo_level = "municip
 
   sheets <- tibble::tribble(
     ~dataset, ~geo_level, ~sheet,
-    "mapbiomas_cover", "any", "LAND COVER - BIOMAS e UF",
-    "mapbiomas_transition", "any", "BD_TRANSICAO_BIOMA-UF",
+    "mapbiomas_cover", "any", "LAND COVER",
+    "mapbiomas_transition", "any", "TRANSITIONS",
     "mapbiomas_deforestation_regeneration", "any", "BD Colecao 5.0(h) - Hectares",
     "mapbiomas_irrigation", "any", "BD_IRRIGACAO",
     "mapbiomas_grazing_quality", "any", "BD_Qualidade",

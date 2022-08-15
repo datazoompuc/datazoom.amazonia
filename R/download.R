@@ -403,11 +403,13 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
 
   if (source == "mapbiomas") {
-    if (dataset == "mapbiomas_cover") {
-      path <- paste(param$url, "Estat%C3%ADsticas/Cole%C3%A7%C3%A3o%206/1-ESTATISTICAS_MapBiomas_COL6.0_UF-BIOMAS_v12_SITE.xlsx", sep = "")
-    }
-    if (dataset == "mapbiomas_transition") {
-      path <- param$url
+    if (dataset %in% c("mapbiomas_cover", "mapbiomas_transition")) {
+      if (param$geo_level == "state"){
+        path <- paste(param$url, "Estat%C3%ADsticas/Cole%C3%A7%C3%A3o%206/1-ESTATISTICAS_MapBiomas_COL6.0_UF-BIOMAS_v12_SITE.xlsx", sep = "")
+      }
+      if (param$geo_level == "municipality"){
+        path <- "https://drive.google.com/uc?export=download&id=1RT7J2jS6LKyISM49ctfRO31ynJZXX_TY"
+      }
     }
     if (dataset == "mapbiomas_deforestation_regeneration") {
       path <- paste(param$url, "Estat%C3%ADsticas/BD-DESM_e_REG_COL5_V8h__SITE.xlsx", sep = "")
@@ -545,10 +547,11 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   file_extension <- stringr::str_sub(path, -4)
   if (source == "mapbiomas") {
-    if (dataset == "mapbiomas_transition") {
-      file_extension <- ".zip"
-    } else {
+    if (param$geo_level == "state"){
       file_extension <- ".xlsx"
+    }
+    if (param$geo_level == "municipality"){
+      file_extension <- ".zip"
     }
   }
   if (source == "ips") {
@@ -598,12 +601,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source %in% c("comex", "degrad", "internal", "ips", "prodes", "sigmine")) {
     utils::download.file(url = path, destfile = temp, mode = "wb")
   }
-  if (source == "mapbiomas") {
-    if (dataset == "mapbiomas_transition") {
-      googledrive::drive_download(path, path = temp, overwrite = TRUE)
-    } else {
-      utils::download.file(url = path, destfile = temp, mode = "wb")
-    }
+  if (source == "mapbiomas" & param$geo_level == "state"){
+    utils::download.file(url = path, destfile = temp, mode = "wb")
   }
   if (source == "iema") {
     googledrive::drive_download(path, path = temp, overwrite = TRUE)
@@ -995,7 +994,7 @@ datasets_link <- function() {
     ###############
 
     "MAPBIOMAS", "mapbiomas_cover", NA, "1985-2019", "Municipality, State", "https://mapbiomas-br-site.s3.amazonaws.com/",
-    "MAPBIOMAS", "mapbiomas_transition", NA, "1985-2019", "Municipality, State", "https://drive.google.com/uc?export=download&id=1RT7J2jS6LKyISM49ctfRO31ynJZXX_TY",
+    "MAPBIOMAS", "mapbiomas_transition", NA, "1985-2019", "Municipality, State", "https://mapbiomas-br-site.s3.amazonaws.com/",
     "MAPBIOMAS", "mapbiomas_deforestation_regeneration", NA, "1988-2017", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
     "MAPBIOMAS", "mapbiomas_irrigation", NA, "2000-2019", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
     "MAPBIOMAS", "mapbiomas_grazing_quality", NA, "2010 & 2018", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
