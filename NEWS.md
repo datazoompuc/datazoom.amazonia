@@ -1,7 +1,3 @@
-# datazoom.amazonia 0.8.3.9000
-
-  * Updated collection 6 Mapbiomas data for "mapbiomas_transition" dataset
-
 # datazoom.amazonia 0.8.2.9000
 
   * Adding a sequential identification variable to `load_deter`
