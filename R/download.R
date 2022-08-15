@@ -404,7 +404,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   if (source == "mapbiomas") {
     if (dataset == "mapbiomas_cover") {
-      path <- paste(param$url, "Estat%C3%ADsticas/Dados_Cobertura_MapBiomas_5.0_UF-MUN_SITE_v2.xlsx", sep = "")
+      path <- paste(param$url, "Estat%C3%ADsticas/Cole%C3%A7%C3%A3o%206/1-ESTATISTICAS_MapBiomas_COL6.0_UF-BIOMAS_v12_SITE.xlsx", sep = "")
     }
     if (dataset == "mapbiomas_transition") {
       path <- "https://storage.googleapis.com/mapbiomas-public/COLECAO/5/DOWNLOADS/ESTATISTICAS/Dados_Transicao_MapBiomas_5.0_UF-MUN_SITE_v2.xlsx"
