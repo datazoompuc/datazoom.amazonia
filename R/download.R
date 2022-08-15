@@ -545,10 +545,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   file_extension <- stringr::str_sub(path, -4)
   if (source == "mapbiomas") {
-    if (dataset == "mapbiomas_transition"){
+    if (dataset == "mapbiomas_transition") {
       file_extension <- ".zip"
-    }
-    else{
+    } else {
       file_extension <- ".xlsx"
     }
   }
@@ -599,11 +598,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source %in% c("comex", "degrad", "internal", "ips", "prodes", "sigmine")) {
     utils::download.file(url = path, destfile = temp, mode = "wb")
   }
-  if (source == "mapbiomas"){
-    if (dataset == "mapbiomas_transition"){
+  if (source == "mapbiomas") {
+    if (dataset == "mapbiomas_transition") {
       googledrive::drive_download(path, path = temp, overwrite = TRUE)
-    }
-    else{
+    } else {
       utils::download.file(url = path, destfile = temp, mode = "wb")
     }
   }
@@ -771,7 +769,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
         tibble::as_tibble()
     }
 
-    if (param$source == "mapbiomas"){
+    if (param$source == "mapbiomas") {
 
       # extracting the one file we care about from the unzipped file
       file <- list.files(dir, pattern = "1-ESTATISTICAS_MapBiomas_COL6.0_UF-MUNICIPIOS_*", full.names = TRUE)
@@ -1139,11 +1137,11 @@ datasets_link <- function() {
     ## SEEG ##
     ##########
 
-    "SEEG", "seeg_farming", NA, "1970-2019","Country, State, Municipality","http://seeg.eco.br/download",
-    "SEEG", "seeg_industry", NA,"1970-2019","Country, State, Municipality","http://seeg.eco.br/download",
-    "SEEG", "seeg_energy", NA,"1970-2019","Country, State, Municipality","http://seeg.eco.br/download",
-    "SEEG", "seeg_land", NA,"1970-2019","Country, State, Municipality","http://seeg.eco.br/download",
-    "SEEG", "seeg_residuals", NA, "1970-2019","Country, State, Municipality","http://seeg.eco.br/download",
+    "SEEG", "seeg_farming", NA, "1970-2019", "Country, State, Municipality", "http://seeg.eco.br/download",
+    "SEEG", "seeg_industry", NA, "1970-2019", "Country, State, Municipality", "http://seeg.eco.br/download",
+    "SEEG", "seeg_energy", NA, "1970-2019", "Country, State, Municipality", "http://seeg.eco.br/download",
+    "SEEG", "seeg_land", NA, "1970-2019", "Country, State, Municipality", "http://seeg.eco.br/download",
+    "SEEG", "seeg_residuals", NA, "1970-2019", "Country, State, Municipality", "http://seeg.eco.br/download",
 
     ##########
     ## BACI ##
@@ -1154,9 +1152,7 @@ datasets_link <- function() {
     ## Shapefile from github repository
 
     "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds",
-
   )
 
   return(link)
 }
-
