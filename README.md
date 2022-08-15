@@ -24,7 +24,7 @@ data with the public then there’s nothing we can do about it.
 
 ``` r
 datazoom.amazonia::datasets_link()
-#> # A tibble: 146 × 6
+#> # A tibble: 148 × 6
 #>    survey   dataset         sidra_code     available_time available_geo    link 
 #>    <chr>    <chr>           <chr>          <chr>          <chr>            <chr>
 #>  1 PAM-IBGE all_crops       5457/all/all   1974-2020      Country, State,… http…
@@ -37,7 +37,7 @@ datazoom.amazonia::datasets_link()
 #>  8 PAM-IBGE temporary_total 1612/c81/0     1974-2020      Country, State,… http…
 #>  9 PAM-IBGE pineapple       1612/c81/2688  1974-2020      Country, State,… http…
 #> 10 PAM-IBGE alfafa          1612/c81/40471 1974-1987      Country, State,… http…
-#> # … with 136 more rows
+#> # … with 138 more rows
 ```
 
 ### Content:
@@ -680,25 +680,28 @@ data <- load_seeg(dataset = "seeg",
 ## 6 - IBAMA
 
 Downloads and compiles data on environmental fines at the municipality
-or state levels considering the Amazon region.
+or state levels considering the Brazilian region.
 
 The function returns either the raw data or a data frame with aggregates
 considering, for each time-location period, counts for total the number
 of infractions, infractions that already went to trial, and number of
-unique perpetrators of infractions.
+unique perpetrators of infractions. There are also two data frames
+regarding distributed and collected fines across municipalities
 
-    There are five parameters in this function:
-      1. dataset = "areas_embargadas"
-      
+    There are four parameters in this function:
+    1. dataset: There are three possible choices.
+    'areas_embargadas': return the amount of embargoed areas
+    'distributed_fines': return fines that have not been paid by individuals or corporations
+    'collected_fines': return fines that have been paid vy individuals or corporations
+
       2. raw_data: there are two options:
       # TRUE: if you want the raw data.
-      # FALSE: if you want the processed version of the data. 
-     
-      3. geo_level: "municipality"
+      # FALSE: if you want the processed version of the data.
+      
+      3. states: specifies for which states to download the data. It is "all" by default, but can be a single state such as "AC" or any vector such as c("AC", "AM"). Does not apply to the "areas_embargadas" dataset.
       
       4. language: you can choose between portuguese and english
       
-      5. legal_amazon_only: setting the return of Legal Amazon Data (legal_amazon_only = TRUE) or Country´s Data (legal_amazon_only = FALSE)
 
 ``` r
 # Download treated data (raw_data = FALSE) from the entire country 

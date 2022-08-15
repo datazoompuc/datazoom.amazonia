@@ -1,6 +1,14 @@
-# datazoom.amazonia 0.8.0.9000
+# datazoom.amazonia 0.9.0.9000
 
   * Added new `load_imazon` function for deforestation data
+
+# datazoom.amazonia 0.8.1.9000
+
+  * Changed code to initiate Deter download
+
+# datazoom.amazonia 0.8.0.9000
+
+  * Added new datasets to `load_ibama` for environmental distributed and collected fines
 
 # datazoom.amazonia 0.7.2.9000
 

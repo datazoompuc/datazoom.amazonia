@@ -277,7 +277,8 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
 
 external_download <- function(dataset = NULL, source = NULL, year = NULL,
                               geo_level = NULL, coords = NULL, dataset_code = NULL,
-                              sheet = NULL, skip_rows = NULL, file_name = NULL) {
+                              sheet = NULL, skip_rows = NULL, file_name = NULL,
+                              state = NULL) {
 
   ## Bind Global Variables
 
@@ -302,6 +303,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   param$skip_rows <- skip_rows
   param$file_name <- file_name
   param$sheet <- sheet
+  param$state <- state
 
   # if (param$geo_level == 'legal_amazon' & param$source == 'prodes'){param$geo_level = 'legal-amz-prodes'}
   # if (param$geo_level == 'amazon_biome' & param$source == 'prodes'){param$geo_level = 'amz-prodes'}
@@ -459,6 +461,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source == "ibama") {
     if (dataset == "areas_embargadas") {
       path <- param$url
+    } else if (dataset == "distributed_fines") {
+      path <- paste0(param$url, param$state, "/Quantidade/multasDistribuidasBensTutelados.csv")
+    } else if (dataset == "collected_fines") {
+      path <- paste0(param$url, param$state, "/Arrecadacao/arrecadacaobenstutelados.csv")
     }
   }
 
@@ -564,7 +570,11 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     file_extension <- ".xlsx"
   }
   if (source == "ibama") {
-    file_extension <- ".zip"
+    if (dataset == "areas_embargadas") {
+      file_extension <- ".zip"
+    } else {
+      file_extension <- ".csv"
+    }
   }
   if (source == "terraclimate") {
     file_extension <- ".nc"
@@ -611,7 +621,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
   }
   if (source %in% c("terraclimate", "ibama")) {
-    utils::download.file(url = path, destfile = temp, method = "curl")
+    utils::download.file(url = path, destfile = temp, method = "curl", quiet = TRUE)
   }
 
   if (source == "imazon_shp") {
@@ -736,7 +746,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
 
     if (param$source == "deter") {
-      dat <- sf::read_sf(paste(dir, "deter_public.shp", sep = "\\")) %>%
+      dat <- sf::read_sf(file.path(dir, "deter_public.shp")) %>%
         janitor::clean_names() %>%
         tibble::as_tibble()
     }
@@ -1039,7 +1049,9 @@ datasets_link <- function() {
 
     # There is a lot to map, seem an incredible data source
 
-    "AREAS_EMBARGADAS-IBAMA", "areas_embargadas", NA, NA, "Municipality", "https://servicos.ibama.gov.br/ctf/publico/areasembargadas/downloadListaAreasEmbargadas.php",
+    "IBAMA", "areas_embargadas", NA, NA, "Municipality", "https://servicos.ibama.gov.br/ctf/publico/areasembargadas/downloadListaAreasEmbargadas.php",
+    "IBAMA", "distributed_fines", NA, NA, "Municipality", "https://dadosabertos.ibama.gov.br/dados/SICAFI/",
+    "IBAMA", "collected_fines", NA, NA, "Municipality", "https://dadosabertos.ibama.gov.br/dados/SICAFI/",
     # http://dadosabertos.ibama.gov.br/organization/instituto-brasileiro-do-meio-ambiente-e-dos-recursos-naturais-renovaveis
 
 
