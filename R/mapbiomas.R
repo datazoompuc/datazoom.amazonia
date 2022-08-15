@@ -28,9 +28,9 @@
 load_mapbiomas <- function(dataset = NULL, raw_data = NULL, geo_level = "municipality",
                            time_period = "all", language = "eng", time_id = "year", cover_level = 1) {
 
-  # Checking for googledrive package (in Suggests)
+  # Checking for googledrive package (in Suggests) only for mapbiomas_transition dataset
 
-  if (!requireNamespace("googledrive", quietly = TRUE)) {
+  if (!requireNamespace("googledrive", quietly = TRUE) & dataset == "mapbiomas_transition") {
     stop(
       "Package \"googledrive\" must be installed to use this function.",
       call. = FALSE
