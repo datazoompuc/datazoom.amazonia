@@ -1,3 +1,6 @@
+utils::globalVariables("where") # the selection helper 'where' is not exported from tidyselect, so this must be used to avoid notes
+# they've recently made the move to export it, but it's still not is CRAN
+
 #' @title DETER - Forest Degradation in the Brazilian Amazon
 #'
 #' @description Loads information on change in forest cover in the Amazon. See \url{http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter}
@@ -6,7 +9,7 @@
 #' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
 #'
-#' @return A \code{tibble} with the selected data.
+#' @return A \code{tibble} (if \code{raw_data} = \code{TRUE}) or a \code{sf} object (if \code{raw_data} = \code{FALSE}).
 #'
 #' @encoding UTF-8
 #'
@@ -38,7 +41,8 @@ load_deter <- function(dataset, raw_data = FALSE,
 
   ## Bind Global Variables
 
-
+  .data <- view_date <- name_muni <- code_muni <- sensor <- satellite <- NULL
+  uc <- classname <- path_row <- area <- quadrant <- geometry <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -69,7 +73,6 @@ load_deter <- function(dataset, raw_data = FALSE,
   ######################
 
   dat <- dat %>%
-    janitor::clean_names() %>%
     dplyr::mutate(
       dplyr::across(
         where(is.character),
@@ -129,8 +132,8 @@ load_deter <- function(dataset, raw_data = FALSE,
         "date" = view_date,
         "municipality" = name_muni,
         "municipality_code" = code_muni,
-        class_name = classname,
-        pathrow = path_row
+        "class_name" = classname,
+        "pathrow" = path_row
       )
   }
 
