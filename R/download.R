@@ -1108,12 +1108,15 @@ datasets_link <- function() {
     "DATASUS", "datasus_cnes_gm", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/GM/",
     "DATASUS", "datasus_sih", NA, "2008-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIHSUS/200801_/dados/",
 
-    ## Shapefile from github repository
+    ##########
+    ## IEMA ##
+    ##########
 
-    "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds",
     "IEMA", "iema", NA, "2018", "Municipality", "https://drive.google.com/uc?export=download&id=10JMRtzu3k95vl8cQmHkVMQ9nJovvIeNl",
 
-    ## SEEG
+    ##########
+    ## SEEG ##
+    ##########
 
     "SEEG", "seeg_farming", NA, "1970-2019","Country, State, Municipality","http://seeg.eco.br/download",
     "SEEG", "seeg_industry", NA,"1970-2019","Country, State, Municipality","http://seeg.eco.br/download",
@@ -1121,9 +1124,16 @@ datasets_link <- function() {
     "SEEG", "seeg_land", NA,"1970-2019","Country, State, Municipality","http://seeg.eco.br/download",
     "SEEG", "seeg_residuals", NA, "1970-2019","Country, State, Municipality","http://seeg.eco.br/download",
 
-    ## BACI
+    ##########
+    ## BACI ##
+    ##########
 
     "BACI", "HS92", NA, "1995-2020", "Country", "http://www.cepii.fr/DATA_DOWNLOAD/baci/data",
+
+    ## Shapefile from github repository
+
+    "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds",
+
   )
 
   return(link)
