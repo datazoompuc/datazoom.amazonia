@@ -686,55 +686,55 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (file_extension == ".zip") {
     if (param$dataset == "degrad") {
       if (param$year %in% 2007) {
-        dat <- sf::read_sf(paste(dir, "Degrad2007_Final_pol.shp", sep = "\\"))
+        dat <- sf::read_sf(file.path(dir, "Degrad2007_Final_pol.shp"))
         dat$year <- param$year
       }
       if (param$year == 2008) {
-        dat <- sf::read_sf(paste(dir, "Degrad2008_Final_pol.shp", sep = "\\"))
+        dat <- sf::read_sf(file.path(dir, "Degrad2008_Final_pol.shp"))
         dat$year <- param$year
       }
       if (param$year == 2009) {
-        dat <- sf::read_sf(paste(dir, "Degrad2009_Final_pol.shp", sep = "\\"))
+        dat <- sf::read_sf(file.path(dir, "Degrad2009_Final_pol.shp"))
         dat$year <- param$year
       }
       if (param$year == 2010) {
-        dat <- sf::read_sf(paste(dir, "DEGRAD_2010_UF_pol.shp", sep = "\\"))
+        dat <- sf::read_sf(file.path(dir, "DEGRAD_2010_UF_pol.shp"))
         dat$year <- param$year
       }
       if (param$year == 2011) {
-        dat <- sf::read_sf(paste(dir, "DEGRAD_2011_INPE_pol.shp", sep = "\\"))
+        dat <- sf::read_sf(file.path(dir, "DEGRAD_2011_INPE_pol.shp"))
         dat$year <- param$year
       }
       if (param$year == 2012) {
-        dat <- sf::read_sf(paste(dir, "DEGRAD_2012_INPE_pol.shp", sep = "\\"))
+        dat <- sf::read_sf(file.path(dir, "DEGRAD_2012_INPE_pol.shp"))
         dat$year <- param$year
       }
       if (param$year == 2013) {
-        dat <- sf::read_sf(paste(dir, "DEGRAD_2013_INPE_pol.shp", sep = "\\"))
+        dat <- sf::read_sf(file.path(dir, "DEGRAD_2013_INPE_pol.shp"))
         dat$year <- param$year
       }
       if (param$year == 2014) {
-        dat <- sf::read_sf(paste(dir, "DEGRAD_2014_pol.shp", sep = "\\"))
+        dat <- sf::read_sf(file.path(dir, "DEGRAD_2014_pol.shp"))
         dat$year <- param$year
       }
       if (param$year == 2015) {
-        dat <- sf::read_sf(paste(dir, "DEGRAD_2015.shp", sep = "\\"))
+        dat <- sf::read_sf(file.path(dir, "DEGRAD_2015.shp"))
         dat$year <- param$year
       }
       if (param$year == 2016) {
-        dat <- sf::read_sf(paste(dir, "DEGRAD_2016_pol.shp", sep = "\\"))
+        dat <- sf::read_sf(file.path(dir, "DEGRAD_2016_pol.shp"))
         dat$year <- param$year
       }
     }
 
     if (param$source == "deter") {
-      dat <- sf::read_sf(paste(dir, "deter_public.shp", sep = "\\")) %>%
+      dat <- sf::read_sf(file.path(dir, "deter_public.shp")) %>%
         janitor::clean_names() %>%
         tibble::as_tibble()
     }
 
     if (param$source == "sigmine") {
-      dat <- sf::read_sf(paste(dir, "BRASIL.shp", sep = "\\"))
+      dat <- sf::read_sf(file.path(dir, "BRASIL.shp"))
     }
 
     if (param$source == "ibama") {
