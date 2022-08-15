@@ -1,11 +1,3 @@
-# datazoom.amazonia 0.8.2.9000
-
-  * Adding a sequential identification variable to `load_deter`
-
-# datazoom.amazonia 0.8.1.9000
-
-  * Changed code to initiate Deter download
-
 # datazoom.amazonia 0.8.0.9000
 
   * Added new datasets to `load_ibama` for environmental distributed and collected fines
