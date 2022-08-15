@@ -28,14 +28,11 @@
 load_mapbiomas <- function(dataset = NULL, raw_data = NULL, geo_level = "municipality",
                            time_period = "all", language = "eng", time_id = "year", cover_level = 1) {
 
-  # Checking for googledrive package (in Suggests)
+  ## To-Do:
+  ## Add Support to Transition Info Download at the State and Biome Level
+  ## Add Support to Covering Info Download at the State and Biome Level
+  ## Include Support for raw raster download
 
-  if (!requireNamespace("googledrive", quietly = TRUE)) {
-    stop(
-      "Package \"googledrive\" must be installed to use this function.",
-      call. = FALSE
-    )
-  }
 
   ###########################
   ## Bind Global Variables ##

@@ -545,12 +545,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   file_extension <- stringr::str_sub(path, -4)
   if (source == "mapbiomas") {
-    if (dataset == "mapbiomas_transition"){
-      file_extension <- ".zip"
-    }
-    else{
-      file_extension <- ".xlsx"
-    }
+    file_extension <- ".xlsx"
   }
   if (source == "ips") {
     file_extension <- ".xlsx"
@@ -596,16 +591,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## Extraction through Curl Requests
   ## Investigate a bit more on how Curl Requests work
 
-  if (source %in% c("comex", "degrad", "internal", "ips", "prodes", "sigmine")) {
+  if (source %in% c("comex", "degrad", "internal", "ips", "mapbiomas", "prodes", "sigmine")) {
     utils::download.file(url = path, destfile = temp, mode = "wb")
-  }
-  if (source == "mapbiomas"){
-    if (dataset == "mapbiomas_transition"){
-      googledrive::drive_download(path, path = temp, overwrite = TRUE)
-    }
-    else{
-      utils::download.file(url = path, destfile = temp, mode = "wb")
-    }
   }
   if (source == "iema") {
     googledrive::drive_download(path, path = temp, overwrite = TRUE)
@@ -769,14 +756,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       dat <- dataset[-c(1:5), ] %>%
         janitor::clean_names() %>%
         tibble::as_tibble()
-    }
-
-    if (param$source == "mapbiomas"){
-
-      # extracting the one file we care about from the unzipped file
-      file <- list.files(dir, pattern = "1-ESTATISTICAS_MapBiomas_COL6.0_UF-MUNICIPIOS_*", full.names = TRUE)
-
-      dat <- readxl::read_xlsx(file, sheet = param$sheet)
     }
   }
   if (file_extension == ".dbc") {
@@ -997,7 +976,7 @@ datasets_link <- function() {
     ###############
 
     "MAPBIOMAS", "mapbiomas_cover", NA, "1985-2019", "Municipality, State", "https://mapbiomas-br-site.s3.amazonaws.com/",
-    "MAPBIOMAS", "mapbiomas_transition", NA, "1985-2019", "Municipality, State", "https://drive.google.com/uc?export=download&id=1RT7J2jS6LKyISM49ctfRO31ynJZXX_TY",
+    "MAPBIOMAS", "mapbiomas_transition", NA, "1985-2019", "Municipality, State", "https://storage.googleapis.com/mapbiomas-public/COLECAO/5/DOWNLOADS/ESTATISTICAS/Dados_Transicao_MapBiomas_5.0_UF-MUN_SITE_v2.xlsx",
     "MAPBIOMAS", "mapbiomas_deforestation_regeneration", NA, "1988-2017", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
     "MAPBIOMAS", "mapbiomas_irrigation", NA, "2000-2019", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
     "MAPBIOMAS", "mapbiomas_grazing_quality", NA, "2010 & 2018", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
