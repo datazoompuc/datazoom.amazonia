@@ -42,7 +42,7 @@ load_deter <- function(dataset, raw_data = FALSE,
   ## Bind Global Variables
 
   .data <- view_date <- name_muni <- code_muni <- sensor <- satellite <- NULL
-  uc <- classname <- path_row <- area <- quadrant <- geometry <- NULL
+  uc <- classname <- path_row <- area <- quadrant <- geometry <- id_alerta <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -60,7 +60,7 @@ load_deter <- function(dataset, raw_data = FALSE,
   dat <- external_download(
     dataset = param$dataset,
     source = "deter"
-    )
+  )
 
   ## Return Raw Data
 
@@ -86,6 +86,11 @@ load_deter <- function(dataset, raw_data = FALSE,
     source = "internal"
   )
 
+  # Adding alert_id variable to preserve the information of which rows belong to the same alert
+
+  dat <- dat %>%
+    dplyr::mutate(id_alerta = dplyr::row_number())
+
   ###################
   ## Harmonize CRS ##
   ###################
@@ -106,8 +111,8 @@ load_deter <- function(dataset, raw_data = FALSE,
 
   dat <- dat %>%
     dplyr::select(
-      view_date, name_muni, code_muni, sensor, satellite, uc,
-      classname, path_row, area, quadrant, geometry
+      view_date, name_muni, code_muni, sensor, satellite,
+      classname, path_row, area, quadrant, geometry, id_alerta
     )
 
   ###################
@@ -133,7 +138,7 @@ load_deter <- function(dataset, raw_data = FALSE,
         "municipality" = name_muni,
         "municipality_code" = code_muni,
         "class_name" = classname,
-        "pathrow" = path_row
+        "alert_id" = id_alerta
       )
   }
 
