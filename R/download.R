@@ -407,7 +407,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       path <- paste(param$url, "Estat%C3%ADsticas/Cole%C3%A7%C3%A3o%206/1-ESTATISTICAS_MapBiomas_COL6.0_UF-BIOMAS_v12_SITE.xlsx", sep = "")
     }
     if (dataset == "mapbiomas_transition") {
-      path <- "https://storage.googleapis.com/mapbiomas-public/COLECAO/5/DOWNLOADS/ESTATISTICAS/Dados_Transicao_MapBiomas_5.0_UF-MUN_SITE_v2.xlsx"
+      path <- param$url
     }
     if (dataset == "mapbiomas_deforestation_regeneration") {
       path <- paste(param$url, "Estat%C3%ADsticas/BD-DESM_e_REG_COL5_V8h__SITE.xlsx", sep = "")
@@ -976,7 +976,7 @@ datasets_link <- function() {
     ###############
 
     "MAPBIOMAS", "mapbiomas_cover", NA, "1985-2019", "Municipality, State", "https://mapbiomas-br-site.s3.amazonaws.com/",
-    "MAPBIOMAS", "mapbiomas_transition", NA, "1985-2019", "Municipality, State", "https://mapbiomas-br-site.s3.amazonaws.com/",
+    "MAPBIOMAS", "mapbiomas_transition", NA, "1985-2019", "Municipality, State", "https://storage.googleapis.com/mapbiomas-public/COLECAO/5/DOWNLOADS/ESTATISTICAS/Dados_Transicao_MapBiomas_5.0_UF-MUN_SITE_v2.xlsx",
     "MAPBIOMAS", "mapbiomas_deforestation_regeneration", NA, "1988-2017", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
     "MAPBIOMAS", "mapbiomas_irrigation", NA, "2000-2019", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
     "MAPBIOMAS", "mapbiomas_grazing_quality", NA, "2010 & 2018", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
