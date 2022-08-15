@@ -5,7 +5,7 @@
 \alias{load_deter}
 \title{DETER - Forest Degradation in the Brazilian Amazon}
 \usage{
-load_deter(dataset = NULL, raw_data, language = "eng")
+load_deter(dataset, raw_data = FALSE, language = "eng")
 }
 \arguments{
 \item{dataset}{A dataset name ("deter_amz", "deter_cerrado") with information about both Amazon and Cerrado}
@@ -15,7 +15,7 @@ load_deter(dataset = NULL, raw_data, language = "eng")
 \item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".}
 }
 \value{
-A \code{tibble} with the selected data.
+A \code{tibble} (if \code{raw_data} = \code{TRUE}) or a \code{sf} object (if \code{raw_data} = \code{FALSE}).
 }
 \description{
 Loads information on change in forest cover in the Amazon. See \url{http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter}
