@@ -9,43 +9,18 @@
 
 [![CRAN
 version](https://www.r-pkg.org/badges/version/datazoom.amazonia?color=orange)](https://cran.r-project.org/package=datazoom.amazonia)
+[![R build
+status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions)
 [![CRAN
-downloads](https://cranlogs.r-pkg.org/badges/datazoom.amazonia?color=blue)](https://cran.r-project.org/package=datazoom.amazonia)
-<!-- [![R build status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions) -->
+downloads](https://cranlogs.r-pkg.org/badges/grand-total/datazoom.amazonia?color=blue)](https://cran.r-project.org/package=datazoom.amazonia)
+[![CRAN
+downloads](https://cranlogs.r-pkg.org/badges/datazoom.amazonia?color=lightgrey)](https://cran.r-project.org/package=datazoom.amazonia)
 <!-- badges: end -->
 
-The goal of package datazoom.amazonia is to facilitate access to
-official data about agriculture, deforestation, production and other
-activities in the Brazilian Amazon.The package provides functions that
-download and pre-process selected datasets. Our users should know that
-our functions pull data from databases from other institutions and
-therefore if one of these institutions decides to stop sharing their
-data with the public then there’s nothing we can do about it.
-
-``` r
-datazoom.amazonia::datasets_link()
-#> # A tibble: 148 × 6
-#>    survey   dataset         sidra_code     available_time available_geo    link 
-#>    <chr>    <chr>           <chr>          <chr>          <chr>            <chr>
-#>  1 PAM-IBGE all_crops       5457/all/all   1974-2020      Country, State,… http…
-#>  2 PAM-IBGE permanent_crops 1613/all/all   1974-2020      Country, State,… http…
-#>  3 PAM-IBGE temporary_crops 1612/all/all   1974-2020      Country, State,… http…
-#>  4 PAM-IBGE corn            839/all/all    2003-2020      Country, State,… http…
-#>  5 PAM-IBGE potato          1001/all/all   2003-2020      Country, State,… http…
-#>  6 PAM-IBGE peanut          1000/all/all   2003-2020      Country, State,… http…
-#>  7 PAM-IBGE beans           1002/all/all   2003-2020      Country, State,… http…
-#>  8 PAM-IBGE temporary_total 1612/c81/0     1974-2020      Country, State,… http…
-#>  9 PAM-IBGE pineapple       1612/c81/2688  1974-2020      Country, State,… http…
-#> 10 PAM-IBGE alfafa          1612/c81/40471 1974-1987      Country, State,… http…
-#> # … with 138 more rows
-```
-
-### Content:
-
--   [Part 1 - Installation](#installation)
--   [Part 2 - Datasets](#datasets)
--   [Part 3 - The Structure of the
-    functions](#the-structure-of-our-functions)
+The datazoom.amazonia package facilitates access to official Brazilian
+Amazon data, including agriculture, deforestation, production. The
+package provides functions that download and pre-process selected
+datasets.
 
 ## Installation
 
@@ -62,16 +37,6 @@ And the development version from GitHub with:
 # install.packages("devtools")
 devtools::install_github("datazoompuc/datazoom.amazonia")
 ```
-
-Before installing our development version, it is required to install
-first this package:
-
-``` r
-devtools::install_github("ipeaGIT/geobr", subdir = "r-package").
-```
-
-After installing it, you will be able to download our development
-version package.
 
 ## Datasets
 
