@@ -40,60 +40,74 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 
 ## Datasets
 
-<div class="alignfull has-no-padding shinyblock">
-  <iframe class="shinyframe"  width="100%" height="600px" frameborder="0" scrolling="no" 
-    src= "https://datazoompuc.github.io/bacia_infografica"  allowfullscreen="allowfullscreen">
-  </iframe>
-</div>
+**[1 - Environmental data](#1---environment)**
 
-**[1 - INPE data:](#1---inpe-data)**
+<table>
+<tr>
+<td>
 
--   [1.1 - PRODES](#prodes)
+|            |                                  |
+|------------|----------------------------------|
+| **PRODES** | *Yearly deforestationn*          |
+| **DETER**  | *Alerts on forest cover changes* |
+| **DEGRAD** | *Forest degradation*             |
 
--   [1.2 - DETER](#deter)
+</td>
+<td>
 
--   [1.3 - DEGRAD](#degrad)
+|                  |                                     |
+|------------------|-------------------------------------|
+| **SEEG**         | *Greenhouse gas emission estimates* |
+| **IBAMA**        | *Environmental fines*               |
+| **MAPBIOMAS**    | *Land cover and use*                |
+| **TerraClimate** | *Climate data such as temperature*  |
 
-**[2 - COMEX data](#2---comex-data)**
+</td>
+</tr>
+</table>
 
-**[3 - IBGE data:](#3---ibge-data)**
+**[2 - Social data](#2---social)**
 
--   [3.1 - PIB-Munic](#pib-munic)
+<table>
+<tr>
+<td>
 
--   [3.2 - CEMPRE](#cempre)
+|             |                                                         |
+|-------------|---------------------------------------------------------|
+| **IPS**     | *Amazon Social Progress Index*                          |
+| **DATASUS** | *Causes of mortality and availability of hospital beds* |
+| **IEMA**    | *Access to electricity in the Amazon region*            |
 
--   [3.3 - PAM](#pam)
+</td>
+</tr>
+</table>
 
--   [3.4 - PEVS](#pevs)
+**[3 - Economic data](#2---social)**
 
--   [3.5 - PPM](#ppm)
+<table>
+<tr>
+<td>
 
-**[4 - IPS data](#4---ips)**
+|                         |                                 |
+|-------------------------|---------------------------------|
+| **[COMEX](#2---comex)** | *Brazilian international trade* |
+| **BACI**                | *Worldwide international trade* |
+| **PIB-Munic**           | *Municipal GDP*                 |
+| **CEMPRE**              | *Central register of companies* |
 
-**[5 - SEEG data](#5---seeg)**
+</td>
+<td>
 
-**[6 - IBAMA data](#6---ibama)**
+|             |                           |
+|-------------|---------------------------|
+| **PAM**     | *Agricultural production* |
+| **PEVS**    | *Forestry and extraction* |
+| **PPM**     | *Livestock farming*       |
+| **SIGMINE** | *Mining*                  |
 
-**[7 - SIGMINE data](#7---sigmine)**
-
-**[8 - MAPBIOMAS data](#8---mapbiomas)**
-
-**[9 - CIPÓ data](#9---cipó)**
-
-**[10 - TerraClimate data](#10---terraclimate)**
-
-**[11 - BACI data](#11---baci)**
-
-**[12 - DATASUS data](#12---datasus)**
-
-**[13 - IEMA data](#13---iema)**
-
-## The Structure of our functions
-
-**[1 - The Structure of the
-functions](#the-structure-of-the-functions)**
-
-**[2 - Examples](#examples)**
+</td>
+</tr>
+</table>
 
 ## 1 - INPE data
 
@@ -183,7 +197,7 @@ data <- load_degrad(dataset = 'degrad',
                     language = 'pt')
 ```
 
-## 2 - COMEX data
+## 2 - COMEX
 
 The Comex dataset gathers data extracted from Siscomex (Integrated
 System of Foreign Trade), which is a database containing information
