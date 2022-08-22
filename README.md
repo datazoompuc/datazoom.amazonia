@@ -40,6 +40,12 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 
 ## Datasets
 
+<div class="alignfull has-no-padding shinyblock">
+  <iframe class="shinyframe"  width="100%" height="600px" frameborder="0" scrolling="no" 
+    src= "https://datazoompuc.github.io/bacia_infografica"  allowfullscreen="allowfullscreen">
+  </iframe>
+</div>
+
 **[1 - INPE data:](#1---inpe-data)**
 
 -   [1.1 - PRODES](#prodes)
