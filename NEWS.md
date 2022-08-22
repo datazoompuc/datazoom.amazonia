@@ -1,3 +1,11 @@
+# datazoom.amazonia 0.8.3.9000
+
+  * Code maintenance tweaks
+
+# datazoom.amazonia 0.8.2.9000
+
+  * Adding a sequential identification variable to `load_deter`
+
 # datazoom.amazonia 0.8.1.9000
 
   * Changed code to initiate Deter download
