@@ -19,25 +19,12 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![CRAN version](https://www.r-pkg.org/badges/version/datazoom.amazonia?color=orange)](https://cran.r-project.org/package=datazoom.amazonia)
-[![CRAN downloads](https://cranlogs.r-pkg.org/badges/datazoom.amazonia?color=blue)](https://cran.r-project.org/package=datazoom.amazonia)
-<!-- [![R build status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions) -->
+[![R build status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions) 
+[![CRAN downloads](https://cranlogs.r-pkg.org/badges/grand-total/datazoom.amazonia?color=blue)](https://cran.r-project.org/package=datazoom.amazonia)
+[![CRAN downloads](https://cranlogs.r-pkg.org/badges/datazoom.amazonia?color=lightgrey)](https://cran.r-project.org/package=datazoom.amazonia)
 <!-- badges: end -->
 
-The goal of package datazoom.amazonia is to facilitate access to official data about agriculture, deforestation, production and other activities in the Brazilian Amazon.The package provides functions that download and pre-process selected datasets. Our users should know that our functions pull data from databases from other institutions and therefore if one of these institutions decides to stop sharing their data with the public then there's nothing we can do about it. 
-
-```{r, echo=FALSE, message=FALSE}
-devtools::load_all()
-```
-
-```{r,eval=TRUE}
-datazoom.amazonia::datasets_link()
-```
-
-### Content:
-
- - [Part 1 - Installation](#installation)
- - [Part 2 - Datasets](#datasets)
- - [Part 3 - The Structure of the functions](#the-structure-of-our-functions)
+The datazoom.amazonia package facilitates access to official Brazilian Amazon data, including agriculture, deforestation, production. The package provides functions that download and pre-process selected datasets.
 
 ## Installation
 
@@ -54,13 +41,15 @@ And the development version from GitHub with:
 # install.packages("devtools")
 devtools::install_github("datazoompuc/datazoom.amazonia")
 ```
-Before installing our development version, it is required to install first this package:
-``` r
-devtools::install_github("ipeaGIT/geobr", subdir = "r-package").
+
+```{r, echo=FALSE, message=FALSE}
+devtools::load_all()
 ```
-After installing it, you will be able to download our development version package.
+
 
 ## Datasets
+
+
 **[1 - INPE data:](#1---inpe-data)** 
 
  - [1.1 - PRODES](#prodes)

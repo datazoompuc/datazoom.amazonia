@@ -1,6 +1,14 @@
-# datazoom.amazonia 0.9.0.9000
+# datazoom.amazonia 0.8.4.9000
 
-  * Added new `load_imazon` function for deforestation data
+  * Exporting dataset with municipality codes and minor bug fixes
+
+# datazoom.amazonia 0.8.3.9000
+
+  * Code maintenance tweaks
+
+# datazoom.amazonia 0.8.2.9000
+
+  * Adding a sequential identification variable to `load_deter`
 
 # datazoom.amazonia 0.8.1.9000
 

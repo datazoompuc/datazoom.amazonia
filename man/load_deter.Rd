@@ -5,7 +5,7 @@
 \alias{load_deter}
 \title{DETER - Forest Degradation in the Brazilian Amazon}
 \usage{
-load_deter(dataset = NULL, raw_data, language = "eng")
+load_deter(dataset, raw_data = FALSE, language = "eng")
 }
 \arguments{
 \item{dataset}{A dataset name ("deter_amz", "deter_cerrado") with information about both Amazon and Cerrado}
