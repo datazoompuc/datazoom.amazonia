@@ -9,7 +9,7 @@
 #'   \item{code_statel}{2-digit state code}
 #'   \item{abbrev_state}{state abbreviations (e.g. "AM")}
 #'   \item{name_state}{full name of the states}
-#'   \item{code_region}}{1-digit regional code}
+#'   \item{code_region}{1-digit regional code}
 #'   \item{name_region}{name of the region}
 #'   \item{legal_amazon}{takes value 1 for municipalities in the legal amazon, 0 otherwise}
 #'   \item{code_micro}{5-digit microregion code}
