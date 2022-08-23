@@ -1,3 +1,11 @@
+# datazoom.amazonia 0.8.5.9000
+
+  * Fixing `load_baci` timeout error upon download
+
+# datazoom.amazonia 0.8.4.9000
+
+  * Exporting dataset with municipality codes and minor bug fixes
+
 # datazoom.amazonia 0.8.3.9000
 
   * Code maintenance tweaks

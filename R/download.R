@@ -48,7 +48,7 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
   ## Get Geographical Information ##
   ##################################
 
-  geo <- municipalities %>%
+  geo <- datazoom.amazonia::municipalities %>%
     tidyr::drop_na() # 5 municipalities have no micro code
 
   # uf = list('RO' = 11,'AC' = 12,'AM' = 13,'RR' = 14,'PA' = 15,'AP' = 16,'TO' = 17,

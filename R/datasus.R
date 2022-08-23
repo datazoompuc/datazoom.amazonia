@@ -245,7 +245,7 @@ load_datasus <- function(dataset,
   if (param$dataset != "datasus_sih") {
     # Adding municipality data
 
-    geo <- municipalities %>%
+    geo <- datazoom.amazonia::municipalities %>%
       dplyr::select(
         code_muni,
         name_muni,
