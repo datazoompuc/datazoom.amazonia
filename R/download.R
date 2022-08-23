@@ -517,14 +517,22 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
   }
 
-  #####################
-  ## IEMA            ##
-  #####################
+  ##########
+  ## IEMA ##
+  ##########
 
   if (source == "iema") {
     if (dataset == "iema") {
       path <- param$url
     }
+  }
+
+  ##########
+  ## BACI ##
+  ##########
+
+  if (source == "baci"){
+    path <- param$url
   }
 
   #####################
@@ -610,15 +618,11 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       googledrive::drive_download(path, path = temp, overwrite = TRUE)
     }
   }
-  if (source %in% c("terraclimate", "ibama")) {
+  if (source %in% c("terraclimate", "ibama", "health")) {
     utils::download.file(url = path, destfile = temp, method = "curl", quiet = TRUE)
   }
-  if (source == "health") {
-    if (stringr::str_detect(dataset, "datasus")) {
-      utils::download.file(url = path, destfile = temp, method = "curl", quiet = TRUE)
-    } else {
-      utils::download.file(url = path, destfile = temp, mode = "wb")
-    }
+  if (source %in% c("baci")){
+    utils::download.file(url = path, destfile = temp, method = "curl", quiet = FALSE)
   }
 
   ## This Data Opening Part Should Include the .Shp, not DBF
@@ -757,9 +761,15 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
         janitor::clean_names() %>%
         tibble::as_tibble()
     }
+
+    if (param$source == "baci"){
+      file <- file.info(list.files(dir, pattern = paste0("*" ,param$year, "_V202201.csv")))
+
+      dat <- readr::read_csv()
+    }
   }
   if (file_extension == ".dbc") {
-    dat <- read.dbc(temp)
+    dat <- data.table::fread(file, skip = param$skip_rows) %>% tibble::as_tibble()
   }
 
   # if (source == 'prodes'){
@@ -1128,7 +1138,7 @@ datasets_link <- function() {
     ## BACI ##
     ##########
 
-    "BACI", "HS92", NA, "1995-2020", "Country", "http://www.cepii.fr/DATA_DOWNLOAD/baci/data",
+    "BACI", "HS92", NA, "1995-2020", "Country", "http://www.cepii.fr/DATA_DOWNLOAD/baci/data/BACI_HS92_V202201.zip",
 
     ## Shapefile from github repository
 
