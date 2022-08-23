@@ -49,6 +49,7 @@ load_ibama <- function(dataset,
   param$dataset <- dataset
   param$language <- language
   param$raw_data <- raw_data
+  param$states <- states
 
   if (states == "all") {
     param$states <- c("RO", "AC", "AM", "RR", "PA", "AP", "TO", "MA", "PI", "CE", "RN", "PB", "PE", "AL", "SE", "BA", "MG", "ES", "RJ", "SP", "PR", "SC", "RS", "MS", "MT", "GO", "DF")

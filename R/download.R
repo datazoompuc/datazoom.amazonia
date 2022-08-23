@@ -48,7 +48,7 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
   ## Get Geographical Information ##
   ##################################
 
-  geo <- municipalities %>%
+  geo <- datazoom.amazonia::municipalities %>%
     tidyr::drop_na() # 5 municipalities have no micro code
 
   # uf = list('RO' = 11,'AC' = 12,'AM' = 13,'RR' = 14,'PA' = 15,'AP' = 16,'TO' = 17,
@@ -403,13 +403,11 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
 
   if (source == "mapbiomas") {
-    if (dataset %in% c("mapbiomas_cover", "mapbiomas_transition")) {
-      if (param$geo_level == "state"){
-        path <- paste(param$url, "Estat%C3%ADsticas/Cole%C3%A7%C3%A3o%206/1-ESTATISTICAS_MapBiomas_COL6.0_UF-BIOMAS_v12_SITE.xlsx", sep = "")
-      }
-      if (param$geo_level == "municipality"){
-        path <- "https://drive.google.com/uc?export=download&id=1RT7J2jS6LKyISM49ctfRO31ynJZXX_TY"
-      }
+    if (dataset == "mapbiomas_cover") {
+      path <- paste(param$url, "Estat%C3%ADsticas/Cole%C3%A7%C3%A3o%206/1-ESTATISTICAS_MapBiomas_COL6.0_UF-BIOMAS_v12_SITE.xlsx", sep = "")
+    }
+    if (dataset == "mapbiomas_transition") {
+      path <- param$url
     }
     if (dataset == "mapbiomas_deforestation_regeneration") {
       path <- paste(param$url, "Estat%C3%ADsticas/BD-DESM_e_REG_COL5_V8h__SITE.xlsx", sep = "")
@@ -547,12 +545,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   file_extension <- stringr::str_sub(path, -4)
   if (source == "mapbiomas") {
-    if (param$geo_level == "state"){
-      file_extension <- ".xlsx"
-    }
-    if (param$geo_level == "municipality"){
-      file_extension <- ".zip"
-    }
+    file_extension <- ".xlsx"
   }
   if (source == "ips") {
     file_extension <- ".xlsx"
@@ -598,16 +591,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## Extraction through Curl Requests
   ## Investigate a bit more on how Curl Requests work
 
-  if (source %in% c("comex", "degrad", "internal", "ips", "prodes", "sigmine")) {
+  if (source %in% c("comex", "degrad", "internal", "ips", "mapbiomas", "prodes", "sigmine")) {
     utils::download.file(url = path, destfile = temp, mode = "wb")
-  }
-  if (source == "mapbiomas"){
-    if (param$geo_level == "state"){
-      utils::download.file(url = path, destfile = temp, mode = "wb")
-    }
-    if (param$geo_level == "municipality"){
-      googledrive::drive_download(path, path = temp, overwrite = TRUE)
-    }
   }
   if (source == "iema") {
     googledrive::drive_download(path, path = temp, overwrite = TRUE)
@@ -771,14 +756,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       dat <- dataset[-c(1:5), ] %>%
         janitor::clean_names() %>%
         tibble::as_tibble()
-    }
-
-    if (param$source == "mapbiomas") {
-
-      # extracting the one file we care about from the unzipped file
-      file <- list.files(dir, pattern = "1-ESTATISTICAS_MapBiomas_COL6.0_UF-MUNICIPIOS_*", full.names = TRUE)
-
-      dat <- readxl::read_xlsx(file, sheet = param$sheet)
     }
   }
   if (file_extension == ".dbc") {
@@ -999,7 +976,7 @@ datasets_link <- function() {
     ###############
 
     "MAPBIOMAS", "mapbiomas_cover", NA, "1985-2019", "Municipality, State", "https://mapbiomas-br-site.s3.amazonaws.com/",
-    "MAPBIOMAS", "mapbiomas_transition", NA, "1985-2019", "Municipality, State", "https://mapbiomas-br-site.s3.amazonaws.com/",
+    "MAPBIOMAS", "mapbiomas_transition", NA, "1985-2019", "Municipality, State", "https://storage.googleapis.com/mapbiomas-public/COLECAO/5/DOWNLOADS/ESTATISTICAS/Dados_Transicao_MapBiomas_5.0_UF-MUN_SITE_v2.xlsx",
     "MAPBIOMAS", "mapbiomas_deforestation_regeneration", NA, "1988-2017", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
     "MAPBIOMAS", "mapbiomas_irrigation", NA, "2000-2019", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
     "MAPBIOMAS", "mapbiomas_grazing_quality", NA, "2010 & 2018", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
@@ -1141,11 +1118,11 @@ datasets_link <- function() {
     ## SEEG ##
     ##########
 
-    "SEEG", "seeg_farming", NA, "1970-2019", "Country, State, Municipality", "http://seeg.eco.br/download",
-    "SEEG", "seeg_industry", NA, "1970-2019", "Country, State, Municipality", "http://seeg.eco.br/download",
-    "SEEG", "seeg_energy", NA, "1970-2019", "Country, State, Municipality", "http://seeg.eco.br/download",
-    "SEEG", "seeg_land", NA, "1970-2019", "Country, State, Municipality", "http://seeg.eco.br/download",
-    "SEEG", "seeg_residuals", NA, "1970-2019", "Country, State, Municipality", "http://seeg.eco.br/download",
+    "SEEG", "seeg_farming", NA, "1970-2019","Country, State, Municipality","http://seeg.eco.br/download",
+    "SEEG", "seeg_industry", NA,"1970-2019","Country, State, Municipality","http://seeg.eco.br/download",
+    "SEEG", "seeg_energy", NA,"1970-2019","Country, State, Municipality","http://seeg.eco.br/download",
+    "SEEG", "seeg_land", NA,"1970-2019","Country, State, Municipality","http://seeg.eco.br/download",
+    "SEEG", "seeg_residuals", NA, "1970-2019","Country, State, Municipality","http://seeg.eco.br/download",
 
     ##########
     ## BACI ##
@@ -1156,7 +1133,9 @@ datasets_link <- function() {
     ## Shapefile from github repository
 
     "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds",
+
   )
 
   return(link)
 }
+
