@@ -193,7 +193,7 @@ load_degrad <- function(dataset = "degrad", raw_data,
   )
 
   # legal_amazon belongs to package's sysdata.rda and filters for municipalities in legal amazon
-  amazon_municipalities <- dplyr::filter(municipalities, .data$legal_amazon == 1)
+  amazon_municipalities <- dplyr::filter(datazoom.amazonia::municipalities, .data$legal_amazon == 1)
 
   # Filters geobr shapefiles to legal amazon municipalities
   geo_amazon <- dplyr::filter(geo_br, .data$code_muni %in% amazon_municipalities$code_muni)

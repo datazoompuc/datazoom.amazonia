@@ -9,7 +9,7 @@ A data frame with 5570 rows and 12 variables:
 \describe{
 \item{code_muni}{IBGE 7-digit municipality code}
 \item{name_muni}{municipality name}
-\item{code_statel}{2-digit state code}
+\item{code_state}{2-digit state code}
 \item{abbrev_state}{state abbreviations (e.g. "AM")}
 \item{name_state}{full name of the states}
 \item{code_region}{1-digit regional code}

@@ -83,7 +83,7 @@ load_iema <- function(dataset = "iema", raw_data = FALSE,
       dplyr::across(municipio, ~ stringr::str_trim(.))
     )
 
-  geo <- municipalities %>%
+  geo <- datazoom.amazonia::municipalities %>%
     dplyr::select(
       code_muni,
       name_muni,
