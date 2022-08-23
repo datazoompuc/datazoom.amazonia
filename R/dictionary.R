@@ -899,9 +899,9 @@ load_dictionary <- function(dataset) {
     )
   }
 
-  if (dataset == "baci") {
+  if (dataset == "baci_countries") {
     harmonization_dat <- tibble::tribble(
-      ~country_code, ~name_pt, ~name_eng,
+      ~country_code, ~country_pt, ~country_eng,
       4, "Afeganistao", "Afghanistan",
       8, "Albania", "Albania",
       12, "Argelia", "Algeria",
@@ -922,7 +922,7 @@ load_dictionary <- function(dataset) {
       68,"Bolivia", "Bolivia",
       70,"Bosnia", "Bosnia",
       72,"Botsuana", "Botswana",
-      76,"Brasil", "Brazil"
+      76,"Brasil", "Brazil",
       84,"Belize", "Belize",
       86,"Oceano Indico Britanico", "British Indian Ocean",
       90,"Ilhas Salomao", "Solomon Islands",
@@ -1136,6 +1136,8 @@ load_dictionary <- function(dataset) {
       887, "Iemen", "Yemen",
       891, "Servia e Montenegro", "Serbia and Montenegro",
       894, "Zambia", "Zambia"
+    )
+  }
 
   ############
   ## Return ##

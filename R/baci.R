@@ -6,7 +6,7 @@
 #'
 #' @param dataset A dataset name ("HS92").
 #' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
-#' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be only one year at a time.
+#' @param time_period A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "pt".
 #'
 #' @return A \code{tibble} consisting of imports or exports data.
@@ -65,20 +65,18 @@ load_baci <- function(dataset = "HS92", raw_data, time_period,
   if (max(time_period) > year_check[2]) {
     stop("Provided time period greater than supported. Check documentation for time availability.")
   }
-  base::message(base::cat("This may take a few hours"))
 
   #################
   ## Downloading ##
   #################
 
+  base::message(base::cat("The download can take some time"))
+
   dat <- external_download(
     source = "baci",
     dataset = param$dataset,
-    year = year,
-    skip_rows = 1
+    year = param$time_period,
   )
-
-  names(dat) <- c("year", "exporter", "importer", "product", "value", "quantity")
 
   ## Return Raw Data
 
@@ -90,99 +88,75 @@ load_baci <- function(dataset = "HS92", raw_data, time_period,
   ## Data Engineering ##
   ######################
 
-  if (param$dataset == "HS92" & param$language == "pt") {
-    dat <- dat %>%
+  # Binding elements
+  dat <- dat %>%
+    data.table::rbindlist() %>%
+    tibble::as_tibble()
+
+  ## Turning country codes into names
+
+  # Transforming country codes into country names
+  countries_dict <- load_dictionary(dataset = "baci_countries")
+
+  # picking only country names in the chosen language
+  countries_dict <- countries_dict %>%
+    dplyr::select(c(country_code, "country" = paste0("country_", param$language)))
+
+  # converting exporters ("i" column)
+  dat <- dat %>%
+    dplyr::left_join(countries_dict, by = c("i" = "country_code")) %>%
+    dplyr::rename("exporter" = country)
+
+  # converting importers ("j" column)
+  dat <- dat %>%
+    dplyr::left_join(countries_dict, by = c("j" = "country_code")) %>%
+    dplyr::rename("importer" = country)
+
+  # removing the old columns
+  dat <- dat %>%
+    dplyr::select(-c(i, j))
+
+  ## Turning product codes into names
+
+  dic <- load_trade_dic(language = param$language)
+
+  dat <- dat %>%
+      dplyr::left_join(dic, by = c("k" = "product_code"))
+
+
+  ################################
+  ## Harmonizing Variable Names ##
+  ################################
+
+  if (param$language == "eng") {
+    dat_mod <- dat %>%
       dplyr::rename(
-        ano = t,
-        exportador = i,
-        importador = j,
-        produto = k,
-        valor = v,
-        quantidade = q
-      )
+          "year" = t,
+          "product_code" = k,
+          "value" = v,
+          "quantity" = q,
+          "product_name" = product
+        )
+    }
+    if (param$language == "pt") {
+      dat_mod <- dat %>%
+        dplyr::rename(
+          "ano" = t,
+          "cod_produto" = k,
+          "valor" = v,
+          "quantidade" = q,
+          "exportador" = exporter,
+          "importador" = importer,
+          "nome_produto" = product
+        )
+    }
 
-    countries_dict <- load_dictionary(dataset = "baci")
-
-    dat <- dat %>%
-      dplyr::mutate(exportador = dplyr::case_when(
-
-      ))
-
-
-    dic <- suppressMessages(load_trade_dic(type = "hs"))
-
-    dic <- dic %>%
-      dplyr::select(co_sh6, no_sh6 = no_sh6_por)
-
-    non_dup <- !duplicated(dic)
-
-    dic <- dic %>%
-      dplyr::filter(non_dup)
-
-    dat <- dat %>%
-      dplyr::rename(co_sh6 = produto) %>%
-      dplyr::mutate(co_sh6 = formatC(co_sh6, width = 4, format = "d", flag = "0")) %>%
-      dplyr::left_join(dic, by = "co_sh6")
-
-
-    dat <- dat %>%
-      dplyr::rename(
-        cod_produto = co_sh6,
-        nome_produto = no_sh6
-      )
-
-    dat <- dat %>%
-      dplyr::mutate(valor = as.numeric(valor))
-
-    dat <- dat %>%
-      dplyr::mutate(nome_produto = dplyr::case_when(
-        cod_produto == "080130" ~
-          "Nozes comestiveis: castanhas de caju, frescas ou secas, mesmo descascadas ou peladas",
-        cod_produto == "844350" ~ "Maquinas de impressao: do tipo NES na posicao 8443",
-        cod_produto == "854380" ~ "Maquinas e aparelhos eletricos: com funcao propria, NES na posicao 8543",
-        cod_produto == "847120" ~ "Maquinas para processamento de dados: automaticas digitais, contendo no mesmo involucro pelo menos uma unidade central de processamento e uma unidade de entrada e saida, combinadas ou nao",
-        cod_produto == "903081" ~ "Instrumentos e aparelhos: com dispositivo de gravacao, especialmente concebido para telecomunicacoes",
-        cod_produto == "560300" ~ "Falsos tecidos: mesmo impregnados, revestidos, recobertos ou estratificados",
-        cod_produto == "847193" ~ "Maquinas de processamento de dados: unidades de armazenamento, apresentadas ou nao com o resto de um sistema",
-        cod_produto == "852490" ~ "Midia gravadas: NES na posicao 8524 para fenomenos de gravacao de som ou similar, incluindo matrizes e mestres para a producao de registros",
-        cod_produto == "080110" ~ "Nozes comestiveis: cocos, frescos ou secos, mesmo descascados ou pelados",
-        cod_produto == "080710" ~ "Frutas comestiveis: meloes (incluindo melancias), frescos",
-        TRUE ~ nome_produto
-      ))
-  }
-
-
-  if (param$dataset == "HS92" & param$language == "eng") {
-    dat <- dat %>%
-      dplyr::rename(
-        year = t,
-        exporter = i,
-        importer = j,
-        product = k,
-        value = v,
-        quantity = q
-      )
-
-
-    dic <- suppressMessages(load_trade_dic_eng(type = "hs"))
-
-    non_dup <- !duplicated(dic)
-
-    dic <- dic %>%
-      dplyr::filter(non_dup)
-
-    dat <- dat %>%
-      dplyr::rename(code = product) %>%
-      dplyr::mutate(code = formatC(code, width = 4, format = "d", flag = "0")) %>%
-      dplyr::left_join(dic, by = "code")
-  }
-
-  return(dat)
+  return(dat_mod)
 }
 
 
 
-load_trade_dic <- function(type) {
+load_trade_dic <- function(language) {
 
   # Bind Global Variables
 
@@ -192,14 +166,11 @@ load_trade_dic <- function(type) {
   ## Download Dictionary ##
   #########################
 
-  path <- "https://balanca.economia.gov.br/balanca/bd/"
+  url <- "https://balanca.economia.gov.br/balanca/bd/tabelas/NCM_SH.csv"
 
-  if (type == "hs") {
-    final <- paste(path, "tabelas/NCM_SH.csv", sep = "")
-  } # Harmonized System
+  base::message("Downloading dictionary for product codes")
 
-
-  dic <- readr::read_delim(final, delim = ";", locale = readr::locale(encoding = "Latin1"), progress = TRUE)
+  dic <- base::suppressMessages(readr::read_delim(url, delim = ";", locale = readr::locale(encoding = "Latin1"), progress = TRUE))
 
   #####################
   ## Data Processing ##
@@ -211,28 +182,21 @@ load_trade_dic <- function(type) {
     }) %>%
     janitor::clean_names()
 
-  return(dic)
-}
-
-
-load_trade_dic_eng <- function(type) {
-  code <- description <- NULL
-
-  url <- "http://www.cepii.fr/DATA_DOWNLOAD/baci/data/BACI_HS92_V202201.zip"
-
-  if (type == "hs") {
-    temp <- tempfile()
-    download.file(url, temp, mode = "wb")
-    dic <- read.table(unz(temp, paste0("product_codes_HS92_V202201.csv")),
-      fill = TRUE, header = FALSE, sep = ","
-    )
-  }
+  # Harmonizing names
 
   dic <- dic %>%
-    dplyr::mutate_if(is.character, function(var) {
-      stringi::stri_trans_general(str = var, id = "Latin-ASCII")
-    }) %>%
-    janitor::clean_names()
+    dplyr::select(
+      "product_code" = co_sh6,
+      "product_pt" = no_sh6_por,
+      "product_eng" = no_sh6_ing
+    )
+
+  dic <- dic %>%
+    dplyr::select(c(product_code, "product" = paste0("product_", language)))
+
+  dic <- dic %>%
+    dplyr::mutate(across(product_code, as.integer))
 
   return(dic)
 }
+

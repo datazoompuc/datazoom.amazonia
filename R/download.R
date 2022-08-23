@@ -763,13 +763,25 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
 
     if (param$source == "baci"){
-      file <- file.info(list.files(dir, pattern = paste0("*" ,param$year, "_V202201.csv")))
 
-      dat <- readr::read_csv()
+      # as year can be a vector, sets up expressions of the form "*YYYY_V202201.csv" for each year to match file names
+      file_expression <- paste0("*", param$year, "_V202201.csv")
+
+      # now turning into *XXXX_V202201.csv|YYYY_V202201.csv|ZZZZ_V202201.csv" to match as regex
+      file_expression <- paste0(file_expression, collapse = "|")
+
+      file <- list.files(dir, pattern = file_expression, full.names = TRUE) %>%
+        as.list()
+
+      # now reads each file
+      dat <- lapply(file, data.table::fread, header = TRUE, sep = ",")
+
+      # each data frame in the list is named after the corresponding year
+      names(dat) <- param$year
     }
   }
   if (file_extension == ".dbc") {
-    dat <- data.table::fread(file, skip = param$skip_rows) %>% tibble::as_tibble()
+    dat <- read.dbc(temp)
   }
 
   # if (source == 'prodes'){
