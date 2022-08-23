@@ -37,6 +37,7 @@ load_baci <- function(dataset = "HS92", raw_data, time_period,
 
   available_time <- i <- j <- k <- v <- co_sh6 <- no_sh6_por <- NULL
   produto <- no_sh6 <- valor <- product <- code <- NULL
+  country <- country_code <-  exporter <- importer <- no_sh6_por <- product_code <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -70,7 +71,7 @@ load_baci <- function(dataset = "HS92", raw_data, time_period,
   ## Downloading ##
   #################
 
-  base::message(base::cat("The download can take some time"))
+  base::message(base::cat("The download can take some time (~10-30mins)"))
 
   dat <- external_download(
     source = "baci",
@@ -118,7 +119,7 @@ load_baci <- function(dataset = "HS92", raw_data, time_period,
 
   ## Turning product codes into names
 
-  dic <- load_trade_dic(language = param$language)
+  dic <- load_baci_dic(language = param$language)
 
   dat <- dat %>%
       dplyr::left_join(dic, by = c("k" = "product_code"))
@@ -156,7 +157,7 @@ load_baci <- function(dataset = "HS92", raw_data, time_period,
 
 
 
-load_trade_dic <- function(language) {
+load_baci_dic <- function(language) {
 
   # Bind Global Variables
 
@@ -195,7 +196,7 @@ load_trade_dic <- function(language) {
     dplyr::select(c(product_code, "product" = paste0("product_", language)))
 
   dic <- dic %>%
-    dplyr::mutate(across(product_code, as.integer))
+    dplyr::mutate(dplyr::across(product_code, as.integer))
 
   return(dic)
 }
