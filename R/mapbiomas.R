@@ -28,11 +28,16 @@
 load_mapbiomas <- function(dataset = NULL, raw_data = NULL, geo_level = "municipality",
                            time_period = "all", language = "eng", time_id = "year", cover_level = 1) {
 
-  ## To-Do:
-  ## Add Support to Transition Info Download at the State and Biome Level
-  ## Add Support to Covering Info Download at the State and Biome Level
-  ## Include Support for raw raster download
+  # Checking for googledrive package (in Suggests) only for mapbiomas_transition dataset
 
+  if (!requireNamespace("googledrive", quietly = TRUE) &
+      dataset %in% c("mapbiomas_cover", "mapbiomas_transition") &
+      geo_level == "municipality") {
+    stop(
+      "Package \"googledrive\" must be installed to use this function.",
+      call. = FALSE
+    )
+  }
 
   ###########################
   ## Bind Global Variables ##
@@ -78,8 +83,8 @@ load_mapbiomas <- function(dataset = NULL, raw_data = NULL, geo_level = "municip
 
   sheets <- tibble::tribble(
     ~dataset, ~geo_level, ~sheet,
-    "mapbiomas_cover", "any", "LAND COVER - BIOMAS e UF",
-    "mapbiomas_transition", "any", "BD_TRANSICAO_BIOMA-UF",
+    "mapbiomas_cover", "any", "LAND COVER",
+    "mapbiomas_transition", "any", "TRANSITIONS",
     "mapbiomas_deforestation_regeneration", "any", "BD Colecao 5.0(h) - Hectares",
     "mapbiomas_irrigation", "any", "BD_IRRIGACAO",
     "mapbiomas_grazing_quality", "any", "BD_Qualidade",
