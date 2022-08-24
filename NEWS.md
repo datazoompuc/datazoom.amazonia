@@ -1,3 +1,7 @@
+# datazoom.amazonia 0.8.5.9000
+
+  * Updated collection 6 Mapbiomas data for "mapbiomas_transition" dataset
+
 # datazoom.amazonia 0.8.4.9000
 
   * Exporting dataset with municipality codes and minor bug fixes

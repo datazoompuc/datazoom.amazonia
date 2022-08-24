@@ -527,6 +527,16 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
   }
 
+  ############
+  ## IMAZON ##
+  ############
+
+  if (source == "imazon_shp") {
+    if (geo_level == "municipality") {
+      path <- "https://docs.google.com/uc?export=download&id=1JHc2J_U8VXHVuWVsi8wVBnNzZ37y1ehv"
+    }
+  }
+
   #####################
   ## GeoBR Shapefile ##
   #####################
@@ -579,6 +589,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   }
   if (source == "iema") {
     file_extension <- ".xlsx"
+  }  
+  if (source == "imazon_shp") {
+    file_extension <- ".rds"
   }
 
   # !!!  We should Change This to a Curl Process
@@ -591,11 +604,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## Extraction through Curl Requests
   ## Investigate a bit more on how Curl Requests work
 
-  if (source %in% c("comex", "degrad", "internal", "ips", "mapbiomas", "prodes", "sigmine")) {
+  if (source %in% c("comex", "degrad", "internal", "ibama", "ips", "mapbiomas", 'prodes', "sigmine")){
     utils::download.file(url = path, destfile = temp, mode = "wb")
-  }
-  if (source == "iema") {
-    googledrive::drive_download(path, path = temp, overwrite = TRUE)
   }
   if (source == "deter") {
     proc <- RCurl::CFILE(temp, mode = "wb")
@@ -613,10 +623,18 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source %in% c("terraclimate", "ibama")) {
     utils::download.file(url = path, destfile = temp, method = "curl", quiet = TRUE)
   }
+
+  if (source == "imazon_shp") {
+    if (geo_level == "municipality") {
+      googledrive::drive_download(path, path = temp, overwrite = TRUE)
+    }
+  }
+
   if (source == "health") {
     if (stringr::str_detect(dataset, "datasus")) {
       utils::download.file(url = path, destfile = temp, method = "curl", quiet = TRUE)
-    } else {
+    }
+    else{
       utils::download.file(url = path, destfile = temp, mode = "wb")
     }
   }
@@ -1134,7 +1152,11 @@ datasets_link <- function() {
 
     "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds",
 
-  )
+    ############
+    ## IMAZON ##
+    ############
+    "Imazon", "imazon_shp", NA, "2020", "Municipality", "https://drive.google.com/drive/u/1/folders/1EAOABo1GVKT3YsYkhtgJI9ckB3RULJSC"
+     )
 
   return(link)
 }
