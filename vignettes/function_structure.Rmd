@@ -1,0 +1,131 @@
+---
+title: "Structure of our functions"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{STRUCTURE}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## The Structure of the functions
+
+**1. Bind Global Variables:** The goal is to ensure that all the variables in the function were initialized to some value. We also do this to avoid errors when we check the function.
+
+**2. Define Basic Parameters:** Create a list with all the parameters from the function. The list *param* will be an organized list with all the parameters of interest.
+
+**3. Download Data:** In the majority of our functions, we download data by using external_download(). However, when we download data from IBGE, we use a function called sidra_download(). Both of these functions can be found in the "download.R" file. 
+
+**4. Data Engineering:** In this section of the code, we (i) exclude variables that we judge not to be relevant;(ii) sometimes we change the class of some variables; (iii) sometimes we change data to be organized in the long format or in the wide format depending on what we want; (iv) generally speaking, it's in this part of the code that we make the most changes in the original Data Frame.  
+
+**5. Harmonizing Variable Names:** Rename columns with better names. 
+
+**6. Load Dictionary:** In the functions that work with IBGE's data, we use the function "load_dictionary()". This function creates an organized correspondence between the code of each product, its name, its unit of measure and other attributes. 
+
+**7. Translation / add variables:** After having organized the Data Frame, we then translate it.  In some functions, the translation will start in a section called "Labelling" and data from the "dictionary.R" file will be used. In other functions, you will see the names of the columns being translated first and then each line of the original Data Frame will be translated.
+
+**8. Return Data Frame:** In the structure of our functions, you will see **(raw_data == TRUE){return(dat)}** right after "Downloading Data". All the changes explained in this document will only happen in case the user specifies **(raw_data == FALSE)**. 
+
+## Examples
+
+**1. Bind Global Variables:** example from *load_cempre()*
+
+```{r}
+sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- ano <- ano_codigo <- classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo <- geo_id <- id_code <- nivel_territorial <- nivel_territorial_codigo <- valor <- variavel <- unidade_de_medida <- unidade_de_medida_codigo <- NULL
+```
+
+**2. Define Basic Parameters:** example from *load_deter()*
+
+```{r}
+# param=list()
+#  param$dataset = dataset
+#  param$time_period = time_period
+#  param$language = language
+#  param$raw_data = raw_data
+#  param$survey_name = datasets_link() %>%
+#    dplyr::filter(dataset == param$dataset) %>%
+#    dplyr::select(survey) %>%
+#    unlist()
+#  param$url = datasets_link() %>%
+#    dplyr::filter(dataset == param$dataset) %>%
+#    dplyr::select(link) %>%
+#    unlist()
+```
+
+**3. Download Data:** example from *load_degrad()*. It uses the *external_download()* function.
+
+```{r}
+# dat = suppressWarnings(as.list(param$time_period) %>%
+#      purrr::map(
+#        function(t){external_download(dataset = param$dataset,
+#                                      source='degrad', year = t) %>%
+#            janitor::clean_names()
+#        }
+#      ))
+```
+
+**4. Data Engineering**: example from *load_pam()*. In this process, we decided to exclude some columns and convert the variable "valor" to become numeric. After that we excluded all the lines with **NA**. 
+
+```{r}
+# dat = dat %>%
+#           janitor::clean_names() %>%
+#           dplyr::mutate_all(function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")})# %>%
+          # dplyr::mutate_all(clean_custom)
+#   dat = dat %>%
+#     dplyr::select(-c(nivel_territorial_codigo,nivel_territorial,ano_codigo)) %>%
+#     dplyr::mutate(valor=as.numeric(valor))
+#   dat = dat %>%
+#     dplyr::filter(!is.na(valor))
+```
+
+**5. Harmonizing Variable Names:** example from *load_pam()*. We localize some datasets by using their numerical codes and within each of these datasets we renamed some columns.
+
+```{r}
+# if (param$code == 5457){
+#     dat = dat %>%
+#       dplyr::rename(produto_das_lavouras_codigo = produto_das_lavouras_temporarias_e_permanentes_codigo,
+#                     produto_das_lavouras = produto_das_lavouras_temporarias_e_permanentes)
+#   }
+#   if (param$code == 1613){
+#     dat = dat %>%
+#       dplyr::rename(produto_das_lavouras_codigo = # produto_das_lavouras_permanentes_codigo,
+#                     produto_das_lavouras = produto_das_lavouras_permanentes)
+#   }
+#   if (param$code %in% c(839,1000,1001,1002,1612)){
+#     dat = dat %>%
+#       dplyr::rename(produto_das_lavouras_codigo = # produto_das_lavouras_temporarias_codigo,
+#                   produto_das_lavouras = produto_das_lavouras_temporarias)
+#   }
+```
+
+**6. Load Dictionary:** example from *load_pam()*. For functions with data from IBGE, we load the dictionary and then we convert the variable "var_code" to become a character. Finally we exclude the observations where var_code == "0".
+
+```{r}
+# dic = load_dictionary(param$dataset)
+#  types = as.character(dic$var_code)
+#  types = types[types != "0"] 
+```
+
+**7. Translation / add variables:** example from *load_degrad()*.This section translates the names of the columns of the original Data Frame.In this example, the original columns (variables) were in English and therefore we translated it to Portuguese in case the user chooses it.
+
+```{r}
+# if (param$language == 'pt'){
+#    dat_mod = dat %>%
+#      dplyr::select(ano = year, linkcolumn, scene_id,
+#                    cod_uf = code_state, cod_municipio = code_muni,
+#                    classe = class_name, pathrow, area, data = view_date,
+#                    julday, geometry
+#      ) %>%
+#      dplyr::arrange(ano, cod_municipio, classe)
+#  }
+```

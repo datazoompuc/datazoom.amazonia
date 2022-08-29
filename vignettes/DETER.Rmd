@@ -7,31 +7,33 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include = FALSE}
+```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 ```
 
-## The Dataset
-
 DETER uses satellite surveillance to detect and report changes in forest cover across the Legal Amazon and the Cerrado biome. Each data point consists of a warning, describing which type of change has affected a certain area of forest at a given date. Broadly speaking, it makes a distinction between events of deforestation, degradation and logging. The data extracted here spans from 2016 onward in the Amazon, and from 2018 onward in the Cerrado.
 
 The raw DETER data shows one warning per row, with each row also containing a municipality. However, many warnings actually overlap with 2 or up to 4 municipalities, which are not shown in the original data. Therefore, when the option `raw_data = TRUE` is selected, the original spatial information is intersected with a municipalities map of Brazil, and each warning can be split into more than one row, with each row corresponding to a municipality.
 
-## Usage
+```
+There are four parameters in this function:
+  
+  1. dataset: there are two options:
+  # information about Amazon: dataset = "deter_amz" 
+  # information about Cerrado: dataset = "deter_cerrado"
+  
+  2. raw_data: there are two options:
+  # TRUE: if you want the raw data.
+  # FALSE: if you want the processed version of the data. 
+  
+  3. language: you can choose between portuguese and english
+```
 
 ```{r,eval=FALSE}
-library(datazoom.amazonia)
-
-# Download raw data (raw_data = TRUE) from Amazonia (dataset = "deter_amz")
+# Download treated data (raw_data = TRUE) from Amazonia (dataset = "deter_amz")
 deter_amz <- load_deter(dataset = 'deter_amz',
-                        raw_data = TRUE)
-
-# Download treated data (raw_data = FALSE) from Cerrado (dataset = "deter_cerrado")
-# in portuguese (language = 'pt')
-deter_cer <- load_deter(dataset = 'deter_cerrado',
-                        raw_data = FALSE,
-                        language = "pt")
+                        raw_data = FALSE)
 ```

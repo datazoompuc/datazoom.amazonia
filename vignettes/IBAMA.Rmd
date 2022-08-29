@@ -18,32 +18,34 @@ knitr::opts_chunk$set(
 
 The dataset is originally from the Brazilian Institute of Environment and Renewable  Natural Resources (Ibama), documenting environmental embargoes and fines at the individual level from 2005 to the present day. In addition, it is possible to download distributed and collected fines from 1994 until the present day.
 
-## Usage
-
-`load_ibama` downloads and compiles data on environmental fines at the municipality level considering the Amazon region. 
-
 The function returns either the raw data or a data frame with aggregates considering, for each time-location period, counts for total the number of infractions, infractions that already went to trial, and number of unique perpetrators of infractions. There are also two data frames regarding distributed and collected fines across municipalities
 
+```
+There are four parameters in this function:
+1. dataset: There are three possible choices.
+'areas_embargadas': return the amount of embargoed areas
+'distributed_fines': return fines that have not been paid by individuals or corporations
+'collected_fines': return fines that have been paid vy individuals or corporations
+
+  2. raw_data: there are two options:
+  # TRUE: if you want the raw data.
+  # FALSE: if you want the processed version of the data.
+  
+  3. states: specifies for which states to download the data. It is "all" by default, but can be a single state such as "AC" or any vector such as c("AC", "AM"). Does not apply to the "areas_embargadas" dataset.
+  
+  4. language: you can choose between portuguese and english
+  
+```
 
 ```{r, eval = FALSE}
 library(datazoom.amazonia)
 
-# Download treated data (raw_data = FALSE) from the entire country 
-# (legal_amazon_only = FALSE) in english (language = "eng")
+# Download treated embargoes data (raw_data = FALSE) in english (language = "eng")
 data <- load_ibama(dataset = "areas_embargadas", raw_data = FALSE, 
-                   language = "eng", legal_amazon_only = FALSE)
-
-# Download raw data (raw_data = TRUE) from Legal Amazon region 
-# (legal_amazon_only = TRUE)
-data <- load_ibama(dataset = "areas_embargadas", raw_data = TRUE, 
-                   legal_amazon_only = TRUE)
+                   language = "eng")
 
 # Download treated collected fines data from "BA"
 data <- load_ibama(dataset = "collected_fines", raw_data = FALSE,
                    states = "BA", language = "pt")
-
-# Download treated distributed fines data from "BA" and "RJ"
-data <- load_ibama(dataset = "collected_fines", raw_data = FALSE,
-                   states = c("BA", "RJ", language = "eng")
 
 ```

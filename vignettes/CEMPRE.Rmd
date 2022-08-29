@@ -14,36 +14,38 @@ knitr::opts_chunk$set(
 )
 ```
 
-## The Dataset
+Employment, salary and firm data from IBGE's "Cadastro Central de Empresas" (CEMPRE). Loads information on companies and other organizations and their respective formally constituted local units, registered with the CNPJ - National Register of Legal Entities. Data is available between 2006 and 2019.
 
-Employment, salary and firm data is from IBGE's "Cadastro Central de Empresas" (aka CEMPRE). The data is available between 2006 and 2019.
 
-The definition of the Brazilian Legal Amazon at the municipality level is taken from IBGE's "Mapas Regionais - Amazônia Legal" available here: https://www.ibge.gov.br/geociencias/cartas-e-mapas/mapas-regionais/15819-amazonia-legal.html?=&t=o-que-e. 
+```
+There are seven parameters in this function:
+  
+  1. dataset = "cempre"
+ 
+  2. raw_data: there are two options:
+  # TRUE: if you want the raw data.
+  # FALSE: if you want the processed version of the data.
+  3. geo_level: "country", "state" or "municipality"
+  
+  4. time_period: data is available from 2006 to 2019
+  5. language: you can choose between portuguese and english
+ 
+  6. sectors: defines if the data will be return separated by sectors (sectors = TRUE) or not (sectors = FALSE)
+  7. legal_amazon_only: setting the return of Legal Amazon Data (legal_amazon_only = TRUE) or Country´s Data (legal_amazon_only = FALSE)
+  
+```
 
-## Usage
-
-Using the package is easy enough:
-
-```{r, eval=FALSE}
-library(datazoom.amazonia)
-
-# Download raw data (raw_data = TRUE) with the aggregation level being the country ( geo_level = "country") 
-# from 2008 to 2010 (time_period = 2008:2010). 
-# In this example, the user did not want to visualize data by sector (sectors = FALSE) 
-# and the user also did not want the data to be restricted to the 
-#Legal Amazon area (legal_amazon_only = FALSE).
+```{r, eval = FALSE}
+# Download raw data (raw_data = TRUE) with the aggregation level being the country ( geo_level = "country") from 2008 to 2010 (time_period = 2008:2010). 
+# In this example, the user did not want to visualize data by sector (sectors = FALSE) and the user also did not want the data to be restricted to the Legal Amazon area (legal_amazon_only = FALSE).
 data <- load_cempre(dataset = "cempre", 
                     raw_data = TRUE,
                     geo_level = "country", 
                     time_period = 2008:2010,
                     sectors = FALSE,
                     legal_amazon_only = FALSE) 
-
-# Download treted data (raw_data = FALSE) by state (geo_level = "state") 
-# from 2008 to 2010 (time_period = 2008:2010) in portuguese (language = "pt"). 
-# In this example, the user wanted to visualize data by sector (sectors = TRUE)
-# and the user also wanted the data to be restricted to the 
-# Legal Amazon area (legal_amazon_only = TRUE).
+# Download treted data (raw_data = FALSE) by state (geo_level = "state") from 2008 to 2010 (time_period = 2008:2010) in portuguese (language = "pt").. 
+# In this example, the user wanted to visualize data by sector (sectors = TRUE) and the user also wanted the data to be restricted to the Legal Amazon area (legal_amazon_only = TRUE).
 data <- load_cempre(dataset = "cempre", 
                     raw_data = FALSE,
                     geo_level = "state", 

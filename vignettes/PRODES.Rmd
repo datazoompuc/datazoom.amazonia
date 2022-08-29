@@ -7,14 +7,12 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include = FALSE}
+```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 ```
-
-## The Dataset
 
 The PRODES project uses satellites to monitor deforestation in Brazil's Legal Amazon. The raw data reports total and incremental (year-by-year) low-cut deforested area at the municipality level.
 
@@ -22,18 +20,21 @@ The data made available in this package goes back to the year 2000, with ongoing
 
 Data is collected based on the PRODES-year, which starts at August 1st and ends on July 31st. Accordingly, 2018 deforestation data covers the period from 01/08/2017 to 31/07/2018. 
 
-## Usage
+```
+There are four parameters in this function:
+  
+  1. dataset = "prodes"
+ 
+  2. raw_data: there are two options:
+  # TRUE: if you want the raw data.
+  # FALSE: if you want the processed version of the data. 
+ 
+  3. time_period: available from 2000 to 2020
+  
+  4. language: you can choose between portuguese and english
+```
 
-Using the function is easy enough:
-
-```{r, eval = FALSE}
-library(datazoom.amazonia)
-
-# Download raw data (raw_data = TRUE) from 2000 to 2005 (time_period = 2000:2005).
-data <- load_prodes(dataset = "prodes", 
-                    raw_data = TRUE,
-                    time_period = 2000:2005) 
-
+```{r,eval=FALSE}
 # Download treated data (raw_data = FALSE) from 2010 (time_period = 2010) 
 # in portuguese (language = 'pt').
 data <- load_prodes(dataset = "prodes", 

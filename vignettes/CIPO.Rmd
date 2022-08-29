@@ -14,29 +14,25 @@ knitr::opts_chunk$set(
 )
 ```
 
-## The Dataset
-
 Mappings by [Plataforma CIPÓ](https://plataformacipo.org/) on environmental crimes. Each dataset available is a spreadsheet pertaining to a different aspect of environmental crimes, namely: the Brazilian institutions and organization involved in their prevention (the `"brazilian_actors"` dataset); the international agreements, treaties and conventions related to the subject (the `"international_cooperation"` dataset); and the arrangements regarding forest governance (the `"forest_governance"` dataset).
 
-## Usage
-
-Using the function is easy enough:
-
-```{r, eval=FALSE}
-library(datazoom.amazonia)
-
-# Download the full mapping on the Brazilian actors
+```
+There are two parameters in this function:
+  
+  1. dataset: There are three choices:
+  # "brazilian_actors": mapping of Brazilian actors involved in preventing environmental crimes.
+  # "international_cooperation": mapping of international agreements, treaties and conventions.
+  # "forest_governance": mapping of forest governance arrangements.
+  2. search: Filters the dataset to the rows containing the chosen search parameter.
+  
+```  
+ 
+```{r eval=FALSE}
+# download the spreacdsheet on Brazilian actors involved in fighting environmental crimes
 brazilian_actors <- load_cipo(dataset = "brazilian_actors")
-
-# Now the International cooperation mapping
-cooperation <- load_cipo(dataset = "international_cooperation")
-
-## Now taking advantage of the search parameter
-
 # searching only for entries containing IBAMA
 actors_ibama <- load_cipo(dataset = "brazilian_actors",
                           search = "ibama")
-
 # entries containing IBAMA or FUNAI
 actors_ibama <- load_cipo(dataset = "brazilian_actors",
                           search = "ibama|funai")

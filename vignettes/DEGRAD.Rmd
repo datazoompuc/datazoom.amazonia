@@ -7,16 +7,13 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include = FALSE}
+```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 ```
 
-This dataset in currently under development.
-
-## The Dataset
 The DEGRAD project uses satellites to monitor degradation of forest areas. Raw data is available as simple features (sf) objects, read from shapefiles. The project was substituted in 2016 by DETER-B. Accordingly, data is available from 2007 up to 2016.
 
 Original documentation for this data is very scarce, users beware. Some things to keep in mind are:
@@ -25,21 +22,21 @@ Event data is organized through yearly editions (DEGRAD 2007-2016). Inside a giv
 
 This package provides degradation data with municipality identification. It does this by intersecting DEGRAD geometries with IBGE's municipality geometries from the year 2019. CRS metadata however is missing from the original data source. A best effort approach is used and a CRS is assumed (proj4string: "+proj=longlat +ellps=aust_SA +towgs84=-66.8700,4.3700,-38.5200,0.0,0.0,0.0,0.0 +no_defs").
 
-## Usage
-
-Using the package is easy enough:
+```
+There are four parameters in this function:
+  
+  1. dataset = "degrad"
+  2. raw_data: there are two options:
+  # TRUE: if you want the raw data.
+  # FALSE: if you want the processed version of the data. 
+  
+  3. time_period: data is available from 2007 to 2016
+  4. language: you can choose between portuguese and english
+```
 
 ```{r, eval = FALSE}
-library(datazoom.amazonia)
-
-# download raw data (raw_data = TRUE) related to forest degradation from 2010 to 2012 (time_period = 2010:2012). 
-data <- load_degrad(dataset = 'degrad', 
-                    raw_data = TRUE,
-                    time_period = 2010:2012)
-
-# download treated data (raw_data = FALSE) related to forest degradation from 2013 (time_period = 2013) in portuguese (language = "pt").
+# download treated data (raw_data = TRUE) related to forest degradation from 2010 to 2012 (time_period = 2010:2012). 
 data <- load_degrad(dataset = 'degrad', 
                     raw_data = FALSE,
-                    time_period = 2013,
-                    language = 'pt')
+                    time_period = 2010:2012)
 ```

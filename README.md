@@ -38,73 +38,71 @@ And the development version from GitHub with:
 devtools::install_github("datazoompuc/datazoom.amazonia")
 ```
 
-## Datasets
-
 **[1 - Environmental data](#environmental-data)**
 
 <table>
 <tr>
 <td>
 
-|            |                                  |
-|------------|----------------------------------|
-| **PRODES** | *Yearly deforestationn*          |
-| **DETER**  | *Alerts on forest cover changes* |
-| **DEGRAD** | *Forest degradation*             |
-| **Imazon** | *Deforestation*                  |
+|                       |                                        |
+|-----------------------|----------------------------------------|
+| **[PRODES](#prodes)** | *Yearly deforestation*                 |
+| **[DETER](#deter)**   | *Alerts on forest cover changes*       |
+| **[DEGRAD](#degrad)** | *Forest degradation*                   |
+| **[Imazon](#imazon)** | *Deforestation pressure in the Amazon* |
 
 </td>
 <td>
 
-|                  |                                     |
-|------------------|-------------------------------------|
-| **IBAMA**        | *Environmental fines*               |
-| **MAPBIOMAS**    | *Land cover and use*                |
-| **TerraClimate** | *Climate data such as temperature*  |
-| **SEEG**         | *Greenhouse gas emission estimates* |
-
-</td>
-</tr>
-</table>
-
-**[2 - Social data](#2---social)**
-
-<table>
-<tr>
-<td>
-
-|             |                                                         |
-|-------------|---------------------------------------------------------|
-| **IPS**     | *Amazon Social Progress Index*                          |
-| **DATASUS** | *Causes of mortality and availability of hospital beds* |
-| **IEMA**    | *Access to electricity in the Amazon region*            |
+|                                   |                                              |
+|-----------------------------------|----------------------------------------------|
+| **[IBAMA](#ibama)**               | *Environmental fines and punished companies* |
+| **[MAPBIOMAS](#mapbiomas)**       | *Land cover and land use*                    |
+| **[TerraClimate](#terraclimate)** | *Climate data*                               |
+| **[SEEG](#seeg)**                 | *Greenhouse gas emission estimates*          |
 
 </td>
 </tr>
 </table>
 
-**[3 - Economic data](#2---social)**
+**[2 - Social data](#social-data)**
 
 <table>
 <tr>
 <td>
 
-|                         |                                 |
-|-------------------------|---------------------------------|
-| **[COMEX](#2---comex)** | *Brazilian international trade* |
-| **BACI**                | *Worldwide international trade* |
-| **PIB-Munic**           | *Municipal GDP*                 |
-| **CEMPRE**              | *Central register of companies* |
+|                         |                                                         |
+|-------------------------|---------------------------------------------------------|
+| **[IPS](#ips)**         | *Amazon Social Progress Index*                          |
+| **[DATASUS](#datasus)** | *Causes of mortality and availability of hospital beds* |
+| **[IEMA](#iema)**       | *Access to electricity in the Amazon region*            |
+
+</td>
+</tr>
+</table>
+
+**[3 - Economic data](#economic-data)**
+
+<table>
+<tr>
+<td>
+
+|                             |                                 |
+|-----------------------------|---------------------------------|
+| **[COMEX](#comex)**         | *Brazilian international trade* |
+| **[BACI](#baci)**           | *Worldwide international trade* |
+| **[PIB-Munic](#pib-munic)** | *Municipal GDP*                 |
+| **[CEMPRE](#cempre)**       | *Central register of companies* |
 
 </td>
 <td>
 
-|             |                           |
-|-------------|---------------------------|
-| **PAM**     | *Agricultural production* |
-| **PEVS**    | *Forestry and extraction* |
-| **PPM**     | *Livestock farming*       |
-| **SIGMINE** | *Mining*                  |
+|                         |                           |
+|-------------------------|---------------------------|
+| **[PAM](#pam)**         | *Agricultural production* |
+| **[PEVS](#pevs)**       | *Forestry and extraction* |
+| **[PPM](#ppm)**         | *Livestock farming*       |
+| **[SIGMINE](#sigmine)** | *Mining*                  |
 
 </td>
 </tr>
@@ -112,13 +110,21 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 
 # Environmental Data
 
-## 1 - INPE data
+## PRODES
 
-### PRODES
+The PRODES project uses satellites to monitor deforestation in Brazil’s
+Legal Amazon. The raw data reports total and incremental (year-by-year)
+low-cut deforested area at the municipality level.
 
-Loads information on clearcut deforestation in the Legal Amazon and
-annual deforestation rates in the region. Data is available from 2000 to
-2020.
+The data made available in this package goes back to the year 2000, with
+ongoing updates. In line with INPE’s API, requesting data for an
+unavailable year does not yield an error, but rather a best effort
+response (columns regarding observation data are filled with default
+values).
+
+Data is collected based on the PRODES-year, which starts at August 1st
+and ends on July 31st. Accordingly, 2018 deforestation data covers the
+period from 01/08/2017 to 31/07/2018.
 
     There are four parameters in this function:
       
@@ -133,10 +139,6 @@ annual deforestation rates in the region. Data is available from 2000 to
       4. language: you can choose between portuguese and english
 
 ``` r
-# Download raw data (raw_data = TRUE) from 2000 to 2005 (time_period = 2000:2005).
-data <- load_prodes(dataset = "prodes", 
-                    raw_data = TRUE,
-                    time_period = 2000:2005) 
 # Download treated data (raw_data = FALSE) from 2010 (time_period = 2010) 
 # in portuguese (language = 'pt').
 data <- load_prodes(dataset = "prodes", 
@@ -145,9 +147,23 @@ data <- load_prodes(dataset = "prodes",
                     language = 'pt')  
 ```
 
-### DETER:
+## DETER
 
-Loads information on change in forest cover in the Amazon.
+DETER uses satellite surveillance to detect and report changes in forest
+cover across the Legal Amazon and the Cerrado biome. Each data point
+consists of a warning, describing which type of change has affected a
+certain area of forest at a given date. Broadly speaking, it makes a
+distinction between events of deforestation, degradation and logging.
+The data extracted here spans from 2016 onward in the Amazon, and from
+2018 onward in the Cerrado.
+
+The raw DETER data shows one warning per row, with each row also
+containing a municipality. However, many warnings actually overlap with
+2 or up to 4 municipalities, which are not shown in the original data.
+Therefore, when the option `raw_data = TRUE` is selected, the original
+spatial information is intersected with a municipalities map of Brazil,
+and each warning can be split into more than one row, with each row
+corresponding to a municipality.
 
     There are four parameters in this function:
       
@@ -162,21 +178,31 @@ Loads information on change in forest cover in the Amazon.
       3. language: you can choose between portuguese and english
 
 ``` r
-# Download raw data (raw_data = TRUE) from Amazonia (dataset = "deter_amz")
+# Download treated data (raw_data = TRUE) from Amazonia (dataset = "deter_amz")
 deter_amz <- load_deter(dataset = 'deter_amz',
-                        raw_data = TRUE)
-# Download treated data (raw_data = FALSE) from Cerrado (dataset = "deter_cerrado")
-# in portuguese (language = 'pt')
-deter_cer <- load_deter(dataset = 'deter_cerrado',
-                        raw_data = FALSE,
-                        language = "pt")
+                        raw_data = FALSE)
 ```
 
-### DEGRAD:
+## DEGRAD
 
-Loads information on forest degradation in the Brazilian Amazon,
-replaced by DETER-B in December 2016. Data is available from 2007 to
-2016.
+The DEGRAD project uses satellites to monitor degradation of forest
+areas. Raw data is available as simple features (sf) objects, read from
+shapefiles. The project was substituted in 2016 by DETER-B. Accordingly,
+data is available from 2007 up to 2016.
+
+Original documentation for this data is very scarce, users beware. Some
+things to keep in mind are:
+
+Event data is organized through yearly editions (DEGRAD 2007-2016).
+Inside a given edition however, there may be data from different years
+(events that happened in 2015 inside DEGRAD 2016 for example).
+
+This package provides degradation data with municipality identification.
+It does this by intersecting DEGRAD geometries with IBGE’s municipality
+geometries from the year 2019. CRS metadata however is missing from the
+original data source. A best effort approach is used and a CRS is
+assumed (proj4string: “+proj=longlat +ellps=aust_SA
++towgs84=-66.8700,4.3700,-38.5200,0.0,0.0,0.0,0.0 +no_defs”).
 
     There are four parameters in this function:
       
@@ -189,18 +215,483 @@ replaced by DETER-B in December 2016. Data is available from 2007 to
       4. language: you can choose between portuguese and english
 
 ``` r
-# download raw data (raw_data = TRUE) related to forest degradation from 2010 to 2012 (time_period = 2010:2012). 
-data <- load_degrad(dataset = 'degrad', 
-                    raw_data = TRUE,
-                    time_period = 2010:2012)
-# download treated data (raw_data = FALSE) related to forest degradation from 2013 (time_period = 2013) in portuguese (language = "pt").
+# download treated data (raw_data = TRUE) related to forest degradation from 2010 to 2012 (time_period = 2010:2012). 
 data <- load_degrad(dataset = 'degrad', 
                     raw_data = FALSE,
-                    time_period = 2013,
-                    language = 'pt')
+                    time_period = 2010:2012)
 ```
 
-## 2 - COMEX
+## Imazon
+
+Loads data categorizing each municipality by the level of deforestation
+pressure faced it faces. The categories used by Imazon have three
+levels, ranging from 0 to 3.
+
+There are four parameters in this function:
+
+      1. dataset:
+      # "imazon_shp" includes the municipalities shapefiles and the deforestation category according to imazon
+      2. raw_data: there is one option:
+      # TRUE, as imazon already delivers organized data.
+      
+      3. geo_level:
+      # "municipality". The data is only available at the municipality level.
+      
+      4. language: you can choose between portuguese ('pt') and english ('eng')
+      
+      
+
+``` r
+# Download data
+data <- load_imazon(dataset = "imazon_shp", raw_data = TRUE,
+                     geo_level = "municipality", language = "pt")
+```
+
+## IBAMA
+
+## The Dataset
+
+The dataset is originally from the Brazilian Institute of Environment
+and Renewable Natural Resources (Ibama), documenting environmental
+embargoes and fines at the individual level from 2005 to the present
+day. In addition, it is possible to download distributed and collected
+fines from 1994 until the present day.
+
+The function returns either the raw data or a data frame with aggregates
+considering, for each time-location period, counts for total the number
+of infractions, infractions that already went to trial, and number of
+unique perpetrators of infractions. There are also two data frames
+regarding distributed and collected fines across municipalities
+
+    There are four parameters in this function:
+    1. dataset: There are three possible choices.
+    'areas_embargadas': return the amount of embargoed areas
+    'distributed_fines': return fines that have not been paid by individuals or corporations
+    'collected_fines': return fines that have been paid vy individuals or corporations
+
+      2. raw_data: there are two options:
+      # TRUE: if you want the raw data.
+      # FALSE: if you want the processed version of the data.
+      
+      3. states: specifies for which states to download the data. It is "all" by default, but can be a single state such as "AC" or any vector such as c("AC", "AM"). Does not apply to the "areas_embargadas" dataset.
+      
+      4. language: you can choose between portuguese and english
+      
+
+``` r
+library(datazoom.amazonia)
+
+# Download treated embargoes data (raw_data = FALSE) in english (language = "eng")
+data <- load_ibama(dataset = "areas_embargadas", raw_data = FALSE, 
+                   language = "eng")
+
+# Download treated collected fines data from "BA"
+data <- load_ibama(dataset = "collected_fines", raw_data = FALSE,
+                   states = "BA", language = "pt")
+```
+
+## MAPBIOMAS
+
+The MAPBIOMAS project gathers data reporting the type of land covering
+each year by area, that is, for example, the area used for a temporary
+crop of soybeans. It also reports the transition between coverings
+during given years.
+
+The data available has an yearly frequency and is available starting
+from the year 1989.
+
+    1. dataset: There are fice possible choices.
+    'mapbiomas_cover': type of land covering by biomes, states and municipalities.
+                      data is available from 1985 to 2020.
+    'mapbiomas_transition': transition between coverings by biomes, states and municipalities.
+                            data is available from 1985 to 2020.
+    'mapbiomas_deforestation_regeneration': deforestation and regeneration by biomes and states. 
+                                            data is available from 1988 to 2020.
+    'mapbiomas_irrigation': data about irrigation area by biomes and states.
+                            data is available from 2000 to 2020
+    'mapbiomas_grazing_quality': data about grazing quality by biome, state and municipality
+                                 data is available from 2010 and 2018
+    'mapbiomas_mining': data about mining areas by biome, state, country, municipality and indigenous lands.
+                                 data is available from 1985 to 2020
+    2. raw_data: there are two options:
+      # TRUE: if you want the data as it is in the mapbiomas's site.
+      # FALSE: if you want the treated (more organized) version of the data. 
+    3. geo_level:  Does not apply to datasets not mentioned below
+                    # For datasets "mapbiomas_cover" and "mapbiomas_transition", can be  "municipality" or "state"
+                    # For dataset "mapbiomas_mining", can be "biome" or "indigenous_land"
+    4. language: you can choose between portuguese ('pt') and english ('eng')
+    5. cover_level: Aggregates the data to some level of land coverage. Only applies to datasets "mapbiomas_cover" and "mapbiomas_grazing_quality":
+                    # cover_level = "none" means no aggregation
+                    # cover_level = 0 has categories such as: Anthropic, Natural, Not Applied 
+                    # cover_level = 1 has categories such as: Forest, Non Forest Natural Formation, Farming, Non Vegetated Area, Water, Non Observed
+                    # cover_level = 2 has categories such as: Agriculture, Aquaculture, Beach and Dune, Forest Plantation,  Pasture, River, Lake and Ocean                                
+                    # cover_level = 3 has categories such as: Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
+                    # cover_level = 4 has categories such as: Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
+
+``` r
+# download treated Mapbiomas Cover data in english at the highest aggregation level
+data = load_mapbiomas(dataset = "mapbiomas_cover", raw_data = FALSE,
+                      language = "eng", cover_level = 0)
+
+# download treated Mapbiomas Transition data in portuguese
+data = load_mapbiomas(dataset = "mapbiomas_transition", raw_data = FALSE,
+                      language = "pt")
+
+# download treated data on mining on indigenous lands
+data = load_mapbiomas("mapbiomas_mining", raw_data = FALSE, geo_level = "indigenous")
+```
+
+## TerraClimate
+
+## The Dataset
+
+Spatial data on several climate variables, extracted from Climatology
+Lab’s [TerraClimate](https://www.climatologylab.org/terraclimate.html).
+The table below shows all possible variables to be extracted, which are
+chosen through the “dataset” parameter. Data ranges from 1958 to 2020.
+
+| Dataset                       | Code | Description                                      |  Units   |
+|:------------------------------|:----:|:-------------------------------------------------|:--------:|
+| max_temperature               | tmax | Maximum 2-m Temperature                          |   degC   |
+| min_temperature               | tmin | Minimum 2-m Temperature                          |   degC   |
+| wind_speed                    |  ws  | Wind Speed at 10-m                               |   m/s    |
+| vapor_pressure_deficit        | vpd  | Vapor Pressure Deficit                           |   kPa    |
+| vapor_pressure                | vap  | 2-m Vapor Pressure                               |   kPa    |
+| snow_water_equivalent         | swe  | Snow Water Equivalent at End of Month            |    mm    |
+| shortwave_radiation_flux      | srad | Downward Shortwave Radiation Flux at the Surface |  W/m^2   |
+| soil_moisture                 | soil | Soil Moisture at End of Month                    |    mm    |
+| runoff                        |  q   | Runoff                                           |    mm    |
+| precipitation                 | ppt  | Accumulated Precipitation                        |    mm    |
+| potential_evaporation         | pet  | Reference Evapotranspiration                     |    mm    |
+| climatic_water_deficit        | def  | Climatic Water Deficit                           |    mm    |
+| water_evaporation             | aet  | Actual Evapotranspiration                        |    mm    |
+| palmer_drought_severity_index | PDSI | Palmer Drought Severity Index                    | unitless |
+
+Netcdf files are downloaded from the
+[THREDDS](http://thredds.northwestknowledge.net:8080/thredds/terraclimate_catalog.html)
+web server, as recommended for rectangular subsets of the global data.
+
+    There are five parameters in this function:
+      
+      1. dataset: picks the variable to be read. Possible options are shown in the table below.
+      2. raw_data: there are two options:
+      # TRUE: if you want the data with fewer manipulations.
+      # FALSE: if you want the treated (more organized) version of the data. 
+      
+      3. time_period: avaliable from 1958 to 2020
+      
+      4. language: you can choose between portuguese ('pt') and english ('eng')
+      
+      5. legal_amazon_only: setting the return of Legal Amazon Data (legal_amazon_only = TRUE) or Country´s Data (legal_amazon_only = FALSE)
+      
+
+``` r
+# Downloading maximum temperature data from 2000 to 2020
+
+max_temp <- load_climate(dataset = "max_temperature", time_period = 2000:2020)
+
+# Downloading precipitation data only for the legal Amazon in 2010
+
+amz_precipitation <- load_climate(dataset = "precipitation",
+                                  time_period = 2010,
+                                  legal_amazon_only = TRUE)
+```
+
+## SEEG
+
+Loads estimates of emission of greenhouse gases of Brazilian cities and
+states from SEEG. SEEG is the System of Estimates of Emissions and
+Removals of Greenhouse Gases (SEEG), an initiative of the Observatório
+do Clima, a network of institutions focused on climate change research
+in Brazil.
+
+The data provided in SEEG’s Collection 9 is a series covering the period
+from 1970 to 2020, except for the Land Use Change Sector that has the
+series from 1990 to 2020.
+
+Using data collected from government entities, institutes, research
+centers, NGOs and other institutions, the estimates are created using
+the methodology of the Brazilian Inventory of Anthropic Emissions and
+Removals of Greenhouse Gases, assembled by the Ministry of Science,
+Technology and Innovation (MCTI), and the directives of
+Intergovernmental Panel on Climate Change (IPCC). A further detailed
+explanation of the methodology used is available in the following link
+(only in Portuguese): <http://seeg.eco.br/notas-metodologicas/>
+
+Emissions are divided in five main sources: Agricultural and Cattle
+Raising, Energy, Changes in Use of Land, Industrial Processes and
+Residues. All greenhouse gases contained in the national inventory are
+considered, encompassing CO2, CH4, N2O and the HFCs, with the conversion
+to carbon equivalence (CO2e) also included, both in the metric of GWP
+(Global Warming Potential) and GTP (Global Temperature Potential).
+
+The data is downloaded from the SEEG website in the form of one single
+file, so the option to select a certain range of years is not available.
+Also, due to the size of the file, a stable internet connection is
+necessary, and the function may take time to run.
+
+    There are four parameters in this function:
+      
+      1. dataset: There are six choices:
+      # "seeg": provides all sectors in a same dataframe. Only works with raw_data = TRUE.
+      # "seeg_farming"
+      # "seeg_industry"
+      # "seeg_energy"
+      # "seeg_land"
+      # "seeg_residuals"
+      
+      2. raw_data: there are two options:
+      # TRUE: if you want the raw data.
+      # FALSE: if you want the processed version of the data. 
+      
+      3. geo_level: there are three options:
+      # "country" 
+      # "state"  
+      # "municipality"
+      
+      4. language: you can choose between portuguese and english
+
+``` r
+# Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg") by municipality (geo_level = "municipality")
+data <- load_seeg(dataset = "seeg", 
+                  raw_data = TRUE,
+                  geo_level = "municipality")
+  
+# Download treated data (raw_data = FALSE) of industry greenhouse gases (dataset = "seeg_industry") by state (geo_level = "state")
+data <- load_seeg(dataset = "seeg_industry", 
+                  raw_data = FALSE,
+                  geo_level = "state")
+```
+
+## CIPÓ
+
+Mappings by [Plataforma CIPÓ](https://plataformacipo.org/) on
+environmental crimes. Each dataset available is a spreadsheet pertaining
+to a different aspect of environmental crimes, namely: the Brazilian
+institutions and organization involved in their prevention (the
+`"brazilian_actors"` dataset); the international agreements, treaties
+and conventions related to the subject (the
+`"international_cooperation"` dataset); and the arrangements regarding
+forest governance (the `"forest_governance"` dataset).
+
+    There are two parameters in this function:
+      
+      1. dataset: There are three choices:
+      # "brazilian_actors": mapping of Brazilian actors involved in preventing environmental crimes.
+      # "international_cooperation": mapping of international agreements, treaties and conventions.
+      # "forest_governance": mapping of forest governance arrangements.
+      2. search: Filters the dataset to the rows containing the chosen search parameter.
+      
+
+``` r
+# download the spreacdsheet on Brazilian actors involved in fighting environmental crimes
+brazilian_actors <- load_cipo(dataset = "brazilian_actors")
+# searching only for entries containing IBAMA
+actors_ibama <- load_cipo(dataset = "brazilian_actors",
+                          search = "ibama")
+# entries containing IBAMA or FUNAI
+actors_ibama <- load_cipo(dataset = "brazilian_actors",
+                          search = "ibama|funai")
+```
+
+# Social Data
+
+## IPS
+
+Loads information on the social and environmental performance of the
+Legal Amazon.
+
+Data from the Amazon Social Progress Index, an initiative from Imazon
+with support from the Social Progress Imperative that measures the
+social and environmental progress of its locations. Namely, the 772
+municipalities in the Amazon region. For more information, check the
+[initiative’s website](http://www.ipsamazonia.org.br/conheca-o-ips).
+Survey is done at the municipal level and data is available in 2014 and
+2018.
+
+    There are four parameters in this function:
+      
+      1. dataset = ("all", "life_quality", "sanit_habit", "violence", "educ", "communic", "mortality", "deforest")
+      2. raw_data: there are two options:
+      # TRUE: if you want the raw data.
+      # FALSE: if you want the processed version of the data. 
+      
+      3. time_period: data is available in 2014 and 2018.
+      4. language: you can choose between portuguese and english
+
+``` r
+# Download raw data from 2014 
+data <- load_ips(dataset = "all", raw_data = TRUE, time_period = 2014)
+
+# Download treated deforest data from 2018 in portuguese
+data <- load_ips(dataset = "deforest", raw_data = FALSE,
+                 time_period = 2018, language = 'pt')
+```
+
+## DATASUS
+
+DATASUS is the IT department of SUS – the Brazilian Unified Health
+System. They provide data on health establishments, mortality, access to
+health services and several health indicators nationwide. This function
+allows for an easy download of several DATASUS raw datasets, and also
+cleans the data in a couple of datasets. The sections below explains
+each avaliable dataset.
+
+    There are six parameters in this function:
+      
+      1. dataset:
+      # "datasus_sim_do" has SIM-DO mortality data
+      # Possible subsets of SIM-DO are "datasus_sim_dofet" (Fetal), "datasus_sim_doext" (External causes), "datasus_sim_doinf" (Children), "datasus_sim_domat (Maternal)"
+      # "datasus_sih" has SIH hospitalization data.
+      # "datasus_cnes_lt" has data on the number of hospital beds.
+      # further subsets of CNES are listed in the vignette, but those only allow for the download of raw data.
+
+      2. raw_data: there are two options:
+      # TRUE: if you want the data in its original form (returns a list of dataframes)
+      # FALSE: if you want the treated (more organized) version of the data. Only effective for SIM-DO and subsets, SIH, and CNES-LT. 
+      
+      3. keep_all: only applies when raw_data is FALSE. There are two options:
+      # TRUE: keeps all original variables, adding variable labels and possibly constructing extra variables.
+      # FALSE: aggregates data at the municipality, thereby losing individual-level data, and only keeping aggregate measures.
+      
+      4. time_period
+      
+      5. states: a vector of states by which to filter the data. Only works for datasets whose data is provided in separate files by state.
+      
+      6. language: you can choose between portuguese ('pt') and english ('eng')
+      
+
+##### DATASUS - SIM (System of Mortality Information)
+
+Each original SIM data file contains rows corresponding to a declaration
+of death (DO), and columns with several characteristics of the person,
+the place of death, and the cause of death. The data comes from the main
+SIM-DO (Declarations of Death) dataset, which goes by the option
+`"datasus_sim_do"`. There are also 4 subsets of SIM-DO, namely SIM-DOFET
+(Fetal), SIM-DOMAT (Maternal), SIM-DOINF (Children), and SIM-DOEXT
+(External Causes), with corresponding dataset options
+`"datasus_sim_dofet", "datasus_sim_domat", "datasus_sim_doinf", "datasus_sim_doext"`.
+Note that only SIM-DO provides separate files for each state, so all
+other dataset options always contain data from the whole country.
+
+Below is an example of downloading the raw data, and also using the
+`raw_data = FALSE` option to obtain treated data. When this option is
+selected, we create several variables for deaths from each cause, which
+are encoded by their CID-10 codes. The function then returns, by
+default, the aggregated data of mortality sources at the municipality
+level. In this process, all the individual information such as age, sex,
+race, and schooling are lost, so we also offer the option of
+`keep_all = TRUE`, which creates all the indicator variables for cause
+of death, adds variable labels, and does not aggregate, thereby keeping
+all individual-level variables.
+
+``` r
+library(datazoom.amazonia)
+
+# download raw data for the year 2010 in the state of AM. 
+data <- load_datasus(dataset = "datasus_sim_do",
+                     time_period = 2010,
+                     states = "AM",
+                     raw_data = TRUE)
+
+# download treated data with the number of deaths by cause in AM and PA.
+data <- load_datasus(dataset = "datasus_sim_do",
+                    time_period = 2010,
+                    states = c("AM", "PA"),
+                    raw_data = FALSE)
+
+# download treated data with the number of deaths by cause in AM and PA, keeping all individual variables.
+data <- load_datasus(dataset = "datasus_sim_do",
+                    time_period = 2010,
+                    states = c("AM", "PA"),
+                    raw_data = FALSE,
+                    keep_all = TRUE)
+```
+
+##### DATASUS - CNES (National Register of Health Establishments)
+
+Provides information on health establishments, avaliable hospital beds,
+and active physicians. The data is split into 13 datasets: LT (Beds), ST
+(Establishments), DC (Complimentary data), EQ (Equipments), SR
+(Specialized services), HB (License), PF (Practicioner), EP (Teams), RC
+(Contractual Rules), IN (Incentives), EE (Teaching establishments), EF
+(Philanthropic establishments), and GM (Management and goals).
+
+Raw data is avaliable for all of them using the dataset option
+`datasus_cnes_lt, datasus_cnes_st`, and so on, and treated data is only
+avaliable for CNES - LT. When `raw_data = FALSE` is chosen, we return
+data on the number of total hospital beds and the ones avaliable through
+SUS, which can be aggregated by municipality (with option
+`keep_all = FALSE`) or keeping all original variables
+(`keep_all = TRUE`).
+
+``` r
+library(datazoom.amazonia)
+
+# download treated data with the number of avaliable beds in AM and PA.
+data <- load_datasus(dataset = "datasus_cnes_lt",
+                    time_period = 2010,
+                    states = c("AM", "PA"),
+                    raw_data = FALSE)
+```
+
+##### DATASUS - SIH (System of Hospital Information)
+
+Contains data on hospitalizations. Treated data only gains variable
+labels, with no extra manipulation. Note that this is a much heavier
+dataset.
+
+``` r
+library(datazoom.amazonia)
+
+# download raw data
+data <- load_datasus(dataset = "datasus_sih",
+                    time_period = 2010,
+                    states = "AM",
+                    raw_data = TRUE)
+
+# download data in a single tibble, with variable labels
+data <- load_datasus(dataset = "datasus_sih",
+                    time_period = 2010,
+                    states = "AM",
+                    raw_data = FALSE)
+```
+
+## IEMA
+
+Data from the Institute of Environment and Water Resources (IEMA),
+documenting the number of people without access to eletric energy
+throughout the Amazon region in the year 2018.
+
+    There are four parameters in this function:
+      
+      1. dataset:
+      # "iema" has population without energy access data
+
+      2. raw_data: there are two options:
+      # TRUE: if you want the data in its original form
+      # FALSE: if you want the treated (more organized) version of the data.
+      
+      3. geo_level:
+      # "municipality". The data is only available at the municipality level.
+      
+      4. language: you can choose between portuguese ('pt') and english ('eng')
+
+``` r
+# Download treated data (raw_data = FALSE)
+data <- load_iema(dataset = "iema", raw_data = FALSE,
+                     geo_level = "municipality", language = "pt")
+
+# Download treated data in english
+data <- load_iema(dataset = "iema", raw_data = FALSE,
+                     geo_level = "municipality", language = "eng")
+```
+
+# Economic Data
+
+## COMEX
+
+## The Dataset
 
 The Comex dataset gathers data extracted from Siscomex (Integrated
 System of Foreign Trade), which is a database containing information
@@ -216,6 +707,9 @@ The data has a monthly frequency and is available starting from the year
 adopted, but all conversions are available on a dictionary in the Comex
 website
 (<https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta/>).
+Systems of nomenclature vary in the degree of detail in terms of the
+product involved, as well as other characteristics, such as unit and
+granularity of location.
 
     There are four parameters in this function:
       
@@ -244,15 +738,40 @@ data <- load_br_trade(dataset = "comex_import_mun",
                       time_period = 1997:2021)
 ```
 
-## 3 - IBGE data
+## BACI
 
-### PIB-Munic
+Loads disaggregated data on bilateral trade flows for more than 5000
+products and 200 countries. The data is from the CEPII Research and
+Expertise on the World Economy and is built from data directly reported
+by each country to the United Nations Statistical Division (Comtrade).
 
-Loads information on gross domestic product at current prices, taxes,
-net of subsidies, on products at current prices and gross value added at
-current prices, total and by economic activity, and respective shares.
-Data is available at country, state and municipality level and from 2002
-to 2018.
+    There are four parameters in this function:
+      
+      1. dataset: There is one choice:
+      # "HS92" which follows the Harmonized System method
+
+      2. raw_data: there are two options:
+      # TRUE: if you want the data as it is in the CEPII site.
+      # FALSE: if you want the treated (more organized) version of the data. 
+      
+      3. time_period: The data availability for each dataset is detailed above
+
+    4. language: you can choose between portuguese ('pt') and english ('eng')
+      
+
+``` r
+# download treated data
+clean_baci <- load_baci(dataset = "HS92", raw_data = FALSE, time_period = 2016,
+                        language = "pt")
+```
+
+## PIB-Munic
+
+Loads IBGE information on gross domestic product at current prices,
+taxes, net of subsidies, on products at current prices and gross value
+added at current prices, total and by economic activity, and respective
+shares. Data is available at country, state and municipality level and
+from 2002 to 2018.
 
     There are six parameters in this function:
       
@@ -293,12 +812,15 @@ data <- load_pibmunic(dataset = 'pibmunic',
                       legal_amazon_only = TRUE)
 ```
 
-### CEMPRE
+## CEMPRE
 
-Loads information on companies and other organizations and their
-respective formally constituted local units, registered with the CNPJ -
-National Register of Legal Entities. Data is available from 2006 to
-2019.
+## The Dataset
+
+Employment, salary and firm data from IBGE’s “Cadastro Central de
+Empresas” (CEMPRE). Loads information on companies and other
+organizations and their respective formally constituted local units,
+registered with the CNPJ - National Register of Legal Entities. Data is
+available between 2006 and 2019.
 
     There are seven parameters in this function:
       
@@ -336,7 +858,9 @@ data <- load_cempre(dataset = "cempre",
                     legal_amazon_only = TRUE) 
 ```
 
-### PAM
+## PAM
+
+## The Dataset
 
 Municipal Agricultural Production (PAM, in Portuguese) is a nationwide
 annual survey conducted by IBGE (Brazilian Institute of Geography and
@@ -350,18 +874,24 @@ and corn), which all sum to a total survey of 64 agricultural products
 is only included in the dataset if the planted area occupies over 1 acre
 or if output exceeds one tonne.
 
+Permanent farming is characterized by a cycle of long duration, whose
+harvests may be done multiple times across the years without the need of
+planting seeds again. Temporary farming, on the other hand, consists of
+cycles of short and medium duration, which after harvesting require
+planting seeds again.
+
+The data also has multiple aggregation levels, such as nationwide, by
+region, mesoregion and microregion, as well as state and municipality.
+
+The data available has a yearly frequency and is available from 1974 to
+the present, with the exception of the four multiple-harvest products,
+which are only available from 2003. More information can be found on
+this link (only in Portuguese):
+<https://www.ibge.gov.br/estatisticas/economicas/agricultura-e-pecuaria/9117-producao-agricola-municipal-culturas-temporarias-e-permanentes.html#>:\~:text=A%20pesquisa%20Produ%C3%A7%C3%A3o%20Agr%C3%ADcola%20Municipal,s%C3%A3o%20da%20cesta%20b%C3%A1sica%20do
+
     There are five parameters in this function:
       
-      1. dataset: There are seven possible choices. 
-      These datasets contain statistics such as quantity produced, area planted and harvested, average quantity of output and monetary value of such output. 
-      
-      # 'pam_all_crops': it selects data about agricultural products divided in permanent and temporary farmed land. 
-      # 'pam_permanent_crops': it selects the data about agricultural products produced in permanent farmed land.
-      # 'pam_temporary_crops':it selects the data about agricultural products produced in temporary farmed land.
-      # 'pam_corn': it selects the data from the first and the second harvests of corn.
-      # 'pam_potato': it selects the data from the first, the second and the third harvests of potato.
-      # 'pam_peanut': it selects the data from the first and the second harvests of peanut.
-      # 'pam_beans':  it selects the data from the first, the second and the third harvests of bean.
+      1. dataset: See tables below
       2. raw_data: there are two options:
       # TRUE: if you want the data as it is in the IBGE's site.
       # FALSE: if you want the treated (more organized) version of the data. 
@@ -490,12 +1020,23 @@ data <- load_pam(dataset = 'corn',
                  language = "pt")
 ```
 
-### PEVS
+## PEVS
 
 Loads information on the amount and value of the production of the
 exploitation of native plant resources and planted forest massifs, as
-well as existing total and harvested areas of forest crops. Survey is
-done at the municipal level and data is available from 1986 to 2019.
+well as existing total and harvested areas of forest crops.
+
+Data is from the Silviculture and Forestry Extraction Production (PEVS,
+in Portuguese), a nationwide annual survey conducted by IBGE (Brazilian
+Institute of Geography and Statistics). The data also has multiple
+aggregation levels, such as nationwide, by region, mesoregion and
+microregion, as well as state and municipality.
+
+The data available has a yearly frequency and is available from 1986 to
+the present, with the exception of the data on total area for
+production, which are only available from 2013 onwards. More information
+can be found on this link (only in Portuguese):
+<https://www.ibge.gov.br/estatisticas/economicas/agricultura-e-pecuaria/9105-producao-da-extracao-vegetal-e-da-silvicultura.html?=&t=o-que-e>
 
     There are five parameters in this function:
       
@@ -532,17 +1073,20 @@ data <- load_pevs(dataset = 'pevs_forest_crops',
                   language = "eng")
 ```
 
-### PPM
+## PPM
 
-Downloads data from PPM (“Pesquisa da Pecuária Municipal”). This survey
-contains information of the livestock inventories (e.g:cattle, pigs and
-hogs) in Brazilian Municipalities. It also provides information on the
-production of animal origin (e.g:output of milk, hen eggs, quail eggs,
-honey) and the value of the production during the reference year.
+Data on livestock inventories (e.g:cattle, pigs and hogs) in Brazilian
+Municipalities, as well as amount and value of animal products
+(e.g:output of milk, hen eggs, quail eggs, honey).
 
 The periodicity of the survey is annual. The geographic coverage is
 national, with results released for Brazil, Major Regions, Federation
 Units, Mesoregions, Microregions and Municipalities.
+
+The data available has a yearly frequency and is available from 1974 to
+the present. More information can be found on this link (only in
+Portuguese):
+<https://www.ibge.gov.br/estatisticas/economicas/agricultura-e-pecuaria/9107-producao-da-pecuaria-municipal.html>
 
     There are five parameters in this function:
       
@@ -583,126 +1127,7 @@ data <- load_ppm(dataset = 'ppm_sheep_farming',
                  language = "pt")
 ```
 
-## 4 - IPS
-
-Loads information on the social and environmental performance of the
-Legal Amazon. Survey is done at the municipal level and data is
-available in 2014 and 2018.
-
-    There are four parameters in this function:
-      
-      1. dataset = ("all", "life_quality", "sanit_habit", "violence", "educ", "communic", "mortality", "deforest")
-      2. raw_data: there are two options:
-      # TRUE: if you want the raw data.
-      # FALSE: if you want the processed version of the data. 
-      
-      3. time_period: data is available in 2014 and 2018.
-      4. language: you can choose between portuguese and english
-
-``` r
-# Download raw data from 2014 
-data <- load_ips(dataset = "all", raw_data = TRUE, time_period = 2014)
-
-# Download treated deforest data from 2018 in portuguese
-data <- load_ips(dataset = "deforest", raw_data = FALSE,
-                 time_period = 2018, language = 'pt')
-```
-
-## 5 - SEEG
-
-Loads data of estimates of emission of greenhouse gases of Brazilian
-cities and states.
-
-According to the “SEEG Brasil” website: all five sectors that are
-sources of emissions - Agriculture, Energy, Land Use Change, Industrial
-Processes and Waste with the same degree of detail contained in the
-emissions inventories are evaluated. The data provided in SEEG’s
-Collection 9 is a series covering the period from 1970 to 2020, except
-for the Land Use Change Sector that has the series from 1990 to 2020.
-
-    There are four parameters in this function:
-      
-      1. dataset: There are six choices:
-      # "seeg": provides all sectors in a same dataframe. Only works with raw_data = TRUE.
-      # "seeg_farming"
-      # "seeg_industry"
-      # "seeg_energy"
-      # "seeg_land"
-      # "seeg_residuals"
-      
-      2. raw_data: there are two options:
-      # TRUE: if you want the raw data.
-      # FALSE: if you want the processed version of the data. 
-      
-      3. geo_level: there are three options:
-      # "country" 
-      # "state"  
-      # "municipality"
-      
-      4. language: you can choose between portuguese and english
-
-``` r
-# Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg") by municipality (geo_level = "municipality")
-data <- load_seeg(dataset = "seeg", 
-                  raw_data = TRUE,
-                  geo_level = "municipality")
-  
-# Download treated data (raw_data = FALSE) of industry greenhouse gases (dataset = "seeg_industry") by state (geo_level = "state")
-data <- load_seeg(dataset = "seeg_industry", 
-                  raw_data = FALSE,
-                  geo_level = "state")
-# Download treated data (raw_data = FALSE) of energy greenhouse gases (dataset = "seeg_energy") by state (geo_level = "state")
-data <- load_seeg(dataset = "seeg_energy", 
-                  raw_data = FALSE,
-                  geo_level = "state")
-# Download treated data (raw_data = FALSE) of land greenhouse gases (dataset = "seeg_land") by country (geo_level = "country")
-data <- load_seeg(dataset = "seeg_land", 
-                  raw_data = FALSE,
-                  geo_level = "country")
-# Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg") by state (geo_level = "state")
-data <- load_seeg(dataset = "seeg", 
-                  raw_data = TRUE,
-                  geo_level = "state")
-```
-
-## 6 - IBAMA
-
-Downloads and compiles data on environmental fines at the municipality
-or state levels considering the Brazilian region.
-
-The function returns either the raw data or a data frame with aggregates
-considering, for each time-location period, counts for total the number
-of infractions, infractions that already went to trial, and number of
-unique perpetrators of infractions. There are also two data frames
-regarding distributed and collected fines across municipalities
-
-    There are four parameters in this function:
-    1. dataset: There are three possible choices.
-    'areas_embargadas': return the amount of embargoed areas
-    'distributed_fines': return fines that have not been paid by individuals or corporations
-    'collected_fines': return fines that have been paid vy individuals or corporations
-
-      2. raw_data: there are two options:
-      # TRUE: if you want the raw data.
-      # FALSE: if you want the processed version of the data.
-      
-      3. states: specifies for which states to download the data. It is "all" by default, but can be a single state such as "AC" or any vector such as c("AC", "AM"). Does not apply to the "areas_embargadas" dataset.
-      
-      4. language: you can choose between portuguese and english
-      
-
-``` r
-# Download treated data (raw_data = FALSE) from the entire country 
-# (legal_amazon_only = FALSE) in english (language = "eng")
-data <- load_ibama(dataset = "areas_embargadas", raw_data = FALSE, 
-                   language = "eng", legal_amazon_only = FALSE)
-# Download raw data (raw_data = TRUE) from Legal Amazon region 
-# (legal_amazon_only = TRUE)
-data <- load_ibama(dataset = "areas_embargadas", raw_data = TRUE, 
-                   legal_amazon_only = TRUE)
-```
-
-## 7 - SIGMINE
+## SIGMINE
 
 Loads information the mines being explored legally in Brazil, including
 their location, status, product being mined and area in square meters
@@ -719,412 +1144,10 @@ Agency (ANM) is responsible for this survey.
       
 
 ``` r
-# Download raw data (raw_data = TRUE).
-data <- load_sigmine(dataset = 'sigmine_active', raw_data = TRUE)
 # Download treated data (raw_data = FALSE) in portuguese (language = "pt").
 data <- load_sigmine(dataset = 'sigmine_active', 
                      raw_data = FALSE,
                      language = "pt")
-```
-
-## 8 - MAPBIOMAS
-
-The MAPBIOMAS project gathers data reporting the type of land covering
-each year by area, that is, for example, the area used for a temporary
-crop of soybeans. It also reports the transition between coverings
-during given years.
-
-    1. dataset: There are six possible choices.
-    'mapbiomas_cover': type of land covering by biomes, states and municipalities.
-                      data is available from 1985 to 2020.
-    'mapbiomas_transition': transition between coverings by biomes, states and municipalities.
-                            data is available from 1985 to 2020.
-    'mapbiomas_deforestation_regeneration': deforestation and regeneration by biomes and states. 
-                                            data is available from 1988 to 2020.
-    'mapbiomas_irrigation': data about irrigation area by biomes and states.
-                            data is available from 2000 to 2020
-    'mapbiomas_grazing_quality': data about grazing quality by biome, state and municipality
-                                 data is available from 2010 and 2018
-    'mapbiomas_mining': data about mining areas by biome, state, country, municipality and indigenous lands.
-                                 data is available from 1985 to 2020
-    2. raw_data: there are two options:
-      # TRUE: if you want the data as it is in the mapbiomas's site.
-      # FALSE: if you want the treated (more organized) version of the data. 
-    3. geo_level: 'state', 'municipality', 'biomes', 'biome', 'country', 'indigenous_lands'
-                   Read the details on the datasets because some of them don't have data for 'municipality' and mapbiomas_mining accepts 'biome', 'country', 'indigenous_lands'.
-    4. time_period: The data availability for each dataset is detailed above
-    5. language: you can choose between portuguese ('pt') and english ('eng')
-    6. time_id: 'year'
-    7. cover_level: Five options: 
-                    # cover_level = 0 has categories such as: Anthropic, Natural, Not Applied 
-                    # cover_level = 1 has categories such as: Forest, Non Forest Natural Formation, Farming, Non Vegetated Area, Water, Non Observed
-                    # cover_level = 2 has categories such as: Agriculture, Aquaculture, Beach and Dune, Forest Plantation,  Pasture, River, Lake and Ocean                                
-                    # cover_level = 3 has categories such as: Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
-                    # cover_level = 4 has categories such as: Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
-
-``` r
-# download treated Mapbiomas Cover data in english
-data = load_mapbiomas(dataset = "mapbiomas_cover", raw_data = FALSE, time_period = "all",
-                      language = "eng")
-# download treated Mapbiomas Transition data in portuguese
-data = load_mapbiomas(dataset = "mapbiomas_transition", raw_data = FALSE, time_period = "all",
-                      language = "pt")
-# download treated Mapbiomas Grazing Quality data in portuguese
-data = load_mapbiomas(dataset = "mapbiomas_grazing_quality", raw_data = FALSE, time_period = "all", language = "pt")
-# download treated Mapbiomas Irrigation data in english
-data = load_mapbiomas(dataset = "mapbiomas_irrigation", raw_data = FALSE, time_period = "all", language = "eng")
-# download treated Mapbiomas deforestauon/regeneration data in portuguese
-data = load_mapbiomas(dataset = "mapbiomas_deforestation_regeneration", raw_data = FALSE, time_period = "all", language = "eng")
-# download treated indigenous lands data in portuguese
-data = load_mapbiomas("mapbiomas_mining", raw_data = FALSE, geo_level = "indigenous", language = "pt")
-```
-
-## 9 - CIPÓ
-
-Loads Plataforma CIPÓ’s mappings on the organizations involved in
-combating environmental crimes. Each mapping consists on a listing of
-actors or agreements along with attributions and many descriptions.
-
-    There are two parameters in this function:
-      
-      1. dataset: There are three choices:
-      # "brazilian_actors": mapping of Brazilian actors involved in preventing environmental crimes.
-      # "international_cooperation": mapping of international agreements, treaties and conventions.
-      # "forest_governance": mapping of forest governance arrangements.
-      2. search: Filters the dataset to the rows containing the chosen search parameter.
-      
-
-``` r
-# download the spreacdsheet on Brazilian actors involved in fighting environmental crimes
-brazilian_actors <- load_cipo(dataset = "brazilian_actors")
-# searching only for entries containing IBAMA
-actors_ibama <- load_cipo(dataset = "brazilian_actors",
-                          search = "ibama")
-# entries containing IBAMA or FUNAI
-actors_ibama <- load_cipo(dataset = "brazilian_actors",
-                          search = "ibama|funai")
-```
-
-## 10 - TerraClimate
-
-Loads TerraClimate data by [Climatology
-Lab](https://www.climatologylab.org), on many available climate
-variables. Data is avaliable from 1958 to 2020.
-
-    There are five parameters in this function:
-      
-      1. dataset: picks the variable to be read. Possible options are shown in the table below.
-      2. raw_data: there are two options:
-      # TRUE: if you want the data with fewer manipulations.
-      # FALSE: if you want the treated (more organized) version of the data. 
-      
-      3. time_period: avaliable from 1958 to 2020
-      
-      4. language: you can choose between portuguese ('pt') and english ('eng')
-      
-      5. legal_amazon_only: setting the return of Legal Amazon Data (legal_amazon_only = TRUE) or Country´s Data (legal_amazon_only = FALSE)
-      
-
-Possible dataset choices:
-
-| Dataset                       | Code | Description                                      |  Units   |
-|:------------------------------|:----:|:-------------------------------------------------|:--------:|
-| max_temperature               | tmax | Maximum 2-m Temperature                          |   degC   |
-| min_temperature               | tmin | Minimum 2-m Temperature                          |   degC   |
-| wind_speed                    |  ws  | Wind Speed at 10-m                               |   m/s    |
-| vapor_pressure_deficit        | vpd  | Vapor Pressure Deficit                           |   kPa    |
-| vapor_pressure                | vap  | 2-m Vapor Pressure                               |   kPa    |
-| snow_water_equivalent         | swe  | Snow Water Equivalent at End of Month            |    mm    |
-| shortwave_radiation_flux      | srad | Downward Shortwave Radiation Flux at the Surface |  W/m^2   |
-| soil_moisture                 | soil | Soil Moisture at End of Month                    |    mm    |
-| runoff                        |  q   | Runoff                                           |    mm    |
-| precipitation                 | ppt  | Accumulated Precipitation                        |    mm    |
-| potential_evaporation         | pet  | Reference Evapotranspiration                     |    mm    |
-| climatic_water_deficit        | def  | Climatic Water Deficit                           |    mm    |
-| water_evaporation             | aet  | Actual Evapotranspiration                        |    mm    |
-| palmer_drought_severity_index | PDSI | Palmer Drought Severity Index                    | unitless |
-
-``` r
-# Downloading maximum temperature data from 2000 to 2020
-max_temp <- load_climate(dataset = "max_temperature", time_period = 2000:2020)
-# Downloading precipitation data only for the legal Amazon in 2010
-amz_precipitation <- load_climate(dataset = "precipitation",
-                                  time_period = 2010,
-                                  legal_amazon_only = TRUE)
-```
-
-## 11 - BACI
-
-Loads disaggregated data on bilateral trade flows for more than 5000
-products and 200 countries.
-
-    There are four parameters in this function:
-      
-      1. dataset: There is one choice:
-      # "HS92" which follows the Harmonized System method
-
-      2. raw_data: there are two options:
-      # TRUE: if you want the data as it is in the CEPII site.
-      # FALSE: if you want the treated (more organized) version of the data. 
-      
-      3. time_period: The data availability for each dataset is detailed above
-
-    4. language: you can choose between portuguese ('pt') and english ('eng')
-      
-
-``` r
-# download raw data
-raw_baci <- load_baci(dataset = "HS92", raw_data = TRUE, time_period = 2016)
-
-# download treated data
-clean_baci <- load_baci(dataset = "HS92", raw_data = FALSE, time_period = 2016,
-                        language = "pt")
-```
-
-## 12 - DATASUS
-
-Loads data on mortality, hospitalizations, and hospital bed avaliability
-from DATASUS.
-
-    There are six parameters in this function:
-      
-      1. dataset:
-      # "datasus_sim_do" has SIM-DO mortality data
-      # Possible subsets of SIM-DO are "datasus_sim_dofet" (Fetal), "datasus_sim_doext" (External causes), "datasus_sim_doinf" (Children), "datasus_sim_domat (Maternal)"
-      # "datasus_sih" has SIH hospitalization data.
-      # "datasus_cnes_lt" has data on the number of hospital beds.
-      # further subsets of CNES are listed in the vignette, but those only allow for the download of raw data.
-
-      2. raw_data: there are two options:
-      # TRUE: if you want the data in its original form (returns a list of dataframes)
-      # FALSE: if you want the treated (more organized) version of the data. Only effective for SIM-DO and subsets, SIH, and CNES-LT. 
-      
-      3. keep_all: only applies when raw_data is FALSE. There are two options:
-      # TRUE: keeps all original variables, adding variable labels and possibly constructing extra variables.
-      # FALSE: aggregates data at the municipality, thereby losing individual-level data, and only keeping aggregate measures.
-      
-      4. time_period
-      
-      5. states: a vector of states by which to filter the data. Only works for datasets whose data is provided in separate files by state.
-      
-      6. language: you can choose between portuguese ('pt') and english ('eng')
-      
-
-``` r
-# download raw SIH data
-raw_sih <- load_baci(dataset = "datasus_sih",
-                      raw_data = TRUE,
-                      time_period = 2016)
-
-# download treated mortality data for the states of AM and AP at the municipality level
-clean_sim <- load_baci(dataset = "datasus_sim_do",
-                        raw_data = FALSE,
-                        keep_all = FALSE,
-                        time_period = 2016,
-                        states = c("AM", "AP"),
-                        language = "pt")
-```
-
-## 13 - IEMA
-
-Loads data on the population without access to eletric energy at the
-municipality level, considering the Amazon region.
-
-    There are four parameters in this function:
-      
-      1. dataset:
-      # "iema" has population without energy access data
-
-      2. raw_data: there are one option:
-      # FALSE: if you want the treated (more organized) version of the data.
-      
-      3. geo_level:
-      # "municipality". The data is only available at the municipality level.
-      
-      4. language: you can choose between portuguese ('pt') and english ('eng')
-      
-
-``` r
-# Download treated data (raw_data = FALSE)
-data <- load_iema(dataset = "iema", raw_data = FALSE,
-                     geo_level = "municipality", language = "pt")
-
-# Download treated data in english
-data <- load_iema(dataset = "iema", raw_data = FALSE,
-                     geo_level = "municipality", language = "eng")
-```
-
-## 14 - IMAZON SHP
-
-Loads data containing the municipality's categorization according to imazon's categories. There are four categories that correspond to the level of deforestation pressure faced by the place.
-
-There are four parameters in this function:
-
-```
-  1. dataset:
-  # "imazon_shp" includes the municipalities shapefiles and the deforestation category according to imazon
-  2. raw_data: there is one option:
-  # TRUE, as imazon already delivers the organized data.
-  
-  3. geo_level:
-  # "municipality". The data is only available at the municipality level.
-  
-  4. language: you can choose between portuguese ('pt') and english ('eng')
-  
-  
-```
-
-```{r eval=FALSE}
-# Download data
-data <- load_imazon(dataset = "imazon_shp", raw_data = TRUE,
-                     geo_level = "municipality", language = "pt")
-```
-
-## The Structure of the functions
-
-**1. Bind Global Variables:** The goal is to ensure that all the
-variables in the function were initialized to some value. We also do
-this to avoid errors when we check the function.
-
-**2. Define Basic Parameters:** Create a list with all the parameters
-from the function. The list *param* will be an organized list with all
-the parameters of interest.
-
-**3. Download Data:** In the majority of our functions, we download data
-by using external_download(). However, when we download data from IBGE,
-we use a function called sidra_download(). Both of these functions can
-be found in the “download.R” file.
-
-**4. Data Engineering:** In this section of the code, we (i) exclude
-variables that we judge not to be relevant;(ii) sometimes we change the
-class of some variables; (iii) sometimes we change data to be organized
-in the long format or in the wide format depending on what we want; (iv)
-generally speaking, it’s in this part of the code that we make the most
-changes in the original Data Frame.
-
-**5. Harmonizing Variable Names:** Rename columns with better names.
-
-**6. Load Dictionary:** In the functions that work with IBGE’s data, we
-use the function “load_dictionary()”. This function creates an organized
-correspondence between the code of each product, its name, its unit of
-measure and other attributes.
-
-**7. Translation / add variables:** After having organized the Data
-Frame, we then translate it. In some functions, the translation will
-start in a section called “Labelling” and data from the “dictionary.R”
-file will be used. In other functions, you will see the names of the
-columns being translated first and then each line of the original Data
-Frame will be translated.
-
-**8. Return Data Frame:** In the structure of our functions, you will
-see **(raw_data == TRUE){return(dat)}** right after “Downloading Data”.
-All the changes explained in this document will only happen in case the
-user specifies **(raw_data == FALSE)**.
-
-## Examples
-
-**1. Bind Global Variables:** example from *load_cempre()*
-
-``` r
-sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- ano <- ano_codigo <- classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo <- geo_id <- id_code <- nivel_territorial <- nivel_territorial_codigo <- valor <- variavel <- unidade_de_medida <- unidade_de_medida_codigo <- NULL
-```
-
-**2. Define Basic Parameters:** example from *load_deter()*
-
-``` r
-# param=list()
-#  param$dataset = dataset
-#  param$time_period = time_period
-#  param$language = language
-#  param$raw_data = raw_data
-#  param$survey_name = datasets_link() %>%
-#    dplyr::filter(dataset == param$dataset) %>%
-#    dplyr::select(survey) %>%
-#    unlist()
-#  param$url = datasets_link() %>%
-#    dplyr::filter(dataset == param$dataset) %>%
-#    dplyr::select(link) %>%
-#    unlist()
-```
-
-**3. Download Data:** example from *load_degrad()*. It uses the
-*external_download()* function.
-
-``` r
-# dat = suppressWarnings(as.list(param$time_period) %>%
-#      purrr::map(
-#        function(t){external_download(dataset = param$dataset,
-#                                      source='degrad', year = t) %>%
-#            janitor::clean_names()
-#        }
-#      ))
-```
-
-**4. Data Engineering**: example from *load_pam()*. In this process, we
-decided to exclude some columns and convert the variable “valor” to
-become numeric. After that we excluded all the lines with **NA**.
-
-``` r
-# dat = dat %>%
-#           janitor::clean_names() %>%
-#           dplyr::mutate_all(function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")})# %>%
-          # dplyr::mutate_all(clean_custom)
-#   dat = dat %>%
-#     dplyr::select(-c(nivel_territorial_codigo,nivel_territorial,ano_codigo)) %>%
-#     dplyr::mutate(valor=as.numeric(valor))
-#   dat = dat %>%
-#     dplyr::filter(!is.na(valor))
-```
-
-**5. Harmonizing Variable Names:** example from *load_pam()*. We
-localize some datasets by using their numerical codes and within each of
-these datasets we renamed some columns.
-
-``` r
-# if (param$code == 5457){
-#     dat = dat %>%
-#       dplyr::rename(produto_das_lavouras_codigo = produto_das_lavouras_temporarias_e_permanentes_codigo,
-#                     produto_das_lavouras = produto_das_lavouras_temporarias_e_permanentes)
-#   }
-#   if (param$code == 1613){
-#     dat = dat %>%
-#       dplyr::rename(produto_das_lavouras_codigo = # produto_das_lavouras_permanentes_codigo,
-#                     produto_das_lavouras = produto_das_lavouras_permanentes)
-#   }
-#   if (param$code %in% c(839,1000,1001,1002,1612)){
-#     dat = dat %>%
-#       dplyr::rename(produto_das_lavouras_codigo = # produto_das_lavouras_temporarias_codigo,
-#                   produto_das_lavouras = produto_das_lavouras_temporarias)
-#   }
-```
-
-**6. Load Dictionary:** example from *load_pam()*. For functions with
-data from IBGE, we load the dictionary and then we convert the variable
-“var_code” to become a character. Finally we exclude the observations
-where var_code == “0”.
-
-``` r
-# dic = load_dictionary(param$dataset)
-#  types = as.character(dic$var_code)
-#  types = types[types != "0"] 
-```
-
-**7. Translation / add variables:** example from *load_degrad()*.This
-section translates the names of the columns of the original Data
-Frame.In this example, the original columns (variables) were in English
-and therefore we translated it to Portuguese in case the user chooses
-it.
-
-``` r
-# if (param$language == 'pt'){
-#    dat_mod = dat %>%
-#      dplyr::select(ano = year, linkcolumn, scene_id,
-#                    cod_uf = code_state, cod_municipio = code_muni,
-#                    classe = class_name, pathrow, area, data = view_date,
-#                    julday, geometry
-#      ) %>%
-#      dplyr::arrange(ano, cod_municipio, classe)
-#  }
 ```
 
 ## Credits
