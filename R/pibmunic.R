@@ -99,7 +99,7 @@ load_pibmunic <- function(dataset = "pibmunic", raw_data,
 
   ## Filter for Legal Amazon
   if (legal_amazon_only) {
-    legal_amazon_filtered <- municipalities %>% dplyr::filter(legal_amazon == 1)
+    legal_amazon_filtered <- datazoom.amazonia::municipalities %>% dplyr::filter(legal_amazon == 1)
 
     dat <- dat %>%
       dplyr::filter(municipio_codigo %in% unique(legal_amazon_filtered$code_muni))

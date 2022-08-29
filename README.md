@@ -954,6 +954,32 @@ data <- load_iema(dataset = "iema", raw_data = FALSE,
                      geo_level = "municipality", language = "eng")
 ```
 
+## 14 - IMAZON SHP
+
+Loads data containing the municipality's categorization according to imazon's categories. There are four categories that correspond to the level of deforestation pressure faced by the place.
+
+There are four parameters in this function:
+
+```
+  1. dataset:
+  # "imazon_shp" includes the municipalities shapefiles and the deforestation category according to imazon
+  2. raw_data: there is one option:
+  # TRUE, as imazon already delivers the organized data.
+  
+  3. geo_level:
+  # "municipality". The data is only available at the municipality level.
+  
+  4. language: you can choose between portuguese ('pt') and english ('eng')
+  
+  
+```
+
+```{r eval=FALSE}
+# Download data
+data <- load_imazon(dataset = "imazon_shp", raw_data = TRUE,
+                     geo_level = "municipality", language = "pt")
+```
+
 ## The Structure of the functions
 
 **1. Bind Global Variables:** The goal is to ensure that all the

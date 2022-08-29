@@ -1,3 +1,31 @@
+# datazoom.amazonia 0.9.1.9000
+
+  * Fixing `load_baci` timeout error upon download
+  
+# datazoom.amazonia 0.9.0.9000
+
+  * Adding new `load_imazon` function for Imazon data
+
+# datazoom.amazonia 0.8.5.9000
+
+  * Updated collection 6 Mapbiomas data for "mapbiomas_transition" dataset
+
+# datazoom.amazonia 0.8.4.9000
+
+  * Exporting dataset with municipality codes and minor bug fixes
+
+# datazoom.amazonia 0.8.3.9000
+
+  * Code maintenance tweaks
+
+# datazoom.amazonia 0.8.2.9000
+
+  * Adding a sequential identification variable to `load_deter`
+
+# datazoom.amazonia 0.8.1.9000
+
+  * Changed code to initiate Deter download
+
 # datazoom.amazonia 0.8.0.9000
 
   * Added new datasets to `load_ibama` for environmental distributed and collected fines

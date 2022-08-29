@@ -21,7 +21,6 @@
 #' )
 #' }
 #'
-#' @importFrom magrittr %>%
 #' @export
 
 load_prodes <- function(dataset = "prodes", raw_data,
@@ -31,7 +30,10 @@ load_prodes <- function(dataset = "prodes", raw_data,
   ###########################
   ## Bind Global Variables ##
   ###########################
-  survey <- link <- NULL
+
+  survey <- link <- cod_ibge <- desmatado <- estado <- floresta <- hidrografia <- NULL
+  incremento <- lat <- latgms <- long <- longms <- municipio <- nao_floresta <- NULL
+  nao_observado <- nr <- nuvem <- soma <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -40,33 +42,12 @@ load_prodes <- function(dataset = "prodes", raw_data,
   param <- list()
   param$dataset <- dataset
   param$raw_data <- raw_data
-  # param$geo_level = geo_level
   param$time_period <- time_period
   param$language <- language
-  # param$time_id = time_id
-
-  param$survey_name <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(survey) %>%
-    unlist()
-
-  param$url <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(link) %>%
-    unlist()
 
   ###################
   ## Download Data ##
   ###################
-
-  ## Dataset
-
-  if (is.null(param$dataset)) {
-    stop("Missing Dataset!")
-  }
-  if (is.null(param$raw_data)) {
-    stop("Missing TRUE/FALSE for Raw Data")
-  }
 
   ## Column Names come with numbers at the side - we need to clean those
 
@@ -74,127 +55,65 @@ load_prodes <- function(dataset = "prodes", raw_data,
     purrr::map(
       function(t) {
         external_download(dataset = param$dataset, source = "prodes", year = t) %>%
-          dplyr::mutate(ano = t)
+          dplyr::mutate(ano = t) # Adding year variable to each dataframe
       }
     )
 
-  ## Include function that treats the data here
-  list_dat <- dat
+  ## Return Raw Data
 
-  dat <- dat %>%
-    dplyr::bind_rows() %>%
-    tibble::as_tibble()
+  if (param$raw_data) {
+    return(dat)
+  }
 
   ######################
   ## Data Engineering ##
   ######################
 
-  dat <- dat %>%
-    janitor::clean_names() %>%
-    dplyr::mutate_if(is.character, function(var) {
-      stringi::stri_trans_general(str = var, id = "Latin-ASCII")
-    })
-
-  ## Change Data Type
+  # Removing years from each data frame's column names
 
   dat <- dat %>%
-    dplyr::mutate_if(is.numeric, as.double)
+    purrr::map(
+      dplyr::rename_with,
+      .fn = ~ gsub("(.*)\\d{4}?", "\\1", .)
+    )
 
+  dat <- dat %>%
+    dplyr::bind_rows() %>%
+    tibble::as_tibble() %>%
+    janitor::clean_names()
 
-  ## Return Raw Data
+  # Removing coordinate variables
 
-  if (raw_data == TRUE) {
-    return(dat)
+  dat <- dat %>%
+    dplyr::select(-c(nr, lat, long, latgms, longms))
+
+  ################################
+  ## Harmonizing Variable Names ##
+  ################################
+
+  if (param$language == "eng") {
+    dat_mod <- dat %>%
+      dplyr::rename(
+        "municipality" = municipio,
+        "municipality_code" = cod_ibge,
+        "state" = estado,
+        "deforestation" = desmatado,
+        "increment" = incremento,
+        "forest" = floresta,
+        "cloud" = nuvem,
+        "not_observed" = nao_observado,
+        "not_forest" = nao_floresta,
+        "hydrography" = hidrografia,
+        "sum" = soma
+      )
   }
-
-
-
-  # ---------------------------------------------------------------------
-
-  treat_prodes_data <- function(df, language) {
-
-    ## Bind Global Variables
-
-    cod_ibge <- nr <- lat <- long <- latgms <- longms <- NULL
-    estado <- soma <- area_km2 <- NULL
-    cod_uf <- NULL
-    cod_munic_ibge <- NULL
-    ano <- NULL
-    desmatado <- NULL
-    incremento <- NULL
-    floresta <- NULL
-    nuvem <- NULL
-    nao_observado <- NULL
-    nao_floresta <- NULL
-    hidrografia <- NULL
-
-    ####################
-    ## Data Carpentry ##
-    ####################
-
-    df <- df %>%
-      janitor::clean_names() %>%
-      # Adds column with UF codes, eg. MA = 21
-      dplyr::mutate(cod_uf = as.factor(base::substr(cod_ibge, start = 1, stop = 2))) %>%
-      dplyr::rename(cod_munic_ibge = cod_ibge)
-
-    ###############################
-    ## Extract Year From Columns ##
-    ###############################
-
-    # Removes year from column name
-    colnames(df) <- gsub("(.*)\\d{4}?", "\\1", colnames(df))
-
-    #################
-    ## Translation ##
-    #################
-
-    language <- tolower(language)
-
-    if (language == "eng") {
-      df <- df %>%
-        dplyr::select(
-          year = ano,
-          nr, lat, lon = long, latgms, longms,
-          state_code = cod_uf,
-          municipality_code = cod_munic_ibge,
-          area_km2,
-          deforestation = desmatado,
-          increment = incremento,
-          forest = floresta,
-          cloud = nuvem,
-          not_observed = nao_observado,
-          not_forest = nao_floresta,
-          hydrography = hidrografia,
-          sum = soma
-        )
-    }
-
-    if (language == "pt") {
-      df <- df %>%
-        dplyr::select(
-          ano,
-          nr, lat,
-          lon = long, latgms, longms,
-          cod_uf,
-          cod_municipio = cod_munic_ibge,
-          area_km2,
-          desmatado,
-          incremento,
-          floresta,
-          nuvem,
-          nao_observado,
-          nao_floresta,
-          hidrografia,
-          soma
-        )
-    }
-
-    return(df)
+  if (param$language == "pt") {
+    dat_mod <- dat %>%
+      dplyr::rename(
+        "cod_municipio" = cod_ibge,
+        "uf" = estado
+      )
   }
-
-  dat_mod <- purrr::map(list_dat, ~ treat_prodes_data(.x, param$language)) %>%
-    dplyr::bind_rows()
 
   return(dat_mod)
 }

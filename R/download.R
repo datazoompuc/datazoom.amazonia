@@ -48,7 +48,7 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
   ## Get Geographical Information ##
   ##################################
 
-  geo <- municipalities %>%
+  geo <- datazoom.amazonia::municipalities %>%
     tidyr::drop_na() # 5 municipalities have no micro code
 
   # uf = list('RO' = 11,'AC' = 12,'AM' = 13,'RR' = 14,'PA' = 15,'AP' = 16,'TO' = 17,
@@ -403,11 +403,13 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
 
   if (source == "mapbiomas") {
-    if (dataset == "mapbiomas_cover") {
-      path <- paste(param$url, "Estat%C3%ADsticas/Dados_Cobertura_MapBiomas_5.0_UF-MUN_SITE_v2.xlsx", sep = "")
-    }
-    if (dataset == "mapbiomas_transition") {
-      path <- "https://storage.googleapis.com/mapbiomas-public/COLECAO/5/DOWNLOADS/ESTATISTICAS/Dados_Transicao_MapBiomas_5.0_UF-MUN_SITE_v2.xlsx"
+    if (dataset %in% c("mapbiomas_cover", "mapbiomas_transition")) {
+      if (param$geo_level == "state") {
+        path <- paste(param$url, "Estat%C3%ADsticas/Cole%C3%A7%C3%A3o%206/1-ESTATISTICAS_MapBiomas_COL6.0_UF-BIOMAS_v12_SITE.xlsx", sep = "")
+      }
+      if (param$geo_level == "municipality") {
+        path <- "https://drive.google.com/uc?export=download&id=1RT7J2jS6LKyISM49ctfRO31ynJZXX_TY"
+      }
     }
     if (dataset == "mapbiomas_deforestation_regeneration") {
       path <- paste(param$url, "Estat%C3%ADsticas/BD-DESM_e_REG_COL5_V8h__SITE.xlsx", sep = "")
@@ -517,13 +519,31 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
   }
 
-  #####################
-  ## IEMA            ##
-  #####################
+  ##########
+  ## IEMA ##
+  ##########
 
   if (source == "iema") {
     if (dataset == "iema") {
       path <- param$url
+    }
+  }
+
+  ##########
+  ## BACI ##
+  ##########
+
+  if (source == "baci") {
+    path <- param$url
+  }
+
+  ############
+  ## IMAZON ##
+  ############
+
+  if (source == "imazon_shp") {
+    if (geo_level == "municipality") {
+      path <- "https://docs.google.com/uc?export=download&id=1JHc2J_U8VXHVuWVsi8wVBnNzZ37y1ehv"
     }
   }
 
@@ -545,7 +565,16 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   file_extension <- stringr::str_sub(path, -4)
   if (source == "mapbiomas") {
-    file_extension <- ".xlsx"
+    if (dataset %in% c("mapbiomas_cover", "mapbiomas_transition")) {
+      if (param$geo_level == "state") {
+        file_extension <- ".xlsx"
+      }
+      if (param$geo_level == "municipality") {
+        file_extension <- ".zip"
+      }
+    } else {
+      file_extension <- ".xlsx"
+    }
   }
   if (source == "ips") {
     file_extension <- ".xlsx"
@@ -580,6 +609,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source == "iema") {
     file_extension <- ".xlsx"
   }
+  if (source == "imazon_shp") {
+    file_extension <- ".rds"
+  }
 
   # !!!  We should Change This to a Curl Process
 
@@ -591,10 +623,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## Extraction through Curl Requests
   ## Investigate a bit more on how Curl Requests work
 
-  if (source %in% c("comex", "degrad", "internal", "ips", "mapbiomas", "prodes", "sigmine")) {
+  if (source %in% c("comex", "degrad", "internal", "ips", "prodes", "sigmine")) {
     utils::download.file(url = path, destfile = temp, mode = "wb")
   }
-  if (source == "iema") {
+  if (source %in% c("iema", "imazon_shp")) {
     googledrive::drive_download(path, path = temp, overwrite = TRUE)
   }
   if (source == "deter") {
@@ -610,12 +642,20 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       googledrive::drive_download(path, path = temp, overwrite = TRUE)
     }
   }
-  if (source %in% c("terraclimate", "ibama")) {
+  if (source %in% c("terraclimate", "ibama", "health")) {
     utils::download.file(url = path, destfile = temp, method = "curl", quiet = TRUE)
   }
-  if (source == "health") {
-    if (stringr::str_detect(dataset, "datasus")) {
-      utils::download.file(url = path, destfile = temp, method = "curl", quiet = TRUE)
+  if (source %in% c("baci")) {
+    utils::download.file(url = path, destfile = temp, method = "curl", quiet = FALSE)
+  }
+  if (source == "mapbiomas") {
+    if (dataset %in% c("mapbiomas_cover", "mapbiomas_transition")) {
+      if (param$geo_level == "state") {
+        utils::download.file(url = path, destfile = temp, mode = "wb")
+      }
+      if (param$geo_level == "municipality") {
+        googledrive::drive_download(path, path = temp, overwrite = TRUE)
+      }
     } else {
       utils::download.file(url = path, destfile = temp, mode = "wb")
     }
@@ -686,55 +726,55 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (file_extension == ".zip") {
     if (param$dataset == "degrad") {
       if (param$year %in% 2007) {
-        dat <- sf::read_sf(paste(dir, "Degrad2007_Final_pol.shp", sep = "\\"))
+        dat <- sf::read_sf(file.path(dir, "Degrad2007_Final_pol.shp"))
         dat$year <- param$year
       }
       if (param$year == 2008) {
-        dat <- sf::read_sf(paste(dir, "Degrad2008_Final_pol.shp", sep = "\\"))
+        dat <- sf::read_sf(file.path(dir, "Degrad2008_Final_pol.shp"))
         dat$year <- param$year
       }
       if (param$year == 2009) {
-        dat <- sf::read_sf(paste(dir, "Degrad2009_Final_pol.shp", sep = "\\"))
+        dat <- sf::read_sf(file.path(dir, "Degrad2009_Final_pol.shp"))
         dat$year <- param$year
       }
       if (param$year == 2010) {
-        dat <- sf::read_sf(paste(dir, "DEGRAD_2010_UF_pol.shp", sep = "\\"))
+        dat <- sf::read_sf(file.path(dir, "DEGRAD_2010_UF_pol.shp"))
         dat$year <- param$year
       }
       if (param$year == 2011) {
-        dat <- sf::read_sf(paste(dir, "DEGRAD_2011_INPE_pol.shp", sep = "\\"))
+        dat <- sf::read_sf(file.path(dir, "DEGRAD_2011_INPE_pol.shp"))
         dat$year <- param$year
       }
       if (param$year == 2012) {
-        dat <- sf::read_sf(paste(dir, "DEGRAD_2012_INPE_pol.shp", sep = "\\"))
+        dat <- sf::read_sf(file.path(dir, "DEGRAD_2012_INPE_pol.shp"))
         dat$year <- param$year
       }
       if (param$year == 2013) {
-        dat <- sf::read_sf(paste(dir, "DEGRAD_2013_INPE_pol.shp", sep = "\\"))
+        dat <- sf::read_sf(file.path(dir, "DEGRAD_2013_INPE_pol.shp"))
         dat$year <- param$year
       }
       if (param$year == 2014) {
-        dat <- sf::read_sf(paste(dir, "DEGRAD_2014_pol.shp", sep = "\\"))
+        dat <- sf::read_sf(file.path(dir, "DEGRAD_2014_pol.shp"))
         dat$year <- param$year
       }
       if (param$year == 2015) {
-        dat <- sf::read_sf(paste(dir, "DEGRAD_2015.shp", sep = "\\"))
+        dat <- sf::read_sf(file.path(dir, "DEGRAD_2015.shp"))
         dat$year <- param$year
       }
       if (param$year == 2016) {
-        dat <- sf::read_sf(paste(dir, "DEGRAD_2016_pol.shp", sep = "\\"))
+        dat <- sf::read_sf(file.path(dir, "DEGRAD_2016_pol.shp"))
         dat$year <- param$year
       }
     }
 
     if (param$source == "deter") {
-      dat <- sf::read_sf(paste(dir, "deter_public.shp", sep = "\\")) %>%
+      dat <- sf::read_sf(file.path(dir, "deter_public.shp")) %>%
         janitor::clean_names() %>%
         tibble::as_tibble()
     }
 
     if (param$source == "sigmine") {
-      dat <- sf::read_sf(paste(dir, "BRASIL.shp", sep = "\\"))
+      dat <- sf::read_sf(file.path(dir, "BRASIL.shp"))
     }
 
     if (param$source == "ibama") {
@@ -756,6 +796,32 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       dat <- dataset[-c(1:5), ] %>%
         janitor::clean_names() %>%
         tibble::as_tibble()
+    }
+
+    if (param$source == "baci") {
+
+      # as year can be a vector, sets up expressions of the form "*YYYY_V202201.csv" for each year to match file names
+      file_expression <- paste0("*", param$year, "_V202201.csv")
+
+      # now turning into *XXXX_V202201.csv|YYYY_V202201.csv|ZZZZ_V202201.csv" to match as regex
+      file_expression <- paste0(file_expression, collapse = "|")
+
+      file <- list.files(dir, pattern = file_expression, full.names = TRUE) %>%
+        as.list()
+
+      # now reads each file
+      dat <- lapply(file, data.table::fread, header = TRUE, sep = ",")
+
+      # each data frame in the list is named after the corresponding year
+      names(dat) <- param$year
+    }
+
+    if (param$source == "mapbiomas") {
+
+      # extracting the one file we care about from the unzipped file
+      file <- list.files(dir, pattern = "1-ESTATISTICAS_MapBiomas_COL6.0_UF-MUNICIPIOS_*", full.names = TRUE)
+
+      dat <- readxl::read_xlsx(file, sheet = param$sheet)
     }
   }
   if (file_extension == ".dbc") {
@@ -1108,35 +1174,38 @@ datasets_link <- function() {
     "DATASUS", "datasus_cnes_gm", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/GM/",
     "DATASUS", "datasus_sih", NA, "2008-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIHSUS/200801_/dados/",
 
+    ##########
+    ## IEMA ##
+    ##########
+
+    "IEMA", "iema", NA, "2018", "Municipality", "https://drive.google.com/uc?export=download&id=10JMRtzu3k95vl8cQmHkVMQ9nJovvIeNl",
+
+    ##########
+    ## SEEG ##
+    ##########
+
+    "SEEG", "seeg_farming", NA, "1970-2019", "Country, State, Municipality", "http://seeg.eco.br/download",
+    "SEEG", "seeg_industry", NA, "1970-2019", "Country, State, Municipality", "http://seeg.eco.br/download",
+    "SEEG", "seeg_energy", NA, "1970-2019", "Country, State, Municipality", "http://seeg.eco.br/download",
+    "SEEG", "seeg_land", NA, "1970-2019", "Country, State, Municipality", "http://seeg.eco.br/download",
+    "SEEG", "seeg_residuals", NA, "1970-2019", "Country, State, Municipality", "http://seeg.eco.br/download",
+
+    ##########
+    ## BACI ##
+    ##########
+
+    "BACI", "HS92", NA, "1995-2020", "Country", "http://www.cepii.fr/DATA_DOWNLOAD/baci/data/BACI_HS92_V202201.zip",
+
+    ############
+    ## IMAZON ##
+    ############
+
+    "Imazon", "imazon_shp", NA, "2020", "Municipality", "https://drive.google.com/drive/u/1/folders/1EAOABo1GVKT3YsYkhtgJI9ckB3RULJSC",
+
     ## Shapefile from github repository
 
     "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds",
-    "IEMA", "iema", NA, "2018", "Municipality", "https://drive.google.com/uc?export=download&id=10JMRtzu3k95vl8cQmHkVMQ9nJovvIeNl",
   )
 
-  return(link)
-}
-
-datasets_seeg <- function() {
-
-  ## Add file type at the end in order to set the Curl Process
-
-  link <- tibble::tribble(
-    ~survey, ~dataset, ~id_code, ~link,
-    "SEEG", "seeg_farming", 100, "http://seeg.eco.br/download",
-    "SEEG", "seeg_industry", 101, "http://seeg.eco.br/download",
-    "SEEG", "seeg_energy", 102, "http://seeg.eco.br/download",
-    "SEEG", "seeg_land", 103, "http://seeg.eco.br/download",
-    "SEEG", "seeg_residuals", 104, "http://seeg.eco.br/download",
-  )
-  return(link)
-}
-
-
-datasets_baci <- function() {
-  link <- tibble::tribble(
-    ~survey, ~dataset, ~available_time, ~link,
-    "BACI", "HS92", "1995-2020", "http://www.cepii.fr/DATA_DOWNLOAD/baci/data",
-  )
   return(link)
 }

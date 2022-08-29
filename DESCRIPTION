@@ -1,6 +1,6 @@
 Package: datazoom.amazonia
 Title: Simplify Access to Data from the Amazon Region
-Version: 0.8.0.9000
+Version: 0.9.1.9000
 Authors@R: c(
     person("Francisco", "de Lima Cavalcanti", , "francisco.lima.cavalcanti@gmail.com", role = c("aut", "cre")),
     person("DataZoom (PUC-Rio)", , , "datazoom@econ.puc-rio.br", role = "fnd"),
@@ -9,6 +9,7 @@ Authors@R: c(
     person("Bruno", "Alcantara Duarte", , "brunoalcanduarte@gmail.com", role = "aut"),
     person("Fredie", "Didier", , "fdidier@terra.com.br", role = "aut"),
     person("Tito", "Bruni", role = "aut"),
+    person("Luiz Guilherme", "Lopes Moussatche", , "luizguilherme.lopesm@gmail.com", role = "aut"),
     person("Victor", "Aliende da Matta", , "victor.al.matta@gmail.com", role = "aut"),
     person("Anna Carolina", "Dutra Saraiva", , "annadutrasaraiva@gmail.com", role = "aut"),
     person("Arthur", "Carvalho Brito", , "arthurcbps@gmail.com", role = "aut"),
@@ -50,6 +51,7 @@ VignetteBuilder:
     knitr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
 LinkingTo: 
     Rcpp
+LazyData: true
