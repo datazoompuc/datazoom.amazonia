@@ -40,7 +40,7 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 
 ## Datasets
 
-**[1 - Environmental data](#1---environment)**
+**[1 - Environmental data](#environmental-data)**
 
 <table>
 <tr>
@@ -51,16 +51,17 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 | **PRODES** | *Yearly deforestationn*          |
 | **DETER**  | *Alerts on forest cover changes* |
 | **DEGRAD** | *Forest degradation*             |
+| **Imazon** | *Deforestation*                  |
 
 </td>
 <td>
 
 |                  |                                     |
 |------------------|-------------------------------------|
-| **SEEG**         | *Greenhouse gas emission estimates* |
 | **IBAMA**        | *Environmental fines*               |
 | **MAPBIOMAS**    | *Land cover and use*                |
 | **TerraClimate** | *Climate data such as temperature*  |
+| **SEEG**         | *Greenhouse gas emission estimates* |
 
 </td>
 </tr>
@@ -108,6 +109,8 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 </td>
 </tr>
 </table>
+
+# Environmental Data
 
 ## 1 - INPE data
 

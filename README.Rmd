@@ -49,7 +49,7 @@ devtools::load_all()
 
 ## Datasets
 
-**[1 - Environmental data](#1---environment)** 
+**[1 - Environmental data](#environmental-data)** 
 
 <table>
 
@@ -57,18 +57,20 @@ devtools::load_all()
 
 |||
 |---|---|
-| **PRODES** | _Yearly deforestationn_ |
-| **DETER** | _Alerts on forest cover changes_ |
-| **DEGRAD** | _Forest degradation_ |
+| **[PRODES](###prodes)** | _Yearly deforestation_ |
+| **[DETER](###deter)** | _Alerts on forest cover changes_ |
+| **[DEGRAD](###degrad)** | _Forest degradation_ |
+| **[Imazon](###imazon)** | _Deforestation in the Legal Amazon_ |
 
 </td><td>
 
 |||
 |---|---|
+| **IBAMA** | _Environmental fines and punished companies_ |
+| **MAPBIOMAS** | _Land cover and land use_ |
+| **TerraClimate** | _Climate data_ |
 | **SEEG** | _Greenhouse gas emission estimates_ |
-| **IBAMA** | _Environmental fines_ |
-| **MAPBIOMAS** | _Land cover and use_ |
-| **TerraClimate** | _Climate data such as temperature_ |
+
 
 </td></tr> </table>
 
@@ -110,8 +112,7 @@ devtools::load_all()
 
 </td></tr> </table>
 
-
-## 1 - INPE data 
+# Environmental Data
 
 ### PRODES
 Loads information on clearcut deforestation in the Legal Amazon and annual deforestation rates in the region. Data is available from 2000 to 2020.
@@ -131,10 +132,6 @@ There are four parameters in this function:
 ```
 
 ```{r,eval=FALSE}
-# Download raw data (raw_data = TRUE) from 2000 to 2005 (time_period = 2000:2005).
-data <- load_prodes(dataset = "prodes", 
-                    raw_data = TRUE,
-                    time_period = 2000:2005) 
 # Download treated data (raw_data = FALSE) from 2010 (time_period = 2010) 
 # in portuguese (language = 'pt').
 data <- load_prodes(dataset = "prodes", 
@@ -145,7 +142,7 @@ data <- load_prodes(dataset = "prodes",
 
 
 ### DETER: 
-Loads information on change in forest cover in the Amazon. 
+Loads information on changes of forest cover in the Amazon. 
 
 ```
 There are four parameters in this function:
@@ -162,14 +159,9 @@ There are four parameters in this function:
 ```
 
 ```{r,eval=FALSE}
-# Download raw data (raw_data = TRUE) from Amazonia (dataset = "deter_amz")
+# Download treated data (raw_data = TRUE) from Amazonia (dataset = "deter_amz")
 deter_amz <- load_deter(dataset = 'deter_amz',
-                        raw_data = TRUE)
-# Download treated data (raw_data = FALSE) from Cerrado (dataset = "deter_cerrado")
-# in portuguese (language = 'pt')
-deter_cer <- load_deter(dataset = 'deter_cerrado',
-                        raw_data = FALSE,
-                        language = "pt")
+                        raw_data = FALSE)
 ```
 
 ### DEGRAD:
@@ -188,15 +180,10 @@ There are four parameters in this function:
 ```
 
 ```{r, eval = FALSE}
-# download raw data (raw_data = TRUE) related to forest degradation from 2010 to 2012 (time_period = 2010:2012). 
-data <- load_degrad(dataset = 'degrad', 
-                    raw_data = TRUE,
-                    time_period = 2010:2012)
-# download treated data (raw_data = FALSE) related to forest degradation from 2013 (time_period = 2013) in portuguese (language = "pt").
+# download treated data (raw_data = TRUE) related to forest degradation from 2010 to 2012 (time_period = 2010:2012). 
 data <- load_degrad(dataset = 'degrad', 
                     raw_data = FALSE,
-                    time_period = 2013,
-                    language = 'pt')
+                    time_period = 2010:2012)
 ```
 
 
