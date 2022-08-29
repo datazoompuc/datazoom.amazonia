@@ -19,8 +19,8 @@
 #' # download raw data from 2014
 #' imazon <- load_imazon(dataset = "imazon_shp")
 #' }
-load_imazon= function(dataset = 'imazon_shp', raw_data = TRUE,
-                      geo_level = 'municipality', language = "pt"){
+load_imazon <- function(dataset = "imazon_shp", raw_data = TRUE,
+                        geo_level = "municipality", language = "pt") {
 
   # Checking for googledrive package (in Suggests)
 
@@ -48,16 +48,15 @@ load_imazon= function(dataset = 'imazon_shp', raw_data = TRUE,
   }
 
   if (param$geo_level == "municipality") {
-  message("Please follow the steps from `googledrive` package to download the data. This may take a while.")
+    message("Please follow the steps from `googledrive` package to download the data. This may take a while.")
   }
 
 
-dat <- external_download(
-  dataset = param$dataset,
-  source = "imazon_shp",
-  geo_level = param$geo_level
-)
+  dat <- external_download(
+    dataset = param$dataset,
+    source = "imazon_shp",
+    geo_level = param$geo_level
+  )
 
-return(dat)
-
+  return(dat)
 }

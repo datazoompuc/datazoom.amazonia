@@ -43,6 +43,15 @@ load_iema <- function(dataset = "iema", raw_data = FALSE,
   param$language <- language
   param$raw_data <- raw_data
 
+  # Checking for googledrive package (in Suggests)
+
+  if (!requireNamespace("googledrive", quietly = TRUE)) {
+    stop(
+      "Package \"googledrive\" must be installed to use this function.",
+      call. = FALSE
+    )
+  }
+
   ##############
   ## Download ##
   ##############

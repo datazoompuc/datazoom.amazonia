@@ -519,14 +519,22 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
   }
 
-  #####################
-  ## IEMA            ##
-  #####################
+  ##########
+  ## IEMA ##
+  ##########
 
   if (source == "iema") {
     if (dataset == "iema") {
       path <- param$url
     }
+  }
+
+  ##########
+  ## BACI ##
+  ##########
+
+  if (source == "baci") {
+    path <- param$url
   }
 
   ############
@@ -615,8 +623,11 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## Extraction through Curl Requests
   ## Investigate a bit more on how Curl Requests work
 
-  if (source %in% c("comex", "degrad", "internal", "ibama", "ips", "prodes", "sigmine")) {
+  if (source %in% c("comex", "degrad", "internal", "ips", "prodes", "sigmine")) {
     utils::download.file(url = path, destfile = temp, mode = "wb")
+  }
+  if (source %in% c("iema", "imazon_shp")) {
+    googledrive::drive_download(path, path = temp, overwrite = TRUE)
   }
   if (source == "deter") {
     proc <- RCurl::CFILE(temp, mode = "wb")
@@ -631,8 +642,11 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       googledrive::drive_download(path, path = temp, overwrite = TRUE)
     }
   }
-  if (source %in% c("terraclimate", "ibama")) {
+  if (source %in% c("terraclimate", "ibama", "health")) {
     utils::download.file(url = path, destfile = temp, method = "curl", quiet = TRUE)
+  }
+  if (source %in% c("baci")) {
+    utils::download.file(url = path, destfile = temp, method = "curl", quiet = FALSE)
   }
   if (source == "mapbiomas") {
     if (dataset %in% c("mapbiomas_cover", "mapbiomas_transition")) {
@@ -642,18 +656,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       if (param$geo_level == "municipality") {
         googledrive::drive_download(path, path = temp, overwrite = TRUE)
       }
-    } else {
-      utils::download.file(url = path, destfile = temp, mode = "wb")
-    }
-  }
-  if (source == "imazon_shp") {
-    if (geo_level == "municipality") {
-      googledrive::drive_download(path, path = temp, overwrite = TRUE)
-    }
-  }
-  if (source == "health") {
-    if (stringr::str_detect(dataset, "datasus")) {
-      utils::download.file(url = path, destfile = temp, method = "curl", quiet = TRUE)
     } else {
       utils::download.file(url = path, destfile = temp, mode = "wb")
     }
@@ -795,6 +797,25 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
         janitor::clean_names() %>%
         tibble::as_tibble()
     }
+
+    if (param$source == "baci") {
+
+      # as year can be a vector, sets up expressions of the form "*YYYY_V202201.csv" for each year to match file names
+      file_expression <- paste0("*", param$year, "_V202201.csv")
+
+      # now turning into *XXXX_V202201.csv|YYYY_V202201.csv|ZZZZ_V202201.csv" to match as regex
+      file_expression <- paste0(file_expression, collapse = "|")
+
+      file <- list.files(dir, pattern = file_expression, full.names = TRUE) %>%
+        as.list()
+
+      # now reads each file
+      dat <- lapply(file, data.table::fread, header = TRUE, sep = ",")
+
+      # each data frame in the list is named after the corresponding year
+      names(dat) <- param$year
+    }
+
     if (param$source == "mapbiomas") {
 
       # extracting the one file we care about from the unzipped file
@@ -1173,16 +1194,17 @@ datasets_link <- function() {
     ## BACI ##
     ##########
 
-    "BACI", "HS92", NA, "1995-2020", "Country", "http://www.cepii.fr/DATA_DOWNLOAD/baci/data",
-
-    ## Shapefile from github repository
-
-    "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds",
+    "BACI", "HS92", NA, "1995-2020", "Country", "http://www.cepii.fr/DATA_DOWNLOAD/baci/data/BACI_HS92_V202201.zip",
 
     ############
     ## IMAZON ##
     ############
-    "Imazon", "imazon_shp", NA, "2020", "Municipality", "https://drive.google.com/drive/u/1/folders/1EAOABo1GVKT3YsYkhtgJI9ckB3RULJSC"
+
+    "Imazon", "imazon_shp", NA, "2020", "Municipality", "https://drive.google.com/drive/u/1/folders/1EAOABo1GVKT3YsYkhtgJI9ckB3RULJSC",
+
+    ## Shapefile from github repository
+
+    "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds",
   )
 
   return(link)
