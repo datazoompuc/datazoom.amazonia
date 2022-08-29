@@ -54,12 +54,12 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 </td>
 <td>
 
-|                                   |                                              |
-|-----------------------------------|----------------------------------------------|
-| **[IBAMA](#ibama)**               | *Environmental fines and punished companies* |
-| **[MAPBIOMAS](#mapbiomas)**       | *Land cover and land use*                    |
-| **[TerraClimate](#terraclimate)** | *Climate data*                               |
-| **[SEEG](#seeg)**                 | *Greenhouse gas emission estimates*          |
+|                                   |                                     |
+|-----------------------------------|-------------------------------------|
+| **[IBAMA](#ibama)**               | *Environmental fines*               |
+| **[MAPBIOMAS](#mapbiomas)**       | *Land cover and land use*           |
+| **[TerraClimate](#terraclimate)** | *Climate data*                      |
+| **[SEEG](#seeg)**                 | *Greenhouse gas emission estimates* |
 
 </td>
 </tr>
@@ -814,8 +814,6 @@ data <- load_pibmunic(dataset = 'pibmunic',
 
 ## CEMPRE
 
-## The Dataset
-
 Employment, salary and firm data from IBGE’s “Cadastro Central de
 Empresas” (CEMPRE). Loads information on companies and other
 organizations and their respective formally constituted local units,
@@ -859,8 +857,6 @@ data <- load_cempre(dataset = "cempre",
 ```
 
 ## PAM
-
-## The Dataset
 
 Municipal Agricultural Production (PAM, in Portuguese) is a nationwide
 annual survey conducted by IBGE (Brazilian Institute of Geography and

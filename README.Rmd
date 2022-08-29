@@ -64,7 +64,7 @@ devtools::load_all()
 
 |||
 |---|---|
-| **[IBAMA](#ibama)** | _Environmental fines and punished companies_ |
+| **[IBAMA](#ibama)** | _Environmental fines_ |
 | **[MAPBIOMAS](#mapbiomas)** | _Land cover and land use_ |
 | **[TerraClimate](#terraclimate)** | _Climate data_ |
 | **[SEEG](#seeg)** | _Greenhouse gas emission estimates_ |
