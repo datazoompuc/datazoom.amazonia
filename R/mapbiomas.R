@@ -26,10 +26,7 @@
 load_mapbiomas <- function(dataset = NULL, raw_data = FALSE, geo_level = "municipality",
                            language = "eng", cover_level = 1) {
 
-  ## To-Do:
-  ## Add Support to Transition Info Download at the State and Biome Level
-  ## Add Support to Covering Info Download at the State and Biome Level
-  ## Include Support for raw raster download
+  # Checking for googledrive package (in Suggests) only for mapbiomas_transition dataset
 
   if (!requireNamespace("googledrive", quietly = TRUE) &
     dataset %in% c("mapbiomas_cover", "mapbiomas_transition") &

@@ -37,7 +37,7 @@ load_baci <- function(dataset = "HS92", raw_data, time_period,
 
   available_time <- i <- j <- k <- v <- co_sh6 <- no_sh6_por <- NULL
   produto <- no_sh6 <- valor <- product <- code <- NULL
-  country <- country_code <-  exporter <- importer <- no_sh6_por <- product_code <- NULL
+  country <- country_code <- exporter <- importer <- no_sh6_por <- product_code <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -122,7 +122,7 @@ load_baci <- function(dataset = "HS92", raw_data, time_period,
   dic <- load_baci_dic(language = param$language)
 
   dat <- dat %>%
-      dplyr::left_join(dic, by = c("k" = "product_code"))
+    dplyr::left_join(dic, by = c("k" = "product_code"))
 
 
   ################################
@@ -132,25 +132,25 @@ load_baci <- function(dataset = "HS92", raw_data, time_period,
   if (param$language == "eng") {
     dat_mod <- dat %>%
       dplyr::rename(
-          "year" = t,
-          "product_code" = k,
-          "value" = v,
-          "quantity" = q,
-          "product_name" = product
-        )
-    }
-    if (param$language == "pt") {
-      dat_mod <- dat %>%
-        dplyr::rename(
-          "ano" = t,
-          "cod_produto" = k,
-          "valor" = v,
-          "quantidade" = q,
-          "exportador" = exporter,
-          "importador" = importer,
-          "nome_produto" = product
-        )
-    }
+        "year" = t,
+        "product_code" = k,
+        "value" = v,
+        "quantity" = q,
+        "product_name" = product
+      )
+  }
+  if (param$language == "pt") {
+    dat_mod <- dat %>%
+      dplyr::rename(
+        "ano" = t,
+        "cod_produto" = k,
+        "valor" = v,
+        "quantidade" = q,
+        "exportador" = exporter,
+        "importador" = importer,
+        "nome_produto" = product
+      )
+  }
 
   return(dat_mod)
 }
@@ -200,4 +200,3 @@ load_baci_dic <- function(language) {
 
   return(dic)
 }
-

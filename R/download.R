@@ -533,7 +533,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## BACI ##
   ##########
 
-  if (source == "baci"){
+  if (source == "baci") {
     path <- param$url
   }
 
@@ -645,7 +645,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source %in% c("terraclimate", "ibama", "health")) {
     utils::download.file(url = path, destfile = temp, method = "curl", quiet = TRUE)
   }
-  if (source %in% c("baci")){
+  if (source %in% c("baci")) {
     utils::download.file(url = path, destfile = temp, method = "curl", quiet = FALSE)
   }
   if (source == "mapbiomas") {
@@ -798,7 +798,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
         tibble::as_tibble()
     }
 
-    if (param$source == "baci"){
+    if (param$source == "baci") {
 
       # as year can be a vector, sets up expressions of the form "*YYYY_V202201.csv" for each year to match file names
       file_expression <- paste0("*", param$year, "_V202201.csv")
@@ -1205,9 +1205,7 @@ datasets_link <- function() {
     ## Shapefile from github repository
 
     "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds",
-
   )
 
   return(link)
 }
-

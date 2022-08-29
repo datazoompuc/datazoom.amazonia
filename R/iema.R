@@ -45,7 +45,7 @@ load_iema <- function(dataset = "iema", raw_data = FALSE,
 
   # Checking for googledrive package (in Suggests)
 
-  if(!requireNamespace("googledrive", quietly = TRUE)) {
+  if (!requireNamespace("googledrive", quietly = TRUE)) {
     stop(
       "Package \"googledrive\" must be installed to use this function.",
       call. = FALSE
