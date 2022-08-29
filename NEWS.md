@@ -1,6 +1,14 @@
-# datazoom.amazonia 0.8.5.9000
+# datazoom.amazonia 0.9.1.9000
 
   * Fixing `load_baci` timeout error upon download
+  
+# datazoom.amazonia 0.9.0.9000
+
+  * Adding new `load_imazon` function for Imazon data
+
+# datazoom.amazonia 0.8.5.9000
+
+  * Updated collection 6 Mapbiomas data for "mapbiomas_transition" dataset
 
 # datazoom.amazonia 0.8.4.9000
 
