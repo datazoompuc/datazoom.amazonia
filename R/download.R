@@ -620,45 +620,42 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   dir <- tempdir()
   temp <- tempfile(fileext = file_extension, tmpdir = dir)
 
-  ## Extraction through Curl Requests
-  ## Investigate a bit more on how Curl Requests work
+  ## Picking the way to download the file
 
-  if (source %in% c("comex", "degrad", "internal", "ips", "prodes", "sigmine")) {
-    utils::download.file(url = path, destfile = temp, mode = "wb")
-  }
+  download_method <- "standard" # works for most functions
+
   if (source %in% c("iema", "imazon_shp")) {
-    googledrive::drive_download(path, path = temp, overwrite = TRUE)
+    download_method <- "googledrive"
   }
-  if (source == "deter") {
-    proc <- RCurl::CFILE(temp, mode = "wb")
-    RCurl::curlPerform(url = path, writedata = proc@ref, noprogress = FALSE)
-    RCurl::close(proc)
-  }
-  if (source == "seeg") {
-    if (geo_level == "state" | geo_level == "country") {
-      utils::download.file(url = path, destfile = temp, mode = "wb")
-    }
-    if (geo_level == "municipality") {
-      googledrive::drive_download(path, path = temp, overwrite = TRUE)
-    }
+  if (source %in% c("deter", "baci")) {
+    download_method <- "curl"
+    quiet <- FALSE
   }
   if (source %in% c("terraclimate", "ibama", "health")) {
-    utils::download.file(url = path, destfile = temp, method = "curl", quiet = TRUE)
+    download_method <- "curl"
+    quiet <- TRUE
   }
-  if (source %in% c("baci")) {
-    utils::download.file(url = path, destfile = temp, method = "curl", quiet = FALSE)
+  if (source == "seeg") {
+    if (geo_level == "municipality") {
+      download_method <- "googledrive"
+    }
   }
   if (source == "mapbiomas") {
-    if (dataset %in% c("mapbiomas_cover", "mapbiomas_transition")) {
-      if (param$geo_level == "state") {
-        utils::download.file(url = path, destfile = temp, mode = "wb")
-      }
-      if (param$geo_level == "municipality") {
-        googledrive::drive_download(path, path = temp, overwrite = TRUE)
-      }
-    } else {
-      utils::download.file(url = path, destfile = temp, mode = "wb")
+    if (dataset %in% c("mapbiomas_cover", "mapbiomas_transition") & param$geo_level == "municipality") {
+      download_method <- "googledrive"
     }
+  }
+
+  ## Downloading file by the selected method
+
+  if (download_method == "standard") {
+    utils::download.file(url = path, destfile = temp, mode = "wb")
+  }
+  if (download_method == "curl") {
+    utils::download.file(url = path, destfile = temp, method = "curl", quiet = quiet)
+  }
+  if (download_method == "googledrive") {
+    googledrive::drive_download(path, path = temp, overwrite = TRUE)
   }
 
   ## This Data Opening Part Should Include the .Shp, not DBF
