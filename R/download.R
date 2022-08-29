@@ -630,9 +630,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     googledrive::drive_download(path, path = temp, overwrite = TRUE)
   }
   if (source == "deter") {
-    proc <- RCurl::CFILE(temp, mode = "wb")
-    RCurl::curlPerform(url = path, writedata = proc@ref, noprogress = FALSE)
-    RCurl::close(proc)
+    utils::download.file(url = path, destfile = temp, method = "curl", quiet = FALSE)
   }
   if (source == "seeg") {
     if (geo_level == "state" | geo_level == "country") {
