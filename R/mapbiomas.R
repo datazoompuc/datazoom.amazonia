@@ -2,12 +2,10 @@
 #'
 #' @description Loads information about land cover and use
 #'
-#' @param dataset A dataset name ("mapbiomas_cover", "mapbiomas_transition", "mapbiomas_irrigation", "mapbiomas_deforestation_regeneration", "mapbiomas_grazing_quality" or "mapbiomas_mining")
+#' @param dataset A dataset name ("mapbiomas_cover", "mapbiomas_transition", "mapbiomas_irrigation", "mapbiomas_deforestation_regeneration", "mapbiomas_grazing_quality", or "mapbiomas_mining")
 #' @param raw_data A \code{boolean} setting the return of raw or processed data
-#' @param geo_level A \code{string} that defines the geographic level of the data. Can be only "municipality", except "mapbiomas_mining" which accepts more options ("biome", "indigenous_land")
-#' @param time_period A \code{numeric} indicating what years will the data be loaded. Can be only "all".
+#' @param geo_level A \code{string} that defines the geographic level of the data. For datasets "mapbiomas_cover" and "mapbiomas_transition", can be "municipality" or "state" (faster download) for datasets. For dataset "mapbiomas_mining", can be "biome" or "indigenous_land"
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported.
-#' @param time_id A \code{string} that indicates the time criteria for the data loaded. Can be "year" or "month". Defaults to year.
 #' @param cover_level A \code{numeric} or \code{string} that indicates the cover aggregation level. Can be "0", "1", "2", "3", "4", or "none", which means no aggregation. Aggregation only supported for "mapbiomas_cover" and "mapbiomas_grazing_quality" datasets.
 #' @return A \code{tibble} with the selected data.
 #'
@@ -17,7 +15,7 @@
 #' treated_mapbiomas_grazing <- load_mapbiomas(
 #'   dataset = "mapbiomas_grazing_quality",
 #'   raw_data = FALSE, geo_level = "municipality",
-#'   time_period = "all", language = "pt"
+#'   language = "pt"
 #' )
 #' }
 #'
@@ -25,14 +23,14 @@
 #' @export
 
 
-load_mapbiomas <- function(dataset = NULL, raw_data = NULL, geo_level = "municipality",
-                           time_period = "all", language = "eng", time_id = "year", cover_level = 1) {
+load_mapbiomas <- function(dataset = NULL, raw_data = FALSE, geo_level = "municipality",
+                           language = "eng", cover_level = 1) {
 
   # Checking for googledrive package (in Suggests) only for mapbiomas_transition dataset
 
   if (!requireNamespace("googledrive", quietly = TRUE) &
-      dataset %in% c("mapbiomas_cover", "mapbiomas_transition") &
-      geo_level == "municipality") {
+    dataset %in% c("mapbiomas_cover", "mapbiomas_transition") &
+    geo_level == "municipality") {
     stop(
       "Package \"googledrive\" must be installed to use this function.",
       call. = FALSE
@@ -56,9 +54,7 @@ load_mapbiomas <- function(dataset = NULL, raw_data = NULL, geo_level = "municip
   param <- list()
   param$dataset <- dataset
   param$geo_level <- geo_level
-  param$time_period <- time_period
   param$language <- language
-  param$time_id <- time_id
   param$raw_data <- raw_data
   param$cover_level <- cover_level
 
@@ -152,7 +148,7 @@ load_mapbiomas <- function(dataset = NULL, raw_data = NULL, geo_level = "municip
     dat <- dat %>%
       tidyr::pivot_wider(
         id_cols = dplyr::any_of(c(
-          "territory_id", "municipality",
+          "geo_code", "city",
           "state", "year",
           "biome", "state"
         )),
@@ -162,12 +158,10 @@ load_mapbiomas <- function(dataset = NULL, raw_data = NULL, geo_level = "municip
         values_fill = NA
       ) %>%
       janitor::clean_names()
-
-    return(dat)
   }
 
   dat <- dat %>%
-    dplyr::select(-category)
+    dplyr::select(-dplyr::any_of("category"))
 
   #################
   ## Translation ##
@@ -179,7 +173,7 @@ load_mapbiomas <- function(dataset = NULL, raw_data = NULL, geo_level = "municip
     )
 
   dat_mod <- dat_mod %>%
-    dplyr::relocate(dplyr::any_of(c("year", "state", "city", "biome", "indigenous_land")))
+    dplyr::relocate(dplyr::any_of(c("year", "state", "city", "geo_code", "biome", "indigenous_land")))
 
   if (param$language == "pt") {
     dat_mod <- dat_mod %>%
@@ -191,15 +185,18 @@ load_mapbiomas <- function(dataset = NULL, raw_data = NULL, geo_level = "municip
         "value" = "valor",
         "state" = "estado",
         "municipality" = "municipio",
+        "city" = "municipio",
+        "geo_code" = "cod_municipio",
         "biome" = "bioma",
         "indigenous_land" = "terra_indigena",
       )
   }
 
-  # Dataset "mapbiomas_deforestation_regeneration" vem em pt
   if (param$language == "eng") {
     dat_mod <- dat_mod %>%
       dplyr::rename_with(dplyr::recode,
+        "city" = "municipality",
+        "geo_code" = "municipality_code",
         "codigobioma" = "biome_code",
         "bioma" = "biome",
         "uf" = "state",
@@ -214,8 +211,6 @@ load_mapbiomas <- function(dataset = NULL, raw_data = NULL, geo_level = "municip
         "cobertura_nivel_4" = "cover_level_4"
       )
   }
-
-
 
   ####################
   ## Returning Data ##
