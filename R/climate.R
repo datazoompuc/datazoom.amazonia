@@ -32,7 +32,7 @@ load_climate <- function(dataset, raw_data = FALSE,
   ## Binding Global Variables ##
   ##############################
 
-  AMZ_LEGAL <- code_muni <- NULL
+  code_muni <- NULL
 
   #############################
   ## Define Basic Parameters ##
