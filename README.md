@@ -90,7 +90,7 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 |                             |                                 |
 |-----------------------------|---------------------------------|
 | **[COMEX](#comex)**         | *Brazilian international trade* |
-| **[BACI](#baci)**           | *Worldwide international trade* |
+| **[BACI](#baci)**           | *Global international trade*    |
 | **[PIB-Munic](#pib-munic)** | *Municipal GDP*                 |
 | **[CEMPRE](#cempre)**       | *Central register of companies* |
 
@@ -690,8 +690,6 @@ data <- load_iema(dataset = "iema", raw_data = FALSE,
 # Economic Data
 
 ## COMEX
-
-## The Dataset
 
 The Comex dataset gathers data extracted from Siscomex (Integrated
 System of Foreign Trade), which is a database containing information

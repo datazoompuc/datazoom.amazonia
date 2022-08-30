@@ -95,7 +95,7 @@ devtools::load_all()
 |||
 |---|---|
 | **[COMEX](#comex)** | _Brazilian international trade_ |
-| **[BACI](#baci)** | _Worldwide international trade_ |
+| **[BACI](#baci)** | _Global international trade_ |
 | **[PIB-Munic](#pib-munic)** | _Municipal GDP_ |
 | **[CEMPRE](#cempre)** | _Central register of companies_ |
 
