@@ -12,7 +12,7 @@ load_baci(dataset = "HS92", raw_data, time_period, language = "pt")
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
-\item{time_period}{A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be only one year at a time.}
+\item{time_period}{A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.}
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "pt".}
 }

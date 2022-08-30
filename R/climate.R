@@ -32,7 +32,7 @@ load_climate <- function(dataset, raw_data = FALSE,
   ## Binding Global Variables ##
   ##############################
 
-  AMZ_LEGAL <- code_muni <- NULL
+  code_muni <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -45,6 +45,7 @@ load_climate <- function(dataset, raw_data = FALSE,
   param$language <- language
   param$initial_time <- min(time_period)
   param$final_time <- max(time_period)
+  param$legal_amazon_only <- legal_amazon_only
 
   ## Coordinates of rectangle around the Legal Amazon
 
@@ -121,6 +122,7 @@ load_climate <- function(dataset, raw_data = FALSE,
   ## Downloading Data ##
   ######################
 
+  base::message("Downloading TerraClimate data")
 
   dat <- external_download(
     source = "terraclimate",
@@ -153,6 +155,8 @@ load_climate <- function(dataset, raw_data = FALSE,
 
   ## Brazilian municipalities/states/country to merge
 
+  base::message("Downloading Brazilian map data")
+
   map <- external_download(
     dataset = "geo_municipalities",
     source = "internal"
@@ -160,12 +164,12 @@ load_climate <- function(dataset, raw_data = FALSE,
 
   ## Filtering for Legal Amazon
 
-  if (legal_amazon_only) {
-    legal_amazon <- legal_amazon %>%
-      dplyr::filter(AMZ_LEGAL == 1)
+  if (param$legal_amazon_only) {
+    legal_amazon <- datazoom.amazonia::municipalities %>%
+      dplyr::filter(legal_amazon == 1)
 
     map <- map %>%
-      dplyr::filter(code_muni %in% legal_amazon$CD_MUN)
+      dplyr::filter(code_muni %in% legal_amazon$code_muni)
   }
 
   ## Performing merge

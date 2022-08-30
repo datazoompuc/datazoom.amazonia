@@ -162,6 +162,7 @@ load_baci_dic <- function(language) {
   # Bind Global Variables
 
   locale <- co_sh6 <- co_sh4 <- co_sh2 <- co_ncm_secrom <- no_sh6_ing <- no_sh4_ing <- no_sh2_ing <- no_sec_ing <- NULL
+  no_sh6_por <- product_code <- NULL
 
   #########################
   ## Download Dictionary ##
