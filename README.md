@@ -249,8 +249,6 @@ data <- load_imazon(dataset = "imazon_shp", raw_data = TRUE,
 
 ## IBAMA
 
-## The Dataset
-
 The dataset is originally from the Brazilian Institute of Environment
 and Renewable Natural Resources (Ibama), documenting environmental
 embargoes and fines at the individual level from 2005 to the present
@@ -342,8 +340,6 @@ data = load_mapbiomas("mapbiomas_mining", raw_data = FALSE, geo_level = "indigen
 ```
 
 ## TerraClimate
-
-## The Dataset
 
 Spatial data on several climate variables, extracted from Climatology
 Lab’s [TerraClimate](https://www.climatologylab.org/terraclimate.html).

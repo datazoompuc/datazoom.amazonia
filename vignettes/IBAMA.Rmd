@@ -14,8 +14,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-## The Dataset
-
 The dataset is originally from the Brazilian Institute of Environment and Renewable  Natural Resources (Ibama), documenting environmental embargoes and fines at the individual level from 2005 to the present day. In addition, it is possible to download distributed and collected fines from 1994 until the present day.
 
 The function returns either the raw data or a data frame with aggregates considering, for each time-location period, counts for total the number of infractions, infractions that already went to trial, and number of unique perpetrators of infractions. There are also two data frames regarding distributed and collected fines across municipalities

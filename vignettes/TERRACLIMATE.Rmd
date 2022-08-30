@@ -14,8 +14,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-## The Dataset
-
 Spatial data on several climate variables, extracted from Climatology Lab's [TerraClimate](https://www.climatologylab.org/terraclimate.html). The table below shows all possible variables to be extracted, which are chosen through the "dataset" parameter. Data ranges from 1958 to 2020.
 
 | Dataset | Code | Description | Units |
