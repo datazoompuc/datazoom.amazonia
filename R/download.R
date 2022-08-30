@@ -627,11 +627,11 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source %in% c("iema", "imazon_shp")) {
     download_method <- "googledrive"
   }
-  if (source %in% c("deter", "baci")) {
+  if (source %in% c("deter", "terraclimate", "baci")) {
     download_method <- "curl"
     quiet <- FALSE
   }
-  if (source %in% c("terraclimate", "ibama", "health")) {
+  if (source %in% c("ibama", "health")) {
     download_method <- "curl"
     quiet <- TRUE
   }

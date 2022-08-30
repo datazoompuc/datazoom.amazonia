@@ -1,3 +1,7 @@
+# datazoom.amazonia 0.9.2.9000
+
+  * Fixing `load_climate` error when option `legal_amazon_only = TRUE`
+
 # datazoom.amazonia 0.9.1.9000
 
   * Fixing `load_baci` timeout error upon download
