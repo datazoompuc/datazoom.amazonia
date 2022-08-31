@@ -102,10 +102,6 @@ load_seeg <- function(dataset = NULL, raw_data,
   ## Download ##
   ##############
 
-  if (param$geo_level == "municipality") {
-    message("Please follow the steps from `googledrive` package to download the data. This may take a while.")
-  }
-
   dat <- external_download(
     dataset = param$dataset,
     source = "seeg",
