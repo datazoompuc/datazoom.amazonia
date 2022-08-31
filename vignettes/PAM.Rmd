@@ -14,8 +14,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-## The Dataset
-
 Municipal Agricultural Production (PAM, in Portuguese) is a nationwide annual survey conducted by IBGE (Brazilian Institute of Geography and Statistics) which provides information on agricultural products, such as quantity produced, area planted and harvested, average quantity of output and monetary value of such output. The products are divided in permanent and temporary farmed land, as well as dedicated surveys to the four products that yield multiple harvests a year (beans, potato, peanut and corn), which all sum to a total survey of 64 agricultural products (31 of temporary tillage and 33 of permanent tillage). Output, however, is only included in the dataset if the planted area occupies over 1 acre or if output exceeds one tonne. 
 
 Permanent farming is characterized by a cycle of long duration, whose harvests may be done multiple times across the years without the need of planting seeds again. Temporary farming, on the other hand, consists of cycles of short and medium duration, which after harvesting require planting seeds again.
@@ -23,6 +21,26 @@ Permanent farming is characterized by a cycle of long duration, whose harvests m
 The data also has multiple aggregation levels, such as nationwide, by region, mesoregion and microregion, as well as state and municipality. 
 
 The data available has a yearly frequency and is available from 1974 to the present, with the exception of the four multiple-harvest products, which are only available from 2003. More information can be found on this link (only in Portuguese): https://www.ibge.gov.br/estatisticas/economicas/agricultura-e-pecuaria/9117-producao-agricola-municipal-culturas-temporarias-e-permanentes.html#:~:text=A%20pesquisa%20Produ%C3%A7%C3%A3o%20Agr%C3%ADcola%20Municipal,s%C3%A3o%20da%20cesta%20b%C3%A1sica%20do 
+
+```
+There are five parameters in this function:
+  
+  1. dataset: See tables below
+  2. raw_data: there are two options:
+  # TRUE: if you want the data as it is in the IBGE's site.
+  # FALSE: if you want the treated (more organized) version of the data. 
+  3. geo_level: there are four options:
+  # "country"
+  # "region"
+  # "state" 
+  # "municipality"
+  4. time_period:
+  # For pam_all_crops, pam_permanent_crops and pam_temporary_crops, data is available from 1974 to 2019.
+  # For pam_corn, pam_potato, pam_peanut and pam_beans, data is avaiable from 2003 to 2019.
+    
+  5. language: you can choose between portuguese and english
+  
+```
 
 The datasets supported are shown in the tables below, made up of both the original databases and their narrower subsets. Note that downloading only specific crops is considerably faster. First, the datasets provided by IBGE in their entirety:
 
@@ -119,21 +137,17 @@ Datasets generated from Permanent Crops:
 | grape |Uva|Grape| 
 | permanent_total |Total|Total|
 
-## Usage
-
-<!-- The package contains of three function: \code{load_pam_permanent}, \code{load_pam_temporary} and \code{load_pam_main} which extract data from the API of the IBGE database website. The first one extracts the data from products of permanent tillage, the second one from products of temporary tillage and the last one encompasses specifically the four products that yield multiple harvests per year (corn, potato, bean and peanut). All of them allow the user to input the years he would like the data to encompass, the geographical aggregation level desired, as well as choosing the language of the data (currently only Portuguese and English are supported). These functions also offer the option to output the data in the long format, in which separate tables are created for each variable and each product becomes a column (whereas previously both were lines of one single larger data frame). -->
-
-<!-- The output is a data frame containing data for the territorial level chosen, the name of such geographic level, the year of the data, the variable in question, the unit of measurement and the value. Each column has a corresponding column containing the numerical code of the specific value, with the exception of the Value column, which is already numeric. If the long format is selected, the output becomes a list of data frames, one for each one of the variables. -->
-
-Using the function is easy enough:
-
-```{r eval = FALSE}
-library(datazoom.amazonia)
-
-# download state raw data from 2012 for all crops
-pam_all_crops <- load_pam(dataset = 'pam_all_crops',
-                          raw_data = TRUE,
-                          geo_level = 'state',
-                          time_period = 2012)
-
+```{r eval=FALSE}
+# Download treated (raw_data = FALSE) data related to the production from permanent and temporary farmed lands (dataset = 'pam_all_crops') by state (geo_level = "state") from 1980 to 1990 (time_period = 1980:1990) in english (language = "eng").
+data <- load_pam(dataset = 'all_crops', 
+                 raw_data = FALSE, 
+                 geo_level = "state", 
+                 time_period = 1980:1990, 
+                 language = "eng")
+# Download raw data (raw_data = TRUE) related to the corn production (dataset = 'pam_corn') by municipality (geo_level = "municipality") from 2010 to 2012 (time_period = 2010:2012) in portuguese (language = "pt").
+data <- load_pam(dataset = 'corn', 
+                 raw_data = TRUE, 
+                 geo_level = "municipality", 
+                 time_period = 2010:2012, 
+                 language = "pt")
 ```

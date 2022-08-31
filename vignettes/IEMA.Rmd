@@ -14,19 +14,25 @@ knitr::opts_chunk$set(
 )
 ```
 
-## The Dataset
+Data from the Institute of Environment and Water Resources (IEMA), documenting the number of people without access to eletric energy throughout the Amazon region in the year 2018.
 
-The dataset is originally from the Institute of Environment and Water Resources (IEMA), documenting the number of people without access to eletric energy throughout the Amazon region in the year 2018.
+```
+There are four parameters in this function:
+  
+  1. dataset:
+  # "iema" has population without energy access data
 
-## Usage
-
-`load_iema` downloads and compiles data on the population without access to eletric energy at the municipality level, considering the Amazon region. 
-
-The function returns only the treated data considering municipality, number of the population and the state.
-
-```{r, eval = FALSE}
-library(datazoom.amazonia)
-
+  2. raw_data: there are two options:
+  # TRUE: if you want the data in its original form
+  # FALSE: if you want the treated (more organized) version of the data.
+  
+  3. geo_level:
+  # "municipality". The data is only available at the municipality level.
+  
+  4. language: you can choose between portuguese ('pt') and english ('eng')
+```
+  
+```{r eval=FALSE}
 # Download treated data (raw_data = FALSE)
 data <- load_iema(dataset = "iema", raw_data = FALSE,
                      geo_level = "municipality", language = "pt")

@@ -14,21 +14,26 @@ knitr::opts_chunk$set(
 )
 ```
 
-## The Dataset
+Loads disaggregated data on bilateral trade flows for more than 5000 products and 200 countries. The data is from the CEPII Research and Expertise on the World Economy and is built from data directly reported by each country to the United Nations Statistical Division (Comtrade).
 
-The dataset is originally from the CEPII Research and Expertise on the World Economy. The database is built from data directly reported by each country to the United Nations Statistical Division (Comtrade)
+```
+There are four parameters in this function:
+  
+  1. dataset: There is one choice:
+  # "HS92" which follows the Harmonized System method
 
-## Usage
+  2. raw_data: there are two options:
+  # TRUE: if you want the data as it is in the CEPII site.
+  # FALSE: if you want the treated (more organized) version of the data. 
+  
+  3. time_period: The data availability for each dataset is detailed above
 
-`load_baci` provides disaggregated data on bilateral trade flows for more than 5000 products and 200 countries. 
-
-The function returns either the raw data or a data frame with aggregates considering the exporter, the importer, the country and the product.
-
-```{r, eval = FALSE}
-library(datazoom.amazonia)
-
-# Download treated trade data in portuguese
-
-baci = load_baci(dataset = "HS92", raw_data = FALSE, time_period = 2018,
-                 language = "pt")
+4. language: you can choose between portuguese ('pt') and english ('eng')
+  
+  ```
+  
+```{r eval=FALSE}
+# download treated data
+clean_baci <- load_baci(dataset = "HS92", raw_data = FALSE, time_period = 2016,
+                        language = "pt")
 ```

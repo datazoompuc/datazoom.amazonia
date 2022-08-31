@@ -7,33 +7,36 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include = FALSE}
+```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 ```
 
-## The Dataset
+Loads information on the social and environmental performance of the Legal Amazon. 
 
-The Amazon Social Progress Index, an initiative from Imazon with support from 
-the Social Progress Imperative is an index that measures the social and environmental progress of its locations. Namely, the 772 municipalities in the Amazon region.
-For more information, check the [initiative's website](http://www.ipsamazonia.org.br/conheca-o-ips).
+Data from the Amazon Social Progress Index, an initiative from Imazon with support from the Social Progress Imperative that measures the social and environmental progress of its locations. Namely, the 772 municipalities in the Amazon region. For more information, check the [initiative's website](http://www.ipsamazonia.org.br/conheca-o-ips). Survey is done at the municipal level and data is available in 2014 and 2018.
 
+```
+There are four parameters in this function:
+  
+  1. dataset = ("all", "life_quality", "sanit_habit", "violence", "educ", "communic", "mortality", "deforest")
+  2. raw_data: there are two options:
+  # TRUE: if you want the raw data.
+  # FALSE: if you want the processed version of the data. 
+  
+  3. time_period: data is available in 2014 and 2018.
+  4. language: you can choose between portuguese and english
+```
 
-## Usage
-
-To download and compile data on the index for 2014 and 2018, just run the function `load_ips`.
-
+  
 ```{r, eval = FALSE}
-library(datazoom.amazonia)
+# Download raw data from 2014 
+data <- load_ips(dataset = "all", raw_data = TRUE, time_period = 2014)
 
-# Download raw data (raw_data = TRUE) from 2014 (time_period = 2014)
-data <- load_ips(dataset = "ips", raw_data = TRUE, time_period = 2014)
-
-# Download treated data (raw_data = FALSE) from 2018 
-# (time_period = 2018) in portuguese (language = 'pt')
-data <- load_ips(dataset = "ips", raw_data = FALSE,
+# Download treated deforest data from 2018 in portuguese
+data <- load_ips(dataset = "deforest", raw_data = FALSE,
                  time_period = 2018, language = 'pt')
 ```
 

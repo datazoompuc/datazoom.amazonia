@@ -7,26 +7,38 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include = FALSE}
+```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 ```
 
-## The Dataset
+Loads IBGE information on gross domestic product at current prices, taxes, net of subsidies, on products at current prices and gross value added at current prices, total and by economic activity, and respective shares. Data is available at country, state and municipality level and from 2002 to 2018.
 
-GDP data at current prices is from IBGE's "Produto Interno Bruto dos Municípios" (aka PIB-Munic). The data is available between 2002 and 2018.
+```
+There are six parameters in this function:
+  
+  1. dataset = "pibmunic"
+  
+  2. raw_data: there are two options:
+  # TRUE: if you want the raw data.
+  # FALSE: if you want the processed version of the data. 
+  
+  3. time_period: data is available from 2002 to 2018
+  
+  4. geo_level: there are three options
+  # "country"
+  # "state"
+  # "municipality"
+  
+  5. language: you can choose between portuguese and english
+  
+  6. legal_amazon_only: setting the return of Legal Amazon Data (legal_amazon_only = TRUE) or Country Data (legal_amazon_only = FALSE)
+  
+```
 
-The definition of the Brazilian Legal Amazon at the municipality level is taken from IBGE's "Mapas Regionais - Amazônia Legal" available here: https://www.ibge.gov.br/geociencias/cartas-e-mapas/mapas-regionais/15819-amazonia-legal.html?=&t=o-que-e. 
-
-## Usage
-
-Using the function is easy enough:
-
-```{r,eval=FALSE}
-library(datazoom.amazonia)
-
+```{r, eval = FALSE}
 # Download raw data (raw_data = TRUE) on gross domestic product 
 # (dataset = 'pibmunic') from the entire country (legal_amazon_only = FALSE) 
 # by state (geo_level = 'state') from 2012 (time_period = 2012)
@@ -35,10 +47,9 @@ data <- load_pibmunic(dataset = 'pibmunic',
                       geo_level = 'state',
                       time_period = 2012,
                       legal_amazon_only = FALSE)
-
 # Download treated data (raw_data = FALSE) on gross domestic product 
 # (dataset = 'pibmunic') from the Legal Amazon (legal_amazon_only = TRUE) 
-# by municipality (geo_level = 'municipality') from 2012 (time_period = 2012).
+# by municipality (geo_level = 'municipality') from 2012 (time_period = 2012).  
 data <- load_pibmunic(dataset = 'pibmunic',
                       raw_data = FALSE,
                       geo_level = 'municipality',

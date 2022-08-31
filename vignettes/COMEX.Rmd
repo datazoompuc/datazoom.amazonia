@@ -7,36 +7,42 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include = FALSE}
+```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 ```
 
-## The Dataset
-
 The Comex dataset gathers data extracted from Siscomex (Integrated System of Foreign Trade), which is a database containing information from all products that are imported to or exported from Brazil. Using data reported from the companies which are responsible for the process of transporting the products, the system adheres to internationally standardized nomenclatures, such as the Harmonized System and the Mercosul Common Nomenclature (which pertains to members of the Mercosul organization). 
 
 The data has a monthly frequency and is available starting from the year 1989. From 1989 to 1996, a different system of nomenclatures was adopted, but all conversions are available on a dictionary in the Comex website (https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta/). Systems of nomenclature vary in the degree of detail in terms of the product involved, as well as other characteristics, such as unit and granularity of location. 
 
-## Usage
+```
+There are four parameters in this function:
+  
+  1. dataset: there are three choices:
+  # "comex_export_mun": selects exports data by municipality
+  # "comex_import_mun": selects imports data by municipality
+  # "comex_export_prod": selects exports data by producer
+  # "comex_import_prod": selects imports data by producer
+  
+  2. raw_data: there are two options:
+  # TRUE: if you want the raw data.
+  # FALSE: if you want the processed version of the data. 
+  
+ 3. time_period: available starting from the year 1989
+ 4. language: you can choose between portuguese and english
+ 
+```
 
-This package contains a single function \code{load_br_trade} which extracts data from the Comex website. It allows the user to input the years he would like the data to encompass, the nomenclature used, as well as choosing between import and export data and the language (currently only Portuguese and English are supported). 
-
-The output is a tibble containing all years selected for the chosen dataset. 
-
-Using the function is easy enough:
-
-```{r,eval=FALSE}
-library(datazoom.amazonia)
-
-# download treated exports data by municipality from 1997 to 2021
-exp_mun <- load_br_trade(dataset = "comex_export_mun", raw_data = FALSE, time_period = 1997:2021)
-
-# download raw imports data by municipality from 1997 to 2021
-raw_imp_mun <- load_br_trade(dataset = "comex_import_mun", raw_data = TRUE, time_period = 1997:2021)
-
-# download treated imports data by ncm from 1997 to 2021
-imp_prod <- load_br_trade(dataset = "comex_import_prod", raw_data = FALSE, time_period = 1997:2021)
+```{r, eval = FALSE}
+# download treated (raw_data = FALSE) exports data by municipality (dataset = "comex_export_mun") from 1997 to 2021 (time_period = 1997:2021)
+data <- load_br_trade(dataset = "comex_export_mun", 
+                      raw_data = FALSE, 
+                      time_period = 1997:2021)
+# download treated(raw_data = FALSE) imports data by municipality (dataset = "comex_import_mun") from 1997 to 2021 (time_period = 1997:2021) 
+data <- load_br_trade(dataset = "comex_import_mun",
+                      raw_data = FALSE, 
+                      time_period = 1997:2021)
 ```
