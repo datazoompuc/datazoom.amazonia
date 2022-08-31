@@ -35,7 +35,7 @@
 #' @importFrom magrittr %>%
 #' @export
 
-load_degrad <- function(dataset = "degrad", raw_data,
+load_degrad <- function(dataset = "degrad", raw_data = FALSE,
                         time_period,
                         language = "eng") {
 

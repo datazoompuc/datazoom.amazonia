@@ -23,7 +23,7 @@
 #'   time_period = 2012
 #' )
 #' }
-load_pam <- function(dataset = NULL, raw_data,
+load_pam <- function(dataset, raw_data = FALSE,
                      geo_level, time_period,
                      language = "eng") {
 

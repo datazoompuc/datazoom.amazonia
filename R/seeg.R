@@ -36,7 +36,7 @@
 #'   geo_level = "municipality"
 #' )
 #' }
-load_seeg <- function(dataset = NULL, raw_data,
+load_seeg <- function(dataset, raw_data = FALSE,
                       geo_level, language = "eng") {
 
 

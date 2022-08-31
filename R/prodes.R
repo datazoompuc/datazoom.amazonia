@@ -23,7 +23,7 @@
 #'
 #' @export
 
-load_prodes <- function(dataset = "prodes", raw_data,
+load_prodes <- function(dataset = "prodes", raw_data = FALSE,
                         time_period,
                         language = "eng") {
 

@@ -24,7 +24,7 @@
 
 
 load_ibama <- function(dataset,
-                       raw_data,
+                       raw_data = FALSE,
                        states = "all",
                        language = "eng") {
 

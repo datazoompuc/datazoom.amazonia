@@ -23,7 +23,7 @@
 #' @export
 
 
-load_mapbiomas <- function(dataset = NULL, raw_data = FALSE, geo_level = "municipality",
+load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality",
                            language = "eng", cover_level = 1) {
 
   # Checking for googledrive package (in Suggests) only for mapbiomas_transition dataset

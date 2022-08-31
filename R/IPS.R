@@ -19,7 +19,7 @@
 #' # download raw data from 2014
 #' ips <- load_ips(dataset = "all", raw_data = TRUE, time_period = 2014)
 #' }
-load_ips <- function(dataset = "all", raw_data,
+load_ips <- function(dataset = "all", raw_data = FALSE,
                      time_period, language = "eng") {
 
   ###########################

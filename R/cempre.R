@@ -10,7 +10,6 @@
 #' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
 #' @param sectors A \code{boolean} that defines if the data will be return separated by sectors (\code{TRUE}) or not (\code{FALSE}). Defaults to \code{FALSE}
-#' @param legal_amazon_only A \code{boolean} setting the return of Legal Amazon Data (\code{TRUE}) or Country's Data (\code{FALSE}). Defaults to \code{FALSE}
 #'
 #' @return A \code{tibble} with the selected data.
 #'
@@ -28,10 +27,9 @@
 #' @importFrom magrittr %>%
 #' @export
 
-load_cempre <- function(dataset = "cempre", raw_data,
+load_cempre <- function(dataset = "cempre", raw_data = FALSE,
                         geo_level, time_period,
-                        language = "eng", sectors = FALSE,
-                        legal_amazon_only = FALSE) {
+                        language = "eng", sectors = FALSE) {
   sidra_code <- available_time <- legal_amazon <- municipio_codigo <- ano <- ano_codigo <- classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo <- geo_id <- id_code <- nivel_territorial <- nivel_territorial_codigo <- valor <- variavel <- unidade_de_medida <- unidade_de_medida_codigo <- NULL
 
   #############################
@@ -72,19 +70,6 @@ load_cempre <- function(dataset = "cempre", raw_data,
   if (max(time_period) > year_check[2]) {
     stop("Provided time period greater than supported. Check documentation for time availability.")
   }
-
-  ## Dataset
-
-  if (is.null(param$dataset)) {
-    stop("Missing Dataset!")
-  }
-  if (is.null(param$raw_data)) {
-    stop("Missing TRUE/FALSE for Raw Data")
-  }
-  if (legal_amazon_only & geo_level != "municipality") {
-    stop('legal_amazon_only = TRUE is only available for geo_level = "municipality".')
-  }
-
 
   ##############
   ## Download ##
@@ -145,18 +130,20 @@ load_cempre <- function(dataset = "cempre", raw_data,
   }
 
 
-  ## Filter for Legal Amazon
-  if (legal_amazon_only) {
-    legal_amazon_filtered <- datazoom.amazonia::municipalities %>% dplyr::filter(legal_amazon == 1)
+  ## Add legal amazon indicator
+  if (param$geo_level == "municipalities") {
+
+    legal_amazon <- datazoom.amazonia::municipalities %>%
+      dplyr::select(code_muni, legal_amazon)
 
     dat <- dat %>%
-      dplyr::filter(municipio_codigo %in% unique(legal_amazon_filtered$code_muni))
-  }
+      dplyr::left_join(legal_amazon, by = c("municipio_codigo" = "code_muni"))
+ }
 
 
   ## Return Raw Data
 
-  if (raw_data == TRUE) {
+  if (param$raw_data) {
     return(dat)
   }
 

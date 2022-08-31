@@ -4,7 +4,6 @@
 #'
 #' @param dataset A dataset name ("iema")
 #' @param raw_data A \code{boolean} setting the return of processed data. Raw Data is not publicly available
-#' @param geo_level A \code{string} that defines the geographic level of the data. Can be only "municipality".
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported.
 #'
 #' @return A \code{tibble} with the selected data.
@@ -23,8 +22,7 @@
 #' @export
 
 
-load_iema <- function(dataset = "iema", raw_data = FALSE,
-                      geo_level = "municipality", language = "pt") {
+load_iema <- function(dataset = "iema", raw_data = FALSE, language = "pt") {
 
   ##############################
   ## Binding Global Variables ##
@@ -39,7 +37,6 @@ load_iema <- function(dataset = "iema", raw_data = FALSE,
 
   param <- list()
   param$dataset <- dataset
-  param$geo_level <- geo_level
   param$language <- language
   param$raw_data <- raw_data
 
@@ -58,8 +55,7 @@ load_iema <- function(dataset = "iema", raw_data = FALSE,
 
   dat <- external_download(
     dataset = param$dataset,
-    source = "iema",
-    geo_level = param$geo_level
+    source = "iema"
   )
 
   ## Return Raw Data

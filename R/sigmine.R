@@ -21,7 +21,7 @@
 #' )
 #' }
 load_sigmine <- function(dataset = "sigmine_active",
-                         raw_data,
+                         raw_data = FALSE,
                          language = "eng") {
   survey <- link <- nome <- uf <- NULL
 

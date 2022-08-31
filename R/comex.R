@@ -37,7 +37,7 @@
 #'
 #' @export
 
-load_br_trade <- function(dataset = NULL, raw_data,
+load_br_trade <- function(dataset, raw_data = FALSE,
                           time_period, language = "eng") {
 
   ## We want to download both imports and exports data

@@ -23,7 +23,7 @@
 #'   time_period = 2012
 #' )
 #' }
-load_pevs <- function(dataset = NULL, raw_data,
+load_pevs <- function(dataset, raw_data = FALSE,
                       geo_level, time_period,
                       language = "eng") {
 

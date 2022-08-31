@@ -7,7 +7,6 @@
 #' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state" or "municipality".
 #' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
-#' @param legal_amazon_only A \code{boolean} setting the return of Legal Amazon Data (\code{TRUE}) or Country's Data (\code{FALSE}).
 #'
 #' @return A \code{tibble} with the selected data.
 #'
@@ -23,14 +22,12 @@
 #'   dataset = "pibmunic",
 #'   raw_data = TRUE,
 #'   geo_level = "state",
-#'   time_period = 2012,
-#'   legal_amazon_only = FALSE
+#'   time_period = 2012
 #' )
 #' }
-load_pibmunic <- function(dataset = "pibmunic", raw_data,
+load_pibmunic <- function(dataset = "pibmunic", raw_data = FALSE,
                           geo_level, time_period,
-                          language = "eng",
-                          legal_amazon_only = FALSE) {
+                          language = "eng") {
   sidra_code <- available_time <- legal_amazon <- municipio_codigo <- ano <- ano_codigo <- geo_id <- nivel_territorial <- nivel_territorial_codigo <- unidade_de_medida <- unidade_de_medida_codigo <- valor <- variavel <- variavel_codigo <- NULL
 
 
@@ -71,10 +68,6 @@ load_pibmunic <- function(dataset = "pibmunic", raw_data,
   if (max(time_period) > year_check[2]) {
     stop("Provided time period greater than supported. Check documentation for time availability.")
   }
-  if (legal_amazon_only & geo_level != "municipality") {
-    stop('legal_amazon_only = TRUE is only available for geo_level = "municipality".')
-  }
-
 
   ##############
   ## Download ##
@@ -97,18 +90,20 @@ load_pibmunic <- function(dataset = "pibmunic", raw_data,
     tibble::as_tibble()
 
 
-  ## Filter for Legal Amazon
-  if (legal_amazon_only) {
-    legal_amazon_filtered <- datazoom.amazonia::municipalities %>% dplyr::filter(legal_amazon == 1)
+  ## Add legal amazon indicator
+  if (param$geo_level == "municipalities") {
+
+    legal_amazon <- datazoom.amazonia::municipalities %>%
+      dplyr::select(code_muni, legal_amazon)
 
     dat <- dat %>%
-      dplyr::filter(municipio_codigo %in% unique(legal_amazon_filtered$code_muni))
+      dplyr::left_join(legal_amazon, by = c("municipio_codigo" = "code_muni"))
   }
 
 
   ## Return Raw Data
 
-  if (raw_data == TRUE) {
+  if (param$raw_data) {
     return(dat)
   }
 

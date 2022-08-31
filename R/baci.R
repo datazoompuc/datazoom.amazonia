@@ -28,7 +28,7 @@
 
 
 
-load_baci <- function(dataset = "HS92", raw_data, time_period,
+load_baci <- function(dataset = "HS92", raw_data = FALSE, time_period,
                       language = "pt") {
 
   ###########################
