@@ -30,7 +30,6 @@ Imports:
     lubridate,
     magrittr,
     purrr,
-    RCurl,
     readr,
     readxl,
     sf,
