@@ -182,7 +182,7 @@ load_climate <- function(dataset, raw_data = FALSE,
 
   ## Return Raw Data
 
-  if (param$raw_data == TRUE) {
+  if (param$raw_data) {
     return(dat)
   }
 

@@ -126,7 +126,8 @@ load_seeg <- function(dataset, raw_data = FALSE,
 
 
   ## Return Raw Data
-  if (param$dataset == "seeg" & param$raw_data == TRUE) {
+
+  if (param$dataset == "seeg" & param$raw_data) {
     return(dat)
   }
 

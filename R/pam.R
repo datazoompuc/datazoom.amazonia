@@ -131,8 +131,9 @@ load_pam <- function(dataset, raw_data = FALSE,
     dplyr::bind_rows() %>%
     tibble::as_tibble()
 
+  ## Return Raw Data
 
-  if (raw_data == TRUE) {
+  if (param$raw_data) {
     return(dat)
   }
 

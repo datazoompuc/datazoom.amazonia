@@ -77,7 +77,7 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
 
   ## Return Raw Data
 
-  if (raw_data == TRUE) {
+  if (param$raw_data) {
     return(dat)
   }
 

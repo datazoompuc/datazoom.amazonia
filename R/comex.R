@@ -93,6 +93,12 @@ load_br_trade <- function(dataset, raw_data = FALSE,
     dplyr::bind_rows() %>%
     tibble::as_tibble()
 
+  ## Return Raw Data
+
+  if (param$raw_data) {
+    return(dat)
+  }
+
   ######################
   ## Data Engineering ##
   ######################
@@ -107,14 +113,6 @@ load_br_trade <- function(dataset, raw_data = FALSE,
 
   dat <- dat %>%
     dplyr::mutate_if(is.numeric, as.double)
-
-  ## Returning Raw Data
-
-  ## Just Add Translation
-
-  if (param$raw_data == TRUE) {
-    return(dat)
-  }
 
   ## ---------------------------------------------------------------------------##
 

@@ -91,20 +91,22 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
     sheet = sheet
   )
 
-  dat <- dat %>%
-    janitor::clean_names() %>%
-    tibble::as_tibble() %>%
-    dplyr::mutate_if(is.character, function(var) {
-      stringi::stri_trans_general(str = var, id = "Latin-ASCII")
-    })
+  ## Return Raw Data
 
-  if (raw_data == TRUE) {
+  if (param$raw_data) {
     return(dat)
   }
 
   ######################
   ## Data Engineering ##
   ######################
+
+  dat <- dat %>%
+    janitor::clean_names() %>%
+    tibble::as_tibble() %>%
+    dplyr::mutate_if(is.character, function(var) {
+      stringi::stri_trans_general(str = var, id = "Latin-ASCII")
+    })
 
   ## Create Longer Data - Years as a Variable
 

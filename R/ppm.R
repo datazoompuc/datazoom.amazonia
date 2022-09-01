@@ -113,7 +113,7 @@ load_ppm <- function(dataset, raw_data = FALSE,
 
   ## Return Raw Data
 
-  if (raw_data == TRUE) {
+  if (param$raw_data) {
     return(dat)
   }
 

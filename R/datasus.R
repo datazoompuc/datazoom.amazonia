@@ -154,10 +154,9 @@ load_datasus <- function(dataset,
 
   ## Return Raw Data
 
-  if (param$raw_data == TRUE) {
+  if (param$raw_data) {
     return(dat)
   }
-
 
   ######################
   ## Data Engineering ##

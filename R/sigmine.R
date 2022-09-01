@@ -47,7 +47,8 @@ load_sigmine <- function(dataset = "sigmine_active",
     janitor::clean_names()
 
   ## Return Raw Data
-  if (raw_data == TRUE) {
+
+  if (param$raw_data) {
     return(dat)
   }
 
