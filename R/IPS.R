@@ -25,8 +25,8 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
   ###########################
   ## Bind Global Variables ##
   ###########################
-  survey <- link <- .data <- NULL
 
+  survey <- link <- .data <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -36,18 +36,7 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
   param$dataset <- dataset
   param$time_period <- time_period
   param$language <- language
-  # param$time_id = time_id
   param$raw_data <- raw_data
-
-  param$survey_name <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(survey) %>%
-    unlist()
-
-  param$url <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(link) %>%
-    unlist()
 
   codigo_ibge <- municipio <- estado <- ips_amazonia <- NULL
   necessidades_humanas_basicas <- fundamentos_para_o_bem_estar <- NULL
@@ -100,14 +89,6 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
 
   ### Dataset
 
-  if (is.null(param$dataset)) {
-    stop("Missing Dataset!")
-  }
-  if (is.null(param$raw_data)) {
-    stop("Missing TRUE/FALSE for Raw Data")
-  }
-
-  ##
   if (raw_data == TRUE & language == "eng") {
     stop("raw_data == TRUE only available in portuguese")
   }
@@ -123,8 +104,6 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
         external_download(dataset = "ips", source = "ips", year = t)
       }
     )
-
-
 
   ####################
   # language = 'pt' ##

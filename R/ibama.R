@@ -58,26 +58,6 @@ load_ibama <- function(dataset,
     param$states <- "all"
   }
 
-  param$survey_name <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(survey) %>%
-    unlist()
-
-  param$url <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(link) %>%
-    unlist()
-
-  ## Dataset
-
-  if (is.null(param$dataset)) {
-    stop("Missing Dataset!")
-  }
-  if (is.null(param$raw_data)) {
-    stop("Missing TRUE/FALSE for Raw Data")
-  }
-
-
   ##############
   ## Download ##
   ##############

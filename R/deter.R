@@ -39,8 +39,6 @@ load_deter <- function(dataset, raw_data = FALSE,
   ## Bind Global Variables ##
   ###########################
 
-  ## Bind Global Variables
-
   .data <- view_date <- name_muni <- code_muni <- sensor <- satellite <- NULL
   uc <- classname <- path_row <- area <- quadrant <- geometry <- id_alerta <- NULL
 

@@ -24,6 +24,15 @@
 
 load_iema <- function(dataset = "iema", raw_data = FALSE, language = "pt") {
 
+  # Checking for googledrive package (in Suggests)
+
+  if (!requireNamespace("googledrive", quietly = TRUE)) {
+    stop(
+      "Package \"googledrive\" must be installed to use this function.",
+      call. = FALSE
+    )
+  }
+
   ##############################
   ## Binding Global Variables ##
   ##############################
@@ -39,15 +48,6 @@ load_iema <- function(dataset = "iema", raw_data = FALSE, language = "pt") {
   param$dataset <- dataset
   param$language <- language
   param$raw_data <- raw_data
-
-  # Checking for googledrive package (in Suggests)
-
-  if (!requireNamespace("googledrive", quietly = TRUE)) {
-    stop(
-      "Package \"googledrive\" must be installed to use this function.",
-      call. = FALSE
-    )
-  }
 
   ##############
   ## Download ##

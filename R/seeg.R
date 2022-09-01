@@ -49,7 +49,21 @@ load_seeg <- function(dataset, raw_data = FALSE,
     )
   }
 
-  survey <- link <- ibge <- x2000 <- x2018 <- id_code <- tipo_de_emissao <- city <- state <- nivel_1 <- municipio <- territorio <- x1970 <- x2019 <- nivel_1_setor <- nivel_2 <- nivel_3 <- nivel_4 <- nivel_5 <- nivel_6 <- produto <- atividade_economica <- Valor <- Ano <- estado <- setor <- processos_geradores_emissoes <- fonte_de_emissoes <- emissores <- gas <- emissao_remocao_bunker <- producao_emissores <- categorias_emissao <- atividade_geradora <- categorias_processos_geradores <- year <- state <- sector <- emitters_production <- emitters <- economic_activity <- product <- value <- emissions_category <- activity <- generating_processes_categories <- biome <- biome_area <- transition_type <- emission_removal_bunker <- emissions_sources <- emissions_type <- emissions_generating_processes <- NULL
+  ##############################
+  ## Binding Global Variables ##
+  ##############################
+
+  survey <- link <- ibge <- x2000 <- x2018 <- id_code <- tipo_de_emissao <- NULL
+  city <- state <- nivel_1 <- municipio <- territorio <- x1970 <- x2019 <- NULL
+  nivel_1_setor <- nivel_2 <- nivel_3 <- nivel_4 <- nivel_5 <- nivel_6 <- NULL
+  produto <- atividade_economica <- Valor <- Ano <- estado <- setor <- NULL
+  processos_geradores_emissoes <- fonte_de_emissoes <- emissores <- gas <- NULL
+  emissao_remocao_bunker <- producao_emissores <- categorias_emissao <- NULL
+  atividade_geradora <- categorias_processos_geradores <- year <- state <- NULL
+  sector <- emitters_production <- emitters <- economic_activity <- product <- NULL
+  value <- emissions_category <- activity <- generating_processes_categories <- NULL
+  biome <- biome_area <- transition_type <- emission_removal_bunker <- NULL
+  emissions_sources <- emissions_type <- emissions_generating_processes <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -72,12 +86,6 @@ load_seeg <- function(dataset, raw_data = FALSE,
 
   ## Dataset
 
-  if (is.null(param$dataset)) {
-    stop("Missing Dataset!")
-  }
-  if (is.null(param$raw_data)) {
-    stop("Missing TRUE/FALSE for Raw Data")
-  }
   if (param$dataset == "seeg" & param$raw_data == FALSE) {
     stop("This dataset only works with raw_data = TRUE")
   }

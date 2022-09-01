@@ -27,15 +27,6 @@ load_pam <- function(dataset, raw_data = FALSE,
                      geo_level, time_period,
                      language = "eng") {
 
-  ## Translation is only made through collapsing at the end
-  # - What if we wanted to deliver raw data?
-
-  ## To-Dos:
-  ## Include Progress Bar
-  ## Include Labels
-  ## Support for Raw Downloads in English
-  ## Write Vignettes
-
   ##############################
   ## Binding Global Variables ##
   ##############################
@@ -98,10 +89,6 @@ load_pam <- function(dataset, raw_data = FALSE,
   }
 
   ## Dataset
-
-  if (is.null(dataset)) {
-    stop("Missing Dataset!")
-  }
 
   if (param$code == 1612) { ## This is a subset of all crops
     param$data_name <- "Temporary Crops (Lavouras Temporarias)"

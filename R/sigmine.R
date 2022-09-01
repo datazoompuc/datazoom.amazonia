@@ -23,6 +23,11 @@
 load_sigmine <- function(dataset = "sigmine_active",
                          raw_data = FALSE,
                          language = "eng") {
+
+  ##############################
+  ## Binding Global Variables ##
+  ##############################
+
   survey <- link <- nome <- uf <- NULL
 
   #############################
@@ -31,30 +36,8 @@ load_sigmine <- function(dataset = "sigmine_active",
 
   param <- list()
   param$dataset <- dataset
-  # param$geo_level = geo_level
-  # param$time_period = time_period
   param$language <- language
-  # param$time_id = time_id
   param$raw_data <- raw_data
-
-  param$survey_name <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(survey) %>%
-    unlist()
-
-  param$url <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(link) %>%
-    unlist()
-
-  ## Dataset
-
-  if (is.null(param$dataset)) {
-    stop("Missing Dataset!")
-  }
-  if (is.null(param$raw_data)) {
-    stop("Missing TRUE/FALSE for Raw Data")
-  }
 
   ######################
   ## Downloading Data ##
@@ -67,7 +50,6 @@ load_sigmine <- function(dataset = "sigmine_active",
   if (raw_data == TRUE) {
     return(dat)
   }
-
 
   ######################
   ## Data Engineering ##

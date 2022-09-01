@@ -28,8 +28,14 @@
 load_pibmunic <- function(dataset = "pibmunic", raw_data = FALSE,
                           geo_level, time_period,
                           language = "eng") {
-  sidra_code <- available_time <- legal_amazon <- municipio_codigo <- ano <- ano_codigo <- geo_id <- nivel_territorial <- nivel_territorial_codigo <- unidade_de_medida <- unidade_de_medida_codigo <- valor <- variavel <- variavel_codigo <- NULL
 
+  ##############################
+  ## Binding Global Variables ##
+  ##############################
+
+  sidra_code <- available_time <- legal_amazon <- municipio_codigo <- ano <- NULL
+  ano_codigo <- geo_id <- nivel_territorial <- nivel_territorial_codigo <- NULL
+  unidade_de_medida <- unidade_de_medida_codigo <- valor <- variavel <- variavel_codigo <- NULL
 
   #############################
   ## Define Basic Parameters ##

@@ -40,25 +40,6 @@
 load_br_trade <- function(dataset, raw_data = FALSE,
                           time_period, language = "eng") {
 
-  ## We want to download both imports and exports data
-
-  ## Type: By NCM, Município da empresa exportadora/importadora e Posição do Sistema Harmonizado (SH4),
-  ##
-
-  ## https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta
-
-  ## https://www.m2vconsultoria.com.br/noticias/a-importancia-da-correta-classificacao-fiscal-de-mercadorias-para-os-processos-aduaneiros/
-  ## http://siscomex.gov.br/balanca-comercial-traz-agora-classificacao-de-produtos-por-setor-de-atividade-economica/
-  # https://wits.worldbank.org/WITS/WITS/Restricted/Login.aspx
-  # http://www.cepii.fr/cepii/en/bdd_modele/bdd.asp
-  # https://www.usitc.gov/data/gravity/data_faq.htm
-  # http://siscomex.gov.br/balanca-comercial-traz-agora-classificacao-de-produtos-por-setor-de-atividade-economica/
-
-
-
-  ## To-Do:
-  ## Include Labels
-
   ###########################
   ## Bind Global Variables ##
   ###########################
@@ -87,25 +68,6 @@ load_br_trade <- function(dataset, raw_data = FALSE,
   param$time_period <- time_period
   param$language <- language
   param$raw_data <- raw_data
-
-  param$survey_name <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(survey) %>%
-    unlist()
-
-  param$url <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(link) %>%
-    unlist()
-
-  ## Dataset
-
-  if (is.null(param$dataset)) {
-    stop("Missing Dataset!")
-  }
-  if (is.null(param$raw_data)) {
-    stop("Missing TRUE/FALSE for Raw Data")
-  }
 
   # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/EXP_2012_MUN.csv
   # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/IMP_2021_MUN.csv

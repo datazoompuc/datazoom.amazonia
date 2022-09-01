@@ -27,39 +27,15 @@ load_ppm <- function(dataset, raw_data = FALSE,
                      geo_level, time_period,
                      language = "eng") {
 
-  ## Translation is only made through collapsing at the end
-  # - What if we wanted to deliver raw data?
-
-  ## To-Dos:
-  ## Include Progress Bar
-  ## Include Labels
-  ## Support for Raw Downloads
-  ## Write Vignettes
-
   ##############################
   ## Binding Global Variables ##
   ##############################
 
-  sidra_code <- NULL
-  nivel_territorial_codigo <- NULL
-  nivel_territorial <- NULL
-  unidade_de_medida_codigo <- NULL
-  variavel_codigo <- NULL
-  ano_codigo <- NULL
-  valor <- NULL
-  geo_id <- NULL
-  ano <- NULL
-  tipo_de_rebanho <- NULL
-  variavel <- NULL
-  unidade_de_medida <- NULL
-  tipo_de_produto_de_origem_animal <- NULL
-  tipo_de_produto_da_aquicultura <- NULL
-  tipo_de_produto_de_origem_animal_codigo <- NULL
+  sidra_code <- nivel_territorial_codigo <- nivel_territorial <- unidade_de_medida_codigo <- NULL
+  variavel_codigo <- ano_codigo <- valor <- geo_id <- ano <- tipo_de_rebanho <- NULL
+  variavel <- unidade_de_medida <- tipo_de_produto_de_origem_animal <- NULL
+  tipo_de_produto_da_aquicultura <- tipo_de_produto_de_origem_animal_codigo <- NULL
   available_time <- tipo_de_rebanho_codigo <- tipo_de_produto_da_aquicultura_codigo <- vars <- NULL
-
-  # Adjust Code Based on State Level Information
-  # Check if any observation geo-time at the final data have multiple NA entries -- this would mean the data is "wrong"
-  # Double Check Translation
 
   #############################
   ## Define Basic Parameters ##
@@ -102,10 +78,6 @@ load_ppm <- function(dataset, raw_data = FALSE,
 
 
   ## Dataset
-
-  if (is.null(param$dataset)) {
-    stop("Missing Dataset!")
-  }
 
   if (param$code == 94) {
     param$data_name <- "Cow Farming (Vacas ordenhadas - Cabecas)"

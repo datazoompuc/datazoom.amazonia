@@ -27,38 +27,15 @@ load_pevs <- function(dataset, raw_data = FALSE,
                       geo_level, time_period,
                       language = "eng") {
 
-  ## Translation is only made through collapsing at the end
-  # - What if we wanted to deliver raw data?
-
-  ## To-Dos:
-  ## Include Progress Bar
-  ## Include Labels
-  ## Support for Raw Downloads
-  ## Write Vignettes
-
   ##############################
   ## Binding Global Variables ##
   ##############################
 
-  sidra_code <- NULL
-  nivel_territorial_codigo <- NULL
-  nivel_territorial <- NULL
-  unidade_de_medida_codigo <- NULL
-  unidade_de_medida <- NULL
-  tipo_de_produto_codigo <- NULL
-  variavel_codigo <- NULL
-  ano_codigo <- NULL
-  valor <- NULL
-  tipo_de_produto_extrativo_codigo <- NULL
-  tipo_de_produto_da_silvicultura_codigo <- NULL
-  tipo_de_produto_da_silvicultura <- NULL
-  especie_florestal_codigo <- NULL
-  especie_florestal <- NULL
-  geo_id <- NULL
-  ano <- NULL
-  variavel <- NULL
-  tipo_de_produto <- NULL
-  tipo_de_produto_extrativo <- NULL
+  sidra_code <- nivel_territorial_codigo <- nivel_territorial <- unidade_de_medida_codigo <- NULL
+  unidade_de_medida <- tipo_de_produto_codigo <- variavel_codigo <- ano_codigo <- NULL
+  valor <- tipo_de_produto_extrativo_codigo <- tipo_de_produto_da_silvicultura_codigo <- NULL
+  tipo_de_produto_da_silvicultura <- especie_florestal_codigo <- especie_florestal <- NULL
+  geo_id <- ano <- variavel <- tipo_de_produto <- tipo_de_produto_extrativo <- NULL
   available_time <- vars <- NULL
 
   #############################
@@ -99,13 +76,7 @@ load_pevs <- function(dataset, raw_data = FALSE,
     stop("Provided time period greater than supported. Check documentation for time availability.")
   }
 
-
-
   ## Dataset
-
-  if (is.null(param$dataset)) {
-    stop("Missing Dataset!")
-  }
 
   if (param$code == 289) {
     param$data_name <- "Vegetal extraction quantity and value (Quantidade e valor da extracao vegetal)"

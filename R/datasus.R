@@ -19,20 +19,15 @@ load_datasus <- function(dataset,
                          raw_data = FALSE,
                          keep_all = FALSE,
                          language = "eng") {
+
+  # Checking for foreign package (in Suggests)
+
   if (!requireNamespace("foreign", quietly = TRUE)) {
     stop(
       "Package \"foreign\" must be installed to use this function.",
       call. = FALSE
     )
   }
-
-  ## TODO
-  # i) Tábuas de mortalidade do IBGE, por UF e Ano
-  # ii) Microdados do SIM/Datasus
-  # iii) SIOPS e CNES/Datasus
-  # iv) Dados da ANS, cobertura de planos privados
-  # v) Dados do e-Gestor, cobertura da atenção básica e SESAI
-  # vi) Microdados da PNS e Vigitel
 
   ##############################
   ## Binding Global Variables ##

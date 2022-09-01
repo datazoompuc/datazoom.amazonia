@@ -40,12 +40,12 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
   ###########################
   ## Bind Global Variables ##
   ###########################
+
   survey <- link <- x1985 <- x2019 <- NULL
   ano <- bioma <- category <- cidade <- city <- class_id <- country <- estado <- feature_id <- group <- terra_indigena <- NULL
   id <- indigenous_land <- level_2 <- level_3 <- name_pt_br <- pais <- x2020 <- NULL
   territory_id <- municipality <- state <- year <- value <- NULL
   x1985_to_1986 <- x2018_to_2019 <- x1988 <- x2017 <- x2000 <- x2010 <- x2018 <- biome <- level_1 <- NULL
-
 
   #############################
   ## Define Basic Parameters ##
@@ -57,25 +57,6 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
   param$language <- language
   param$raw_data <- raw_data
   param$cover_level <- cover_level
-
-  param$survey_name <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(survey) %>%
-    unlist()
-
-  param$url <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(link) %>%
-    unlist()
-
-  ## Dataset
-
-  if (is.null(param$dataset)) {
-    stop("Missing Dataset!")
-  }
-  if (is.null(param$raw_data)) {
-    stop("Missing TRUE/FALSE for Raw Data")
-  }
 
   sheets <- tibble::tribble(
     ~dataset, ~geo_level, ~sheet,

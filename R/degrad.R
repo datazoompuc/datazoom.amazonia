@@ -39,11 +39,9 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
                         time_period,
                         language = "eng") {
 
-  # ,all_events = FALSE
-
-  ## To-Do:
-  # Include Safety Download and Message if any Error Occurs
-  # Harmonize Columns Names, Create Panel and Deliver Raw Data
+  ##############################
+  ## Binding Global Variables ##
+  ##############################
 
   survey <- link <- .data <- abbrev_state <- ano <- area <- NULL
   areameters <- areametros <- class_name <- classe <- cod_municipio <- NULL
@@ -61,26 +59,6 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
   param$time_period <- time_period
   param$language <- language
   param$raw_data <- raw_data
-
-  param$survey_name <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(survey) %>%
-    unlist()
-
-  param$url <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(link) %>%
-    unlist()
-
-  ## Dataset
-
-  if (is.null(param$dataset)) {
-    stop("Missing Dataset!")
-  }
-  if (is.null(param$raw_data)) {
-    stop("Missing TRUE/FALSE for Raw Data")
-  }
-
 
   ######################
   ## Downloading Data ##
@@ -231,31 +209,6 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
       year, linkcolumn, scene_id, code_state, code_muni,
       class_name, pathrow, area, view_date, julday, geometry
     )
-
-  # # Set aggregation level
-  # geo_level <- tolower(geo_level)
-  # if (geo_level == "state") {
-  #   df <- df %>%
-  #     # Replaces state names (with errors because of accents) with state code
-  #     dplyr::mutate(code_state = as.factor(.data$code_state)) %>%
-  #     dplyr::group_by(.data$code_state) %>%
-  #     dplyr::rename(Estado = .data$abbrev_state, Evento = .data$class_name) %>%
-  #     # Removes useless columns
-  #     dplyr::select(-c("code_muni", "code_state"))
-  # }
-  # else {
-  #   if (geo_level != "municipality") {
-  #     warning("Spatial aggregation level not supported. Proceeding with Municipality.")
-  #   }
-  #
-  #   df <- df %>%
-  #     # Adds from which municipality each observation is
-  #     dplyr::mutate(CodIBGE = as.factor(.data$code_muni)) %>%
-  #     dplyr::group_by(.data$CodIBGE, .data$name_muni, .add = TRUE) %>%
-  #     dplyr::rename(Municipio = .data$name_muni, Estado = .data$abbrev_state, Evento = .data$class_name) %>%
-  #     dplyr::select(-c("code_muni", "code_state"))
-  # }
-  #
 
   #################
   ## Translation ##
