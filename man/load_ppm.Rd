@@ -5,7 +5,7 @@
 \alias{load_ppm}
 \title{PPM - Municipal Livestock Production}
 \usage{
-load_ppm(dataset = NULL, raw_data, geo_level, time_period, language = "eng")
+load_ppm(dataset, raw_data = FALSE, geo_level, time_period, language = "eng")
 }
 \arguments{
 \item{dataset}{A dataset name ("ppm_livestock_inventory", "ppm_sheep_farming", "ppm_animal_orig_production", "ppm_cow_farming" or "ppm_aquaculture". You can also use SIDRA codes (see \url{https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019})}

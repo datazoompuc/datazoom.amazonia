@@ -5,19 +5,12 @@
 \alias{load_imazon}
 \title{IMAZON}
 \usage{
-load_imazon(
-  dataset = "imazon_shp",
-  raw_data = TRUE,
-  geo_level = "municipality",
-  language = "pt"
-)
+load_imazon(dataset = "imazon_shp", raw_data = TRUE, language = "pt")
 }
 \arguments{
 \item{dataset}{There is one dataset available ("imazon_shp")}
 
 \item{raw_data}{A \code{boolean} setting the return of raw or processed data}
-
-\item{geo_level}{A \code{string} that defines the geographic level of the data. Only "municipality" available.}
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese is supported.}
 }

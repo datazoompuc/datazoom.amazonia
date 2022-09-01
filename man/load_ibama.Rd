@@ -4,7 +4,7 @@
 \alias{load_ibama}
 \title{IBAMA - Brazilian Institute for the Environment and Renewable Natural Resources}
 \usage{
-load_ibama(dataset, raw_data, states = "all", language = "eng")
+load_ibama(dataset, raw_data = FALSE, states = "all", language = "eng")
 }
 \arguments{
 \item{dataset}{A dataset name ("areas_embargadas", "distributed_fines", "collected_fines")}

@@ -5,7 +5,7 @@
 \alias{load_ips}
 \title{IPS - Amazon Social Progress Index}
 \usage{
-load_ips(dataset = "all", raw_data, time_period, language = "eng")
+load_ips(dataset = "all", raw_data = FALSE, time_period, language = "eng")
 }
 \arguments{
 \item{dataset}{There are multiple datasets ("all", "life_quality", "sanit_habit", "violence", "educ", "communic", "mortality", "deforest")}

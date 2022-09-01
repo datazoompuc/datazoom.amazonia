@@ -7,12 +7,11 @@
 \usage{
 load_cempre(
   dataset = "cempre",
-  raw_data,
+  raw_data = FALSE,
   geo_level,
   time_period,
   language = "eng",
-  sectors = FALSE,
-  legal_amazon_only = FALSE
+  sectors = FALSE
 )
 }
 \arguments{
@@ -27,8 +26,6 @@ load_cempre(
 \item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".}
 
 \item{sectors}{A \code{boolean} that defines if the data will be return separated by sectors (\code{TRUE}) or not (\code{FALSE}). Defaults to \code{FALSE}}
-
-\item{legal_amazon_only}{A \code{boolean} setting the return of Legal Amazon Data (\code{TRUE}) or Country's Data (\code{FALSE}). Defaults to \code{FALSE}}
 }
 \value{
 A \code{tibble} with the selected data.

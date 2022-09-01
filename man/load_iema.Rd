@@ -4,19 +4,12 @@
 \alias{load_iema}
 \title{IEMA - Institute of Environment and Water Resources}
 \usage{
-load_iema(
-  dataset = "iema",
-  raw_data = FALSE,
-  geo_level = "municipality",
-  language = "pt"
-)
+load_iema(dataset = "iema", raw_data = FALSE, language = "pt")
 }
 \arguments{
 \item{dataset}{A dataset name ("iema")}
 
 \item{raw_data}{A \code{boolean} setting the return of processed data. Raw Data is not publicly available}
-
-\item{geo_level}{A \code{string} that defines the geographic level of the data. Can be only "municipality".}
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported.}
 }

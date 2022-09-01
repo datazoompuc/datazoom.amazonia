@@ -5,7 +5,7 @@
 \title{MAPBIOMAS - The Annual Land Cover and Use Mapping Project in Brazil}
 \usage{
 load_mapbiomas(
-  dataset = NULL,
+  dataset,
   raw_data = FALSE,
   geo_level = "municipality",
   language = "eng",

@@ -5,7 +5,7 @@
 \alias{load_br_trade}
 \title{Comex - External Trade}
 \usage{
-load_br_trade(dataset = NULL, raw_data, time_period, language = "eng")
+load_br_trade(dataset, raw_data = FALSE, time_period, language = "eng")
 }
 \arguments{
 \item{dataset}{A dataset name ("comex_export_mun", "comex_import_mun", "comex_export_prod" or "comex_import_prod").}

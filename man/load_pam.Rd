@@ -5,7 +5,7 @@
 \alias{load_pam}
 \title{PAM - Municipal Agricultural Production}
 \usage{
-load_pam(dataset = NULL, raw_data, geo_level, time_period, language = "eng")
+load_pam(dataset, raw_data = FALSE, geo_level, time_period, language = "eng")
 }
 \arguments{
 \item{dataset}{A dataset name ("all_crops", "permanent_crops", "temporary_crops" or many individual crop possibilities (see \code{vignette(load_pam)})). You can also use SIDRA codes (see \url{https://sidra.ibge.gov.br/pesquisa/pam/tabelas})}

@@ -7,11 +7,10 @@
 \usage{
 load_pibmunic(
   dataset = "pibmunic",
-  raw_data,
+  raw_data = FALSE,
   geo_level,
   time_period,
-  language = "eng",
-  legal_amazon_only = FALSE
+  language = "eng"
 )
 }
 \arguments{
@@ -24,8 +23,6 @@ load_pibmunic(
 \item{time_period}{A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.}
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".}
-
-\item{legal_amazon_only}{A \code{boolean} setting the return of Legal Amazon Data (\code{TRUE}) or Country's Data (\code{FALSE}).}
 }
 \value{
 A \code{tibble} with the selected data.
@@ -40,8 +37,7 @@ pibmunic <- load_pibmunic(
   dataset = "pibmunic",
   raw_data = TRUE,
   geo_level = "state",
-  time_period = 2012,
-  legal_amazon_only = FALSE
+  time_period = 2012
 )
 }
 }

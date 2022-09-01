@@ -5,7 +5,7 @@
 \alias{load_sigmine}
 \title{SIGMINE - Mining Geographic Information System}
 \usage{
-load_sigmine(dataset = "sigmine_active", raw_data, language = "eng")
+load_sigmine(dataset = "sigmine_active", raw_data = FALSE, language = "eng")
 }
 \arguments{
 \item{dataset}{A dataset name ("sigmine_active")}

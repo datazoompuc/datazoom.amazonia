@@ -5,7 +5,7 @@
 \alias{load_baci}
 \title{BACI - External Trade}
 \usage{
-load_baci(dataset = "HS92", raw_data, time_period, language = "pt")
+load_baci(dataset = "HS92", raw_data = FALSE, time_period, language = "pt")
 }
 \arguments{
 \item{dataset}{A dataset name ("HS92").}

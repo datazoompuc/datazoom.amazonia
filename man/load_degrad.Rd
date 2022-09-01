@@ -5,7 +5,12 @@
 \alias{load_degrad}
 \title{Degrad - Forest Degradation in the Brazilian Amazon}
 \usage{
-load_degrad(dataset = "degrad", raw_data, time_period, language = "eng")
+load_degrad(
+  dataset = "degrad",
+  raw_data = FALSE,
+  time_period,
+  language = "eng"
+)
 }
 \arguments{
 \item{dataset}{A dataset name ("degrad").}

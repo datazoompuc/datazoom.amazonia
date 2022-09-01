@@ -5,7 +5,7 @@
 \alias{load_pevs}
 \title{PEVS - Forestry Activities}
 \usage{
-load_pevs(dataset = NULL, raw_data, geo_level, time_period, language = "eng")
+load_pevs(dataset, raw_data = FALSE, geo_level, time_period, language = "eng")
 }
 \arguments{
 \item{dataset}{A dataset name ("pevs_forest_crops", "pevs_silviculture" or "pevs_silviculture_area"). You can also use SIDRA codes (see \url{https://sidra.ibge.gov.br/pesquisa/pevs/quadros/brasil/2019})}

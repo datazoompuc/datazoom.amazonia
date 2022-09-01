@@ -1140,6 +1140,21 @@ data <- load_sigmine(dataset = 'sigmine_active',
                      language = "pt")
 ```
 
+## Legal Amazon Municipalities
+
+Many of our functions use a dataset with Brazilian municipalities, their
+municipality codes, whether they belong to the Legal Amazon, their
+state, and some more variables. It was constructed from the [IBGE
+spreadsheet](https://www.ibge.gov.br/geociencias/cartas-e-mapas/mapas-regionais/15819-amazonia-legal.html?=&t=acesso-ao-produto)
+with Legal Amazon municipalities, along with a data frame from the
+‘geobr’ package. For more information on the columns, run
+`??datazoom.amazonia::municipalities`.
+
+``` r
+# load Brazilian municipalities dataset
+data <- datazoom.amazonia::municipalities
+```
+
 ## Credits
 
 DataZoom is developed by a team at Pontifícia Universidade Católica do
