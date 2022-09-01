@@ -104,7 +104,6 @@ load_cempre <- function(dataset = "cempre", raw_data = FALSE,
 
     dat <- year_cnaes %>%
       purrr::map(function(year_cnae) {
-        # suppressMessages(
         sidra_download(
           sidra_code = param$code,
           year = year_cnae[[1]],
@@ -112,7 +111,6 @@ load_cempre <- function(dataset = "cempre", raw_data = FALSE,
           classific = c("C12762"),
           category = list(year_cnae[[2]])
         )
-        # )
       }) %>%
       dplyr::bind_rows() %>%
       tibble::as_tibble()
@@ -123,7 +121,6 @@ load_cempre <- function(dataset = "cempre", raw_data = FALSE,
 
     dat <- as.list(as.character(param$time_period)) %>%
       purrr::map(function(year_num) {
-        # suppressMessages(
         sidra_download(
           sidra_code = param$code,
           year = year_num,
@@ -131,29 +128,20 @@ load_cempre <- function(dataset = "cempre", raw_data = FALSE,
           classific = c("C12762"),
           category = cnaes
         )
-        # )
       }) %>%
       dplyr::bind_rows() %>%
       tibble::as_tibble()
   }
-
-
-  ## Add legal amazon indicator
-  if (param$geo_level == "municipalities") {
-
-    legal_amazon <- datazoom.amazonia::municipalities %>%
-      dplyr::select(code_muni, legal_amazon)
-
-    dat <- dat %>%
-      dplyr::left_join(legal_amazon, by = c("municipio_codigo" = "code_muni"))
- }
-
 
   ## Return Raw Data
 
   if (param$raw_data) {
     return(dat)
   }
+
+  ######################
+  ## Data Engineering ##
+  ######################
 
 
   dat <- dat %>%
@@ -392,8 +380,6 @@ load_cempre <- function(dataset = "cempre", raw_data = FALSE,
       values_fill = NA
     ) %>%
     janitor::clean_names()
-
-
 
   labelled <- function(x, label) {
     Hmisc::label(x) <- label

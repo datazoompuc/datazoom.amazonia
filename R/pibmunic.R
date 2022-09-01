@@ -95,25 +95,11 @@ load_pibmunic <- function(dataset = "pibmunic", raw_data = FALSE,
     dplyr::bind_rows() %>%
     tibble::as_tibble()
 
-
-  ## Add legal amazon indicator
-  if (param$geo_level == "municipalities") {
-
-    legal_amazon <- datazoom.amazonia::municipalities %>%
-      dplyr::select(code_muni, legal_amazon)
-
-    dat <- dat %>%
-      dplyr::left_join(legal_amazon, by = c("municipio_codigo" = "code_muni"))
-  }
-
-
   ## Return Raw Data
 
   if (param$raw_data) {
     return(dat)
   }
-
-
 
   ######################
   ## Data Enginnering ##
@@ -163,7 +149,7 @@ load_pibmunic <- function(dataset = "pibmunic", raw_data = FALSE,
   dat <- dat %>%
     dplyr::arrange(variavel_codigo, variavel) %>%
     tidyr::pivot_wider(
-      id_cols = c(geo_id, ano),
+      id_cols = c(ano, geo_id),
       names_from = variavel:variavel_codigo,
       values_from = valor,
       names_sep = "_V",
@@ -171,7 +157,6 @@ load_pibmunic <- function(dataset = "pibmunic", raw_data = FALSE,
       values_fill = NA
     ) %>%
     janitor::clean_names()
-
 
   if (language == "eng") {
     dat <- dat %>%
@@ -220,11 +205,6 @@ load_pibmunic <- function(dataset = "pibmunic", raw_data = FALSE,
 
 
   if (language == "eng") {
-
-    # f = dat %>%
-    #   dplyr::mutate_at(vars(tidyr::matches(as.character(types[1]))),
-    #                    ~ labelled::set_variable_labels(. = as.character(dic[dic$var_code == types[1],'var_eng']))
-    #   )
 
     for (i in seq_along(types)) {
       dat <- label_data_eng(dat, cols = types[i], dic = dic)
