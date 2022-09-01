@@ -206,14 +206,6 @@ load_climate <- function(dataset, raw_data = FALSE,
       date = dplyr::recode(date, !!!time)
     )
 
-  ######################
-  ## Aggregating Data ##
-  ######################
-
-  # dat <- dat %>%
-  # dplyr::group_by(code_muni, name_muni, code_state, date) %>%
-  # dplyr::summarise(across(param$dataset_name, ~ mean(., na.rm = TRUE)))
-
   ################################
   ## Harmonizing Variable Names ##
   ################################

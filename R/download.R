@@ -542,9 +542,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ############
 
   if (source == "imazon_shp") {
-    if (geo_level == "municipality") {
-      path <- "https://docs.google.com/uc?export=download&id=1JHc2J_U8VXHVuWVsi8wVBnNzZ37y1ehv"
-    }
+    path <- "https://docs.google.com/uc?export=download&id=1JHc2J_U8VXHVuWVsi8wVBnNzZ37y1ehv"
   }
 
   #####################
