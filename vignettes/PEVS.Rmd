@@ -18,7 +18,7 @@ Loads information on the amount and value of the production of the exploitation 
 
 Data is from the Silviculture and Forestry Extraction Production (PEVS, in Portuguese), a nationwide annual survey conducted by IBGE (Brazilian Institute of Geography and Statistics). The data also has multiple aggregation levels, such as nationwide, by region, mesoregion and microregion, as well as state and municipality. 
 
-The data available has a yearly frequency and is available from 1986 to the present, with the exception of the data on total area for production, which are only available from 2013 onwards. More information can be found on this link (only in Portuguese): https://www.ibge.gov.br/estatisticas/economicas/agricultura-e-pecuaria/9105-producao-da-extracao-vegetal-e-da-silvicultura.html?=&t=o-que-e
+The data available has a yearly frequency and is available from 1986 to the present, with the exception of the data on total area for production, which are only available from 2013 onwards. More information can be found in [this link](https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/18374-forestry-activities.html?=&t=o-que-e).
 
 ```
 There are five parameters in this function:

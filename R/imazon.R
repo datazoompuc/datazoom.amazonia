@@ -1,21 +1,19 @@
-#' @title IMAZON
+#' @title IMAZON - Deforestation pressure by municipality
 #'
-#' @description Loads information on ...  See \url{http://www.ipsamazonia.org.br/}
+#' @description Loads data categorizing each municipality by the level of deforestation pressure it faces
 #'
 #' @param dataset There is one dataset available ("imazon_shp")
-#' @param raw_data A \code{boolean} setting the return of raw or processed data
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
+#' @inheritParams load_baci
 #'
-#' @return A \code{tibble} with the selected data.
-#'
-#' @encoding UTF-8
-#'
-#' @export
+#' @return A \code{tibble}.
 #'
 #' @examples \dontrun{
 #' # download raw data from 2014
 #' imazon <- load_imazon()
 #' }
+#'
+#' @export
+
 load_imazon <- function(dataset = "imazon_shp", raw_data = FALSE, language = "eng") {
 
   # Checking for googledrive package (in Suggests)

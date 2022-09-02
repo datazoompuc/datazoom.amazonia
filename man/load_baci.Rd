@@ -3,9 +3,9 @@
 \encoding{UTF-8}
 \name{load_baci}
 \alias{load_baci}
-\title{BACI - External Trade}
+\title{BACI - Global international trade}
 \usage{
-load_baci(dataset = "HS92", raw_data = FALSE, time_period, language = "pt")
+load_baci(dataset = "HS92", raw_data = FALSE, time_period, language = "eng")
 }
 \arguments{
 \item{dataset}{A dataset name ("HS92").}
@@ -14,13 +14,13 @@ load_baci(dataset = "HS92", raw_data = FALSE, time_period, language = "pt")
 
 \item{time_period}{A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.}
 
-\item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "pt".}
+\item{language}{A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.}
 }
 \value{
-A \code{tibble} consisting of imports or exports data.
+A \code{tibble}.
 }
 \description{
-provides disaggregated data on bilateral trade flows for more than 5000 products and 200 countries. See \url{http://www.cepii.fr/CEPII/en/bdd_modele/presentation.asp?id=37}.
+Loads disaggregated data on bilateral trade flows for more than 5000 products and 200 countries.
 }
 \examples{
 \dontrun{

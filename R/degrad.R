@@ -1,15 +1,12 @@
 #' @title Degrad - Forest Degradation in the Brazilian Amazon
 #'
-#' @description Loads information on forest degradation in the Brazilian Amazon, replaced by DETER-B in December 2016. Data is available from 2007 to 2016. See \url{http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad}.
+#' @description Loads information on forest degradation in the Brazilian Amazon, replaced by DETER-B in December 2016.
 #'
 #' @encoding UTF-8
 #'
 #' @param dataset A dataset name ("degrad").
-#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
-#' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
-#'
-#' @return A \code{list} (if \code{raw_data} = \code{TRUE}) or a tibble (if \code{raw_data} = \code{FALSE}) with the selected data.
+#' @inheritParams load_baci
+#' @return A \code{list} of tibbles (if \code{raw_data} = \code{TRUE}) or a tibble (if \code{raw_data} = \code{FALSE}).
 #'
 #'
 #' @examples
@@ -32,7 +29,6 @@
 #' )
 #' }
 #'
-#' @importFrom magrittr %>%
 #' @export
 
 load_degrad <- function(dataset = "degrad", raw_data = FALSE,

@@ -1,18 +1,14 @@
-#' @title Greenhouse gases emission estimates (SEEG)
+#' @title Greenhouse gas emission estimates (SEEG)
 #'
 #' @description Loads data of estimates of emission of greenhouse gases
 #'
 #' @param dataset A dataset name ("seeg", seeg_farming", "seeg_industry", "seeg_energy", "seeg_land", "seeg_residuals"). On which "seeg" contains all five sectors (only works with raw_data = TRUE) and the others are filtered specifically by a main source of emission. See \url{http://seeg.eco.br/notas-metodologicas/}
-#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
+#' @inheritParams load_baci
 #' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state" or "municipality".
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
 #'
-#' @return A \code{tibble} with the selected data.
-#'
-#' @encoding UTF-8
+#' @return A \code{tibble}.
 #'
 #' @export
-#' @importFrom magrittr %>%
 #'
 #' @examples \dontrun{
 #' # download state raw data

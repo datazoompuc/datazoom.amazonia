@@ -1,17 +1,13 @@
 #' @title SIGMINE - Mining Geographic Information System
 #'
-#' @description Loads information the mines being explored legally in Brazil, including their location, status, product being mined and area in square meters etc. Survey is done at municipal and state level
+#' @description Loads information the mines being explored legally in Brazil, including their location, status, product being mined and area in square meters.
 #'
 #' @param dataset A dataset name ("sigmine_active")
-#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
+#' @inheritParams load_baci
 #'
-#' @return A \code{tibble} with the selected data.
-#'
-#' @encoding UTF-8
+#' @return A \code{tibble}.
 #'
 #' @export
-#' @importFrom magrittr %>%
 #'
 #' @examples \dontrun{
 #' # download state raw data

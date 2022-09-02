@@ -1,18 +1,19 @@
-#' DATASUS
+#' @title DATASUS - Mortality, hospitalizations and hospital beds
+#'
+#' @description Loads DATASUS data on health establishments, mortality, access to health services and several health indicators.
 #'
 #' @param dataset A dataset name, can be one of ("datasus_sim_do", "datasus_sih", "datasus_cnes_lt"), or more. For more details, try \code{vignette("DATASUS")}.
-#' @param time_period A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.
+#' @inheritParams load_baci
 #' @param states A \code{string} specifying for which states to download the data. It is "all" by default, but can be a single state such as "AC" or any vector such as c("AC", "AM").
-#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
 #' @param keep_all A \code{boolean} choosing whether to aggregate the data by municipality, in turn losing individual-level variables (\code{FALSE}) or to keep all the original variables. Only applies when raw_data is \code{TRUE}.
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng", but some datasets have no translated variable labels.
 #'
 #' @examples\dontrun{
 #' mortality_rj <- load_datasus(dataset = "datasus_sim", time_period = 2010, states = "RJ")
 #' }
 #'
-#' @return A \code{tibble}
+#' @return A \code{tibble}.
 #' @export
+
 load_datasus <- function(dataset,
                          time_period,
                          states = "all",

@@ -1,24 +1,19 @@
 #' @title IPS - Amazon Social Progress Index
 #'
-#' @description Loads information on the social and environmental performance of the Legal Amazon. Survey is done at the municipal level and data is available in 2014, 2018 and 2021. See \url{http://www.ipsamazonia.org.br/}
+#' @description Loads information on the social and environmental performance of the Legal Amazon.
 #'
-#' @param dataset There are multiple datasets ("all", "life_quality", "sanit_habit", "violence", "educ", "communic", "mortality", "deforest")
-#' @param raw_data A \code{boolean} setting the return of raw or processed data
-#' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY.
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese and English are supported.
+#' @param dataset A dataset name ("all", "life_quality", "sanit_habit", "violence", "educ", "communic", "mortality", or "deforest")
+#' @inheritParams load_baci
 #'
-#' @return A \code{tibble} with the selected data.
-#'
-#' @encoding UTF-8
-#'
-#' @importFrom magrittr %>%
-#'
-#' @export
+#' @return A \code{tibble}.
 #'
 #' @examples \dontrun{
 #' # download raw data from 2014
 #' ips <- load_ips(dataset = "all", raw_data = TRUE, time_period = 2014)
 #' }
+#'
+#' @export
+
 load_ips <- function(dataset = "all", raw_data = FALSE,
                      time_period, language = "eng") {
 

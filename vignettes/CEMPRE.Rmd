@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-Employment, salary and firm data from IBGE's "Cadastro Central de Empresas" (CEMPRE). Loads information on companies and other organizations and their respective formally constituted local units, registered with the CNPJ - National Register of Legal Entities. Data is available between 2006 and 2019.
+Employment, salary and firm data from IBGE's [Cadastro Central de Empresas (CEMPRE)](https://sidra.ibge.gov.br/pesquisa/cempre/tabelas). Loads information on companies and other organizations and their respective formally constituted local units, registered with the CNPJ - National Register of Legal Entities. Data is available between 2006 and 2019.
 
 
 ```

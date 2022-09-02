@@ -3,17 +3,12 @@ utils::globalVariables("where") # the selection helper 'where' is not exported f
 
 #' @title DETER - Forest Degradation in the Brazilian Amazon
 #'
-#' @description Loads information on change in forest cover in the Amazon. See \url{http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter}
+#' @description Loads information on changes in forest cover in the Amazon.
 #'
 #' @param dataset A dataset name ("deter_amz", "deter_cerrado") with information about both Amazon and Cerrado
-#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
+#' @inheritParams load_baci
 #'
 #' @return A \code{tibble} (if \code{raw_data} = \code{TRUE}) or a \code{sf} object (if \code{raw_data} = \code{FALSE}).
-#'
-#' @encoding UTF-8
-#'
-#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -32,6 +27,8 @@ utils::globalVariables("where") # the selection helper 'where' is not exported f
 #' )
 #' }
 #'
+#' @export
+
 load_deter <- function(dataset, raw_data = FALSE,
                        language = "eng") {
 

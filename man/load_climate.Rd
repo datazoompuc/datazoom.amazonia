@@ -2,7 +2,7 @@
 % Please edit documentation in R/climate.R
 \name{load_climate}
 \alias{load_climate}
-\title{TerraClimate}
+\title{TerraClimate - Climate monitoring}
 \usage{
 load_climate(
   dataset,
@@ -17,17 +17,17 @@ load_climate(
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
-\item{time_period}{A \code{numeric} indicating for what years the data will the be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.}
+\item{time_period}{A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.}
 
-\item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".}
+\item{language}{A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.}
 
 \item{legal_amazon_only}{A \code{boolean} setting the return of Legal Amazon Data (\code{TRUE}) or Country's Data (\code{FALSE}). Defaults to \code{FALSE}}
 }
 \value{
-A \code{tibble}
+A \code{tibble}.
 }
 \description{
-TerraClimate
+Spatial data on climate variables, extracted from Climatology Lab's TerraClimate.
 }
 \examples{
 \dontrun{

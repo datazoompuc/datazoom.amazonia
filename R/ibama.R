@@ -1,14 +1,13 @@
 #' @title IBAMA - Brazilian Institute for the Environment and Renewable Natural Resources
 #'
-#' @description Loads information on environmental fines at the municipality or state levels considering the Amazon region
+#' @description Loads information on environmental fines in the Amazon region
 #'
-#' @param dataset A dataset name ("areas_embargadas", "distributed_fines", "collected_fines")
-#' @param raw_data A \code{boolean} setting the return of raw or processed data
+#' @param dataset A dataset name ("areas_embargadas", "distributed_fines", or "collected_fines")
+#' @inheritParams load_baci
 #' @param states A \code{string} specifying for which states to download the data. It is "all" by default, but can be a single state such as "AC" or any vector such as c("AC", "AM"). Does not apply to the "areas_embargadas" dataset.
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported.
 #'
-#'
-#' @return A \code{tibble} with the selected data.
+#' @return A \code{tibble}.
 #'
 #' @examples
 #' \dontrun{
@@ -19,9 +18,7 @@
 #' )
 #' }
 #'
-#' @importFrom magrittr %>%
 #' @export
-
 
 load_ibama <- function(dataset,
                        raw_data = FALSE,

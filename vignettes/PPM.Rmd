@@ -18,7 +18,7 @@ Data on livestock inventories (e.g:cattle, pigs and hogs) in Brazilian Municipal
 
 The periodicity of the survey is annual. The geographic coverage is national, with results released for Brazil, Major Regions, Federation Units, Mesoregions, Microregions and Municipalities.
 
-The data available has a yearly frequency and is available from 1974 to the present. More information can be found on this link (only in Portuguese): https://www.ibge.gov.br/estatisticas/economicas/agricultura-e-pecuaria/9107-producao-da-pecuaria-municipal.html
+The data available has a yearly frequency and is available from 1974 to the present. More information can be found in [this link](https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/17353-municipal-livestock-production.html?=&t=o-que-e).
 
 ```
 There are five parameters in this function:

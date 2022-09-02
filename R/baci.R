@@ -1,16 +1,13 @@
-#' @title BACI - External Trade
+#' @title BACI - Global international trade
 #'
-#' @description provides disaggregated data on bilateral trade flows for more than 5000 products and 200 countries. See \url{http://www.cepii.fr/CEPII/en/bdd_modele/presentation.asp?id=37}.
-#'
-#' @encoding UTF-8
+#' @description Loads disaggregated data on bilateral trade flows for more than 5000 products and 200 countries.
 #'
 #' @param dataset A dataset name ("HS92").
 #' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
 #' @param time_period A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "pt".
+#' @param language A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.
 #'
-#' @return A \code{tibble} consisting of imports or exports data.
-#'
+#' @return A \code{tibble}.
 #'
 #' @examples
 #' \dontrun{
@@ -21,15 +18,14 @@
 #' )
 #' }
 #'
+#' @encoding UTF-8
+#'
 #' @importFrom magrittr %>%
-#' @importFrom utils download.file read.table
 #'
 #' @export
 
-
-
 load_baci <- function(dataset = "HS92", raw_data = FALSE, time_period,
-                      language = "pt") {
+                      language = "eng") {
 
   ###########################
   ## Bind Global Variables ##

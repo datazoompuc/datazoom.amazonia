@@ -1,18 +1,12 @@
 #' @title PEVS - Forestry Activities
 #'
-#' @description Loads information on the amount and value of the production of the exploitation of native plant resources and planted forest massifs, as well as existing total and harvested areas of forest crops. Survey is done at the municipal level and data is available from 1986 to 2020. See \url{https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/18374-forestry-activities.html?=&t=o-que-e}
+#' @description Loads information on the amount and value of the production of the exploitation of native plant resources and planted forest massifs, as well as existing total and harvested areas of forest crops.
 #'
 #' @param dataset A dataset name ("pevs_forest_crops", "pevs_silviculture" or "pevs_silviculture_area"). You can also use SIDRA codes (see \url{https://sidra.ibge.gov.br/pesquisa/pevs/quadros/brasil/2019})
-#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
-#' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "region", "state", "mesoregion", "microregion" or "city". See documentation of \code{sidrar}.
-#' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
+#' @inheritParams load_baci
+#' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "region", "state", "mesoregion", "microregion" or "city".
 #'
 #' @return A \code{tibble} consisting of geographic units that present positive values for any of the variables in the dataset.
-#'
-#' @encoding UTF-8
-#'
-#' @export
 #'
 #' @examples \dontrun{
 #' # download state raw data from 2012 for silviculture
@@ -23,6 +17,9 @@
 #'   time_period = 2012
 #' )
 #' }
+#'
+#' @export
+
 load_pevs <- function(dataset, raw_data = FALSE,
                       geo_level, time_period,
                       language = "eng") {

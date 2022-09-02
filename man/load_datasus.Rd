@@ -2,7 +2,7 @@
 % Please edit documentation in R/datasus.R
 \name{load_datasus}
 \alias{load_datasus}
-\title{DATASUS}
+\title{DATASUS - Mortality, hospitalizations and hospital beds}
 \usage{
 load_datasus(
   dataset,
@@ -24,13 +24,13 @@ load_datasus(
 
 \item{keep_all}{A \code{boolean} choosing whether to aggregate the data by municipality, in turn losing individual-level variables (\code{FALSE}) or to keep all the original variables. Only applies when raw_data is \code{TRUE}.}
 
-\item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng", but some datasets have no translated variable labels.}
+\item{language}{A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.}
 }
 \value{
-A \code{tibble}
+A \code{tibble}.
 }
 \description{
-DATASUS
+Loads DATASUS data on health establishments, mortality, access to health services and several health indicators.
 }
 \examples{
 \dontrun{

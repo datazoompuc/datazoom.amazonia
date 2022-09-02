@@ -9,15 +9,15 @@ load_iema(dataset = "iema", raw_data = FALSE, language = "pt")
 \arguments{
 \item{dataset}{A dataset name ("iema")}
 
-\item{raw_data}{A \code{boolean} setting the return of processed data. Raw Data is not publicly available}
+\item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
-\item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported.}
+\item{language}{A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.}
 }
 \value{
-A \code{tibble} with the selected data.
+A \code{tibble}.
 }
 \description{
-Loads information on electric energy access at the municipality level considering the Amazon region
+Loads information on electric energy access at the municipality level in the Amazon region
 }
 \examples{
 \dontrun{

@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-Loads data categorizing each municipality by the level of deforestation pressure faced it faces. The categories used by Imazon have three levels, ranging from 0 to 3.
+Loads data categorizing each municipality by the level of deforestation pressure it faces. The categories used by Imazon have three levels, ranging from 0 to 3.
 
 There are four parameters in this function:
 

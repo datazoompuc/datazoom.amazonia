@@ -1,12 +1,11 @@
 #' @title IEMA - Institute of Environment and Water Resources
 #'
-#' @description Loads information on electric energy access at the municipality level considering the Amazon region
+#' @description Loads information on electric energy access at the municipality level in the Amazon region
 #'
 #' @param dataset A dataset name ("iema")
-#' @param raw_data A \code{boolean} setting the return of processed data. Raw Data is not publicly available
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported.
+#' @inheritParams load_baci
 #'
-#' @return A \code{tibble} with the selected data.
+#' @return A \code{tibble}.
 #'
 #' @examples
 #' \dontrun{
@@ -18,9 +17,7 @@
 #' )
 #' }
 #'
-#' @importFrom magrittr %>%
 #' @export
-
 
 load_iema <- function(dataset = "iema", raw_data = FALSE, language = "pt") {
 

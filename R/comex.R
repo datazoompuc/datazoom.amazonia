@@ -1,16 +1,11 @@
-#' @title Comex - External Trade
+#' @title Comex - Brazilian external trade
 #'
-#' @description Loads information on both imports and exports data. Data is available from 1997 to 2021 for most datasets. See \url{https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta/}.
-#'
-#' @encoding UTF-8
+#' @description Loads data on all products imported to or exported from Brazil.
 #'
 #' @param dataset A dataset name ("comex_export_mun", "comex_import_mun", "comex_export_prod" or "comex_import_prod").
-#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
-#' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
+#' @inheritParams load_baci
 #'
-#' @return A \code{tibble} consisting of imports or exports data.
-#'
+#' @return A \code{tibble}.
 #'
 #' @examples
 #' \dontrun{
@@ -32,8 +27,6 @@
 #'   raw_data = FALSE, time_period = 1997:2021
 #' )
 #' }
-#'
-#' @importFrom magrittr %>%
 #'
 #' @export
 
