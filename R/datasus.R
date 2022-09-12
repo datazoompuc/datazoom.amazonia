@@ -30,6 +30,15 @@ load_datasus <- function(dataset,
     )
   }
 
+  # Checking for RCurl package (in Suggests)
+
+  if (!requireNamespace("RCurl", quietly = TRUE)) {
+    stop(
+      "Package \"RCurl\" must be installed to use this function.",
+      call. = FALSE
+    )
+  }
+
   ##############################
   ## Binding Global Variables ##
   ##############################

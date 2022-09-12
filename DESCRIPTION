@@ -45,7 +45,8 @@ Suggests:
     knitr,
     rmarkdown,
     terra,
-    foreign
+    foreign,
+    RCurl
 VignetteBuilder: 
     knitr
 Encoding: UTF-8

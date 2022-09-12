@@ -25,6 +25,12 @@ load_imazon <- function(dataset = "imazon_shp", raw_data = FALSE, language = "en
     )
   }
 
+  ##############################
+  ## Binding Global Variables ##
+  ##############################
+
+  CD_GEOCMU <- NULL
+
   #############################
   ## Define Basic Parameters ##
   #############################

@@ -4,7 +4,7 @@
 \alias{load_iema}
 \title{IEMA - Institute of Environment and Water Resources}
 \usage{
-load_iema(dataset = "iema", raw_data = FALSE, language = "pt")
+load_iema(dataset = "iema", raw_data = FALSE, language = "eng")
 }
 \arguments{
 \item{dataset}{A dataset name ("iema")}
