@@ -19,7 +19,7 @@
 #'
 #' @export
 
-load_iema <- function(dataset = "iema", raw_data = FALSE, language = "pt") {
+load_iema <- function(dataset = "iema", raw_data = FALSE, language = "eng") {
 
   # Checking for googledrive package (in Suggests)
 
