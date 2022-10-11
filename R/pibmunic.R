@@ -12,11 +12,12 @@
 #'
 #' @examples \dontrun{
 #' # download treated municipal GDP data at the state level for 2010 to 2012
-#' data <- load_pibmunic(raw_data = FALSE,
-#'                       geo_level = "state",
-#'                       time_period = 2010:2010)
+#' data <- load_pibmunic(
+#'   raw_data = FALSE,
+#'   geo_level = "state",
+#'   time_period = 2010:2010
+#' )
 #' }
-
 load_pibmunic <- function(dataset = "pibmunic", raw_data = FALSE,
                           geo_level, time_period,
                           language = "eng") {
@@ -198,7 +199,6 @@ load_pibmunic <- function(dataset = "pibmunic", raw_data = FALSE,
 
 
   if (language == "eng") {
-
     for (i in seq_along(types)) {
       dat <- label_data_eng(dat, cols = types[i], dic = dic)
     }

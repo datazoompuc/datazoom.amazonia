@@ -10,24 +10,30 @@
 #' @examples
 #' \dontrun{
 #' # download raw data for the year 2010 in the state of AM.
-#' data <- load_datasus(dataset = "datasus_sim_do",
-#'                      time_period = 2010,
-#'                      states = "AM",
-#'                      raw_data = TRUE)
+#' data <- load_datasus(
+#'   dataset = "datasus_sim_do",
+#'   time_period = 2010,
+#'   states = "AM",
+#'   raw_data = TRUE
+#' )
 #'
 #' # download treated data with the number of deaths by cause in AM and PA.
-#' data <- load_datasus(dataset = "datasus_sim_do",
-#'                      time_period = 2010,
-#'                      states = c("AM", "PA"),
-#'                      raw_data = FALSE)
+#' data <- load_datasus(
+#'   dataset = "datasus_sim_do",
+#'   time_period = 2010,
+#'   states = c("AM", "PA"),
+#'   raw_data = FALSE
+#' )
 #'
 #' # download treated data with the number of deaths by cause in AM and PA
 #' # keeping all individual variables.
-#' data <- load_datasus(dataset = "datasus_sim_do",
-#'                      time_period = 2010,
-#'                      states = c("AM", "PA"),
-#'                      raw_data = FALSE,
-#'                      keep_all = TRUE)
+#' data <- load_datasus(
+#'   dataset = "datasus_sim_do",
+#'   time_period = 2010,
+#'   states = c("AM", "PA"),
+#'   raw_data = FALSE,
+#'   keep_all = TRUE
+#' )
 #' }
 #'
 #' @return A \code{tibble}.

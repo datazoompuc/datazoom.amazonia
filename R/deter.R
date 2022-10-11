@@ -13,8 +13,10 @@ utils::globalVariables("where") # the selection helper 'where' is not exported f
 #' @examples
 #' \dontrun{
 #' # Download treated data (raw_data = FALSE) from Amazonia (dataset = "deter_amz")
-#' deter_amz <- load_deter(dataset = 'deter_amz',
-#'                         raw_data = FALSE)
+#' deter_amz <- load_deter(
+#'   dataset = "deter_amz",
+#'   raw_data = FALSE
+#' )
 #' }
 #'
 #' @export
