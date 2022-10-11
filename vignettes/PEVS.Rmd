@@ -20,27 +20,27 @@ Data is from the Silviculture and Forestry Extraction Production (PEVS, in Portu
 
 The data available has a yearly frequency and is available from 1986 to the present, with the exception of the data on total area for production, which are only available from 2013 onwards. More information can be found in [this link](https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/18374-forestry-activities.html?=&t=o-que-e).
 
-```
-There are five parameters in this function:
+***
+**Options:**
+
+  1. **dataset**: there are three choices:
+      * `"pevs_forest_crops"`: provides data related to both quantity and value of the forestry activities. The data goes from 1986 to 2019 and it is divided by type of product.
+      * `"pevs_silviculture"`: provides data related to both quantity and value of the silviculture. The data goes from 1986 to 2019 and it is divided by type of product.
+      * `"pevs_silviculture_area"`: total existing area used for silviculture in 12/31.The data goes from 2013 to 2019 and it is divided by forestry species.  
+
+  2. **raw_data**: there are two options:
+      * `TRUE`: if you want the data as it is originally.
+      * `FALSE`: if you want the treated version of the data. 
+      
+  3. **geo_level**: `"country"`, `"region"`, `"state"`, or `"municipality"`  
   
-  1. dataset: there are three choices:
-  # 'pevs_forest_crops': provides data related to both quantity and value of the forestry activities. The data goes from 1986 to 2019 and it is divided by type of product.
-  # 'pevs_silviculture': provides data related to both quantity and value of the silviculture. The data goes from 1986 to 2019 and it is divided by type of product.
-  # 'pevs_silviculture_area': total existing area used for silviculture in 12/31.The data goes from 2013 to 2019 and it is divided by forestry species.  
+  4. **time_period**: picks the years for which the data will be downloaded
+
+  5. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
   
-  2. raw_data: there are two options:
-  # TRUE: if you want the data as it is in the IBGE's site.
-  # FALSE: if you want the treated (more organized) version of the data. 
-  
-  3. geo_level: there are four options:
-  # "country"
-  # "region"
-  # "state"
-  # "municipality"
-  
-  4. time_period: data goes from 1986 to 2019, except for the pevs_silviculture_area dataset where data is available from 2013 to 2019.
-  5. language: you can choose between portuguese and english
-```
+***
+
+**Examples:**
 
 ```{r eval=FALSE}
 # Download treated (raw_data = FALSE) silviculture data (dataset = 'pevs_silviculture') by state (geo_level = 'state') from 2012 (time_period =  2012) in portuguese (language = "pt")

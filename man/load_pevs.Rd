@@ -11,7 +11,7 @@ load_pevs(dataset, raw_data = FALSE, geo_level, time_period, language = "eng")
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
-\item{geo_level}{A \code{string} that defines the geographic level of the data. Can be one of "country", "region", "state", "mesoregion", "microregion" or "city".}
+\item{geo_level}{A \code{string} that defines the geographic level of the data. Can be one of "country", "region", "state", or "municipality".}
 
 \item{time_period}{A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.}
 

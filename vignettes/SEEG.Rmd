@@ -24,28 +24,28 @@ Emissions are divided in five main sources: Agricultural and Cattle Raising, Ene
 
 The data is downloaded from the SEEG website in the form of one single file, so the option to select a certain range of years is not available. Also, due to the size of the file, a stable internet connection is necessary, and the function may take time to run. 
 
-```
-There are four parameters in this function:
+***
+**Options:**
+
+  1. **dataset**: there are six choices:
+      * `"seeg"`: provides all sectors in a same dataframe. Only works with `raw_data = TRUE`
+      * `"seeg_farming"`
+      * `"seeg_industry"`
+      * `"seeg_energy"`
+      * `"seeg_land"`
+      * `"seeg_residuals"`
+
+  2. **raw_data**: there are two options:
+      * `TRUE`: if you want the data as it is originally.
+      * `FALSE`: if you want the treated version of the data. 
+      
+  3. **geo_level**: `"country"`, `"state"`, or `"municipality"`
+
+  4. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
   
-  1. dataset: There are six choices:
-  # "seeg": provides all sectors in a same dataframe. Only works with raw_data = TRUE.
-  # "seeg_farming"
-  # "seeg_industry"
-  # "seeg_energy"
-  # "seeg_land"
-  # "seeg_residuals"
-  
-  2. raw_data: there are two options:
-  # TRUE: if you want the raw data.
-  # FALSE: if you want the processed version of the data. 
-  
-  3. geo_level: there are three options:
-  # "country" 
-  # "state"  
-  # "municipality"
-  
-  4. language: you can choose between portuguese and english
-```
+***
+
+**Examples:**  
   
 ```{r eval=FALSE}
 # Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg") by state (geo_level = "state")

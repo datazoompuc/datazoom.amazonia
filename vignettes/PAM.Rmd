@@ -22,25 +22,22 @@ The data also has multiple aggregation levels, such as nationwide, by region, me
 
 The data available has a yearly frequency and is available from 1974 to the present, with the exception of the four multiple-harvest products, which are only available from 2003. More information can be found on [this link](https://www.ibge.gov.br/estatisticas/economicas/agricultura-e-pecuaria/9117-producao-agricola-municipal-culturas-temporarias-e-permanentes.html#:~:text=A%20pesquisa%20Produ%C3%A7%C3%A3o%20Agr%C3%ADcola%20Municipal,s%C3%A3o%20da%20cesta%20b%C3%A1sica%20do ) (only in Portuguese).
 
-```
-There are five parameters in this function:
+***
+**Options:**
+
+  1. **dataset**: See tables below
+
+  2. **raw_data**: there are two options:
+      * `TRUE`: if you want the data as it is originally.
+      * `FALSE`: if you want the treated version of the data. 
+      
+  3. **geo_level**: `"country"`, `"region"`, `"state"`, or `"municipality"`    
   
-  1. dataset: See tables below
-  2. raw_data: there are two options:
-  # TRUE: if you want the data as it is in the IBGE's site.
-  # FALSE: if you want the treated (more organized) version of the data. 
-  3. geo_level: there are four options:
-  # "country"
-  # "region"
-  # "state" 
-  # "municipality"
-  4. time_period:
-  # For pam_all_crops, pam_permanent_crops and pam_temporary_crops, data is available from 1974 to 2019.
-  # For pam_corn, pam_potato, pam_peanut and pam_beans, data is avaiable from 2003 to 2019.
-    
-  5. language: you can choose between portuguese and english
+  4. **time_period**: picks the years for which the data will be downloaded
+
+  5. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
   
-```
+***
 
 The datasets supported are shown in the tables below, made up of both the original databases and their narrower subsets. Note that downloading only specific crops is considerably faster. First, the datasets provided by IBGE in their entirety:
 
@@ -136,6 +133,8 @@ Datasets generated from Permanent Crops:
 | annatto_seeds |Urucum (Semente)|Annatto (Seed)| 
 | grape |Uva|Grape| 
 | permanent_total |Total|Total|
+
+**Examples:**
 
 ```{r eval=FALSE}
 # download treated data at the state level from 2010 to 2011 for all crops

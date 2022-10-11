@@ -17,20 +17,6 @@ knitr::opts_chunk$set(
 The MAPBIOMAS project gathers data reporting the type of land covering each year by area, that is, for example, the area used for a temporary crop of soybeans. It also reports the transition between coverings during given years.
 
 The data available has an yearly frequency and is available starting from the year 1989.
-
-```
-3. geo_level:  Does not apply to datasets not mentioned below
-                # For datasets "mapbiomas_cover" and "mapbiomas_transition", can be  "municipality" or "state"
-                # For dataset "mapbiomas_mining", can be "biome" or "indigenous_land"
-4. language: you can choose between portuguese ('pt') and english ('eng')
-5. cover_level: Aggregates the data to some level of land coverage. Only applies to datasets "mapbiomas_cover" and "mapbiomas_grazing_quality":
-                # cover_level = "none" means no aggregation
-                # cover_level = 0 has categories such as: Anthropic, Natural, Not Applied 
-                # cover_level = 1 has categories such as: Forest, Non Forest Natural Formation, Farming, Non Vegetated Area, Water, Non Observed
-                # cover_level = 2 has categories such as: Agriculture, Aquaculture, Beach and Dune, Forest Plantation,  Pasture, River, Lake and Ocean                                
-                # cover_level = 3 has categories such as: Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
-                # cover_level = 4 has categories such as: Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
-```
  
 ***
 **Options:**
@@ -54,13 +40,13 @@ The data available has an yearly frequency and is available starting from the ye
 
   4. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
   
-  5. cover_level: Aggregates the data to some level of land coverage. Only applies to datasets `"mapbiomas_cover"` and `"mapbiomas_grazing_quality"`:
+  5. **cover_level**: Aggregates the data to some level of land coverage. Only applies to datasets `"mapbiomas_cover"` and `"mapbiomas_grazing_quality"`:
       * `cover_level = "none"`: no aggregation
       * `cover_level = 0`: least aggregated, with categories of Anthropic and Natural
       * `cover_level = 1`: categories such as Forest, Non Forest Natural Formation, Farming, Non Vegetated Area, Water, Non Observed
       * `cover_level = 2`: categories such as Agriculture, Aquaculture, Beach and Dune, Forest Plantation,  Pasture, River, Lake and Ocean                            
-                # cover_level = 3 has categories such as: Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
-                # cover_level = 4 has categories such as: Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
+      * `cover_level = 3`: categories such as Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
+      * `cover_level = 4`: categories such as Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
   
 ***
 

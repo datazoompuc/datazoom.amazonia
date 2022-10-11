@@ -20,31 +20,29 @@ The periodicity of the survey is annual. The geographic coverage is national, wi
 
 The data available has a yearly frequency and is available from 1974 to the present. More information can be found in [this link](https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/17353-municipal-livestock-production.html?=&t=o-que-e).
 
-```
-There are five parameters in this function:
+***
+**Options:**
+
+  1. **dataset**: there are five possible choices:
+    * `"ppm_livestock_inventory"`
+    * `"ppm_sheep_farming"`
+    * `"ppm_animal_orig_production"`
+    * `"ppm_cow_farming"`
+    * `"ppm_aquaculture"`
+
+  2. **raw_data**: there are two options:
+      * `TRUE`: if you want the data as it is originally.
+      * `FALSE`: if you want the treated version of the data. 
+      
+  3. **geo_level**: `"country"`, `"region"`, `"state"`, or `"municipality"`    
   
-  1. dataset: There are five possible choices. 
-  # 'ppm_livestock_inventory'
-  # 'ppm_sheep_farming'
-  # 'ppm_animal_orig_production' 
-  # 'ppm_cow_farming'
-  # 'ppm_aquaculture' 
-  2. raw_data: there are two options:
-  # TRUE: if you want the data as it is in the IBGE's site.
-  # FALSE: if you want the treated (more organized) version of the data. 
-  3. geo_level: there are four options:
-  # "country"
-  # "region"
-  # "state"
-  # "municipality"
-    
-  4. time_period:
+  4. **time_period**: picks the years for which the data will be downloaded
+
+  5. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
   
-  # For ppm_livestock_inventory, ppm_sheep_farming, ppm_animal_orig_production and ppm_cow_farming: data is avaiable from 1974 to 2019.
-  # For ppm_aquaculture: data is avaiable from 2013 to 2019 
-  
-  5. language: you can choose between portuguese and english
-```  
+***
+
+**Examples:**
 
 ```{r eval=FALSE}
 # Download treated data (raw_data = FALSE) about aquaculture (dataset = "ppm_aquaculture") from 2013 to 2015 (time_period = 2013:2015) in english with the level of aggregation being the country (geo_level = "country"). 

@@ -16,27 +16,24 @@ knitr::opts_chunk$set(
 
 Loads IBGE information on gross domestic product at current prices, taxes, net of subsidies, on products at current prices and gross value added at current prices, total and by economic activity, and respective shares. Data is available at country, state and municipality level and from 2002 to 2018.
 
-```
-There are six parameters in this function:
+***
+**Options:**
+
+  1. **dataset**: `"pibmunic"`
+
+  2. **raw_data**: there are two options:
+      * `TRUE`: if you want the data as it is originally.
+      * `FALSE`: if you want the treated version of the data. 
+      
+  3. **geo_level**: `"country"`, `"state"`, or `"municipality"`    
   
-  1. dataset = "pibmunic"
+  4. **time_period**: picks the years for which the data will be downloaded
+
+  5. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
   
-  2. raw_data: there are two options:
-  # TRUE: if you want the raw data.
-  # FALSE: if you want the processed version of the data. 
-  
-  3. time_period: data is available from 2002 to 2018
-  
-  4. geo_level: there are three options
-  # "country"
-  # "state"
-  # "municipality"
-  
-  5. language: you can choose between portuguese and english
-  
-  6. legal_amazon_only: setting the return of Legal Amazon Data (legal_amazon_only = TRUE) or Country Data (legal_amazon_only = FALSE)
-  
-```
+***
+
+**Examples:**
 
 ```{r, eval = FALSE}
 # download treated municipal GDP data at the state level for 2010 to 2012

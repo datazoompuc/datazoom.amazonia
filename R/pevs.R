@@ -4,7 +4,7 @@
 #'
 #' @param dataset A dataset name ("pevs_forest_crops", "pevs_silviculture" or "pevs_silviculture_area"). You can also use SIDRA codes (see \url{https://sidra.ibge.gov.br/pesquisa/pevs/quadros/brasil/2019})
 #' @inheritParams load_baci
-#' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "region", "state", "mesoregion", "microregion" or "city".
+#' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "region", "state", or "municipality".
 #'
 #' @return A \code{tibble} consisting of geographic units that present positive values for any of the variables in the dataset.
 #'
