@@ -6,7 +6,7 @@
 #' @inheritParams load_baci
 #' @param geo_level A \code{string} that defines the geographic level of the data.
 #'   * For datasets "mapbiomas_cover" and "mapbiomas_transition", can be "municipality" or "state" (faster download).
-#'   * For datasets. For dataset "mapbiomas_mining", can be "biome" or "indigenous_land".
+#'   * For dataset "mapbiomas_mining", can be "biome" or "indigenous_land".
 #' @param cover_level A \code{numeric} or \code{string} that indicates the cover aggregation level. Can be "0", "1", "2", "3", "4", or "none", which means no aggregation. Aggregation only supported for "mapbiomas_cover" and "mapbiomas_grazing_quality" datasets.
 #'
 #' @return A \code{tibble}.

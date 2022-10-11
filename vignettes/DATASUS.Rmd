@@ -15,37 +15,39 @@ knitr::opts_chunk$set(
 ```
 
 DATASUS is the IT department of SUS -- the Brazilian Unified Health System. They provide data on health establishments, mortality, access to health services and several health indicators nationwide. This function allows for an easy download of several DATASUS raw datasets, and also cleans the data in a couple of datasets. The sections below explains each avaliable dataset.
+  
+***
+**Options:**
 
-```
-There are six parameters in this function:
-  
-  1. dataset:
-  # "datasus_sim_do" has SIM-DO mortality data
-  # Possible subsets of SIM-DO are "datasus_sim_dofet" (Fetal), "datasus_sim_doext" (External causes), "datasus_sim_doinf" (Children), "datasus_sim_domat (Maternal)"
-  # "datasus_sih" has SIH hospitalization data.
-  # "datasus_cnes_lt" has data on the number of hospital beds.
-  # further subsets of CNES are listed in the vignette, but those only allow for the download of raw data.
+  1. **dataset**:
+      * `"datasus_sim_do"` has SIM-DO mortality data
+      * Possible subsets of SIM-DO are `"datasus_sim_dofet"` (Fetal), `"datasus_sim_doext"` (External causes), `"datasus_sim_doinf"` (Children), `"datasus_sim_domat"` (Maternal)
+      * `"datasus_sih"` has SIH hospitalization data.
+      * `"datasus_cnes_lt"` has data on the number of hospital beds.
+      * further subsets of CNES are listed later, but those only allow for the download of raw data.
 
-  2. raw_data: there are two options:
-  # TRUE: if you want the data in its original form (returns a list of dataframes)
-  # FALSE: if you want the treated (more organized) version of the data. Only effective for SIM-DO and subsets, SIH, and CNES-LT. 
+  2. **raw_data**: there are two options:
+      * `TRUE`: if you want the data as it is originally.
+      * `FALSE`: if you want the treated version of the data. Only effective for SIM-DO and subsets, SIH, and CNES-LT. 
+      
+  3. **keep_all**: only applies when raw_data is FALSE. There are two options:
+      * `TRUE`: keeps all original variables, adding variable labels and possibly constructing extra variables.
+      * `FALSE`: aggregates data at the municipality, thereby losing individual-level data, and only keeping aggregate measures.
   
-  3. keep_all: only applies when raw_data is FALSE. There are two options:
-  # TRUE: keeps all original variables, adding variable labels and possibly constructing extra variables.
-  # FALSE: aggregates data at the municipality, thereby losing individual-level data, and only keeping aggregate measures.
+  4. **time_period**: picks the years for which the data will be downloaded
   
-  4. time_period
+  5. **states**: a vector of states by which to filter the data. Only works for datasets whose data is provided in separate files by state.
+
+  6. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
   
-  5. states: a vector of states by which to filter the data. Only works for datasets whose data is provided in separate files by state.
-  
-  6. language: you can choose between portuguese ('pt') and english ('eng')
-  
-  ```
+***
 
 ##### DATASUS - SIM (System of Mortality Information)
 Each original SIM data file contains rows corresponding to a declaration of death (DO), and columns with several characteristics of the person, the place of death, and the cause of death. The data comes from the main SIM-DO (Declarations of Death) dataset, which goes by the option `"datasus_sim_do"`. There are also 4 subsets of SIM-DO, namely SIM-DOFET (Fetal), SIM-DOMAT (Maternal), SIM-DOINF (Children), and SIM-DOEXT (External Causes), with corresponding dataset options `"datasus_sim_dofet", "datasus_sim_domat", "datasus_sim_doinf", "datasus_sim_doext"`. Note that only SIM-DO provides separate files for each state, so all other dataset options always contain data from the whole country.
 
 Below is an example of downloading the raw data, and also using the `raw_data = FALSE` option to obtain treated data. When this option is selected, we create several variables for deaths from each cause, which are encoded by their CID-10 codes. The function then returns, by default, the aggregated data of mortality sources at the municipality level. In this process, all the individual information such as age, sex, race, and schooling are lost, so we also offer the option of `keep_all = TRUE`, which creates all the indicator variables for cause of death, adds variable labels, and does not aggregate, thereby keeping all individual-level variables.
+
+**Examples:**
 
 ```{r, eval = FALSE}
 library(datazoom.amazonia)
@@ -75,6 +77,8 @@ Provides information on health establishments, avaliable hospital beds, and acti
 
 Raw data is avaliable for all of them using the dataset option `datasus_cnes_lt, datasus_cnes_st`, and so on, and treated data is only avaliable for CNES - LT. When `raw_data = FALSE` is chosen, we return data on the number of total hospital beds and the ones avaliable through SUS, which can be aggregated by municipality (with option `keep_all = FALSE`) or keeping all original variables (`keep_all = TRUE`).
 
+**Examples:**
+
 ```{r, eval = FALSE}
 library(datazoom.amazonia)
 
@@ -86,7 +90,9 @@ data <- load_datasus(dataset = "datasus_cnes_lt",
 ```
 
 ##### DATASUS - SIH (System of Hospital Information)
-Contains data on hospitalizations. Treated data only gains variable labels, with no extra manipulation. Note that this is a much heavier dataset.
+Contains data on hospitalizations. Treated data only gains variable labels, with no extra manipulation. Beware that this is a much heavier dataset.
+
+**Examples:**
 
 ```{r, eval = FALSE}
 library(datazoom.amazonia)

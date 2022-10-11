@@ -18,21 +18,23 @@ Loads disaggregated data on bilateral trade flows for more than 5000 products an
 
 As all of the data is packed into one single .zip file in the website, data on all years must be downloaded, even if not all of it is used. Therefore, downloading the data can take a long time.
 
-```
-There are four parameters in this function:
-  
-  1. dataset: There is one choice:
-  # "HS92" which follows the Harmonized System method
+***
+**Options:**
 
-  2. raw_data: there are two options:
-  # TRUE: if you want the data as it is in the CEPII site.
-  # FALSE: if you want the treated (more organized) version of the data. 
-  
-  3. time_period: The data availability for each dataset is detailed above
+  1. **dataset**: there is one choice:
+      * `"HS92"` which follows the Harmonized System method
 
-4. language: you can choose between portuguese ('pt') and english ('eng')
+  2. **raw_data**: there are two options:
+      * `TRUE`: if you want the data as it is originally.
+      * `FALSE`: if you want the treated version of the data. 
   
-  ```
+  3. **time_period**: picks the years for which the data will be downloaded
+
+  4. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
+  
+***
+
+**Examples:**
   
 ```{r eval=FALSE}
 # download treated data for 2016 (takes a long time to download)

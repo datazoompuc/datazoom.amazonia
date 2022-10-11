@@ -18,22 +18,25 @@ The dataset is originally from the Brazilian Institute of Environment and Renewa
 
 The function returns either the raw data or a data frame with aggregates considering, for each time-location period, counts for total the number of infractions, infractions that already went to trial, and number of unique perpetrators of infractions. There are also two data frames regarding distributed and collected fines across municipalities
 
-```
-There are four parameters in this function:
-1. dataset: There are three possible choices.
-'areas_embargadas': return the amount of embargoed areas
-'distributed_fines': return fines that have not been paid by individuals or corporations
-'collected_fines': return fines that have been paid vy individuals or corporations
+***
+**Options:**
 
-  2. raw_data: there are two options:
-  # TRUE: if you want the raw data.
-  # FALSE: if you want the processed version of the data.
+  1. **dataset**: there are three possible choices.
+      * `"areas_embargadas"`: embargoed areas
+      * `"distributed_fines"`: fines that have not been paid by individuals or corporations
+      * `"collected_fines"`: fines that have been paid by individuals or corporations
+
+  2. **raw_data**: there are two options:
+      * `TRUE`: if you want the data as it is originally.
+      * `FALSE`: if you want the treated version of the data. 
   
-  3. states: specifies for which states to download the data. It is "all" by default, but can be a single state such as "AC" or any vector such as c("AC", "AM"). Does not apply to the "areas_embargadas" dataset.
+  3. **states**: specifies for which states to download the data. It is "all" by default, but can be a single state such as `"AC"` or any vector such as `c("AC", "AM")`. Does not apply to the `"areas_embargadas"` dataset.
+
+  4. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
   
-  4. language: you can choose between portuguese and english
-  
-```
+***
+
+**Examples:**
 
 ```{r, eval = FALSE}
 library(datazoom.amazonia)

@@ -20,7 +20,7 @@ load_mapbiomas(
 \item{geo_level}{A \code{string} that defines the geographic level of the data.
 \itemize{
 \item For datasets "mapbiomas_cover" and "mapbiomas_transition", can be "municipality" or "state" (faster download).
-\item For datasets. For dataset "mapbiomas_mining", can be "biome" or "indigenous_land".
+\item For dataset "mapbiomas_mining", can be "biome" or "indigenous_land".
 }}
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.}

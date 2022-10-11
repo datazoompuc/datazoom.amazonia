@@ -20,19 +20,24 @@ Original documentation for this data is very scarce, users beware. Some things t
 
 Event data is organized through yearly editions (DEGRAD 2007-2016). Inside a given edition however, there may be data from different years (events that happened in 2015 inside DEGRAD 2016 for example). 
 
-This package provides degradation data with municipality identification. It does this by intersecting DEGRAD geometries with IBGE's municipality geometries from the year 2019. CRS metadata however is missing from the original data source. A best effort approach is used and a CRS is assumed (proj4string: "+proj=longlat +ellps=aust_SA +towgs84=-66.8700,4.3700,-38.5200,0.0,0.0,0.0,0.0 +no_defs").
+This package provides degradation data with municipality identification. It does this by intersecting DEGRAD geometries with IBGE's municipality geometries from the year 2019. CRS metadata however is missing from the original data source. A best effort approach is used and a CRS is assumed `(proj4string: "+proj=longlat +ellps=aust_SA +towgs84=-66.8700,4.3700,-38.5200,0.0,0.0,0.0,0.0 +no_defs")`.
 
-```
-There are four parameters in this function:
+***
+**Options:**
+
+  1. **dataset**: `"degrad"`
+
+  2. **raw_data**: there are two options:
+      * `TRUE`: if you want the data as it is originally.
+      * `FALSE`: if you want the treated version of the data. 
   
-  1. dataset = "degrad"
-  2. raw_data: there are two options:
-  # TRUE: if you want the raw data.
-  # FALSE: if you want the processed version of the data. 
+  3. **time_period**: picks the years for which the data will be downloaded
+
+  4. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
   
-  3. time_period: data is available from 2007 to 2016
-  4. language: you can choose between portuguese and english
-```
+***
+
+**Examples:**
 
 ```{r, eval = FALSE}
 # download treated data (raw_data = TRUE) related to forest degradation from 2010 to 2012 (time_period = 2010:2012). 

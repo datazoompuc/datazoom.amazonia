@@ -16,24 +16,26 @@ knitr::opts_chunk$set(
 
 Employment, salary and firm data from IBGE's [Cadastro Central de Empresas (CEMPRE)](https://sidra.ibge.gov.br/pesquisa/cempre/tabelas). Loads information on companies and other organizations and their respective formally constituted local units, registered with the CNPJ - National Register of Legal Entities. Data is available between 2006 and 2019.
 
+***
+**Options:**
 
-```
-There are seven parameters in this function:
+  1. **dataset**: `"cempre"`
+
+  2. **raw_data**: there are two options:
+      * `TRUE`: if you want the data as it is originally.
+      * `FALSE`: if you want the treated version of the data. 
+      
+  3. **geo_level**: `"country"`, `"state"` or `"municipality"`    
   
-  1. dataset = "cempre"
- 
-  2. raw_data: there are two options:
-  # TRUE: if you want the raw data.
-  # FALSE: if you want the processed version of the data.
-  3. geo_level: "country", "state" or "municipality"
+  4. **time_period**: picks the years for which the data will be downloaded
+
+  5. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
   
-  4. time_period: data is available from 2006 to 2019
-  5. language: you can choose between portuguese and english
- 
-  6. sectors: defines if the data will be return separated by sectors (sectors = TRUE) or not (sectors = FALSE)
-  7. legal_amazon_only: setting the return of Legal Amazon Data (legal_amazon_only = TRUE) or Country´s Data (legal_amazon_only = FALSE)
+  6. **sectors**: defines if the data will be return separated by sectors (`sectors = TRUE`) or not (`sectors = FALSE`)
   
-```
+***
+
+**Examples:**
 
 ```{r, eval = FALSE}
 # Download raw data (raw_data = TRUE) with the aggregation level being the country ( geo_level = "country") from 2008 to 2010 (time_period = 2008:2010).

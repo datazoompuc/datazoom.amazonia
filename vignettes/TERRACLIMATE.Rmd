@@ -2,7 +2,7 @@
 title: "TerraClimate"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{TERRACLIMATE}
+  %\VignetteIndexEntry{TerraClimate}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -35,21 +35,24 @@ Spatial data on several climate variables, extracted from Climatology Lab's [Ter
 
 Netcdf files are downloaded from the [THREDDS](http://thredds.northwestknowledge.net:8080/thredds/terraclimate_catalog.html) web server, as recommended for rectangular subsets of the global data.
 
-```
-There are five parameters in this function:
+***
+**Options:**
+
+  1. **dataset**: picks the variable to be read. Possible options are shown in the table above.
+
+  2. **raw_data**: there are two options:
+      * `TRUE`: if you want the data as it is originally.
+      * `FALSE`: if you want the treated version of the data. 
   
-  1. dataset: picks the variable to be read. Possible options are shown in the table below.
-  2. raw_data: there are two options:
-  # TRUE: if you want the data with fewer manipulations.
-  # FALSE: if you want the treated (more organized) version of the data. 
+  3. **time_period**: picks the years for which the data will be downloaded
+
+  4. **language**: you can choose between portuguese `("pt")` and english `("eng")`
   
-  3. time_period: avaliable from 1958 to 2020
+  5. **legal_amazon_only**: if set to `TRUE`, only downloads data from the Legal Amazon region
   
-  4. language: you can choose between portuguese ('pt') and english ('eng')
-  
-  5. legal_amazon_only: setting the return of Legal Amazon Data (legal_amazon_only = TRUE) or Country´s Data (legal_amazon_only = FALSE)
-  
-```  
+***
+
+**Examples:**
 
 ```{r, eval=FALSE}
 # Downloading maximum temperature data from 2000 to 2001
