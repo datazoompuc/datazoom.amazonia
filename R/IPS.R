@@ -104,8 +104,8 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
   if (raw_data == FALSE) {
     year_char <- c("_2012", "_2013", "_2014", "_2015", "_2016", "_2017", "_2018", "_2019", "_2020", "_2021")
 
-    for (j in 1:length(time_period)) {
-      for (i in 1:length(year_char)) {
+    for (j in seq_len(time_period)) {
+      for (i in seq_len(year_char)) {
         colnames(dat[[j]]) <- colnames(dat[[j]]) %>%
           stringr::str_remove_all(year_char[i])
       }
@@ -122,7 +122,7 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
   if (raw_data == FALSE & language == "eng") {
     dat_eng <- dat
 
-    for (i in 1:length(time_period)) {
+    for (i in seq_len(time_period)) {
       dat_eng[[i]] <- dat_eng[[i]] %>%
         dplyr::rename(
           c(
@@ -204,7 +204,7 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
   ###############
 
 
-  for (i in 1:length(time_period)) {
+  for (i in seq_len(time_period)) {
     if (dataset == "life_quality") {
       dat[[i]] <- dat[[i]] %>%
         dplyr::select(
@@ -322,7 +322,7 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
   if (raw_data == FALSE & language == "eng") {
     col_index <- match(colnames(dat[[i]]), colnames(dat_pt[[i]]))
 
-    for (i in 1:length(time_period)) {
+    for (i in seq_len(time_period)) {
       dat_eng[[i]] <- dat_eng[[i]][, col_index]
     }
 

@@ -242,7 +242,8 @@ assumed
 **Examples:**
 
 ``` r
-# download treated data (raw_data = TRUE) related to forest degradation from 2010 to 2012 (time_period = 2010:2012). 
+# download treated data (raw_data = TRUE) related to forest degradation
+# from 2010 to 2012 (time_period = 2010:2012). 
 data <- load_degrad(dataset = 'degrad', 
                     raw_data = FALSE,
                     time_period = 2010:2012)
@@ -536,12 +537,13 @@ necessary, and the function may take time to run.
 **Examples:**
 
 ``` r
-# Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg") by state (geo_level = "state")
+# Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg") 
+# by state (geo_level = "state")
 data <- load_seeg(dataset = "seeg", 
                   raw_data = TRUE,
                   geo_level = "state")
   
-# Download treated data (raw_data = FALSE) of industry greenhouse gases (dataset = "seeg_industry") by state (geo_level = "state")
+# Download treated data (raw_data = FALSE) of industry greenhouse gases (dataset = "seeg_industry")
 data <- load_seeg(dataset = "seeg_industry", 
                   raw_data = FALSE,
                   geo_level = "state")
@@ -726,7 +728,8 @@ data <- load_datasus(dataset = "datasus_sim_do",
                     states = c("AM", "PA"),
                     raw_data = FALSE)
 
-# download treated data with the number of deaths by cause in AM and PA, keeping all individual variables.
+# download treated data with the number of deaths by cause in AM and PA
+# keeping all individual variables.
 data <- load_datasus(dataset = "datasus_sim_do",
                     time_period = 2010,
                     states = c("AM", "PA"),
@@ -866,11 +869,13 @@ granularity of location.
 **Examples:**
 
 ``` r
-# download treated (raw_data = FALSE) exports data by municipality (dataset = "comex_export_mun") from 2020 to 2021 (time_period = 2020:2021)
+# download treated (raw_data = FALSE) exports data by municipality (dataset = "comex_export_mun")
+# from 2020 to 2021 (time_period = 2020:2021)
 data <- load_br_trade(dataset = "comex_export_mun", 
                       raw_data = FALSE, 
                       time_period = 2020:2021)
-# download treated(raw_data = FALSE) imports data by municipality (dataset = "comex_import_mun") from 2020 to 2021 (time_period = 2020:2021) 
+# download treated(raw_data = FALSE) imports data by municipality (dataset = "comex_import_mun")
+# from 2020 to 2021 (time_period = 2020:2021) 
 data <- load_br_trade(dataset = "comex_import_mun",
                       raw_data = FALSE, 
                       time_period = 2020:2021)
@@ -993,13 +998,15 @@ National Register of Legal Entities. Data is available between 2006 and
 **Examples:**
 
 ``` r
-# Download raw data (raw_data = TRUE) with the aggregation level being the country ( geo_level = "country") from 2008 to 2010 (time_period = 2008:2010).
+# Download raw data (raw_data = TRUE) at the country level
+# from 2008 to 2010 (time_period = 2008:2010).
 data <- load_cempre(
   raw_data = TRUE,
   geo_level = "country", 
   time_period = 2008:2010
 ) 
-# Download treted data (raw_data = FALSE) by state (geo_level = "state") from 2008 to 2010 (time_period = 2008:2010) in portuguese (language = "pt").
+# Download treted data (raw_data = FALSE) by state (geo_level = "state") 
+# from 2008 to 2010 (time_period = 2008:2010) in portuguese (language = "pt").
 # In this example, data is split by sector (sectors = TRUE)
 data <- load_cempre(raw_data = FALSE,
                     geo_level = "state", 
@@ -1224,14 +1231,17 @@ link](https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fi
 **Examples:**
 
 ``` r
-# Download treated (raw_data = FALSE) silviculture data (dataset = 'pevs_silviculture') by state (geo_level = 'state') from 2012 (time_period =  2012) in portuguese (language = "pt")
+# Download treated (raw_data = FALSE) silviculture data (dataset = 'pevs_silviculture') 
+# by state (geo_level = 'state') from 2012 (time_period =  2012) 
+# in portuguese (language = "pt")
 data <- load_pevs(dataset = 'pevs_silviculture', 
                   raw_data = FALSE,
                   geo_level = 'state', 
                   time_period = 2012, 
                   language = "pt")
 
-# Download raw (raw_data = TRUE) forest crops data by region from 2012 to 2013 in english
+# Download raw (raw_data = TRUE) forest crops data by region 
+# from 2012 to 2013 in english
 data <- load_pevs(dataset = 'pevs_forest_crops', 
                   raw_data = TRUE, 
                   geo_level = "region", 
@@ -1280,7 +1290,9 @@ link](https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fi
 **Examples:**
 
 ``` r
-# Download treated data (raw_data = FALSE) about aquaculture (dataset = "ppm_aquaculture") from 2013 to 2015 (time_period = 2013:2015) in english with the level of aggregation being the country (geo_level = "country"). 
+# Download treated data (raw_data = FALSE) about aquaculture (dataset = "ppm_aquaculture") 
+# from 2013 to 2015 (time_period = 2013:2015) in english
+# with the level of aggregation being the country (geo_level = "country"). 
 data <- load_ppm(dataset = "ppm_aquaculture", 
                  raw_data = FALSE, 
                  geo_level = "country", 
