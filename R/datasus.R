@@ -21,7 +21,8 @@
 #'                      states = c("AM", "PA"),
 #'                      raw_data = FALSE)
 #'
-#' # download treated data with the number of deaths by cause in AM and PA, keeping all individual variables.
+#' # download treated data with the number of deaths by cause in AM and PA
+#' # keeping all individual variables.
 #' data <- load_datasus(dataset = "datasus_sim_do",
 #'                      time_period = 2010,
 #'                      states = c("AM", "PA"),

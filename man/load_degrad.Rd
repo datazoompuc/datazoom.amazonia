@@ -29,7 +29,8 @@ Loads information on forest degradation in the Brazilian Amazon, replaced by DET
 }
 \examples{
 \dontrun{
-# download treated data (raw_data = TRUE) related to forest degradation from 2010 to 2012 (time_period = 2010:2012).
+# download treated data (raw_data = TRUE) related to forest degradation
+# from 2010 to 2012 (time_period = 2010:2012).
 data <- load_degrad(dataset = 'degrad',
                     raw_data = FALSE,
                     time_period = 2010:2012)
