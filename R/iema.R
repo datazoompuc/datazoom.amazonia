@@ -9,12 +9,8 @@
 #'
 #' @examples
 #' \dontrun{
-#' # download processed data
-#' iema_clean <- load_iema(
-#'   dataset = "iema",
-#'   raw_data = FALSE,
-#'   language = "eng"
-#' )
+#' # Download treated data
+#' data <- load_iema(raw_data = FALSE)
 #' }
 #'
 #' @export

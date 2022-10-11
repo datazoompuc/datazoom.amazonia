@@ -33,7 +33,6 @@ There are four parameters in this function:
 ```
 
 ```{r eval=FALSE}
-# Download data
-data <- load_imazon(dataset = "imazon_shp", raw_data = TRUE,
-                     geo_level = "municipality", language = "pt")
+# Download treated data
+data <- load_imazon(raw_data = FALSE)
 ```

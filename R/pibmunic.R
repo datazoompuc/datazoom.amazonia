@@ -11,13 +11,10 @@
 #' @export
 #'
 #' @examples \dontrun{
-#' # download state raw data from 2012 for all country
-#' pibmunic <- load_pibmunic(
-#'   dataset = "pibmunic",
-#'   raw_data = TRUE,
-#'   geo_level = "state",
-#'   time_period = 2012
-#' )
+#' # download treated municipal GDP data at the state level for 2010 to 2012
+#' data <- load_pibmunic(raw_data = FALSE,
+#'                       geo_level = "state",
+#'                       time_period = 2010:2010)
 #' }
 
 load_pibmunic <- function(dataset = "pibmunic", raw_data = FALSE,
@@ -41,6 +38,7 @@ load_pibmunic <- function(dataset = "pibmunic", raw_data = FALSE,
   param$geo_level <- geo_level
   param$time_period <- time_period
   param$language <- language
+  param$raw_data <- raw_data
 
   if (!is.numeric(param$dataset)) {
     param$code <- datasets_link() %>%

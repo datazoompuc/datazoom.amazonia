@@ -11,13 +11,19 @@
 #'
 #' @examples
 #' \dontrun{
-#' # download raw data from 2006 to 2019
-#' raw_cempre_all <- load_cempre(
-#'   dataset = "cempre",
-#'   raw_data = TRUE,
-#'   geo_level = "municipality",
-#'   time_period = 2006:2019
-#' )
+#' # Download raw data (raw_data = TRUE) with the aggregation level being the country ( geo_level = "country") from 2008 to 2010 (time_period = 2008:2010).
+#' data <- load_cempre(
+#'  raw_data = TRUE,
+#'  geo_level = "country",
+#'  time_period = 2008:2010)
+#'
+#' # Download treted data (raw_data = FALSE) by state (geo_level = "state") from 2008 to 2010 (time_period = 2008:2010) in portuguese (language = "pt").
+#' # In this example, data is split by sector (sectors = TRUE)
+#' data <- load_cempre(raw_data = FALSE,
+#'                    geo_level = "state",
+#'                    time_period = 2008:2010,
+#'                    language = "pt",
+#'                    sectors = TRUE)
 #' }
 #'
 #' @export

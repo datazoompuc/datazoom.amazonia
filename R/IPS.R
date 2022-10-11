@@ -8,8 +8,12 @@
 #' @return A \code{tibble}.
 #'
 #' @examples \dontrun{
-#' # download raw data from 2014
-#' ips <- load_ips(dataset = "all", raw_data = TRUE, time_period = 2014)
+#' # Download raw data from 2014
+#' data <- load_ips(dataset = "all", raw_data = TRUE, time_period = 2014)
+#'
+#' # Download treated deforest data from 2018 in portuguese
+#' data <- load_ips(dataset = "deforest", raw_data = FALSE,
+#'                  time_period = 2018, language = "pt")
 #' }
 #'
 #' @export
@@ -81,13 +85,6 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
   empregos_ensino_superior_percent_de_empregos_em_relacao_ao_total <- NULL
   mulheres_com_empregos_ensino_superior_percent_de_empregos_em_relacao_ao_total <- NULL
   nutricao_e_cuidados_medicos_basicos <- NULL
-
-  ### Dataset
-
-  if (raw_data == TRUE & language == "eng") {
-    stop("raw_data == TRUE only available in portuguese")
-  }
-
 
   ##############
   ## Download ##

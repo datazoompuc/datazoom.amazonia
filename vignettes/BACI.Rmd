@@ -16,6 +16,8 @@ knitr::opts_chunk$set(
 
 Loads disaggregated data on bilateral trade flows for more than 5000 products and 200 countries. The data is from the [CEPII](http://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37) and is built from data directly reported by each country to the United Nations Statistical Division (Comtrade).
 
+As all of the data is packed into one single .zip file in the website, data on all years must be downloaded, even if not all of it is used. Therefore, downloading the data can take a long time.
+
 ```
 There are four parameters in this function:
   
@@ -33,7 +35,9 @@ There are four parameters in this function:
   ```
   
 ```{r eval=FALSE}
-# download treated data
-clean_baci <- load_baci(dataset = "HS92", raw_data = FALSE, time_period = 2016,
-                        language = "pt")
+# download treated data for 2016 (takes a long time to download)
+clean_baci <- load_baci(
+  raw_data = FALSE,
+  time_period = 2016
+)
 ```

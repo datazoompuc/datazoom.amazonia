@@ -24,10 +24,10 @@ Loads disaggregated data on bilateral trade flows for more than 5000 products an
 }
 \examples{
 \dontrun{
-# download treated trade data from 2018
-exp_mun <- load_br_trade(
-  dataset = "HS92",
-  raw_data = FALSE, time_period = 2018
+# download treated data for 2016 (takes a long time to download)
+clean_baci <- load_baci(
+ raw_data = FALSE,
+ time_period = 2016
 )
 }
 

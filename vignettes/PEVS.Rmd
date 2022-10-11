@@ -49,10 +49,10 @@ data <- load_pevs(dataset = 'pevs_silviculture',
                   geo_level = 'state', 
                   time_period = 2012, 
                   language = "pt")
-# Download raw (raw_data = TRUE) forest crops data (dataset = 'pevs_forest_crops') by municipality (geo_level = 'municipality') from 2012 to 2013 (time_period = 2012:2013) in english (language = "eng")
+
+# Download raw (raw_data = TRUE) forest crops data by region from 2012 to 2013 in english
 data <- load_pevs(dataset = 'pevs_forest_crops', 
                   raw_data = TRUE, 
-                  geo_level = "municipality", 
-                  time_period = 2012:2013, 
-                  language = "eng")
+                  geo_level = "region", 
+                  time_period = 2012:2013)
 ```

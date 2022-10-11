@@ -21,8 +21,8 @@ Loads data categorizing each municipality by the level of deforestation pressure
 }
 \examples{
 \dontrun{
-# download raw data from 2014
-imazon <- load_imazon()
+# Download treated data
+data <- load_imazon(raw_data = FALSE)
 }
 
 }

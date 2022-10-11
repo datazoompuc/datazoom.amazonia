@@ -138,16 +138,10 @@ Datasets generated from Permanent Crops:
 | permanent_total |Total|Total|
 
 ```{r eval=FALSE}
-# Download treated (raw_data = FALSE) data related to the production from permanent and temporary farmed lands (dataset = 'pam_all_crops') by state (geo_level = "state") from 1980 to 1990 (time_period = 1980:1990) in english (language = "eng").
-data <- load_pam(dataset = 'all_crops', 
+# download treated data at the state level from 2010 to 2011 for all crops
+data <- load_pam(dataset = "all_crops", 
                  raw_data = FALSE, 
                  geo_level = "state", 
-                 time_period = 1980:1990, 
+                 time_period = 2010:2011,
                  language = "eng")
-# Download raw data (raw_data = TRUE) related to the corn production (dataset = 'pam_corn') by municipality (geo_level = "municipality") from 2010 to 2012 (time_period = 2010:2012) in portuguese (language = "pt").
-data <- load_pam(dataset = 'corn', 
-                 raw_data = TRUE, 
-                 geo_level = "municipality", 
-                 time_period = 2010:2012, 
-                 language = "pt")
 ```

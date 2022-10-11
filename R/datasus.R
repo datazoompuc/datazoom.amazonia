@@ -7,8 +7,26 @@
 #' @param states A \code{string} specifying for which states to download the data. It is "all" by default, but can be a single state such as "AC" or any vector such as c("AC", "AM").
 #' @param keep_all A \code{boolean} choosing whether to aggregate the data by municipality, in turn losing individual-level variables (\code{FALSE}) or to keep all the original variables. Only applies when raw_data is \code{TRUE}.
 #'
-#' @examples\dontrun{
-#' mortality_rj <- load_datasus(dataset = "datasus_sim", time_period = 2010, states = "RJ")
+#' @examples
+#' \dontrun{
+#' # download raw data for the year 2010 in the state of AM.
+#' data <- load_datasus(dataset = "datasus_sim_do",
+#'                      time_period = 2010,
+#'                      states = "AM",
+#'                      raw_data = TRUE)
+#'
+#' # download treated data with the number of deaths by cause in AM and PA.
+#' data <- load_datasus(dataset = "datasus_sim_do",
+#'                      time_period = 2010,
+#'                      states = c("AM", "PA"),
+#'                      raw_data = FALSE)
+#'
+#' # download treated data with the number of deaths by cause in AM and PA, keeping all individual variables.
+#' data <- load_datasus(dataset = "datasus_sim_do",
+#'                      time_period = 2010,
+#'                      states = c("AM", "PA"),
+#'                      raw_data = FALSE,
+#'                      keep_all = TRUE)
 #' }
 #'
 #' @return A \code{tibble}.

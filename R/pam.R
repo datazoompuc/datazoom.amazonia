@@ -9,13 +9,12 @@
 #' @return A \code{tibble} consisting of geographic units that present positive values for any of the variables in the dataset.
 #'
 #' @examples \dontrun{
-#' # download state raw data from 2012 for all crops
-#' pam_all_crops <- load_pam(
-#'   dataset = "all_crops",
-#'   raw_data = TRUE,
-#'   geo_level = "state",
-#'   time_period = 2012
-#' )
+#' # download treated data at the state level from 2010 to 2011 for all crops
+#' data <- load_pam(dataset = "all_crops",
+#'                  raw_data = FALSE,
+#'                  geo_level = "state",
+#'                  time_period = 2010:2011,
+#'                  language = "eng")
 #' }
 #'
 #' @export
@@ -49,6 +48,7 @@ load_pam <- function(dataset, raw_data = FALSE,
   param$geo_level <- geo_level
   param$time_period <- time_period
   param$language <- language
+  param$raw_data <- raw_data
 
   # Extracting sidra info in the form code/classific/category
 

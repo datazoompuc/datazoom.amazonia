@@ -21,12 +21,8 @@ Loads information on electric energy access at the municipality level in the Ama
 }
 \examples{
 \dontrun{
-# download processed data
-iema_clean <- load_iema(
-  dataset = "iema",
-  raw_data = FALSE,
-  language = "eng"
-)
+# Download treated data
+data <- load_iema(raw_data = FALSE)
 }
 
 }
