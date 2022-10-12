@@ -46,7 +46,7 @@ Netcdf files are downloaded from the [THREDDS](http://thredds.northwestknowledge
   
   3. **time_period**: picks the years for which the data will be downloaded
 
-  4. **language**: you can choose between portuguese `("pt")` and english `("eng")`
+  4. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
   
   5. **legal_amazon_only**: if set to `TRUE`, only downloads data from the Legal Amazon region
   

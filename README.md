@@ -455,7 +455,7 @@ web server, as recommended for rectangular subsets of the global data.
 3.  **time_period**: picks the years for which the data will be
     downloaded
 
-4.  **language**: you can choose between portuguese `("pt")` and english
+4.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`
 
 5.  **legal_amazon_only**: if set to `TRUE`, only downloads data from
@@ -737,8 +737,8 @@ data <- load_datasus(dataset = "datasus_sim_do",
 
 Provides information on health establishments, avaliable hospital beds,
 and active physicians. The data is split into 13 datasets: LT (Beds), ST
-(Establishments), DC (Complimentary data), EQ (Equipments), SR
-(Specialized services), HB (License), PF (Practicioner), EP (Teams), RC
+(Establishments), DC (Complimentary data), EQ (Equipment), SR
+(Specialized services), HB (License), PF (Practitioner), EP (Teams), RC
 (Contractual Rules), IN (Incentives), EE (Teaching establishments), EF
 (Philanthropic establishments), and GM (Management and goals).
 

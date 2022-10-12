@@ -74,7 +74,7 @@ data <- load_datasus(dataset = "datasus_sim_do",
 ```
 
 ##### DATASUS - CNES (National Register of Health Establishments)
-Provides information on health establishments, avaliable hospital beds, and active physicians. The data is split into 13 datasets: LT (Beds), ST (Establishments), DC (Complimentary data), EQ (Equipments), SR (Specialized services), HB (License), PF (Practicioner), EP (Teams), RC (Contractual Rules), IN (Incentives), EE (Teaching establishments), EF (Philanthropic establishments), and GM (Management and goals).
+Provides information on health establishments, avaliable hospital beds, and active physicians. The data is split into 13 datasets: LT (Beds), ST (Establishments), DC (Complimentary data), EQ (Equipment), SR (Specialized services), HB (License), PF (Practitioner), EP (Teams), RC (Contractual Rules), IN (Incentives), EE (Teaching establishments), EF (Philanthropic establishments), and GM (Management and goals).
 
 Raw data is avaliable for all of them using the dataset option `datasus_cnes_lt, datasus_cnes_st`, and so on, and treated data is only avaliable for CNES - LT. When `raw_data = FALSE` is chosen, we return data on the number of total hospital beds and the ones avaliable through SUS, which can be aggregated by municipality (with option `keep_all = FALSE`) or keeping all original variables (`keep_all = TRUE`).
 
