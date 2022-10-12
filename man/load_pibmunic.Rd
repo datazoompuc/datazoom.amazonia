@@ -32,8 +32,10 @@ Loads information on gross domestic product at current prices, taxes, net of sub
 \examples{
 \dontrun{
 # download treated municipal GDP data at the state level for 2010 to 2012
-data <- load_pibmunic(raw_data = FALSE,
-                      geo_level = "state",
-                      time_period = 2010:2010)
+data <- load_pibmunic(
+  raw_data = FALSE,
+  geo_level = "state",
+  time_period = 2010:2010
+)
 }
 }
