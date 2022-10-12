@@ -18,7 +18,7 @@ Loads estimates of emission of greenhouse gases of Brazilian cities and states f
 
 The data provided in SEEG's Collection 9 is a series covering the period from 1970 to 2020, except for the Land Use Change Sector that has the series from 1990 to 2020.
 
-Using data collected from government entities, institutes, research centers, NGOs and other institutions, the estimates are created using the methodology of the Brazilian Inventory of Anthropic Emissions and Removals of Greenhouse Gases, assembled by the Ministry of Science, Technology and Innovation (MCTI), and the directives of Intergovernmental Panel on Climate Change (IPCC). A further detailed explanation of the methodology used is available in the following link (only in Portuguese): http://seeg.eco.br/notas-metodologicas/
+Using data collected from government entities, institutes, research centers, NGOs and other institutions, the estimates are created using the methodology of the Brazilian Inventory of Anthropic Emissions and Removals of Greenhouse Gases, assembled by the Ministry of Science, Technology and Innovation (MCTI), and the directives of Intergovernmental Panel on Climate Change (IPCC)
 
 Emissions are divided in five main sources: Agricultural and Cattle Raising, Energy, Changes in Use of Land, Industrial Processes and Residues. All greenhouse gases contained in the national inventory are considered, encompassing CO2, CH4, N2O and the HFCs, with the conversion to carbon equivalence (CO2e) also included, both in the metric of GWP (Global Warming Potential) and GTP (Global Temperature Potential).
 

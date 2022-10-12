@@ -492,9 +492,7 @@ centers, NGOs and other institutions, the estimates are created using
 the methodology of the Brazilian Inventory of Anthropic Emissions and
 Removals of Greenhouse Gases, assembled by the Ministry of Science,
 Technology and Innovation (MCTI), and the directives of
-Intergovernmental Panel on Climate Change (IPCC). A further detailed
-explanation of the methodology used is available in the following link
-(only in Portuguese): <http://seeg.eco.br/notas-metodologicas/>
+Intergovernmental Panel on Climate Change (IPCC)
 
 Emissions are divided in five main sources: Agricultural and Cattle
 Raising, Energy, Changes in Use of Land, Industrial Processes and
@@ -599,10 +597,8 @@ Legal Amazon.
 Data from the Amazon Social Progress Index, an initiative from Imazon
 with support from the Social Progress Imperative that measures the
 social and environmental progress of its locations. Namely, the 772
-municipalities in the Amazon region. For more information, check the
-[initiative’s website](http://www.ipsamazonia.org.br/conheca-o-ips).
-Survey is done at the municipal level and data is available in 2014 and
-2018.
+municipalities in the Amazon region. Survey is done at the municipal
+level and data is available in 2014 and 2018.
 
 ------------------------------------------------------------------------
 

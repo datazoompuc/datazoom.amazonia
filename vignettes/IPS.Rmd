@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 Loads information on the social and environmental performance of the Legal Amazon. 
 
-Data from the Amazon Social Progress Index, an initiative from Imazon with support from the Social Progress Imperative that measures the social and environmental progress of its locations. Namely, the 772 municipalities in the Amazon region. For more information, check the [initiative's website](http://www.ipsamazonia.org.br/conheca-o-ips). Survey is done at the municipal level and data is available in 2014 and 2018.
+Data from the Amazon Social Progress Index, an initiative from Imazon with support from the Social Progress Imperative that measures the social and environmental progress of its locations. Namely, the 772 municipalities in the Amazon region. Survey is done at the municipal level and data is available in 2014 and 2018.
 
 ***
 **Options:**
