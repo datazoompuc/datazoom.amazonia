@@ -52,6 +52,10 @@ load_iema <- function(dataset = "iema", raw_data = FALSE,
     )
   }
 
+  message("Please follow the steps from `googledrive` package to download the data. This may take a while.")
+  message("IMPORTANT: In order to download the files, you must accept the requirements from the package.
+          Don´t worry! It won´t change or affect data that belongs to your personal account.")
+  
   ##############
   ## Download ##
   ##############
