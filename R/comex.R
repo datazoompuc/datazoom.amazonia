@@ -1,63 +1,34 @@
-#' @title Comex - External Trade
+#' @title Comex - Brazilian external trade
 #'
-#' @description Loads information on both imports and exports data. Data is available from 1997 to 2021 for most datasets. See \url{https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta/}.
-#'
-#' @encoding UTF-8
+#' @description Loads data on all products imported to or exported from Brazil.
 #'
 #' @param dataset A dataset name ("comex_export_mun", "comex_import_mun", "comex_export_prod" or "comex_import_prod").
-#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
-#' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
+#' @inheritParams load_baci
 #'
-#' @return A \code{tibble} consisting of imports or exports data.
-#'
+#' @return A \code{tibble}.
 #'
 #' @examples
 #' \dontrun{
-#' # download treated exports data by municipality from 1997 to 2021
-#' exp_mun <- load_br_trade(
+#' # download treated (raw_data = FALSE) exports data by municipality (dataset = "comex_export_mun")
+#' # from 2020 to 2021 (time_period = 2020:2021)
+#' data <- load_br_trade(
 #'   dataset = "comex_export_mun",
-#'   raw_data = FALSE, time_period = 1997:2021
+#'   raw_data = FALSE,
+#'   time_period = 2020:2021
 #' )
-#'
-#' # download raw imports data by municipality from 1997 to 2021
-#' raw_imp_mun <- load_br_trade(
+#' # download treated(raw_data = FALSE) imports data by municipality (dataset = "comex_import_mun")
+#' # from 2020 to 2021 (time_period = 2020:2021)
+#' data <- load_br_trade(
 #'   dataset = "comex_import_mun",
-#'   raw_data = TRUE, time_period = 1997:2021
-#' )
-#'
-#' # download treated imports data by ncm from 1997 to 2021
-#' imp_prod <- load_br_trade(
-#'   dataset = "comex_import_prod",
-#'   raw_data = FALSE, time_period = 1997:2021
+#'   raw_data = FALSE,
+#'   time_period = 2020:2021
 #' )
 #' }
 #'
-#' @importFrom magrittr %>%
-#'
 #' @export
 
-load_br_trade <- function(dataset = NULL, raw_data,
+load_br_trade <- function(dataset, raw_data = FALSE,
                           time_period, language = "eng") {
-
-  ## We want to download both imports and exports data
-
-  ## Type: By NCM, Município da empresa exportadora/importadora e Posição do Sistema Harmonizado (SH4),
-  ##
-
-  ## https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta
-
-  ## https://www.m2vconsultoria.com.br/noticias/a-importancia-da-correta-classificacao-fiscal-de-mercadorias-para-os-processos-aduaneiros/
-  ## http://siscomex.gov.br/balanca-comercial-traz-agora-classificacao-de-produtos-por-setor-de-atividade-economica/
-  # https://wits.worldbank.org/WITS/WITS/Restricted/Login.aspx
-  # http://www.cepii.fr/cepii/en/bdd_modele/bdd.asp
-  # https://www.usitc.gov/data/gravity/data_faq.htm
-  # http://siscomex.gov.br/balanca-comercial-traz-agora-classificacao-de-produtos-por-setor-de-atividade-economica/
-
-
-
-  ## To-Do:
-  ## Include Labels
 
   ###########################
   ## Bind Global Variables ##
@@ -88,25 +59,6 @@ load_br_trade <- function(dataset = NULL, raw_data,
   param$language <- language
   param$raw_data <- raw_data
 
-  param$survey_name <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(survey) %>%
-    unlist()
-
-  param$url <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(link) %>%
-    unlist()
-
-  ## Dataset
-
-  if (is.null(param$dataset)) {
-    stop("Missing Dataset!")
-  }
-  if (is.null(param$raw_data)) {
-    stop("Missing TRUE/FALSE for Raw Data")
-  }
-
   # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/EXP_2012_MUN.csv
   # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/IMP_2021_MUN.csv
   # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncmv2/IMP_2012_V2.csv
@@ -131,6 +83,12 @@ load_br_trade <- function(dataset = NULL, raw_data,
     dplyr::bind_rows() %>%
     tibble::as_tibble()
 
+  ## Return Raw Data
+
+  if (param$raw_data) {
+    return(dat)
+  }
+
   ######################
   ## Data Engineering ##
   ######################
@@ -145,14 +103,6 @@ load_br_trade <- function(dataset = NULL, raw_data,
 
   dat <- dat %>%
     dplyr::mutate_if(is.numeric, as.double)
-
-  ## Returning Raw Data
-
-  ## Just Add Translation
-
-  if (param$raw_data == TRUE) {
-    return(dat)
-  }
 
   ## ---------------------------------------------------------------------------##
 

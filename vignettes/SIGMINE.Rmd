@@ -15,17 +15,21 @@ knitr::opts_chunk$set(
 ```
 
 Loads information the mines being explored legally in Brazil, including their location, status, product being mined and area in square meters etc. Survey is done at municipal and state level. The National Mining Agency (ANM) is responsible for this survey.
+ 
+***
+**Options:**
 
-```
-There are three parameters in this function:
+  1. **dataset**: `"sigmine_active"`
+
+  2. **raw_data**: there are two options:
+      * `TRUE`: if you want the data as it is originally.
+      * `FALSE`: if you want the treated version of the data.
+
+  3. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
   
-  1. dataset = 'sigmine_active'
-  2. raw_data: there are two options:
-  # TRUE: if you want the raw data.
-  # FALSE: if you want the processed data. 
-  3. language: you can choose between portuguese and english
-  
-```
+***
+
+**Examples:** 
  
 ```{r eval=FALSE}
 # Download treated data (raw_data = FALSE) in portuguese (language = "pt").

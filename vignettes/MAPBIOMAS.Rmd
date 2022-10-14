@@ -17,48 +17,57 @@ knitr::opts_chunk$set(
 The MAPBIOMAS project gathers data reporting the type of land covering each year by area, that is, for example, the area used for a temporary crop of soybeans. It also reports the transition between coverings during given years.
 
 The data available has an yearly frequency and is available starting from the year 1989.
+ 
+***
+**Options:**
 
-```
-1. dataset: There are fice possible choices.
-'mapbiomas_cover': type of land covering by biomes, states and municipalities.
-                  data is available from 1985 to 2020.
-'mapbiomas_transition': transition between coverings by biomes, states and municipalities.
-                        data is available from 1985 to 2020.
-'mapbiomas_deforestation_regeneration': deforestation and regeneration by biomes and states. 
-                                        data is available from 1988 to 2020.
-'mapbiomas_irrigation': data about irrigation area by biomes and states.
-                        data is available from 2000 to 2020
-'mapbiomas_grazing_quality': data about grazing quality by biome, state and municipality
-                             data is available from 2010 and 2018
-'mapbiomas_mining': data about mining areas by biome, state, country, municipality and indigenous lands.
-                             data is available from 1985 to 2020
-2. raw_data: there are two options:
-  # TRUE: if you want the data as it is in the mapbiomas's site.
-  # FALSE: if you want the treated (more organized) version of the data. 
-3. geo_level:  Does not apply to datasets not mentioned below
-                # For datasets "mapbiomas_cover" and "mapbiomas_transition", can be  "municipality" or "state"
-                # For dataset "mapbiomas_mining", can be "biome" or "indigenous_land"
-4. language: you can choose between portuguese ('pt') and english ('eng')
-5. cover_level: Aggregates the data to some level of land coverage. Only applies to datasets "mapbiomas_cover" and "mapbiomas_grazing_quality":
-                # cover_level = "none" means no aggregation
-                # cover_level = 0 has categories such as: Anthropic, Natural, Not Applied 
-                # cover_level = 1 has categories such as: Forest, Non Forest Natural Formation, Farming, Non Vegetated Area, Water, Non Observed
-                # cover_level = 2 has categories such as: Agriculture, Aquaculture, Beach and Dune, Forest Plantation,  Pasture, River, Lake and Ocean                                
-                # cover_level = 3 has categories such as: Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
-                # cover_level = 4 has categories such as: Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
-```
+  1. **dataset**:
+      * `"mapbiomas_cover"`: types of land cover
+      * `"mapbiomas_transition"`: changes in land cover
+      * `"mapbiomas_deforestation_regeneration"`: deforestation and forest regeneration
+      * `"mapbiomas_irrigation"`: irrigated areas
+      * `"mapbiomas_grazing_quality"`: grazing quality
+      * `"mapbiomas_mining"`: areas used for mining
+
+  2. **raw_data**: there are two options:
+      * `TRUE`: if you want the data as it is originally.
+      * `FALSE`: if you want the treated version of the data. 
+      
+  3. **geo_level**:
+      * For datasets `"mapbiomas_cover"` and `"mapbiomas_transition"`, can be `"municipality"` or `"state"` (faster download).
+      * For dataset `"mapbiomas_mining"`, can be `"biome"` or `"indigenous_land"`.
+      * Does not apply to other datasets.
+
+  4. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
+  
+  5. **cover_level**: Aggregates the data to some level of land coverage. Only applies to datasets `"mapbiomas_cover"` and `"mapbiomas_grazing_quality"`:
+      * `cover_level = "none"`: no aggregation
+      * `cover_level = 0`: least aggregated, with categories of Anthropic and Natural
+      * `cover_level = 1`: categories such as Forest, Non Forest Natural Formation, Farming, Non Vegetated Area, Water, Non Observed
+      * `cover_level = 2`: categories such as Agriculture, Aquaculture, Beach and Dune, Forest Plantation,  Pasture, River, Lake and Ocean                            
+      * `cover_level = 3`: categories such as Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
+      * `cover_level = 4`: categories such as Aquaculture, Beach and Dune, Forest Formation, Forest Plantation 
+  
+***
+
+**Examples:** 
  
 ```{r eval=FALSE}
 # download treated Mapbiomas Cover data in english at the highest aggregation level
-data = load_mapbiomas(dataset = "mapbiomas_cover", raw_data = FALSE,
-                      language = "eng", cover_level = 0)
+data <- load_mapbiomas(dataset = "mapbiomas_cover",
+                       raw_data = FALSE,
+                       geo_level = "municipality",
+                       language = "eng",
+                       cover_level = 0)
 
 # download treated Mapbiomas Transition data in portuguese
-data = load_mapbiomas(dataset = "mapbiomas_transition", raw_data = FALSE,
-                      language = "pt")
+data <- load_mapbiomas(dataset = "mapbiomas_transition", raw_data = FALSE,
+                       geo_level = "state", language = "pt")
 
 # download treated data on mining on indigenous lands
-data = load_mapbiomas("mapbiomas_mining", raw_data = FALSE, geo_level = "indigenous")
+data <- load_mapbiomas("mapbiomas_mining",
+                       raw_data = FALSE,
+                       geo_level = "indigenous_land")
 ```
 
 

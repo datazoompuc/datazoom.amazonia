@@ -1,30 +1,33 @@
 #' @title IBAMA - Brazilian Institute for the Environment and Renewable Natural Resources
 #'
-#' @description Loads information on environmental fines at the municipality or state levels considering the Amazon region
+#' @description Loads information on environmental fines in the Amazon region
 #'
-#' @param dataset A dataset name ("areas_embargadas", "distributed_fines", "collected_fines")
-#' @param raw_data A \code{boolean} setting the return of raw or processed data
+#' @param dataset A dataset name ("areas_embargadas", "distributed_fines", or "collected_fines")
+#' @inheritParams load_baci
 #' @param states A \code{string} specifying for which states to download the data. It is "all" by default, but can be a single state such as "AC" or any vector such as c("AC", "AM"). Does not apply to the "areas_embargadas" dataset.
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported.
 #'
-#'
-#' @return A \code{tibble} with the selected data.
+#' @return A \code{tibble}.
 #'
 #' @examples
 #' \dontrun{
-#' # download raw data from all country
-#' raw_ibama_all <- load_ibama(
-#'   dataset = "areas_embargadas",
-#'   raw_data = TRUE
+#' # Download treated embargoes data (raw_data = FALSE) in english (language = "eng")
+#' data <- load_ibama(
+#'   dataset = "areas_embargadas", raw_data = FALSE,
+#'   language = "eng"
+#' )
+#'
+#' # Download treated collected fines data from "BA"
+#' data <- load_ibama(
+#'   dataset = "collected_fines", raw_data = FALSE,
+#'   states = "BA", language = "pt"
 #' )
 #' }
 #'
-#' @importFrom magrittr %>%
 #' @export
 
-
 load_ibama <- function(dataset,
-                       raw_data,
+                       raw_data = FALSE,
                        states = "all",
                        language = "eng") {
 
@@ -57,26 +60,6 @@ load_ibama <- function(dataset,
   if (dataset == "areas_embargadas") {
     param$states <- "all"
   }
-
-  param$survey_name <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(survey) %>%
-    unlist()
-
-  param$url <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(link) %>%
-    unlist()
-
-  ## Dataset
-
-  if (is.null(param$dataset)) {
-    stop("Missing Dataset!")
-  }
-  if (is.null(param$raw_data)) {
-    stop("Missing TRUE/FALSE for Raw Data")
-  }
-
 
   ##############
   ## Download ##

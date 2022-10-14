@@ -5,10 +5,6 @@
 #'
 #' @return A \code{tibble} of the chosen CIPÓ spreadsheet.
 #'
-#' @encoding UTF-8
-#'
-#' @export
-#'
 #' @examples \dontrun{
 #' # download the spreacdsheet on Brazilian actors involved in fighting environmental crimes
 #' brazilian_actors <- load_cipo(dataset = "brazilian_actors")
@@ -25,6 +21,10 @@
 #'   search = "ibama|funai"
 #' )
 #' }
+#'
+#' @export
+#'
+
 load_cipo <- function(dataset = "brazilian_actors",
                       search = "") {
 

@@ -14,26 +14,24 @@ knitr::opts_chunk$set(
 )
 ```
 
-Loads data categorizing each municipality by the level of deforestation pressure faced it faces. The categories used by Imazon have three levels, ranging from 0 to 3.
+Loads data categorizing each municipality by the level of deforestation pressure it faces. The categories used by Imazon have three levels, ranging from 0 to 3.
 
-There are four parameters in this function:
+***
+**Options:**
 
-```
-  1. dataset:
-  # "imazon_shp" includes the municipalities shapefiles and the deforestation category according to imazon
-  2. raw_data: there is one option:
-  # TRUE, as imazon already delivers organized data.
+  1. **dataset**: `"imazon_shp"`
+
+  2. **raw_data**: there are two options:
+      * `TRUE`: if you want the data as it is originally.
+      * `FALSE`: if you want the treated version of the data.
+
+  3. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
   
-  3. geo_level:
-  # "municipality". The data is only available at the municipality level.
-  
-  4. language: you can choose between portuguese ('pt') and english ('eng')
-  
-  
-```
+***
+
+**Examples:**
 
 ```{r eval=FALSE}
-# Download data
-data <- load_imazon(dataset = "imazon_shp", raw_data = TRUE,
-                     geo_level = "municipality", language = "pt")
+# Download treated data
+data <- load_imazon(raw_data = FALSE)
 ```

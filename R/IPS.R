@@ -1,32 +1,33 @@
 #' @title IPS - Amazon Social Progress Index
 #'
-#' @description Loads information on the social and environmental performance of the Legal Amazon. Survey is done at the municipal level and data is available in 2014, 2018 and 2021. See \url{http://www.ipsamazonia.org.br/}
+#' @description Loads information on the social and environmental performance of the Legal Amazon.
 #'
-#' @param dataset There are multiple datasets ("all", "life_quality", "sanit_habit", "violence", "educ", "communic", "mortality", "deforest")
-#' @param raw_data A \code{boolean} setting the return of raw or processed data
-#' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY.
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese and English are supported.
+#' @param dataset A dataset name ("all", "life_quality", "sanit_habit", "violence", "educ", "communic", "mortality", or "deforest")
+#' @inheritParams load_baci
 #'
-#' @return A \code{tibble} with the selected data.
-#'
-#' @encoding UTF-8
-#'
-#' @importFrom magrittr %>%
-#'
-#' @export
+#' @return A \code{tibble}.
 #'
 #' @examples \dontrun{
-#' # download raw data from 2014
-#' ips <- load_ips(dataset = "all", raw_data = TRUE, time_period = 2014)
+#' # Download raw data from 2014
+#' data <- load_ips(dataset = "all", raw_data = TRUE, time_period = 2014)
+#'
+#' # Download treated deforest data from 2018 in portuguese
+#' data <- load_ips(
+#'   dataset = "deforest", raw_data = FALSE,
+#'   time_period = 2018, language = "pt"
+#' )
 #' }
-load_ips <- function(dataset = "all", raw_data,
+#'
+#' @export
+
+load_ips <- function(dataset = "all", raw_data = FALSE,
                      time_period, language = "eng") {
 
   ###########################
   ## Bind Global Variables ##
   ###########################
-  survey <- link <- .data <- NULL
 
+  survey <- link <- .data <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -36,18 +37,7 @@ load_ips <- function(dataset = "all", raw_data,
   param$dataset <- dataset
   param$time_period <- time_period
   param$language <- language
-  # param$time_id = time_id
   param$raw_data <- raw_data
-
-  param$survey_name <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(survey) %>%
-    unlist()
-
-  param$url <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(link) %>%
-    unlist()
 
   codigo_ibge <- municipio <- estado <- ips_amazonia <- NULL
   necessidades_humanas_basicas <- fundamentos_para_o_bem_estar <- NULL
@@ -98,21 +88,6 @@ load_ips <- function(dataset = "all", raw_data,
   mulheres_com_empregos_ensino_superior_percent_de_empregos_em_relacao_ao_total <- NULL
   nutricao_e_cuidados_medicos_basicos <- NULL
 
-  ### Dataset
-
-  if (is.null(param$dataset)) {
-    stop("Missing Dataset!")
-  }
-  if (is.null(param$raw_data)) {
-    stop("Missing TRUE/FALSE for Raw Data")
-  }
-
-  ##
-  if (raw_data == TRUE & language == "eng") {
-    stop("raw_data == TRUE only available in portuguese")
-  }
-
-
   ##############
   ## Download ##
   ##############
@@ -124,8 +99,6 @@ load_ips <- function(dataset = "all", raw_data,
       }
     )
 
-
-
   ####################
   # language = 'pt' ##
   ####################
@@ -133,8 +106,8 @@ load_ips <- function(dataset = "all", raw_data,
   if (raw_data == FALSE) {
     year_char <- c("_2012", "_2013", "_2014", "_2015", "_2016", "_2017", "_2018", "_2019", "_2020", "_2021")
 
-    for (j in 1:length(time_period)) {
-      for (i in 1:length(year_char)) {
+    for (j in seq_len(time_period)) {
+      for (i in seq_len(year_char)) {
         colnames(dat[[j]]) <- colnames(dat[[j]]) %>%
           stringr::str_remove_all(year_char[i])
       }
@@ -151,7 +124,7 @@ load_ips <- function(dataset = "all", raw_data,
   if (raw_data == FALSE & language == "eng") {
     dat_eng <- dat
 
-    for (i in 1:length(time_period)) {
+    for (i in seq_len(time_period)) {
       dat_eng[[i]] <- dat_eng[[i]] %>%
         dplyr::rename(
           c(
@@ -233,7 +206,7 @@ load_ips <- function(dataset = "all", raw_data,
   ###############
 
 
-  for (i in 1:length(time_period)) {
+  for (i in seq_len(time_period)) {
     if (dataset == "life_quality") {
       dat[[i]] <- dat[[i]] %>%
         dplyr::select(
@@ -351,7 +324,7 @@ load_ips <- function(dataset = "all", raw_data,
   if (raw_data == FALSE & language == "eng") {
     col_index <- match(colnames(dat[[i]]), colnames(dat_pt[[i]]))
 
-    for (i in 1:length(time_period)) {
+    for (i in seq_len(time_period)) {
       dat_eng[[i]] <- dat_eng[[i]][, col_index]
     }
 

@@ -1,65 +1,48 @@
 #' @title PPM - Municipal Livestock Production
 #'
-#' @description Loads information on animal farming inventories and livestock products (IBGE). Survey is done at the municipal level and data is available from 1974 to 2020 for most datasets. See \url{https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/17353-municipal-livestock-production.html?=&t=o-que-e}
+#' @description Loads information on animal farming inventories and livestock products (IBGE).
 #'
 #' @param dataset A dataset name ("ppm_livestock_inventory", "ppm_sheep_farming", "ppm_animal_orig_production", "ppm_cow_farming" or "ppm_aquaculture". You can also use SIDRA codes (see \url{https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019})
-#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
-#' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state" or "municipality". See documentation of \code{sidrar}.
-#' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
+#' @inheritParams load_baci
+#' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state" or "municipality".
 #'
 #' @return A \code{tibble} consisting of geographic units that present positive values for any of the variables in the dataset.
-#'
-#' @encoding UTF-8
 #'
 #' @export
 #'
 #' @examples \dontrun{
-#' # download state raw data from 2012 for animal origin production
-#' ppm_aop <- load_ppm(
-#'   dataset = "ppm_animal_origin_production",
+#' # Download treated data (raw_data = FALSE) about aquaculture (dataset = "ppm_aquaculture")
+#' # from 2013 to 2015 (time_period = 2013:2015) in english
+#' # with the level of aggregation being the country (geo_level = "country").
+#' data <- load_ppm(
+#'   dataset = "ppm_aquaculture",
+#'   raw_data = FALSE,
+#'   geo_level = "country",
+#'   time_period = 2013:2015
+#' )
+#'
+#' # Download raw data about sheep farming by state from 1980 to 1995 in portuguese (language = "pt")
+#' data <- load_ppm(
+#'   dataset = "ppm_sheep_farming",
 #'   raw_data = TRUE,
 #'   geo_level = "state",
-#'   time_period = 2012
+#'   time_period = 1980:1995,
+#'   language = "pt"
 #' )
 #' }
-load_ppm <- function(dataset = NULL, raw_data,
+load_ppm <- function(dataset, raw_data = FALSE,
                      geo_level, time_period,
                      language = "eng") {
-
-  ## Translation is only made through collapsing at the end
-  # - What if we wanted to deliver raw data?
-
-  ## To-Dos:
-  ## Include Progress Bar
-  ## Include Labels
-  ## Support for Raw Downloads
-  ## Write Vignettes
 
   ##############################
   ## Binding Global Variables ##
   ##############################
 
-  sidra_code <- NULL
-  nivel_territorial_codigo <- NULL
-  nivel_territorial <- NULL
-  unidade_de_medida_codigo <- NULL
-  variavel_codigo <- NULL
-  ano_codigo <- NULL
-  valor <- NULL
-  geo_id <- NULL
-  ano <- NULL
-  tipo_de_rebanho <- NULL
-  variavel <- NULL
-  unidade_de_medida <- NULL
-  tipo_de_produto_de_origem_animal <- NULL
-  tipo_de_produto_da_aquicultura <- NULL
-  tipo_de_produto_de_origem_animal_codigo <- NULL
+  sidra_code <- nivel_territorial_codigo <- nivel_territorial <- unidade_de_medida_codigo <- NULL
+  variavel_codigo <- ano_codigo <- valor <- geo_id <- ano <- tipo_de_rebanho <- NULL
+  variavel <- unidade_de_medida <- tipo_de_produto_de_origem_animal <- NULL
+  tipo_de_produto_da_aquicultura <- tipo_de_produto_de_origem_animal_codigo <- NULL
   available_time <- tipo_de_rebanho_codigo <- tipo_de_produto_da_aquicultura_codigo <- vars <- NULL
-
-  # Adjust Code Based on State Level Information
-  # Check if any observation geo-time at the final data have multiple NA entries -- this would mean the data is "wrong"
-  # Double Check Translation
 
   #############################
   ## Define Basic Parameters ##
@@ -70,6 +53,7 @@ load_ppm <- function(dataset = NULL, raw_data,
   param$geo_level <- geo_level
   param$time_period <- time_period
   param$language <- language
+  param$raw_data <- raw_data
 
   if (!is.numeric(param$dataset)) {
     param$code <- datasets_link() %>%
@@ -102,10 +86,6 @@ load_ppm <- function(dataset = NULL, raw_data,
 
 
   ## Dataset
-
-  if (is.null(param$dataset)) {
-    stop("Missing Dataset!")
-  }
 
   if (param$code == 94) {
     param$data_name <- "Cow Farming (Vacas ordenhadas - Cabecas)"
@@ -141,7 +121,7 @@ load_ppm <- function(dataset = NULL, raw_data,
 
   ## Return Raw Data
 
-  if (raw_data == TRUE) {
+  if (param$raw_data) {
     return(dat)
   }
 

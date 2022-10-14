@@ -24,7 +24,7 @@
 #' After decompressing, it reads the temporary DBF file into a \code{data.frame} using \code{read.dbf} from the \code{foreign} package.
 #'
 #' @note
-#' DATASUS is the name of the Department of Informatics of the Brazilian Health System and is resposible for publishing public healthcare data. Besides the DATASUS, the Brazilian National Agency for Supplementary Health (ANS) also uses this file format for its public data.
+#' DATASUS is the name of the Department of Informatics of the Brazilian Health System and is responsible for publishing public healthcare data. Besides the DATASUS, the Brazilian National Agency for Supplementary Health (ANS) also uses this file format for its public data.
 #'
 #' This function was tested using files from both DATASUS and ANS to ensure compliance with the format, and hence ensure its usability by researchers.
 #'

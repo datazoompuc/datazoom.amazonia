@@ -1,17 +1,25 @@
-#' TerraClimate
+#' @title TerraClimate - Climate monitoring
+#'
+#' @description Spatial data on climate variables, extracted from Climatology Lab's TerraClimate.
 #'
 #' @param dataset A dataset name, choosing which variable will be loaded. One of ("max_temperature", "min_temperature", "wind_speed", "vapor_pressure_deficit", "vapor_pressure", "snow_water_equivalent", "shortwave_radiation_flux", "soil_moisture", "runoff", "precipitation", "potential_evaporation", "climatic_water_deficit", "water_evaporation", "palmer_drought_severity_index"). For extra details, try \code{vignette("TERRACLIMATE")}.
-#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
-#' @param time_period A \code{numeric} indicating for what years the data will the be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
+#' @inheritParams load_baci
 #' @param legal_amazon_only A \code{boolean} setting the return of Legal Amazon Data (\code{TRUE}) or Country's Data (\code{FALSE}). Defaults to \code{FALSE}
 #'
 #' @examples
 #' \dontrun{
-#' max_temp <- load_climate(dataset = "max_temperature", time_period = 2000:2020)
+#' # Downloading maximum temperature data from 2000 to 2001
+#' max_temp <- load_climate(dataset = "max_temperature", time_period = 2000:2001)
+#'
+#' # Downloading precipitation data only for the legal Amazon in 2010
+#' amz_precipitation <- load_climate(
+#'   dataset = "precipitation",
+#'   time_period = 2010,
+#'   legal_amazon_only = TRUE
+#' )
 #' }
 #'
-#' @return A \code{tibble}
+#' @return A \code{tibble}.
 #' @export
 
 load_climate <- function(dataset, raw_data = FALSE,
@@ -182,7 +190,7 @@ load_climate <- function(dataset, raw_data = FALSE,
 
   ## Return Raw Data
 
-  if (param$raw_data == TRUE) {
+  if (param$raw_data) {
     return(dat)
   }
 
@@ -205,14 +213,6 @@ load_climate <- function(dataset, raw_data = FALSE,
     dplyr::mutate(
       date = dplyr::recode(date, !!!time)
     )
-
-  ######################
-  ## Aggregating Data ##
-  ######################
-
-  # dat <- dat %>%
-  # dplyr::group_by(code_muni, name_muni, code_state, date) %>%
-  # dplyr::summarise(across(param$dataset_name, ~ mean(., na.rm = TRUE)))
 
   ################################
   ## Harmonizing Variable Names ##

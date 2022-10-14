@@ -1,29 +1,26 @@
 #' @title PRODES - Deforestation Monitoring Project in the Legal Amazon by Satellite
 #'
-#' @description Loads information on clearcut deforestation in the Legal Amazon and annual deforestation rates in the region. Survey is done at state or municipality level and data is available from 2000 to 2020.
-#'
-#' @encoding UTF-8
+#' @description Loads information on clearcut deforestation in the Legal Amazon and annual deforestation rates in the region.
 #'
 #' @param dataset A dataset name ("prodes").
-#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
-#' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
+#' @inheritParams load_baci
 #'
 #' @return A \code{tibble} with the selected data.
 #'
 #' @examples
 #' \dontrun{
-#' # download raw data from 2000 to 2020
-#' raw_prodes_all <- load_prodes(
-#'   dataset = "prodes",
-#'   raw_data = TRUE,
-#'   time_period = 2000:2020
+#' # Download treated data (raw_data = FALSE) from 2010 (time_period = 2010)
+#' # in portuguese (language = 'pt').
+#' data <- load_prodes(
+#'   raw_data = FALSE,
+#'   time_period = 2010,
+#'   language = "pt"
 #' )
 #' }
 #'
 #' @export
 
-load_prodes <- function(dataset = "prodes", raw_data,
+load_prodes <- function(dataset = "prodes", raw_data = FALSE,
                         time_period,
                         language = "eng") {
 

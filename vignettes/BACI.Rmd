@@ -14,26 +14,32 @@ knitr::opts_chunk$set(
 )
 ```
 
-Loads disaggregated data on bilateral trade flows for more than 5000 products and 200 countries. The data is from the CEPII Research and Expertise on the World Economy and is built from data directly reported by each country to the United Nations Statistical Division (Comtrade).
+Loads disaggregated data on bilateral trade flows for more than 5000 products and 200 countries. The data is from the [CEPII](http://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37) and is built from data directly reported by each country to the United Nations Statistical Division (Comtrade).
 
-```
-There are four parameters in this function:
-  
-  1. dataset: There is one choice:
-  # "HS92" which follows the Harmonized System method
+As all of the data is packed into one single .zip file in the website, data on all years must be downloaded, even if not all of it is used. Therefore, downloading the data can take a long time.
 
-  2. raw_data: there are two options:
-  # TRUE: if you want the data as it is in the CEPII site.
-  # FALSE: if you want the treated (more organized) version of the data. 
-  
-  3. time_period: The data availability for each dataset is detailed above
+***
+**Options:**
 
-4. language: you can choose between portuguese ('pt') and english ('eng')
+  1. **dataset**: there is one choice:
+      * `"HS92"` which follows the Harmonized System method
+
+  2. **raw_data**: there are two options:
+      * `TRUE`: if you want the data as it is originally.
+      * `FALSE`: if you want the treated version of the data. 
   
-  ```
+  3. **time_period**: picks the years for which the data will be downloaded
+
+  4. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
+  
+***
+
+**Examples:**
   
 ```{r eval=FALSE}
-# download treated data
-clean_baci <- load_baci(dataset = "HS92", raw_data = FALSE, time_period = 2016,
-                        language = "pt")
+# download treated data for 2016 (takes a long time to download)
+clean_baci <- load_baci(
+  raw_data = FALSE,
+  time_period = 2016
+)
 ```

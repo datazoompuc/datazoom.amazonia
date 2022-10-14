@@ -42,6 +42,11 @@ look <- geobr::lookup_muni("all") %>%
 municipalities <- municipalities %>%
   full_join(look, by = "code_muni")
 
+# To avoid notes, convert all municipality names to ASCII
+
+municipalities <- municipalities %>%
+  mutate(across(where(is.character), stringi::stri_enc_toascii))
+
 ## Adding to sysdata
 
 usethis::use_data(

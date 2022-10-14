@@ -1,38 +1,50 @@
 #' @title CEMPRE - Central Register of Companies
 #'
-#' @description Loads information on companies and other organizations and their respective formally constituted local units, registered with the CNPJ - National Register of Legal Entities. Data is available from 2006 to 2019. See \url{https://sidra.ibge.gov.br/pesquisa/cempre/tabelas}
-#'
-#' @encoding UTF-8
+#' @description Loads information on companies and other organizations and their respective formally constituted local units, registered with the CNPJ - National Register of Legal Entities.
 #'
 #' @param dataset A dataset name ("cempre").
-#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
-#' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state" or "municipality". See documentation of \code{sidrar}.
-#' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
-#' @param sectors A \code{boolean} that defines if the data will be return separated by sectors (\code{TRUE}) or not (\code{FALSE}). Defaults to \code{FALSE}
-#' @param legal_amazon_only A \code{boolean} setting the return of Legal Amazon Data (\code{TRUE}) or Country's Data (\code{FALSE}). Defaults to \code{FALSE}
+#' @inheritParams load_baci
+#' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state" or "municipality".
+#' @param sectors A \code{boolean} that defines if the data will be return separated by sectors (\code{TRUE}) or not (\code{FALSE}).
 #'
-#' @return A \code{tibble} with the selected data.
+#' @return A \code{tibble}.
 #'
 #' @examples
 #' \dontrun{
-#' # download raw data from 2006 to 2019
-#' raw_cempre_all <- load_cempre(
-#'   dataset = "cempre",
+#' # Download raw data (raw_data = TRUE) at the country level
+#' # from 2008 to 2010 (time_period = 2008:2010).
+#' data <- load_cempre(
 #'   raw_data = TRUE,
-#'   geo_level = "municipality",
-#'   time_period = 2006:2019
+#'   geo_level = "country",
+#'   time_period = 2008:2010
+#' )
+#'
+#' # Download treted data (raw_data = FALSE) by state (geo_level = "state")
+#' # from 2008 to 2010 (time_period = 2008:2010) in portuguese (language = "pt").
+#' # In this example, data is split by sector (sectors = TRUE)
+#' data <- load_cempre(
+#'   raw_data = FALSE,
+#'   geo_level = "state",
+#'   time_period = 2008:2010,
+#'   language = "pt",
+#'   sectors = TRUE
 #' )
 #' }
 #'
-#' @importFrom magrittr %>%
 #' @export
 
-load_cempre <- function(dataset = "cempre", raw_data,
+load_cempre <- function(dataset = "cempre", raw_data = FALSE,
                         geo_level, time_period,
-                        language = "eng", sectors = FALSE,
-                        legal_amazon_only = FALSE) {
-  sidra_code <- available_time <- legal_amazon <- municipio_codigo <- ano <- ano_codigo <- classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo <- geo_id <- id_code <- nivel_territorial <- nivel_territorial_codigo <- valor <- variavel <- unidade_de_medida <- unidade_de_medida_codigo <- NULL
+                        language = "eng", sectors = FALSE) {
+
+  ###########################
+  ## Bind Global Variables ##
+  ###########################
+
+  sidra_code <- available_time <- legal_amazon <- municipio_codigo <- ano <- NULL
+  ano_codigo <- classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo <- NULL
+  geo_id <- id_code <- nivel_territorial <- nivel_territorial_codigo <- valor <- NULL
+  variavel <- unidade_de_medida <- unidade_de_medida_codigo <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -73,19 +85,6 @@ load_cempre <- function(dataset = "cempre", raw_data,
     stop("Provided time period greater than supported. Check documentation for time availability.")
   }
 
-  ## Dataset
-
-  if (is.null(param$dataset)) {
-    stop("Missing Dataset!")
-  }
-  if (is.null(param$raw_data)) {
-    stop("Missing TRUE/FALSE for Raw Data")
-  }
-  if (legal_amazon_only & geo_level != "municipality") {
-    stop('legal_amazon_only = TRUE is only available for geo_level = "municipality".')
-  }
-
-
   ##############
   ## Download ##
   ##############
@@ -111,7 +110,6 @@ load_cempre <- function(dataset = "cempre", raw_data,
 
     dat <- year_cnaes %>%
       purrr::map(function(year_cnae) {
-        # suppressMessages(
         sidra_download(
           sidra_code = param$code,
           year = year_cnae[[1]],
@@ -119,7 +117,6 @@ load_cempre <- function(dataset = "cempre", raw_data,
           classific = c("C12762"),
           category = list(year_cnae[[2]])
         )
-        # )
       }) %>%
       dplyr::bind_rows() %>%
       tibble::as_tibble()
@@ -130,7 +127,6 @@ load_cempre <- function(dataset = "cempre", raw_data,
 
     dat <- as.list(as.character(param$time_period)) %>%
       purrr::map(function(year_num) {
-        # suppressMessages(
         sidra_download(
           sidra_code = param$code,
           year = year_num,
@@ -138,27 +134,20 @@ load_cempre <- function(dataset = "cempre", raw_data,
           classific = c("C12762"),
           category = cnaes
         )
-        # )
       }) %>%
       dplyr::bind_rows() %>%
       tibble::as_tibble()
   }
 
-
-  ## Filter for Legal Amazon
-  if (legal_amazon_only) {
-    legal_amazon_filtered <- datazoom.amazonia::municipalities %>% dplyr::filter(legal_amazon == 1)
-
-    dat <- dat %>%
-      dplyr::filter(municipio_codigo %in% unique(legal_amazon_filtered$code_muni))
-  }
-
-
   ## Return Raw Data
 
-  if (raw_data == TRUE) {
+  if (param$raw_data) {
     return(dat)
   }
+
+  ######################
+  ## Data Engineering ##
+  ######################
 
 
   dat <- dat %>%
@@ -397,8 +386,6 @@ load_cempre <- function(dataset = "cempre", raw_data,
       values_fill = NA
     ) %>%
     janitor::clean_names()
-
-
 
   labelled <- function(x, label) {
     Hmisc::label(x) <- label
