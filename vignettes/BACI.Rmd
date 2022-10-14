@@ -30,8 +30,6 @@ There are four parameters in this function:
 
 4. language: you can choose between portuguese ('pt') and english ('eng')
   
-   WARNING: These files contain a lot of information and are quite heavy. Downloading, even if "time_period" is defined as only one year, may take a while.
-   
   ```
   
 ```{r eval=FALSE}

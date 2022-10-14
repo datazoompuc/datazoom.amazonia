@@ -49,7 +49,6 @@ load_seeg <- function(dataset = NULL, raw_data,
     )
   }
 
-
   survey <- link <- ibge <- x2000 <- x2018 <- id_code <- tipo_de_emissao <- city <- state <- nivel_1 <- municipio <- territorio <- x1970 <- x2019 <- nivel_1_setor <- nivel_2 <- nivel_3 <- nivel_4 <- nivel_5 <- nivel_6 <- produto <- atividade_economica <- Valor <- Ano <- estado <- setor <- processos_geradores_emissoes <- fonte_de_emissoes <- emissores <- gas <- emissao_remocao_bunker <- producao_emissores <- categorias_emissao <- atividade_geradora <- categorias_processos_geradores <- year <- state <- sector <- emitters_production <- emitters <- economic_activity <- product <- value <- emissions_category <- activity <- generating_processes_categories <- biome <- biome_area <- transition_type <- emission_removal_bunker <- emissions_sources <- emissions_type <- emissions_generating_processes <- NULL
 
   #############################
@@ -105,8 +104,6 @@ load_seeg <- function(dataset = NULL, raw_data,
 
   if (param$geo_level == "municipality") {
     message("Please follow the steps from `googledrive` package to download the data. This may take a while.")
-    message("IMPORTANT: In order to download the files, you must accept the requirements from the package.
-          Don´t worry! It won´t change or affect data that belongs to your personal account.")
   }
 
   dat <- external_download(

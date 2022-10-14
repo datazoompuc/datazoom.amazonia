@@ -49,8 +49,6 @@ load_imazon <- function(dataset = "imazon_shp", raw_data = TRUE,
 
   if (param$geo_level == "municipality") {
     message("Please follow the steps from `googledrive` package to download the data. This may take a while.")
-    message("IMPORTANT: In order to download the files, you must accept the requirements from the package.
-          Don´t worry! It won´t change or affect data that belongs to your personal account.")
   }
 
 

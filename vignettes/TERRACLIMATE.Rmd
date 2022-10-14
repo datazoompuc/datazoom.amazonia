@@ -49,14 +49,12 @@ There are five parameters in this function:
   
   5. legal_amazon_only: setting the return of Legal Amazon Data (legal_amazon_only = TRUE) or Country´s Data (legal_amazon_only = FALSE)
   
-   WARNING: These files contain a lot of information and are quite heavy. If argument "time_period" represents a long time span, downloading may take a while.
-  
 ```  
 
 ```{r, eval=FALSE}
-# Downloading maximum temperature data from 2000 to 2002
+# Downloading maximum temperature data from 2000 to 2020
 
-max_temp <- load_climate(dataset = "max_temperature", time_period = 2000:2002)
+max_temp <- load_climate(dataset = "max_temperature", time_period = 2000:2020)
 
 # Downloading precipitation data only for the legal Amazon in 2010
 
