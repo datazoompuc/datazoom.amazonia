@@ -8,13 +8,21 @@
 <!-- badges: start -->
 
 [![CRAN
-version](https://www.r-pkg.org/badges/version/datazoom.amazonia?color=orange)](https://cran.r-project.org/package=datazoom.amazonia)
+version](https://www.r-pkg.org/badges/version/datazoom.amazonia?color=orange)](https://cran.r-project.org/package=datazoom.amazonia?style=flat)
 [![R build
-status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions)
+status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions?style=flat)
 [![CRAN
-downloads](https://cranlogs.r-pkg.org/badges/grand-total/datazoom.amazonia?color=blue)](https://cran.r-project.org/package=datazoom.amazonia)
+downloads](https://cranlogs.r-pkg.org/badges/grand-total/datazoom.amazonia?color=blue)](https://cran.r-project.org/package=datazoom.amazonia?style=flat)
 [![CRAN
-downloads](https://cranlogs.r-pkg.org/badges/datazoom.amazonia?color=lightgrey)](https://cran.r-project.org/package=datazoom.amazonia)
+downloads](https://cranlogs.r-pkg.org/badges/datazoom.amazonia?color=lightgrey)](https://cran.r-project.org/package=datazoom.amazonia?style=flat)
+![Languages](https://img.shields.io/github/languages/count/datazoompuc/datazoom.amazonia?style=flat)
+![Commits](https://img.shields.io/github/commit-activity/y/datazoompuc/datazoom.amazonia?style=flat)
+![Open
+Issues](https://img.shields.io/github/issues-raw/datazoompuc/datazoom.amazonia?style=flat)
+![Closed
+Issues](https://img.shields.io/github/issues-closed-raw/datazoompuc/datazoom.amazonia?style=flat)
+![Files](https://img.shields.io/github/directory-file-count/datazoompuc/datazoom.amazonia?style=flat)
+![Followers](https://img.shields.io/github/followers/datazoompuc?style=flat)
 <!-- badges: end -->
 
 The datazoom.amazonia package facilitates access to official Brazilian
@@ -457,6 +465,32 @@ data <- load_seeg(dataset = "seeg",
 data <- load_seeg(dataset = "seeg_industry", 
                   raw_data = FALSE,
                   geo_level = "state")
+```
+
+Be aware that, in order to complete the download, you should allow the
+tidyverse API to access your google drive account, selecting the ‘Yes’
+option:
+
+
+
+    ```r
+    # Is it OK to cache OAuth access credentials in the folder
+    # C:/Users/vhste/AppData/Local/gargle/gargle/Cache between R sessions?
+
+    # 1: Yes
+    # 2: No
+
+    Or else the following error will occur:
+
+``` r
+#Error in `gargle_abort_request_failed()`:
+#! Client error: (403) Forbidden
+#Insufficient Permission: Request had insufficient authentication scopes.
+#• domain: global
+#• reason: insufficientPermissions
+#• message: Insufficient Permission: Request had insufficient authentication
+#  scopes.
+#Run `rlang::last_error()` to see where the error occurred.
 ```
 
 ## CIPÓ
