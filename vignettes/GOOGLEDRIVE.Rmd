@@ -1,0 +1,21 @@
+---
+title: "GOOGLEDRIVE"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{GoogleDrive}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Some functions require that "googledrive" package is installed in order to run. This only means that these datasets have data stored in Google Drive.
+
+When the package is downloaded and the functions ran, it requires somewhat invasive permissions, such as access to your files and changing or moving them. This happens because some features within the package can do this. However, none of them are used by datazoom.amazonia, as it only pulls data from a source in googledrive.
+
+For further information, click [here](https://googledrive.tidyverse.org/) to access the official package page.
