@@ -58,27 +58,4 @@ data <- load_seeg(dataset = "seeg_industry",
                   raw_data = FALSE,
                   geo_level = "state")
 ```
-Be aware that, in order to complete the download, you should allow the tidyverse API to access your google drive account, selecting the 'Yes' option:
-```
 
-```{r}
-# Is it OK to cache OAuth access credentials in the folder
-# C:/Users/vhste/AppData/Local/gargle/gargle/Cache between R sessions?
-
-# 1: Yes
-# 2: No
-```
-
-```
-Or else the following error will occur:
-```
-```{r}
-#Error in `gargle_abort_request_failed()`:
-#! Client error: (403) Forbidden
-#Insufficient Permission: Request had insufficient authentication scopes.
-#• domain: global
-#• reason: insufficientPermissions
-#• message: Insufficient Permission: Request had insufficient authentication
-#  scopes.
-#Run `rlang::last_error()` to see where the error occurred.
-```

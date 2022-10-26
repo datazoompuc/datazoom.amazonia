@@ -18,4 +18,28 @@ Some functions require that "googledrive" package is installed in order to run. 
 
 When the package is downloaded and the functions ran, it requires somewhat invasive permissions, such as access to your files and changing or moving them. This happens because some features within the package can do this. However, none of them are used by datazoom.amazonia, as it only pulls data from a source in googledrive.
 
+Be aware that, in order to complete the download, you should allow the tidyverse API to access your Google Drive account, selecting the 'Yes' option when this message appears:
+
+```{r}
+# Is it OK to cache OAuth access credentials in the folder
+# C:/Users/vhste/AppData/Local/gargle/gargle/Cache between R sessions?
+
+# 1: Yes
+# 2: No
+```
+
+```
+Or else the following error will occur:
+```
+```{r}
+#Error in `gargle_abort_request_failed()`:
+#! Client error: (403) Forbidden
+#Insufficient Permission: Request had insufficient authentication scopes.
+#• domain: global
+#• reason: insufficientPermissions
+#• message: Insufficient Permission: Request had insufficient authentication
+#  scopes.
+#Run `rlang::last_error()` to see where the error occurred.
+```
+
 For further information, click [here](https://googledrive.tidyverse.org/) to access the official package page.
