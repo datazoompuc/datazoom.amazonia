@@ -138,6 +138,10 @@ devtools::load_all()
 ```{r child = "vignettes/IMAZON.Rmd"}
 ```
 
+<span style="color:red">
+This function uses the `googledrive` package to download data. In case of authentication errors, see [googledrive](#googledrive).
+</span>
+
 ## IBAMA
 
 ```{r child = "vignettes/IBAMA.Rmd"}
@@ -148,6 +152,10 @@ devtools::load_all()
 ```{r child = "vignettes/MAPBIOMAS.Rmd"}
 ```
 
+<span style="color:red">
+This function uses the `googledrive` package to download data for datasets `"mapbiomas_cover"` and `"mapbiomas_transition"` at the municipality level. In case of authentication errors, see [googledrive](#googledrive).
+</span>
+
 ## TerraClimate
 
 ```{r child = "vignettes/TERRACLIMATE.Rmd"}
@@ -157,6 +165,10 @@ devtools::load_all()
 
 ```{r child = "vignettes/SEEG.Rmd"}
 ```
+
+<span style="color:red">
+This function uses the `googledrive` package to download data at the municipality level. In case of authentication errors, see [googledrive](#googledrive).
+</span>
 
 ## CIPÓ
 
@@ -179,6 +191,10 @@ devtools::load_all()
 
 ```{r child = "vignettes/IEMA.Rmd"}
 ```
+
+<span style="color:red">
+This function uses the `googledrive` package to download data. In case of authentication errors, see [googledrive](#googledrive).
+</span>
 
 # Economic Data
 
@@ -225,6 +241,11 @@ devtools::load_all()
 ## Legal Amazon Municipalities
 
 ```{r child = "vignettes/municipalities.Rmd"}
+```
+
+## <a name="googledrive"></a> The 'googledrive' package
+
+```{r child = "vignettes/GOOGLEDRIVE.Rmd"}
 ```
 
 ## Credits
