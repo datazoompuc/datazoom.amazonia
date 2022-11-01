@@ -286,9 +286,8 @@ ranging from 0 to 3.
 data <- load_imazon(raw_data = FALSE)
 ```
 
-<span style="color:red"> This function uses the `googledrive` package to
-download data. In case of authentication errors, see
-[googledrive](#googledrive). </span>
+🔴 This function uses the `googledrive` package to download data. In case
+of authentication errors, see [googledrive](#googledrive).
 
 ## IBAMA
 
@@ -424,10 +423,10 @@ data <- load_mapbiomas("mapbiomas_mining",
                        geo_level = "indigenous_land")
 ```
 
-<span style="color:red"> This function uses the `googledrive` package to
-download data for datasets `"mapbiomas_cover"` and
-`"mapbiomas_transition"` at the municipality level. In case of
-authentication errors, see [googledrive](#googledrive). </span>
+🔴 This function uses the `googledrive` package to download data for
+datasets `"mapbiomas_cover"` and `"mapbiomas_transition"` at the
+municipality level. In case of authentication errors, see
+[googledrive](#googledrive).
 
 ## TerraClimate
 
@@ -564,9 +563,9 @@ data <- load_seeg(dataset = "seeg_industry",
                   geo_level = "state")
 ```
 
-<span style="color:red"> This function uses the `googledrive` package to
-download data at the municipality level. In case of authentication
-errors, see [googledrive](#googledrive). </span>
+🔴 This function uses the `googledrive` package to download data at the
+municipality level. In case of authentication errors, see
+[googledrive](#googledrive).
 
 ## CIPÓ
 
@@ -836,9 +835,8 @@ throughout the Amazon region in the year 2018.
 data <- load_iema(raw_data = FALSE)
 ```
 
-<span style="color:red"> This function uses the `googledrive` package to
-download data. In case of authentication errors, see
-[googledrive](#googledrive). </span>
+🔴 This function uses the `googledrive` package to download data. In case
+of authentication errors, see [googledrive](#googledrive).
 
 # Economic Data
 

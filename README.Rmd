@@ -138,9 +138,7 @@ devtools::load_all()
 ```{r child = "vignettes/IMAZON.Rmd"}
 ```
 
-<span style="color:red">
-This function uses the `googledrive` package to download data. In case of authentication errors, see [googledrive](#googledrive).
-</span>
+&#x1F534; This function uses the `googledrive` package to download data. In case of authentication errors, see [googledrive](#googledrive).
 
 ## IBAMA
 
@@ -152,9 +150,7 @@ This function uses the `googledrive` package to download data. In case of authen
 ```{r child = "vignettes/MAPBIOMAS.Rmd"}
 ```
 
-<span style="color:red">
-This function uses the `googledrive` package to download data for datasets `"mapbiomas_cover"` and `"mapbiomas_transition"` at the municipality level. In case of authentication errors, see [googledrive](#googledrive).
-</span>
+&#x1F534; This function uses the `googledrive` package to download data for datasets `"mapbiomas_cover"` and `"mapbiomas_transition"` at the municipality level. In case of authentication errors, see [googledrive](#googledrive).
 
 ## TerraClimate
 
@@ -166,9 +162,7 @@ This function uses the `googledrive` package to download data for datasets `"map
 ```{r child = "vignettes/SEEG.Rmd"}
 ```
 
-<span style="color:red">
-This function uses the `googledrive` package to download data at the municipality level. In case of authentication errors, see [googledrive](#googledrive).
-</span>
+&#x1F534; This function uses the `googledrive` package to download data at the municipality level. In case of authentication errors, see [googledrive](#googledrive).
 
 ## CIPÓ
 
@@ -192,9 +186,7 @@ This function uses the `googledrive` package to download data at the municipalit
 ```{r child = "vignettes/IEMA.Rmd"}
 ```
 
-<span style="color:red">
-This function uses the `googledrive` package to download data. In case of authentication errors, see [googledrive](#googledrive).
-</span>
+&#x1F534; This function uses the `googledrive` package to download data. In case of authentication errors, see [googledrive](#googledrive).
 
 # Economic Data
 
