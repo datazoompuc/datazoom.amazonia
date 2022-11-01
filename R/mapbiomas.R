@@ -3,27 +3,41 @@
 #' @description Loads information about land cover and use
 #'
 #' @param dataset A dataset name ("mapbiomas_cover", "mapbiomas_transition", "mapbiomas_irrigation", "mapbiomas_deforestation_regeneration", "mapbiomas_grazing_quality", or "mapbiomas_mining")
-#' @param raw_data A \code{boolean} setting the return of raw or processed data
-#' @param geo_level A \code{string} that defines the geographic level of the data. For datasets "mapbiomas_cover" and "mapbiomas_transition", can be "municipality" or "state" (faster download) for datasets. For dataset "mapbiomas_mining", can be "biome" or "indigenous_land"
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported.
+#' @inheritParams load_baci
+#' @param geo_level A \code{string} that defines the geographic level of the data.
+#'   * For datasets "mapbiomas_cover" and "mapbiomas_transition", can be "municipality" or "state" (faster download).
+#'   * For dataset "mapbiomas_mining", can be "biome" or "indigenous_land".
 #' @param cover_level A \code{numeric} or \code{string} that indicates the cover aggregation level. Can be "0", "1", "2", "3", "4", or "none", which means no aggregation. Aggregation only supported for "mapbiomas_cover" and "mapbiomas_grazing_quality" datasets.
-#' @return A \code{tibble} with the selected data.
+#'
+#' @return A \code{tibble}.
 #'
 #' @examples
 #' \dontrun{
-#' # download treated data from mapbiomas_grazing_quality
-#' treated_mapbiomas_grazing <- load_mapbiomas(
-#'   dataset = "mapbiomas_grazing_quality",
-#'   raw_data = FALSE, geo_level = "municipality",
-#'   language = "pt"
+#' # download treated Mapbiomas Cover data in english at the highest aggregation level
+#' data <- load_mapbiomas(
+#'   dataset = "mapbiomas_cover",
+#'   raw_data = FALSE,
+#'   geo_level = "municipality",
+#'   language = "eng",
+#'   cover_level = 0
+#' )
+#'
+#' # download treated Mapbiomas Transition data in portuguese
+#' data <- load_mapbiomas(
+#'   dataset = "mapbiomas_transition", raw_data = FALSE,
+#'   geo_level = "state", language = "pt"
+#' )
+#'
+#' # download treated data on mining on indigenous lands
+#' data <- load_mapbiomas("mapbiomas_mining",
+#'   raw_data = FALSE,
+#'   geo_level = "indigenous_land"
 #' )
 #' }
 #'
-#' @importFrom magrittr %>%
 #' @export
 
-
-load_mapbiomas <- function(dataset = NULL, raw_data = FALSE, geo_level = "municipality",
+load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality",
                            language = "eng", cover_level = 1) {
 
   # Checking for googledrive package (in Suggests) only for mapbiomas_transition dataset
@@ -40,12 +54,12 @@ load_mapbiomas <- function(dataset = NULL, raw_data = FALSE, geo_level = "munici
   ###########################
   ## Bind Global Variables ##
   ###########################
+
   survey <- link <- x1985 <- x2019 <- NULL
   ano <- bioma <- category <- cidade <- city <- class_id <- country <- estado <- feature_id <- group <- terra_indigena <- NULL
   id <- indigenous_land <- level_2 <- level_3 <- name_pt_br <- pais <- x2020 <- NULL
   territory_id <- municipality <- state <- year <- value <- NULL
   x1985_to_1986 <- x2018_to_2019 <- x1988 <- x2017 <- x2000 <- x2010 <- x2018 <- biome <- level_1 <- NULL
-
 
   #############################
   ## Define Basic Parameters ##
@@ -57,25 +71,6 @@ load_mapbiomas <- function(dataset = NULL, raw_data = FALSE, geo_level = "munici
   param$language <- language
   param$raw_data <- raw_data
   param$cover_level <- cover_level
-
-  param$survey_name <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(survey) %>%
-    unlist()
-
-  param$url <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(link) %>%
-    unlist()
-
-  ## Dataset
-
-  if (is.null(param$dataset)) {
-    stop("Missing Dataset!")
-  }
-  if (is.null(param$raw_data)) {
-    stop("Missing TRUE/FALSE for Raw Data")
-  }
 
   sheets <- tibble::tribble(
     ~dataset, ~geo_level, ~sheet,
@@ -110,20 +105,22 @@ load_mapbiomas <- function(dataset = NULL, raw_data = FALSE, geo_level = "munici
     sheet = sheet
   )
 
-  dat <- dat %>%
-    janitor::clean_names() %>%
-    tibble::as_tibble() %>%
-    dplyr::mutate_if(is.character, function(var) {
-      stringi::stri_trans_general(str = var, id = "Latin-ASCII")
-    })
+  ## Return Raw Data
 
-  if (raw_data == TRUE) {
+  if (param$raw_data) {
     return(dat)
   }
 
   ######################
   ## Data Engineering ##
   ######################
+
+  dat <- dat %>%
+    janitor::clean_names() %>%
+    tibble::as_tibble() %>%
+    dplyr::mutate_if(is.character, function(var) {
+      stringi::stri_trans_general(str = var, id = "Latin-ASCII")
+    })
 
   ## Create Longer Data - Years as a Variable
 

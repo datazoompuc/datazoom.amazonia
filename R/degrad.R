@@ -1,49 +1,34 @@
 #' @title Degrad - Forest Degradation in the Brazilian Amazon
 #'
-#' @description Loads information on forest degradation in the Brazilian Amazon, replaced by DETER-B in December 2016. Data is available from 2007 to 2016. See \url{http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad}.
+#' @description Loads information on forest degradation in the Brazilian Amazon, replaced by DETER-B in December 2016.
 #'
 #' @encoding UTF-8
 #'
 #' @param dataset A dataset name ("degrad").
-#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
-#' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
-#'
-#' @return A \code{list} (if \code{raw_data} = \code{TRUE}) or a tibble (if \code{raw_data} = \code{FALSE}) with the selected data.
+#' @inheritParams load_baci
+#' @return A \code{list} of tibbles (if \code{raw_data} = \code{TRUE}) or a tibble (if \code{raw_data} = \code{FALSE}).
 #'
 #'
 #' @examples
 #' \dontrun{
-#' # download raw data (raw_data = TRUE) related to forest degradation
+#' # download treated data (raw_data = TRUE) related to forest degradation
 #' # from 2010 to 2012 (time_period = 2010:2012).
 #' data <- load_degrad(
 #'   dataset = "degrad",
-#'   raw_data = TRUE,
-#'   time_period = 2010:2012
-#' )
-#'
-#' # download treated data (raw_data = FALSE) related to forest degradation
-#' # from 2013 (time_period = 2013) in portuguese (language = "pt").
-#' data <- load_degrad(
-#'   dataset = "degrad",
 #'   raw_data = FALSE,
-#'   time_period = 2013,
-#'   language = "pt"
+#'   time_period = 2010:2012
 #' )
 #' }
 #'
-#' @importFrom magrittr %>%
 #' @export
 
-load_degrad <- function(dataset = "degrad", raw_data,
+load_degrad <- function(dataset = "degrad", raw_data = FALSE,
                         time_period,
                         language = "eng") {
 
-  # ,all_events = FALSE
-
-  ## To-Do:
-  # Include Safety Download and Message if any Error Occurs
-  # Harmonize Columns Names, Create Panel and Deliver Raw Data
+  ##############################
+  ## Binding Global Variables ##
+  ##############################
 
   survey <- link <- .data <- abbrev_state <- ano <- area <- NULL
   areameters <- areametros <- class_name <- classe <- cod_municipio <- NULL
@@ -62,26 +47,6 @@ load_degrad <- function(dataset = "degrad", raw_data,
   param$language <- language
   param$raw_data <- raw_data
 
-  param$survey_name <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(survey) %>%
-    unlist()
-
-  param$url <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(link) %>%
-    unlist()
-
-  ## Dataset
-
-  if (is.null(param$dataset)) {
-    stop("Missing Dataset!")
-  }
-  if (is.null(param$raw_data)) {
-    stop("Missing TRUE/FALSE for Raw Data")
-  }
-
-
   ######################
   ## Downloading Data ##
   ######################
@@ -99,7 +64,7 @@ load_degrad <- function(dataset = "degrad", raw_data,
 
   ## Return Raw Data
 
-  if (raw_data == TRUE) {
+  if (param$raw_data) {
     return(dat)
   }
 
@@ -231,31 +196,6 @@ load_degrad <- function(dataset = "degrad", raw_data,
       year, linkcolumn, scene_id, code_state, code_muni,
       class_name, pathrow, area, view_date, julday, geometry
     )
-
-  # # Set aggregation level
-  # geo_level <- tolower(geo_level)
-  # if (geo_level == "state") {
-  #   df <- df %>%
-  #     # Replaces state names (with errors because of accents) with state code
-  #     dplyr::mutate(code_state = as.factor(.data$code_state)) %>%
-  #     dplyr::group_by(.data$code_state) %>%
-  #     dplyr::rename(Estado = .data$abbrev_state, Evento = .data$class_name) %>%
-  #     # Removes useless columns
-  #     dplyr::select(-c("code_muni", "code_state"))
-  # }
-  # else {
-  #   if (geo_level != "municipality") {
-  #     warning("Spatial aggregation level not supported. Proceeding with Municipality.")
-  #   }
-  #
-  #   df <- df %>%
-  #     # Adds from which municipality each observation is
-  #     dplyr::mutate(CodIBGE = as.factor(.data$code_muni)) %>%
-  #     dplyr::group_by(.data$CodIBGE, .data$name_muni, .add = TRUE) %>%
-  #     dplyr::rename(Municipio = .data$name_muni, Estado = .data$abbrev_state, Evento = .data$class_name) %>%
-  #     dplyr::select(-c("code_muni", "code_state"))
-  # }
-  #
 
   #################
   ## Translation ##

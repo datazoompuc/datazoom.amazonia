@@ -20,25 +20,27 @@ The data made available in this package goes back to the year 2000, with ongoing
 
 Data is collected based on the PRODES-year, which starts at August 1st and ends on July 31st. Accordingly, 2018 deforestation data covers the period from 01/08/2017 to 31/07/2018. 
 
-```
-There are four parameters in this function:
+***
+**Options:**
+
+  1. **dataset**: `"prodes"`
+
+  2. **raw_data**: there are two options:
+      * `TRUE`: if you want the data as it is originally.
+      * `FALSE`: if you want the treated version of the data. 
   
-  1. dataset = "prodes"
- 
-  2. raw_data: there are two options:
-  # TRUE: if you want the raw data.
-  # FALSE: if you want the processed version of the data. 
- 
-  3. time_period: available from 2000 to 2020
+  3. **time_period**: picks the years for which the data will be downloaded
+
+  4. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
   
-  4. language: you can choose between portuguese and english
-```
+***
+
+**Examples:**
 
 ```{r,eval=FALSE}
 # Download treated data (raw_data = FALSE) from 2010 (time_period = 2010) 
 # in portuguese (language = 'pt').
-data <- load_prodes(dataset = "prodes", 
-                    raw_data = FALSE,
+data <- load_prodes(raw_data = FALSE,
                     time_period = 2010,
                     language = 'pt')  
 ```

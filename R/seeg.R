@@ -1,42 +1,32 @@
-#' @title Greenhouse gases emission estimates (SEEG)
+#' @title Greenhouse gas emission estimates (SEEG)
 #'
 #' @description Loads data of estimates of emission of greenhouse gases
 #'
-#' @param dataset A dataset name ("seeg", seeg_farming", "seeg_industry", "seeg_energy", "seeg_land", "seeg_residuals"). On which "seeg" contains all five sectors (only works with raw_data = TRUE) and the others are filtered specifically by a main source of emission. See \url{http://seeg.eco.br/notas-metodologicas/}
-#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
+#' @param dataset A dataset name ("seeg", seeg_farming", "seeg_industry", "seeg_energy", "seeg_land", "seeg_residuals"). On which "seeg" contains all five sectors (only works with raw_data = TRUE) and the others are filtered specifically by a main source of emission.
+#' @inheritParams load_baci
 #' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state" or "municipality".
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
 #'
-#' @return A \code{tibble} with the selected data.
-#'
-#' @encoding UTF-8
+#' @return A \code{tibble}.
 #'
 #' @export
-#' @importFrom magrittr %>%
 #'
 #' @examples \dontrun{
-#' # download state raw data
-#' seeg <- load_seeg(
+#' # Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg")
+#' # by state (geo_level = "state")
+#' data <- load_seeg(
 #'   dataset = "seeg",
 #'   raw_data = TRUE,
 #'   geo_level = "state"
 #' )
 #'
-#' # download country energy treated data
-#' seeg1 <- load_seeg(
-#'   dataset = "seeg_energy",
+#' # Download treated data (raw_data = FALSE) of industry greenhouse gases (dataset = "seeg_industry")
+#' data <- load_seeg(
+#'   dataset = "seeg_industry",
 #'   raw_data = FALSE,
-#'   geo_level = "country"
-#' )
-#'
-#' # download land municipality treated data
-#' seeg2 <- load_seeg(
-#'   dataset = "seeg_land",
-#'   raw_data = FALSE,
-#'   geo_level = "municipality"
+#'   geo_level = "state"
 #' )
 #' }
-load_seeg <- function(dataset = NULL, raw_data,
+load_seeg <- function(dataset, raw_data = FALSE,
                       geo_level, language = "eng") {
 
 
@@ -49,7 +39,21 @@ load_seeg <- function(dataset = NULL, raw_data,
     )
   }
 
-  survey <- link <- ibge <- x2000 <- x2018 <- id_code <- tipo_de_emissao <- city <- state <- nivel_1 <- municipio <- territorio <- x1970 <- x2019 <- nivel_1_setor <- nivel_2 <- nivel_3 <- nivel_4 <- nivel_5 <- nivel_6 <- produto <- atividade_economica <- Valor <- Ano <- estado <- setor <- processos_geradores_emissoes <- fonte_de_emissoes <- emissores <- gas <- emissao_remocao_bunker <- producao_emissores <- categorias_emissao <- atividade_geradora <- categorias_processos_geradores <- year <- state <- sector <- emitters_production <- emitters <- economic_activity <- product <- value <- emissions_category <- activity <- generating_processes_categories <- biome <- biome_area <- transition_type <- emission_removal_bunker <- emissions_sources <- emissions_type <- emissions_generating_processes <- NULL
+  ##############################
+  ## Binding Global Variables ##
+  ##############################
+
+  survey <- link <- ibge <- x2000 <- x2018 <- id_code <- tipo_de_emissao <- NULL
+  city <- state <- nivel_1 <- municipio <- territorio <- x1970 <- x2019 <- NULL
+  nivel_1_setor <- nivel_2 <- nivel_3 <- nivel_4 <- nivel_5 <- nivel_6 <- NULL
+  produto <- atividade_economica <- Valor <- Ano <- estado <- setor <- NULL
+  processos_geradores_emissoes <- fonte_de_emissoes <- emissores <- gas <- NULL
+  emissao_remocao_bunker <- producao_emissores <- categorias_emissao <- NULL
+  atividade_geradora <- categorias_processos_geradores <- year <- state <- NULL
+  sector <- emitters_production <- emitters <- economic_activity <- product <- NULL
+  value <- emissions_category <- activity <- generating_processes_categories <- NULL
+  biome <- biome_area <- transition_type <- emission_removal_bunker <- NULL
+  emissions_sources <- emissions_type <- emissions_generating_processes <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -72,12 +76,6 @@ load_seeg <- function(dataset = NULL, raw_data,
 
   ## Dataset
 
-  if (is.null(param$dataset)) {
-    stop("Missing Dataset!")
-  }
-  if (is.null(param$raw_data)) {
-    stop("Missing TRUE/FALSE for Raw Data")
-  }
   if (param$dataset == "seeg" & param$raw_data == FALSE) {
     stop("This dataset only works with raw_data = TRUE")
   }
@@ -102,10 +100,6 @@ load_seeg <- function(dataset = NULL, raw_data,
   ## Download ##
   ##############
 
-  if (param$geo_level == "municipality") {
-    message("Please follow the steps from `googledrive` package to download the data. This may take a while.")
-  }
-
   dat <- external_download(
     dataset = param$dataset,
     source = "seeg",
@@ -122,7 +116,8 @@ load_seeg <- function(dataset = NULL, raw_data,
 
 
   ## Return Raw Data
-  if (param$dataset == "seeg" & param$raw_data == TRUE) {
+
+  if (param$dataset == "seeg" & param$raw_data) {
     return(dat)
   }
 

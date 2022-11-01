@@ -1,30 +1,30 @@
 #' @title IEMA - Institute of Environment and Water Resources
 #'
-#' @description Loads information on electric energy access at the municipality level considering the Amazon region
+#' @description Loads information on electric energy access at the municipality level in the Amazon region
 #'
 #' @param dataset A dataset name ("iema")
-#' @param raw_data A \code{boolean} setting the return of processed data. Raw Data is not publicly available
-#' @param geo_level A \code{string} that defines the geographic level of the data. Can be only "municipality".
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported.
+#' @inheritParams load_baci
 #'
-#' @return A \code{tibble} with the selected data.
+#' @return A \code{tibble}.
 #'
 #' @examples
 #' \dontrun{
-#' # download processed data
-#' iema_clean <- load_iema(
-#'   dataset = "iema",
-#'   raw_data = FALSE,
-#'   language = "eng"
-#' )
+#' # Download treated data
+#' data <- load_iema(raw_data = FALSE)
 #' }
 #'
-#' @importFrom magrittr %>%
 #' @export
 
+load_iema <- function(dataset = "iema", raw_data = FALSE, language = "eng") {
 
-load_iema <- function(dataset = "iema", raw_data = FALSE,
-                      geo_level = "municipality", language = "pt") {
+  # Checking for googledrive package (in Suggests)
+
+  if (!requireNamespace("googledrive", quietly = TRUE)) {
+    stop(
+      "Package \"googledrive\" must be installed to use this function.",
+      call. = FALSE
+    )
+  }
 
   ##############################
   ## Binding Global Variables ##
@@ -39,18 +39,8 @@ load_iema <- function(dataset = "iema", raw_data = FALSE,
 
   param <- list()
   param$dataset <- dataset
-  param$geo_level <- geo_level
   param$language <- language
   param$raw_data <- raw_data
-
-  # Checking for googledrive package (in Suggests)
-
-  if (!requireNamespace("googledrive", quietly = TRUE)) {
-    stop(
-      "Package \"googledrive\" must be installed to use this function.",
-      call. = FALSE
-    )
-  }
 
   ##############
   ## Download ##
@@ -58,8 +48,7 @@ load_iema <- function(dataset = "iema", raw_data = FALSE,
 
   dat <- external_download(
     dataset = param$dataset,
-    source = "iema",
-    geo_level = param$geo_level
+    source = "iema"
   )
 
   ## Return Raw Data

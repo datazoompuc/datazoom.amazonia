@@ -1,3 +1,7 @@
+# datazoom.amazonia 0.9.3.0
+
+  * Making documentation consistent across functions
+
 # datazoom.amazonia 0.9.2.9000
 
   * Fixing `load_climate` error when option `legal_amazon_only = TRUE`

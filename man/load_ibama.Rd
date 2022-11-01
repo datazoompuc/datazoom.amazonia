@@ -4,29 +4,35 @@
 \alias{load_ibama}
 \title{IBAMA - Brazilian Institute for the Environment and Renewable Natural Resources}
 \usage{
-load_ibama(dataset, raw_data, states = "all", language = "eng")
+load_ibama(dataset, raw_data = FALSE, states = "all", language = "eng")
 }
 \arguments{
-\item{dataset}{A dataset name ("areas_embargadas", "distributed_fines", "collected_fines")}
+\item{dataset}{A dataset name ("areas_embargadas", "distributed_fines", or "collected_fines")}
 
-\item{raw_data}{A \code{boolean} setting the return of raw or processed data}
+\item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
 \item{states}{A \code{string} specifying for which states to download the data. It is "all" by default, but can be a single state such as "AC" or any vector such as c("AC", "AM"). Does not apply to the "areas_embargadas" dataset.}
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported.}
 }
 \value{
-A \code{tibble} with the selected data.
+A \code{tibble}.
 }
 \description{
-Loads information on environmental fines at the municipality or state levels considering the Amazon region
+Loads information on environmental fines in the Amazon region
 }
 \examples{
 \dontrun{
-# download raw data from all country
-raw_ibama_all <- load_ibama(
-  dataset = "areas_embargadas",
-  raw_data = TRUE
+# Download treated embargoes data (raw_data = FALSE) in english (language = "eng")
+data <- load_ibama(
+  dataset = "areas_embargadas", raw_data = FALSE,
+  language = "eng"
+)
+
+# Download treated collected fines data from "BA"
+data <- load_ibama(
+  dataset = "collected_fines", raw_data = FALSE,
+  states = "BA", language = "pt"
 )
 }
 

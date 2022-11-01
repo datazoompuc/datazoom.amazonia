@@ -1,24 +1,53 @@
-#' DATASUS
+#' @title DATASUS - Mortality, hospitalizations and hospital beds
+#'
+#' @description Loads DATASUS data on health establishments, mortality, access to health services and several health indicators.
 #'
 #' @param dataset A dataset name, can be one of ("datasus_sim_do", "datasus_sih", "datasus_cnes_lt"), or more. For more details, try \code{vignette("DATASUS")}.
-#' @param time_period A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.
+#' @inheritParams load_baci
 #' @param states A \code{string} specifying for which states to download the data. It is "all" by default, but can be a single state such as "AC" or any vector such as c("AC", "AM").
-#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
 #' @param keep_all A \code{boolean} choosing whether to aggregate the data by municipality, in turn losing individual-level variables (\code{FALSE}) or to keep all the original variables. Only applies when raw_data is \code{TRUE}.
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng", but some datasets have no translated variable labels.
 #'
-#' @examples\dontrun{
-#' mortality_rj <- load_datasus(dataset = "datasus_sim", time_period = 2010, states = "RJ")
+#' @examples
+#' \dontrun{
+#' # download raw data for the year 2010 in the state of AM.
+#' data <- load_datasus(
+#'   dataset = "datasus_sim_do",
+#'   time_period = 2010,
+#'   states = "AM",
+#'   raw_data = TRUE
+#' )
+#'
+#' # download treated data with the number of deaths by cause in AM and PA.
+#' data <- load_datasus(
+#'   dataset = "datasus_sim_do",
+#'   time_period = 2010,
+#'   states = c("AM", "PA"),
+#'   raw_data = FALSE
+#' )
+#'
+#' # download treated data with the number of deaths by cause in AM and PA
+#' # keeping all individual variables.
+#' data <- load_datasus(
+#'   dataset = "datasus_sim_do",
+#'   time_period = 2010,
+#'   states = c("AM", "PA"),
+#'   raw_data = FALSE,
+#'   keep_all = TRUE
+#' )
 #' }
 #'
-#' @return A \code{tibble}
+#' @return A \code{tibble}.
 #' @export
+
 load_datasus <- function(dataset,
                          time_period,
                          states = "all",
                          raw_data = FALSE,
                          keep_all = FALSE,
                          language = "eng") {
+
+  # Checking for foreign package (in Suggests)
+
   if (!requireNamespace("foreign", quietly = TRUE)) {
     stop(
       "Package \"foreign\" must be installed to use this function.",
@@ -26,13 +55,14 @@ load_datasus <- function(dataset,
     )
   }
 
-  ## TODO
-  # i) Tábuas de mortalidade do IBGE, por UF e Ano
-  # ii) Microdados do SIM/Datasus
-  # iii) SIOPS e CNES/Datasus
-  # iv) Dados da ANS, cobertura de planos privados
-  # v) Dados do e-Gestor, cobertura da atenção básica e SESAI
-  # vi) Microdados da PNS e Vigitel
+  # Checking for RCurl package (in Suggests)
+
+  if (!requireNamespace("RCurl", quietly = TRUE)) {
+    stop(
+      "Package \"RCurl\" must be installed to use this function.",
+      call. = FALSE
+    )
+  }
 
   ##############################
   ## Binding Global Variables ##
@@ -159,10 +189,9 @@ load_datasus <- function(dataset,
 
   ## Return Raw Data
 
-  if (param$raw_data == TRUE) {
+  if (param$raw_data) {
     return(dat)
   }
-
 
   ######################
   ## Data Engineering ##

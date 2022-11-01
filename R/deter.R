@@ -3,43 +3,30 @@ utils::globalVariables("where") # the selection helper 'where' is not exported f
 
 #' @title DETER - Forest Degradation in the Brazilian Amazon
 #'
-#' @description Loads information on change in forest cover in the Amazon. See \url{http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter}
+#' @description Loads information on changes in forest cover in the Amazon.
 #'
 #' @param dataset A dataset name ("deter_amz", "deter_cerrado") with information about both Amazon and Cerrado
-#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
+#' @inheritParams load_baci
 #'
 #' @return A \code{tibble} (if \code{raw_data} = \code{TRUE}) or a \code{sf} object (if \code{raw_data} = \code{FALSE}).
 #'
-#' @encoding UTF-8
-#'
-#' @export
-#'
 #' @examples
 #' \dontrun{
-#' # Download raw data (raw_data = TRUE) from Amazonia (dataset = "deter_amz")
+#' # Download treated data (raw_data = FALSE) from Amazonia (dataset = "deter_amz")
 #' deter_amz <- load_deter(
 #'   dataset = "deter_amz",
-#'   raw_data = TRUE
-#' )
-#'
-#' # Download treated data (raw_data = FALSE) from Cerrado (dataset = "deter_cerrado")
-#' # in portuguese (language = 'pt')
-#' deter_cer <- load_deter(
-#'   dataset = "deter_cerrado",
-#'   raw_data = FALSE,
-#'   language = "pt"
+#'   raw_data = FALSE
 #' )
 #' }
 #'
+#' @export
+
 load_deter <- function(dataset, raw_data = FALSE,
                        language = "eng") {
 
   ###########################
   ## Bind Global Variables ##
   ###########################
-
-  ## Bind Global Variables
 
   .data <- view_date <- name_muni <- code_muni <- sensor <- satellite <- NULL
   uc <- classname <- path_row <- area <- quadrant <- geometry <- id_alerta <- NULL
@@ -64,7 +51,7 @@ load_deter <- function(dataset, raw_data = FALSE,
 
   ## Return Raw Data
 
-  if (raw_data == TRUE) {
+  if (param$raw_data) {
     return(dat)
   }
 

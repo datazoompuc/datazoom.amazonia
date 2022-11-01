@@ -18,41 +18,44 @@ Loads information on the amount and value of the production of the exploitation 
 
 Data is from the Silviculture and Forestry Extraction Production (PEVS, in Portuguese), a nationwide annual survey conducted by IBGE (Brazilian Institute of Geography and Statistics). The data also has multiple aggregation levels, such as nationwide, by region, mesoregion and microregion, as well as state and municipality. 
 
-The data available has a yearly frequency and is available from 1986 to the present, with the exception of the data on total area for production, which are only available from 2013 onwards. More information can be found on this link (only in Portuguese): https://www.ibge.gov.br/estatisticas/economicas/agricultura-e-pecuaria/9105-producao-da-extracao-vegetal-e-da-silvicultura.html?=&t=o-que-e
+The data available has a yearly frequency and is available from 1986 to the present, with the exception of the data on total area for production, which are only available from 2013 onwards. More information can be found in [this link](https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/18374-forestry-activities.html?=&t=o-que-e).
 
-```
-There are five parameters in this function:
+***
+**Options:**
+
+  1. **dataset**: there are three choices:
+      * `"pevs_forest_crops"`: provides data related to both quantity and value of the forestry activities. The data goes from 1986 to 2019 and it is divided by type of product.
+      * `"pevs_silviculture"`: provides data related to both quantity and value of the silviculture. The data goes from 1986 to 2019 and it is divided by type of product.
+      * `"pevs_silviculture_area"`: total existing area used for silviculture in 12/31.The data goes from 2013 to 2019 and it is divided by forestry species.  
+
+  2. **raw_data**: there are two options:
+      * `TRUE`: if you want the data as it is originally.
+      * `FALSE`: if you want the treated version of the data. 
+      
+  3. **geo_level**: `"country"`, `"region"`, `"state"`, or `"municipality"`  
   
-  1. dataset: there are three choices:
-  # 'pevs_forest_crops': provides data related to both quantity and value of the forestry activities. The data goes from 1986 to 2019 and it is divided by type of product.
-  # 'pevs_silviculture': provides data related to both quantity and value of the silviculture. The data goes from 1986 to 2019 and it is divided by type of product.
-  # 'pevs_silviculture_area': total existing area used for silviculture in 12/31.The data goes from 2013 to 2019 and it is divided by forestry species.  
+  4. **time_period**: picks the years for which the data will be downloaded
+
+  5. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
   
-  2. raw_data: there are two options:
-  # TRUE: if you want the data as it is in the IBGE's site.
-  # FALSE: if you want the treated (more organized) version of the data. 
-  
-  3. geo_level: there are four options:
-  # "country"
-  # "region"
-  # "state"
-  # "municipality"
-  
-  4. time_period: data goes from 1986 to 2019, except for the pevs_silviculture_area dataset where data is available from 2013 to 2019.
-  5. language: you can choose between portuguese and english
-```
+***
+
+**Examples:**
 
 ```{r eval=FALSE}
-# Download treated (raw_data = FALSE) silviculture data (dataset = 'pevs_silviculture') by state (geo_level = 'state') from 2012 (time_period =  2012) in portuguese (language = "pt")
+# Download treated (raw_data = FALSE) silviculture data (dataset = 'pevs_silviculture') 
+# by state (geo_level = 'state') from 2012 (time_period =  2012) 
+# in portuguese (language = "pt")
 data <- load_pevs(dataset = 'pevs_silviculture', 
                   raw_data = FALSE,
                   geo_level = 'state', 
                   time_period = 2012, 
                   language = "pt")
-# Download raw (raw_data = TRUE) forest crops data (dataset = 'pevs_forest_crops') by municipality (geo_level = 'municipality') from 2012 to 2013 (time_period = 2012:2013) in english (language = "eng")
+
+# Download raw (raw_data = TRUE) forest crops data by region 
+# from 2012 to 2013 in english
 data <- load_pevs(dataset = 'pevs_forest_crops', 
                   raw_data = TRUE, 
-                  geo_level = "municipality", 
-                  time_period = 2012:2013, 
-                  language = "eng")
+                  geo_level = "region", 
+                  time_period = 2012:2013)
 ```

@@ -1,28 +1,30 @@
 #' @title SIGMINE - Mining Geographic Information System
 #'
-#' @description Loads information the mines being explored legally in Brazil, including their location, status, product being mined and area in square meters etc. Survey is done at municipal and state level
+#' @description Loads information the mines being explored legally in Brazil, including their location, status, product being mined and area in square meters.
 #'
 #' @param dataset A dataset name ("sigmine_active")
-#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
+#' @inheritParams load_baci
 #'
-#' @return A \code{tibble} with the selected data.
-#'
-#' @encoding UTF-8
+#' @return A \code{tibble}.
 #'
 #' @export
-#' @importFrom magrittr %>%
 #'
 #' @examples \dontrun{
-#' # download state raw data
-#' sigmine_active <- load_sigmine(
+#' # Download treated data (raw_data = FALSE) in portuguese (language = "pt").
+#' data <- load_sigmine(
 #'   dataset = "sigmine_active",
-#'   raw_data = TRUE
+#'   raw_data = FALSE,
+#'   language = "pt"
 #' )
 #' }
 load_sigmine <- function(dataset = "sigmine_active",
-                         raw_data,
+                         raw_data = FALSE,
                          language = "eng") {
+
+  ##############################
+  ## Binding Global Variables ##
+  ##############################
+
   survey <- link <- nome <- uf <- NULL
 
   #############################
@@ -31,30 +33,8 @@ load_sigmine <- function(dataset = "sigmine_active",
 
   param <- list()
   param$dataset <- dataset
-  # param$geo_level = geo_level
-  # param$time_period = time_period
   param$language <- language
-  # param$time_id = time_id
   param$raw_data <- raw_data
-
-  param$survey_name <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(survey) %>%
-    unlist()
-
-  param$url <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(link) %>%
-    unlist()
-
-  ## Dataset
-
-  if (is.null(param$dataset)) {
-    stop("Missing Dataset!")
-  }
-  if (is.null(param$raw_data)) {
-    stop("Missing TRUE/FALSE for Raw Data")
-  }
 
   ######################
   ## Downloading Data ##
@@ -64,10 +44,10 @@ load_sigmine <- function(dataset = "sigmine_active",
     janitor::clean_names()
 
   ## Return Raw Data
-  if (raw_data == TRUE) {
+
+  if (param$raw_data) {
     return(dat)
   }
-
 
   ######################
   ## Data Engineering ##

@@ -1,40 +1,29 @@
 #' @title PAM - Municipal Agricultural Production
 #'
-#' @description Loads information on the  temporary and permanent crops of the Country that are characterized not only by their great economic importance in the export agenda, but also by their social relevance, since its components are on the Brazilian table (IBGE). Survey is done at the municipal level and data is available from 1974 to 2020 for most datasets. See \url{https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/16773-municipal-agricultural-production-temporary-and-permanent-crops.html?=&t=o-que-e}
+#' @description Loads information on the quantity, value and area of temporary and permanent crops cultivated.
 #'
 #' @param dataset A dataset name ("all_crops", "permanent_crops", "temporary_crops" or many individual crop possibilities (see \code{vignette(load_pam)})). You can also use SIDRA codes (see \url{https://sidra.ibge.gov.br/pesquisa/pam/tabelas})
-#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
-#' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state" or "municipality". See documentation of \code{sidrar}.
-#' @param time_period A \code{numeric} indicating what years will the data be loaded in the format YYYY. Can be a sequence of numbers such as 2010:2012.
-#' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported. Defaults to "eng".
+#' @inheritParams load_baci
+#' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state" or "municipality".
 #'
 #' @return A \code{tibble} consisting of geographic units that present positive values for any of the variables in the dataset.
 #'
-#' @encoding UTF-8
-#'
-#' @export
-#'
 #' @examples \dontrun{
-#' # download state raw data from 2012 for all crops
-#' pam_all_crops <- load_pam(
+#' # download treated data at the state level from 2010 to 2011 for all crops
+#' data <- load_pam(
 #'   dataset = "all_crops",
-#'   raw_data = TRUE,
+#'   raw_data = FALSE,
 #'   geo_level = "state",
-#'   time_period = 2012
+#'   time_period = 2010:2011,
+#'   language = "eng"
 #' )
 #' }
-load_pam <- function(dataset = NULL, raw_data,
+#'
+#' @export
+
+load_pam <- function(dataset, raw_data = FALSE,
                      geo_level, time_period,
                      language = "eng") {
-
-  ## Translation is only made through collapsing at the end
-  # - What if we wanted to deliver raw data?
-
-  ## To-Dos:
-  ## Include Progress Bar
-  ## Include Labels
-  ## Support for Raw Downloads in English
-  ## Write Vignettes
 
   ##############################
   ## Binding Global Variables ##
@@ -61,6 +50,7 @@ load_pam <- function(dataset = NULL, raw_data,
   param$geo_level <- geo_level
   param$time_period <- time_period
   param$language <- language
+  param$raw_data <- raw_data
 
   # Extracting sidra info in the form code/classific/category
 
@@ -98,10 +88,6 @@ load_pam <- function(dataset = NULL, raw_data,
   }
 
   ## Dataset
-
-  if (is.null(dataset)) {
-    stop("Missing Dataset!")
-  }
 
   if (param$code == 1612) { ## This is a subset of all crops
     param$data_name <- "Temporary Crops (Lavouras Temporarias)"
@@ -144,8 +130,9 @@ load_pam <- function(dataset = NULL, raw_data,
     dplyr::bind_rows() %>%
     tibble::as_tibble()
 
+  ## Return Raw Data
 
-  if (raw_data == TRUE) {
+  if (param$raw_data) {
     return(dat)
   }
 
