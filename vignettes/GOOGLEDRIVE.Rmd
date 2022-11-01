@@ -1,8 +1,8 @@
 ---
-title: "GOOGLEDRIVE"
+title: "googledrive"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{GoogleDrive}
+  %\VignetteIndexEntry{GOOGLEDRIVE}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -14,23 +14,12 @@ knitr::opts_chunk$set(
 )
 ```
 
-Some functions require that "googledrive" package is installed in order to run. This only means that these datasets have data stored in Google Drive.
+For some of our functions, the original data is stored in Google Drive. As a result, the `googledrive` package is required to download the data and run the function.
 
-When the package is downloaded and the functions ran, it requires somewhat invasive permissions, such as access to your files and changing or moving them. This happens because some features within the package can do this. However, none of them are used by datazoom.amazonia, as it only pulls data from a source in googledrive.
+The first time the package is called, it requires you to link your Google account and grant some permissions to be able to download data through the Google Drive API.
 
-Be aware that, in order to complete the download, you should allow the tidyverse API to access your Google Drive account, selecting the 'Yes' option when this message appears:
+You **must** tick all boxes when the permissions page opens, or else the following error will occur:
 
-```{r}
-# Is it OK to cache OAuth access credentials in the folder
-# C:/Users/vhste/AppData/Local/gargle/gargle/Cache between R sessions?
-
-# 1: Yes
-# 2: No
-```
-
-```
-Or else the following error will occur:
-```
 ```{r}
 #Error in `gargle_abort_request_failed()`:
 #! Client error: (403) Forbidden
