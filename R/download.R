@@ -653,7 +653,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     utils::download.file(url = path, destfile = temp, method = "curl", quiet = quiet)
   }
   if (download_method == "googledrive") {
-    message("Please follow the steps from `googledrive` package to download the data. This may take a while.")
+    message("Please follow the steps from `googledrive` package to download the data. This may take a while.\nIn case of authentication errors, run vignette(\"GOOGLEDRIVE\").")
 
     googledrive::drive_download(path, path = temp, overwrite = TRUE)
   }
