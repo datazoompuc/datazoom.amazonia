@@ -116,6 +116,19 @@ devtools::load_all()
 
 </td></tr> </table>
 
+**[4 - Other tools](#other-tools)**
+
+<table>
+
+<tr><td>
+
+|||
+|---|---|
+| **[Legal Amazon Municipalities](#legal-amazon-municipalities)** | _Dataset with brazilian cities and whether they belong to the Legal Amazon_ |
+| **[The 'googledrive' package](#googledrive)** | _Troubleshooting and information for downloads from Google Drive_ |
+
+</table>
+
 # Environmental Data
 
 ## PRODES
@@ -229,6 +242,8 @@ devtools::load_all()
 
 ```{r child = "vignettes/SIGMINE.Rmd"}
 ```
+
+# Other tools
 
 ## Legal Amazon Municipalities
 

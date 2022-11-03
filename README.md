@@ -116,6 +116,19 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 </tr>
 </table>
 
+**[4 - Other tools](#other-tools)**
+
+<table>
+<tr>
+<td>
+
+|                                                                 |                                                                             |
+|-----------------------------------------------------------------|-----------------------------------------------------------------------------|
+| **[Legal Amazon Municipalities](#legal-amazon-municipalities)** | *Dataset with brazilian cities and whether they belong to the Legal Amazon* |
+| **[The ‘googledrive’ package](#googledrive)**                   | *Troubleshooting and information for downloads from Google Drive*           |
+
+</table>
+
 # Environmental Data
 
 ## PRODES
@@ -1357,6 +1370,8 @@ data <- load_sigmine(dataset = 'sigmine_active',
                      language = "pt")
 ```
 
+# Other tools
+
 ## Legal Amazon Municipalities
 
 Many of our functions use a dataset with Brazilian municipalities, their
@@ -1374,13 +1389,14 @@ data <- datazoom.amazonia::municipalities
 
 ## <a name="googledrive"></a> The ‘googledrive’ package
 
-For some of our functions, the original data is stored in Google Drive.
+For some of our functions, the original data is stored in Google Drive
+and exceeds the file size limit for which direct downloads are possible.
 As a result, the `googledrive` package is required to download the data
-and run the function.
+though the Google Drive API and run the function.
 
 The first time the package is called, it requires you to link your
-Google account and grant some permissions to be able to download data
-through the Google Drive API.
+Google account and grant permissions to be able to download data through
+the Google Drive API.
 
 You **must** tick all boxes when the permissions page opens, or else the
 following error will occur:

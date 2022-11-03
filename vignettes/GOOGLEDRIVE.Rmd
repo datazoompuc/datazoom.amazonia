@@ -14,9 +14,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-For some of our functions, the original data is stored in Google Drive. As a result, the `googledrive` package is required to download the data and run the function.
+For some of our functions, the original data is stored in Google Drive and exceeds the file size limit for which direct downloads are possible. As a result, the `googledrive` package is required to download the data though the Google Drive API and run the function.
 
-The first time the package is called, it requires you to link your Google account and grant some permissions to be able to download data through the Google Drive API.
+The first time the package is called, it requires you to link your Google account and grant permissions to be able to download data through the Google Drive API.
 
 You **must** tick all boxes when the permissions page opens, or else the following error will occur:
 
