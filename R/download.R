@@ -610,7 +610,15 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source == "imazon_shp") {
     file_extension <- ".rds"
   }
-
+  if (source == "Energy") {
+    if(dataset %in% c("CMEEC", "BEN")){
+      file_extension <- ".xls"
+    } else {
+    if (dataset %in% c("SIGA"){
+      file_extension <- ".xlsx"
+    }
+    }
+  }
   # !!!  We should Change This to a Curl Process
 
   ## Define Empty Directory and Files For Download
@@ -820,6 +828,26 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
       dat <- readxl::read_xlsx(file, sheet = param$sheet)
     }
+    if (param$source == "energy") {
+      if (param$dataset == "CMEEC") {
+
+        #Finding sheet names
+        all_sheets <- readxl::excel_sheets(temp)
+
+        #Making a list with all the sheets
+        dat <-  purrr::map(
+          all_sheets,
+          function(sheets){
+            readxl::read_xls(temp, sheet = sheets)
+          }
+        )
+      }
+      if (param$dataset == "SIGA") {
+
+        dat <- readxl::read_xlsx(temp, skip = 1, col_names = TRUE)
+      }
+    }
+
   }
   if (file_extension == ".dbc") {
     dat <- read.dbc(temp)
@@ -1198,6 +1226,19 @@ datasets_link <- function() {
     ############
 
     "Imazon", "imazon_shp", NA, "2020", "Municipality", "https://drive.google.com/drive/u/1/folders/1EAOABo1GVKT3YsYkhtgJI9ckB3RULJSC",
+
+    ############
+    ## ENERGY ##
+    ############
+    "Energy", "CMEEC", NA, "2004-2022", "Region, Electric_Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/Documents/CONSUMO%20MENSAL%20DE%20ENERGIA%20EL%c3%89TRICA%20POR%20CLASSE.xls"
+
+     #SIGA = Sistema de Informacoes de Geracao da Aneel
+    "Energy", "SIGA", NA, "1908-2021", "Municipality", "https://git.aneel.gov.br/publico/centralconteudo/-/raw/main/relatorioseindicadores/geracao/BD_SIGA.xlsx?inline=false"
+
+     # BEN = Balanco Energetico Nacional
+     # Vai ser bem complicada de limpar. Vale a pena essa base?
+    "Energy", "BEN", NA, "2011-2022","https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/PublicacoesArquivos/publicacao-145/topico-515/Cap%C3%ADtulo%208%20-%20(Dados%20Estaduais).xls"
+
 
     ## Shapefile from github repository
 
