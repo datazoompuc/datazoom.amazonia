@@ -68,7 +68,7 @@ load_energy <- function(dataset = "SIGA", raw_data = FALSE, time_period,
 
   dat <- external_download(
     source = "Energy",
-    dataset = param$dataset
+    dataset = param$dataset,
     year = param$time_period
   )
 
