@@ -100,7 +100,7 @@ load_energy <- function(dataset = "SIGA", raw_data = FALSE, time_period,
 
           #renomear colunas
           df2[1,4] <- NA
-          names(df2) <- c("Estado", "Mes", "Valor", "Ano")
+          names(df2) <- c("Estado", "Mes", paste0(sheet_name), "Ano")
 
           #criar uma coluna de ano onde entra o ano de cada observacao de acordo com o numero associado ao mes
           for(i in 1:nrow(df2)){
@@ -182,19 +182,22 @@ load_energy <- function(dataset = "SIGA", raw_data = FALSE, time_period,
 
         }
 
-        #Run function that tidies sheets and bind all sheets together
-
+        #Define an empty data.frame that will receive the data
         final_dat <- data.frame(Estado = as.character(NULL),
                                 Mes = as.character(NULL),
                                 Ano = as.integer(NULL))[numeric(0), ]
 
-        for(i in 1:length(sheets_selected)){
+        #Run function that tidies sheets and bind all sheets together
+        for(i in 1:nrow(sheets_selected)){
           single_sheet <- manipular(paste0(sheets_selected[i,1]))
-          final_dat <- full_join(final_dat, single_sheet, by = c("Estado", "Mes", "Ano"))
+          final_dat <- inner_join(final_dat, single_sheet, by = c("Estado", "Ano", "Mes"))
         }
 
-        #If user selects region level
+        #If user selects Region geo_level
       } else if (geo_level == "Region"){}
+
+      #If user selects SubSystem geo_level
+      else if (geo_level == "SubSystem"){}
 
 } else if (param$dataset == "SIGA"){}
 
