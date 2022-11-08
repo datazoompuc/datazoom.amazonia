@@ -1,0 +1,540 @@
+---
+title: "Contribution Guide"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Contribution Guide}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The point of this document is to present the structure of the `datazoom.amazonia` functions, and share our workflow of how to create new functions.
+
+We will add as many examples as possible to show how things actually work, and this document should be continuously improved upon, adding new sections as our functions are changed.
+
+## General structure of our functions
+
+The starting point to a `datazoom.amazonia` function is some interesting database to explore. The function you then create should allow the user to, [at the touch of a button](https://www.youtube.com/watch?v=aEN4__UhghU), have the data automatically downloaded, cleaned, and provided in the format they desire. The diagram below (created with some [cool R code](https://bookdown.org/yihui/rmarkdown-cookbook/diagrams.html)) summarises the process of creating a new function.
+
+```{r, echo = FALSE}
+DiagrammeR::grViz("digraph {
+  graph [layout = dot, rankdir = TB]
+  
+  node [shape = rectangle]        
+  rec1 [label = 'Write code to automate the download']
+  rec2 [label = 'Make into a working function, following our template']
+  rec3 [label = 'Pick the appropriate parameters']
+  rec4 [label = 'Make the data as neat as possible for the user']
+  rec5 [label = 'Documentation and checks']
+  
+  # edge definitions with the node IDs
+  rec1 -> rec2 -> rec3 -> rec4 -> rec5
+  }")
+```
+
+## Automating the download
+
+Once you've settled on creating some new **load_*****database*** function, you have to figure out how to get some piece of code to automatically download the data for you.
+
+At this point it is crucial that you understand the downloading process yourself before teaching the machine to do it for you. That means manually opening your browser, downloading the data and having a look at it. Usually it's just a simple spreadsheet -- or many spreadsheets -- in `.csv` or `.xls`, but spatial data is different and data can come in odd file extensions or be compressed to a `.zip` file, which you'll have to get your code to deal with. If you run into some different edge case, it is likely that some existing function already deals with the same issue, so have a careful look around.
+
+By downloading the data yourself manually, you should obtain a **direct download link**. If you paste this URL into your browser, the download should begin by itself. You can usually easily copy and paste this download link from the site the data is stored at, but another trick is to go to your browser **Downloads** and try to get the link from there.
+
+Once you have the URL, write up some code like this:
+
+```{r, eval = FALSE}
+path <- "www.../download-link/"
+
+# we can't clutter our users' PCs with random files,
+# so we create a temporary folder and save the data
+# into a temporary file therein
+dir <- tempdir()
+temp <- tempfile(fileext = ".csv", tmpdir = dir) 
+# fileext can be any other format  
+  
+download.file(url = path, destfile = temp, mode = "wb")  
+```
+
+If all goes according to plan, the object `temp` now stores the path to the data you just downloaded in your computer. In some cases, data is stored in Google Drive, which requires using the `googledrive` package, which already has a code bit ready in `external_download`. In other cases, this way of downloading just fails, and you must also try
+
+```{r, eval = FALSE}
+utils::download.file(url = path, destfile = temp, method = "curl")
+```
+
+Depending on the file extension, opening the data entails something like
+
+```{r, eval = FALSE}
+dat <- readr::read_csv(temp)
+# or
+dat <- readxl::read_xls(temp)
+# or...
+```
+
+Before actually creating the function, it is strongly recommended that you get the general code above to work, at least before you've got the hang of things.
+
+Since basically all of your functions require very similar download code, it would make no sense to write the same thing over and over again. Instead, we coded the `external_download` function, which can run each particular case we need once you specify its parameters.
+
+The next section will show you how to incorporate this code into our more automated structure, which relies on the `external_download` function defined in the `download.R` file. I'd encourage you to have a look at it -- you're not expected to understand a whole lot right now. If you can get through the endless _if_ conditions, you can see that behind such a daunting facade lies some code pretty much like the one you just wrote.
+
+## Creating the function
+
+Just create a `load_database.R` file in the `datazoom.amazonia/R/` folder. You can start by just taking your previous code and packaging it into a function
+
+```{r, eval = FALSE}
+load_database <- function(){
+  path <- "www.../download-link/"
+
+  dir <- tempdir()
+  temp <- tempfile(fileext = ".csv", tmpdir = dir) 
+  
+  download.file(url = path, destfile = temp, mode = "wb")
+
+  dat <- readr::read_csv(temp)
+  
+  return(dat)
+}
+```
+
+Very often, this will require some changes right off the gate. A database usually contains more than one dataset, which can be stored in different download URLs. This would lead to something like
+
+```{r}
+load_database <- function(dataset){
+  if (dataset == "dataset1"){
+    path <- "www.../download-link/file1"
+  }
+  if (dataset == "dataset2"){
+    path <- "www.../download-link/file2"
+  }
+
+  dir <- tempdir()
+  temp <- tempfile(fileext = ".csv", tmpdir = dir) 
+  
+  download.file(url = path, destfile = temp, mode = "wb")
+
+  dat <- readr::read_csv(temp)
+  
+  return(dat)
+}
+```
+
+Once you get this to work, you can move on in a couple different ways. One option is to incorporate this code into our `external_download` framework -- the code above should only serve as a temporary aid, none of our functions actually call `download.file` directly. The other option is to just go ahead and complement your `load_database.R` with some data cleaning code -- this can better to start with if the database isn't crazy complicated.
+
+If you go the former route, stick around.
+
+### An `external_download` explainer
+
+If you scroll down the `download.R` file, you'll reach the `external_download` function. Now keep scrolling all the way down and you'll find `datasets_link`. THis function is how we actually store all the download URLs we need instead of manually pasting them into the body of our functions.
+
+It looks something like this
+
+```{r}
+datasets_link <- function() {
+
+  ## Add file type at the end in order to set the Curl Process
+
+  link <- tibble::tribble(
+    ~survey, ~dataset, ~sidra_code, ~available_time, ~available_geo, ~link,
+    "PAM-IBGE", "all_crops", "5457/all/all", "1974-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    
+    # ...
+    
+    "...", "...", "...", "...", "...", "...",
+    
+    # ...
+    
+    ############
+    ## IMAZON ##
+    ############
+
+    "Imazon", "imazon_shp", NA, "2020", "Municipality", "https://drive.google.com/drive/u/1/folders/1EAOABo1GVKT3YsYkhtgJI9ckB3RULJSC",
+
+    ## Shapefile from github repository
+
+    "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds",
+  )
+
+  return(link)
+}
+```
+
+If you actually run it, you'll see that it just creates a data frame
+
+```{r}
+datasets_link()
+```
+
+At the start of the `external_download` code, you can see that it's used right away
+
+```{r, eval = FALSE}
+## Create Basic Url
+
+  dat_url <- datasets_link() # stores the whole data frame
+
+  param$url <- dat_url %>%
+    dplyr::filter(dataset == param$dataset) %>% # picks only the row
+                                          # with the dataset you want
+    dplyr::select(link) %>% # only grabs the column with the link
+    base::unlist() %>% # turns it from a tibble to a vector
+    as.character()
+```
+
+So, when you make a new function, you should add a new row to `datasets_link` for each dataset you need
+
+```{r, eval = FALSE}
+datasets_link <- function() {
+
+  ## Add file type at the end in order to set the Curl Process
+
+  link <- tibble::tribble(
+    
+    # ...
+    
+    ###################
+    ## Your Database ##
+    ###################
+
+    "Database", "dataset1", NA, "2020", "Municipality", "https://www...",
+    "Database", "dataset2", NA, "2020", "Municipality", "https://www...",
+
+    ## Shapefile from github repository
+
+    "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds",
+  )
+
+  return(link)
+}
+```
+
+Then, instead of having to write `url <- "https://www..."` in your code, `external_download` just grabs it from `datasets_link()` and stores it into `dat_url`.
+
+The next section of `external_download` is
+
+```{r, eval = FALSE}
+  #####################
+  ## Construct Links ##
+  #####################
+
+  ...
+
+  ###################
+  ## Your Database ##
+  ###################
+
+  if (source == "database") {
+      path <- param$url
+  }
+
+  ...
+  
+```
+
+`path` is the object that actually goes into `download.file()`. Depending on the dataset, you may have to paste something at the end of the URL for different years or datasets, and this is what that section is for.
+
+What comes next is
+
+```{r, eval = FALSE}
+  #######################
+  ## Initiate Download ##
+  #######################
+
+  ## We should be careful when the downloaded files is terminated in .xlsx
+
+  file_extension <- stringr::str_sub(path, -4) # grabs the last 4 characters
+                                    # of your download link.
+
+  # if it's something like "www.../file.csv", you'se all set.
+  # file_extension will be automatically ".csv"
+
+  ...
+  
+  # in case something's off, or your file extension doesn't have
+  # exactly 3 characters, you have to specify
+
+  if (source == "database"){
+    file_extension <- ".xxxx"
+  }
+  
+  ...
+```
+
+And finally, the next section is the most important
+
+```{r, eval = FALSE}
+## Define Empty Directory and Files For Download
+
+  dir <- tempdir()
+  temp <- tempfile(fileext = file_extension, tmpdir = dir)
+
+  ## Picking the way to download the file
+
+  download_method <- "standard" # works for most functions
+
+  if (source %in% c("iema", "imazon_shp")) {
+    download_method <- "googledrive"
+  }
+  if (source %in% c("deter", "terraclimate", "baci")) {
+    download_method <- "curl"
+    quiet <- FALSE
+  }
+  if (source %in% c("ibama", "health")) {
+    download_method <- "curl"
+    quiet <- TRUE
+  }
+  if (source == "seeg") {
+    if (geo_level == "municipality") {
+      download_method <- "googledrive"
+    }
+  }
+  if (source == "mapbiomas") {
+    if (dataset %in% c("mapbiomas_cover", "mapbiomas_transition") & param$geo_level == "municipality") {
+      download_method <- "googledrive"
+    }
+  }
+
+  ## Downloading file by the selected method
+
+  if (download_method == "standard") {
+    utils::download.file(url = path, destfile = temp, mode = "wb")
+  }
+  if (download_method == "curl") {
+    utils::download.file(url = path, destfile = temp, method = "curl", quiet = quiet)
+  }
+  if (download_method == "googledrive") {
+    message("Please follow the steps from `googledrive` package to download the data. This may take a while.")
+
+    googledrive::drive_download(path, path = temp, overwrite = TRUE)
+  }
+```
+
+A lot of this should look very familiar! Understanding this part is left as an essential exercise for the reader. You must pick which download method you want for your function, specifying it in one of the conditions above.
+
+From now on, the function also automatically reads your data depending on the `file_extension`.
+
+So, once you've added all you need to `download.R`, you should be able to download your data automatically by adding your changes to the package with `devtools::load_all()` and running
+
+```{r, eval = FALSE}
+  dat <- external_download(
+    source = "database",
+    dataset = "dataset1"
+  )
+```
+
+Add it to your function instead of that more manual download and make the whole thing look like the template in the next section.
+
+### The function template
+
+Pretty much all of our functions follow the format below. Do not underestimate the utility of `#` comments and the big section separators such as for `## Bind Global Variables`. They make code lot clearer. Add as many comments as possible, try to always explain what you're doing!
+
+```{r, eval = FALSE}
+#' @title Database - some explanation
+#'
+#' ...
+#'
+#' This is the Roxygen skeleton, which is generated automatically,
+#' and one you fill it up with info, it created the function help file
+load_database <- function(dataset = "default_dataset",
+                          raw_data = FALSE,
+                          time_period, # no default year, user must choose
+                          language = "eng") {
+
+  ###########################
+  ## Bind Global Variables ##
+  ###########################
+
+  a <- b <- ... <- NULL
+  # A technicality that will come up later
+
+  #############################
+  ## Define Basic Parameters ##
+  #############################
+
+  param <- list()
+  param$dataset <- dataset
+  param$raw_data <- raw_data
+  param$time_period <- time_period
+  param$language <- language
+  
+  # All parameters are packed into a list. This makes the code a lot more
+  # readable, as you always know when a parameter is called.
+  # From here on, you'll never call the dataset object, but param$dataset.
+
+  #################
+  ## Downloading ##
+  #################
+
+  dat <- external_download(
+    source = "database",
+    dataset = param$dataset,
+    ... # maybe something else is required, such as a year option
+  )
+
+  ## Return Raw Data
+
+  if (param$raw_data) {
+    return(dat)
+  }
+
+  ######################
+  ## Data Engineering ##
+  ######################
+
+  # All the cleaning and wrangling you find appropriate
+  
+  ################################
+  ## Harmonizing Variable Names ##
+  ################################
+
+  if (param$language == "eng") {
+    dat_mod <- dat %>%
+      dplyr::rename(
+        ...
+      )
+  }
+  if (param$language == "pt") {
+    dat_mod <- dat %>%
+      dplyr::rename(
+        ...
+      )
+  }
+
+  return(dat_mod)
+}
+```
+
+## Parameters
+
+## Data Engineering
+
+## Documentation and Checks
+
+### Checklist
+
+  * Run `devtools::check`, make sure there are no notes, warnings, or errors
+  
+  * Run `styler::style_file()`
+  
+  * Test all possibilities
+
+## The Structure of the functions
+
+**1. Bind Global Variables:** The goal is to ensure that all the variables in the function were initialized to some value. We also do this to avoid errors when we check the function.
+
+**2. Define Basic Parameters:** Create a list with all the parameters from the function. The list *param* will be an organized list with all the parameters of interest.
+
+**3. Download Data:** In the majority of our functions, we download data by using external_download(). However, when we download data from IBGE, we use a function called sidra_download(). Both of these functions can be found in the "download.R" file. 
+
+**4. Data Engineering:** In this section of the code, we (i) exclude variables that we judge not to be relevant;(ii) sometimes we change the class of some variables; (iii) sometimes we change data to be organized in the long format or in the wide format depending on what we want; (iv) generally speaking, it's in this part of the code that we make the most changes in the original Data Frame.  
+
+**5. Harmonizing Variable Names:** Rename columns with better names. 
+
+**6. Load Dictionary:** In the functions that work with IBGE's data, we use the function "load_dictionary()". This function creates an organized correspondence between the code of each product, its name, its unit of measure and other attributes. 
+
+**7. Translation / add variables:** After having organized the Data Frame, we then translate it.  In some functions, the translation will start in a section called "Labelling" and data from the "dictionary.R" file will be used. In other functions, you will see the names of the columns being translated first and then each line of the original Data Frame will be translated.
+
+**8. Return Data Frame:** In the structure of our functions, you will see **(raw_data == TRUE){return(dat)}** right after "Downloading Data". All the changes explained in this document will only happen in case the user specifies **(raw_data == FALSE)**. 
+
+## Examples
+
+**1. Bind Global Variables:** example from *load_cempre()*
+
+```{r}
+sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- ano <- ano_codigo <- classificacao_nacional_de_atividades_economicas_cnae_2_0_codigo <- geo_id <- id_code <- nivel_territorial <- nivel_territorial_codigo <- valor <- variavel <- unidade_de_medida <- unidade_de_medida_codigo <- NULL
+```
+
+**2. Define Basic Parameters:** example from *load_deter()*
+
+```{r}
+# param=list()
+#  param$dataset = dataset
+#  param$time_period = time_period
+#  param$language = language
+#  param$raw_data = raw_data
+#  param$survey_name = datasets_link() %>%
+#    dplyr::filter(dataset == param$dataset) %>%
+#    dplyr::select(survey) %>%
+#    unlist()
+#  param$url = datasets_link() %>%
+#    dplyr::filter(dataset == param$dataset) %>%
+#    dplyr::select(link) %>%
+#    unlist()
+```
+
+**3. Download Data:** example from *load_degrad()*. It uses the *external_download()* function.
+
+```{r}
+# dat = suppressWarnings(as.list(param$time_period) %>%
+#      purrr::map(
+#        function(t){external_download(dataset = param$dataset,
+#                                      source='degrad', year = t) %>%
+#            janitor::clean_names()
+#        }
+#      ))
+```
+
+**4. Data Engineering**: example from *load_pam()*. In this process, we decided to exclude some columns and convert the variable "valor" to become numeric. After that we excluded all the lines with **NA**. 
+
+```{r}
+# dat = dat %>%
+#           janitor::clean_names() %>%
+#           dplyr::mutate_all(function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")})# %>%
+          # dplyr::mutate_all(clean_custom)
+#   dat = dat %>%
+#     dplyr::select(-c(nivel_territorial_codigo,nivel_territorial,ano_codigo)) %>%
+#     dplyr::mutate(valor=as.numeric(valor))
+#   dat = dat %>%
+#     dplyr::filter(!is.na(valor))
+```
+
+**5. Harmonizing Variable Names:** example from *load_pam()*. We localize some datasets by using their numerical codes and within each of these datasets we renamed some columns.
+
+```{r}
+# if (param$code == 5457){
+#     dat = dat %>%
+#       dplyr::rename(produto_das_lavouras_codigo = produto_das_lavouras_temporarias_e_permanentes_codigo,
+#                     produto_das_lavouras = produto_das_lavouras_temporarias_e_permanentes)
+#   }
+#   if (param$code == 1613){
+#     dat = dat %>%
+#       dplyr::rename(produto_das_lavouras_codigo = # produto_das_lavouras_permanentes_codigo,
+#                     produto_das_lavouras = produto_das_lavouras_permanentes)
+#   }
+#   if (param$code %in% c(839,1000,1001,1002,1612)){
+#     dat = dat %>%
+#       dplyr::rename(produto_das_lavouras_codigo = # produto_das_lavouras_temporarias_codigo,
+#                   produto_das_lavouras = produto_das_lavouras_temporarias)
+#   }
+```
+
+**6. Load Dictionary:** example from *load_pam()*. For functions with data from IBGE, we load the dictionary and then we convert the variable "var_code" to become a character. Finally we exclude the observations where var_code == "0".
+
+```{r}
+# dic = load_dictionary(param$dataset)
+#  types = as.character(dic$var_code)
+#  types = types[types != "0"] 
+```
+
+**7. Translation / add variables:** example from *load_degrad()*.This section translates the names of the columns of the original Data Frame.In this example, the original columns (variables) were in English and therefore we translated it to Portuguese in case the user chooses it.
+
+```{r}
+# if (param$language == 'pt'){
+#    dat_mod = dat %>%
+#      dplyr::select(ano = year, linkcolumn, scene_id,
+#                    cod_uf = code_state, cod_municipio = code_muni,
+#                    classe = class_name, pathrow, area, data = view_date,
+#                    julday, geometry
+#      ) %>%
+#      dplyr::arrange(ano, cod_municipio, classe)
+#  }
+```
