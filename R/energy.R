@@ -187,12 +187,34 @@ load_energy <- function(dataset = "SIGA", raw_data = FALSE, time_period,
                                 Mes = as.character(NULL),
                                 Ano = as.integer(NULL))[numeric(0), ]
 
+        ##############################################################
+        #####################  COMECO DO PROBLEMA  ###################
+        ##############################################################
+
         #Run function that tidies sheets and bind all sheets together
+
+               #Opcao 1
         for(i in 1:nrow(sheets_selected)){
           single_sheet <- manipular(paste0(sheets_selected[i,1]))
           final_dat <- inner_join(final_dat, single_sheet, by = c("Estado", "Ano", "Mes"))
         }
 
+               #Opcao 2
+        for(i in 1:nrow(sheets_selected)){
+          final_dat <- manipular(paste0(sheets_selected[i,1])) %>%
+            inner_join(final_dat)
+        }
+
+               #Opcao 3
+        purrr::map(sheets_selected,
+                   function(sheet){
+                     final_dat <- manipular(sheet) %>%
+                       inner_join(final_dat, by = c("Estado", "Mes", "Ano"))
+                   })
+
+        ########################################################
+        ###################  FIM DO PROBLEMA ###################
+        ########################################################
         #If user selects Region geo_level
       } else if (geo_level == "Region"){}
 
