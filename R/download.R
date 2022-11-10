@@ -618,6 +618,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source == "imazon_shp") {
     file_extension <- ".rds"
   }
+  if (source == "EPE"){
+    file_extension <- ".xls"
+  }
   if (source == "Energy") {
     if(dataset %in% c("CMEEC", "BEN")){
       file_extension <- ".xls"
@@ -836,6 +839,11 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       file <- list.files(dir, pattern = "1-ESTATISTICAS_MapBiomas_COL6.0_UF-MUNICIPIOS_*", full.names = TRUE)
 
       dat <- readxl::read_xlsx(file, sheet = param$sheet)
+    }
+    if (param$source == "EPE"){
+
+      dat <- readxl::read_xls(temp)
+
     }
     if (param$source == "energy") {
       if (param$dataset == "CMEEC") {
@@ -1236,20 +1244,28 @@ datasets_link <- function() {
 
     "Imazon", "imazon_shp", NA, "2020", "Municipality", "https://drive.google.com/drive/u/1/folders/1EAOABo1GVKT3YsYkhtgJI9ckB3RULJSC",
 
-    ############
-    ## ENERGY ##
-    ############
-    "Energy", "CMEEC", NA, "2004-2022", "Region, Electric_Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/Documents/CONSUMO%20MENSAL%20DE%20ENERGIA%20EL%c3%89TRICA%20POR%20CLASSE.xls",
+    #########
+    ## EPE ##
+    #########
 
-     #SIGA = Sistema de Informacoes de Geracao da Aneel
-    "Energy", "SIGA", NA, "1908-2021", "Municipality", "https://git.aneel.gov.br/publico/centralconteudo/-/raw/main/relatorioseindicadores/geracao/BD_SIGA.xlsx?inline=false",
+    "EPE", "CONSUMO", NA, "2004-2021", "Region, Electric_Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/Documents/CONSUMO%20MENSAL%20DE%20ENERGIA%20EL%c3%89TRICA%20POR%20CLASSE.xls",
+    "EPE", "CONSUMIDOR", NA, "2004-2021", "Region, Electric_Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/Documents/CONSUMO%20MENSAL%20DE%20ENERGIA%20EL%c3%89TRICA%20POR%20CLASSE.xls",
 
-     # BEN = Balanco Energetico Nacional
-     # Vai ser bem complicada de limpar. Vale a pena essa base?
-    "Energy", "BEN", NA, "2011-2022", "Region, Municipality","https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/PublicacoesArquivos/publicacao-145/topico-515/Cap%C3%ADtulo%208%20-%20(Dados%20Estaduais).xls",
+    ##########
+    ## SIGA ##
+    ##########
+
+    "SIGA", "SIGA", NA, "1908-2021", "Municipality", "https://git.aneel.gov.br/publico/centralconteudo/-/raw/main/relatorioseindicadores/geracao/BD_SIGA.xlsx?inline=false",
+
+    #########
+    ## BEN ##
+    #########
+
+    "BEN", "BEN", NA, "2011-2022", "Region, Municipality","https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/PublicacoesArquivos/publicacao-145/topico-515/Cap%C3%ADtulo%208%20-%20(Dados%20Estaduais).xls",
 
 
     ## Shapefile from github repository
+
 
     "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds",
   )
