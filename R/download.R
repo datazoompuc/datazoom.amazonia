@@ -618,18 +618,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source == "imazon_shp") {
     file_extension <- ".rds"
   }
-  if (source == "EPE"){
+  if (source == "EPE") {
     file_extension <- ".xls"
   }
-  if (source == "Energy") {
-    if(dataset %in% c("CMEEC", "BEN")){
-      file_extension <- ".xls"
-    } else {
-    if (dataset %in% c("SIGA")){
-      file_extension <- ".xlsx"
-    }
-    }
-  }
+
 
   # !!!  We should Change This to a Curl Process
 
@@ -691,6 +683,25 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   # This Depends on Data Type (.csv, .shp, ...) and on datasource
 
   # df = sf::read_sf(paste(dir, "deter_public.shp", sep = "/"))
+
+  if (file_extension == ".xls"){
+    if (param$source == "EPE"){
+
+      #Finding sheet names
+      all_sheets <- readxl::excel_sheets(temp)
+
+      #Making a list with all the sheets
+      dat <- purrr::map(
+        all_sheets,
+        function(sheets){
+          readxl::read_xls(temp, sheet = sheets)
+        }
+      )
+
+      names(dat) <- all_sheets
+
+    }
+  }
 
   if (file_extension == ".csv") {
     dat <- data.table::fread(temp) %>% tibble::as_tibble()
@@ -840,22 +851,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
       dat <- readxl::read_xlsx(file, sheet = param$sheet)
     }
-    if (param$source == "EPE"){
 
-      #Finding sheet names
-      all_sheets <- readxl::excel_sheets(temp)
-
-      #Making a list with all the sheets
-      dat <-  purrr::map(
-        all_sheets,
-        function(sheets){
-          readxl::read_xls(temp, sheet = sheets)
-        }
-      )
-
-        names(dat) <- all_sheets
-
-    }
     if (param$source == "energy") {
       if (param$dataset == "CMEEC") {
 

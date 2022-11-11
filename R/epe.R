@@ -57,8 +57,8 @@ load_epe <- function(dataset, raw_data = FALSE, time_period = 2004:2021,
       filter(Sistema == "Sistemas Isolados") %>%
       drop_na() %>%
       slice(-1) %>% # remove ano corrente, para o qual dados sao parciais
-      mutate(Ano = 2021:2004) %>%  mutate(Ano = as.numeric(Ano)) %>%
-      select(Ano, Total) %>%
+      mutate(ano = 2021:2004) %>%  mutate(ano = as.numeric(ano)) %>%
+      select(ano, Total) %>%
       mutate(tipo = paste0("CONSUMO ", sheet_name)) %>% # adiciona coluna para tipo de consumo
       rename("valor" = "Total")
 
@@ -76,11 +76,11 @@ load_epe <- function(dataset, raw_data = FALSE, time_period = 2004:2021,
       clean_df <- df %>%
         filter(Sistema == "Sistemas Isolados") %>%
         slice(-1) %>% #remove ano corrente, para o qual dados sao parciais
-        mutate(Ano = 2021:2004)  %>%
+        mutate(ano = 2021:2004)  %>%
         pivot_longer(cols = c(2:13), names_to = "Mes", values_to = "Quantidade") %>%
-        select(Ano, Quantidade) %>% #tira a coluna "Sistema", que tinha apenas valores iguais ("Sistemas Isolados") e "Mes"
-        mutate(Ano = as.numeric(Ano), Quantidade = as.numeric(Quantidade)) %>%
-        group_by(Ano) %>%
+        select(ano, Quantidade) %>% #tira a coluna "Sistema", que tinha apenas valores iguais ("Sistemas Isolados") e "Mes"
+        mutate(ano = as.numeric(ano), Quantidade = as.numeric(Quantidade)) %>%
+        group_by(ano) %>%
         dplyr::summarise(media = mean(Quantidade)) %>%
         mutate(tipo = sheet_name) # adiciona coluna para tipo de consumidor
 
