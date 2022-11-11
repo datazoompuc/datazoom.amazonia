@@ -25,7 +25,7 @@
 #'
 #' @export
 
-load_epe <- function(dataset, raw_data = FALSE, time_period,
+load_epe <- function(dataset, raw_data = FALSE, time_period = 2004:2021,
                      language = "pt", geo_level = "state"){
 
   param <- list()

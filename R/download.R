@@ -853,11 +853,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
         }
       )
 
-      for(i in 1:length(all_sheets)){
+        names(dat) <- all_sheets
 
-        names(dat)[i] <- all_sheets[i]
-
-      }
     }
     if (param$source == "energy") {
       if (param$dataset == "CMEEC") {
