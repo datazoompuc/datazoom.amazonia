@@ -559,7 +559,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## Energy ##
   ############
 
-  if (source == "Energy") {
+  if (source == "EPE") {
    path <- param$url
   }
 
@@ -842,8 +842,22 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
     if (param$source == "EPE"){
 
-      dat <- readxl::read_xls(temp)
+      #Finding sheet names
+      all_sheets <- readxl::excel_sheets(temp)
 
+      #Making a list with all the sheets
+      dat <-  purrr::map(
+        all_sheets,
+        function(sheets){
+          readxl::read_xls(temp, sheet = sheets)
+        }
+      )
+
+      for(i in 1:length(all_sheets)){
+
+        names(dat)[i] <- all_sheets[i]
+
+      }
     }
     if (param$source == "energy") {
       if (param$dataset == "CMEEC") {

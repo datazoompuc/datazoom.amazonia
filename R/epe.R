@@ -25,16 +25,15 @@
 #'
 #' @export
 
-load_epe <- function(raw_data = FALSE, time_period,
+load_epe <- function(dataset, raw_data = FALSE, time_period,
                      language = "pt", geo_level = "state"){
 
   param <- list()
   param$dataset <- dataset
   param$raw_data <- raw_data
   param$geo_level <- geo_level
-  param$time_period <- time_period
   param$language <- language
-
+  param$time_period <- time_period
 
   dat <- external_download(
     source = "EPE",
@@ -48,11 +47,13 @@ load_epe <- function(raw_data = FALSE, time_period,
 
     # funcao para limpar dados de consumo -----------------------------------------------
     limpa_consumo <- function(sheet_name) {
-    # troca nome das colunas
-    colnames(raw_df) <- c("Sistema", 1:12, "Total")
+
+       # troca nome das colunas
+    df <- as.data.frame(dat[sheet_name])
+      colnames(df) <- c("Sistema", 1:12, "Total")
 
     # limpa
-    clean_df <- raw_df %>%
+    clean_df <- df %>%
       filter(Sistema == "Sistemas Isolados") %>%
       drop_na() %>%
       slice(-1) %>% # remove ano corrente, para o qual dados sao parciais
@@ -67,12 +68,12 @@ load_epe <- function(raw_data = FALSE, time_period,
 
      # funcao para limpar dados de consumidores -----------------------------------------------
     limpa_consumidores <- function(sheet_name) {
-
+      df <- as.data.frame(dat[sheet_name])
       # troca nome das colunas
-      colnames(raw_df) <- c("Sistema", 1:12)
+      colnames(df) <- c("Sistema", 1:12)
 
       # limpa
-      clean_df <- raw_df %>%
+      clean_df <- df %>%
         filter(Sistema == "Sistemas Isolados") %>%
         slice(-1) %>% #remove ano corrente, para o qual dados sao parciais
         mutate(Ano = 2021:2004)  %>%
