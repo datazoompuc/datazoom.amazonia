@@ -2,7 +2,7 @@
 #'
 #' @description Electrical Energy Monthly Consumption per Class
 #'
-#' @param dataset A dataset name ("SIGA").
+#' @param dataset A dataset name ("epe").
 #' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
 #' @param time_period A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.
 #' @param language A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.
@@ -27,6 +27,16 @@
 
 load_epe <- function(dataset, raw_data = FALSE, time_period = 2004:2021,
                      language = "pt", geo_level = "state"){
+
+  ###########################
+  ## Bind Global Variables ##
+  ###########################
+
+
+
+  #############################
+  ## Define Basic Parameters ##
+  #############################
 
   param <- list()
   param$dataset <- dataset
@@ -104,6 +114,9 @@ load_epe <- function(dataset, raw_data = FALSE, time_period = 2004:2021,
   db_consumo <- bind_rows(list(db_consumo_total, db_consumo_residencial,
                                db_consumo_industrial, db_consumo_comercial,
                                db_consumo_outros))
+
+  db_consumo <- filter(db_consumo, ano %in% param$time_period)
+
  return(db_consumo)
   }
   # dados de consumidores -------------------------------------------------------------
@@ -118,6 +131,8 @@ load_epe <- function(dataset, raw_data = FALSE, time_period = 2004:2021,
 
   # bind all
   db_consumidores <- bind_rows(list(db_consumidores_total, db_consumidores_residencial))
+
+  db_consumidores <- filter(db_consumidores, ano %in% param$time_period)
 
   return(db_consumidores)
 }

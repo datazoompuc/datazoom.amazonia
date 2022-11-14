@@ -563,6 +563,31 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
    path <- param$url
   }
 
+  #########
+  ## BEN ##
+  #########
+
+  if (source == "BEN") {
+    path <- param$url
+  }
+
+  ###########
+  ## ANEEL ##
+  ###########
+
+  if (source == "ANEEL") {
+    path <- param$url
+  }
+
+  ##########
+  ## SIGA ##
+  ##########
+
+  if (source == "SIGA") {
+    path <- param$url
+  }
+
+
   #######################
   ## Initiate Download ##
   #######################
@@ -621,6 +646,15 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source == "EPE") {
     file_extension <- ".xls"
   }
+  if (source == "BEN") {
+    file_extension <- ".csv"
+  }
+  if (source == "ANEEL") {
+    file_extension <- ".csv"
+  }
+  if (source == "SIGA") {
+    file_extension <- ".xlsx"
+  }
 
 
   # !!!  We should Change This to a Curl Process
@@ -634,7 +668,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   download_method <- "standard" # works for most functions
 
-  if (source %in% c("iema", "imazon_shp")) {
+  if (source %in% c("iema", "imazon_shp", "BEN", "ANEEL")) {
     download_method <- "googledrive"
   }
   if (source %in% c("deter", "terraclimate", "baci")) {
@@ -667,7 +701,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (download_method == "googledrive") {
     message("Please follow the steps from `googledrive` package to download the data. This may take a while.")
 
-    googledrive::drive_download(path, path = temp, overwrite = TRUE)
+   googledrive::drive_download(path, path = temp, overwrite = TRUE)
   }
 
   ## This Data Opening Part Should Include the .Shp, not DBF
@@ -852,26 +886,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       dat <- readxl::read_xlsx(file, sheet = param$sheet)
     }
 
-    if (param$source == "energy") {
-      if (param$dataset == "CMEEC") {
-
-        #Finding sheet names
-        all_sheets <- readxl::excel_sheets(temp)
-
-        #Making a list with all the sheets
-        dat <-  purrr::map(
-          all_sheets,
-          function(sheets){
-            readxl::read_xls(temp, sheet = sheets)
-          }
-        )
-      }
-      if (param$dataset == "SIGA") {
-
-        dat <- readxl::read_xlsx(temp, skip = 1, col_names = TRUE)
-      }
-    }
-
   }
   if (file_extension == ".dbc") {
     dat <- read.dbc(temp)
@@ -882,6 +896,18 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   #   dat = sf::read_sf(paste(dir,file,sep='\\'))
   # }
 
+  if (param$source == "ANEEL"){
+    if (param$dataset == "ccc"){
+      dat <- readr::read_csv(file, col_names = TRUE)
+    }
+  }
+
+  if (param$source == "SIGA"){
+    if (param$dataset == "siga"){
+      dat <- readxl::read_xlsx(temp, skip = 1, col_names = TRUE)
+
+    }
+  }
   ##############################
   ## Excluding Temporary File ##
   ##############################
@@ -1262,16 +1288,22 @@ datasets_link <- function() {
     ## SIGA ##
     ##########
 
-    "SIGA", "SIGA", NA, "1908-2021", "Municipality", "https://git.aneel.gov.br/publico/centralconteudo/-/raw/main/relatorioseindicadores/geracao/BD_SIGA.xlsx?inline=false",
+    "SIGA", "siga", NA, "1908-2021", "Municipality", "https://git.aneel.gov.br/publico/centralconteudo/-/raw/main/relatorioseindicadores/geracao/BD_SIGA.xlsx?inline=false",
 
     #########
     ## BEN ##
     #########
 
-    "BEN", "BEN", NA, "2011-2022", "Region, Municipality","https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/PublicacoesArquivos/publicacao-145/topico-515/Cap%C3%ADtulo%208%20-%20(Dados%20Estaduais).xls",
+    "BEN", "ben", NA, "2011-2022", "Region, Municipality","https://drive.google.com/file/d/1_JTYyAPdbQayR-nrURts6OmbKcm2cLix/view?usp=share_link",
+
+    ###########
+    ## ANEEL ##
+    ###########
+
+    "ANEEL", "ccc", NA, "2013-2022", "Country", "https://drive.google.com/file/d/1SlV1Y8fcZlYsr_eQRKTqsJxg6xsyMysu/view?usp=share_link",
 
 
-    ## Shapefile from github repository
+     ## Shapefile from github repository
 
 
     "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds",
