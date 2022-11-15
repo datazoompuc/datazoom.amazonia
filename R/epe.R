@@ -2,13 +2,15 @@
 #'
 #' @description Electrical Energy Monthly Consumption per Class
 #'
+#' @param dataset A dataset name, either ("CONSUMO") for consumption, or ("CONSUMIDOR") for consumers
+#' @param language Only available in Portuguese ("pt") as of now
 #' @inheritParams load_baci
 #'
 #' @examples
 #' \dontrun{
 #' # download treated data for 2016
 #' clean_epe <- load_epe(
-#'   dataset = "EPE",
+#'   dataset = "CONSUMO",
 #'   raw_data = FALSE,
 #'   time_period = 2016
 #' )
