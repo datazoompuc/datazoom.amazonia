@@ -2,6 +2,8 @@
 #'
 #' @description National Electric Energy Agency - ANEEL
 #'
+#' @param dataset A dataset name ("ccc")
+#' @param language Only available in Portuguese ("pt") as of now
 #' @inheritParams load_baci
 #'
 #' @examples
@@ -13,13 +15,9 @@
 #' )
 #' }
 #'
-#' @encoding UTF-8
-#'
-#' @importFrom magrittr %>%
-#'
 #' @export
 
-load_aneel <- function(dataset, raw_data = FALSE, time_period = 2013:2022,
+load_aneel <- function(dataset = "ccc", raw_data = FALSE, time_period = 2013:2022,
                        language = "pt") {
   ###########################
   ## Bind Global Variables ##
