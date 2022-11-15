@@ -2,25 +2,23 @@
 #'
 #' @description National Energy Balance
 #'
+#' @param dataset A dataset name ("ben")
+#' @param language Only available in Portuguese ("pt") as of now
 #' @inheritParams load_baci
 #'
 #' @examples
 #' \dontrun{
 #' # download treated data for 2016
 #' clean_ben <- load_ben(
-#'   dataset = "EPE",
+#'   dataset = "ben",
 #'   raw_data = FALSE,
 #'   time_period = 2016
 #' )
 #' }
 #'
-#' @encoding UTF-8
-#'
-#' @importFrom magrittr %>%
-#'
 #' @export
 
-load_ben <- function(dataset, raw_data = FALSE, time_period = 2004:2021,
+load_ben <- function(dataset = "ben", raw_data = FALSE, time_period = 2004:2021,
                      language = "pt") {
   ###########################
   ## Bind Global Variables ##
