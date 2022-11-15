@@ -2,25 +2,20 @@
 #'
 #' @description ANEEL's Generation Information System
 #'
+#' @param dataset A dataset name ("siga")
+#' @param language Only available in Portuguese ("pt") as of now
 #' @inheritParams load_baci
 #'
 #' @examples
 #' \dontrun{
 #' # download treated data
-#' clean_siga <- load_siga(
-#'   dataset = "SIGA",
-#'   raw_data = FALSE,
-#' )
+#' clean_siga <- load_siga()
 #' }
-#'
-#' @encoding UTF-8
-#'
-#' @importFrom magrittr %>%
 #'
 #' @export
 
-load_siga <- function(dataset, raw_data = FALSE, time_period = NA,
-                      language = "pt") {
+load_siga <- function(dataset = "siga", raw_data = FALSE, language = "pt") {
+  
   ###########################
   ## Bind Global Variables ##
   ###########################
@@ -35,12 +30,10 @@ load_siga <- function(dataset, raw_data = FALSE, time_period = NA,
   param$dataset <- dataset
   param$raw_data <- raw_data
   param$language <- language
-  param$time_period <- time_period
 
   dat <- external_download(
     source = "SIGA",
-    dataset = param$dataset,
-    year = param$time_period
+    dataset = param$dataset
   )
 
   if (raw_data == TRUE) {
