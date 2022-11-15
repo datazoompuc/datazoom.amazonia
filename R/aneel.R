@@ -46,7 +46,7 @@ load_aneel <- function(dataset, raw_data = FALSE, time_period = 2013:2022,
     dat <- "No raw data available."
   }
 
-  dat <- dplyr::filter(dat, Ano == param$time_period)
+  dat <- dplyr::filter(dat, Ano %in% param$time_period)
 
   return(dat)
 }

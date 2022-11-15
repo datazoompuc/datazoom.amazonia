@@ -898,7 +898,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   if (param$source == "ANEEL"){
     if (param$dataset == "ccc"){
-      dat <- readr::read_csv(file, col_names = TRUE)
+      dat <- readr::read_csv2(temp, col_names = TRUE)
     }
   }
 
@@ -1300,7 +1300,7 @@ datasets_link <- function() {
     ## ANEEL ##
     ###########
 
-    "ANEEL", "ccc", NA, "2013-2022", "Country", "https://drive.google.com/file/d/1SlV1Y8fcZlYsr_eQRKTqsJxg6xsyMysu/view?usp=share_link",
+    "ANEEL", "ccc", NA, "2013-2022", NA, "https://drive.google.com/file/d/1SlV1Y8fcZlYsr_eQRKTqsJxg6xsyMysu/view?usp=share_link",
 
 
      ## Shapefile from github repository
