@@ -2,12 +2,7 @@
 #'
 #' @description Electrical Energy Monthly Consumption per Class
 #'
-#' @param dataset A dataset name ("epe").
-#' @param raw_data A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
-#' @param time_period A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.
-#' @param language A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.
-#'
-#' @return A \code{tibble}.
+#' @inheritParams load_baci
 #'
 #' @examples
 #' \dontrun{
@@ -26,13 +21,12 @@
 #' @export
 
 load_epe <- function(dataset, raw_data = FALSE, time_period = 2004:2021,
-                     language = "pt", geo_level = "state"){
-
+                     language = "pt") {
   ###########################
   ## Bind Global Variables ##
   ###########################
 
-
+  Sistema <- ano <- Total <- Quantidade <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -41,7 +35,6 @@ load_epe <- function(dataset, raw_data = FALSE, time_period = 2004:2021,
   param <- list()
   param$dataset <- dataset
   param$raw_data <- raw_data
-  param$geo_level <- geo_level
   param$language <- language
   param$time_period <- time_period
 
@@ -54,29 +47,27 @@ load_epe <- function(dataset, raw_data = FALSE, time_period = 2004:2021,
   if (param$raw_data == TRUE) {
     return(dat)
   } else {
-
     # funcao para limpar dados de consumo -----------------------------------------------
     limpa_consumo <- function(sheet_name) {
-
-       # troca nome das colunas
-    df <- as.data.frame(dat[sheet_name])
+      # troca nome das colunas
+      df <- as.data.frame(dat[sheet_name])
       colnames(df) <- c("Sistema", 1:12, "Total")
 
-    # limpa
-    clean_df <- df %>%
-      filter(Sistema == "Sistemas Isolados") %>%
-      drop_na() %>%
-      slice(-1) %>% # remove ano corrente, para o qual dados sao parciais
-      mutate(ano = 2021:2004) %>%  mutate(ano = as.numeric(ano)) %>%
-      select(ano, Total) %>%
-      mutate(tipo = paste0("CONSUMO ", sheet_name)) %>% # adiciona coluna para tipo de consumo
-      rename("valor" = "Total")
+      # limpa
+      clean_df <- df %>%
+        dplyr::filter(Sistema == "Sistemas Isolados") %>%
+        tidyr::drop_na() %>%
+        dplyr::slice(-1) %>% # remove ano corrente, para o qual dados sao parciais
+        dplyr::mutate(ano = 2021:2004) %>%
+        dplyr::mutate(ano = as.numeric(ano)) %>%
+        dplyr::select(ano, Total) %>%
+        dplyr::mutate(tipo = paste0("CONSUMO ", sheet_name)) %>% # adiciona coluna para tipo de consumo
+        dplyr::rename("valor" = "Total")
 
-    return(clean_df)
+      return(clean_df)
+    }
 
-  }
-
-     # funcao para limpar dados de consumidores -----------------------------------------------
+    # funcao para limpar dados de consumidores -----------------------------------------------
     limpa_consumidores <- function(sheet_name) {
       df <- as.data.frame(dat[sheet_name])
       # troca nome das colunas
@@ -84,57 +75,58 @@ load_epe <- function(dataset, raw_data = FALSE, time_period = 2004:2021,
 
       # limpa
       clean_df <- df %>%
-        filter(Sistema == "Sistemas Isolados") %>%
-        slice(-1) %>% #remove ano corrente, para o qual dados sao parciais
-        mutate(ano = 2021:2004)  %>%
-        pivot_longer(cols = c(2:13), names_to = "Mes", values_to = "Quantidade") %>%
-        select(ano, Quantidade) %>% #tira a coluna "Sistema", que tinha apenas valores iguais ("Sistemas Isolados") e "Mes"
-        mutate(ano = as.numeric(ano), Quantidade = as.numeric(Quantidade)) %>%
-        group_by(ano) %>%
+        dplyr::filter(Sistema == "Sistemas Isolados") %>%
+        dplyr::slice(-1) %>% # remove ano corrente, para o qual dados sao parciais
+        dplyr::mutate(ano = 2021:2004) %>%
+        tidyr::pivot_longer(cols = c(2:13), names_to = "Mes", values_to = "Quantidade") %>%
+        dplyr::select(ano, Quantidade) %>% # tira a coluna "Sistema", que tinha apenas valores iguais ("Sistemas Isolados") e "Mes"
+        dplyr::mutate(ano = as.numeric(ano), Quantidade = as.numeric(Quantidade)) %>%
+        dplyr::group_by(ano) %>%
         dplyr::summarise(media = mean(Quantidade)) %>%
-        mutate(tipo = sheet_name) # adiciona coluna para tipo de consumidor
+        dplyr::mutate(tipo = sheet_name) # adiciona coluna para tipo de consumidor
 
       return(clean_df)
-
     }
 
-  # roda funcao -----------------------------------------------------------------------
-  # consumo total
+    # roda funcao -----------------------------------------------------------------------
+    # consumo total
 
- if(param$dataset == "CONSUMO"){
-   db_consumo_total <- limpa_consumo("TOTAL")
+    if (param$dataset == "CONSUMO") {
+      db_consumo_total <- limpa_consumo("TOTAL")
 
-  # consumo por residencial, industrial, comercial e outros
-  db_consumo_residencial <- limpa_consumo("RESIDENCIAL")
-  db_consumo_industrial <- limpa_consumo("INDUSTRIAL")
-  db_consumo_comercial <- limpa_consumo("COMERCIAL")
-  db_consumo_outros <- limpa_consumo("OUTROS")
+      # consumo por residencial, industrial, comercial e outros
+      db_consumo_residencial <- limpa_consumo("RESIDENCIAL")
+      db_consumo_industrial <- limpa_consumo("INDUSTRIAL")
+      db_consumo_comercial <- limpa_consumo("COMERCIAL")
+      db_consumo_outros <- limpa_consumo("OUTROS")
 
-  # bind all
-  db_consumo <- bind_rows(list(db_consumo_total, db_consumo_residencial,
-                               db_consumo_industrial, db_consumo_comercial,
-                               db_consumo_outros))
+      # bind all
+      db_consumo <- dplyr::bind_rows(list(
+        db_consumo_total, db_consumo_residencial,
+        db_consumo_industrial, db_consumo_comercial,
+        db_consumo_outros
+      ))
 
-  db_consumo <- filter(db_consumo, ano %in% param$time_period)
+      db_consumo <- dplyr::filter(db_consumo, ano %in% param$time_period)
 
- return(db_consumo)
-  }
-  # dados de consumidores -------------------------------------------------------------
+      return(db_consumo)
+    }
+    # dados de consumidores -------------------------------------------------------------
 
-  # roda funcao -----------------------------------------------------------------------
-  # consumidores total
- if(param$dataset == "CONSUMIDOR"){
-   db_consumidores_total <- limpa_consumidores("CONSUMIDORES TOTAIS")
+    # roda funcao -----------------------------------------------------------------------
+    # consumidores total
+    if (param$dataset == "CONSUMIDOR") {
+      db_consumidores_total <- limpa_consumidores("CONSUMIDORES TOTAIS")
 
-  # consumidores por residencial, industrial, comercial e outros
-  db_consumidores_residencial <- limpa_consumidores("CONSUMIDORES RESIDENCIAIS")
+      # consumidores por residencial, industrial, comercial e outros
+      db_consumidores_residencial <- limpa_consumidores("CONSUMIDORES RESIDENCIAIS")
 
-  # bind all
-  db_consumidores <- bind_rows(list(db_consumidores_total, db_consumidores_residencial))
+      # bind all
+      db_consumidores <- dplyr::bind_rows(list(db_consumidores_total, db_consumidores_residencial))
 
-  db_consumidores <- filter(db_consumidores, ano %in% param$time_period)
+      db_consumidores <- dplyr::filter(db_consumidores, ano %in% param$time_period)
 
-  return(db_consumidores)
-}
+      return(db_consumidores)
+    }
   }
 }
