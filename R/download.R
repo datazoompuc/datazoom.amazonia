@@ -650,7 +650,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     file_extension <- ".csv"
   }
   if (source == "ANEEL") {
-    file_extension <- ".csv"
+    if (dataset == "cde_budget_expenses"){
+    file_extension <- ".rds"
+    }
   }
   if (source == "SIGA") {
     file_extension <- ".xlsx"
@@ -897,8 +899,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   # }
 
   if (param$source == "ANEEL"){
-    if (param$dataset == "ccc"){
-      dat <- readr::read_csv2(temp, col_names = TRUE)
+    if (param$dataset == "cde_budget_expenses"){
+      dat <- readr::read_rds(temp)
     }
   }
 
@@ -1300,8 +1302,8 @@ datasets_link <- function() {
     ## ANEEL ##
     ###########
 
-    "ANEEL", "ccc", NA, "2013-2022", NA, "https://drive.google.com/file/d/1SlV1Y8fcZlYsr_eQRKTqsJxg6xsyMysu/view?usp=share_link",
-
+    "ANEEL", "cde_budget_expenses", NA, "2013-2022", NA, "https://drive.google.com/file/d/1h7mu-9qbKfISk1-k4JSrBhXKBMQHTOH9/view?usp=share_link",
+    "ANEEL", "distributed_generation_ventures", NA, "year", NA, "link",
 
      ## Shapefile from github repository
 
