@@ -82,6 +82,7 @@ if(param$time_period != "default"){
   } else {
 
   if (param$dataset == "energy_consumption_per_class"){
+    base::message("Almost done.")
     if(param$time_period == "default"){
       param$time_period <- 2004:2021
     }
