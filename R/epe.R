@@ -22,7 +22,7 @@
 #'
 #' @export
 
-load_epe <- function(dataset, raw_data = FALSE, time_period = 2004:2021,
+load_epe <- function(dataset, raw_data = FALSE, time_period = "default",
                      geo_level = "State", language = "pt") {
   ###########################
   ## Bind Global Variables ##
@@ -42,9 +42,9 @@ load_epe <- function(dataset, raw_data = FALSE, time_period = 2004:2021,
   param$geo_level <- geo_level
 
 
-  ######################################
-  ## Downloading Data from download.R ##
-  ######################################
+  #################
+  ## Downloading ##
+  #################
   dat <- external_download(
     source = "EPE",
     dataset = param$dataset,
@@ -54,7 +54,7 @@ load_epe <- function(dataset, raw_data = FALSE, time_period = 2004:2021,
   ##################
   ## Period Check ##
   ##################
-
+if(param$time_period != "default"){
   year_check <- datasets_link() %>%
     dplyr::filter(dataset == param$dataset) %>%
     dplyr::select(available_time) %>%
@@ -64,26 +64,31 @@ load_epe <- function(dataset, raw_data = FALSE, time_period = 2004:2021,
     unlist() %>%
     as.numeric()
 
+
   if (min(time_period) < year_check[1]) {
     stop("Provided time period less than supported. Check documentation for time availability.")
   }
   if (max(time_period) > year_check[2]) {
     stop("Provided time period greater than supported. Check documentation for time availability.")
   }
+}
 
-  ###################
-  ## Data Cleaning ##
-  ###################
+  ######################
+  ## Data Engineering ##
+  ######################
 
   if (param$raw_data == TRUE) {
     return(dat)
   } else {
 
+  if (param$dataset == "energy_consumption_per_class"){
+    if(param$time_period == "default"){
+      param$time_period <- 2004:2021
+    }
 
-  if (param$geo_level == "State"){
+    if (param$geo_level == "State"){
 
     #Select sheets with 'UF' in the name
-
     sheets_selected <- as.data.frame(all_sheets) %>%
       filter(str_detect(as.data.frame(all_sheets)[,1], "UF") == T | str_detect(as.data.frame(all_sheets)[,1], "POR") == T)
 
@@ -141,7 +146,7 @@ load_epe <- function(dataset, raw_data = FALSE, time_period = 2004:2021,
    return(final_dat)
   }
 
-  if (param$geo_level == "SubSystem"){
+    if (param$geo_level == "SubSystem"){
   # funcao para limpar dados de consumo ----------------------------------------------
   limpa_consumo <- function(sheet_name) {
       # troca nome das colunas
@@ -182,61 +187,58 @@ load_epe <- function(dataset, raw_data = FALSE, time_period = 2004:2021,
       return(clean_df)
     }
 
-    # roda funcao -----------------------------------------------------------------------
-    # consumo total
+      sheets_selected_consumo <- as.data.frame(all_sheets) %>%
+        filter(str_detect(as.data.frame(all_sheets)[,1], "POR") == F &
+               str_detect(as.data.frame(all_sheets)[,1], "CONSUMIDORES") == F &
+               str_detect(as.data.frame(all_sheets)[,1], "GENERO") == F &
+               str_detect(as.data.frame(all_sheets)[,1], "UF") == F)
 
-    if (param$dataset == "CONSUMO") {
+      final_dat_consumo <- data.frame()
 
-      sheets_selected <- as.data.frame(all_sheets) %>%
-        filter(str_detect(as.data.frame(all_sheets)[,1], "UF") == F & str_detect(as.data.frame(all_sheets)[,1], "POR") == F & str_detect(as.data.frame(all_sheets)[,1], "CONSUMIDORES") == F)
+      for(i in 1:nrow(sheets_selected_consumo)){
+        db <- limpa_consumo(paste0(sheets_selected_consumo[i,1]))
+        final_dat_consumo <- dplyr::bind_rows(final_dat_consumo, db)
+      }
 
-      db_consumo <- data.frame()
+      sheets_selected_consumidores <- as.data.frame(all_sheets) %>%
+        filter(str_detect(as.data.frame(all_sheets)[,1], "POR") == F &
+                 str_detect(as.data.frame(all_sheets)[,1], "UF") == F &
+                 str_detect(as.data.frame(all_sheets)[,1], "CONSUMIDORES") == T)
 
-      db_consumo <- purrr::map(
-        sheets_selected[,1],
-        function(sheet){
-          db <- limpa_consumo(sheet)
-          db_consumo <- dplyr::bind_rows(db_consumo, db)
-        }
+      final_dat_consumidores <- data.frame()
+
+      for(i in 1:nrow(sheets_selected_consumidores)){
+        db <- limpa_consumidores(paste0(sheets_selected_consumidores[i,1]))
+        final_dat_consumidores <- dplyr::bind_rows(final_dat_consumidores, db)
+      }
+
+
+      dat <- dplyr::full_join(final_dat_consumidores,final_dat_consumo)
+
+      return(dat)
+    }
+
+    if (param$geo_level == "Region") {
+
+    }
+}
+
+  if (param$dataset == "national_energy_balance") {
+
+    if(param$time_period == "default"){
+      param$time_period <- 2011:2022
+    }
+
+    dat <- dat %>%
+      dplyr::rename(
+      "amazonia_legal" = "amz legal"
       )
-      db_consumo_total <- limpa_consumo("TOTAL")
-      db_consumo_residencial <- limpa_consumo("RESIDENCIAL")
-      db_consumo_industrial <- limpa_consumo("INDUSTRIAL")
-      db_consumo_comercial <- limpa_consumo("COMERCIAL")
-      db_consumo_outros <- limpa_consumo("OUTROS")
 
-      # bind all
-      db_consumo <- dplyr::bind_rows(list(
-        db_consumo_total, db_consumo_residencial,
-        db_consumo_industrial, db_consumo_comercial,
-        db_consumo_outros
-      ))
-
-      db_consumo <- dplyr::filter(db_consumo, ano %in% param$time_period)
-
-      return(db_consumo)
-    }
-    # dados de consumidores -------------------------------------------------------------
-
-    # roda funcao -----------------------------------------------------------------------
-    # consumidores total
-    if (param$dataset == "CONSUMIDOR") {
-      db_consumidores_total <- limpa_consumidores("CONSUMIDORES TOTAIS")
-
-      # consumidores por residencial, industrial, comercial e outros
-      db_consumidores_residencial <- limpa_consumidores("CONSUMIDORES RESIDENCIAIS")
-
-      # bind all
-      db_consumidores <- dplyr::bind_rows(list(db_consumidores_total, db_consumidores_residencial))
-
-      db_consumidores <- dplyr::filter(db_consumidores, ano %in% param$time_period)
-
-      return(db_consumidores)
-    }
-}
-
-  if (param$geo_level == "Region") {
-
+    dat <- dat %>%
+      dplyr::filter(ano %in% param$time_period)
+    return(dat)
   }
   }
 }
+
+

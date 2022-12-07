@@ -644,10 +644,12 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     file_extension <- ".rds"
   }
   if (source == "EPE") {
+    if (param$dataset == "energy_consumption_per_class"){
     file_extension <- ".xls"
-  }
-  if (source == "BEN") {
-    file_extension <- ".csv"
+    }
+    if (param$dataset == "national_energy_balance"){
+      file_extension <- ".csv"
+    }
   }
   if (source == "ANEEL") {
     if (dataset == "cde_budget_expenses"){
@@ -670,8 +672,13 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   download_method <- "standard" # works for most functions
 
-  if (source %in% c("iema", "imazon_shp", "BEN", "ANEEL")) {
+  if (source %in% c("iema", "imazon_shp", "ANEEL")) {
     download_method <- "googledrive"
+  }
+  if (source == "EPE"){
+    if (dataset == "national_energy_balance"){
+      download_method <- "googledrive"
+    }
   }
   if (source %in% c("deter", "terraclimate", "baci")) {
     download_method <- "curl"
@@ -722,7 +729,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   if (file_extension == ".xls"){
     if (param$source == "EPE"){
-
+      if (param$dataset == "energy_consumption_per_class"){
       #Finding sheet names
       all_sheets <- readxl::excel_sheets(temp)
 
@@ -733,8 +740,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
           readxl::read_xls(temp, sheet = sheets)
         }
       )
-
+      #Renaming list elements with sheet names
       names(dat) <- all_sheets
+      }
 
     }
   }
@@ -1283,20 +1291,14 @@ datasets_link <- function() {
     ## EPE ##
     #########
 
-    "EPE", "CONSUMO", NA, "2004-2021", "Region, Electric_Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/Documents/CONSUMO%20MENSAL%20DE%20ENERGIA%20EL%c3%89TRICA%20POR%20CLASSE.xls",
-    "EPE", "CONSUMIDOR", NA, "2004-2021", "Region, Electric_Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/Documents/CONSUMO%20MENSAL%20DE%20ENERGIA%20EL%c3%89TRICA%20POR%20CLASSE.xls",
+    "EPE", "energy_consumption_per_class", NA, "2004-2021", "Region, Electric_Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/Documents/CONSUMO%20MENSAL%20DE%20ENERGIA%20EL%c3%89TRICA%20POR%20CLASSE.xls",
+    "EPE", "national_energy_balance", NA, "2011-2022", "Region, Municipality","https://drive.google.com/file/d/1_JTYyAPdbQayR-nrURts6OmbKcm2cLix/view?usp=share_link",
 
     ##########
     ## SIGA ##
     ##########
 
     "SIGA", "siga", NA, "1908-2021", "Municipality", "https://git.aneel.gov.br/publico/centralconteudo/-/raw/main/relatorioseindicadores/geracao/BD_SIGA.xlsx?inline=false",
-
-    #########
-    ## BEN ##
-    #########
-
-    "BEN", "ben", NA, "2011-2022", "Region, Municipality","https://drive.google.com/file/d/1_JTYyAPdbQayR-nrURts6OmbKcm2cLix/view?usp=share_link",
 
     ###########
     ## ANEEL ##
