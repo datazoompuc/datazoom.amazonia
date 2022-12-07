@@ -15,7 +15,7 @@
 #' @export
 
 load_siga <- function(dataset = "siga", raw_data = FALSE, language = "pt") {
-  
+
   ###########################
   ## Bind Global Variables ##
   ###########################
@@ -31,13 +31,23 @@ load_siga <- function(dataset = "siga", raw_data = FALSE, language = "pt") {
   param$raw_data <- raw_data
   param$language <- language
 
+  #################
+  ## Downloading ##
+  #################
+
   dat <- external_download(
     source = "SIGA",
     dataset = param$dataset
   )
 
-  if (raw_data == TRUE) {
-    dat <- "No raw data available."
+  ######################
+  ## Data Engineering ##
+  ######################
+
+  if (raw_data) {
+    base::message("No raw data available.")
+  } else {
+
   }
 
   return(dat)
