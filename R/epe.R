@@ -2,15 +2,17 @@
 #'
 #' @description Electrical Energy Monthly Consumption per Class
 #'
-#' @param dataset A dataset name, either ("CONSUMO") for consumption, or ("CONSUMIDOR") for consumers
+#' @param dataset A dataset name, ("energy_consumption_per_class") or ("national_energy_balance")
 #' @param language Only available in Portuguese ("pt") as of now
+#' @param geo_level A geographical level, ("State") or ("Subsystem"), only available for ("energy_consumption_per_class")
 #' @inheritParams load_baci
 #'
 #' @examples
 #' \dontrun{
 #' # download treated data for 2016
 #' clean_epe <- load_epe(
-#'   dataset = "CONSUMO",
+#'   dataset = "energy_consumption_per_class",
+#'   geo_level = "State",
 #'   raw_data = FALSE,
 #'   time_period = 2016
 #' )
@@ -23,7 +25,7 @@
 #' @export
 
 load_epe <- function(dataset, raw_data = FALSE, time_period = "default",
-                     geo_level = "State", language = "pt") {
+                     geo_level = "state", language = "pt") {
   ###########################
   ## Bind Global Variables ##
   ###########################
@@ -147,46 +149,51 @@ if(param$time_period != "default"){
    return(final_dat)
   }
 
-    if (param$geo_level == "SubSystem"){
-  # funcao para limpar dados de consumo ----------------------------------------------
+    ###########################
+    ## Geo-Level = Subsystem ##
+    ###########################
+
+    if (param$geo_level == "Subsystem"){
+
+  geolevel.pattern <- "SUBSISTEMA ELÉTRICO"
+
+      ###########################
+      ### Build limpa_consumo ###
+      ###########################
+
   limpa_consumo <- function(sheet_name) {
       # troca nome das colunas
       df <- as.data.frame(dat[sheet_name])
-      colnames(df) <- c("Sistema", 1:12, "Total")
+      colnames(df) <- c("sistema", "jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez", "anual")
 
-      # limpa
-      clean_df <- df %>%
-        dplyr::filter(Sistema == "Sistemas Isolados") %>%
-        tidyr::drop_na() %>%
-        dplyr::mutate(ano = 2022:2004) %>%
-        dplyr::mutate(ano = as.numeric(ano)) %>%
-        dplyr::select(ano, Total) %>%
-        dplyr::mutate(tipo = paste0("CONSUMO ", sheet_name)) %>% # adiciona coluna para tipo de consumo
-        dplyr::rename("valor" = "Total")
+      #identify row numbers that have the geo_level we want
+      id <- grep(geolevel.pattern, df$sistema)
 
-      return(clean_df)
-    }
+      dat.final <- data.frame()
+      row.x <- data.frame()
+      for(i in 1:length(id)){
 
-    # funcao para limpar dados de consumidores -----------------------------------------------
-    limpa_consumidores <- function(sheet_name) {
-      df <- as.data.frame(dat[sheet_name])
-      # troca nome das colunas
-      colnames(df) <- c("Sistema", 1:12)
+        #0:5 because there are only five subsystems. 0 is for SUBSISTEMA ELÉTRICO
+      for(j in 1:5){
 
-      # limpa
-      clean_df <- df %>%
-        dplyr::filter(Sistema == "Sistemas Isolados") %>%
-        dplyr::slice(-1) %>% # remove ano corrente, para o qual dados sao parciais
-        dplyr::mutate(ano = 2021:2004) %>%
-        tidyr::pivot_longer(cols = c(2:13), names_to = "Mes", values_to = "Quantidade") %>%
-        dplyr::select(ano, Quantidade) %>% # tira a coluna "Sistema", que tinha apenas valores iguais ("Sistemas Isolados") e "Mes"
-        dplyr::mutate(ano = as.numeric(ano), Quantidade = as.numeric(Quantidade)) %>%
-        dplyr::group_by(ano) %>%
-        dplyr::summarise(media = mean(Quantidade)) %>%
-        dplyr::mutate(tipo = sheet_name) # adiciona coluna para tipo de consumidor
+        #bind every row that is under SUBSISTEMA ELÉTRICO
 
-      return(clean_df)
-    }
+        row.x <- df[(id[i]+j),] %>%
+        mutate("ano" = as.character(2004 + length(id) - i)) %>%
+        pivot_longer(c(2:ncol(df)))
+
+      dat.final <- bind_rows(dat.final, row.x)
+
+        }
+      }
+      names(dat.final) <- c("subsistema", "ano", "mes", "consumo")
+      return(dat.final)
+
+  }
+
+      #########################
+      ### Run limpa_consumo ###
+      #########################
 
       sheets_selected_consumo <- as.data.frame(all_sheets) %>%
         filter(str_detect(as.data.frame(all_sheets)[,1], "POR") == F &
@@ -194,36 +201,126 @@ if(param$time_period != "default"){
                str_detect(as.data.frame(all_sheets)[,1], "GENERO") == F &
                str_detect(as.data.frame(all_sheets)[,1], "UF") == F)
 
-      final_dat_consumo <- data.frame()
+      final_dat_consumo <- data.frame(subsistema = as.character(NULL),
+                                      ano = as.character(NULL),
+                                      mes = as.character(NULL))
 
       for(i in 1:nrow(sheets_selected_consumo)){
         db <- limpa_consumo(paste0(sheets_selected_consumo[i,1]))
-        final_dat_consumo <- dplyr::bind_rows(final_dat_consumo, db)
+          names(db) <- c("subsistema","ano","mes",paste0("CONSUMO ", sheets_selected_consumo[i,1]))
+        final_dat_consumo <- dplyr::full_join(final_dat_consumo, db, by = c("subsistema", "ano", "mes"))
       }
+
+      ################################
+      ### Build limpa_consumidores ###
+      ################################
+
+      limpa_consumidores <- function(sheet_name) {
+        # troca nome das colunas
+        df <- as.data.frame(dat[sheet_name])
+        colnames(df) <- c("sistema", "jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez")
+
+        #identify row numbers that have the geo_level we want
+        id <- grep(geolevel.pattern, df$sistema)
+
+        dat.final <- data.frame()
+        row.x <- data.frame()
+        for(i in 1:length(id)){
+
+          #0:5 because there are only five subsystems. 0 is for SUBSISTEMA ELÉTRICO
+          for(j in 1:5){
+
+            #bind every row that is under SUBSISTEMA ELÉTRICO
+
+            row.x <- df[(id[i]+j),] %>%
+              mutate("ano" = as.character(2004 + length(id) - i)) %>%
+              pivot_longer(c(2:ncol(df)))
+
+            dat.final <- bind_rows(dat.final, row.x)
+
+          }
+        }
+        names(dat.final) <- c("subsistema", "ano", "mes", "consumidores")
+        return(dat.final)
+
+      }
+
+      ##############################
+      ### Run limpa_consumidores ###
+      ##############################
 
       sheets_selected_consumidores <- as.data.frame(all_sheets) %>%
         filter(str_detect(as.data.frame(all_sheets)[,1], "POR") == F &
                  str_detect(as.data.frame(all_sheets)[,1], "UF") == F &
                  str_detect(as.data.frame(all_sheets)[,1], "CONSUMIDORES") == T)
 
-      final_dat_consumidores <- data.frame()
+      final_dat_consumidores <- data.frame(subsistema = as.character(NULL),
+                                           ano = as.character(NULL),
+                                           mes = as.character(NULL))
 
       for(i in 1:nrow(sheets_selected_consumidores)){
         db <- limpa_consumidores(paste0(sheets_selected_consumidores[i,1]))
-        final_dat_consumidores <- dplyr::bind_rows(final_dat_consumidores, db)
+        names(db) <- c("subsistema","ano","mes",paste0(sheets_selected_consumidores[i,1]))
+        final_dat_consumidores <- dplyr::full_join(final_dat_consumidores, db, by = c("subsistema", "ano", "mes"))
       }
 
 
-      dat <- dplyr::full_join(final_dat_consumidores,final_dat_consumo)
+      #merge CONSUMO and CONSUMIDOR dataframes
+      dat <- dplyr::full_join(final_dat_consumidores,final_dat_consumo, by = c("subsistema", "ano", "mes")) %>%
+        arrange(ano) %>%
+        janitor::clean_names() %>%
+        filter(ano %in% param$time_period)
 
+      if(param$language == "eng"){
+        dat <- rename(dat,
+                      "subsystem" = "subsistema",
+                      "year" = "ano",
+                      "month" = "mes",
+                      "residential_consumers" = "consumidores_residenciais",
+                      "total_consumers" = "consumidores_totais",
+                      "total_consumption" = "consumo_total",
+                      "residencial_consumption" = "consumo_residencial",
+                      "industrial_consumption" = "consumo_industrial",
+                      "comercial_consumption"= "consumo_comercial",
+                      "other_consumption"= "consumo_outros",
+                      "captive_consumption"= "consumo_cativo"
+                      ) %>%
+                mutate(subsystem = case_when(subsystem == "Sistemas Isolados" ~ "Isolated Systems",
+                                             subsystem == "Norte" ~ "North",
+                                             subsystem == "Nordeste" ~ "Northeast",
+                                             subsystem == "Sudeste/C.Oeste" ~ "Southeast/Midwest",
+                                             subsystem == "Sul" ~ "South"),
+                       month = case_when(month == "jan" ~ "jan",
+                                         month == "fev" ~ "feb",
+                                         month == "mar" ~ "mar",
+                                         month == "abr" ~ "apr",
+                                         month == "mai" ~ "may",
+                                         month == "jun" ~ "jun",
+                                         month == "jul" ~ "jul",
+                                         month == "ago" ~ "aug",
+                                         month == "set" ~ "sep",
+                                         month == "out" ~ "oct",
+                                         month == "nov" ~ "nov",
+                                         month == "dez" ~ "dec",
+                                         month == "anual" ~ "yearly"
+                                         ))
+
+    }
       return(dat)
     }
 
+    ########################
+    ## Geo-Level = Region ##
+    ########################
+
     if (param$geo_level == "Region") {
+      geolevel.pattern <- "REGIÃO GEOGRÁFICA"
 
     }
 }
-
+########################################
+## Data-Set = national_energy_balance ##
+########################################
   if (param$dataset == "national_energy_balance") {
 
     if(param$time_period == "default"){
