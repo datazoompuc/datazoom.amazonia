@@ -1292,7 +1292,7 @@ datasets_link <- function() {
     ## EPE ##
     #########
 
-    "EPE", "energy_consumption_per_class", NA, "2004-2021", "Region, Electric_Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/Documents/CONSUMO%20MENSAL%20DE%20ENERGIA%20EL%c3%89TRICA%20POR%20CLASSE.xls",
+    "EPE", "energy_consumption_per_class", NA, "2004-2021", "Region, Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/Documents/CONSUMO%20MENSAL%20DE%20ENERGIA%20EL%c3%89TRICA%20POR%20CLASSE.xls",
     "EPE", "national_energy_balance", NA, "2011-2022", "Region, Municipality","https://drive.google.com/file/d/1_JTYyAPdbQayR-nrURts6OmbKcm2cLix/view?usp=share_link",
 
     ##########
