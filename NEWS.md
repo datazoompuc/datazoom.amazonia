@@ -1,3 +1,7 @@
+# datazoom.amazonia 0.10.0.0
+
+  * Adding new `load_epe` function for EPE data and adding new `load_aneel` function for ANEEL data
+
 # datazoom.amazonia 0.9.3.0
 
   * Making documentation consistent across functions
