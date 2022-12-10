@@ -25,7 +25,7 @@
 #' @export
 
 load_epe <- function(dataset, raw_data = FALSE, time_period = "default",
-                     geo_level = "state", language = "pt") {
+                     geo_level = "State", language = "pt") {
   ###########################
   ## Bind Global Variables ##
   ###########################
@@ -52,6 +52,8 @@ load_epe <- function(dataset, raw_data = FALSE, time_period = "default",
     dataset = param$dataset,
     year = param$time_period
   )
+
+  all_sheets <- names(dat)
 
   ##################
   ## Period Check ##
