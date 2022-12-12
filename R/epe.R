@@ -164,7 +164,9 @@ if(param$time_period != "default"){
       final_dat <- dplyr::right_join(final_dat, df, by = c("Estado", "Ano", "Mes"))
     }
 
-    final_dat <- final_dat %>% janitor::clean_names()
+    final_dat <- final_dat %>%
+      janitor::clean_names() %>%
+      dplyr::filter(stringr::str_detect(final_dat[,1], "Nota:") == F)
 
     if (param$language == "eng"){
       final_dat <- final_dat %>%
@@ -186,9 +188,9 @@ if(param$time_period != "default"){
    return(final_dat)
   }
 
-    ###########################
-    ## Geo-Level = Subsystem ##
-    ###########################
+    #####################################
+    ## Geo-Level = Subsystem or Region ##
+    #####################################
 
     if (param$geo_level == "Subsystem" | param$geo_level == "Region"){
 
@@ -224,11 +226,11 @@ if(param$time_period != "default"){
                                              ano = as.integer(NULL))[numeric(0), ]
       }
 
-  #Select sheets with consumption data
+  #select sheets with consumption data
   sheets_selected_consumo <- as.data.frame(sheets_selected) %>%
     dplyr::filter(stringr::str_detect(as.data.frame(sheets_selected)[,1], "CONSUMIDORES") == F)
 
-  #Select sheets with consumers data
+  #select sheets with consumers data
   sheets_selected_consumidores <- as.data.frame(sheets_selected) %>%
     dplyr::filter(stringr::str_detect(as.data.frame(sheets_selected)[,1], "CONSUMIDORES") == T)
 
@@ -255,7 +257,7 @@ if(param$time_period != "default"){
       dat.mid <- data.frame()
       row.x <- data.frame()
 
-      #Loop that repeats for every row with the gelevel.pattern
+      #loop that repeats for every row with the gelevel.pattern
       for(i in 1:length(id)){
 
       #1:5 because there are exactly five subsystems. It starts at 1 because it skips the line with the geolevel.pattern, which doesn't have data.
