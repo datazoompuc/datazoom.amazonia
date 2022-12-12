@@ -70,7 +70,7 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
   ## Downloading Data ##
   ######################
 
-  dat <- supressWarnings(purrr::map2(
+  dat <- base::suppressWarnings(purrr::map2(
       param$time_period, file_names,
       function(year, file) {
         external_download(
