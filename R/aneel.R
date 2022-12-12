@@ -24,7 +24,7 @@ load_aneel <- function(dataset, raw_data = FALSE, time_period = 2013:2022,
   ## Bind Global Variables ##
   ###########################
 
-  Ano <- NULL
+  ano <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -57,7 +57,8 @@ load_aneel <- function(dataset, raw_data = FALSE, time_period = 2013:2022,
     if (param$dataset == "cde_budget_expenses"){
 
        dat <- dat %>%
-        dplyr::filter(Ano %in% param$time_period)
+       janitor::clean_names() %>%
+        dplyr::filter(ano %in% param$time_period)
 
 
             ################################
@@ -69,10 +70,10 @@ load_aneel <- function(dataset, raw_data = FALSE, time_period = 2013:2022,
 
          dat <- dat %>%
            dplyr::rename(
-             "year" = "Ano",
-             "type_of_expenses" = "Tipo de Despesa",
-             "value" = "Soma de Valor",
-             "share_of_total_amount" = "Participação"
+             "year" = "ano",
+             "type_of_expenses" = "tipo_de_despesa",
+             "value" = "soma_de_valor",
+             "share_of_total_amount" = "participacao"
            )
        }
 
@@ -80,10 +81,10 @@ load_aneel <- function(dataset, raw_data = FALSE, time_period = 2013:2022,
 
          dat <- dat %>%
            dplyr::rename(
-             "ano" = "Ano",
-             "tipo_de_despesa" = "Tipo de Despesa",
-             "total" = "Soma de Valor",
-             "participacao_no_total" = "Participação"
+             "ano" = "ano",
+             "tipo_de_despesa" = "tipo_de_despesa",
+             "total" = "soma_de_valor",
+             "participacao_no_total" = "participacao"
            )
        }
     }

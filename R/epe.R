@@ -30,7 +30,7 @@ load_epe <- function(dataset, raw_data = FALSE, time_period = "default",
   ## Bind Global Variables ##
   ###########################
 
-  Sistema <- ano <- Total <- Quantidade <- NULL
+  Sistema <- ano <- Total <- Quantidade <- available_time <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -75,7 +75,9 @@ load_epe <- function(dataset, raw_data = FALSE, time_period = "default",
     dataset = param$dataset,
     year = param$time_period,
     sheet = sheets_selected
-  )
+    )
+
+
 
   ##################
   ## Period Check ##
@@ -133,7 +135,7 @@ if(param$time_period != "default"){
       df <- df %>% janitor::row_to_names(5) %>% janitor::clean_names()
 
       #Maket pivot longer
-      df <- pivot_longer(df, cols = c(2:length(df)))
+      df <- tidyr::pivot_longer(df, cols = c(2:length(df)))
 
       #Rename Colunms
       df[1,4] <- NA
@@ -143,7 +145,7 @@ if(param$time_period != "default"){
       #(ex.: when "jan_10" > year = "2013" | when "jan_11" > year = "2014" | when "jan" > year = 2004)
       for(r in 1:nrow(df)){
         if(stringr::str_detect(df[r,"Mes"], "_") == TRUE){
-          df[r,"Ano"] <- 2003 + as.numeric(str_split(df[r,"Mes"], "_")[[1]][[2]])
+          df[r,"Ano"] <- 2003 + as.numeric(stringr::str_split(df[r,"Mes"], "_")[[1]][[2]])
         } else {
           df[r, "Ano"] <- 2004
         }
@@ -154,19 +156,19 @@ if(param$time_period != "default"){
       for(r in 1:nrow(df)){
 
         if(stringr::str_detect(df[r,"Mes"], "_") == TRUE){
-          df[r,"Mes"] <- (str_split(df[r,"Mes"], "_")[[1]][[1]])
+          df[r,"Mes"] <- (stringr::str_split(df[r,"Mes"], "_")[[1]][[1]])
         } else {
           df[r, "Mes"] <- df[r, "Mes"]
         }
       }
-      final_dat <- right_join(final_dat, df, by = c("Estado", "Ano", "Mes"))
+      final_dat <- dplyr::right_join(final_dat, df, by = c("Estado", "Ano", "Mes"))
     }
 
     final_dat <- final_dat %>% janitor::clean_names()
 
     if (param$language == "eng"){
       final_dat <- final_dat %>%
-                    rename("state" = "estado",
+                    dplyr::rename("state" = "estado",
                            "month" = "mes",
                            "year" = "ano",
                            "consumption_per_state" = "consumo_por_uf",
@@ -192,7 +194,7 @@ if(param$time_period != "default"){
 
       if (param$geo_level == "Subsystem"){
 
-        geolevel.pattern <- "SUBSISTEMA ELÉTRICO"
+        geolevel.pattern <- "SUBSISTEMA ELETRICO"
         geolevel.names <- "subsistema"
 
         #define an empty data.frame for consumption data
@@ -208,7 +210,7 @@ if(param$time_period != "default"){
 
       if (param$geo_level == "Region"){
 
-        geolevel.pattern <- "REGIÃO GEOGRÁFICA"
+        geolevel.pattern <- "REGIAO GEOGRAFICA"
         geolevel.names <- "regiao"
 
          #define an empty data.frame for consumption data
@@ -238,7 +240,10 @@ if(param$time_period != "default"){
   for (s in 1:nrow(sheets_selected_consumo)){
 
       #select a data.frame form the list
-      df <- as.data.frame(dat[paste0(sheets_selected_consumo[s,1])])
+      df <- as.data.frame(dat[paste0(sheets_selected_consumo[s,1])]) %>%
+        dplyr::mutate_if(is.character, function(var) {
+          stringi::stri_trans_general(str = var, id = "Latin-ASCII")
+        })
 
       #change column names
       colnames(df) <- c(paste0(geolevel.names), "jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez", "anual")
@@ -277,7 +282,10 @@ if(param$time_period != "default"){
         for (s in 1:nrow(sheets_selected_consumidores)) {
 
         #select a data.frame form the list
-        df <- as.data.frame(dat[paste0(sheets_selected_consumidores[s,1])])
+        df <- as.data.frame(dat[paste0(sheets_selected_consumidores[s,1])]) %>%
+          dplyr::mutate_if(is.character, function(var) {
+            stringi::stri_trans_general(str = var, id = "Latin-ASCII")
+          })
 
         #change column names
         colnames(df) <- c(paste0(geolevel.names), "jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez")
@@ -299,16 +307,16 @@ if(param$time_period != "default"){
             #bind every row that is under SUBSISTEMA ELÉTRICO
 
             row.x <- df[(id[i]+j),] %>%
-              mutate("ano" = 2004 + length(id) - i) %>%
-              pivot_longer(c(2:ncol(df)))
+              dplyr::mutate("ano" = 2004 + length(id) - i) %>%
+              tidyr::pivot_longer(c(2:ncol(df)))
 
-            dat.mid <- bind_rows(dat.mid, row.x)
+            dat.mid <- dplyr::bind_rows(dat.mid, row.x)
 
           }
 
         }
         names(dat.mid) <- c(paste0(geolevel.names),"ano","mes",paste0(sheets_selected_consumidores[s,1]))
-        final_dat_consumidores <- right_join(final_dat_consumidores, dat.mid, by = c(paste0(geolevel.names), "ano", "mes"))
+        final_dat_consumidores <- dplyr::right_join(final_dat_consumidores, dat.mid, by = c(paste0(geolevel.names), "ano", "mes"))
       }
 
       #merge CONSUMO and CONSUMIDOR dataframes
@@ -332,12 +340,12 @@ if(param$time_period != "default"){
                       "other_consumption"= "consumo_outros",
                       "captive_consumption"= "consumo_cativo"
                       ) %>%
-                dplyr::mutate(subsystem = case_when(subsystem == "Sistemas Isolados" ~ "Isolated Systems",
+                dplyr::mutate(subsystem = dplyr::case_when(subsystem == "Sistemas Isolados" ~ "Isolated Systems",
                                              subsystem == "Norte" ~ "North",
                                              subsystem == "Nordeste" ~ "Northeast",
                                              subsystem == "Sudeste/C.Oeste" ~ "Southeast/Midwest",
                                              subsystem == "Sul" ~ "South"),
-                       month = case_when(month == "jan" ~ "jan",
+                       month = dplyr::case_when(month == "jan" ~ "jan",
                                          month == "fev" ~ "feb",
                                          month == "mar" ~ "mar",
                                          month == "abr" ~ "apr",
@@ -366,12 +374,12 @@ if(param$time_period != "default"){
                           "other_consumption"= "consumo_outros",
                           "captive_consumption"= "consumo_cativo"
             ) %>%
-            dplyr::mutate(region = case_when(region == "Norte" ~ "North",
+            dplyr::mutate(region = dplyr::case_when(region == "Norte" ~ "North",
                                              region == "Nordeste" ~ "Northeast",
                                              region == "Sudeste" ~ "Southeast",
                                              region == "Centro-Oeste" ~ "Midwest",
                                              region == "Sul" ~ "South"),
-                          month = case_when(month == "jan" ~ "jan",
+                          month = dplyr::case_when(month == "jan" ~ "jan",
                                             month == "fev" ~ "feb",
                                             month == "mar" ~ "mar",
                                             month == "abr" ~ "apr",
