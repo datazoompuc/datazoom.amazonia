@@ -4,17 +4,12 @@
 \alias{load_aneel}
 \title{ANEEL}
 \usage{
-load_aneel(
-  dataset = "ccc",
-  raw_data = FALSE,
-  time_period = 2013:2022,
-  language = "pt"
-)
+load_aneel(dataset, raw_data = FALSE, time_period = 2013:2022, language = "pt")
 }
 \arguments{
-\item{dataset}{A dataset name ("ccc")}
+\item{dataset}{A dataset name ("cde_budget_expenses")}
 
-\item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
+\item{raw_data}{Only treated data (\code{False}) is available}
 
 \item{time_period}{A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.}
 
