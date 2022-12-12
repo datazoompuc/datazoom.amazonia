@@ -284,29 +284,22 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   link <- NULL
 
-  # Need to Check Mapbiomas, Prodes and Comex
-
-  # ----------------------
-  # To Do:
-  # - Insert Error Message when user gives a wrong input
-  # ----------------------
-
   ## Define Basic Parameters
 
   param <- list()
   param$dataset <- dataset
   param$source <- source
-  param$year <- year # This may not make sense if data is downloaded for all time periods together
-  param$geo_level <- geo_level # This could also not make sense
+
+  # Optional parameters for functions that need them:
+
+  param$year <- year # if download is perform separately by year
+  param$geo_level <- geo_level # if some geo_levels have a different download link
   param$coords <- coords
   param$dataset_code <- dataset_code
-  param$skip_rows <- skip_rows
+  param$skip_rows <- skip_rows # number of rows to skip atop a spreadsheet
   param$file_name <- file_name
-  param$sheet <- sheet
+  param$sheet <- sheet # which sheet of a .xlsx to read
   param$state <- state
-
-  # if (param$geo_level == 'legal_amazon' & param$source == 'prodes'){param$geo_level = 'legal-amz-prodes'}
-  # if (param$geo_level == 'amazon_biome' & param$source == 'prodes'){param$geo_level = 'amz-prodes'}
 
   ## Create Basic Url
 
@@ -322,16 +315,17 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## Construct Links ##
   #####################
 
-  ###########
-  ## Comex ##
-  ###########
+  # For many sources, the URL in datasets_link is already the URL needed for the download
+  # Below are the exceptions, for which manipulation is needed
 
-  # 2014 Examples
-  # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm/EXP_2014.csv
-  # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncmv2/IMP_2014_V2.csv
-  # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/EXP_2014_MUN.csv
-  # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/IMP_2014_MUN.csv
+  # If the datasets_link URL is the download path you need,
+  # do not change this section for a new function
 
+  ##### Exceptions only #####
+
+  ## Comex
+
+  # Download path depends on the dataset and year
 
   if (source == "comex") {
     if (dataset == "comex_export_mun") {
@@ -348,41 +342,18 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
   }
 
-  ############
-  ## Prodes ##
-  ############
+  ## Prodes
 
-  # http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2020&estado=&ordem=MUNICIPIO&type=tabela&output=txt&
+  # Download path depends on the year
 
   if (source == "prodes") {
     path <- paste(param$url, "/tabelatxt.php?ano=", param$year, "&estado=&ordem=MUNICIPIO&type=tabela&output=txt&", sep = "")
   }
 
-  # Create a previous if for termination of file (vector .shp)
 
-  # if (source == 'prodes'){
-  #   if (dataset == 'prodes_accum_deforestation'){path = paste(param$url,param$geo_level,'vector/accumulated_deforestation_1988_2007.zip',sep='/')}
-  #   if (dataset == 'prodes_annual_increase_deforestation'){path = paste(param$url,param$geo_level,'vector/yearly_deforestation.zip',sep='/')}
-  #   if (dataset == 'prodes_cloud'){path = paste(param$url,param$geo_level,'vector/cloud.zip',sep='/')}
-  #   if (dataset == 'prodes_forest'){path = paste(param$url,param$geo_level,'vector/forest.zip',sep='/')}
-  #   if (dataset == 'prodes_hydrography'){path = paste(param$url,param$geo_level,'vector/hydrography.zip',sep='/')}
-  #   if (dataset == 'prodes_not_forest'){path = paste(param$url,param$geo_level,'vector/no_forest.zip',sep='/')}
-  # }
+  ## Degrad
 
-  ###########
-  ## Deter ##
-  ###########
-
-  # # Amazonia Legal = legal-amz-prodes
-  # Bioma Amazonia = amz-prodes
-
-  if (source == "deter") {
-    path <- paste(param$url, stringr::str_replace(param$dataset, "_", "-"), "/shape", sep = "")
-  }
-
-  ############
-  ## Degrad ##
-  ############
+  # Download path depends on the year
 
   if (source == "degrad") {
     if (dataset == "degrad") {
@@ -390,17 +361,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
   }
 
-  ###############
-  ## MapBiomas ##
-  ###############
+  ## MapBiomas
 
-  # https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Dados_Cobertura_MapBiomas_5.0_UF-BIOMAS_SITE.xlsx
-  # https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Dados_Cobertura_MapBiomas_5.0_UF-MUN_SITE_v2.xlsx
-  # https://storage.googleapis.com/mapbiomas-public/COLECAO/5/DOWNLOADS/ESTATISTICAS/Dados_Transicao_MapBiomas_5.0_UF-MUN_SITE_v2.xlsx
-  # https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/BD-DESM_e_REG_COL5_V8h__SITE.xlsx
-  # https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/MapBIomas_COL5_IRRIGACAO-biomas-estados-SITE.xlsx
-  # https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/MapBIomas_COL5_QUALIDADE_PASTAGEM-biomas-estados-SITE.xlsx
-
+  # Download path depends on dataset and geo_level
 
   if (source == "mapbiomas") {
     if (dataset %in% c("mapbiomas_cover", "mapbiomas_transition")) {
@@ -425,19 +388,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
   }
 
-  #############
-  ## SIGMINE ##
-  #############
+  ## SEEG
 
-  if (source == "sigmine") {
-    if (dataset == "sigmine_active") {
-      path <- paste(param$url, "SIGMINE/PROCESSOS_MINERARIOS/BRASIL.zip", sep = "")
-    }
-  }
-
-  ##########
-  ## SEEG ##
-  ##########
+  # Download path depends on geo_level
 
   if (source == "seeg") {
     if (geo_level == "municipality") {
@@ -448,17 +401,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
   }
 
-  #########
-  ## IPS ##
-  #########
+  ## IBAMA
 
-  if (source == "ips") {
-    path <- paste(param$url, "/assets/IPS_Tabela_Completa-1df30fcea79209e3c7e8634a586f95e6.xlsx", sep = "")
-  }
-
-  ###########
-  ## IBAMA ##
-  ###########
+  # Download path depends on state
 
   if (source == "ibama") {
     if (dataset == "areas_embargadas") {
@@ -470,9 +415,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
   }
 
-  ##################
-  ## TerraClimate ##
-  ##################
+  ## TerraClimate
+
+  # Download path depends on geographical parameters
 
   if (source == "terraclimate") {
     filename <- paste0(
@@ -506,118 +451,53 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     )
   }
 
-  #################
-  ## Health Data ##
-  #################
+  ## Datasus
 
-  if (source == "health") {
-    if (dataset == "ibge_mortality_table") {
-      path <- param$url
-    }
-    if (stringr::str_detect(dataset, "datasus")) {
-      path <- paste0(param$url, param$file_name)
-    }
+  # Download path depends on the specific file wanted
+
+  if (source == "datasus") {
+    path <- paste0(param$url, param$file_name)
   }
 
-  ##########
-  ## IEMA ##
-  ##########
+  ## All other functions
 
-  if (source == "iema") {
-    if (dataset == "iema") {
-      path <- param$url
-    }
-  }
+  # The URL in datasets_link is just what you need
 
-  ##########
-  ## BACI ##
-  ##########
-
-  if (source == "baci") {
+  else{
     path <- param$url
   }
-
-  ############
-  ## IMAZON ##
-  ############
-
-  if (source == "imazon_shp") {
-    path <- "https://docs.google.com/uc?export=download&id=1JHc2J_U8VXHVuWVsi8wVBnNzZ37y1ehv"
-  }
-
-  #####################
-  ## GeoBR Shapefile ##
-  #####################
-
-  if (source == "internal") {
-    if (dataset == "geo_municipalities") {
-      path <- param$url
-    }
-  }
-
-  ############
-  ## Energy ##
-  ############
-
-  if (source == "EPE") {
-   path <- param$url
-  }
-
-  #########
-  ## BEN ##
-  #########
-
-  if (source == "BEN") {
-    path <- param$url
-  }
-
-  ###########
-  ## ANEEL ##
-  ###########
-
-  if (source == "ANEEL") {
-    path <- param$url
-  }
-
-  ##########
-  ## SIGA ##
-  ##########
-
-  if (source == "SIGA") {
-    path <- param$url
-  }
-
 
   #######################
   ## Initiate Download ##
   #######################
 
-  ## We should be careful when the downloaded files is terminated in .xlsx
+  ## Specify file extension to be passed to tempfile()
 
-  file_extension <- stringr::str_sub(path, -4)
-  if (source == "mapbiomas") {
-    if (dataset %in% c("mapbiomas_cover", "mapbiomas_transition")) {
-      if (param$geo_level == "state") {
-        file_extension <- ".xlsx"
-      }
-      if (param$geo_level == "municipality") {
-        file_extension <- ".zip"
-      }
-    } else {
-      file_extension <- ".xlsx"
+  # For most functions, the file extension is automatically detected
+
+  file_extension <- sub('.*\\.', '.', path)
+
+  ##### Exceptions only #####
+
+  # Only manually input the file_extension if the download_path does
+  # not end in ".ext", where .ext is any file extension
+
+  if (source == "mapbiomas" & dataset %in% c("mapbiomas_cover", "mapbiomas_transition")) {
+    if (param$geo_level == "municipality") {
+      file_extension <- ".zip"
     }
-  }
-  if (source == "ips") {
-    file_extension <- ".xlsx"
   }
   if (source == "prodes") {
     file_extension <- ".txt"
   }
+  if (source %in% c("seeg", "iema", "SIGA")) {
+    file_extension <- ".xlsx"
+  }
+  if (source == "terraclimate") {
+    file_extension <- ".nc"
+  }
   if (source == "deter") {
     file_extension <- ".zip"
-  }
-  if (source == "seeg") {
-    file_extension <- ".xlsx"
   }
   if (source == "ibama") {
     if (dataset == "areas_embargadas") {
@@ -626,38 +506,12 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       file_extension <- ".csv"
     }
   }
-  if (source == "terraclimate") {
-    file_extension <- ".nc"
-  }
-  if (source == "internal") {
-    file_extension <- ".rds"
-  }
-  if (source == "health") {
-    if (stringr::str_detect(dataset, "datasus")) {
-      file_extension <- ".dbc"
-    }
-  }
-  if (source == "iema") {
-    file_extension <- ".xlsx"
-  }
   if (source == "imazon_shp") {
     file_extension <- ".rds"
   }
-  if (source == "EPE") {
-    file_extension <- ".xls"
-  }
-  if (source == "BEN") {
+  if (source %in% c("BEN", "ANEEL")) {
     file_extension <- ".csv"
   }
-  if (source == "ANEEL") {
-    file_extension <- ".csv"
-  }
-  if (source == "SIGA") {
-    file_extension <- ".xlsx"
-  }
-
-
-  # !!!  We should Change This to a Curl Process
 
   ## Define Empty Directory and Files For Download
 
@@ -704,7 +558,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
    googledrive::drive_download(path, path = temp, overwrite = TRUE)
   }
 
-  ## This Data Opening Part Should Include the .Shp, not DBF
+  ## Unzipping if the file is zipped
 
   if (file_extension == ".zip") {
     utils::unzip(temp, exdir = dir)
@@ -714,36 +568,13 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## Load Data ##
   ###############
 
-  # This Depends on Data Type (.csv, .shp, ...) and on datasource
-
-  # df = sf::read_sf(paste(dir, "deter_public.shp", sep = "/"))
-
-  if (file_extension == ".xls"){
-    if (param$source == "EPE"){
-
-      #Finding sheet names
-      all_sheets <- readxl::excel_sheets(temp)
-
-      #Making a list with all the sheets
-      dat <- purrr::map(
-        all_sheets,
-        function(sheets){
-          readxl::read_xls(temp, sheet = sheets)
-        }
-      )
-
-      names(dat) <- all_sheets
-
-    }
-  }
+  # This Depends on Data Type (.csv, .shp, ...) and on the data source
 
   if (file_extension == ".csv") {
-    dat <- data.table::fread(temp) %>% tibble::as_tibble()
+    dat <- data.table::fread(temp)
   }
   if (file_extension == ".txt") {
-    dat <- readr::read_csv(temp, locale = readr::locale(encoding = "latin1")) %>%
-      janitor::clean_names() %>%
-      tibble::as_tibble()
+    dat <- readr::read_csv(temp, locale = readr::locale(encoding = "latin1"))
   }
   if (file_extension == ".nc") {
     dat <- terra::rast(temp)
@@ -752,93 +583,25 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     dat <- readr::read_rds(temp)
   }
   if (file_extension == ".xlsx") {
-    dat <- readxl::read_xlsx(temp, sheet = param$sheet)
-
-    if (param$source == "seeg") {
-      if (geo_level == "country") {
-        dat <- readxl::read_excel(temp, sheet = "GEE Brasil")
-      }
-      if (geo_level == "state") {
-        dat <- readxl::read_excel(temp, sheet = "GEE Estados")
-      }
-      if (geo_level == "municipality") {
-        dat <- readxl::read_excel(temp, sheet = "BD GEE Municipios GWP-AR5")
-      }
-    }
-
-    if (param$dataset == "ips") {
-      if (param$year == 2014) {
-        dat <- readxl::read_excel(temp, sheet = "IPS 2014")
-      }
-      if (param$year == 2018) {
-        dat <- readxl::read_excel(temp, sheet = "IPS 2018 ")
-      }
-      if (param$year == 2021) {
-        dat <- readxl::read_excel(temp, sheet = "IPS 2021")
-      }
-    }
-
-
-
-    dat <- dat %>%
-      janitor::clean_names() %>%
-      tibble::as_tibble()
+    dat <- readxl::read_xlsx(temp, sheet = param$sheet, skip = param$skip_rows)
   }
+  if (file_extension == ".dbc") {
+    dat <- read.dbc(temp)
+  }
+
+  ##### Exceptions only #####
 
   if (file_extension == ".zip") {
     if (param$dataset == "degrad") {
-      if (param$year %in% 2007) {
-        dat <- sf::read_sf(file.path(dir, "Degrad2007_Final_pol.shp"))
-        dat$year <- param$year
-      }
-      if (param$year == 2008) {
-        dat <- sf::read_sf(file.path(dir, "Degrad2008_Final_pol.shp"))
-        dat$year <- param$year
-      }
-      if (param$year == 2009) {
-        dat <- sf::read_sf(file.path(dir, "Degrad2009_Final_pol.shp"))
-        dat$year <- param$year
-      }
-      if (param$year == 2010) {
-        dat <- sf::read_sf(file.path(dir, "DEGRAD_2010_UF_pol.shp"))
-        dat$year <- param$year
-      }
-      if (param$year == 2011) {
-        dat <- sf::read_sf(file.path(dir, "DEGRAD_2011_INPE_pol.shp"))
-        dat$year <- param$year
-      }
-      if (param$year == 2012) {
-        dat <- sf::read_sf(file.path(dir, "DEGRAD_2012_INPE_pol.shp"))
-        dat$year <- param$year
-      }
-      if (param$year == 2013) {
-        dat <- sf::read_sf(file.path(dir, "DEGRAD_2013_INPE_pol.shp"))
-        dat$year <- param$year
-      }
-      if (param$year == 2014) {
-        dat <- sf::read_sf(file.path(dir, "DEGRAD_2014_pol.shp"))
-        dat$year <- param$year
-      }
-      if (param$year == 2015) {
-        dat <- sf::read_sf(file.path(dir, "DEGRAD_2015.shp"))
-        dat$year <- param$year
-      }
-      if (param$year == 2016) {
-        dat <- sf::read_sf(file.path(dir, "DEGRAD_2016_pol.shp"))
-        dat$year <- param$year
-      }
+      dat <- sf::read_sf(file.path(dir, param$file_name))
+      dat$year <- param$year
     }
-
     if (param$source == "deter") {
-      dat <- sf::read_sf(file.path(dir, "deter_public.shp")) %>%
-        janitor::clean_names() %>%
-        tibble::as_tibble()
+      dat <- sf::read_sf(file.path(dir, "deter_public.shp"))
     }
-
     if (param$source == "sigmine") {
       dat <- sf::read_sf(file.path(dir, "BRASIL.shp"))
     }
-
     if (param$source == "ibama") {
 
       # get latest downloaded file (the name changes daily)
@@ -855,9 +618,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
       colnames(dataset) <- dataset[5, ]
 
-      dat <- dataset[-c(1:5), ] %>%
-        janitor::clean_names() %>%
-        tibble::as_tibble()
+      dat <- dataset[-c(1:5), ]
     }
 
     if (param$source == "baci") {
@@ -885,29 +646,25 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
       dat <- readxl::read_xlsx(file, sheet = param$sheet)
     }
-
-  }
-  if (file_extension == ".dbc") {
-    dat <- read.dbc(temp)
   }
 
-  # if (source == 'prodes'){
-  #   file = list.files(dir)[stringr::str_detect(list.files(dir),'.shp')]
-  #   dat = sf::read_sf(paste(dir,file,sep='\\'))
-  # }
+  if (param$source == "EPE"){
 
-  if (param$source == "ANEEL"){
-    if (param$dataset == "ccc"){
-      dat <- readr::read_csv2(temp, col_names = TRUE)
-    }
+    # Finding sheet names
+    all_sheets <- readxl::excel_sheets(temp)
+
+    # Making a list with all the sheets
+    dat <- purrr::map(
+      all_sheets,
+      function(sheets){
+        readxl::read_xls(temp, sheet = sheets)
+      }
+    )
+
+    names(dat) <- all_sheets
+
   }
 
-  if (param$source == "SIGA"){
-    if (param$dataset == "siga"){
-      dat <- readxl::read_xlsx(temp, skip = 1, col_names = TRUE)
-
-    }
-  }
   ##############################
   ## Excluding Temporary File ##
   ##############################
@@ -918,12 +675,25 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     unlink(temp)
   }
 
-  ####################
-  ## Pre-Processing ##
-  ####################
+  #########################
+  ## Pre-processing data ##
+  #########################
 
-  # Prodes and Txt need to have year extracted + encoding ajusted
-
+  if (is.list(dat)){
+    dat <- dat %>%
+      purrr::map(
+        function(df){
+          df %>%
+            janitor::clean_names() %>%
+            tibble::as_tibble()
+        }
+      )
+  }
+  else{
+    dat <- dat %>%
+      janitor::clean_names() %>%
+      tibble::as_tibble()
+  }
 
   #################
   ## Return Data ##
@@ -1051,8 +821,6 @@ datasets_link <- function() {
     ## COMEX ##
     ###########
 
-    # https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta
-
     "COMEX-EXP-PROD_NCM", "comex_export_prod", NA, "1997-2021", NA, "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm",
     "COMEX-IMP-PROD_NCM", "comex_import_prod", NA, "1997-2021", NA, "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm",
     "COMEX-EXP-MUNIC_FIRM", "comex_export_mun", NA, "1997-2021", NA, "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun",
@@ -1062,53 +830,10 @@ datasets_link <- function() {
     ## INPE ##
     ##########
 
-    # Todos os Biomas
-
-    # We can include CAR as well
-
-    # PRODES
-
-    # http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/prodes
-    # http://www.dpi.inpe.br/prodesdigital/prodesmunicipal.php
-    # http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2020&estado=&ordem=MUNICIPIO&type=tabela&output=txt&
-
-    # Desmatamento Acumulado -http://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/vector/accumulated_deforestation_1988_2007.zip
-    # Floresta Anual - http://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/vector/forest.zip
-    # Hidrografia - http://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/vector/hydrography.zip
-    # Incremento Anual do Desmatamento - http://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/vector/yearly_deforestation.zip
-    # PRODES Completo - http://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/PDigital2000_2020_AMZ_raster_v20210521.zip
-    # Nao Floresta - http://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/vector/cloud.zip
-
     "PRODES-INPE", "prodes", NA, "2000-2020", NA, "http://www.dpi.inpe.br/prodesdigital",
-    # 'PRODES-INPE','prodes_accum_deforestation',NA,'1988-2007',NA,'http://terrabrasilis.dpi.inpe.br/download/dataset',
-    # 'PRODES-INPE','prodes_forest',NA,'2016-2019',NA,'http://terrabrasilis.dpi.inpe.br/download/dataset',
-    # 'PRODES-INPE','prodes_hydrography',NA,NA,NA,'http://terrabrasilis.dpi.inpe.br/download/dataset',
-    # 'PRODES-INPE','prodes_annual_increase_deforestation',NA,'2008-2020',NA,'http://terrabrasilis.dpi.inpe.br/download/dataset',
-    # 'PRODES-INPE','prodes_cloud',NA,'2016-2020',NA,'http://terrabrasilis.dpi.inpe.br/download/dataset',
-    # 'PRODES-INPE','prodes_not_forest',NA,NA,NA,'http://terrabrasilis.dpi.inpe.br/download/dataset',
 
-
-    ## Auxiliares
-
-    # Estados - http://terrabrasilis.dpi.inpe.br/download/dataset/amz-aux/vector/states_amazon_biome.zip
-    # Limite - http://terrabrasilis.dpi.inpe.br/download/dataset/amz-aux/vector/amazon_border.zip
-    # Municipio Bioma Amazonia - http://terrabrasilis.dpi.inpe.br/download/dataset/amz-aux/vector/municipalities_amazon_biome.zip
-    # Unidade Conservacao - http://terrabrasilis.dpi.inpe.br/download/dataset/amz-aux/vector/conservation_units_amazon_biome.zip
-    # Area Indigena - http://terrabrasilis.dpi.inpe.br/download/dataset/amz-aux/vector/indigeneous_area_amazon_biome.zip
-
-    # DETER (Somente Amazônia Legal e Cerrado)
-
-    # DEGRAD is included here http://www.inpe.br/cra/projetos_pesquisas/deter.php
-
-    # javascript: download('http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-amz/shape','file-download-1');
-    # javascript: download('http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-cerrado/shape','file-download-2');
-
-    "DETER-INPE", "deter_amz", NA, NA, NA, "http://terrabrasilis.dpi.inpe.br/file-delivery/download/",
-    "DETER-INPE", "deter_cerrado", NA, NA, NA, "http://terrabrasilis.dpi.inpe.br/file-delivery/download/",
-
-    # DEGRAD
-
-    # "http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad",year,"_final_shp.zip"
+    "DETER-INPE", "deter_amz", NA, NA, NA, "http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-amz/shape",
+    "DETER-INPE", "deter_cerrado", NA, NA, NA, "http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-cerrado/shape",
 
     "DEGRAD-INPE", "degrad", NA, "2007-2016", NA, "http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad",
 
@@ -1127,25 +852,7 @@ datasets_link <- function() {
     ## SIGMINE ##
     #############
 
-    # Agencia Nacional de Mineracao (ANM)
-
-    "ANM-SIGMINE", "sigmine_active", NA, NA, NA, "https://app.anm.gov.br/dadosabertos/",
-
-    # https://dados.gov.br/dataset/sistema-de-informacoes-geograficas-da-mineracao-sigmine
-
-    # Processos minerários ativos - Brasil
-    # https://app.anm.gov.br/dadosabertos/SIGMINE/PROCESSOS_MINERARIOS/BRASIL.zip
-    # Processos minerários inativos - Brasil
-    # https://app.anm.gov.br/dadosabertos/SIGMINE/PROCESSOS_MINERARIOS/BRASIL_INATIVOS.zip
-    # Arrendamentos
-    # https://app.anm.gov.br/dadosabertos/SIGMINE/ARRENDAMENTO.zip
-    # Áreas de proteção de fonte
-    # https://app.anm.gov.br/dadosabertos/SIGMINE/PROTECAO_FONTE.zip
-    # Áreas de bloqueio
-    # https://app.anm.gov.br/dadosabertos/SIGMINE/BLOQUEIO.zip
-    # Reservas garimpeiras
-    # https://app.anm.gov.br/dadosabertos/SIGMINE/RESERVAS_GARIMPEIRAS.zip
-
+    "ANM-SIGMINE", "sigmine_active", NA, NA, NA, "https://app.anm.gov.br/dadosabertos/SIGMINE/PROCESSOS_MINERARIOS/BRASIL.zip",
 
     ##########
     ## SEEG ##
@@ -1153,30 +860,19 @@ datasets_link <- function() {
 
     "SEEG", "seeg", NA, NA, "Country, State, Municipality", "http://seeg.eco.br/download",
 
-    # http://seeg.eco.br/download
-
-    # UF - https://seeg-br.s3.amazonaws.com/2019-v7.0/download/1-SEEG8_GERAL-BR_UF_2020.11.05_-_SITE.xlsx
-    # Municipios - https://drive.google.com/drive/folders/1S789njrMQCSJdnEjiOisk6VWy7eFwBfi?usp=sharing
-
     #########
     ## IPS ##
     #########
 
-    #  http://www.ipsamazonia.org.br/assets/IPS_Tabela_Completa-8bb3b841e46c8fb17b0331d8ea92bef3.xlsx
-
-    "IPS", "ips", NA, "2014 and/or 2018 and/or 2021", NA, "http://www.ipsamazonia.org.br",
+    "IPS", "ips", NA, "2014 and/or 2018 and/or 2021", NA, "http://www.ipsamazonia.org.br/assets/IPS_Tabela_Completa-1df30fcea79209e3c7e8634a586f95e6.xlsx",
 
     ###########
     ## IBAMA ##
     ###########
 
-    # There is a lot to map, seem an incredible data source
-
     "IBAMA", "areas_embargadas", NA, NA, "Municipality", "https://servicos.ibama.gov.br/ctf/publico/areasembargadas/downloadListaAreasEmbargadas.php",
     "IBAMA", "distributed_fines", NA, NA, "Municipality", "https://dadosabertos.ibama.gov.br/dados/SICAFI/",
     "IBAMA", "collected_fines", NA, NA, "Municipality", "https://dadosabertos.ibama.gov.br/dados/SICAFI/",
-    # http://dadosabertos.ibama.gov.br/organization/instituto-brasileiro-do-meio-ambiente-e-dos-recursos-naturais-renovaveis
-
 
     #################################################################
     ## Other Economics Datasets IBGE - GDP Munic, Employment, Wage ##
@@ -1186,17 +882,9 @@ datasets_link <- function() {
 
     "PIB_MUNIC-IBGE", "pibmunic", "5938", "2002-2018", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pib-munic/tabelas",
 
-    ## Estimated Population ##
-
-    # https://sidra.ibge.gov.br/pesquisa/estimapop/tabelas
-
     ## Labor Market Info ##
 
     "CEMPRE-IBGE", "cempre", "6449", "2006-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/cempre/tabelas",
-
-    ## Demographic Info ##
-
-    # https://sidra.ibge.gov.br/pesquisa/censo-demografico/series-temporais/series-temporais/
 
     ##########
     ## CIPÓ ##
@@ -1275,7 +963,7 @@ datasets_link <- function() {
     ## IMAZON ##
     ############
 
-    "Imazon", "imazon_shp", NA, "2020", "Municipality", "https://drive.google.com/drive/u/1/folders/1EAOABo1GVKT3YsYkhtgJI9ckB3RULJSC",
+    "Imazon", "imazon_shp", NA, "2020", "Municipality", "https://docs.google.com/uc?export=download&id=1JHc2J_U8VXHVuWVsi8wVBnNzZ37y1ehv",
 
     #########
     ## EPE ##

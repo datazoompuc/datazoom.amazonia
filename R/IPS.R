@@ -28,17 +28,6 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
   ###########################
 
   survey <- link <- .data <- NULL
-
-  #############################
-  ## Define Basic Parameters ##
-  #############################
-
-  param <- list()
-  param$dataset <- dataset
-  param$time_period <- time_period
-  param$language <- language
-  param$raw_data <- raw_data
-
   codigo_ibge <- municipio <- estado <- ips_amazonia <- NULL
   necessidades_humanas_basicas <- fundamentos_para_o_bem_estar <- NULL
   oportunidades <- agua_e_saneamento <- moradia <- seguranca_pessoal <- NULL
@@ -88,14 +77,39 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
   mulheres_com_empregos_ensino_superior_percent_de_empregos_em_relacao_ao_total <- NULL
   nutricao_e_cuidados_medicos_basicos <- NULL
 
+  #############################
+  ## Define Basic Parameters ##
+  #############################
+
+  param <- list()
+  param$dataset <- dataset
+  param$time_period <- time_period
+  param$language <- language
+  param$raw_data <- raw_data
+
+  # Picking which sheet to download
+
+  sheet_list <- c(
+    "2014" = "IPS 2014",
+    "2018" = "IPS 2018 ",
+    "2021" = "IPS 2021"
+  )
+
+  sheets <- param$time_period %>%
+    dplyr::recode(!!!sheet_list)
+
   ##############
   ## Download ##
   ##############
 
-  dat <- as.list(param$time_period) %>%
-    purrr::map(
-      function(t) {
-        external_download(dataset = "ips", source = "ips", year = t)
+  dat <- purrr::map2(
+    param$time_period, sheets,
+      function(year, sheet) {
+        external_download(
+          dataset = "ips",
+          source = "ips",
+          year = year,
+          sheet = sheet)
       }
     )
 

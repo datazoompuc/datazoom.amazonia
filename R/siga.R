@@ -15,7 +15,7 @@
 #' @export
 
 load_siga <- function(dataset = "siga", raw_data = FALSE, language = "pt") {
-  
+
   ###########################
   ## Bind Global Variables ##
   ###########################
@@ -33,7 +33,8 @@ load_siga <- function(dataset = "siga", raw_data = FALSE, language = "pt") {
 
   dat <- external_download(
     source = "SIGA",
-    dataset = param$dataset
+    dataset = param$dataset,
+    skip_rows = 1
   )
 
   if (raw_data == TRUE) {
