@@ -5,7 +5,6 @@
 #' @param dataset A dataset name ("siga")
 #' @param language Only available in Portuguese ("pt") as of now
 #' @param raw_data Only treated data (\code{FALSE}) is available
-#' @inheritParams load_baci
 #'
 #' @examples
 #' \dontrun{

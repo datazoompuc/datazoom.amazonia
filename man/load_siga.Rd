@@ -9,7 +9,7 @@ load_siga(dataset = "siga", raw_data = FALSE, language = "pt")
 \arguments{
 \item{dataset}{A dataset name ("siga")}
 
-\item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
+\item{raw_data}{Only treated data (\code{FALSE}) is available}
 
 \item{language}{Only available in Portuguese ("pt") as of now}
 }
