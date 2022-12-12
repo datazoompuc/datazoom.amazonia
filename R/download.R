@@ -731,18 +731,16 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     if (param$source == "EPE"){
       if (param$dataset == "energy_consumption_per_class"){
         base::message("This might take a while.")
-      #Finding sheet names
-      all_sheets <- readxl::excel_sheets(temp)
 
       #Making a list with all the sheets
       dat <- purrr::map(
-        all_sheets,
+        param$sheet,
         function(sheets){
           readxl::read_xls(temp, sheet = sheets)
         }
       )
       #Renaming list elements with sheet names
-      names(dat) <- all_sheets
+      names(dat) <- param$sheet
       }
 
     }
