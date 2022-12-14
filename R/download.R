@@ -579,15 +579,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     path <- param$url
   }
 
-  ##########
-  ## SIGA ##
-  ##########
-
-  if (source == "SIGA") {
-    path <- param$url
-  }
-
-
   #######################
   ## Initiate Download ##
   #######################
@@ -655,11 +646,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     if (dataset == "cde_budget_expenses"){
     file_extension <- ".rds"
     }
+    if (dataset == "aneel_generation_information_system"){
+      file_extension <- ".xlsx"
+    }
   }
-  if (source == "SIGA") {
-    file_extension <- ".xlsx"
-  }
-
 
   # !!!  We should Change This to a Curl Process
 
@@ -672,8 +662,13 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   download_method <- "standard" # works for most functions
 
-  if (source %in% c("iema", "imazon_shp", "ANEEL")) {
+  if (source %in% c("iema", "imazon_shp")) {
     download_method <- "googledrive"
+  }
+  if (source == "ANEEL"){
+    if (dataset %in% c("cde_budget_expenses", "distributed_generation_ventures")){
+      download_method <- "googledrive"
+    }
   }
   if (source == "EPE"){
     if (dataset == "national_energy_balance"){
@@ -909,14 +904,11 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     if (param$dataset == "cde_budget_expenses"){
       dat <- readr::read_rds(temp)
     }
-  }
-
-  if (param$source == "SIGA"){
-    if (param$dataset == "siga"){
+    if (param$dataset == "aneel_generation_information_system"){
       dat <- readxl::read_xlsx(temp, skip = 1, col_names = TRUE)
-
     }
   }
+
   ##############################
   ## Excluding Temporary File ##
   ##############################
@@ -1293,18 +1285,13 @@ datasets_link <- function() {
     "EPE", "energy_consumption_per_class", NA, "2004-2021", "Region, Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/Documents/CONSUMO%20MENSAL%20DE%20ENERGIA%20EL%c3%89TRICA%20POR%20CLASSE.xls",
     "EPE", "national_energy_balance", NA, "2011-2022", "Region, Municipality","https://drive.google.com/file/d/1_JTYyAPdbQayR-nrURts6OmbKcm2cLix/view?usp=share_link",
 
-    ##########
-    ## SIGA ##
-    ##########
-
-    "SIGA", "siga", NA, "1908-2021", "Municipality", "https://git.aneel.gov.br/publico/centralconteudo/-/raw/main/relatorioseindicadores/geracao/BD_SIGA.xlsx?inline=false",
-
     ###########
     ## ANEEL ##
     ###########
 
     "ANEEL", "cde_budget_expenses", NA, "2013-2022", NA, "https://drive.google.com/file/d/1h7mu-9qbKfISk1-k4JSrBhXKBMQHTOH9/view?usp=share_link",
     "ANEEL", "distributed_generation_ventures", NA, "year", NA, "link",
+    "ANEEL", "aneel_generation_information_system", NA, "1908-2021", "Municipality", "https://git.aneel.gov.br/publico/centralconteudo/-/raw/main/relatorioseindicadores/geracao/BD_SIGA.xlsx?inline=false",
 
      ## Shapefile from github repository
 
