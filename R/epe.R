@@ -142,7 +142,7 @@ if(param$time_period != "default"){
       names(df) <- c("Estado", "Mes", paste0(sheets_selected[s]), "Ano")
 
       #Make year observations by the numbers associated with the month variable
-      #(ex.: when "jan_10" > year = "2013" | when "jan_11" > year = "2014" | when "jan" > year = 2004)
+      #(ex.: when "jan_10" -> year = "2013" | when "jan_11" -> year = "2014" | when "jan" -> year = 2004)
       for(r in 1:nrow(df)){
         if(stringr::str_detect(df[r,"Mes"], "_") == TRUE){
           df[r,"Ano"] <- 2003 + as.numeric(stringr::str_split(df[r,"Mes"], "_")[[1]][[2]])
@@ -179,7 +179,7 @@ if(param$time_period != "default"){
                            "industrial_consumption_per_state" = "consumo_industrial_por_uf",
                            "comercial_consumption_per_state" = "consumo_comercial_por_uf",
                            "other_consumption_per_state" = "consumo_outros_por_uf",
-                           "residential_consumers_per_state" = "consumidores_residenciais_por_f", # Ha um erro na planilha de origem, por isso 'f' ao inves de 'uf'
+                           "residential_consumers_per_state" = "consumidores_residenciais_por_f", # There is an error on the original sheet, as of 14/dec/2022. This is the reason for 'f' instead of 'uf'
                            "industrial_consumers_per_state" = "consumidores_industriais_por_uf",
                            "comercial_consumers_per_state" = "consumidores_comerciais_por_uf",
                            "other_consumers_per_state" = "consumidores_outros_por_uf"
@@ -327,6 +327,11 @@ if(param$time_period != "default"){
         janitor::clean_names() %>%
         dplyr::filter(ano %in% param$time_period)
 
+
+      ################################
+      ## Harmonizing variable names ##
+      ################################
+
       if(param$language == "eng"){
         if(param$geo_level == "Subsystem"){
         dat <- dat %>%
@@ -400,27 +405,29 @@ if(param$time_period != "default"){
       return(dat)
     }
 
+  }
 
 ########################################
 ## Data-Set = national_energy_balance ##
 ########################################
 
-  if (param$dataset == "national_energy_balance") {
+  if (param$dataset == "national_energy_balance"){
 
     if(param$time_period == "default"){
       param$time_period <- 2011:2022
     }
 
+    ################################
+    ## Harmonizing variable names ##
+    ################################
+
     dat <- dat %>%
       dplyr::rename(
-      "amazonia_legal" = "amz legal"
-      )
-
-    dat <- dat %>%
+        "amazonia_legal" = "amz legal"
+      ) %>%
       dplyr::filter(ano %in% param$time_period)
-    return(dat)
-  }
 
+    return(dat)
   }
 }
 
