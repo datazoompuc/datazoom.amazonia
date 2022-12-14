@@ -529,7 +529,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     download_method <- "curl"
     quiet <- FALSE
   }
-  if (source %in% c("ibama", "health")) {
+  if (source %in% c("ibama", "datasus")) {
     download_method <- "curl"
     quiet <- TRUE
   }
@@ -679,7 +679,12 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## Pre-processing data ##
   #########################
 
-  if (is.list(dat)){
+  if (is.data.frame(dat)){
+    dat <- dat %>%
+      janitor::clean_names() %>%
+      tibble::as_tibble()
+  }
+  else{
     dat <- dat %>%
       purrr::map(
         function(df){
@@ -688,11 +693,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
             tibble::as_tibble()
         }
       )
-  }
-  else{
-    dat <- dat %>%
-      janitor::clean_names() %>%
-      tibble::as_tibble()
   }
 
   #################
