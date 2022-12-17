@@ -111,6 +111,10 @@ if(param$time_period != "default"){
   ## Data Engineering ##
   ######################
 
+#############################################
+## Data-Set = energy_consumption_per_class ##
+#############################################
+
   if (param$dataset == "energy_consumption_per_class"){
     base::message("Download complete. Almost done.")
     if(param$time_period == "default"){
@@ -226,13 +230,13 @@ if(param$time_period != "default"){
                                              ano = as.integer(NULL))[numeric(0), ]
       }
 
-  #select sheets with consumption data
-  sheets_selected_consumo <- as.data.frame(sheets_selected) %>%
-    dplyr::filter(stringr::str_detect(as.data.frame(sheets_selected)[,1], "CONSUMIDORES") == F)
+         #select sheets with consumption data
+          sheets_selected_consumo <- as.data.frame(sheets_selected) %>%
+            dplyr::filter(stringr::str_detect(as.data.frame(sheets_selected)[,1], "CONSUMIDORES") == F)
 
-  #select sheets with consumers data
-  sheets_selected_consumidores <- as.data.frame(sheets_selected) %>%
-    dplyr::filter(stringr::str_detect(as.data.frame(sheets_selected)[,1], "CONSUMIDORES") == T)
+         #select sheets with consumers data
+          sheets_selected_consumidores <- as.data.frame(sheets_selected) %>%
+            dplyr::filter(stringr::str_detect(as.data.frame(sheets_selected)[,1], "CONSUMIDORES") == T)
 
 
         #################################
@@ -281,9 +285,9 @@ if(param$time_period != "default"){
         ### cleaning consumers data ###
         ###############################
 
-        for (s in 1:nrow(sheets_selected_consumidores)) {
+  for (s in 1:nrow(sheets_selected_consumidores)){
 
-        #select a data.frame form the list
+        #select a data.frame form the list and remove non_ASCII characters
         df <- as.data.frame(dat[paste0(sheets_selected_consumidores[s,1])]) %>%
           dplyr::mutate_if(is.character, function(var) {
             stringi::stri_trans_general(str = var, id = "Latin-ASCII")
@@ -319,14 +323,16 @@ if(param$time_period != "default"){
         }
         names(dat.mid) <- c(paste0(geolevel.names),"ano","mes",paste0(sheets_selected_consumidores[s,1]))
         final_dat_consumidores <- dplyr::right_join(final_dat_consumidores, dat.mid, by = c(paste0(geolevel.names), "ano", "mes"))
-      }
+  }
 
-      #merge CONSUMO and CONSUMIDOR dataframes
+        ##################################################
+        ### merge consumption and consumers dataframes ###
+        ##################################################
+
       dat <- dplyr::full_join(final_dat_consumidores,final_dat_consumo, by = c(paste0(geolevel.names), "ano", "mes")) %>%
         dplyr::arrange(ano) %>%
         janitor::clean_names() %>%
         dplyr::filter(ano %in% param$time_period)
-
 
       ################################
       ## Harmonizing variable names ##
