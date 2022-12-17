@@ -423,9 +423,37 @@ if(param$time_period != "default"){
 
     dat <- dat %>%
       dplyr::rename(
-        "amazonia_legal" = "amz legal"
+        "amazonia_legal" = "amz legal",
+        "oleo_combustivel" = "combustivel",
+        "oleo_diesel" = "diesel",
+        "bagaco_de_cana" = "cana"
       ) %>%
+      janitor::clean_names()%>%
+      dplyr::select(estado,amazonia_legal,ano,tidyselect::everything()) %>%
+      dplyr::select(-c(v1)) %>%
       dplyr::filter(ano %in% param$time_period)
+
+    if (param$language == "eng"){
+        dat <- dat %>%
+        dplyr::rename(
+        "state" = "estado",
+        "legal_amazon" = "amazonia_legal",
+        "year" = "ano",
+        "hydro" = "hidro",
+        "wind"= "eolica",
+        "thermal" = "termo",
+        "sugar_cane_bagasse" = "bagaco_de_cana",
+        "firewood" = "lenha",
+        "black_liquor" = "lixivia",
+        "other_renewable_sources" = "outras_fontes_renovaveis",
+        "steam_coal" = "carvao_vapor",
+        "natural_gas"= "gas_natural",
+        "coke_oven_gas" = "gas_de_coqueira",
+        "fuel_oil" = "oleo_combustivel",
+        "diesel_oil" = "oleo_diesel",
+        "other_non_renewable_sources"= "outras_fontes_nao_renovaveis",
+      )
+      }
 
     return(dat)
   }
