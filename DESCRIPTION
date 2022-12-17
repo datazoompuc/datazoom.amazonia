@@ -38,6 +38,7 @@ Imports:
     stringr,
     tibble,
     tidyr,
+    tidyselect,
     utils,
     XML
 Suggests: 
