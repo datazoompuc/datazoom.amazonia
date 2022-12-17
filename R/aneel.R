@@ -92,7 +92,7 @@ load_aneel <- function(dataset, raw_data = FALSE, time_period = 2013:2022,
            ) %>%
            dplyr::mutate(type_of_expenses = case_when( type_of_expenses == "Custos Administrativos e Financeiros e os Encargos Tributarios CCEE - CAFT CCEE" ~ "Administrative and Financial Costs and Tax Charges CCEE - CAFT CCEE",
                                                        type_of_expenses == "Carvao Mineral" ~ "Mineral Coal",
-                                                       type_of_expenses == "Conta de Consumo de Combustiveis - CCC" ~ "Fuel Consumption Account",
+                                                       type_of_expenses == "Conta de Consumo de Combustiveis - CCC" ~ "Fuel Consumption Account - CCC",
                                                        type_of_expenses == "Indenizacao das Concessoes" ~ "Concessions Indemnity" ,
                                                        type_of_expenses == "Programa Luz para Todos - PLPT" ~ "Light For All Program - PLPT",
                                                        type_of_expenses == "Restos a Pagar" ~ "Left to Pay", #maybe 'Payables'
@@ -122,11 +122,11 @@ load_aneel <- function(dataset, raw_data = FALSE, time_period = 2013:2022,
         janitor::clean_names() %>%
         dplyr::mutate_if(is.character, function(var) {
           stringi::stri_trans_general(str = var, id = "Latin-ASCII")}) %>%
-          dplyr::rename("municipios" = "municipio_s",
-                        "potencia_outorgada_kw" = "potencia_outorgada_k_w",
-                        "potencia_fiscalizada_kw" = "potencia_fiscalizada_kw",
-                        "garantia_fisica_k_w" = "garantia_fisica_kw",
-                        "proprietario_ou_regime_de_exploracao" = "proprietario_regime_de_exploracao") %>%
+        dplyr::rename("municipios" = "municipio_s",
+                      "potencia_outorgada_kw" = "potencia_outorgada_k_w",
+                      "potencia_fiscalizada_kw" = "potencia_fiscalizada_k_w",
+                      "garantia_fisica_kw" = "garantia_fisica_k_w",
+                      "proprietario_ou_regime_de_exploracao" = "proprietario_regime_de_exploracao") %>%
           dplyr::mutate(fonte = dplyr::case_when(fonte == "CGH" ~ "CGH - Central geradora hidreletrica",
                                                   fonte == "CGU" ~ "CGU - Central geradora undi-eletrica",
                                                   fonte == "EOL" ~ "EOL - Central geradora eolica",
@@ -148,25 +148,25 @@ load_aneel <- function(dataset, raw_data = FALSE, time_period = 2013:2022,
                  "type_of_action" = "tipo_de_atuacao", #maybe type_of_permission is more appropriate
                  "final_fuel" = "combustivel_final",
                  "operation_start" = "entrada_em_operacao",
-                 "granted_potency_kw" = "potencia_outorgada_k_w",
-                 "fiscalized_potency_kw" = "potencia_fiscalizada_k_w",
-                 "fisical_guarantee_kw" = "garantia_fisica_k_w",
+                 "granted_potency_kw" = "potencia_outorgada_kw",
+                 "fiscalized_potency_kw" = "potencia_fiscalizada_kw",
+                 "fisical_guarantee_kw" = "garantia_fisica_kw",
                  "qualified_generation" = "geracao_qualificada",
                  "decimal_latitude" = "latitude_decimal",
                  "decimal_longitude" = "longitude_decimal",
                  "validity_start" = "inicio_vigencia",
                  "validity_end" = "fim_vigencia",
-                 "proprietary_or_exploration_regime" = "proprietario_regime_de_exploracao",
+                 "proprietary_or_exploration_regime" = "proprietario_ou_regime_de_exploracao",
                  "sub_basin" = "sub_bacia",
-                 "municipalities" = "municipio_s") %>%
-          dplyr::mutate(source = dplyr::case_when( source == "CGH" ~ "CGH - Hydroelectric generator center",
-                                                   source == "CGU" ~ "CGU - Undi-elctric generator center",
-                                                   source == "EOL" ~ "EOL - Eolic generator center",
-                                                   source == "PCH" ~ "PCH - Small hydroelectric center",
-                                                   source == "UFV" ~ "UFV - Photovoltaic solar generator center",
-                                                   source == "UHE" ~ "UHE - Hydroelectric power plant",
-                                                   source == "UTE" ~ "UTE - Thermoelectric power plant",
-                                                   source == "UTN" ~ "UTN - Thermonuclear power plant"),
+                 "municipalities" = "municipios") %>%
+          dplyr::mutate(source = dplyr::case_when( source == "CGH - Central geradora hidreletrica" ~ "CGH - Hydroelectric generator center",
+                                                   source == "CGU - Central geradora undi-eletrica" ~ "CGU - Undi-elctric generator center",
+                                                   source == "EOL - Central geradora eolica" ~ "EOL - Eolic generator center",
+                                                   source == "PCH - Pequena central hidreletrica" ~ "PCH - Small hydroelectric center",
+                                                   source == "UFV - Central geradora solar fotovoltaica" ~ "UFV - Photovoltaic solar generator center",
+                                                   source == "UHE - Usina hidreletrica" ~ "UHE - Hydroelectric power plant",
+                                                   source == "UTE - Usina termeletrica" ~ "UTE - Thermoelectric power plant",
+                                                   source == "UTN - Usina termonuclear" ~ "UTN - Thermonuclear power plant"),
                         phase = dplyr::case_when( phase == "Operacao" ~ "Operation",
                                                   phase == "Construcao nao iniciada" ~ "Construction not initiated",
                                                   phase == "Construcao" ~ "Construction"),
@@ -221,22 +221,19 @@ load_aneel <- function(dataset, raw_data = FALSE, time_period = 2013:2022,
                                                        final_fuel == "Calor de Processo - CM" ~ "Process Heat - CM",
                                                        final_fuel == "Biogas - Floresta" ~ "Biogas - Forest",
                                                        final_fuel == "Gas de Alto Forno - PE" ~ "Blast Furnace Gas - PE",
-                                                       final_fuel == "Etanol" ~ "Ethanol"))
+                                                       final_fuel == "Etanol" ~ "Ethanol",
+                                                       final_fuel == "Bagaco de Cana de Acucar" ~ "Sugar Cane Bagasse"))
+
         dat <- dat %>%
-                dplyr::mutate(proprietary_or_exploration_regime = dplyr::case_when(stringr::str_detect(dat$proprietary_or_exploration_regime,
-                                                                                                       pattern = "% para") ~
-                                                                                      stringr::str_replace_all(dat$proprietary_or_exploration_regime,
-                                                                                                                pattern = "% para",
-                                                                                                                replacement = "% for"),
-                                                                                   dat$proprietary_or_exploration_regime == "Nao Informado" ~
-                                                                                    "Not Informed"),
-                              sub_basin = dplyr::case_when(stringr::str_detect(dat$sub_basin,
-                                                                                pattern = "e outros") ~
-                                                            stringr::str_replace_all(dat$sub_basin,
-                                                                                     pattern = "e outros",
-                                                                                     replacement = "and others"),
-                                                           TRUE ~
-                                                            dat$sub_basin))
+                dplyr::mutate(proprietary_or_exploration_regime = dplyr::case_when(stringr::str_detect(dat$proprietary_or_exploration_regime, pattern = "% para") ~
+                                                                                      stringr::str_replace_all(dat$proprietary_or_exploration_regime, pattern = "% para", replacement = "% for"),
+                                                                                   dat$proprietary_or_exploration_regime == "Nao Informado" ~ "Not Informed"),
+                              sub_basin = dplyr::case_when(stringr::str_detect(dat$sub_basin, pattern = "e outros") ~
+                                                              stringr::str_replace_all(dat$sub_basin, pattern = "e outros", replacement = "and others"),
+                                                           TRUE ~ dat$sub_basin),
+                              qualified_generation = dplyr::case_when( qualified_generation == "Sim" ~ "Yes",
+                                                                       qualified_generation == "Nao" ~ "No",
+                                                                       TRUE ~ dat$qualified_generation))
 
 
       }
