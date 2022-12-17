@@ -1290,7 +1290,6 @@ datasets_link <- function() {
     ###########
 
     "ANEEL", "cde_budget_expenses", NA, "2013-2022", NA, "https://drive.google.com/file/d/1h7mu-9qbKfISk1-k4JSrBhXKBMQHTOH9/view?usp=share_link",
-    "ANEEL", "distributed_generation_ventures", NA, "year", NA, "link",
     "ANEEL", "aneel_generation_information_system", NA, "1908-2021", "Municipality", "https://git.aneel.gov.br/publico/centralconteudo/-/raw/main/relatorioseindicadores/geracao/BD_SIGA.xlsx?inline=false",
 
      ## Shapefile from github repository
