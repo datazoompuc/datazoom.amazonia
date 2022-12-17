@@ -65,6 +65,21 @@ load_aneel <- function(dataset, raw_data = FALSE, time_period = 2013:2022,
             ## Harmonizing Variable Names ##
             ################################
 
+           dat <- dat %>%
+           dplyr::rename(
+             "valor" = "soma_de_valor",
+             "participacao_no_total" = "participacao"
+           ) %>%
+             dplyr::mutate_if(is.character, function(var) {
+               stringi::stri_trans_general(str = var, id = "Latin-ASCII")
+             }) %>%
+           dplyr::mutate(tipo_de_despesa = case_when( tipo_de_despesa == "CAFT CCEE" ~ "Custos Administrativos e Financeiros e os Encargos Tributarios CCEE - CAFT CCEE",
+                                                      tipo_de_despesa == "CCC" ~ "Conta de Consumo de Combustiveis - CCC",
+                                                      tipo_de_despesa == "Subvencao RTE" ~ "Subvencao Revisao Tarifaria Extraordinaria - RTE",
+                                                      tipo_de_despesa == "Verba MME" ~ "Verba Ministerio de Minas e Energia - MME",
+                                                      TRUE ~ dat$tipo_de_despesa
+                                                      ))
+
 
        if (param$language == "eng"){
 
@@ -72,25 +87,29 @@ load_aneel <- function(dataset, raw_data = FALSE, time_period = 2013:2022,
            dplyr::rename(
              "year" = "ano",
              "type_of_expenses" = "tipo_de_despesa",
-             "value" = "soma_de_valor",
-             "share_of_total_amount" = "participacao"
-           )
+             "value" = "valor",
+             "share_of_total_amount" = "participacao_no_total"
+           ) %>%
+           dplyr::mutate(type_of_expenses = case_when( type_of_expenses == "Custos Administrativos e Financeiros e os Encargos Tributarios CCEE - CAFT CCEE" ~ "Administrative and Financial Costs and Tax Charges CCEE - CAFT CCEE",
+                                                       type_of_expenses == "Carvao Mineral" ~ "Mineral Coal",
+                                                       type_of_expenses == "Conta de Consumo de Combustiveis - CCC" ~ "Fuel Consumption Account",
+                                                       type_of_expenses == "Indenizacao das Concessoes" ~ "Concessions Indemnity" ,
+                                                       type_of_expenses == "Programa Luz para Todos - PLPT" ~ "Light For All Program - PLPT",
+                                                       type_of_expenses == "Restos a Pagar" ~ "Left to Pay", #maybe 'Payables'
+                                                       type_of_expenses == "Subsidio Agua-esgoto-saneamento" ~ "Water-sewer-sanitation Aid",
+                                                       type_of_expenses == "Subsidio Baixa Renda" ~ "Low Income Aid",
+                                                       type_of_expenses == "Subsidio Consumidor Fonte Incentivada" ~ "Incentivized Source Consumer Aid",
+                                                       type_of_expenses == "Subsidio Distribuidora" ~ "Distributor Aid",
+                                                       type_of_expenses == "Subsidio Fonte Incentivada  (Transmissoras)" ~ "Incentivized Source Aid (Transmitters)",
+                                                       type_of_expenses == "Subsidio Geracao Fonte Incentivada" ~ "Incentivized Source Generation Aid",
+                                                       type_of_expenses == "Subsidio Irrigacao e Aquicultura" ~ "Irrigation and Aquaculture Aid",
+                                                       type_of_expenses == "Subsidio Rural" ~ "Rural Subvention",
+                                                       type_of_expenses == "Subvencao Cooperativa" ~ "Cooperative Subvention" ,
+                                                       type_of_expenses == "Subvencao Revisao Tarifaria Extraordinaria - RTE" ~ "Extraordinary Tariff Review (RTE) Subvention",
+                                                       type_of_expenses == "Verba Ministerio de Minas e Energia - MME" ~ "Ministry of Mines and Energy (MME) Budget"))
        }
 
-       if (param$language == "pt"){
 
-         dat <- dat %>%
-           dplyr::rename(
-             "ano" = "ano",
-             "tipo_de_despesa" = "tipo_de_despesa",
-             "total" = "soma_de_valor",
-             "participacao_no_total" = "participacao"
-           )
-       }
-    }
-
-    if (param$dataset == "distributed_generation_ventures"){
-        dat <- NULL
     }
 
     if (param$dataset == "aneel_generation_information_system"){
