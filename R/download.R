@@ -643,10 +643,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
   }
   if (source == "ANEEL") {
-    if (dataset == "cde_budget_expenses"){
+    if (dataset == "energy_development_budget"){
     file_extension <- ".rds"
     }
-    if (dataset == "aneel_generation_information_system"){
+    if (dataset == "energy_generation"){
       file_extension <- ".xlsx"
     }
   }
@@ -666,7 +666,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     download_method <- "googledrive"
   }
   if (source == "ANEEL"){
-    if (dataset %in% c("cde_budget_expenses", "distributed_generation_ventures")){
+    if (dataset == "energy_development_budget"){
       download_method <- "googledrive"
     }
   }
@@ -901,10 +901,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   # }
 
   if (param$source == "ANEEL"){
-    if (param$dataset == "cde_budget_expenses"){
+    if (param$dataset == "energy_development_budget"){
       dat <- readr::read_rds(temp)
     }
-    if (param$dataset == "aneel_generation_information_system"){
+    if (param$dataset == "energy_generation"){
       dat <- readxl::read_xlsx(temp, skip = 1, col_names = TRUE)
     }
   }
@@ -1289,8 +1289,8 @@ datasets_link <- function() {
     ## ANEEL ##
     ###########
 
-    "ANEEL", "cde_budget_expenses", NA, "2013-2022", NA, "https://drive.google.com/file/d/1h7mu-9qbKfISk1-k4JSrBhXKBMQHTOH9/view?usp=share_link",
-    "ANEEL", "aneel_generation_information_system", NA, "1908-2021", "Municipality", "https://git.aneel.gov.br/publico/centralconteudo/-/raw/main/relatorioseindicadores/geracao/BD_SIGA.xlsx?inline=false",
+    "ANEEL", "energy_development_budget", NA, "2013-2022", NA, "https://drive.google.com/file/d/1h7mu-9qbKfISk1-k4JSrBhXKBMQHTOH9/view?usp=share_link",
+    "ANEEL", "energy_generation", NA, "1908-2021", "Municipality", "https://git.aneel.gov.br/publico/centralconteudo/-/raw/main/relatorioseindicadores/geracao/BD_SIGA.xlsx?inline=false",
 
      ## Shapefile from github repository
 
