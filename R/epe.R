@@ -3,8 +3,7 @@
 #' @description Electrical Energy Monthly Consumption per Class
 #'
 #' @param dataset A dataset name, ("energy_consumption_per_class") or ("national_energy_balance")
-#' @param language Only available in Portuguese ("pt") as of now
-#' @param geo_level A geographical level, ("State") or ("Subsystem"), only available for ("energy_consumption_per_class")
+#' @param geo_level A geographical level, ("state") or ("subsystem"), only available for "energy_consumption_per_class"
 #' @inheritParams load_baci
 #'
 #' @examples
@@ -18,19 +17,16 @@
 #' )
 #' }
 #'
-#' @encoding UTF-8
-#'
-#' @importFrom magrittr %>%
-#'
 #' @export
 
-load_epe <- function(dataset, raw_data = FALSE, time_period = "default",
-                     geo_level = "State", language = "pt") {
+load_epe <- function(dataset, raw_data = FALSE,
+                     geo_level = "state", language = "eng") {
   ###########################
   ## Bind Global Variables ##
   ###########################
 
   Sistema <- ano <- Total <- Quantidade <- available_time <- NULL
+  mes <- uf <- geo <- region_subsystem <- v1 <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -40,13 +36,15 @@ load_epe <- function(dataset, raw_data = FALSE, time_period = "default",
   param$dataset <- dataset
   param$raw_data <- raw_data
   param$language <- language
-  param$time_period <- time_period
   param$geo_level <- geo_level
 
   #################
   ## Downloading ##
   #################
-  if (param$geo_level == "State"){
+
+  # Choosing which sheets to read
+
+  if (param$geo_level == "state"){
     sheets_selected <- c("CONSUMO POR UF",
                          "CONSUMO CATIVO POR UF",
                          "CONSUMO RESIDENCIAL POR UF",
@@ -58,7 +56,7 @@ load_epe <- function(dataset, raw_data = FALSE, time_period = "default",
                          "CONSUMIDORES COMERCIAIS POR UF",
                          "CONSUMIDORES OUTROS POR UF")
   }
-  if (param$geo_level == "Region" | param$geo_level == "Subsystem"){
+  if (param$geo_level == "region" | param$geo_level == "subsystem"){
 
     sheets_selected <- c("TOTAL",
                          "RESIDENCIAL",
@@ -77,32 +75,6 @@ load_epe <- function(dataset, raw_data = FALSE, time_period = "default",
     sheet = sheets_selected
     )
 
-
-
-  ##################
-  ## Period Check ##
-  ##################
-if(param$time_period != "default"){
-  year_check <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(available_time) %>%
-    unlist() %>%
-    as.character() %>%
-    stringr::str_split(pattern = "-") %>%
-    unlist() %>%
-    as.numeric()
-
-
-  if (min(time_period) < year_check[1]) {
-    stop("Provided time period less than supported. Check documentation for time availability.")
-  }
-  if (max(time_period) > year_check[2]) {
-    stop("Provided time period greater than supported. Check documentation for time availability.")
-  }
-}
-
-
-
   if (param$raw_data) {
     return(dat)
   }
@@ -111,358 +83,318 @@ if(param$time_period != "default"){
   ## Data Engineering ##
   ######################
 
-#############################################
-## Data-Set = energy_consumption_per_class ##
-#############################################
-
   if (param$dataset == "energy_consumption_per_class"){
-    base::message("Download complete. Almost done.")
-    if(param$time_period == "default"){
-      param$time_period <- 2004:2021
-    }
 
-    if (param$geo_level == "State"){
+    # removing accents from each sheet
 
-      #Define an empty data.frame that will receive the data
-      final_dat <- data.frame(Estado = as.character(NULL),
-                              Mes = as.character(NULL),
-                              Ano = as.integer(NULL))[numeric(0), ]
-
-    #Select sheets with 'UF' in the name
-      for (s in 1:length(sheets_selected)){
-
-      #Selecting a data.frame to be manipulated
-      df <- as.data.frame(dat[paste0(sheets_selected[s])])
-
-      #Make months as row names and have exclusive names
-      #(ex.: When year is 2004, month is still "jan" | when year is 2005, month is "jan_2")
-      df <- df %>% janitor::row_to_names(5) %>% janitor::clean_names()
-
-      #Maket pivot longer
-      df <- tidyr::pivot_longer(df, cols = c(2:length(df)))
-
-      #Rename Colunms
-      df[1,4] <- NA
-      names(df) <- c("Estado", "Mes", paste0(sheets_selected[s]), "Ano")
-
-      #Make year observations by the numbers associated with the month variable
-      #(ex.: when "jan_10" -> year = "2013" | when "jan_11" -> year = "2014" | when "jan" -> year = 2004)
-      for(r in 1:nrow(df)){
-        if(stringr::str_detect(df[r,"Mes"], "_") == TRUE){
-          df[r,"Ano"] <- 2003 + as.numeric(stringr::str_split(df[r,"Mes"], "_")[[1]][[2]])
-        } else {
-          df[r, "Ano"] <- 2004
-        }
-
-      }
-
-      #Make month observations lose the nunmbers (ex.: turn "jan_10" into "jan")
-      for(r in 1:nrow(df)){
-
-        if(stringr::str_detect(df[r,"Mes"], "_") == TRUE){
-          df[r,"Mes"] <- (stringr::str_split(df[r,"Mes"], "_")[[1]][[1]])
-        } else {
-          df[r, "Mes"] <- df[r, "Mes"]
-        }
-      }
-      final_dat <- dplyr::right_join(final_dat, df, by = c("Estado", "Ano", "Mes"))
-    }
-
-    final_dat <- final_dat %>%
-      janitor::clean_names() %>%
-      dplyr::filter(stringr::str_detect(final_dat[,1], "Nota:") == F)
-
-    if (param$language == "eng"){
-      final_dat <- final_dat %>%
-                    dplyr::rename("state" = "estado",
-                           "month" = "mes",
-                           "year" = "ano",
-                           "consumption_per_state" = "consumo_por_uf",
-                           "captive_consumption_per_state" = "consumo_cativo_por_uf",
-                           "residential_consumption_per_state" = "consumo_residencial_por_uf",
-                           "industrial_consumption_per_state" = "consumo_industrial_por_uf",
-                           "comercial_consumption_per_state" = "consumo_comercial_por_uf",
-                           "other_consumption_per_state" = "consumo_outros_por_uf",
-                           "residential_consumers_per_state" = "consumidores_residenciais_por_f", # There is an error on the original sheet, as of 14/dec/2022. This is the reason for 'f' instead of 'uf'
-                           "industrial_consumers_per_state" = "consumidores_industriais_por_uf",
-                           "comercial_consumers_per_state" = "consumidores_comerciais_por_uf",
-                           "other_consumers_per_state" = "consumidores_outros_por_uf"
-                           )
-    }
-   return(final_dat)
-  }
-
-    #####################################
-    ## Geo-Level = Subsystem or Region ##
-    #####################################
-
-    if (param$geo_level == "Subsystem" | param$geo_level == "Region"){
-
-      if (param$geo_level == "Subsystem"){
-
-        geolevel.pattern <- "SUBSISTEMA ELETRICO"
-        geolevel.names <- "subsistema"
-
-        #define an empty data.frame for consumption data
-        final_dat_consumo <- data.frame(subsistema = as.character(NULL),
-                                        mes = as.character(NULL),
-                                        ano = as.integer(NULL))[numeric(0), ]
-
-        #define an empty data.frame for consumers data
-        final_dat_consumidores <- data.frame(subsistema = as.character(NULL),
-                                             mes = as.character(NULL),
-                                             ano = as.integer(NULL))[numeric(0), ]
-      }
-
-      if (param$geo_level == "Region"){
-
-        geolevel.pattern <- "REGIAO GEOGRAFICA"
-        geolevel.names <- "regiao"
-
-         #define an empty data.frame for consumption data
-        final_dat_consumo <- data.frame(regiao = as.character(NULL),
-                                        mes = as.character(NULL),
-                                        ano = as.integer(NULL))[numeric(0), ]
-
-        #define an empty data.frame for consumers data
-        final_dat_consumidores <- data.frame(regiao = as.character(NULL),
-                                             mes = as.character(NULL),
-                                             ano = as.integer(NULL))[numeric(0), ]
-      }
-
-         #select sheets with consumption data
-          sheets_selected_consumo <- as.data.frame(sheets_selected) %>%
-            dplyr::filter(stringr::str_detect(as.data.frame(sheets_selected)[,1], "CONSUMIDORES") == F)
-
-         #select sheets with consumers data
-          sheets_selected_consumidores <- as.data.frame(sheets_selected) %>%
-            dplyr::filter(stringr::str_detect(as.data.frame(sheets_selected)[,1], "CONSUMIDORES") == T)
-
-
-        #################################
-        ### cleaning consumption data ###
-        #################################
-
-  for (s in 1:nrow(sheets_selected_consumo)){
-
-      #select a data.frame form the list
-      df <- as.data.frame(dat[paste0(sheets_selected_consumo[s,1])]) %>%
-        dplyr::mutate_if(is.character, function(var) {
+    dat <- dat %>%
+      purrr::map(
+        ~ dplyr::mutate_if(., is.character, function(var) {
           stringi::stri_trans_general(str = var, id = "Latin-ASCII")
         })
+      )
 
-      #change column names
-      colnames(df) <- c(paste0(geolevel.names), "jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez", "anual")
+    if (geo_level == "state"){
 
-      #identify row numbers that have the geo_level we want
-      if (param$geo_level == "Subsystem"){id <- grep(geolevel.pattern, df$subsistema)}
-      if (param$geo_level == "Region"){id <- grep(geolevel.pattern, df$regiao)}
+      # removes first three rows of each data frame + last row
 
-      dat.mid <- data.frame()
-      row.x <- data.frame()
+      dat <- dat %>%
+        purrr::map(dplyr::slice_tail, n = -3) %>%
+        purrr::map(dplyr::slice_head, n = -1)
 
-      #loop that repeats for every row with the gelevel.pattern
-      for(i in 1:length(id)){
+      # turns each sheet sideways, easier to work with
 
-      #1:5 because there are exactly five subsystems. It starts at 1 because it skips the line with the geolevel.pattern, which doesn't have data.
-      for(j in 1:5){
+      dat <- dat %>%
+        purrr::map(t) # applies t() function for transpose
 
-        #bind every row that is under geolevel.patern
-        row.x <- df[(id[i]+j),] %>%
-        dplyr::mutate("ano" = 2004 + length(id) - i) %>%
-        tidyr::pivot_longer(c(2:ncol(df)))
+      dat <- dat %>%
+        purrr::map(tibble::as_tibble)
 
-      dat.mid <- dplyr::bind_rows(dat.mid, row.x)
+      # creates list with column names (initially from first row)
 
-        }
-      }
-      names(dat.mid) <- c(paste0(geolevel.names), "ano", "mes", paste0("consumo_",sheets_selected_consumo[s,1]))
-      final_dat_consumo <- dplyr::right_join(final_dat_consumo, dat.mid, by = c(paste0(geolevel.names), "ano", "mes"))
+      var_names <- dat %>%
+        purrr::map(dplyr::slice_head, n = 1) %>%
+        purrr::map(as.character)
 
-  }
+      # first and second are Year and Month respectively
 
-        ###############################
-        ### cleaning consumers data ###
-        ###############################
+      var_names <- var_names %>%
+        purrr::map(
+          function(names){
+            names[1] <- "ano"
+            names[2] <- "mes"
 
-  for (s in 1:nrow(sheets_selected_consumidores)){
-
-        #select a data.frame form the list and remove non_ASCII characters
-        df <- as.data.frame(dat[paste0(sheets_selected_consumidores[s,1])]) %>%
-          dplyr::mutate_if(is.character, function(var) {
-            stringi::stri_trans_general(str = var, id = "Latin-ASCII")
-          })
-
-        #change column names
-        colnames(df) <- c(paste0(geolevel.names), "jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez")
-
-        #identify row numbers that have the geo_level we want
-        if (param$geo_level == "Subsystem"){id <- grep(geolevel.pattern, df$subsistema)}
-        if (param$geo_level == "Region"){id <- grep(geolevel.pattern, df$regiao)}
-
-        #define empty data.frame for manipulating each row of 'df' (row.x) and binding them in a new data.frame(dat.mid)
-        dat.mid <- data.frame()
-        row.x <- data.frame()
-
-
-        for(i in 1:length(id)){
-
-          #1:5 because there are exactly five regions.
-          for(j in 1:5){
-
-            #bind every row that is under SUBSISTEMA ELÉTRICO
-
-            row.x <- df[(id[i]+j),] %>%
-              dplyr::mutate("ano" = 2004 + length(id) - i) %>%
-              tidyr::pivot_longer(c(2:ncol(df)))
-
-            dat.mid <- dplyr::bind_rows(dat.mid, row.x)
-
+            names
           }
+        )
 
-        }
-        names(dat.mid) <- c(paste0(geolevel.names),"ano","mes",paste0(sheets_selected_consumidores[s,1]))
-        final_dat_consumidores <- dplyr::right_join(final_dat_consumidores, dat.mid, by = c(paste0(geolevel.names), "ano", "mes"))
-  }
+      # removing first row and turning into column names
 
-        ##################################################
-        ### merge consumption and consumers dataframes ###
-        ##################################################
+      dat <- dat %>%
+        purrr::map(dplyr::slice_tail, n = -1) %>%
+        purrr::map2(var_names, stats::setNames)
 
-      dat <- dplyr::full_join(final_dat_consumidores,final_dat_consumo, by = c(paste0(geolevel.names), "ano", "mes")) %>%
-        dplyr::arrange(ano) %>%
+      # extending year variable for all the missing rows
+
+      dat <- dat %>%
+        purrr::map(tidyr::fill, ano, .direction = "down")
+
+      # shifting into long format
+
+      dat <- dat %>%
+        purrr::imap(
+          ~ tidyr::pivot_longer(.x, -c("ano", "mes"), names_to = "uf", values_to = .y)
+        )
+
+      # merging everything into one dataframe
+
+      dat <- dat %>%
+        purrr::reduce(dplyr::full_join, by = c("ano", "mes", "uf"))
+
+      # general data cleaning
+
+      month_numbers <- c(
+        "JAN" = 1,
+        "FEV" = 2,
+        "MAR" = 3,
+        "ABR" = 4,
+        "MAI" = 5,
+        "JUN" = 6,
+        "JUL" = 7,
+        "AGO" = 8,
+        "SET" = 9,
+        "OUT" = 10,
+        "NOV" = 11,
+        "DEZ" = 12
+      )
+
+      dat <- dat %>%
+        dplyr::mutate(dplyr::across(ano, stringr::str_remove, "\\*"))
+
+      dat <- dat %>%
         janitor::clean_names() %>%
-        dplyr::filter(ano %in% param$time_period)
+        dplyr::mutate(dplyr::across(mes, dplyr::recode, !!!month_numbers)) %>%
+        dplyr::mutate(dplyr::across(-uf, as.numeric))
 
-      ################################
-      ## Harmonizing variable names ##
-      ################################
+      dat <- dat %>%
+        dplyr::mutate(uf = dplyr::case_when(uf == "TOTAL POR UF" ~ "Total",
+                                            TRUE ~ uf))
 
-      if(param$language == "eng"){
-        if(param$geo_level == "Subsystem"){
+    }
+
+    if (param$geo_level %in% c("subsystem", "region")){
+
+      # removes first 3 rows of each sheet
+
+      dat <- dat %>%
+        purrr::map(dplyr::slice_tail, n = -3)
+
+      # if sheet has an extra column, remove last useless one
+
+      dat <- dat %>%
+        purrr::map(
+          function(df){
+            if (ncol(df) == 14){
+              df <- df[, -14]
+            }
+
+            df
+          }
+        )
+
+      # creating year variable from second column
+
+      dat <- dat %>%
+        purrr::map(
+          ~ dplyr::mutate(., ano = .[[2]])
+        )
+
+      # removing annoying asterisk
+
+      dat <- dat %>%
+        purrr::map(
+          ~ dplyr::mutate(., dplyr::across(ano, stringr::str_remove, "\\*"))
+        )
+
+      # keeping only actual years in year variable
+
+      dat <- dat %>%
+        purrr::map(
+            ~ dplyr::mutate(., ano = dplyr::case_when(
+              ano %in% as.character(2000:2030) ~ ano
+            ))
+          )
+
+      # extending year to missing values
+
+      dat <- dat %>%
+        purrr::map(tidyr::fill, ano, .direction = "down")
+
+      # now creating a variable to identify regions vc. subsystems
+
+      # creating geo variable from first column
+
+      dat <- dat %>%
+        purrr::map(
+          ~ dplyr::mutate(., geo = .[[1]])
+        )
+
+      # it can only take two values: REGIAO GEOGRAFICA or SUBSISTEMA ELETRICO
+
+      dat <- dat %>%
+        purrr::map(
+          ~ dplyr::mutate(., geo = dplyr::case_when(
+            geo %in% c("REGIAO GEOGRAFICA", "SUBSISTEMA ELETRICO") ~ geo
+          ))
+        )
+
+      # extending to missing values
+
+      dat <- dat %>%
+        purrr::map(tidyr::fill, geo, .direction = "down")
+
+      # making region/subsystem variable
+
+      region_system_list <- c(
+        "Norte", "Nordeste", "Sudeste", "Sul", "Centro-Oeste", "Sudeste/C.Oeste"
+      )
+
+      dat <- dat %>%
+        purrr::map(
+          ~ dplyr::mutate(., region_subsystem = dplyr::case_when(
+            .[[1]] %in% region_system_list ~ .[[1]]
+          ))
+        )
+
+      dat <- dat %>%
+        purrr::map(dplyr::select, -1) %>% # remove first column
+        purrr::map(tidyr::drop_na, region_subsystem) # remove rows with missing regions
+
+      # column names
+
+      var_names <- c(1:12, "ano", "geo", "region_subsystem") # twelve months and the three artificial variables
+
+      # removing first row and setting column names
+
+      dat <- dat %>%
+        purrr::map(dplyr::slice_tail, n = -1) %>%
+        purrr::map(stats::setNames, var_names)
+
+
+      # shifting into long format
+
+      dat <- dat %>%
+        purrr::imap(
+          ~ tidyr::pivot_longer(.x, -c("ano", "geo", "region_subsystem"), names_to = "mes", values_to = .y)
+        )
+
+      # merging everything into one dataframe
+
+      dat <- dat %>%
+        purrr::reduce(dplyr::full_join, by = c("geo", "ano", "mes", "region_subsystem"))
+
+      dat <- dat %>%
+        janitor::clean_names() %>%
+        dplyr::mutate(dplyr::across(-c("geo", "ano", "region_subsystem"), as.numeric))
+
+      # Finally picking geo_level
+      if (param$geo_level == "subsystem"){
         dat <- dat %>%
-               dplyr::rename("subsystem" = "subsistema",
-                      "year" = "ano",
-                      "month" = "mes",
-                      "residential_consumers" = "consumidores_residenciais",
-                      "total_consumers" = "consumidores_totais",
-                      "total_consumption" = "consumo_total",
-                      "residencial_consumption" = "consumo_residencial",
-                      "industrial_consumption" = "consumo_industrial",
-                      "comercial_consumption"= "consumo_comercial",
-                      "other_consumption"= "consumo_outros",
-                      "captive_consumption"= "consumo_cativo"
-                      ) %>%
-                dplyr::mutate(subsystem = dplyr::case_when(subsystem == "Sistemas Isolados" ~ "Isolated Systems",
-                                             subsystem == "Norte" ~ "North",
-                                             subsystem == "Nordeste" ~ "Northeast",
-                                             subsystem == "Sudeste/C.Oeste" ~ "Southeast/Midwest",
-                                             subsystem == "Sul" ~ "South"),
-                       month = dplyr::case_when(month == "jan" ~ "jan",
-                                         month == "fev" ~ "feb",
-                                         month == "mar" ~ "mar",
-                                         month == "abr" ~ "apr",
-                                         month == "mai" ~ "may",
-                                         month == "jun" ~ "jun",
-                                         month == "jul" ~ "jul",
-                                         month == "ago" ~ "aug",
-                                         month == "set" ~ "sep",
-                                         month == "out" ~ "oct",
-                                         month == "nov" ~ "nov",
-                                         month == "dez" ~ "dec",
-                                         month == "anual" ~ "yearly"
-                       ))
-        }
-        if(param$geo_level == "Region"){
-          dat <- dat %>%
-            dplyr::rename("region" = "regiao",
-                          "year" = "ano",
-                          "month" = "mes",
-                          "residential_consumers" = "consumidores_residenciais",
-                          "total_consumers" = "consumidores_totais",
-                          "total_consumption" = "consumo_total",
-                          "residencial_consumption" = "consumo_residencial",
-                          "industrial_consumption" = "consumo_industrial",
-                          "comercial_consumption"= "consumo_comercial",
-                          "other_consumption"= "consumo_outros",
-                          "captive_consumption"= "consumo_cativo"
-            ) %>%
-            dplyr::mutate(region = dplyr::case_when(region == "Norte" ~ "North",
-                                             region == "Nordeste" ~ "Northeast",
-                                             region == "Sudeste" ~ "Southeast",
-                                             region == "Centro-Oeste" ~ "Midwest",
-                                             region == "Sul" ~ "South"),
-                          month = dplyr::case_when(month == "jan" ~ "jan",
-                                            month == "fev" ~ "feb",
-                                            month == "mar" ~ "mar",
-                                            month == "abr" ~ "apr",
-                                            month == "mai" ~ "may",
-                                            month == "jun" ~ "jun",
-                                            month == "jul" ~ "jul",
-                                            month == "ago" ~ "aug",
-                                            month == "set" ~ "sep",
-                                            month == "out" ~ "oct",
-                                            month == "nov" ~ "nov",
-                                            month == "dez" ~ "dec",
-                                            month == "anual" ~ "yearly"
-                          ))
-        }
-    }
-      return(dat)
-    }
+          dplyr::filter(geo == "SUBSISTEMA ELETRICO") %>%
+          dplyr::rename("subsistema" = "region_subsystem")
+      }
+      if (param$geo_level == "region"){
+        dat <- dat %>%
+          dplyr::filter(geo == "REGIAO GEOGRAFICA") %>%
+          dplyr::rename("regiao" = "region_subsystem")
+      }
 
+      dat <- dat %>%
+        dplyr::select(-geo)
+    }
   }
-
-########################################
-## Data-Set = national_energy_balance ##
-########################################
 
   if (param$dataset == "national_energy_balance"){
 
-    if(param$time_period == "default"){
-      param$time_period <- 2011:2022
-    }
+  dat <- dat %>%
+    janitor::clean_names() %>%
+    dplyr::select(-v1)
 
-    ################################
-    ## Harmonizing variable names ##
-    ################################
-
-    dat <- dat %>%
-      dplyr::rename(
-        "amazonia_legal" = "amz legal",
-        "oleo_combustivel" = "combustivel",
-        "oleo_diesel" = "diesel",
-        "bagaco_de_cana" = "cana"
-      ) %>%
-      janitor::clean_names()%>%
-      dplyr::select(estado,amazonia_legal,ano,tidyselect::everything()) %>%
-      dplyr::select(-c(v1)) %>%
-      dplyr::filter(ano %in% param$time_period)
-
-    if (param$language == "eng"){
-        dat <- dat %>%
-        dplyr::rename(
-        "state" = "estado",
-        "legal_amazon" = "amazonia_legal",
-        "year" = "ano",
-        "hydro" = "hidro",
-        "wind"= "eolica",
-        "thermal" = "termo",
-        "sugar_cane_bagasse" = "bagaco_de_cana",
-        "firewood" = "lenha",
-        "black_liquor" = "lixivia",
-        "other_renewable_sources" = "outras_fontes_renovaveis",
-        "steam_coal" = "carvao_vapor",
-        "natural_gas"= "gas_natural",
-        "coke_oven_gas" = "gas_de_coqueira",
-        "fuel_oil" = "oleo_combustivel",
-        "diesel_oil" = "oleo_diesel",
-        "other_non_renewable_sources"= "outras_fontes_nao_renovaveis",
-      )
-      }
-
-    return(dat)
   }
+
+  ################################
+  ## Harmonizing Variable Names ##
+  ################################
+
+  dat <- dat %>%
+    dplyr::rename_with(
+      function(name){
+        name %>%
+          stringr::str_remove("_por_uf") %>%
+          stringr::str_remove("_por_f") %>%
+          stringr::str_remove("consumo_")
+      }
+    )
+
+  names(dat) %>%
+    stringr::str_remove("_por_uf") %>%
+    stringr::str_remove("_por_f")
+
+  if (param$language == "pt") {
+    dat_mod <- dat %>%
+      dplyr::rename_with(dplyr::recode,
+                         "total" = "consumo_total",
+                         "residencial" = "consumo_residencial",
+                         "industrial" = "consumo_industrial",
+                         "comercial" = "consumo_comercial",
+                         "outros" = "consumo_outros",
+                         "cativo" = "consumo_cativo",
+                         "consumo" = "consumo_total"
+      )
+  }
+
+  if (param$language == "eng") {
+    dat_mod <- dat %>%
+      dplyr::rename_with(dplyr::recode,
+                         "estado" = "state",
+                         "amz_legal" = "legal_amazon",
+                         "ano" = "year",
+                         "hidro" = "hydro",
+                         "eolica" = "wind",
+                         "termo" = "thermal",
+                         "cana" = "sugar_cane_bagasse",
+                         "lenha" = "firewood",
+                         "lixivia" = "black_liquor",
+                         "outras_fontes_renovaveis" = "other_renewable_sources",
+                         "carvao_vapor" = "steam_coal",
+                         "gas_natural" = "natural_gas",
+                         "gas_de_coqueira" = "coke_oven_gas",
+                         "combustivel" = "fuel_oil",
+                         "diesel" = "diesel",
+                         "outras_fontes_nao_renovaveis" = "other_non_renewable_sources",
+                         "regiao" = "region",
+                         "subsistema" = "subsystem",
+                         "mes" = "month",
+                         "total" = "total_consumption",
+                         "residencial" = "residential_consumption",
+                         "industrial" = "industrial_consumption",
+                         "comercial" = "comercial_consumption",
+                         "outros" = "other_consumption",
+                         "cativo" = "captive_consumption",
+                         "consumidores_residenciais" = "residential_consumers",
+                         "consumidores_totais" = "total_consumers",
+                         "consumidores_comerciais" = "commercial_consumers",
+                         "consumidores_outros" = "other_consumers",
+                         "consumo" = "total_consumption"
+      )
+  }
+
+  ####################
+  ## Returning Data ##
+  ####################
+
+  return(dat_mod)
+
 }
 
 

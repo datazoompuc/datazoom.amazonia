@@ -725,7 +725,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (file_extension == ".xls"){
     if (param$source == "EPE"){
       if (param$dataset == "energy_consumption_per_class"){
-        base::message("This might take a while.")
 
       #Making a list with all the sheets
       dat <- purrr::map(

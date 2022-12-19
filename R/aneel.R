@@ -22,8 +22,7 @@ load_aneel <- function(dataset, raw_data = FALSE, language = "eng") {
   ## Bind Global Variables ##
   ###########################
 
-  ano <- NULL
-  variable <- NULL
+  ano <- variable <- label <- var_code <- NULL
 
   #############################
   ## Define Basic Parameters ##
