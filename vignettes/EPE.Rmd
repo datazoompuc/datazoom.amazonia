@@ -1,0 +1,66 @@
+---
+title: "EPE"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{EPE}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Loads data from Energy Research Company (EPE), a brazilian public company that works closely with the brazilian Ministry of Mines and Energy (MME) and other agencies to assure the sustainable development of Brazil´s energy infraestructure. EPE´s duty on that mission is to support MME with research in order to aid Brazil´s energy infraestructure planning.
+
+As of now, there are two different datasets available for download.
+
+The energy consumption per class dataset provides data about monthly energy consumption and consumers from 2004 to 2022, whith three different agregattion levels. 
+The Region level encompasses the five brazillian geographical regions (North, Northeast, Midwest, Southeast and South).
+The Subsystem level encompasses the five brazillian Electric Subsystems (North, Northeast, Southeast, South/Midwest, Isolated Systems)
+The State level encompasses 
+
+Using data collected from government entities, institutes, research centers, NGOs and other institutions, the estimates are created using the methodology of the Brazilian Inventory of Anthropic Emissions and Removals of Greenhouse Gases, assembled by the Ministry of Science, Technology and Innovation (MCTI), and the directives of Intergovernmental Panel on Climate Change (IPCC)
+
+Emissions are divided in five main sources: Agricultural and Cattle Raising, Energy, Changes in Use of Land, Industrial Processes and Residues. All greenhouse gases contained in the national inventory are considered, encompassing CO2, CH4, N2O and the HFCs, with the conversion to carbon equivalence (CO2e) also included, both in the metric of GWP (Global Warming Potential) and GTP (Global Temperature Potential).
+
+The data is downloaded from the SEEG website in the form of one single file, so the option to select a certain range of years is not available. Also, due to the size of the file, a stable internet connection is necessary, and the function may take time to run. 
+
+***
+**Options:**
+
+  1. **dataset**: there are six choices:
+      * `"seeg"`: provides all sectors in a same dataframe. Only works with `raw_data = TRUE`
+      * `"seeg_farming"`
+      * `"seeg_industry"`
+      * `"seeg_energy"`
+      * `"seeg_land"`
+      * `"seeg_residuals"`
+
+  2. **raw_data**: there are two options:
+      * `TRUE`: if you want the data as it is originally.
+      * `FALSE`: if you want the treated version of the data. 
+      
+  3. **geo_level**: `"country"`, `"state"`, or `"municipality"`
+
+  4. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
+  
+***
+
+**Examples:**  
+  
+```{r eval=FALSE}
+# Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg") 
+# by state (geo_level = "state")
+data <- load_seeg(dataset = "seeg", 
+                  raw_data = TRUE,
+                  geo_level = "state")
+  
+# Download treated data (raw_data = FALSE) of industry greenhouse gases (dataset = "seeg_industry")
+data <- load_seeg(dataset = "seeg_industry", 
+                  raw_data = FALSE,
+                  geo_level = "state")
+```
