@@ -7,10 +7,11 @@
 #'
 #' @examples
 #' \dontrun{
-#' # download treated data for 2016 (takes a long time to download)
+#' # download treated data about energy generation
 #' clean_aneel <- load_aneel(
+#'   dataset = "energy generation",
 #'   raw_data = FALSE,
-#'   time_period = 2016
+#'   language = "eng"
 #' )
 #' }
 #'

@@ -8,12 +8,11 @@
 #'
 #' @examples
 #' \dontrun{
-#' # download treated data for 2016
+#' # download treated data about energy consumption in state level
 #' clean_epe <- load_epe(
 #'   dataset = "energy_consumption_per_class",
-#'   geo_level = "State",
-#'   raw_data = FALSE,
-#'   time_period = 2016
+#'   geo_level = "state",
+#'   raw_data = FALSE
 #' )
 #' }
 #'
