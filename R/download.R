@@ -315,13 +315,16 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## Construct Links ##
   #####################
 
-  # For many sources, the URL in datasets_link is already the URL needed for the download
+  # For most sources, the URL in datasets_link is already the URL needed for the download
+
+  path <- param$url
+
   # Below are the exceptions, for which manipulation is needed
+
+  ##### Exceptions only #####
 
   # If the datasets_link URL is the download path you need,
   # do not change this section for a new function
-
-  ##### Exceptions only #####
 
   ## Comex
 
@@ -459,14 +462,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     path <- paste0(param$url, param$file_name)
   }
 
-  ## All other functions
-
-  # The URL in datasets_link is just what you need
-
-  else{
-    path <- param$url
-  }
-
   #######################
   ## Initiate Download ##
   #######################
@@ -481,6 +476,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   # Only manually input the file_extension if the download_path does
   # not end in ".ext", where .ext is any file extension
+
+  # googledrive links do not contain the file extension, for example
 
   if (source == "mapbiomas" & dataset %in% c("mapbiomas_cover", "mapbiomas_transition")) {
     if (param$geo_level == "municipality") {
@@ -509,8 +506,18 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source == "imazon_shp") {
     file_extension <- ".rds"
   }
-  if (source %in% c("BEN", "ANEEL")) {
-    file_extension <- ".csv"
+  if (source == "EPE") {
+    if (param$dataset == "national_energy_balance"){
+      file_extension <- ".csv"
+    }
+  }
+  if (source == "ANEEL") {
+    if (dataset == "energy_development_budget"){
+    file_extension <- ".rds"
+    }
+    if (dataset == "energy_generation"){
+      file_extension <- ".xlsx"
+    }
   }
 
   ## Define Empty Directory and Files For Download
@@ -522,8 +529,18 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   download_method <- "standard" # works for most functions
 
-  if (source %in% c("iema", "imazon_shp", "BEN", "ANEEL")) {
+  if (source %in% c("iema", "imazon_shp")) {
     download_method <- "googledrive"
+  }
+  if (source == "ANEEL"){
+    if (dataset == "energy_development_budget"){
+      download_method <- "googledrive"
+    }
+  }
+  if (source == "EPE"){
+    if (dataset == "national_energy_balance"){
+      download_method <- "googledrive"
+    }
   }
   if (source %in% c("deter", "terraclimate", "baci")) {
     download_method <- "curl"
@@ -648,21 +665,24 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
   }
 
-  if (param$source == "EPE"){
+  if (param$source == "EPE" & param$dataset == "energy_consumption_per_class"){
 
-    # Finding sheet names
-    all_sheets <- readxl::excel_sheets(temp)
+    # param$sheet contains the selected sheets
 
     # Making a list with all the sheets
-    dat <- purrr::map(
-      all_sheets,
-      function(sheets){
-        readxl::read_xls(temp, sheet = sheets)
+    dat <- purrr::imap(
+      param$sheet,
+      function(sheets, number){
+        base::message(
+          paste0("Reading sheet ", number, " out of ", length(param$sheet), " (", sheets, ")")
+        )
+        base::suppressMessages(
+          readxl::read_xls(temp, sheet = sheets)
+        )
       }
     )
 
-    names(dat) <- all_sheets
-
+    names(dat) <- param$sheet
   }
 
   ##############################
@@ -969,27 +989,15 @@ datasets_link <- function() {
     ## EPE ##
     #########
 
-    "EPE", "CONSUMO", NA, "2004-2021", "Region, Electric_Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/Documents/CONSUMO%20MENSAL%20DE%20ENERGIA%20EL%c3%89TRICA%20POR%20CLASSE.xls",
-    "EPE", "CONSUMIDOR", NA, "2004-2021", "Region, Electric_Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/Documents/CONSUMO%20MENSAL%20DE%20ENERGIA%20EL%c3%89TRICA%20POR%20CLASSE.xls",
-
-    ##########
-    ## SIGA ##
-    ##########
-
-    "SIGA", "siga", NA, "1908-2021", "Municipality", "https://git.aneel.gov.br/publico/centralconteudo/-/raw/main/relatorioseindicadores/geracao/BD_SIGA.xlsx?inline=false",
-
-    #########
-    ## BEN ##
-    #########
-
-    "BEN", "ben", NA, "2011-2022", "Region, Municipality","https://drive.google.com/file/d/1_JTYyAPdbQayR-nrURts6OmbKcm2cLix/view?usp=share_link",
+    "EPE", "energy_consumption_per_class", NA, "2004-2021", "Region, Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/Documents/CONSUMO%20MENSAL%20DE%20ENERGIA%20EL%c3%89TRICA%20POR%20CLASSE.xls",
+    "EPE", "national_energy_balance", NA, "2011-2022", "Region, Municipality","https://drive.google.com/file/d/1_JTYyAPdbQayR-nrURts6OmbKcm2cLix/view?usp=share_link",
 
     ###########
     ## ANEEL ##
     ###########
 
-    "ANEEL", "ccc", NA, "2013-2022", NA, "https://drive.google.com/file/d/1SlV1Y8fcZlYsr_eQRKTqsJxg6xsyMysu/view?usp=share_link",
-
+    "ANEEL", "energy_development_budget", NA, "2013-2022", NA, "https://drive.google.com/file/d/1h7mu-9qbKfISk1-k4JSrBhXKBMQHTOH9/view?usp=share_link",
+    "ANEEL", "energy_generation", NA, "1908-2021", "Municipality", "https://git.aneel.gov.br/publico/centralconteudo/-/raw/main/relatorioseindicadores/geracao/BD_SIGA.xlsx?inline=false",
 
      ## Shapefile from github repository
 
