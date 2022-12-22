@@ -14,23 +14,36 @@ knitr::opts_chunk$set(
 )
 ```
 
-Loads data from Energy Research Company (EPE), a brazilian public company that works closely with the brazilian Ministry of Mines and Energy (MME) and other agencies to assure the sustainable development of Brazil's energy infraestructure. EPE´s duty on that mission is to support MME with research in order to aid Brazil's energy infraestructure planning.
+Loads data from Energy Research Company (EPE), a Brazilian public company that works closely with the Brazilian Ministry of Mines and Energy (MME) and other agencies to assure the sustainable development of Brazil's energy infrastructure. EPE´s duty on that mission is to support MME with research in order to aid Brazil's energy infrastructure planning.
 
-As of now, there are two different datasets available for download.
+As of now, there are two different datasets available for download, the Energy Consumption Per Class and the National Energy Balance.
 
-The energy consumption per class dataset provides data about monthly energy consumption and consumers from 2004 to 2022, whith three different agregattion levels. 
-The Region level encompasses the five brazillian geographical regions (North, Northeast, Midwest, Southeast and South).
-The Subsystem level encompasses the five brazillian Electric Subsystems (North, Northeast, Southeast, South/Midwest, Isolated Systems)
-The State level encompasses 
+#### Energy Consumption Per Class
+The Energy Consumption Per Class dataset provides monthly data about energy consumption and consumers from 2004 to 2022, for each class of energy consumption.
+
+The different classes are Total consumption (and consumers), Industrial consumption (and consumers), Residential consumption (and consumers), Commercial consumption (and consumers), Captive consumption* and other consumption (and consumers).**
+
+*Note that there are no consumer data for 'Captive' class at all.
+**There is also no consumer data for 'Industrial', 'Commercial' and 'Other' classes when the geographical level is 'Subsystem' or 'Region'.
+
+There are three different aggregation levels: 
+The Region level encompasses the five Brazilian geographical regions (North, Northeast, Midwest, Southeast and South).
+The Subsystem level encompasses the five Brazilian Electric Subsystems (North, Northeast, Southeast/Midwest, South, Isolated Systems)
+The State level encompasses the 26 Brazilian States and the Federal District.
+
+#### National Energy Balance
+The National Energy Balance dataset provides yearly data about energy generation per source of production. The sources can be divided into two groups, the renewable sources (hydro, wind, solar, nuclear, thermal, sugar_cane_bagasse, firewood, black_liquor) and the non-renewable sources (steam_coal, natural_gas, coke_oven_gas, fuel_oil, diesel).
+
+The dataset has information at the Brazilian state level, including the Federal District, from 2011 to 2021 and also indicates if the state is in the Legal Amazon.
 
 
-[descrição do BEN]
+
 
 ***
 **Options:**
 
   1. **dataset**: there are two choices:
-      * `"energy_consumption_per_class"`: energy consumption and consumers by State or Subsystem
+      * `"energy_consumption_per_class"`: energy consumption and consumers by State, Region or Electric Subsystem
       * `"national_energy_balance"`:
 
   2. **raw_data**: there are two options:
@@ -51,6 +64,15 @@ The State level encompasses
 # download treated data about energy consumption at the state level
 clean_epe <- load_epe(
   dataset = "energy_consumption_per_class",
+  geo_level = "state",
+  raw_data = FALSE
+)
+```
+
+```{r eval=FALSE}
+# download treated data about energy consumption at the state level
+clean_epe <- load_epe(
+  dataset = "national_energy_balance",
   geo_level = "state",
   raw_data = FALSE
 )
