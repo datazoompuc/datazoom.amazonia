@@ -14,16 +14,17 @@ knitr::opts_chunk$set(
 )
 ```
 
-Loads data from Energy Research Company (EPE), a Brazilian public company that works closely with the Brazilian Ministry of Mines and Energy (MME) and other agencies to assure the sustainable development of Brazil's energy infrastructure. EPE´s duty on that mission is to support MME with research in order to aid Brazil's energy infrastructure planning.
+Loads data from the Energy Research Company (EPE), a Brazilian public company that works closely with the Brazilian Ministry of Mines and Energy (MME) and other agencies to assure the sustainable development of Brazil's energy infrastructure. EPE´s duty on that mission is to support MME with quality research and studies in order to aid Brazil's energy infrastructure planning.
 
 As of now, there are two different datasets available for download, the Energy Consumption Per Class and the National Energy Balance.
 
 #### Energy Consumption Per Class
 The Energy Consumption Per Class dataset provides monthly data about energy consumption and consumers from 2004 to 2022, for each class of energy consumption.
 
-The different classes are Total consumption (and consumers), Industrial consumption (and consumers), Residential consumption (and consumers), Commercial consumption (and consumers), Captive consumption* and other consumption (and consumers).**
+The different classes are Total consumption (and consumers), Industrial consumption (and consumers), Residential consumption (and consumers), Commercial consumption (and consumers), Captive consumption* and Other consumption (and consumers).**
 
-*Note that there are no consumer data for 'Captive' class at all.
+*Note that there is no consumer data for 'Captive' class at all.
+
 **There is also no consumer data for 'Industrial', 'Commercial' and 'Other' classes when the geographical level is 'Subsystem' or 'Region'.
 
 There are three different aggregation levels: 
@@ -32,9 +33,11 @@ The Subsystem level encompasses the five Brazilian Electric Subsystems (North, N
 The State level encompasses the 26 Brazilian States and the Federal District.
 
 #### National Energy Balance
-The National Energy Balance dataset provides yearly data about energy generation per source of production. The sources can be divided into two groups, the renewable sources (hydro, wind, solar, nuclear, thermal, sugar_cane_bagasse, firewood, black_liquor) and the non-renewable sources (steam_coal, natural_gas, coke_oven_gas, fuel_oil, diesel).
+The National Energy Balance is a thorough and extense research developed and published by EPE that contains useful data about energy consumption, generation, exportation and many more subjects.
 
-The dataset has information at the Brazilian state level, including the Federal District, from 2011 to 2021 and also indicates if the state is in the Legal Amazon.
+As of now, the National Energy Balance dataset provides yearly data about energy generation per source of production. The sources can be divided into two groups, the renewable sources (hydro, wind, solar, nuclear, thermal, sugar_cane_bagasse, firewood, black_liquor) and the non-renewable sources (steam_coal, natural_gas, coke_oven_gas, fuel_oil, diesel).
+
+The dataset has information at the Brazilian state level, including the Federal District, from 2011 to 2021 and also indicates whether the state is in the Legal Amazon or not.
 
 
 
