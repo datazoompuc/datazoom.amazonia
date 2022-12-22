@@ -255,7 +255,7 @@ load_epe <- function(dataset, raw_data = FALSE,
       # making region/subsystem variable
 
       region_system_list <- c(
-        "Norte", "Nordeste", "Sudeste", "Sul", "Centro-Oeste", "Sudeste/C.Oeste"
+        "Norte", "Nordeste", "Sudeste", "Sul", "Centro-Oeste", "Sudeste/C.Oeste", "Sistemas Isolados"
       )
 
       dat <- dat %>%
