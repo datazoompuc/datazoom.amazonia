@@ -1,0 +1,42 @@
+---
+title: "ANEEL"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ANEEL}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+... Texto explicando SIGA e a base de geração
+
+***
+**Options:**
+
+  1. **dataset**: there are two choices:
+      * `"energy_development_budget"`: government spending towards energy sources
+      * `"energy_generation"`: energy generation by source
+
+  2. **raw_data**: there are two options:
+      * `TRUE`: if you want the data as it is originally.
+      * `FALSE`: if you want the treated version of the data. 
+
+  3. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
+  
+***
+
+**Examples:**  
+  
+```{r eval=FALSE}
+# download treated data about energy generation
+clean_aneel <- load_aneel(
+ dataset = "energy generation",
+ raw_data = FALSE
+)
+```

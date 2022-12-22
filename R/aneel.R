@@ -10,8 +10,7 @@
 #' # download treated data about energy generation
 #' clean_aneel <- load_aneel(
 #'   dataset = "energy generation",
-#'   raw_data = FALSE,
-#'   language = "eng"
+#'   raw_data = FALSE
 #' )
 #' }
 #'

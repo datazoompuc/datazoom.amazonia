@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-Loads data from Energy Research Company (EPE), a brazilian public company that works closely with the brazilian Ministry of Mines and Energy (MME) and other agencies to assure the sustainable development of Brazil´s energy infraestructure. EPE´s duty on that mission is to support MME with research in order to aid Brazil´s energy infraestructure planning.
+Loads data from Energy Research Company (EPE), a brazilian public company that works closely with the brazilian Ministry of Mines and Energy (MME) and other agencies to assure the sustainable development of Brazil's energy infraestructure. EPE´s duty on that mission is to support MME with research in order to aid Brazil's energy infraestructure planning.
 
 As of now, there are two different datasets available for download.
 
@@ -23,28 +23,23 @@ The Region level encompasses the five brazillian geographical regions (North, No
 The Subsystem level encompasses the five brazillian Electric Subsystems (North, Northeast, Southeast, South/Midwest, Isolated Systems)
 The State level encompasses 
 
-Using data collected from government entities, institutes, research centers, NGOs and other institutions, the estimates are created using the methodology of the Brazilian Inventory of Anthropic Emissions and Removals of Greenhouse Gases, assembled by the Ministry of Science, Technology and Innovation (MCTI), and the directives of Intergovernmental Panel on Climate Change (IPCC)
 
-Emissions are divided in five main sources: Agricultural and Cattle Raising, Energy, Changes in Use of Land, Industrial Processes and Residues. All greenhouse gases contained in the national inventory are considered, encompassing CO2, CH4, N2O and the HFCs, with the conversion to carbon equivalence (CO2e) also included, both in the metric of GWP (Global Warming Potential) and GTP (Global Temperature Potential).
-
-The data is downloaded from the SEEG website in the form of one single file, so the option to select a certain range of years is not available. Also, due to the size of the file, a stable internet connection is necessary, and the function may take time to run. 
+[descrição do BEN]
 
 ***
 **Options:**
 
-  1. **dataset**: there are six choices:
-      * `"seeg"`: provides all sectors in a same dataframe. Only works with `raw_data = TRUE`
-      * `"seeg_farming"`
-      * `"seeg_industry"`
-      * `"seeg_energy"`
-      * `"seeg_land"`
-      * `"seeg_residuals"`
+  1. **dataset**: there are two choices:
+      * `"energy_consumption_per_class"`: energy consumption and consumers by State or Subsystem
+      * `"national_energy_balance"`:
 
   2. **raw_data**: there are two options:
       * `TRUE`: if you want the data as it is originally.
       * `FALSE`: if you want the treated version of the data. 
       
-  3. **geo_level**: `"country"`, `"state"`, or `"municipality"`
+  3. **geo_level**: only applies to the `"energy_consumption_per_class"` dataset. 
+      * `"state"`
+      * `"subsystem"`
 
   4. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
   
@@ -53,14 +48,10 @@ The data is downloaded from the SEEG website in the form of one single file, so 
 **Examples:**  
   
 ```{r eval=FALSE}
-# Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg") 
-# by state (geo_level = "state")
-data <- load_seeg(dataset = "seeg", 
-                  raw_data = TRUE,
-                  geo_level = "state")
-  
-# Download treated data (raw_data = FALSE) of industry greenhouse gases (dataset = "seeg_industry")
-data <- load_seeg(dataset = "seeg_industry", 
-                  raw_data = FALSE,
-                  geo_level = "state")
+# download treated data about energy consumption at the state level
+clean_epe <- load_epe(
+  dataset = "energy_consumption_per_class",
+  geo_level = "state",
+  raw_data = FALSE
+)
 ```
