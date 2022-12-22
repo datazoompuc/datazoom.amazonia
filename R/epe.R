@@ -229,7 +229,7 @@ load_epe <- function(dataset, raw_data = FALSE,
       dat <- dat %>%
         purrr::map(tidyr::fill, ano, .direction = "down")
 
-      # now creating a variable to identify regions vc. subsystems
+      # now creating a variable to identify regions vs. subsystems
 
       # creating geo variable from first column
 
@@ -243,7 +243,8 @@ load_epe <- function(dataset, raw_data = FALSE,
       dat <- dat %>%
         purrr::map(
           ~ dplyr::mutate(., geo = dplyr::case_when(
-            geo %in% c("REGIAO GEOGRAFICA", "SUBSISTEMA ELETRICO") ~ geo
+            geo %in% c("REGIAO GEOGRAFICA", "SUBSISTEMA ELETRICO") ~ geo,
+            geo == "SUBSISTEMA" ~ "SUBSISTEMA ELETRICO" # sometimes this alt name is used
           ))
         )
 
