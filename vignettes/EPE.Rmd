@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 Loads data from the Energy Research Company (EPE), a Brazilian public company that works closely with the Brazilian Ministry of Mines and Energy (MME) and other agencies to assure the sustainable development of Brazil's energy infrastructure. EPE´s duty on that mission is to support MME with quality research and studies in order to aid Brazil's energy infrastructure planning.
 
-As of now, there are two different datasets available for download, the Energy Consumption Per Class and the National Energy Balance.
+As for now, there are two different datasets available for download: the Energy Consumption Per Class and the National Energy Balance.
 
 Both of them were obtained from the EPE website.
 

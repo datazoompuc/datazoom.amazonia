@@ -14,10 +14,10 @@ knitr::opts_chunk$set(
 )
 ```
 
-Loads data from the Electrical Energy National Agency (ANEEL), a Brazilian independent federal agency linked to the Ministry of Mines and Energy (MME). 
+Loads data from the National Electrical Energy Agency (ANEEL), a Brazilian independent federal agency linked to the Ministry of Mines and Energy (MME). 
 ANEEL works to provide favorable conditions for the Electrical Energy Market to develop with balance and for the benefit of society.
 
-As of now, there are two different datasets available for download, the Energy Development Budget and the Energy Generation.
+As for now, there are two different datasets available for download: the Energy Development Budget and the Energy Generation.
 
 #### Energy Development Budget
 The Energy Development Budget dataset showcases the Energy Development Account's (CDE) anual budget expenses. The CDE is designed to promote the Brazilian energy development and is managed by the Electrical Energy Commercialization Chamber (CCEE).
@@ -27,6 +27,7 @@ The dataset makes available the year of the observation, the type of expense, it
 *Note that 'share_of_total' values sum to 1 for each year available.
 
 #### Energy Generation
+
 
 
 ***
