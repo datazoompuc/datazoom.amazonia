@@ -18,6 +18,8 @@ Loads data from the Energy Research Company (EPE), a Brazilian public company th
 
 As of now, there are two different datasets available for download, the Energy Consumption Per Class and the National Energy Balance.
 
+Both of them were obtained from the EPE website.
+
 #### Energy Consumption Per Class
 The Energy Consumption Per Class dataset provides monthly data about energy consumption and consumers from 2004 to 2022, for each class of energy consumption.
 
@@ -46,8 +48,8 @@ The dataset has information at the Brazilian state level, including the Federal 
 **Options:**
 
   1. **dataset**: there are two choices:
-      * `"energy_consumption_per_class"`: energy consumption and consumers by State, Region or Electric Subsystem
-      * `"national_energy_balance"`:
+      * `"energy_consumption_per_class"`: monthly energy consumption and consumers by State, Region or Electric Subsystem
+      * `"national_energy_balance"`: yearly energy generation per source, by State
 
   2. **raw_data**: there are two options:
       * `TRUE`: if you want the data as it is originally.
