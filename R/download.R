@@ -698,31 +698,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     unlink(temp)
   }
 
-  #########################
-  ## Pre-processing data ##
-  #########################
-
-  # datasets where one individual data frame is returned (as raw data)
-
-  if (is.data.frame(dat)){
-    dat <- dat %>%
-      janitor::clean_names() %>%
-      tibble::as_tibble()
-  }
-
-  # datasets where a list of data frames is returned (as raw data)
-
-  else{
-    dat <- dat %>%
-      purrr::map(
-        function(df){
-          df %>%
-            janitor::clean_names() %>%
-            tibble::as_tibble()
-        }
-      )
-  }
-
   #################
   ## Return Data ##
   #################
