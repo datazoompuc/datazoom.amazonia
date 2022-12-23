@@ -484,10 +484,13 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       file_extension <- ".zip"
     }
   }
+  if (source == "cipo"){
+    file_extension <- ".csv"
+  }
   if (source == "prodes") {
     file_extension <- ".txt"
   }
-  if (source %in% c("seeg", "iema", "SIGA")) {
+  if (source %in% c("seeg", "iema")) {
     file_extension <- ".xlsx"
   }
   if (source == "terraclimate") {
@@ -699,11 +702,16 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## Pre-processing data ##
   #########################
 
+  # datasets where one individual data frame is returned (as raw data)
+
   if (is.data.frame(dat)){
     dat <- dat %>%
       janitor::clean_names() %>%
       tibble::as_tibble()
   }
+
+  # datasets where a list of data frames is returned (as raw data)
+
   else{
     dat <- dat %>%
       purrr::map(
@@ -910,9 +918,9 @@ datasets_link <- function() {
     ## CIPÓ ##
     ##########
 
-    "CIPO", "brazilian_actors", NA, NA, NA, "https://plataformacipo.org/mapa-crimes-ambientais/",
-    "CIPO", "international_cooperation", NA, NA, NA, "https://plataformacipo.org/mapeamento-cooperacao-internacional/",
-    "CIPO", "forest_governance", NA, NA, NA, "https://plataformacipo.org/arranjos-globais-de-governanca-florestal/",
+    "CIPO", "brazilian_actors", NA, NA, NA, "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpRIu-paL_8rtXLpiT-kCTJRa2Tf_jCCPZxZBc3sjCwMHL8mkrhG2eqVeeIdWkxLTUKPru5uYAWG6g/pub?output=csv",
+    "CIPO", "international_cooperation", NA, NA, NA, "https://docs.google.com/spreadsheets/u/0/d/e/2PACX-1vSpyBina4qr3GG-5ZlKW8_fjQwgIP3lq5lxanpO5_bUZenCVFO6N-WrF3bTkpokVzNVpRnob9Jhn8qe/pub?output=csv",
+    "CIPO", "forest_governance", NA, NA, NA, "https://docs.google.com/spreadsheets/u/0/d/e/2PACX-1vTpnO9DEiy1mMRwBI5jAzBbYhFVBlcsX4TNRZyoDYBNUhEPZcLviexaynCJfY3JC-CCBGy00-Fs3jxu/pub?output=csv",
 
     ##################
     ## TerraClimate ##

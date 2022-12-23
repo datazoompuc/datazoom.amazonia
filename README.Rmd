@@ -165,6 +165,11 @@ devtools::load_all()
 
 &#x1F534; This function uses the `googledrive` package to download data for datasets `"mapbiomas_cover"` and `"mapbiomas_transition"` at the municipality level. In case of authentication errors, see [googledrive](#googledrive).
 
+## CIPO
+
+```{r child = "vignettes/CIPO.Rmd"}
+```
+
 ## TerraClimate
 
 ```{r child = "vignettes/TERRACLIMATE.Rmd"}
