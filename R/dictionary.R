@@ -1159,7 +1159,6 @@ load_dictionary <- function(dataset) {
       "tipo_de_despesa", "Subvencao Cooperativa", "Subvencao Cooperativa", "Cooperative Subvention",
       "tipo_de_despesa", "Subvencao RTE", "Subvencao Revisao Tarifaria Extraordinaria", "Extraordinary Tariff Review Subvention",
       "tipo_de_despesa", "Verba MME", "Verba Ministerio de Minas e Energia", "Ministry of Mines and Energy Budget"
-
     )
   }
 

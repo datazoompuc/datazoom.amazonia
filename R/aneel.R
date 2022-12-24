@@ -35,7 +35,7 @@ load_aneel <- function(dataset, raw_data = FALSE, language = "eng") {
 
   skip <- NULL
 
-  if (param$dataset == "energy_generation"){
+  if (param$dataset == "energy_generation") {
     skip <- 1
     # skips first row of excel sheet for this dataset
   }
@@ -83,12 +83,11 @@ load_aneel <- function(dataset, raw_data = FALSE, language = "eng") {
 
   dat <- names(dat) %>%
     purrr::map_dfc(
-      function(var){
-
+      function(var) {
         df <- dat %>%
           dplyr::select(var)
 
-        if (var %in% available_vars){
+        if (var %in% available_vars) {
           dic <- dic %>%
             dplyr::filter(variable == var)
 
@@ -116,9 +115,10 @@ load_aneel <- function(dataset, raw_data = FALSE, language = "eng") {
     dplyr::mutate(
       dplyr::across(
         operation_start,
-        as.Date, format = "%d/%m/%Y", origin = "1970-01-01"
-        )
+        as.Date,
+        format = "%d/%m/%Y", origin = "1970-01-01"
       )
+    )
 
   ################################
   ## Harmonizing Variable Names ##
@@ -127,42 +127,42 @@ load_aneel <- function(dataset, raw_data = FALSE, language = "eng") {
   if (param$language == "pt") {
     dat_mod <- dat %>%
       dplyr::rename_with(dplyr::recode,
-                         "soma_de_valor" = "value",
-                         "participacao" = "participacao_no_total",
-                         "municipio_s" = "municipios",
-                         "potencia_outorgada_k_w" = "potencia_outorgada_kw",
-                         "potencia_fiscalizada_k_w" = "potencia_fiscalizada_kw",
-                         "garantia_fisica_k_w" = "garantia_fisica_kw",
+        "soma_de_valor" = "value",
+        "participacao" = "participacao_no_total",
+        "municipio_s" = "municipios",
+        "potencia_outorgada_k_w" = "potencia_outorgada_kw",
+        "potencia_fiscalizada_k_w" = "potencia_fiscalizada_kw",
+        "garantia_fisica_k_w" = "garantia_fisica_kw",
       )
   }
 
   if (param$language == "eng") {
     dat_mod <- dat %>%
       dplyr::rename_with(dplyr::recode,
-                         "ano" = "year",
-                         "tipo_de_despesa" = "type_of_expense",
-                         "soma_de_valor" = "value",
-                         "participacao" = "share_of_total",
-                         "empreendimento" = "venture",
-                         "uf" = "state",
-                         "fonte" = "source",
-                         "fase" = "stage",
-                         "origem" = "origin",
-                         "tipo" = "type",
-                         "tipo_de_atuacao" = "type_of_permission",
-                         "combustivel_final" = "final_fuel",
-                         "entrada_em_operacao" = "operation_start",
-                         "potencia_outorgada_k_w" = "granted_power_kw",
-                         "potencia_fiscalizada_k_w" = "fiscalized_power_kw",
-                         "garantia_fisica_k_w" = "physical_guarantee_kw",
-                         "geracao_qualificada" = "qualified_generation",
-                         "latitude_decimal" = "latitude_dd",
-                         "longitude_decimal" = "longitude_dd",
-                         "inicio_vigencia" = "validity_start",
-                         "fim_vigencia" = "validity_end",
-                         "proprietario_regime_de_exploracao" = "owner_or_exploration_regime",
-                         "sub_bacia" = "sub_basin",
-                         "municipio_s" = "municipalities"
+        "ano" = "year",
+        "tipo_de_despesa" = "type_of_expense",
+        "soma_de_valor" = "value",
+        "participacao" = "share_of_total",
+        "empreendimento" = "venture",
+        "uf" = "state",
+        "fonte" = "source",
+        "fase" = "stage",
+        "origem" = "origin",
+        "tipo" = "type",
+        "tipo_de_atuacao" = "type_of_permission",
+        "combustivel_final" = "final_fuel",
+        "entrada_em_operacao" = "operation_start",
+        "potencia_outorgada_k_w" = "granted_power_kw",
+        "potencia_fiscalizada_k_w" = "fiscalized_power_kw",
+        "garantia_fisica_k_w" = "physical_guarantee_kw",
+        "geracao_qualificada" = "qualified_generation",
+        "latitude_decimal" = "latitude_dd",
+        "longitude_decimal" = "longitude_dd",
+        "inicio_vigencia" = "validity_start",
+        "fim_vigencia" = "validity_end",
+        "proprietario_regime_de_exploracao" = "owner_or_exploration_regime",
+        "sub_bacia" = "sub_basin",
+        "municipio_s" = "municipalities"
       )
   }
 
@@ -171,5 +171,4 @@ load_aneel <- function(dataset, raw_data = FALSE, language = "eng") {
   ####################
 
   return(dat_mod)
-
 }
