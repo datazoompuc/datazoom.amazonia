@@ -20,7 +20,7 @@ Electrical Energy Monthly Consumption per Class
 }
 \examples{
 \dontrun{
-# download treated data about energy consumption in state level
+# download treated data about energy consumption at the state level
 clean_epe <- load_epe(
   dataset = "energy_consumption_per_class",
   geo_level = "state",

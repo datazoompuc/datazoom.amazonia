@@ -104,15 +104,17 @@ devtools::load_all()
 | **[BACI](#baci)** | _Global international trade_ |
 | **[PIB-Munic](#pib-munic)** | _Municipal GDP_ |
 | **[CEMPRE](#cempre)** | _Central register of companies_ |
+| **[PAM](#pam)** | _Agricultural production_ |
 
 </td><td>
 
 |||
 |---|---|
-| **[PAM](#pam)** | _Agricultural production_ |
 | **[PEVS](#pevs)** | _Forestry and extraction_ |
 | **[PPM](#ppm)** | _Livestock farming_ |
 | **[SIGMINE](#sigmine)** | _Mining_ |
+| **[ANEEL](#aneel)** | _Energy development_ |
+| **[EPE](#epe)** | _Energy consumption_ |
 
 </td></tr> </table>
 
@@ -246,6 +248,16 @@ devtools::load_all()
 ## SIGMINE
 
 ```{r child = "vignettes/SIGMINE.Rmd"}
+```
+
+## ANEEL
+
+```{r child = "vignettes/ANEEL.Rmd"}
+```
+
+## EPE
+
+```{r child = "vignettes/EPE.Rmd"}
 ```
 
 # Other tools

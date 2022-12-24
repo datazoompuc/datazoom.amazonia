@@ -590,6 +590,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## Load Data ##
   ###############
 
+
   ##### Exceptions only #####
 
   if (file_extension == ".zip") {
