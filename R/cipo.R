@@ -68,7 +68,7 @@ load_cipo <- function(dataset = "brazilian_actors", raw_data = FALSE,
 
   # getting rid of first few rows for brazilian_actors dataset
 
-  if (param$dataset == "brazilian_actors"){
+  if (param$dataset == "brazilian_actors") {
     dat <- dat %>%
       janitor::row_to_names(3)
   }

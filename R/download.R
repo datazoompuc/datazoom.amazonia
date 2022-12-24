@@ -472,7 +472,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   # For most functions, the file extension is automatically detected
 
-  file_extension <- sub('.*\\.', '.', path)
+  file_extension <- sub(".*\\.", ".", path)
 
   ##### Exceptions only #####
 
@@ -486,7 +486,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       file_extension <- ".zip"
     }
   }
-  if (source == "cipo"){
+  if (source == "cipo") {
     file_extension <- ".csv"
   }
   if (source == "prodes") {
@@ -512,15 +512,15 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     file_extension <- ".rds"
   }
   if (source == "EPE") {
-    if (param$dataset == "national_energy_balance"){
+    if (param$dataset == "national_energy_balance") {
       file_extension <- ".csv"
     }
   }
   if (source == "ANEEL") {
-    if (dataset == "energy_development_budget"){
-    file_extension <- ".rds"
+    if (dataset == "energy_development_budget") {
+      file_extension <- ".rds"
     }
-    if (dataset == "energy_generation"){
+    if (dataset == "energy_generation") {
       file_extension <- ".xlsx"
     }
   }
@@ -537,13 +537,13 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source %in% c("iema", "imazon_shp")) {
     download_method <- "googledrive"
   }
-  if (source == "ANEEL"){
-    if (dataset == "energy_development_budget"){
+  if (source == "ANEEL") {
+    if (dataset == "energy_development_budget") {
       download_method <- "googledrive"
     }
   }
-  if (source == "EPE"){
-    if (dataset == "national_energy_balance"){
+  if (source == "EPE") {
+    if (dataset == "national_energy_balance") {
       download_method <- "googledrive"
     }
   }
@@ -577,7 +577,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (download_method == "googledrive") {
     message("Please follow the steps from `googledrive` package to download the data. This may take a while.\nIn case of authentication errors, run vignette(\"GOOGLEDRIVE\").")
 
-   googledrive::drive_download(path, path = temp, overwrite = TRUE)
+    googledrive::drive_download(path, path = temp, overwrite = TRUE)
   }
 
   ## Unzipping if the file is zipped
@@ -650,14 +650,14 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
   }
 
-  if (param$source == "EPE" & param$dataset == "energy_consumption_per_class"){
+  if (param$source == "EPE" & param$dataset == "energy_consumption_per_class") {
 
     # param$sheet contains the selected sheets
 
     # Making a list with all the sheets
     dat <- purrr::imap(
       param$sheet,
-      function(sheets, number){
+      function(sheets, number) {
         base::message(
           paste0("Reading sheet ", number, " out of ", length(param$sheet), " (", sheets, ")")
         )
@@ -669,7 +669,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
     names(dat) <- param$sheet
   }
-  if (param$source == "ips"){
+  if (param$source == "ips") {
     dat <- param$sheet %>%
       purrr::map(
         ~ readxl::read_xlsx(temp, sheet = .)
@@ -680,27 +680,25 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   # This Depends on Data Type (.csv, .shp, ...) and on the data source
 
-  else{
-
-  if (file_extension == ".csv") {
-    dat <- data.table::fread(temp)
-  }
-  if (file_extension == ".txt") {
-    dat <- readr::read_csv(temp, locale = readr::locale(encoding = "latin1"))
-  }
-  if (file_extension == ".nc") {
-    dat <- terra::rast(temp)
-  }
-  if (file_extension == ".rds") {
-    dat <- readr::read_rds(temp)
-  }
-  if (file_extension == ".xlsx") {
-    dat <- readxl::read_xlsx(temp, sheet = param$sheet, skip = param$skip_rows)
-  }
-  if (file_extension == ".dbc") {
-    dat <- read.dbc(temp)
-  }
-
+  else {
+    if (file_extension == ".csv") {
+      dat <- data.table::fread(temp)
+    }
+    if (file_extension == ".txt") {
+      dat <- readr::read_csv(temp, locale = readr::locale(encoding = "latin1"))
+    }
+    if (file_extension == ".nc") {
+      dat <- terra::rast(temp)
+    }
+    if (file_extension == ".rds") {
+      dat <- readr::read_rds(temp)
+    }
+    if (file_extension == ".xlsx") {
+      dat <- readxl::read_xlsx(temp, sheet = param$sheet, skip = param$skip_rows)
+    }
+    if (file_extension == ".dbc") {
+      dat <- read.dbc(temp)
+    }
   }
 
   ##############################
@@ -849,10 +847,8 @@ datasets_link <- function() {
     ##########
 
     "PRODES-INPE", "prodes", NA, "2000-2020", NA, "http://www.dpi.inpe.br/prodesdigital",
-
     "DETER-INPE", "deter_amz", NA, NA, NA, "http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-amz/shape",
     "DETER-INPE", "deter_cerrado", NA, NA, NA, "http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-cerrado/shape",
-
     "DEGRAD-INPE", "degrad", NA, "2007-2016", NA, "http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad",
 
     ###############
@@ -988,7 +984,7 @@ datasets_link <- function() {
     #########
 
     "EPE", "energy_consumption_per_class", NA, "2004-2021", "Region, Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/Documents/CONSUMO%20MENSAL%20DE%20ENERGIA%20EL%c3%89TRICA%20POR%20CLASSE.xls",
-    "EPE", "national_energy_balance", NA, "2011-2022", "Region, Municipality","https://drive.google.com/file/d/1_JTYyAPdbQayR-nrURts6OmbKcm2cLix/view?usp=share_link",
+    "EPE", "national_energy_balance", NA, "2011-2022", "Region, Municipality", "https://drive.google.com/file/d/1_JTYyAPdbQayR-nrURts6OmbKcm2cLix/view?usp=share_link",
 
     ###########
     ## ANEEL ##
@@ -997,7 +993,7 @@ datasets_link <- function() {
     "ANEEL", "energy_development_budget", NA, "2013-2022", NA, "https://drive.google.com/file/d/1h7mu-9qbKfISk1-k4JSrBhXKBMQHTOH9/view?usp=share_link",
     "ANEEL", "energy_generation", NA, "1908-2021", "Municipality", "https://git.aneel.gov.br/publico/centralconteudo/-/raw/main/relatorioseindicadores/geracao/BD_SIGA.xlsx?inline=false",
 
-     ## Shapefile from github repository
+    ## Shapefile from github repository
 
 
     "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds",

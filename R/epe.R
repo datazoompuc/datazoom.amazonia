@@ -43,28 +43,31 @@ load_epe <- function(dataset, raw_data = FALSE,
 
   # Choosing which sheets to read
 
-  if (param$geo_level == "state"){
-    sheets_selected <- c("CONSUMO POR UF",
-                         "CONSUMO CATIVO POR UF",
-                         "CONSUMO RESIDENCIAL POR UF",
-                         "CONSUMO INDUSTRIAL POR UF",
-                         "CONSUMO COMERCIAL POR UF",
-                         "CONSUMO OUTROS POR UF",
-                         "CONSUMIDORES RESIDENCIAIS POR F", #Ha um erro de escrita na planilha de origem: 'F' ao invés de 'UF'
-                         "CONSUMIDORES INDUSTRIAIS POR UF",
-                         "CONSUMIDORES COMERCIAIS POR UF",
-                         "CONSUMIDORES OUTROS POR UF")
+  if (param$geo_level == "state") {
+    sheets_selected <- c(
+      "CONSUMO POR UF",
+      "CONSUMO CATIVO POR UF",
+      "CONSUMO RESIDENCIAL POR UF",
+      "CONSUMO INDUSTRIAL POR UF",
+      "CONSUMO COMERCIAL POR UF",
+      "CONSUMO OUTROS POR UF",
+      "CONSUMIDORES RESIDENCIAIS POR F", # Ha um erro de escrita na planilha de origem: 'F' ao invés de 'UF'
+      "CONSUMIDORES INDUSTRIAIS POR UF",
+      "CONSUMIDORES COMERCIAIS POR UF",
+      "CONSUMIDORES OUTROS POR UF"
+    )
   }
-  if (param$geo_level == "region" | param$geo_level == "subsystem"){
-
-    sheets_selected <- c("TOTAL",
-                         "RESIDENCIAL",
-                         "INDUSTRIAL",
-                         "COMERCIAL",
-                         "OUTROS",
-                         "CATIVO",
-                         "CONSUMIDORES RESIDENCIAIS",
-                         "CONSUMIDORES TOTAIS")
+  if (param$geo_level == "region" | param$geo_level == "subsystem") {
+    sheets_selected <- c(
+      "TOTAL",
+      "RESIDENCIAL",
+      "INDUSTRIAL",
+      "COMERCIAL",
+      "OUTROS",
+      "CATIVO",
+      "CONSUMIDORES RESIDENCIAIS",
+      "CONSUMIDORES TOTAIS"
+    )
   }
 
   dat <- external_download(
@@ -72,7 +75,7 @@ load_epe <- function(dataset, raw_data = FALSE,
     dataset = param$dataset,
     year = param$time_period,
     sheet = sheets_selected
-    )
+  )
 
   if (param$raw_data) {
     return(dat)
@@ -82,7 +85,7 @@ load_epe <- function(dataset, raw_data = FALSE,
   ## Data Engineering ##
   ######################
 
-  if (param$dataset == "energy_consumption_per_class"){
+  if (param$dataset == "energy_consumption_per_class") {
 
     # removing accents from each sheet
 
@@ -93,7 +96,7 @@ load_epe <- function(dataset, raw_data = FALSE,
         })
       )
 
-    if (geo_level == "state"){
+    if (geo_level == "state") {
 
       # removes first three rows of each data frame + last row
 
@@ -107,8 +110,8 @@ load_epe <- function(dataset, raw_data = FALSE,
         purrr::map(t) # applies t() function for transpose
 
       base::suppressMessages(
-      dat <- dat %>%
-        purrr::map(tibble::as_tibble, .name_repair = "unique")
+        dat <- dat %>%
+          purrr::map(tibble::as_tibble, .name_repair = "unique")
       )
 
       # creates list with column names (initially from first row)
@@ -121,7 +124,7 @@ load_epe <- function(dataset, raw_data = FALSE,
 
       var_names <- var_names %>%
         purrr::map(
-          function(names){
+          function(names) {
             names[1] <- "ano"
             names[2] <- "mes"
 
@@ -178,12 +181,13 @@ load_epe <- function(dataset, raw_data = FALSE,
         dplyr::mutate(dplyr::across(-uf, as.numeric))
 
       dat <- dat %>%
-        dplyr::mutate(uf = dplyr::case_when(uf == "TOTAL POR UF" ~ "Total",
-                                            TRUE ~ uf))
-
+        dplyr::mutate(uf = dplyr::case_when(
+          uf == "TOTAL POR UF" ~ "Total",
+          TRUE ~ uf
+        ))
     }
 
-    if (param$geo_level %in% c("subsystem", "region")){
+    if (param$geo_level %in% c("subsystem", "region")) {
 
       # removes first 3 rows of each sheet
 
@@ -194,8 +198,8 @@ load_epe <- function(dataset, raw_data = FALSE,
 
       dat <- dat %>%
         purrr::map(
-          function(df){
-            if (ncol(df) == 14){
+          function(df) {
+            if (ncol(df) == 14) {
               df <- df[, -14]
             }
 
@@ -221,10 +225,10 @@ load_epe <- function(dataset, raw_data = FALSE,
 
       dat <- dat %>%
         purrr::map(
-            ~ dplyr::mutate(., ano = dplyr::case_when(
-              ano %in% as.character(2000:2030) ~ ano
-            ))
-          )
+          ~ dplyr::mutate(., ano = dplyr::case_when(
+            ano %in% as.character(2000:2030) ~ ano
+          ))
+        )
 
       # extending year to missing values
 
@@ -300,12 +304,12 @@ load_epe <- function(dataset, raw_data = FALSE,
         dplyr::mutate(dplyr::across(-c("geo", "ano", "region_subsystem"), as.numeric))
 
       # Finally picking geo_level
-      if (param$geo_level == "subsystem"){
+      if (param$geo_level == "subsystem") {
         dat <- dat %>%
           dplyr::filter(geo == "SUBSISTEMA ELETRICO") %>%
           dplyr::rename("subsistema" = "region_subsystem")
       }
-      if (param$geo_level == "region"){
+      if (param$geo_level == "region") {
         dat <- dat %>%
           dplyr::filter(geo == "REGIAO GEOGRAFICA") %>%
           dplyr::rename("regiao" = "region_subsystem")
@@ -316,12 +320,10 @@ load_epe <- function(dataset, raw_data = FALSE,
     }
   }
 
-  if (param$dataset == "national_energy_balance"){
-
-  dat <- dat %>%
-    janitor::clean_names() %>%
-    dplyr::select(-v1)
-
+  if (param$dataset == "national_energy_balance") {
+    dat <- dat %>%
+      janitor::clean_names() %>%
+      dplyr::select(-v1)
   }
 
   ################################
@@ -330,7 +332,7 @@ load_epe <- function(dataset, raw_data = FALSE,
 
   dat <- dat %>%
     dplyr::rename_with(
-      function(name){
+      function(name) {
         name %>%
           stringr::str_remove("_por_uf") %>%
           stringr::str_remove("_por_f") %>%
@@ -345,50 +347,50 @@ load_epe <- function(dataset, raw_data = FALSE,
   if (param$language == "pt") {
     dat_mod <- dat %>%
       dplyr::rename_with(dplyr::recode,
-                         "total" = "consumo_total",
-                         "residencial" = "consumo_residencial",
-                         "industrial" = "consumo_industrial",
-                         "comercial" = "consumo_comercial",
-                         "outros" = "consumo_outros",
-                         "cativo" = "consumo_cativo",
-                         "consumo" = "consumo_total"
+        "total" = "consumo_total",
+        "residencial" = "consumo_residencial",
+        "industrial" = "consumo_industrial",
+        "comercial" = "consumo_comercial",
+        "outros" = "consumo_outros",
+        "cativo" = "consumo_cativo",
+        "consumo" = "consumo_total"
       )
   }
 
   if (param$language == "eng") {
     dat_mod <- dat %>%
       dplyr::rename_with(dplyr::recode,
-                         "estado" = "state",
-                         "amz_legal" = "legal_amazon",
-                         "ano" = "year",
-                         "hidro" = "hydro",
-                         "eolica" = "wind",
-                         "termo" = "thermal",
-                         "cana" = "sugar_cane_bagasse",
-                         "lenha" = "firewood",
-                         "lixivia" = "black_liquor",
-                         "outras_fontes_renovaveis" = "other_renewable_sources",
-                         "carvao_vapor" = "steam_coal",
-                         "gas_natural" = "natural_gas",
-                         "gas_de_coqueira" = "coke_oven_gas",
-                         "combustivel" = "fuel_oil",
-                         "diesel" = "diesel",
-                         "outras_fontes_nao_renovaveis" = "other_non_renewable_sources",
-                         "regiao" = "region",
-                         "subsistema" = "subsystem",
-                         "mes" = "month",
-                         "total" = "total_consumption",
-                         "residencial" = "residential_consumption",
-                         "industrial" = "industrial_consumption",
-                         "comercial" = "comercial_consumption",
-                         "outros" = "other_consumption",
-                         "cativo" = "captive_consumption",
-                         "consumidores_residenciais" = "residential_consumers",
-                         "consumidores_industriais" = "industrial_consumers",
-                         "consumidores_totais" = "total_consumers",
-                         "consumidores_comerciais" = "commercial_consumers",
-                         "consumidores_outros" = "other_consumers",
-                         "consumo" = "total_consumption"
+        "estado" = "state",
+        "amz_legal" = "legal_amazon",
+        "ano" = "year",
+        "hidro" = "hydro",
+        "eolica" = "wind",
+        "termo" = "thermal",
+        "cana" = "sugar_cane_bagasse",
+        "lenha" = "firewood",
+        "lixivia" = "black_liquor",
+        "outras_fontes_renovaveis" = "other_renewable_sources",
+        "carvao_vapor" = "steam_coal",
+        "gas_natural" = "natural_gas",
+        "gas_de_coqueira" = "coke_oven_gas",
+        "combustivel" = "fuel_oil",
+        "diesel" = "diesel",
+        "outras_fontes_nao_renovaveis" = "other_non_renewable_sources",
+        "regiao" = "region",
+        "subsistema" = "subsystem",
+        "mes" = "month",
+        "total" = "total_consumption",
+        "residencial" = "residential_consumption",
+        "industrial" = "industrial_consumption",
+        "comercial" = "comercial_consumption",
+        "outros" = "other_consumption",
+        "cativo" = "captive_consumption",
+        "consumidores_residenciais" = "residential_consumers",
+        "consumidores_industriais" = "industrial_consumers",
+        "consumidores_totais" = "total_consumers",
+        "consumidores_comerciais" = "commercial_consumers",
+        "consumidores_outros" = "other_consumers",
+        "consumo" = "total_consumption"
       )
   }
 
@@ -397,7 +399,4 @@ load_epe <- function(dataset, raw_data = FALSE,
   ####################
 
   return(dat_mod)
-
 }
-
-

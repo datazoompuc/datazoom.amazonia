@@ -71,17 +71,17 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
   ######################
 
   dat <- base::suppressWarnings(purrr::map2(
-      param$time_period, file_names,
-      function(year, file) {
-        external_download(
-          dataset = param$dataset,
-          source = "degrad",
-          year = year,
-          file_name = file
-        ) %>%
-          janitor::clean_names()
-      }
-    ))
+    param$time_period, file_names,
+    function(year, file) {
+      external_download(
+        dataset = param$dataset,
+        source = "degrad",
+        year = year,
+        file_name = file
+      ) %>%
+        janitor::clean_names()
+    }
+  ))
 
   ## Return Raw Data
 
