@@ -590,27 +590,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## Load Data ##
   ###############
 
-  # This Depends on Data Type (.csv, .shp, ...) and on the data source
-
-  if (file_extension == ".csv") {
-    dat <- data.table::fread(temp)
-  }
-  if (file_extension == ".txt") {
-    dat <- readr::read_csv(temp, locale = readr::locale(encoding = "latin1"))
-  }
-  if (file_extension == ".nc") {
-    dat <- terra::rast(temp)
-  }
-  if (file_extension == ".rds") {
-    dat <- readr::read_rds(temp)
-  }
-  if (file_extension == ".xlsx" & param$source != "ips") {
-    dat <- readxl::read_xlsx(temp, sheet = param$sheet, skip = param$skip_rows)
-  }
-  if (file_extension == ".dbc") {
-    dat <- read.dbc(temp)
-  }
-
   ##### Exceptions only #####
 
   if (file_extension == ".zip") {
@@ -694,6 +673,33 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       purrr::map(
         ~ readxl::read_xlsx(temp, sheet = .)
       )
+  }
+
+  ## Now the rest of the functions
+
+  # This Depends on Data Type (.csv, .shp, ...) and on the data source
+
+  else{
+
+  if (file_extension == ".csv") {
+    dat <- data.table::fread(temp)
+  }
+  if (file_extension == ".txt") {
+    dat <- readr::read_csv(temp, locale = readr::locale(encoding = "latin1"))
+  }
+  if (file_extension == ".nc") {
+    dat <- terra::rast(temp)
+  }
+  if (file_extension == ".rds") {
+    dat <- readr::read_rds(temp)
+  }
+  if (file_extension == ".xlsx") {
+    dat <- readxl::read_xlsx(temp, sheet = param$sheet, skip = param$skip_rows)
+  }
+  if (file_extension == ".dbc") {
+    dat <- read.dbc(temp)
+  }
+
   }
 
   ##############################

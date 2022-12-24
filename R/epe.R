@@ -106,8 +106,10 @@ load_epe <- function(dataset, raw_data = FALSE,
       dat <- dat %>%
         purrr::map(t) # applies t() function for transpose
 
+      base::suppressMessages(
       dat <- dat %>%
-        purrr::map(tibble::as_tibble)
+        purrr::map(tibble::as_tibble, .name_repair = "unique")
+      )
 
       # creates list with column names (initially from first row)
 
