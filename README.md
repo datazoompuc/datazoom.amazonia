@@ -101,16 +101,18 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 | **[BACI](#baci)**           | *Global international trade*    |
 | **[PIB-Munic](#pib-munic)** | *Municipal GDP*                 |
 | **[CEMPRE](#cempre)**       | *Central register of companies* |
+| **[PAM](#pam)**             | *Agricultural production*       |
 
 </td>
 <td>
 
 |                         |                           |
 |-------------------------|---------------------------|
-| **[PAM](#pam)**         | *Agricultural production* |
 | **[PEVS](#pevs)**       | *Forestry and extraction* |
 | **[PPM](#ppm)**         | *Livestock farming*       |
 | **[SIGMINE](#sigmine)** | *Mining*                  |
+| **[ANEEL](#aneel)**     | *Energy development*      |
+| **[EPE](#epe)**         | *Energy consumption*      |
 
 </td>
 </tr>
@@ -153,12 +155,12 @@ period from 01/08/2017 to 31/07/2018.
 
 1.  **dataset**: `"prodes"`
 
-2.  **raw\_data**: there are two options:
+2.  **raw_data**: there are two options:
 
     -   `TRUE`: if you want the data as it is originally.
     -   `FALSE`: if you want the treated version of the data.
 
-3.  **time\_period**: picks the years for which the data will be
+3.  **time_period**: picks the years for which the data will be
     downloaded
 
 4.  **language**: you can choose between Portuguese `("pt")` and English
@@ -202,7 +204,7 @@ corresponding to a municipality.
 1.  **dataset**: there are two options:
     -   `"deter_amz"` for data from the Amazon
     -   `"deter_cerrado"` for data from the Cerrado
-2.  **raw\_data**: there are two options:
+2.  **raw_data**: there are two options:
     -   `TRUE`: if you want the data as it is originally.
     -   `FALSE`: if you want the treated version of the data.
 3.  **language**: you can choose between Portuguese `("pt")` and English
@@ -247,12 +249,12 @@ assumed
 
 1.  **dataset**: `"degrad"`
 
-2.  **raw\_data**: there are two options:
+2.  **raw_data**: there are two options:
 
     -   `TRUE`: if you want the data as it is originally.
     -   `FALSE`: if you want the treated version of the data.
 
-3.  **time\_period**: picks the years for which the data will be
+3.  **time_period**: picks the years for which the data will be
     downloaded
 
 4.  **language**: you can choose between Portuguese `("pt")` and English
@@ -282,7 +284,7 @@ ranging from 0 to 3.
 
 1.  **dataset**: `"imazon_shp"`
 
-2.  **raw\_data**: there are two options:
+2.  **raw_data**: there are two options:
 
     -   `TRUE`: if you want the data as it is originally.
     -   `FALSE`: if you want the treated version of the data.
@@ -299,8 +301,8 @@ ranging from 0 to 3.
 data <- load_imazon(raw_data = FALSE)
 ```
 
-🔴 This function uses the `googledrive` package to download data. In case
-of authentication errors, see [googledrive](#googledrive).
+🔴 This function uses the `googledrive` package to download data. In
+case of authentication errors, see [googledrive](#googledrive).
 
 ## IBAMA
 
@@ -328,7 +330,7 @@ regarding distributed and collected fines across municipalities
     -   `"collected_fines"`: fines that have been paid by individuals or
         corporations
 
-2.  **raw\_data**: there are two options:
+2.  **raw_data**: there are two options:
 
     -   `TRUE`: if you want the data as it is originally.
     -   `FALSE`: if you want the treated version of the data.
@@ -381,12 +383,12 @@ from the year 1989.
     -   `"mapbiomas_grazing_quality"`: grazing quality
     -   `"mapbiomas_mining"`: areas used for mining
 
-2.  **raw\_data**: there are two options:
+2.  **raw_data**: there are two options:
 
     -   `TRUE`: if you want the data as it is originally.
     -   `FALSE`: if you want the treated version of the data.
 
-3.  **geo\_level**:
+3.  **geo_level**:
 
     -   For datasets `"mapbiomas_cover"` and `"mapbiomas_transition"`,
         can be `"municipality"` or `"state"` (faster download).
@@ -397,8 +399,8 @@ from the year 1989.
 4.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`
 
-5.  **cover\_level**: Aggregates the data to some level of land
-    coverage. Only applies to datasets `"mapbiomas_cover"` and
+5.  **cover_level**: Aggregates the data to some level of land coverage.
+    Only applies to datasets `"mapbiomas_cover"` and
     `"mapbiomas_grazing_quality"`:
 
     -   `cover_level = "none"`: no aggregation
@@ -448,22 +450,22 @@ Lab’s [TerraClimate](https://www.climatologylab.org/terraclimate.html).
 The table below shows all possible variables to be extracted, which are
 chosen through the “dataset” parameter. Data ranges from 1958 to 2020.
 
-| Dataset                          | Code | Description                                      |  Units   |
-|:---------------------------------|:----:|:-------------------------------------------------|:--------:|
-| max\_temperature                 | tmax | Maximum 2-m Temperature                          |   degC   |
-| min\_temperature                 | tmin | Minimum 2-m Temperature                          |   degC   |
-| wind\_speed                      |  ws  | Wind Speed at 10-m                               |   m/s    |
-| vapor\_pressure\_deficit         | vpd  | Vapor Pressure Deficit                           |   kPa    |
-| vapor\_pressure                  | vap  | 2-m Vapor Pressure                               |   kPa    |
-| snow\_water\_equivalent          | swe  | Snow Water Equivalent at End of Month            |    mm    |
-| shortwave\_radiation\_flux       | srad | Downward Shortwave Radiation Flux at the Surface |  W/m^2   |
-| soil\_moisture                   | soil | Soil Moisture at End of Month                    |    mm    |
-| runoff                           |  q   | Runoff                                           |    mm    |
-| precipitation                    | ppt  | Accumulated Precipitation                        |    mm    |
-| potential\_evaporation           | pet  | Reference Evapotranspiration                     |    mm    |
-| climatic\_water\_deficit         | def  | Climatic Water Deficit                           |    mm    |
-| water\_evaporation               | aet  | Actual Evapotranspiration                        |    mm    |
-| palmer\_drought\_severity\_index | PDSI | Palmer Drought Severity Index                    | unitless |
+| Dataset                       | Code | Description                                      |  Units   |
+|:------------------------------|:----:|:-------------------------------------------------|:--------:|
+| max_temperature               | tmax | Maximum 2-m Temperature                          |   degC   |
+| min_temperature               | tmin | Minimum 2-m Temperature                          |   degC   |
+| wind_speed                    |  ws  | Wind Speed at 10-m                               |   m/s    |
+| vapor_pressure_deficit        | vpd  | Vapor Pressure Deficit                           |   kPa    |
+| vapor_pressure                | vap  | 2-m Vapor Pressure                               |   kPa    |
+| snow_water_equivalent         | swe  | Snow Water Equivalent at End of Month            |    mm    |
+| shortwave_radiation_flux      | srad | Downward Shortwave Radiation Flux at the Surface |  W/m^2   |
+| soil_moisture                 | soil | Soil Moisture at End of Month                    |    mm    |
+| runoff                        |  q   | Runoff                                           |    mm    |
+| precipitation                 | ppt  | Accumulated Precipitation                        |    mm    |
+| potential_evaporation         | pet  | Reference Evapotranspiration                     |    mm    |
+| climatic_water_deficit        | def  | Climatic Water Deficit                           |    mm    |
+| water_evaporation             | aet  | Actual Evapotranspiration                        |    mm    |
+| palmer_drought_severity_index | PDSI | Palmer Drought Severity Index                    | unitless |
 
 Netcdf files are downloaded from the
 [THREDDS](http://thredds.northwestknowledge.net:8080/thredds/terraclimate_catalog.html)
@@ -476,18 +478,18 @@ web server, as recommended for rectangular subsets of the global data.
 1.  **dataset**: picks the variable to be read. Possible options are
     shown in the table above.
 
-2.  **raw\_data**: there are two options:
+2.  **raw_data**: there are two options:
 
     -   `TRUE`: if you want the data as it is originally.
     -   `FALSE`: if you want the treated version of the data.
 
-3.  **time\_period**: picks the years for which the data will be
+3.  **time_period**: picks the years for which the data will be
     downloaded
 
 4.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`
 
-5.  **legal\_amazon\_only**: if set to `TRUE`, only downloads data from
+5.  **legal_amazon_only**: if set to `TRUE`, only downloads data from
     the Legal Amazon region
 
 ------------------------------------------------------------------------
@@ -549,12 +551,12 @@ necessary, and the function may take time to run.
     -   `"seeg_land"`
     -   `"seeg_residuals"`
 
-2.  **raw\_data**: there are two options:
+2.  **raw_data**: there are two options:
 
     -   `TRUE`: if you want the data as it is originally.
     -   `FALSE`: if you want the treated version of the data.
 
-3.  **geo\_level**: `"country"`, `"state"`, or `"municipality"`
+3.  **geo_level**: `"country"`, `"state"`, or `"municipality"`
 
 4.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`
@@ -642,12 +644,12 @@ level and data is available in 2014 and 2018.
     -   `"all"`, `"life_quality"`, `"sanit_habit"`, `"violence"`,
         `"educ"`, `"communic"`, `"mortality"`, or `"deforest"`
 
-2.  **raw\_data**: there are two options:
+2.  **raw_data**: there are two options:
 
     -   `TRUE`: if you want the data as it is originally.
     -   `FALSE`: if you want the treated version of the data.
 
-3.  **time\_period**: picks the years for which the data will be
+3.  **time_period**: picks the years for which the data will be
     downloaded
 
 4.  **language**: you can choose between Portuguese `("pt")` and English
@@ -690,13 +692,13 @@ each avaliable dataset.
     -   further subsets of CNES are listed later, but those only allow
         for the download of raw data.
 
-2.  **raw\_data**: there are two options:
+2.  **raw_data**: there are two options:
 
     -   `TRUE`: if you want the data as it is originally.
     -   `FALSE`: if you want the treated version of the data. Only
         effective for SIM-DO and subsets, SIH, and CNES-LT.
 
-3.  **keep\_all**: only applies when raw\_data is FALSE. There are two
+3.  **keep_all**: only applies when raw_data is FALSE. There are two
     options:
 
     -   `TRUE`: keeps all original variables, adding variable labels and
@@ -704,7 +706,7 @@ each avaliable dataset.
     -   `FALSE`: aggregates data at the municipality, thereby losing
         individual-level data, and only keeping aggregate measures.
 
-4.  **time\_period**: picks the years for which the data will be
+4.  **time_period**: picks the years for which the data will be
     downloaded
 
 5.  **states**: a vector of states by which to filter the data. Only
@@ -831,7 +833,7 @@ throughout the Amazon region in the year 2018.
 
 1.  **dataset**: `"iema"`
 
-2.  **raw\_data**: there are two options:
+2.  **raw_data**: there are two options:
 
     -   `TRUE`: if you want the data as it is originally.
     -   `FALSE`: if you want the treated version of the data.
@@ -848,8 +850,8 @@ throughout the Amazon region in the year 2018.
 data <- load_iema(raw_data = FALSE)
 ```
 
-🔴 This function uses the `googledrive` package to download data. In case
-of authentication errors, see [googledrive](#googledrive).
+🔴 This function uses the `googledrive` package to download data. In
+case of authentication errors, see [googledrive](#googledrive).
 
 # Economic Data
 
@@ -885,12 +887,12 @@ granularity of location.
     -   `"comex_export_prod"`: selects exports data by producer
     -   `"comex_import_prod"`: selects imports data by producer
 
-2.  **raw\_data**: there are two options:
+2.  **raw_data**: there are two options:
 
     -   `TRUE`: if you want the data as it is originally.
     -   `FALSE`: if you want the treated version of the data.
 
-3.  **time\_period**: picks the years for which the data will be
+3.  **time_period**: picks the years for which the data will be
     downloaded
 
 4.  **language**: you can choose between Portuguese `("pt")` and English
@@ -933,12 +935,12 @@ Therefore, downloading the data can take a long time.
 
     -   `"HS92"` which follows the Harmonized System method
 
-2.  **raw\_data**: there are two options:
+2.  **raw_data**: there are two options:
 
     -   `TRUE`: if you want the data as it is originally.
     -   `FALSE`: if you want the treated version of the data.
 
-3.  **time\_period**: picks the years for which the data will be
+3.  **time_period**: picks the years for which the data will be
     downloaded
 
 4.  **language**: you can choose between Portuguese `("pt")` and English
@@ -970,14 +972,14 @@ from 2002 to 2018.
 
 1.  **dataset**: `"pibmunic"`
 
-2.  **raw\_data**: there are two options:
+2.  **raw_data**: there are two options:
 
     -   `TRUE`: if you want the data as it is originally.
     -   `FALSE`: if you want the treated version of the data.
 
-3.  **geo\_level**: `"country"`, `"state"`, or `"municipality"`
+3.  **geo_level**: `"country"`, `"state"`, or `"municipality"`
 
-4.  **time\_period**: picks the years for which the data will be
+4.  **time_period**: picks the years for which the data will be
     downloaded
 
 5.  **language**: you can choose between Portuguese `("pt")` and English
@@ -1009,14 +1011,14 @@ National Register of Legal Entities. Data is available between 2006 and
 
 1.  **dataset**: `"cempre"`
 
-2.  **raw\_data**: there are two options:
+2.  **raw_data**: there are two options:
 
     -   `TRUE`: if you want the data as it is originally.
     -   `FALSE`: if you want the treated version of the data.
 
-3.  **geo\_level**: `"country"`, `"state"` or `"municipality"`
+3.  **geo_level**: `"country"`, `"state"` or `"municipality"`
 
-4.  **time\_period**: picks the years for which the data will be
+4.  **time_period**: picks the years for which the data will be
     downloaded
 
 5.  **language**: you can choose between Portuguese `("pt")` and English
@@ -1085,15 +1087,15 @@ link](https://www.ibge.gov.br/estatisticas/economicas/agricultura-e-pecuaria/911
 
 1.  **dataset**: See tables below
 
-2.  **raw\_data**: there are two options:
+2.  **raw_data**: there are two options:
 
     -   `TRUE`: if you want the data as it is originally.
     -   `FALSE`: if you want the treated version of the data.
 
-3.  **geo\_level**: `"country"`, `"region"`, `"state"`, or
+3.  **geo_level**: `"country"`, `"region"`, `"state"`, or
     `"municipality"`
 
-4.  **time\_period**: picks the years for which the data will be
+4.  **time_period**: picks the years for which the data will be
     downloaded
 
 5.  **language**: you can choose between Portuguese `("pt")` and English
@@ -1106,98 +1108,98 @@ the original databases and their narrower subsets. Note that downloading
 only specific crops is considerably faster. First, the datasets provided
 by IBGE in their entirety:
 
-| dataset          |
-|:-----------------|
-| all\_crops       |
-| temporary\_crops |
-| permanent\_crops |
-| corn             |
-| potato           |
-| peanut           |
-| beans            |
+| dataset         |
+|:----------------|
+| all_crops       |
+| temporary_crops |
+| permanent_crops |
+| corn            |
+| potato          |
+| peanut          |
+| beans           |
 
 Datasets generated from Temporary Crops:
 
-| dataset            |          Name (pt)           |          Name (eng)           |
-|:-------------------|:----------------------------:|:-----------------------------:|
-| pineapple          |           Abacaxi            |           Pineapple           |
-| alfafa             |        Alfafa Fenada         |         Alfafa Fenada         |
-| cotton\_herbaceous | Algodao Herbaceo (em Caroco) | Herbaceous Cotton (in Caroco) |
-| garlic             |             Alho             |            Garlic             |
-| peanut\_temporary  |     Amendoim (em Casca)      |      Peanuts (in Shell)       |
-| rice               |       Arroz (em Casca)       |        Rice (in husk)         |
-| oats               |       Aveia (em Grao)        |        Oats (in grain)        |
-| sweet\_potato      |         Batata Doce          |         Sweet potato          |
-| potato\_temporary  |        Batata Inglesa        |        English potato         |
-| sugar\_cane        |        Cana de Acucar        |          Sugar cane           |
-| forage\_cane       |      Cana para Forragem      |          Forage cane          |
-| onion              |            Cebola            |             Onion             |
-| rye                |      Centeio (em Grao)       |        Rye (in grain)         |
-| barley             |       Cevada (em Grao)       |       Barley (in Grain)       |
-| pea                |      Ervilha (em Grao)       |        Pea (in Grain)         |
-| broad\_bean        |        Fava (em Grao)        |     Broad Bean (in Grain)     |
-| beans\_temporary   |       Feijao (em Grao)       |       Beans (in Grain)        |
-| tobacco            |       Fumo (em Folha)        |       Smoke (in Sheet)        |
-| sunflower\_seeds   |      Girassol (em Grao)      |     Sunflower (in Grain)      |
-| jute\_fiber        |         Juta (Fibra)         |         Jute (Fiber)          |
-| linen\_seeds       |       Linho (Semente)        |         Linen (Seed)          |
-| malva\_fiber       |        Malva (Fibra)         |         Malva (Fiber)         |
-| castor\_bean       |        Mamona (Baga)         |      Castor bean (Berry)      |
-| cassava            |           Mandioca           |            Cassava            |
-| watermelon         |           Melancia           |          watermelon           |
-| melon              |            Melao             |             Melon             |
-| corn\_temporary    |       Milho (em Grao)        |        corn (in grain)        |
-| ramie\_fiber       |         Rami (Fibra)         |         Ramie (Fiber)         |
-| soybean            |        Soja (em Grao)        |      Soybean (in grain)       |
-| sorghum            |       Sorgo (em Grao)        |      Sorghum (in Grain)       |
-| tomato             |            Tomate            |            Tomato             |
-| wheat              |       Trigo (em Grao)        |        Wheat in grain)        |
-| triticale          |     Triticale (em Grao)      |     Triticale (in grain)      |
-| temporary\_total   |            Total             |             Total             |
+| dataset           |          Name (pt)           |          Name (eng)           |
+|:------------------|:----------------------------:|:-----------------------------:|
+| pineapple         |           Abacaxi            |           Pineapple           |
+| alfafa            |        Alfafa Fenada         |         Alfafa Fenada         |
+| cotton_herbaceous | Algodao Herbaceo (em Caroco) | Herbaceous Cotton (in Caroco) |
+| garlic            |             Alho             |            Garlic             |
+| peanut_temporary  |     Amendoim (em Casca)      |      Peanuts (in Shell)       |
+| rice              |       Arroz (em Casca)       |        Rice (in husk)         |
+| oats              |       Aveia (em Grao)        |        Oats (in grain)        |
+| sweet_potato      |         Batata Doce          |         Sweet potato          |
+| potato_temporary  |        Batata Inglesa        |        English potato         |
+| sugar_cane        |        Cana de Acucar        |          Sugar cane           |
+| forage_cane       |      Cana para Forragem      |          Forage cane          |
+| onion             |            Cebola            |             Onion             |
+| rye               |      Centeio (em Grao)       |        Rye (in grain)         |
+| barley            |       Cevada (em Grao)       |       Barley (in Grain)       |
+| pea               |      Ervilha (em Grao)       |        Pea (in Grain)         |
+| broad_bean        |        Fava (em Grao)        |     Broad Bean (in Grain)     |
+| beans_temporary   |       Feijao (em Grao)       |       Beans (in Grain)        |
+| tobacco           |       Fumo (em Folha)        |       Smoke (in Sheet)        |
+| sunflower_seeds   |      Girassol (em Grao)      |     Sunflower (in Grain)      |
+| jute_fiber        |         Juta (Fibra)         |         Jute (Fiber)          |
+| linen_seeds       |       Linho (Semente)        |         Linen (Seed)          |
+| malva_fiber       |        Malva (Fibra)         |         Malva (Fiber)         |
+| castor_bean       |        Mamona (Baga)         |      Castor bean (Berry)      |
+| cassava           |           Mandioca           |            Cassava            |
+| watermelon        |           Melancia           |          watermelon           |
+| melon             |            Melao             |             Melon             |
+| corn_temporary    |       Milho (em Grao)        |        corn (in grain)        |
+| ramie_fiber       |         Rami (Fibra)         |         Ramie (Fiber)         |
+| soybean           |        Soja (em Grao)        |      Soybean (in grain)       |
+| sorghum           |       Sorgo (em Grao)        |      Sorghum (in Grain)       |
+| tomato            |            Tomate            |            Tomato             |
+| wheat             |       Trigo (em Grao)        |        Wheat in grain)        |
+| triticale         |     Triticale (em Grao)      |     Triticale (in grain)      |
+| temporary_total   |            Total             |             Total             |
 
 Datasets generated from Permanent Crops:
 
-| dataset                   |          Name (pt)          |         Name (eng)         |
-|:--------------------------|:---------------------------:|:--------------------------:|
-| avocado                   |           Abacate           |          Avocado           |
-| cotton\_arboreo           | Algodao Arboreo (em Caroco) | Arboreo cotton (in Caroco) |
-| acai                      |            Acai             |            Acai            |
-| olive                     |          Azeitona           |           Olive            |
-| banana                    |       Banana (Cacho)        |       Banana (Bunch)       |
-| rubber\_coagulated\_latex | Borracha (Latex Coagulado)  | Rubber (Coagulated Latex)  |
-| rubber\_liquid\_latex     |  Borracha (Latex Liquido)   |   Rubber (Liquid Latex)    |
-| cocoa\_beans              |     Cacau (em Amendoa)      |     Cocoa (in Almonds)     |
-| coffee\_total             |    Cafe (em Grao) Total     |  Coffee (in Grain) Total   |
-| coffee\_arabica           |   Cafe (em Grao) Arabica    |   Cafe (in Grao) Arabica   |
-| coffee\_canephora         |  Cafe (em Grao) Canephora   | Cafe (in Grain) Canephora  |
-| cashew                    |            Caju             |           Cashew           |
-| khaki                     |            Caqui            |           Khaki            |
-| cashew\_nut               |      Castanha de Caju       |        Cashew Nuts         |
-| india\_tea                | Cha da India (Folha Verde)  |      India Tea (Leaf)      |
-| coconut                   |        Coco da Baia         |          Coconut           |
-| coconut\_bunch            |    Dende (Cacho de Coco)    |       Coconut Bunch        |
-| yerba\_mate               |   Erva Mate (Folha Verde)   |      Mate Herb (Leaf)      |
-| fig                       |            Figo             |            Fig             |
-| guava                     |           Goiaba            |           Guava            |
-| guarana\_seeds            |      Guarana (Semente)      |       Guarana (Seed)       |
-| orange                    |           Laranja           |           Orange           |
-| lemon                     |            Limao            |           Lemon            |
-| apple                     |            Maca             |           Apple            |
-| papaya                    |            Mamao            |           Papaya           |
-| mango                     |            Manga            |           Mango            |
-| passion\_fruit            |          Maracuja           |       Passion fruit        |
-| quince                    |           Marmelo           |           Quince           |
-| walnut                    |      Noz (Fruto Seco)       |     Walnut (Dry Fruit)     |
-| heart\_of\_palm           |           Palmito           |         Palm heart         |
-| pear                      |            Pera             |            Pear            |
-| peach                     |           Pessego           |           Peach            |
-| black\_pepper             |      Pimenta do Reino       |        Black pepper        |
-| sisal\_or\_agave          |   Sisal ou Agave (Fibra)    |   Sisal or Agave (Fiber)   |
-| tangerine                 |          Tangerina          |         Tangerine          |
-| tung                      |     Tungue (Fruto Seco)     |      Tung (Dry Fruit)      |
-| annatto\_seeds            |      Urucum (Semente)       |       Annatto (Seed)       |
-| grape                     |             Uva             |           Grape            |
-| permanent\_total          |            Total            |           Total            |
+| dataset                 |          Name (pt)          |         Name (eng)         |
+|:------------------------|:---------------------------:|:--------------------------:|
+| avocado                 |           Abacate           |          Avocado           |
+| cotton_arboreo          | Algodao Arboreo (em Caroco) | Arboreo cotton (in Caroco) |
+| acai                    |            Acai             |            Acai            |
+| olive                   |          Azeitona           |           Olive            |
+| banana                  |       Banana (Cacho)        |       Banana (Bunch)       |
+| rubber_coagulated_latex | Borracha (Latex Coagulado)  | Rubber (Coagulated Latex)  |
+| rubber_liquid_latex     |  Borracha (Latex Liquido)   |   Rubber (Liquid Latex)    |
+| cocoa_beans             |     Cacau (em Amendoa)      |     Cocoa (in Almonds)     |
+| coffee_total            |    Cafe (em Grao) Total     |  Coffee (in Grain) Total   |
+| coffee_arabica          |   Cafe (em Grao) Arabica    |   Cafe (in Grao) Arabica   |
+| coffee_canephora        |  Cafe (em Grao) Canephora   | Cafe (in Grain) Canephora  |
+| cashew                  |            Caju             |           Cashew           |
+| khaki                   |            Caqui            |           Khaki            |
+| cashew_nut              |      Castanha de Caju       |        Cashew Nuts         |
+| india_tea               | Cha da India (Folha Verde)  |      India Tea (Leaf)      |
+| coconut                 |        Coco da Baia         |          Coconut           |
+| coconut_bunch           |    Dende (Cacho de Coco)    |       Coconut Bunch        |
+| yerba_mate              |   Erva Mate (Folha Verde)   |      Mate Herb (Leaf)      |
+| fig                     |            Figo             |            Fig             |
+| guava                   |           Goiaba            |           Guava            |
+| guarana_seeds           |      Guarana (Semente)      |       Guarana (Seed)       |
+| orange                  |           Laranja           |           Orange           |
+| lemon                   |            Limao            |           Lemon            |
+| apple                   |            Maca             |           Apple            |
+| papaya                  |            Mamao            |           Papaya           |
+| mango                   |            Manga            |           Mango            |
+| passion_fruit           |          Maracuja           |       Passion fruit        |
+| quince                  |           Marmelo           |           Quince           |
+| walnut                  |      Noz (Fruto Seco)       |     Walnut (Dry Fruit)     |
+| heart_of_palm           |           Palmito           |         Palm heart         |
+| pear                    |            Pera             |            Pear            |
+| peach                   |           Pessego           |           Peach            |
+| black_pepper            |      Pimenta do Reino       |        Black pepper        |
+| sisal_or_agave          |   Sisal ou Agave (Fibra)    |   Sisal or Agave (Fiber)   |
+| tangerine               |          Tangerina          |         Tangerine          |
+| tung                    |     Tungue (Fruto Seco)     |      Tung (Dry Fruit)      |
+| annatto_seeds           |      Urucum (Semente)       |       Annatto (Seed)       |
+| grape                   |             Uva             |           Grape            |
+| permanent_total         |            Total            |           Total            |
 
 **Examples:**
 
@@ -1244,15 +1246,15 @@ link](https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fi
         silviculture in 12/31.The data goes from 2013 to 2019 and it is
         divided by forestry species.
 
-2.  **raw\_data**: there are two options:
+2.  **raw_data**: there are two options:
 
     -   `TRUE`: if you want the data as it is originally.
     -   `FALSE`: if you want the treated version of the data.
 
-3.  **geo\_level**: `"country"`, `"region"`, `"state"`, or
+3.  **geo_level**: `"country"`, `"region"`, `"state"`, or
     `"municipality"`
 
-4.  **time\_period**: picks the years for which the data will be
+4.  **time_period**: picks the years for which the data will be
     downloaded
 
 5.  **language**: you can choose between Portuguese `("pt")` and English
@@ -1303,15 +1305,15 @@ link](https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fi
     `"ppm_animal_orig_production"` \* `"ppm_cow_farming"` \*
     `"ppm_aquaculture"`
 
-2.  **raw\_data**: there are two options:
+2.  **raw_data**: there are two options:
 
     -   `TRUE`: if you want the data as it is originally.
     -   `FALSE`: if you want the treated version of the data.
 
-3.  **geo\_level**: `"country"`, `"region"`, `"state"`, or
+3.  **geo_level**: `"country"`, `"region"`, `"state"`, or
     `"municipality"`
 
-4.  **time\_period**: picks the years for which the data will be
+4.  **time_period**: picks the years for which the data will be
     downloaded
 
 5.  **language**: you can choose between Portuguese `("pt")` and English
@@ -1351,7 +1353,7 @@ Agency (ANM) is responsible for this survey.
 
 1.  **dataset**: `"sigmine_active"`
 
-2.  **raw\_data**: there are two options:
+2.  **raw_data**: there are two options:
 
     -   `TRUE`: if you want the data as it is originally.
     -   `FALSE`: if you want the treated version of the data.
@@ -1368,6 +1370,161 @@ Agency (ANM) is responsible for this survey.
 data <- load_sigmine(dataset = 'sigmine_active', 
                      raw_data = FALSE,
                      language = "pt")
+```
+
+## ANEEL
+
+Loads data from the National Electrical Energy Agency (ANEEL), a
+Brazilian independent federal agency linked to the Ministry of Mines and
+Energy (MME). ANEEL works to provide favorable conditions for the
+Electrical Energy Market to develop with balance and for the benefit of
+society.
+
+As for now, there are two different datasets available for download: the
+Energy Development Budget and the Energy Generation.
+
+#### Energy Development Budget
+
+The Energy Development Budget dataset showcases the Energy Development
+Account’s (CDE) anual budget expenses. The CDE is designed to promote
+the Brazilian energy development and is managed by the Electrical Energy
+Commercialization Chamber (CCEE).
+
+The dataset makes available the year of the observation – from 2013 to
+2022 –, the type of expense, its value in R$ (Reais) and its share over
+the total amount of CDE budget expenses on the year\*.
+
+\*Note that ‘share_of_total’ values sum to 1 for each year available.
+
+#### Energy Generation
+
+The Energy Generation dataset showcases information about ANEEL’s
+Generation Informations System (SIGA). SIGA provides information about
+the Brazilian electrical energy generation installed capacity.
+
+The dataset provides information at the individual venture/entity level.
+It contains information about the power, source, stage, type of
+permission, origin and final fuel with which each venture/entity
+operates, as well as other legal, technical and geographical
+information.\* Operation start dates contained in the dataset go as far
+back as 1924 up to 2022.
+
+\* For more details on each variable, access [This
+link](https://app.powerbi.com/view?r=eyJrIjoiNjc4OGYyYjQtYWM2ZC00YjllLWJlYmEtYzdkNTQ1MTc1NjM2IiwidCI6IjQwZDZmOWI4LWVjYTctNDZhMi05MmQ0LWVhNGU5YzAxNzBlMSIsImMiOjR9)
+and select “Manual do Usuario”.
+
+------------------------------------------------------------------------
+
+**Options:**
+
+1.  **dataset**: there are two choices:
+    -   `"energy_development_budget"`: government spending towards
+        energy sources
+    -   `"energy_generation"`: energy generation by entity/corporation
+2.  **raw_data**: there are two options:
+    -   `TRUE`: if you want the data as it is originally.
+    -   `FALSE`: if you want the treated version of the data.
+3.  **language**: you can choose between Portuguese `("pt")` and English
+    `("eng")`
+
+------------------------------------------------------------------------
+
+**Examples:**
+
+``` r
+# download treated data about energy generation in english
+clean_aneel <- load_aneel(
+ dataset = "energy generation",
+ raw_data = FALSE,
+ language = "eng"
+)
+```
+
+## EPE
+
+Loads data from the Energy Research Company (EPE), a Brazilian public
+company that works closely with the Brazilian Ministry of Mines and
+Energy (MME) and other agencies to ensure the sustainable development of
+Brazil’s energy infrastructure. EPE’s duty on that mission is to support
+MME with quality research and studies in order to aid Brazil’s energy
+infrastructure planning.
+
+As for now, there are two different datasets available for download: the
+Energy Consumption Per Class and the National Energy Balance. Both of
+them were obtained from the [EPE
+website](https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/).
+
+#### Energy Consumption Per Class
+
+The Energy Consumption Per Class dataset provides monthly data about
+energy consumption and consumers from 2004 to 2022, for each class of
+energy consumption.
+
+The different classes are Total consumption (and consumers), Industrial
+consumption (and consumers), Residential consumption (and consumers),
+Commercial consumption (and consumers), Captive consumption\* and Other
+consumption (and consumers).\*\*
+
+\*Note that there is no consumer data for ‘Captive’ class at all.
+
+\*\*There is also no consumer data for ‘Industrial’, ‘Commercial’ and
+‘Other’ classes when the geographical level is ‘Subsystem’ or ‘Region’.
+
+There are three different aggregation levels: The Region level
+encompasses the five Brazilian geographical regions (North, Northeast,
+Midwest, Southeast and South). The Subsystem level encompasses the five
+Brazilian Electric Subsystems (North, Northeast, Southeast/Midwest,
+South, Isolated Systems). The State level encompasses the 26 Brazilian
+States and the Federal District.
+
+#### National Energy Balance
+
+The National Energy Balance is a thorough and extensive research
+developed and published by EPE that contains useful data about energy
+consumption, generation, exportation and many more subjects.
+
+As for now, the National Energy Balance dataset provides yearly data
+about energy generation per source of production. The sources can be
+divided into two groups: the renewable sources (hydro, wind, solar,
+nuclear, thermal, sugar_cane_bagasse, firewood, black_liquor) and the
+non-renewable sources (steam_coal, natural_gas, coke_oven_gas, fuel_oil,
+diesel).
+
+The dataset has information at the Brazilian state level, including the
+Federal District, from 2011 to 2021 and also indicates whether the state
+is in the Legal Amazon or not.
+
+------------------------------------------------------------------------
+
+**Options:**
+
+1.  **dataset**: there are two choices:
+    -   `"energy_consumption_per_class"`: monthly energy consumption and
+        consumers by State, Region or Electric Subsystem
+    -   `"national_energy_balance"`: yearly energy generation per
+        source, by State
+2.  **raw_data**: there are two options:
+    -   `TRUE`: if you want the data as it is originally.
+    -   `FALSE`: if you want the treated version of the data.
+3.  **geo_level**: only applies to the `"energy_consumption_per_class"`
+    dataset.
+    -   `"state"`
+    -   `"subsystem"`
+4.  **language**: you can choose between Portuguese `("pt")` and English
+    `("eng")`
+
+------------------------------------------------------------------------
+
+**Examples:**
+
+``` r
+# download treated data about energy consumption at the state level in english
+clean_epe <- load_epe(
+  dataset = "energy_consumption_per_class",
+  geo_level = "state",
+  raw_data = FALSE,
+  language = "eng"
+)
 ```
 
 # Other tools

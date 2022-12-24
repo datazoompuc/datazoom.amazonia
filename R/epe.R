@@ -8,7 +8,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' # download treated data about energy consumption in state level
+#' # download treated data about energy consumption at the state level
 #' clean_epe <- load_epe(
 #'   dataset = "energy_consumption_per_class",
 #'   geo_level = "state",
@@ -107,7 +107,7 @@ load_epe <- function(dataset, raw_data = FALSE,
         purrr::map(t) # applies t() function for transpose
 
       dat <- dat %>%
-        purrr::map(tibble::as_tibble)
+        purrr::map(tibble::as_tibble, .name_repair = "unique")
 
       # creates list with column names (initially from first row)
 
