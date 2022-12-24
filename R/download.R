@@ -301,6 +301,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   param$sheet <- sheet # which sheet of a .xlsx to read
   param$state <- state
 
+  if (is.null(param$skip_rows)) param$skip_rows <- 0 # makes it more error-proof
+
   ## Create Basic Url
 
   dat_url <- datasets_link()
@@ -602,7 +604,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (file_extension == ".rds") {
     dat <- readr::read_rds(temp)
   }
-  if (file_extension == ".xlsx") {
+  if (file_extension == ".xlsx" & param$source != "ips") {
     dat <- readxl::read_xlsx(temp, sheet = param$sheet, skip = param$skip_rows)
   }
   if (file_extension == ".dbc") {
@@ -686,6 +688,12 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     )
 
     names(dat) <- param$sheet
+  }
+  if (param$source == "ips"){
+    dat <- param$sheet %>%
+      purrr::map(
+        ~ readxl::read_xlsx(temp, sheet = .)
+      )
   }
 
   ##############################
