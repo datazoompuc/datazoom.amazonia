@@ -4,10 +4,12 @@
 \alias{load_cipo}
 \title{Plataforma CIPÓ - Mappings on environmental crimes}
 \usage{
-load_cipo(dataset = "brazilian_actors", search = "")
+load_cipo(dataset = "brazilian_actors", raw_data = FALSE, search = "")
 }
 \arguments{
 \item{dataset}{A dataset name ("brazilian_actors", "international_cooperation", "forest_governance")}
+
+\item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
 \item{search}{A \code{string} that filters entries containing it.}
 }

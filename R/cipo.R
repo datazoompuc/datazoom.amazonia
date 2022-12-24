@@ -66,6 +66,17 @@ load_cipo <- function(dataset = "brazilian_actors", raw_data = FALSE,
   ## Data Engineering ##
   ######################
 
+  # getting rid of first few rows for brazilian_actors dataset
+
+  if (param$dataset == "brazilian_actors"){
+    dat <- dat %>%
+      janitor::row_to_names(3)
+  }
+
+  dat <- dat %>%
+    janitor::clean_names() %>%
+    tibble::as_tibble()
+
   # only modification is to filter rows that include the 'search' parameter
 
   dat <- dat %>%
@@ -80,7 +91,7 @@ load_cipo <- function(dataset = "brazilian_actors", raw_data = FALSE,
   ## Returning Data ##
   ####################
 
-  return(dat_mod)
+  return(dat)
 }
 
 clean_text <- function(text) {
