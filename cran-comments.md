@@ -2,7 +2,13 @@
 
 Since our previous submission, we have added many new functions and changed the way most pre-existing functions work.
 
-GitHub Actions checks on Windows, MacOS, and Linux return no errors, warnings, or notes.
+## Test environments
+- R-hub windows-x86_64-devel (r-devel)
+
+## R CMD check results
+0 errors ✔ | 0 warnings ✔ | 0 notes ✔
+
+GitHub Actions checks on Windows, MacOS, and Linux also return no errors, warnings, or notes.
 
 # Previous CRAN comments
 
