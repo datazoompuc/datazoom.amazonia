@@ -31,13 +31,13 @@ The different classes are Total consumption (and consumers), Industrial consumpt
 
 There are three different aggregation levels: 
 The Region level encompasses the five Brazilian geographical regions (North, Northeast, Midwest, Southeast and South).
-The Subsystem level encompasses the five Brazilian Electric Subsystems (North, Northeast, Southeast/Midwest, South, Isolated Systems)
+The Subsystem level encompasses the five Brazilian Electric Subsystems (North, Northeast, Southeast/Midwest, South, Isolated Systems).
 The State level encompasses the 26 Brazilian States and the Federal District.
 
 #### National Energy Balance
-The National Energy Balance is a thorough and extense research developed and published by EPE that contains useful data about energy consumption, generation, exportation and many more subjects.
+The National Energy Balance is a thorough and extensive research developed and published by EPE that contains useful data about energy consumption, generation, exportation and many more subjects.
 
-As of now, the National Energy Balance dataset provides yearly data about energy generation per source of production. The sources can be divided into two groups, the renewable sources (hydro, wind, solar, nuclear, thermal, sugar_cane_bagasse, firewood, black_liquor) and the non-renewable sources (steam_coal, natural_gas, coke_oven_gas, fuel_oil, diesel).
+As for now, the National Energy Balance dataset provides yearly data about energy generation per source of production. The sources can be divided into two groups: the renewable sources (hydro, wind, solar, nuclear, thermal, sugar_cane_bagasse, firewood, black_liquor) and the non-renewable sources (steam_coal, natural_gas, coke_oven_gas, fuel_oil, diesel).
 
 The dataset has information at the Brazilian state level, including the Federal District, from 2011 to 2021 and also indicates whether the state is in the Legal Amazon or not.
 
