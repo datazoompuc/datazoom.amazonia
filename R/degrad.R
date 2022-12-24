@@ -76,7 +76,7 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
         external_download(
           dataset = param$dataset,
           source = "degrad",
-          year = t,
+          year = year,
           file_name = file
         ) %>%
           janitor::clean_names()
