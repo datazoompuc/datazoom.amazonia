@@ -4,31 +4,24 @@
 \alias{load_aneel}
 \title{ANEEL}
 \usage{
-load_aneel(
-  dataset = "ccc",
-  raw_data = FALSE,
-  time_period = 2013:2022,
-  language = "pt"
-)
+load_aneel(dataset, raw_data = FALSE, language = "eng")
 }
 \arguments{
-\item{dataset}{A dataset name ("ccc")}
+\item{dataset}{A dataset name ("energy_development_budget" or "energy_generation")}
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
-\item{time_period}{A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.}
-
-\item{language}{Only available in Portuguese ("pt") as of now}
+\item{language}{A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.}
 }
 \description{
 National Electric Energy Agency - ANEEL
 }
 \examples{
 \dontrun{
-# download treated data for 2016 (takes a long time to download)
+# download treated data about energy generation
 clean_aneel <- load_aneel(
-  raw_data = FALSE,
-  time_period = 2016
+  dataset = "energy generation",
+  raw_data = FALSE
 )
 }
 
