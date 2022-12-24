@@ -1432,11 +1432,10 @@ and select “Manual do Usuario”.
 **Examples:**
 
 ``` r
-# download treated data about energy generation in english
+# download treated data about energy generation
 clean_aneel <- load_aneel(
  dataset = "energy generation",
- raw_data = FALSE,
- language = "eng"
+ raw_data = FALSE
 )
 ```
 
@@ -1518,12 +1517,11 @@ is in the Legal Amazon or not.
 **Examples:**
 
 ``` r
-# download treated data about energy consumption at the state level in english
+# download treated data about energy consumption at the state level
 clean_epe <- load_epe(
   dataset = "energy_consumption_per_class",
   geo_level = "state",
-  raw_data = FALSE,
-  language = "eng"
+  raw_data = FALSE
 )
 ```
 

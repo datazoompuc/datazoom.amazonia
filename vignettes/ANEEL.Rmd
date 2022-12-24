@@ -52,10 +52,9 @@ The dataset provides information at the individual venture/entity level. It cont
 **Examples:**  
   
 ```{r eval=FALSE}
-# download treated data about energy generation in english
+# download treated data about energy generation
 clean_aneel <- load_aneel(
  dataset = "energy generation",
- raw_data = FALSE,
- language = "eng"
+ raw_data = FALSE
 )
 ```

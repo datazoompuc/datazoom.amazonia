@@ -22,7 +22,7 @@ load_aneel <- function(dataset, raw_data = FALSE, language = "eng") {
   ## Bind Global Variables ##
   ###########################
 
-  ano <- variable <- label <- var_code <- NULL
+  ano <- variable <- label <- var_code <- operation_start <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -102,6 +102,15 @@ load_aneel <- function(dataset, raw_data = FALSE, language = "eng") {
       }
     )
 
+  # changing operation_start to date format
+
+  dat <- dat %>%
+    dplyr::mutate(
+      dplyr::across(
+        operation_start,
+        as.Date, format = "%d/%m/%Y", origin = "1970-01-01"
+        )
+      )
 
   ################################
   ## Harmonizing Variable Names ##
