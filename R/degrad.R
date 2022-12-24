@@ -47,16 +47,37 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
   param$language <- language
   param$raw_data <- raw_data
 
+  # .shp file names for each year
+
+  file_list <- c(
+    "2007" = "Degrad2007_Final_pol.shp",
+    "2008" = "Degrad2008_Final_pol.shp",
+    "2009" = "Degrad2009_Final_pol.shp",
+    "2010" = "DEGRAD_2010_UF_pol.shp",
+    "2011" = "DEGRAD_2011_INPE_pol.shp",
+    "2012" = "DEGRAD_2012_INPE_pol.shp",
+    "2013" = "DEGRAD_2013_INPE_pol.shp",
+    "2014" = "DEGRAD_2014_pol.shp",
+    "2015" = "DEGRAD_2015.shp",
+    "2016" = "DEGRAD_2016_pol.shp"
+  )
+
+  file_names <- param$time_period %>%
+    dplyr::recode(!!!file_list)
+
+
   ######################
   ## Downloading Data ##
   ######################
 
-  dat <- suppressWarnings(as.list(param$time_period) %>%
-    purrr::map(
-      function(t) {
+  dat <- base::suppressWarnings(purrr::map2(
+      param$time_period, file_names,
+      function(year, file) {
         external_download(
           dataset = param$dataset,
-          source = "degrad", year = t
+          source = "degrad",
+          year = year,
+          file_name = file
         ) %>%
           janitor::clean_names()
       }

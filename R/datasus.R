@@ -177,7 +177,7 @@ load_datasus <- function(dataset,
         base::message(paste0("Downloading file ", file_name, " (", iteration, " out of ", length(filenames), ")"))
 
         external_download(
-          source = "health",
+          source = "datasus",
           dataset = param$dataset,
           skip_rows = param$skip_rows,
           file_name = file_name

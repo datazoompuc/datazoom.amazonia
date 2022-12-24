@@ -28,7 +28,7 @@ Data from the Amazon Social Progress Index, an initiative from Imazon with suppo
       * `TRUE`: if you want the data as it is originally.
       * `FALSE`: if you want the treated version of the data. 
   
-  3. **time_period**: picks the years for which the data will be downloaded
+  3. **time_period**: can be 2014, 2018, 2021, or a vector with some combination thereof
 
   4. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
   

@@ -33,13 +33,21 @@ load_aneel <- function(dataset, raw_data = FALSE, language = "eng") {
   param$raw_data <- raw_data
   param$language <- language
 
+  skip <- NULL
+
+  if (param$dataset == "energy_generation"){
+    skip <- 1
+    # skips first row of excel sheet for this dataset
+  }
+
   #################
   ## Downloading ##
   #################
 
   dat <- external_download(
     source = "ANEEL",
-    dataset = param$dataset
+    dataset = param$dataset,
+    skip_rows = skip
   )
 
   if (param$raw_data) {
