@@ -4,14 +4,19 @@
 \alias{load_ips}
 \title{IPS - Amazon Social Progress Index}
 \usage{
-load_ips(dataset = "all", raw_data = FALSE, time_period, language = "eng")
+load_ips(
+  dataset = "all",
+  raw_data = FALSE,
+  time_period = c(2014, 2018, 2021),
+  language = "eng"
+)
 }
 \arguments{
 \item{dataset}{A dataset name ("all", "life_quality", "sanit_habit", "violence", "educ", "communic", "mortality", or "deforest")}
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
-\item{time_period}{A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.}
+\item{time_period}{Year to download. Can be 2014, 2018, 2021, or a vector with some combination thereof}
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.}
 }

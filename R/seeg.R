@@ -106,7 +106,6 @@ load_seeg <- function(dataset, raw_data = FALSE,
   sheet <- param$geo_level %>%
     dplyr::recode(!!!sheet_list)
 
-
   ##############
   ## Download ##
   ##############
