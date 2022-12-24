@@ -14,20 +14,19 @@ knitr::opts_chunk$set(
 )
 ```
 
-Loads data from the Energy Research Company (EPE), a Brazilian public company that works closely with the Brazilian Ministry of Mines and Energy (MME) and other agencies to assure the sustainable development of Brazil's energy infrastructure. EPE´s duty on that mission is to support MME with quality research and studies in order to aid Brazil's energy infrastructure planning.
+Loads data from the Energy Research Company (EPE), a Brazilian public company that works closely with the Brazilian Ministry of Mines and Energy (MME) and other agencies to ensure the sustainable development of Brazil's energy infrastructure. EPE's duty on that mission is to support MME with quality research and studies in order to aid Brazil's energy infrastructure planning.
 
-As for now, there are two different datasets available for download: the Energy Consumption Per Class and the National Energy Balance.
-
-Both of them were obtained from the EPE website.
+As for now, there are two different datasets available for download: the Energy Consumption Per Class and the National Energy Balance. Both of them were obtained from the [EPE website](https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/).
 
 #### Energy Consumption Per Class
+
 The Energy Consumption Per Class dataset provides monthly data about energy consumption and consumers from 2004 to 2022, for each class of energy consumption.
 
-The different classes are Total consumption (and consumers), Industrial consumption (and consumers), Residential consumption (and consumers), Commercial consumption (and consumers), Captive consumption* and Other consumption (and consumers).**
+The different classes are Total consumption (and consumers), Industrial consumption (and consumers), Residential consumption (and consumers), Commercial consumption (and consumers), Captive consumption\* and Other consumption (and consumers).\*\*
 
 *Note that there is no consumer data for 'Captive' class at all.
 
-**There is also no consumer data for 'Industrial', 'Commercial' and 'Other' classes when the geographical level is 'Subsystem' or 'Region'.
+\*\*There is also no consumer data for 'Industrial', 'Commercial' and 'Other' classes when the geographical level is 'Subsystem' or 'Region'.
 
 There are three different aggregation levels: 
 The Region level encompasses the five Brazilian geographical regions (North, Northeast, Midwest, Southeast and South).
@@ -63,7 +62,7 @@ The dataset has information at the Brazilian state level, including the Federal 
   
 ***
 
-**Example:**  
+**Examples:**  
   
 ```{r eval=FALSE}
 # download treated data about energy consumption at the state level in english

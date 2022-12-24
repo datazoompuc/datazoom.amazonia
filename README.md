@@ -1374,7 +1374,44 @@ data <- load_sigmine(dataset = 'sigmine_active',
 
 ## ANEEL
 
-… Texto explicando SIGA e a base de geração
+Loads data from the National Electrical Energy Agency (ANEEL), a
+Brazilian independent federal agency linked to the Ministry of Mines and
+Energy (MME). ANEEL works to provide favorable conditions for the
+Electrical Energy Market to develop with balance and for the benefit of
+society.
+
+As for now, there are two different datasets available for download: the
+Energy Development Budget and the Energy Generation.
+
+#### Energy Development Budget
+
+The Energy Development Budget dataset showcases the Energy Development
+Account’s (CDE) anual budget expenses. The CDE is designed to promote
+the Brazilian energy development and is managed by the Electrical Energy
+Commercialization Chamber (CCEE).
+
+The dataset makes available the year of the observation – from 2013 to
+2022 –, the type of expense, its value in R$ (Reais) and its share over
+the total amount of CDE budget expenses on the year\*.
+
+\*Note that ‘share_of_total’ values sum to 1 for each year available.
+
+#### Energy Generation
+
+The Energy Generation dataset showcases information about ANEEL’s
+Generation Informations System (SIGA). SIGA provides information about
+the Brazilian electrical energy generation installed capacity.
+
+The dataset provides information at the individual venture/entity level.
+It contains information about the power, source, stage, type of
+permission, origin and final fuel with which each venture/entity
+operates, as well as other legal, technical and geographical
+information.\* Operation start dates contained in the dataset go as far
+back as 1924 up to 2022.
+
+\* For more details on each variable, access [This
+link](https://app.powerbi.com/view?r=eyJrIjoiNjc4OGYyYjQtYWM2ZC00YjllLWJlYmEtYzdkNTQ1MTc1NjM2IiwidCI6IjQwZDZmOWI4LWVjYTctNDZhMi05MmQ0LWVhNGU5YzAxNzBlMSIsImMiOjR9)
+and select “Manual do Usuario”.
 
 ------------------------------------------------------------------------
 
@@ -1383,7 +1420,7 @@ data <- load_sigmine(dataset = 'sigmine_active',
 1.  **dataset**: there are two choices:
     -   `"energy_development_budget"`: government spending towards
         energy sources
-    -   `"energy_generation"`: energy generation by source
+    -   `"energy_generation"`: energy generation by entity/corporation
 2.  **raw_data**: there are two options:
     -   `TRUE`: if you want the data as it is originally.
     -   `FALSE`: if you want the treated version of the data.
@@ -1395,42 +1432,77 @@ data <- load_sigmine(dataset = 'sigmine_active',
 **Examples:**
 
 ``` r
-# download treated data about energy generation
+# download treated data about energy generation in english
 clean_aneel <- load_aneel(
  dataset = "energy generation",
- raw_data = FALSE
+ raw_data = FALSE,
+ language = "eng"
 )
 ```
 
 ## EPE
 
-Loads data from Energy Research Company (EPE), a brazilian public
-company that works closely with the brazilian Ministry of Mines and
-Energy (MME) and other agencies to assure the sustainable development of
-Brazil’s energy infraestructure. EPE´s duty on that mission is to
-support MME with research in order to aid Brazil’s energy
-infraestructure planning.
+Loads data from the Energy Research Company (EPE), a Brazilian public
+company that works closely with the Brazilian Ministry of Mines and
+Energy (MME) and other agencies to ensure the sustainable development of
+Brazil’s energy infrastructure. EPE’s duty on that mission is to support
+MME with quality research and studies in order to aid Brazil’s energy
+infrastructure planning.
 
-As of now, there are two different datasets available for download.
+As for now, there are two different datasets available for download: the
+Energy Consumption Per Class and the National Energy Balance. Both of
+them were obtained from the [EPE
+website](https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/).
 
-The energy consumption per class dataset provides data about monthly
-energy consumption and consumers from 2004 to 2022, whith three
-different agregattion levels. The Region level encompasses the five
-brazillian geographical regions (North, Northeast, Midwest, Southeast
-and South). The Subsystem level encompasses the five brazillian Electric
-Subsystems (North, Northeast, Southeast, South/Midwest, Isolated
-Systems) The State level encompasses
+#### Energy Consumption Per Class
 
-\[descrição do BEN\]
+The Energy Consumption Per Class dataset provides monthly data about
+energy consumption and consumers from 2004 to 2022, for each class of
+energy consumption.
+
+The different classes are Total consumption (and consumers), Industrial
+consumption (and consumers), Residential consumption (and consumers),
+Commercial consumption (and consumers), Captive consumption\* and Other
+consumption (and consumers).\*\*
+
+\*Note that there is no consumer data for ‘Captive’ class at all.
+
+\*\*There is also no consumer data for ‘Industrial’, ‘Commercial’ and
+‘Other’ classes when the geographical level is ‘Subsystem’ or ‘Region’.
+
+There are three different aggregation levels: The Region level
+encompasses the five Brazilian geographical regions (North, Northeast,
+Midwest, Southeast and South). The Subsystem level encompasses the five
+Brazilian Electric Subsystems (North, Northeast, Southeast/Midwest,
+South, Isolated Systems). The State level encompasses the 26 Brazilian
+States and the Federal District.
+
+#### National Energy Balance
+
+The National Energy Balance is a thorough and extensive research
+developed and published by EPE that contains useful data about energy
+consumption, generation, exportation and many more subjects.
+
+As for now, the National Energy Balance dataset provides yearly data
+about energy generation per source of production. The sources can be
+divided into two groups: the renewable sources (hydro, wind, solar,
+nuclear, thermal, sugar_cane_bagasse, firewood, black_liquor) and the
+non-renewable sources (steam_coal, natural_gas, coke_oven_gas, fuel_oil,
+diesel).
+
+The dataset has information at the Brazilian state level, including the
+Federal District, from 2011 to 2021 and also indicates whether the state
+is in the Legal Amazon or not.
 
 ------------------------------------------------------------------------
 
 **Options:**
 
 1.  **dataset**: there are two choices:
-    -   `"energy_consumption_per_class"`: energy consumption and
-        consumers by State or Subsystem
-    -   `"national_energy_balance"`:
+    -   `"energy_consumption_per_class"`: monthly energy consumption and
+        consumers by State, Region or Electric Subsystem
+    -   `"national_energy_balance"`: yearly energy generation per
+        source, by State
 2.  **raw_data**: there are two options:
     -   `TRUE`: if you want the data as it is originally.
     -   `FALSE`: if you want the treated version of the data.
@@ -1446,11 +1518,12 @@ Systems) The State level encompasses
 **Examples:**
 
 ``` r
-# download treated data about energy consumption at the state level
+# download treated data about energy consumption at the state level in english
 clean_epe <- load_epe(
   dataset = "energy_consumption_per_class",
   geo_level = "state",
-  raw_data = FALSE
+  raw_data = FALSE,
+  language = "eng"
 )
 ```
 
