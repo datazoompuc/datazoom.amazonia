@@ -4,13 +4,25 @@
     <loc>/404.html</loc>
   </url>
   <url>
+    <loc>/articles/ANEEL.html</loc>
+  </url>
+  <url>
+    <loc>/articles/BACI.html</loc>
+  </url>
+  <url>
     <loc>/articles/CEMPRE.html</loc>
   </url>
   <url>
     <loc>/articles/Census.html</loc>
   </url>
   <url>
+    <loc>/articles/CIPO.html</loc>
+  </url>
+  <url>
     <loc>/articles/COMEX.html</loc>
+  </url>
+  <url>
+    <loc>/articles/DATASUS.html</loc>
   </url>
   <url>
     <loc>/articles/DEGRAD.html</loc>
@@ -22,10 +34,25 @@
     <loc>/articles/dz_amazonia_guide.html</loc>
   </url>
   <url>
+    <loc>/articles/EPE.html</loc>
+  </url>
+  <url>
+    <loc>/articles/function_structure.html</loc>
+  </url>
+  <url>
     <loc>/articles/GDP.html</loc>
   </url>
   <url>
+    <loc>/articles/GOOGLEDRIVE.html</loc>
+  </url>
+  <url>
     <loc>/articles/IBAMA.html</loc>
+  </url>
+  <url>
+    <loc>/articles/IEMA.html</loc>
+  </url>
+  <url>
+    <loc>/articles/IMAZON.html</loc>
   </url>
   <url>
     <loc>/articles/index.html</loc>
@@ -35,6 +62,9 @@
   </url>
   <url>
     <loc>/articles/MAPBIOMAS.html</loc>
+  </url>
+  <url>
+    <loc>/articles/municipalities.html</loc>
   </url>
   <url>
     <loc>/articles/PAM.html</loc>
@@ -58,6 +88,9 @@
     <loc>/articles/SIGMINE.html</loc>
   </url>
   <url>
+    <loc>/articles/TERRACLIMATE.html</loc>
+  </url>
+  <url>
     <loc>/authors.html</loc>
   </url>
   <url>
@@ -73,6 +106,9 @@
     <loc>/news/index.html</loc>
   </url>
   <url>
+    <loc>/reference/dbc2dbf.html</loc>
+  </url>
+  <url>
     <loc>/reference/index.html</loc>
   </url>
   <url>
@@ -85,13 +121,28 @@
     <loc>/reference/load_amazon_income.html</loc>
   </url>
   <url>
+    <loc>/reference/load_aneel.html</loc>
+  </url>
+  <url>
+    <loc>/reference/load_baci.html</loc>
+  </url>
+  <url>
     <loc>/reference/load_br_trade.html</loc>
   </url>
   <url>
     <loc>/reference/load_cempre.html</loc>
   </url>
   <url>
+    <loc>/reference/load_cipo.html</loc>
+  </url>
+  <url>
+    <loc>/reference/load_climate.html</loc>
+  </url>
+  <url>
     <loc>/reference/load_comex.html</loc>
+  </url>
+  <url>
+    <loc>/reference/load_datasus.html</loc>
   </url>
   <url>
     <loc>/reference/load_degrad.html</loc>
@@ -109,16 +160,28 @@
     <loc>/reference/load_employment.html</loc>
   </url>
   <url>
+    <loc>/reference/load_epe.html</loc>
+  </url>
+  <url>
     <loc>/reference/load_gdp.html</loc>
   </url>
   <url>
     <loc>/reference/load_ibama.html</loc>
   </url>
   <url>
+    <loc>/reference/load_iema.html</loc>
+  </url>
+  <url>
+    <loc>/reference/load_imazon.html</loc>
+  </url>
+  <url>
     <loc>/reference/load_income.html</loc>
   </url>
   <url>
     <loc>/reference/load_IPS.html</loc>
+  </url>
+  <url>
+    <loc>/reference/load_mapbiomas.html</loc>
   </url>
   <url>
     <loc>/reference/load_mapbiomas_covering.html</loc>
@@ -167,5 +230,11 @@
   </url>
   <url>
     <loc>/reference/load_sigmine.html</loc>
+  </url>
+  <url>
+    <loc>/reference/municipalities.html</loc>
+  </url>
+  <url>
+    <loc>/reference/read.dbc.html</loc>
   </url>
 </urlset>
