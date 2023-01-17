@@ -19,7 +19,7 @@ Authors@R: c(
 Description: Functions to download and treat data regarding the Brazilian
     Amazon region from a variety of official sources.
 License: MIT + file LICENSE
-URL: http://www.econ.puc-rio.br/datazoom/
+URL: https://www.econ.puc-rio.br/datazoom/
 Depends: 
     R (>= 4.0)
 Imports:

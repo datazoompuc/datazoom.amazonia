@@ -1575,4 +1575,4 @@ package page.
 
 DataZoom is developed by a team at Pontifícia Universidade Católica do
 Rio de Janeiro (PUC-Rio), Department of Economics. Our official website
-is at: <http://www.econ.puc-rio.br/datazoom/>.
+is at: <https://www.econ.puc-rio.br/datazoom/>.
