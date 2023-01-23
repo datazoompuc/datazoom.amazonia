@@ -1,6 +1,6 @@
 # New submission
 
-Since our previous submission, we have added many new functions and changed the way most pre-existing functions work.
+Since our previous submission, we have added many new functions and changed the way most pre-existing functions work. We have change http to https.
 
 ## Test environments
 - R-hub windows-x86_64-devel (r-devel)
