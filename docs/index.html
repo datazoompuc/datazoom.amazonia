@@ -88,7 +88,7 @@
       <a href="articles/function_structure.html">STRUCTURE</a>
     </li>
     <li>
-      <a href="articles/GOOGLEDRIVE.html">googledrive</a>
+      <a href="articles/GOOGLEDRIVE.html">GOOGLEDRIVE</a>
     </li>
     <li>
       <a href="articles/IBAMA.html">IBAMA</a>
@@ -478,7 +478,7 @@
 <hr>
 <p><strong>Examples:</strong></p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.econ.puc-rio.br/datazoom/" class="external-link">datazoom.amazonia</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.econ.puc-rio.br/datazoom/" class="external-link">datazoom.amazonia</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Download treated embargoes data (raw_data = FALSE) in english (language = "eng")</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_ibama.html">load_ibama</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"areas_embargadas"</span>, raw_data <span class="op">=</span> <span class="cn">FALSE</span>, </span>
@@ -879,7 +879,7 @@
 <p>Below is an example of downloading the raw data, and also using the <code>raw_data = FALSE</code> option to obtain treated data. When this option is selected, we create several variables for deaths from each cause, which are encoded by their CID-10 codes. The function then returns, by default, the aggregated data of mortality sources at the municipality level. In this process, all the individual information such as age, sex, race, and schooling are lost, so we also offer the option of <code>keep_all = TRUE</code>, which creates all the indicator variables for cause of death, adds variable labels, and does not aggregate, thereby keeping all individual-level variables.</p>
 <p><strong>Examples:</strong></p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.econ.puc-rio.br/datazoom/" class="external-link">datazoom.amazonia</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.econ.puc-rio.br/datazoom/" class="external-link">datazoom.amazonia</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># download raw data for the year 2010 in the state of AM. </span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_datasus.html">load_datasus</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"datasus_sim_do"</span>,</span>
@@ -908,7 +908,7 @@
 <p>Raw data is avaliable for all of them using the dataset option <code>datasus_cnes_lt, datasus_cnes_st</code>, and so on, and treated data is only avaliable for CNES - LT. When <code>raw_data = FALSE</code> is chosen, we return data on the number of total hospital beds and the ones avaliable through SUS, which can be aggregated by municipality (with option <code>keep_all = FALSE</code>) or keeping all original variables (<code>keep_all = TRUE</code>).</p>
 <p><strong>Examples:</strong></p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.econ.puc-rio.br/datazoom/" class="external-link">datazoom.amazonia</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.econ.puc-rio.br/datazoom/" class="external-link">datazoom.amazonia</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># download treated data with the number of avaliable beds in AM and PA.</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_datasus.html">load_datasus</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"datasus_cnes_lt"</span>,</span>
@@ -922,7 +922,7 @@
 <p>Contains data on hospitalizations. Treated data only gains variable labels, with no extra manipulation. Beware that this is a much heavier dataset.</p>
 <p><strong>Examples:</strong></p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.econ.puc-rio.br/datazoom/" class="external-link">datazoom.amazonia</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.econ.puc-rio.br/datazoom/" class="external-link">datazoom.amazonia</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># download raw data</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_datasus.html">load_datasus</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"datasus_sih"</span>,</span>
@@ -1847,7 +1847,7 @@
 <div class="section level2">
 <h2 id="credits">Credits<a class="anchor" aria-label="anchor" href="#credits"></a>
 </h2>
-<p>DataZoom is developed by a team at Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio), Department of Economics. Our official website is at: <a href="http://www.econ.puc-rio.br/datazoom/" class="external-link uri">http://www.econ.puc-rio.br/datazoom/</a>.</p>
+<p>DataZoom is developed by a team at Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio), Department of Economics. Our official website is at: <a href="https://www.econ.puc-rio.br/datazoom/" class="external-link uri">https://www.econ.puc-rio.br/datazoom/</a>.</p>
 </div>
 </div>
 
