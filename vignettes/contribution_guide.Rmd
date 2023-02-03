@@ -239,6 +239,10 @@ datasets_link <- function() {
 
 Then, instead of having to write `url <- "https://www..."` in your code, `external_download` just grabs it from `datasets_link()` and stores it into `dat_url`.
 
+The other columns are also important. The first one shows the source of the data you are including in the package. The second one is the name of the dataset, which will be used in the **load_*****database*** function in case you have more than one dataset for this source. The column `sidra_code` is used only for datasets that come from IBGE and it corresponds to the ID of the dataset provided by [SIDRA-IBGE](https://sidra.ibge.gov.br/). 
+
+Finally, the columns `available_time` and `available_geo` tell the user which years (2020, 2003-2020, 2010 & 2018, ...) and aggregations (Country, State, Municipality, ...) are available for that particular dataset.
+
 The next section of `external_download` is
 
 ```{r, eval = FALSE}
