@@ -894,7 +894,7 @@ datasets_link <- function() {
 
     ## Municipal GDP ##
 
-    "PIB_MUNIC-IBGE", "pibmunic", "5938", "2002-2018", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pib-munic/tabelas",
+    "PIB_MUNIC-IBGE", "pibmunic", "5938", "2002-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pib-munic/tabelas",
 
     ## Labor Market Info ##
 
