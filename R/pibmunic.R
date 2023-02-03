@@ -15,7 +15,7 @@
 #' data <- load_pibmunic(
 #'   raw_data = FALSE,
 #'   geo_level = "state",
-#'   time_period = 2010:2010
+#'   time_period = 2010:2012
 #' )
 #' }
 load_pibmunic <- function(dataset = "pibmunic", raw_data = FALSE,
