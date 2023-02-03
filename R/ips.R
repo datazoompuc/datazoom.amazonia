@@ -97,7 +97,12 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
   )
 
   sheets <- param$time_period %>%
-    dplyr::recode(!!!sheet_list)
+    {purrr::quietly(dplyr::recode)}(!!!sheet_list) %>%
+    purrr::pluck("result")
+
+  if(any(is.na(sheets))) {
+    stop("Some of the years you request aren't available. Check documentation for time availability.")
+  }
 
   ##############
   ## Download ##
