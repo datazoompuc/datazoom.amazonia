@@ -46,7 +46,8 @@ Suggests:
     knitr,
     RCurl,
     rmarkdown,
-    terra
+    terra,
+    DiagrammeR
 LinkingTo: 
     Rcpp
 VignetteBuilder: 

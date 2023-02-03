@@ -20,13 +20,33 @@ knitr::opts_chunk$set(
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-The point of this document is to present the structure of the `datazoom.amazonia` functions, and share our workflow of how to create new functions.
+## Contributing to datazoom.amazonia
 
-We will add as many examples as possible to show how things actually work, and this document should be continuously improved upon, adding new sections as our functions are changed.
+Please follow this workflow when contributing to `datazoom.amazonia`:  
+1. Fork the repository under your own user  
+2. Clone the repository locally  
+3. Create a new branch for your changes  
+4. Add your changes to the branch  
+5. Commit your changes  
+6. Push your branch to the remote repository  
+7. Create a pull request on GitHub  
+
+
+## Working on existing issues
+
+If you intend to work on an issue, leave a comment and state your intentions.
+Also feel free to ask for clarifications if you're not sure what the issue
+entails. If you don't understand an issue, it's on us, not on you!
 
 ## General structure of our functions
 
-The starting point to a `datazoom.amazonia` function is some interesting database to explore. The function you then create should allow the user to, [at the touch of a button](https://www.youtube.com/watch?v=aEN4__UhghU), have the data automatically downloaded, cleaned, and provided in the format they desire. The diagram below (created with some [cool R code](https://bookdown.org/yihui/rmarkdown-cookbook/diagrams.html)) summarises the process of creating a new function.
+The point of the sections below is to present the structure of the `datazoom.amazonia` functions, and share our workflow of how to create new functions.
+
+We will add as many examples as possible to show how things actually work, and this document should be continuously improved upon, adding new sections as our functions are changed.
+
+## A new function
+
+The starting point to a `datazoom.amazonia` function is some interesting database to explore. The function you then create should allow the user to, at the touch of a button, have the data automatically downloaded, cleaned, and provided in the format they desire. The diagram below summarises the process of creating a new function.
 
 ```{r, echo = FALSE}
 DiagrammeR::grViz("digraph {
@@ -335,7 +355,7 @@ Add it to your function instead of that more manual download and make the whole 
 
 ### The function template
 
-Pretty much all of our functions follow the format below. Do not underestimate the utility of `#` comments and the big section separators such as for `## Bind Global Variables`. They make code lot clearer. Add as many comments as possible, try to always explain what you're doing!
+Pretty much all of our functions follow the format below. Do not underestimate the utility of `#` comments and the big section separators such as for `## Bind Global Variables`. They make code a lot clearer. Add as many comments as possible, try to always explain what you're doing!
 
 ```{r, eval = FALSE}
 #' @title Database - some explanation
@@ -343,7 +363,7 @@ Pretty much all of our functions follow the format below. Do not underestimate t
 #' ...
 #'
 #' This is the Roxygen skeleton, which is generated automatically,
-#' and one you fill it up with info, it created the function help file
+#' and once you fill it up with info, it creates the function help file
 load_database <- function(dataset = "default_dataset",
                           raw_data = FALSE,
                           time_period, # no default year, user must choose
