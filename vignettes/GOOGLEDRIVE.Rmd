@@ -1,0 +1,34 @@
+---
+title: "GOOGLEDRIVE"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{GOOGLEDRIVE}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+For some of our functions, the original data is stored in Google Drive and exceeds the file size limit for which direct downloads are possible. As a result, the `googledrive` package is required to download the data though the Google Drive API and run the function.
+
+The first time the package is called, it requires you to link your Google account and grant permissions to be able to download data through the Google Drive API.
+
+You **must** tick all boxes when the permissions page opens, or else the following error will occur:
+
+```{r}
+#Error in `gargle_abort_request_failed()`:
+#! Client error: (403) Forbidden
+#Insufficient Permission: Request had insufficient authentication scopes.
+#• domain: global
+#• reason: insufficientPermissions
+#• message: Insufficient Permission: Request had insufficient authentication
+#  scopes.
+#Run `rlang::last_error()` to see where the error occurred.
+```
+
+For further information, click [here](https://googledrive.tidyverse.org/) to access the official package page.

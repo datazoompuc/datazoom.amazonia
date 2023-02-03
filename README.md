@@ -8,13 +8,21 @@
 <!-- badges: start -->
 
 [![CRAN
-version](https://www.r-pkg.org/badges/version/datazoom.amazonia?color=orange)](https://cran.r-project.org/package=datazoom.amazonia)
+version](https://www.r-pkg.org/badges/version/datazoom.amazonia?color=orange)](https://cran.r-project.org/package=datazoom.amazonia?style=flat)
 [![R build
-status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions)
+status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions?style=flat)
 [![CRAN
-downloads](https://cranlogs.r-pkg.org/badges/grand-total/datazoom.amazonia?color=blue)](https://cran.r-project.org/package=datazoom.amazonia)
+downloads](https://cranlogs.r-pkg.org/badges/grand-total/datazoom.amazonia?color=blue)](https://cran.r-project.org/package=datazoom.amazonia?style=flat)
 [![CRAN
-downloads](https://cranlogs.r-pkg.org/badges/datazoom.amazonia?color=lightgrey)](https://cran.r-project.org/package=datazoom.amazonia)
+downloads](https://cranlogs.r-pkg.org/badges/datazoom.amazonia?color=lightgrey)](https://cran.r-project.org/package=datazoom.amazonia?style=flat)
+![Languages](https://img.shields.io/github/languages/count/datazoompuc/datazoom.amazonia?style=flat)
+![Commits](https://img.shields.io/github/commit-activity/y/datazoompuc/datazoom.amazonia?style=flat)
+![Open
+Issues](https://img.shields.io/github/issues-raw/datazoompuc/datazoom.amazonia?style=flat)
+![Closed
+Issues](https://img.shields.io/github/issues-closed-raw/datazoompuc/datazoom.amazonia?style=flat)
+![Files](https://img.shields.io/github/directory-file-count/datazoompuc/datazoom.amazonia?style=flat)
+![Followers](https://img.shields.io/github/followers/datazoompuc?style=flat)
 <!-- badges: end -->
 
 The datazoom.amazonia package facilitates access to official Brazilian
@@ -93,19 +101,34 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 | **[BACI](#baci)**           | *Global international trade*    |
 | **[PIB-Munic](#pib-munic)** | *Municipal GDP*                 |
 | **[CEMPRE](#cempre)**       | *Central register of companies* |
+| **[PAM](#pam)**             | *Agricultural production*       |
 
 </td>
 <td>
 
 |                         |                           |
 |-------------------------|---------------------------|
-| **[PAM](#pam)**         | *Agricultural production* |
 | **[PEVS](#pevs)**       | *Forestry and extraction* |
 | **[PPM](#ppm)**         | *Livestock farming*       |
 | **[SIGMINE](#sigmine)** | *Mining*                  |
+| **[ANEEL](#aneel)**     | *Energy development*      |
+| **[EPE](#epe)**         | *Energy consumption*      |
 
 </td>
 </tr>
+</table>
+
+**[4 - Other tools](#other-tools)**
+
+<table>
+<tr>
+<td>
+
+|                                                                 |                                                                             |
+|-----------------------------------------------------------------|-----------------------------------------------------------------------------|
+| **[Legal Amazon Municipalities](#legal-amazon-municipalities)** | *Dataset with brazilian cities and whether they belong to the Legal Amazon* |
+| **[The ‘googledrive’ package](#googledrive)**                   | *Troubleshooting and information for downloads from Google Drive*           |
+
 </table>
 
 # Environmental Data
@@ -278,6 +301,9 @@ ranging from 0 to 3.
 data <- load_imazon(raw_data = FALSE)
 ```
 
+🔴 This function uses the `googledrive` package to download data. In
+case of authentication errors, see [googledrive](#googledrive).
+
 ## IBAMA
 
 The dataset is originally from the Brazilian Institute of Environment
@@ -411,6 +437,11 @@ data <- load_mapbiomas("mapbiomas_mining",
                        raw_data = FALSE,
                        geo_level = "indigenous_land")
 ```
+
+🔴 This function uses the `googledrive` package to download data for
+datasets `"mapbiomas_cover"` and `"mapbiomas_transition"` at the
+municipality level. In case of authentication errors, see
+[googledrive](#googledrive).
 
 ## TerraClimate
 
@@ -546,6 +577,10 @@ data <- load_seeg(dataset = "seeg_industry",
                   raw_data = FALSE,
                   geo_level = "state")
 ```
+
+🔴 This function uses the `googledrive` package to download data at the
+municipality level. In case of authentication errors, see
+[googledrive](#googledrive).
 
 ## CIPÓ
 
@@ -814,6 +849,9 @@ throughout the Amazon region in the year 2018.
 # Download treated data
 data <- load_iema(raw_data = FALSE)
 ```
+
+🔴 This function uses the `googledrive` package to download data. In
+case of authentication errors, see [googledrive](#googledrive).
 
 # Economic Data
 
@@ -1334,6 +1372,161 @@ data <- load_sigmine(dataset = 'sigmine_active',
                      language = "pt")
 ```
 
+## ANEEL
+
+Loads data from the National Electrical Energy Agency (ANEEL), a
+Brazilian independent federal agency linked to the Ministry of Mines and
+Energy (MME). ANEEL works to provide favorable conditions for the
+Electrical Energy Market to develop with balance and for the benefit of
+society.
+
+As for now, there are two different datasets available for download: the
+Energy Development Budget and the Energy Generation.
+
+#### Energy Development Budget
+
+The Energy Development Budget dataset showcases the Energy Development
+Account’s (CDE) anual budget expenses. The CDE is designed to promote
+the Brazilian energy development and is managed by the Electrical Energy
+Commercialization Chamber (CCEE).
+
+The dataset makes available the year of the observation – from 2013 to
+2022 –, the type of expense, its value in R$ (Reais) and its share over
+the total amount of CDE budget expenses on the year\*.
+
+\*Note that ‘share_of_total’ values sum to 1 for each year available.
+
+#### Energy Generation
+
+The Energy Generation dataset showcases information about ANEEL’s
+Generation Informations System (SIGA). SIGA provides information about
+the Brazilian electrical energy generation installed capacity.
+
+The dataset provides information at the individual venture/entity level.
+It contains information about the power, source, stage, type of
+permission, origin and final fuel with which each venture/entity
+operates, as well as other legal, technical and geographical
+information.\* Operation start dates contained in the dataset go as far
+back as 1924 up to 2022.
+
+\* For more details on each variable, access [This
+link](https://app.powerbi.com/view?r=eyJrIjoiNjc4OGYyYjQtYWM2ZC00YjllLWJlYmEtYzdkNTQ1MTc1NjM2IiwidCI6IjQwZDZmOWI4LWVjYTctNDZhMi05MmQ0LWVhNGU5YzAxNzBlMSIsImMiOjR9)
+and select “Manual do Usuario”.
+
+------------------------------------------------------------------------
+
+**Options:**
+
+1.  **dataset**: there are two choices:
+    -   `"energy_development_budget"`: government spending towards
+        energy sources
+    -   `"energy_generation"`: energy generation by entity/corporation
+2.  **raw_data**: there are two options:
+    -   `TRUE`: if you want the data as it is originally.
+    -   `FALSE`: if you want the treated version of the data.
+3.  **language**: you can choose between Portuguese `("pt")` and English
+    `("eng")`
+
+------------------------------------------------------------------------
+
+**Examples:**
+
+``` r
+# download treated data about energy generation
+clean_aneel <- load_aneel(
+ dataset = "energy generation",
+ raw_data = FALSE
+)
+```
+
+## EPE
+
+Loads data from the Energy Research Company (EPE), a Brazilian public
+company that works closely with the Brazilian Ministry of Mines and
+Energy (MME) and other agencies to ensure the sustainable development of
+Brazil’s energy infrastructure. EPE’s duty on that mission is to support
+MME with quality research and studies in order to aid Brazil’s energy
+infrastructure planning.
+
+As for now, there are two different datasets available for download: the
+Energy Consumption Per Class and the National Energy Balance. Both of
+them were obtained from the [EPE
+website](https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/).
+
+#### Energy Consumption Per Class
+
+The Energy Consumption Per Class dataset provides monthly data about
+energy consumption and consumers from 2004 to 2022, for each class of
+energy consumption.
+
+The different classes are Total consumption (and consumers), Industrial
+consumption (and consumers), Residential consumption (and consumers),
+Commercial consumption (and consumers), Captive consumption\* and Other
+consumption (and consumers).\*\*
+
+\*Note that there is no consumer data for ‘Captive’ class at all.
+
+\*\*There is also no consumer data for ‘Industrial’, ‘Commercial’ and
+‘Other’ classes when the geographical level is ‘Subsystem’ or ‘Region’.
+
+There are three different aggregation levels: The Region level
+encompasses the five Brazilian geographical regions (North, Northeast,
+Midwest, Southeast and South). The Subsystem level encompasses the five
+Brazilian Electric Subsystems (North, Northeast, Southeast/Midwest,
+South, Isolated Systems). The State level encompasses the 26 Brazilian
+States and the Federal District.
+
+#### National Energy Balance
+
+The National Energy Balance is a thorough and extensive research
+developed and published by EPE that contains useful data about energy
+consumption, generation, exportation and many more subjects.
+
+As for now, the National Energy Balance dataset provides yearly data
+about energy generation per source of production. The sources can be
+divided into two groups: the renewable sources (hydro, wind, solar,
+nuclear, thermal, sugar_cane_bagasse, firewood, black_liquor) and the
+non-renewable sources (steam_coal, natural_gas, coke_oven_gas, fuel_oil,
+diesel).
+
+The dataset has information at the Brazilian state level, including the
+Federal District, from 2011 to 2021 and also indicates whether the state
+is in the Legal Amazon or not.
+
+------------------------------------------------------------------------
+
+**Options:**
+
+1.  **dataset**: there are two choices:
+    -   `"energy_consumption_per_class"`: monthly energy consumption and
+        consumers by State, Region or Electric Subsystem
+    -   `"national_energy_balance"`: yearly energy generation per
+        source, by State
+2.  **raw_data**: there are two options:
+    -   `TRUE`: if you want the data as it is originally.
+    -   `FALSE`: if you want the treated version of the data.
+3.  **geo_level**: only applies to the `"energy_consumption_per_class"`
+    dataset.
+    -   `"state"`
+    -   `"subsystem"`
+4.  **language**: you can choose between Portuguese `("pt")` and English
+    `("eng")`
+
+------------------------------------------------------------------------
+
+**Examples:**
+
+``` r
+# download treated data about energy consumption at the state level
+clean_epe <- load_epe(
+  dataset = "energy_consumption_per_class",
+  geo_level = "state",
+  raw_data = FALSE
+)
+```
+
+# Other tools
+
 ## Legal Amazon Municipalities
 
 Many of our functions use a dataset with Brazilian municipalities, their
@@ -1349,8 +1542,37 @@ with Legal Amazon municipalities, along with a data frame from the
 data <- datazoom.amazonia::municipalities
 ```
 
+## <a name="googledrive"></a> The ‘googledrive’ package
+
+For some of our functions, the original data is stored in Google Drive
+and exceeds the file size limit for which direct downloads are possible.
+As a result, the `googledrive` package is required to download the data
+though the Google Drive API and run the function.
+
+The first time the package is called, it requires you to link your
+Google account and grant permissions to be able to download data through
+the Google Drive API.
+
+You **must** tick all boxes when the permissions page opens, or else the
+following error will occur:
+
+``` r
+#Error in `gargle_abort_request_failed()`:
+#! Client error: (403) Forbidden
+#Insufficient Permission: Request had insufficient authentication scopes.
+#• domain: global
+#• reason: insufficientPermissions
+#• message: Insufficient Permission: Request had insufficient authentication
+#  scopes.
+#Run `rlang::last_error()` to see where the error occurred.
+```
+
+For further information, click
+[here](https://googledrive.tidyverse.org/) to access the official
+package page.
+
 ## Credits
 
 DataZoom is developed by a team at Pontifícia Universidade Católica do
 Rio de Janeiro (PUC-Rio), Department of Economics. Our official website
-is at: <http://www.econ.puc-rio.br/datazoom/>.
+is at: <https://www.econ.puc-rio.br/datazoom/>.

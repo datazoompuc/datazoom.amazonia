@@ -1,0 +1,60 @@
+---
+title: "ANEEL"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ANEEL}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Loads data from the National Electrical Energy Agency (ANEEL), a Brazilian independent federal agency linked to the Ministry of Mines and Energy (MME). ANEEL works to provide favorable conditions for the Electrical Energy Market to develop with balance and for the benefit of society.
+
+As for now, there are two different datasets available for download: the Energy Development Budget and the Energy Generation.
+
+#### Energy Development Budget
+
+The Energy Development Budget dataset showcases the Energy Development Account's (CDE) anual budget expenses. The CDE is designed to promote the Brazilian energy development and is managed by the Electrical Energy Commercialization Chamber (CCEE).
+
+The dataset makes available the year of the observation -- from 2013 to 2022 --, the type of expense, its value in R$ (Reais) and its share over the total amount of CDE budget expenses on the year\*.
+
+\*Note that 'share_of_total' values sum to 1 for each year available.
+
+#### Energy Generation
+The Energy Generation dataset showcases information about ANEEL's Generation Informations System (SIGA). SIGA provides information about the Brazilian electrical energy generation installed capacity.
+
+The dataset provides information at the individual venture/entity level. It contains information about the power, source, stage, type of permission, origin and final fuel with which each venture/entity operates, as well as other legal, technical and geographical information.* Operation start dates contained in the dataset go as far back as 1924 up to 2022.
+
+\* For more details on each variable, access [This link](https://app.powerbi.com/view?r=eyJrIjoiNjc4OGYyYjQtYWM2ZC00YjllLWJlYmEtYzdkNTQ1MTc1NjM2IiwidCI6IjQwZDZmOWI4LWVjYTctNDZhMi05MmQ0LWVhNGU5YzAxNzBlMSIsImMiOjR9) and select "Manual do Usuario".
+
+
+***
+**Options:**
+
+  1. **dataset**: there are two choices:
+      * `"energy_development_budget"`: government spending towards energy sources
+      * `"energy_generation"`: energy generation by entity/corporation
+
+  2. **raw_data**: there are two options:
+      * `TRUE`: if you want the data as it is originally.
+      * `FALSE`: if you want the treated version of the data. 
+
+  3. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
+  
+***
+
+**Examples:**  
+  
+```{r eval=FALSE}
+# download treated data about energy generation
+clean_aneel <- load_aneel(
+ dataset = "energy generation",
+ raw_data = FALSE
+)
+```

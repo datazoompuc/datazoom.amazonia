@@ -18,10 +18,16 @@ knitr::opts_chunk$set(
 # datazoom.amazonia
 
 <!-- badges: start -->
-[![CRAN version](https://www.r-pkg.org/badges/version/datazoom.amazonia?color=orange)](https://cran.r-project.org/package=datazoom.amazonia)
-[![R build status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions) 
-[![CRAN downloads](https://cranlogs.r-pkg.org/badges/grand-total/datazoom.amazonia?color=blue)](https://cran.r-project.org/package=datazoom.amazonia)
-[![CRAN downloads](https://cranlogs.r-pkg.org/badges/datazoom.amazonia?color=lightgrey)](https://cran.r-project.org/package=datazoom.amazonia)
+[![CRAN version](https://www.r-pkg.org/badges/version/datazoom.amazonia?color=orange)](https://cran.r-project.org/package=datazoom.amazonia?style=flat)
+[![R build status](https://github.com/datazoompuc/datazoom.amazonia/workflows/R-CMD-check/badge.svg)](https://github.com/datazoompuc/datazoom.amazonia/actions?style=flat) 
+[![CRAN downloads](https://cranlogs.r-pkg.org/badges/grand-total/datazoom.amazonia?color=blue)](https://cran.r-project.org/package=datazoom.amazonia?style=flat)
+[![CRAN downloads](https://cranlogs.r-pkg.org/badges/datazoom.amazonia?color=lightgrey)](https://cran.r-project.org/package=datazoom.amazonia?style=flat)
+![Languages](https://img.shields.io/github/languages/count/datazoompuc/datazoom.amazonia?style=flat)
+![Commits](https://img.shields.io/github/commit-activity/y/datazoompuc/datazoom.amazonia?style=flat)
+![Open Issues](https://img.shields.io/github/issues-raw/datazoompuc/datazoom.amazonia?style=flat)
+![Closed Issues](https://img.shields.io/github/issues-closed-raw/datazoompuc/datazoom.amazonia?style=flat)
+![Files](https://img.shields.io/github/directory-file-count/datazoompuc/datazoom.amazonia?style=flat)
+![Followers](https://img.shields.io/github/followers/datazoompuc?style=flat)
 <!-- badges: end -->
 
 The datazoom.amazonia package facilitates access to official Brazilian Amazon data, including agriculture, deforestation, production. The package provides functions that download and pre-process selected datasets.
@@ -98,17 +104,32 @@ devtools::load_all()
 | **[BACI](#baci)** | _Global international trade_ |
 | **[PIB-Munic](#pib-munic)** | _Municipal GDP_ |
 | **[CEMPRE](#cempre)** | _Central register of companies_ |
+| **[PAM](#pam)** | _Agricultural production_ |
 
 </td><td>
 
 |||
 |---|---|
-| **[PAM](#pam)** | _Agricultural production_ |
 | **[PEVS](#pevs)** | _Forestry and extraction_ |
 | **[PPM](#ppm)** | _Livestock farming_ |
 | **[SIGMINE](#sigmine)** | _Mining_ |
+| **[ANEEL](#aneel)** | _Energy development_ |
+| **[EPE](#epe)** | _Energy consumption_ |
 
 </td></tr> </table>
+
+**[4 - Other tools](#other-tools)**
+
+<table>
+
+<tr><td>
+
+|||
+|---|---|
+| **[Legal Amazon Municipalities](#legal-amazon-municipalities)** | _Dataset with brazilian cities and whether they belong to the Legal Amazon_ |
+| **[The 'googledrive' package](#googledrive)** | _Troubleshooting and information for downloads from Google Drive_ |
+
+</table>
 
 # Environmental Data
 
@@ -132,6 +153,8 @@ devtools::load_all()
 ```{r child = "vignettes/IMAZON.Rmd"}
 ```
 
+&#x1F534; This function uses the `googledrive` package to download data. In case of authentication errors, see [googledrive](#googledrive).
+
 ## IBAMA
 
 ```{r child = "vignettes/IBAMA.Rmd"}
@@ -140,6 +163,13 @@ devtools::load_all()
 ## MAPBIOMAS
 
 ```{r child = "vignettes/MAPBIOMAS.Rmd"}
+```
+
+&#x1F534; This function uses the `googledrive` package to download data for datasets `"mapbiomas_cover"` and `"mapbiomas_transition"` at the municipality level. In case of authentication errors, see [googledrive](#googledrive).
+
+## CIPO
+
+```{r child = "vignettes/CIPO.Rmd"}
 ```
 
 ## TerraClimate
@@ -151,6 +181,8 @@ devtools::load_all()
 
 ```{r child = "vignettes/SEEG.Rmd"}
 ```
+
+&#x1F534; This function uses the `googledrive` package to download data at the municipality level. In case of authentication errors, see [googledrive](#googledrive).
 
 ## CIPÓ
 
@@ -173,6 +205,8 @@ devtools::load_all()
 
 ```{r child = "vignettes/IEMA.Rmd"}
 ```
+
+&#x1F534; This function uses the `googledrive` package to download data. In case of authentication errors, see [googledrive](#googledrive).
 
 # Economic Data
 
@@ -216,12 +250,29 @@ devtools::load_all()
 ```{r child = "vignettes/SIGMINE.Rmd"}
 ```
 
+## ANEEL
+
+```{r child = "vignettes/ANEEL.Rmd"}
+```
+
+## EPE
+
+```{r child = "vignettes/EPE.Rmd"}
+```
+
+# Other tools
+
 ## Legal Amazon Municipalities
 
 ```{r child = "vignettes/municipalities.Rmd"}
 ```
 
+## <a name="googledrive"></a> The 'googledrive' package
+
+```{r child = "vignettes/GOOGLEDRIVE.Rmd"}
+```
+
 ## Credits
 
-DataZoom is developed by a team at Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio), Department of Economics. Our official website is at: <http://www.econ.puc-rio.br/datazoom/>.
+DataZoom is developed by a team at Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio), Department of Economics. Our official website is at: <https://www.econ.puc-rio.br/datazoom/>.
 

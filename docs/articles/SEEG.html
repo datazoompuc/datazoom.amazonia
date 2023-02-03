@@ -6,6 +6,12 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SEEG • datazoom.amazonia</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cerulean/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
@@ -13,6 +19,7 @@
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="SEEG">
 <meta property="og:description" content="datazoom.amazonia">
+<meta property="og:image" content="/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -33,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">datazoom.amazonia</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
       </span>
     </div>
 
@@ -43,17 +50,29 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
+      <a href="../articles/ANEEL.html">ANEEL</a>
+    </li>
+    <li>
+      <a href="../articles/BACI.html">BACI</a>
+    </li>
+    <li>
       <a href="../articles/CEMPRE.html">CEMPRE</a>
     </li>
     <li>
+      <a href="../articles/CIPO.html">CIPÓ</a>
+    </li>
+    <li>
       <a href="../articles/COMEX.html">COMEX</a>
+    </li>
+    <li>
+      <a href="../articles/DATASUS.html">DATASUS</a>
     </li>
     <li>
       <a href="../articles/DEGRAD.html">DEGRAD</a>
@@ -62,13 +81,31 @@
       <a href="../articles/DETER.html">DETER</a>
     </li>
     <li>
+      <a href="../articles/EPE.html">EPE</a>
+    </li>
+    <li>
+      <a href="../articles/function_structure.html">STRUCTURE</a>
+    </li>
+    <li>
+      <a href="../articles/GOOGLEDRIVE.html">GOOGLEDRIVE</a>
+    </li>
+    <li>
       <a href="../articles/IBAMA.html">IBAMA</a>
+    </li>
+    <li>
+      <a href="../articles/IEMA.html">IEMA</a>
+    </li>
+    <li>
+      <a href="../articles/IMAZON.html">IMAZON</a>
     </li>
     <li>
       <a href="../articles/IPS.html">Social Progress Index</a>
     </li>
     <li>
       <a href="../articles/MAPBIOMAS.html">MAPBIOMAS</a>
+    </li>
+    <li>
+      <a href="../articles/municipalities.html">legal_amazon</a>
     </li>
     <li>
       <a href="../articles/PAM.html">PAM</a>
@@ -91,6 +128,9 @@
     <li>
       <a href="../articles/SIGMINE.html">SIGMINE</a>
     </li>
+    <li>
+      <a href="../articles/TERRACLIMATE.html">TerraClimate</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -107,7 +147,7 @@
 
       
 
-      </header><script src="SEEG_files/header-attrs-2.10/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>SEEG</h1>
@@ -120,48 +160,80 @@
 
     
     
-<div id="the-dataset" class="section level2">
-<h2 class="hasAnchor">
-<a href="#the-dataset" class="anchor" aria-hidden="true"></a>The Dataset</h2>
-<p>The estimates of emissions and removals of greenhouse gases are a database created by the System of Estimates of Emissions and Removals of Greenhouse Gases (SEEG), an initiative of the Observatório do Clima, a network of institutions focused on climate change research in Brazil.</p>
-<p>Using data collected from government entities, institutes, research centers, NGOs and other institutions, the estimates are created using the methodology of the Brazilian Inventory of Anthropic Emissions and Removals of Greenhouse Gases, assembled by the Ministry of Science, Technology and Innovation (MCTI), and the directives of Intergovernmental Panel on Climate Change (IPCC). A further detailed explanation of the methodology used is available in the following link (only in Portuguese): <a href="http://seeg.eco.br/notas-metodologicas/" class="external-link uri">http://seeg.eco.br/notas-metodologicas/</a></p>
-<p>The data ranges currently from the years 2000 to 2018. Emissions are divided in five main sources: Agricultural and Cattle Raising, Energy, Changes in Use of Land, Industrial Processses and Residues. All greenhouse gases contained in the national inventory are considered, encompassing CO2, CH4, N2O and the HFCs, with the conversion to carbon equivalence (CO2e) also included, both in the metric of GWP (Global Warming Potential) and GTP (Global Temperature Potential).</p>
-<p>The data is download from the SEEG website in the form of one single file, so the option to select a certain range of years in not available. Also, due to the size of the file, a stable internet connection is necessary, and the function may take time to run.</p>
-<p>There are six available datasets.The “seeg” one contemplates all sectors and the others are each divided by a specific emission source.</p>
-</div>
-<div id="usage" class="section level2">
-<h2 class="hasAnchor">
-<a href="#usage" class="anchor" aria-hidden="true"></a>Usage</h2>
-<p>Using the function is easy enough:</p>
+<p>Loads estimates of emission of greenhouse gases of Brazilian cities
+and states from SEEG. SEEG is the System of Estimates of Emissions and
+Removals of Greenhouse Gases (SEEG), an initiative of the Observatório
+do Clima, a network of institutions focused on climate change research
+in Brazil.</p>
+<p>The data provided in SEEG’s Collection 9 is a series covering the
+period from 1970 to 2020, except for the Land Use Change Sector that has
+the series from 1990 to 2020.</p>
+<p>Using data collected from government entities, institutes, research
+centers, NGOs and other institutions, the estimates are created using
+the methodology of the Brazilian Inventory of Anthropic Emissions and
+Removals of Greenhouse Gases, assembled by the Ministry of Science,
+Technology and Innovation (MCTI), and the directives of
+Intergovernmental Panel on Climate Change (IPCC)</p>
+<p>Emissions are divided in five main sources: Agricultural and Cattle
+Raising, Energy, Changes in Use of Land, Industrial Processes and
+Residues. All greenhouse gases contained in the national inventory are
+considered, encompassing CO2, CH4, N2O and the HFCs, with the conversion
+to carbon equivalence (CO2e) also included, both in the metric of GWP
+(Global Warming Potential) and GTP (Global Temperature Potential).</p>
+<p>The data is downloaded from the SEEG website in the form of one
+single file, so the option to select a certain range of years is not
+available. Also, due to the size of the file, a stable internet
+connection is necessary, and the function may take time to run.</p>
+<hr>
+<p><strong>Options:</strong></p>
+<ol style="list-style-type: decimal">
+<li>
+<p><strong>dataset</strong>: there are six choices:</p>
+<ul>
+<li>
+<code>"seeg"</code>: provides all sectors in a same dataframe. Only
+works with <code>raw_data = TRUE</code>
+</li>
+<li><code>"seeg_farming"</code></li>
+<li><code>"seeg_industry"</code></li>
+<li><code>"seeg_energy"</code></li>
+<li><code>"seeg_land"</code></li>
+<li><code>"seeg_residuals"</code></li>
+</ul>
+</li>
+<li>
+<p><strong>raw_data</strong>: there are two options:</p>
+<ul>
+<li>
+<code>TRUE</code>: if you want the data as it is originally.</li>
+<li>
+<code>FALSE</code>: if you want the treated version of the
+data.</li>
+</ul>
+</li>
+<li><p><strong>geo_level</strong>: <code>"country"</code>,
+<code>"state"</code>, or <code>"municipality"</code></p></li>
+<li><p><strong>language</strong>: you can choose between Portuguese
+<code>("pt")</code> and English <code>("eng")</code></p></li>
+</ol>
+<hr>
+<p><strong>Examples:</strong></p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.econ.puc-rio.br/datazoom/" class="external-link">datazoom.amazonia</a></span><span class="op">)</span>
-<span class="co"># download state raw data</span>
-<span class="va">seeg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_seeg.html">load_seeg</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">'seeg'</span>,
-                  raw_data <span class="op">=</span> <span class="cn">TRUE</span>,
-                  geo_level <span class="op">=</span> <span class="st">'state'</span><span class="op">)</span>
-
-<span class="co"># download industry state treated data in english</span>
-<span class="va">seeg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_seeg.html">load_seeg</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">'seeg_industry'</span>,
-                  raw_data <span class="op">=</span> <span class="cn">FALSE</span>,
-                  geo_level <span class="op">=</span> <span class="st">'state'</span>, language <span class="op">=</span> <span class="st">'eng'</span><span class="op">)</span>
-
-<span class="co"># download country energy treated data in portuguese</span>
-<span class="va">seeg</span> <span class="op">=</span> <span class="fu"><a href="../reference/load_seeg.html">load_seeg</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">'seeg_energy'</span>,
-                  raw_data <span class="op">=</span> <span class="cn">FALSE</span>,
-                  geo_level <span class="op">=</span> <span class="st">'country'</span>, language <span class="op">=</span> <span class="st">'pt'</span><span class="op">)</span>
-
-<span class="co"># download municipality land treated data in english</span>
-<span class="va">seeg</span> <span class="op">=</span> <span class="fu"><a href="../reference/load_seeg.html">load_seeg</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">'seeg_land'</span>,
-                  raw_data <span class="op">=</span> <span class="cn">FALSE</span>,
-                  geo_level <span class="op">=</span> <span class="st">'municipality'</span>, language <span class="op">=</span> <span class="st">'eng'</span><span class="op">)</span></code></pre></div>
-</div>
+<code class="sourceCode R"><span><span class="co"># Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg") </span></span>
+<span><span class="co"># by state (geo_level = "state")</span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_seeg.html">load_seeg</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"seeg"</span>, </span>
+<span>                  raw_data <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                  geo_level <span class="op">=</span> <span class="st">"state"</span><span class="op">)</span></span>
+<span>  </span>
+<span><span class="co"># Download treated data (raw_data = FALSE) of industry greenhouse gases (dataset = "seeg_industry")</span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_seeg.html">load_seeg</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"seeg_industry"</span>, </span>
+<span>                  raw_data <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>                  geo_level <span class="op">=</span> <span class="st">"state"</span><span class="op">)</span></span></code></pre></div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
-    </nav>
-</div>
+      </div>
 
 </div>
 
@@ -169,12 +241,12 @@
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by DataZoom (PUC-Rio), Francisco de Lima Cavalcanti, Guilherme Jardim, Daniel AC Barbosa, Bruno Alcantara Duarte, Fredie Didier, Tito Bruni, Victor Aliende da Matta, Anna Carolina Dutra Saraiva, Arthur Carvalho Brito, Igor Rigolon Veiga, Maria Mittelbach.</p>
+<p>Developed by Francisco de Lima Cavalcanti, DataZoom (PUC-Rio), Guilherme Jardim, Daniel AC Barbosa, Bruno Alcantara Duarte, Fredie Didier, Tito Bruni, Luiz Guilherme Lopes Moussatche, Victor Aliende da Matta, Anna Carolina Dutra Saraiva, Arthur Carvalho Brito, Igor Rigolon Veiga, Maria Mittelbach.</p>
 </div>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9001.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>

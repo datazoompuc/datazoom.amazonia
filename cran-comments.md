@@ -1,7 +1,16 @@
+# New submission
+
+Since our previous submission, we have added many new functions and changed the way most pre-existing functions work. We have change http to https.
+
 ## Test environments
 - R-hub windows-x86_64-devel (r-devel)
-- R-hub ubuntu-gcc-release (r-release)
-- R-hub fedora-clang-devel (r-devel)
+
+## R CMD check results
+0 errors ✔ | 0 warnings ✔ | 0 notes ✔
+
+GitHub Actions checks on Windows, MacOS, and Linux also return no errors, warnings, or notes.
+
+# Previous CRAN comments
 
 ## R CMD check results
 > On windows-x86_64-devel (r-devel), ubuntu-gcc-release (r-release), fedora-clang-devel (r-devel)

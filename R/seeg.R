@@ -95,6 +95,16 @@ load_seeg <- function(dataset, raw_data = FALSE,
     stop("This dataset only works with raw_data = FALSE")
   }
 
+  # Picking which sheet to download
+
+  sheet_list <- c(
+    "country" = "GEE Brasil",
+    "state" = "GEE Estados",
+    "municipality" = "BD GEE Municipios GWP-AR5"
+  )
+
+  sheet <- param$geo_level %>%
+    dplyr::recode(!!!sheet_list)
 
   ##############
   ## Download ##
@@ -103,7 +113,8 @@ load_seeg <- function(dataset, raw_data = FALSE,
   dat <- external_download(
     dataset = param$dataset,
     source = "seeg",
-    geo_level = param$geo_level
+    geo_level = param$geo_level,
+    sheet = sheet
   )
 
 
