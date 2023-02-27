@@ -44,8 +44,19 @@ municipalities <- municipalities %>%
 
 # To avoid notes, convert all municipality names to ASCII
 
+#municipalities <- municipalities %>%
+#  mutate(across(where(is.character), stringi::stri_enc_toascii))
+
+# Removing accents and lowering letters
+
 municipalities <- municipalities %>%
-  mutate(across(where(is.character), stringi::stri_enc_toascii))
+  dplyr::mutate(
+    dplyr::across(
+      contains("name"),
+      ~ stringi::stri_trans_general(., id = "Latin-ASCII")
+    )
+  ) %>%
+  dplyr::mutate(dplyr::across(contains("name"), tolower))
 
 ## Adding to sysdata
 
