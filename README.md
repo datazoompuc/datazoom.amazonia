@@ -157,8 +157,8 @@ period from 01/08/2017 to 31/07/2018.
 
 2.  **raw_data**: there are two options:
 
-    -   `TRUE`: if you want the data as it is originally.
-    -   `FALSE`: if you want the treated version of the data.
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
 
 3.  **time_period**: picks the years for which the data will be
     downloaded
@@ -202,11 +202,11 @@ corresponding to a municipality.
 **Options:**
 
 1.  **dataset**: there are two options:
-    -   `"deter_amz"` for data from the Amazon
-    -   `"deter_cerrado"` for data from the Cerrado
+    - `"deter_amz"` for data from the Amazon
+    - `"deter_cerrado"` for data from the Cerrado
 2.  **raw_data**: there are two options:
-    -   `TRUE`: if you want the data as it is originally.
-    -   `FALSE`: if you want the treated version of the data.
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
 3.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`
 
@@ -251,8 +251,8 @@ assumed
 
 2.  **raw_data**: there are two options:
 
-    -   `TRUE`: if you want the data as it is originally.
-    -   `FALSE`: if you want the treated version of the data.
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
 
 3.  **time_period**: picks the years for which the data will be
     downloaded
@@ -286,8 +286,8 @@ ranging from 0 to 3.
 
 2.  **raw_data**: there are two options:
 
-    -   `TRUE`: if you want the data as it is originally.
-    -   `FALSE`: if you want the treated version of the data.
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
 
 3.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`
@@ -324,16 +324,16 @@ regarding distributed and collected fines across municipalities
 
 1.  **dataset**: there are three possible choices.
 
-    -   `"areas_embargadas"`: embargoed areas
-    -   `"distributed_fines"`: fines that have not been paid by
-        individuals or corporations
-    -   `"collected_fines"`: fines that have been paid by individuals or
-        corporations
+    - `"areas_embargadas"`: embargoed areas
+    - `"distributed_fines"`: fines that have not been paid by
+      individuals or corporations
+    - `"collected_fines"`: fines that have been paid by individuals or
+      corporations
 
 2.  **raw_data**: there are two options:
 
-    -   `TRUE`: if you want the data as it is originally.
-    -   `FALSE`: if you want the treated version of the data.
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
 
 3.  **states**: specifies for which states to download the data. It is
     “all” by default, but can be a single state such as `"AC"` or any
@@ -375,26 +375,26 @@ from the year 1989.
 
 1.  **dataset**:
 
-    -   `"mapbiomas_cover"`: types of land cover
-    -   `"mapbiomas_transition"`: changes in land cover
-    -   `"mapbiomas_deforestation_regeneration"`: deforestation and
-        forest regeneration
-    -   `"mapbiomas_irrigation"`: irrigated areas
-    -   `"mapbiomas_grazing_quality"`: grazing quality
-    -   `"mapbiomas_mining"`: areas used for mining
+    - `"mapbiomas_cover"`: types of land cover
+    - `"mapbiomas_transition"`: changes in land cover
+    - `"mapbiomas_deforestation_regeneration"`: deforestation and forest
+      regeneration
+    - `"mapbiomas_irrigation"`: irrigated areas
+    - `"mapbiomas_grazing_quality"`: grazing quality
+    - `"mapbiomas_mining"`: areas used for mining
 
 2.  **raw_data**: there are two options:
 
-    -   `TRUE`: if you want the data as it is originally.
-    -   `FALSE`: if you want the treated version of the data.
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
 
 3.  **geo_level**:
 
-    -   For datasets `"mapbiomas_cover"` and `"mapbiomas_transition"`,
-        can be `"municipality"` or `"state"` (faster download).
-    -   For dataset `"mapbiomas_mining"`, can be `"biome"` or
-        `"indigenous_land"`.
-    -   Does not apply to other datasets.
+    - For datasets `"mapbiomas_cover"` and `"mapbiomas_transition"`, can
+      be `"municipality"` or `"state"` (faster download).
+    - For dataset `"mapbiomas_mining"`, can be `"biome"` or
+      `"indigenous_land"`.
+    - Does not apply to other datasets.
 
 4.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`
@@ -403,18 +403,18 @@ from the year 1989.
     Only applies to datasets `"mapbiomas_cover"` and
     `"mapbiomas_grazing_quality"`:
 
-    -   `cover_level = "none"`: no aggregation
-    -   `cover_level = 0`: least aggregated, with categories of
-        Anthropic and Natural
-    -   `cover_level = 1`: categories such as Forest, Non Forest Natural
-        Formation, Farming, Non Vegetated Area, Water, Non Observed
-    -   `cover_level = 2`: categories such as Agriculture, Aquaculture,
-        Beach and Dune, Forest Plantation, Pasture, River, Lake and
-        Ocean  
-    -   `cover_level = 3`: categories such as Aquaculture, Beach and
-        Dune, Forest Formation, Forest Plantation
-    -   `cover_level = 4`: categories such as Aquaculture, Beach and
-        Dune, Forest Formation, Forest Plantation
+    - `cover_level = "none"`: no aggregation
+    - `cover_level = 0`: least aggregated, with categories of Anthropic
+      and Natural
+    - `cover_level = 1`: categories such as Forest, Non Forest Natural
+      Formation, Farming, Non Vegetated Area, Water, Non Observed
+    - `cover_level = 2`: categories such as Agriculture, Aquaculture,
+      Beach and Dune, Forest Plantation, Pasture, River, Lake and
+      Ocean  
+    - `cover_level = 3`: categories such as Aquaculture, Beach and Dune,
+      Forest Formation, Forest Plantation
+    - `cover_level = 4`: categories such as Aquaculture, Beach and Dune,
+      Forest Formation, Forest Plantation
 
 ------------------------------------------------------------------------
 
@@ -442,6 +442,50 @@ data <- load_mapbiomas("mapbiomas_mining",
 datasets `"mapbiomas_cover"` and `"mapbiomas_transition"` at the
 municipality level. In case of authentication errors, see
 [googledrive](#googledrive).
+
+## CIPO
+
+Mappings by [Plataforma CIPÓ](https://plataformacipo.org/) on
+environmental crimes. Each dataset available is a spreadsheet pertaining
+to a different aspect of environmental crimes, namely: the Brazilian
+institutions and organization involved in their prevention (the
+`"brazilian_actors"` dataset); the international agreements, treaties
+and conventions related to the subject (the
+`"international_cooperation"` dataset); and the arrangements regarding
+forest governance (the `"forest_governance"` dataset).
+
+------------------------------------------------------------------------
+
+**Options:**
+
+1.  **dataset**: there are three choices:
+    - `"brazilian_actors"`: mapping of Brazilian actors involved in
+      preventing environmental crimes.
+    - `"international_cooperation"`: mapping of international
+      agreements, treaties and conventions.
+    - `"forest_governance"`: mapping of forest governance arrangements.
+2.  **raw_data**: there are two options:
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
+3.  **search**: Filters the dataset to the rows containing the chosen
+    search parameter.
+
+------------------------------------------------------------------------
+
+**Examples:**
+
+``` r
+# download the spreacdsheet on Brazilian actors involved in fighting environmental crimes
+brazilian_actors <- load_cipo(dataset = "brazilian_actors")
+
+# searching only for entries containing IBAMA
+actors_ibama <- load_cipo(dataset = "brazilian_actors",
+                          search = "ibama")
+
+# entries containing IBAMA or FUNAI
+actors_ibama <- load_cipo(dataset = "brazilian_actors",
+                          search = "ibama|funai")
+```
 
 ## TerraClimate
 
@@ -480,8 +524,8 @@ web server, as recommended for rectangular subsets of the global data.
 
 2.  **raw_data**: there are two options:
 
-    -   `TRUE`: if you want the data as it is originally.
-    -   `FALSE`: if you want the treated version of the data.
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
 
 3.  **time_period**: picks the years for which the data will be
     downloaded
@@ -543,18 +587,18 @@ necessary, and the function may take time to run.
 
 1.  **dataset**: there are six choices:
 
-    -   `"seeg"`: provides all sectors in a same dataframe. Only works
-        with `raw_data = TRUE`
-    -   `"seeg_farming"`
-    -   `"seeg_industry"`
-    -   `"seeg_energy"`
-    -   `"seeg_land"`
-    -   `"seeg_residuals"`
+    - `"seeg"`: provides all sectors in a same dataframe. Only works
+      with `raw_data = TRUE`
+    - `"seeg_farming"`
+    - `"seeg_industry"`
+    - `"seeg_energy"`
+    - `"seeg_land"`
+    - `"seeg_residuals"`
 
 2.  **raw_data**: there are two options:
 
-    -   `TRUE`: if you want the data as it is originally.
-    -   `FALSE`: if you want the treated version of the data.
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
 
 3.  **geo_level**: `"country"`, `"state"`, or `"municipality"`
 
@@ -598,13 +642,15 @@ forest governance (the `"forest_governance"` dataset).
 **Options:**
 
 1.  **dataset**: there are three choices:
-    -   `"brazilian_actors"`: mapping of Brazilian actors involved in
-        preventing environmental crimes.
-    -   `"international_cooperation"`: mapping of international
-        agreements, treaties and conventions.
-    -   `"forest_governance"`: mapping of forest governance
-        arrangements.
-2.  **search**: Filters the dataset to the rows containing the chosen
+    - `"brazilian_actors"`: mapping of Brazilian actors involved in
+      preventing environmental crimes.
+    - `"international_cooperation"`: mapping of international
+      agreements, treaties and conventions.
+    - `"forest_governance"`: mapping of forest governance arrangements.
+2.  **raw_data**: there are two options:
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
+3.  **search**: Filters the dataset to the rows containing the chosen
     search parameter.
 
 ------------------------------------------------------------------------
@@ -614,9 +660,11 @@ forest governance (the `"forest_governance"` dataset).
 ``` r
 # download the spreacdsheet on Brazilian actors involved in fighting environmental crimes
 brazilian_actors <- load_cipo(dataset = "brazilian_actors")
+
 # searching only for entries containing IBAMA
 actors_ibama <- load_cipo(dataset = "brazilian_actors",
                           search = "ibama")
+
 # entries containing IBAMA or FUNAI
 actors_ibama <- load_cipo(dataset = "brazilian_actors",
                           search = "ibama|funai")
@@ -641,16 +689,16 @@ level and data is available in 2014 and 2018.
 
 1.  **dataset**:
 
-    -   `"all"`, `"life_quality"`, `"sanit_habit"`, `"violence"`,
-        `"educ"`, `"communic"`, `"mortality"`, or `"deforest"`
+    - `"all"`, `"life_quality"`, `"sanit_habit"`, `"violence"`,
+      `"educ"`, `"communic"`, `"mortality"`, or `"deforest"`
 
 2.  **raw_data**: there are two options:
 
-    -   `TRUE`: if you want the data as it is originally.
-    -   `FALSE`: if you want the treated version of the data.
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
 
-3.  **time_period**: picks the years for which the data will be
-    downloaded
+3.  **time_period**: can be 2014, 2018, 2021, or a vector with some
+    combination thereof
 
 4.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`
@@ -683,28 +731,28 @@ each avaliable dataset.
 
 1.  **dataset**:
 
-    -   `"datasus_sim_do"` has SIM-DO mortality data
-    -   Possible subsets of SIM-DO are `"datasus_sim_dofet"` (Fetal),
-        `"datasus_sim_doext"` (External causes), `"datasus_sim_doinf"`
-        (Children), `"datasus_sim_domat"` (Maternal)
-    -   `"datasus_sih"` has SIH hospitalization data.
-    -   `"datasus_cnes_lt"` has data on the number of hospital beds.
-    -   further subsets of CNES are listed later, but those only allow
-        for the download of raw data.
+    - `"datasus_sim_do"` has SIM-DO mortality data
+    - Possible subsets of SIM-DO are `"datasus_sim_dofet"` (Fetal),
+      `"datasus_sim_doext"` (External causes), `"datasus_sim_doinf"`
+      (Children), `"datasus_sim_domat"` (Maternal)
+    - `"datasus_sih"` has SIH hospitalization data.
+    - `"datasus_cnes_lt"` has data on the number of hospital beds.
+    - further subsets of CNES are listed later, but those only allow for
+      the download of raw data.
 
 2.  **raw_data**: there are two options:
 
-    -   `TRUE`: if you want the data as it is originally.
-    -   `FALSE`: if you want the treated version of the data. Only
-        effective for SIM-DO and subsets, SIH, and CNES-LT.
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data. Only
+      effective for SIM-DO and subsets, SIH, and CNES-LT.
 
 3.  **keep_all**: only applies when raw_data is FALSE. There are two
     options:
 
-    -   `TRUE`: keeps all original variables, adding variable labels and
-        possibly constructing extra variables.
-    -   `FALSE`: aggregates data at the municipality, thereby losing
-        individual-level data, and only keeping aggregate measures.
+    - `TRUE`: keeps all original variables, adding variable labels and
+      possibly constructing extra variables.
+    - `FALSE`: aggregates data at the municipality, thereby losing
+      individual-level data, and only keeping aggregate measures.
 
 4.  **time_period**: picks the years for which the data will be
     downloaded
@@ -835,8 +883,8 @@ throughout the Amazon region in the year 2018.
 
 2.  **raw_data**: there are two options:
 
-    -   `TRUE`: if you want the data as it is originally.
-    -   `FALSE`: if you want the treated version of the data.
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
 
 3.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`
@@ -882,15 +930,15 @@ granularity of location.
 
 1.  **dataset**: there are four choices:
 
-    -   `"comex_export_mun"`: selects exports data by municipality
-    -   `"comex_import_mun"`: selects imports data by municipality
-    -   `"comex_export_prod"`: selects exports data by producer
-    -   `"comex_import_prod"`: selects imports data by producer
+    - `"comex_export_mun"`: selects exports data by municipality
+    - `"comex_import_mun"`: selects imports data by municipality
+    - `"comex_export_prod"`: selects exports data by producer
+    - `"comex_import_prod"`: selects imports data by producer
 
 2.  **raw_data**: there are two options:
 
-    -   `TRUE`: if you want the data as it is originally.
-    -   `FALSE`: if you want the treated version of the data.
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
 
 3.  **time_period**: picks the years for which the data will be
     downloaded
@@ -933,12 +981,12 @@ Therefore, downloading the data can take a long time.
 
 1.  **dataset**: there is one choice:
 
-    -   `"HS92"` which follows the Harmonized System method
+    - `"HS92"` which follows the Harmonized System method
 
 2.  **raw_data**: there are two options:
 
-    -   `TRUE`: if you want the data as it is originally.
-    -   `FALSE`: if you want the treated version of the data.
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
 
 3.  **time_period**: picks the years for which the data will be
     downloaded
@@ -974,8 +1022,8 @@ from 2002 to 2018.
 
 2.  **raw_data**: there are two options:
 
-    -   `TRUE`: if you want the data as it is originally.
-    -   `FALSE`: if you want the treated version of the data.
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
 
 3.  **geo_level**: `"country"`, `"state"`, or `"municipality"`
 
@@ -993,7 +1041,7 @@ from 2002 to 2018.
 # download treated municipal GDP data at the state level for 2010 to 2012
 data <- load_pibmunic(raw_data = FALSE,
                       geo_level = "state",
-                      time_period = 2010:2010)
+                      time_period = 2010:2012)
 ```
 
 ## CEMPRE
@@ -1013,8 +1061,8 @@ National Register of Legal Entities. Data is available between 2006 and
 
 2.  **raw_data**: there are two options:
 
-    -   `TRUE`: if you want the data as it is originally.
-    -   `FALSE`: if you want the treated version of the data.
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
 
 3.  **geo_level**: `"country"`, `"state"` or `"municipality"`
 
@@ -1089,8 +1137,8 @@ link](https://www.ibge.gov.br/estatisticas/economicas/agricultura-e-pecuaria/911
 
 2.  **raw_data**: there are two options:
 
-    -   `TRUE`: if you want the data as it is originally.
-    -   `FALSE`: if you want the treated version of the data.
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
 
 3.  **geo_level**: `"country"`, `"region"`, `"state"`, or
     `"municipality"`
@@ -1236,20 +1284,20 @@ link](https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fi
 
 1.  **dataset**: there are three choices:
 
-    -   `"pevs_forest_crops"`: provides data related to both quantity
-        and value of the forestry activities. The data goes from 1986 to
-        2019 and it is divided by type of product.
-    -   `"pevs_silviculture"`: provides data related to both quantity
-        and value of the silviculture. The data goes from 1986 to 2019
-        and it is divided by type of product.
-    -   `"pevs_silviculture_area"`: total existing area used for
-        silviculture in 12/31.The data goes from 2013 to 2019 and it is
-        divided by forestry species.
+    - `"pevs_forest_crops"`: provides data related to both quantity and
+      value of the forestry activities. The data goes from 1986 to 2019
+      and it is divided by type of product.
+    - `"pevs_silviculture"`: provides data related to both quantity and
+      value of the silviculture. The data goes from 1986 to 2019 and it
+      is divided by type of product.
+    - `"pevs_silviculture_area"`: total existing area used for
+      silviculture in 12/31.The data goes from 2013 to 2019 and it is
+      divided by forestry species.
 
 2.  **raw_data**: there are two options:
 
-    -   `TRUE`: if you want the data as it is originally.
-    -   `FALSE`: if you want the treated version of the data.
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
 
 3.  **geo_level**: `"country"`, `"region"`, `"state"`, or
     `"municipality"`
@@ -1307,8 +1355,8 @@ link](https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fi
 
 2.  **raw_data**: there are two options:
 
-    -   `TRUE`: if you want the data as it is originally.
-    -   `FALSE`: if you want the treated version of the data.
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
 
 3.  **geo_level**: `"country"`, `"region"`, `"state"`, or
     `"municipality"`
@@ -1355,8 +1403,8 @@ Agency (ANM) is responsible for this survey.
 
 2.  **raw_data**: there are two options:
 
-    -   `TRUE`: if you want the data as it is originally.
-    -   `FALSE`: if you want the treated version of the data.
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
 
 3.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`
@@ -1391,7 +1439,7 @@ the Brazilian energy development and is managed by the Electrical Energy
 Commercialization Chamber (CCEE).
 
 The dataset makes available the year of the observation – from 2013 to
-2022 –, the type of expense, its value in R$ (Reais) and its share over
+2022 –, the type of expense, its value in R\$ (Reais) and its share over
 the total amount of CDE budget expenses on the year\*.
 
 \*Note that ‘share_of_total’ values sum to 1 for each year available.
@@ -1418,12 +1466,12 @@ and select “Manual do Usuario”.
 **Options:**
 
 1.  **dataset**: there are two choices:
-    -   `"energy_development_budget"`: government spending towards
-        energy sources
-    -   `"energy_generation"`: energy generation by entity/corporation
+    - `"energy_development_budget"`: government spending towards energy
+      sources
+    - `"energy_generation"`: energy generation by entity/corporation
 2.  **raw_data**: there are two options:
-    -   `TRUE`: if you want the data as it is originally.
-    -   `FALSE`: if you want the treated version of the data.
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
 3.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`
 
@@ -1498,17 +1546,17 @@ is in the Legal Amazon or not.
 **Options:**
 
 1.  **dataset**: there are two choices:
-    -   `"energy_consumption_per_class"`: monthly energy consumption and
-        consumers by State, Region or Electric Subsystem
-    -   `"national_energy_balance"`: yearly energy generation per
-        source, by State
+    - `"energy_consumption_per_class"`: monthly energy consumption and
+      consumers by State, Region or Electric Subsystem
+    - `"national_energy_balance"`: yearly energy generation per source,
+      by State
 2.  **raw_data**: there are two options:
-    -   `TRUE`: if you want the data as it is originally.
-    -   `FALSE`: if you want the treated version of the data.
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
 3.  **geo_level**: only applies to the `"energy_consumption_per_class"`
     dataset.
-    -   `"state"`
-    -   `"subsystem"`
+    - `"state"`
+    - `"subsystem"`
 4.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`
 
@@ -1576,3 +1624,18 @@ package page.
 DataZoom is developed by a team at Pontifícia Universidade Católica do
 Rio de Janeiro (PUC-Rio), Department of Economics. Our official website
 is at: <https://www.econ.puc-rio.br/datazoom/>.
+
+To cite package `datazoom.amazonia` in publications use:
+
+> Data Zoom (2023). Data Zoom: Simplifying Access To Brazilian
+> Microdata.  
+> <https://www.econ.puc-rio.br/datazoom/english/index.html>
+
+A BibTeX entry for LaTeX users is:
+
+    @Unpublished{DataZoom2023,
+        author = {Data Zoom},
+        title = {Data Zoom: Simplifying Access To Brazilian Microdata},
+        url = {https://www.econ.puc-rio.br/datazoom/english/index.html},
+        year = {2023},
+    }
