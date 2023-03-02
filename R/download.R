@@ -551,8 +551,13 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     download_method <- "curl"
     quiet <- FALSE
   }
-  if (source %in% c("ibama", "datasus")) {
+  if (source == "datasus") {
     download_method <- "curl"
+    quiet <- TRUE
+  }
+  if (source == "ibama") {
+    download_method <- "curl"
+    options(download.file.method = "curl", download.file.extra = "-k -L") # https://stackoverflow.com/questions/69716835/turning-ssl-verification-off-inside-download-file
     quiet <- TRUE
   }
   if (source == "seeg") {
