@@ -30,6 +30,10 @@ Amazon data, including agriculture, deforestation, production. The
 package provides functions that download and pre-process selected
 datasets.
 
+If you want to contribute to the library, please refer to our
+[contributing](https://datazoompuc.github.io/datazoom.amazonia/articles/contribution_guide.html)
+guidelines.
+
 ## Installation
 
 You can install the released version of `datazoom.amazonia` from
