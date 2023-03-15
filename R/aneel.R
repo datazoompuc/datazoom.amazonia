@@ -2,7 +2,7 @@
 #'
 #' @description National Electric Energy Agency - ANEEL
 #'
-#' @param dataset A dataset name ("energy_development_budget" or "energy_generation")
+#' @param dataset A dataset name ("energy_development_budget", "energy_generation" or "energy_enterprises_distributed")
 #' @inheritParams load_baci
 #'
 #' @examples
