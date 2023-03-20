@@ -373,23 +373,23 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source == "mapbiomas") {
     if (dataset %in% c("mapbiomas_cover", "mapbiomas_transition")) {
       if (param$geo_level == "state") {
-        path <- paste(param$url, "Estat%C3%ADsticas/Cole%C3%A7%C3%A3o%206/1-ESTATISTICAS_MapBiomas_COL6.0_UF-BIOMAS_v12_SITE.xlsx", sep = "")
+        path <- paste(param$url, "Estat%C3%ADsticas/1_-_TABELA_GERAL_COL7_MAPBIOMAS_BIOMAS_UF_FINAL.xlsx", sep = "")
       }
       if (param$geo_level == "municipality") {
-        path <- "https://drive.google.com/uc?export=download&id=1RT7J2jS6LKyISM49ctfRO31ynJZXX_TY"
+        path <- "https://storage.googleapis.com/mapbiomas-public/brasil/downloads/1-tabela-geral-col7-mapbiomas-biomas-municipio-final.xlsx"
       }
     }
     if (dataset == "mapbiomas_deforestation_regeneration") {
-      path <- paste(param$url, "Estat%C3%ADsticas/BD-DESM_e_REG_COL5_V8h__SITE.xlsx", sep = "")
+      path <- paste(param$url, "Estat%C3%ADsticas/TABELA_GERAL_COL7_MAPBIOMAS_DESMAT_VEGSEC_UF.xlsx", sep = "")
     }
     if (dataset == "mapbiomas_irrigation") {
-      path <- paste(param$url, "Estat%C3%ADsticas/MapBIomas_COL5_IRRIGACAO-biomas-estados-SITE.xlsx", sep = "")
+      path <- paste(param$url, "Estat%C3%ADsticas/Colecao_7_Irrigacao_Biomes_UF.xlsx", sep = "")
     }
     if (dataset == "mapbiomas_grazing_quality") {
       path <- paste(param$url, "Estat%C3%ADsticas/MapBIomas_COL5_QUALIDADE_PASTAGEM-biomas-estados-SITE.xlsx", sep = "")
     }
     if (dataset == "mapbiomas_mining") {
-      path <- paste(param$url, "Estat%C3%ADsticas/Cole%C3%A7%C3%A3o%206/Colecao_6_Mining_BR_UF_Biome_Mun_TI_SITE.xlsx", sep = "")
+      path <- paste(param$url, "Estat%C3%ADsticas/Colecao_7_Mining_BR_UF_Biome_Mun_TI_SITE__3_.xlsx", sep = "")
     }
   }
 
@@ -481,11 +481,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   # googledrive links do not contain the file extension, for example
 
-  if (source == "mapbiomas" & dataset %in% c("mapbiomas_cover", "mapbiomas_transition")) {
-    if (param$geo_level == "municipality") {
-      file_extension <- ".zip"
-    }
-  }
   if (source == "cipo") {
     file_extension <- ".csv"
   }
@@ -557,11 +552,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   }
   if (source == "seeg") {
     if (geo_level == "municipality") {
-      download_method <- "googledrive"
-    }
-  }
-  if (source == "mapbiomas") {
-    if (dataset %in% c("mapbiomas_cover", "mapbiomas_transition") & param$geo_level == "municipality") {
       download_method <- "googledrive"
     }
   }
