@@ -38,18 +38,7 @@
 #' @export
 
 load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality",
-                           language = "eng", cover_level = 1) {
-
-  # Checking for googledrive package (in Suggests) only for mapbiomas_transition dataset
-
-  if (!requireNamespace("googledrive", quietly = TRUE) &
-    dataset %in% c("mapbiomas_cover", "mapbiomas_transition") &
-    geo_level == "municipality") {
-    stop(
-      "Package \"googledrive\" must be installed to use this function.",
-      call. = FALSE
-    )
-  }
+                           language = "eng", cover_level = "none") {
 
   ###########################
   ## Bind Global Variables ##
@@ -74,10 +63,13 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
 
   sheets <- tibble::tribble(
     ~dataset, ~geo_level, ~sheet,
-    "mapbiomas_cover", "any", "LAND COVER",
-    "mapbiomas_transition", "any", "TRANSITIONS",
-    "mapbiomas_deforestation_regeneration", "any", "BD Colecao 5.0(h) - Hectares",
-    "mapbiomas_irrigation", "any", "BD_IRRIGACAO",
+    "mapbiomas_cover", "any", "COBERTURA_COL7",
+    "mapbiomas_transition", "state", "TRANSICOES_COL7",
+    "mapbiomas_transition", "municipality", "TRANSICAO_COL7",
+    "mapbiomas_deforestation_regeneration", "state", "DESMAT_VEGSEC_UF_COL7",
+    "mapbiomas_deforestation_regeneration", "municipality", "DESMAT_VEGSEC_CITY_COL7",
+    "mapbiomas_irrigation", "state", "UF",
+    "mapbiomas_irrigation", "biome", "BIOME",
     "mapbiomas_grazing_quality", "any", "BD_Qualidade",
     "mapbiomas_mining", "country", "BR",
     "mapbiomas_mining", "state", "UF",
@@ -151,7 +143,7 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
         )),
         names_from = paste0("level_", param$cover_level),
         values_from = value,
-        values_fn = sum,
+        values_fn = ~sum(.x, na.rm = TRUE),
         values_fill = NA
       ) %>%
       janitor::clean_names()
