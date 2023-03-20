@@ -9,7 +9,7 @@ load_mapbiomas(
   raw_data = FALSE,
   geo_level = "municipality",
   language = "eng",
-  cover_level = 1
+  cover_level = "none"
 )
 }
 \arguments{
