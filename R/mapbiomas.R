@@ -38,7 +38,7 @@
 #' @export
 
 load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality",
-                           language = "eng", cover_level = "none") {
+                           language = "eng", cover_level = 1) {
 
   ###########################
   ## Bind Global Variables ##
@@ -114,6 +114,12 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
       stringi::stri_trans_general(str = var, id = "Latin-ASCII")
     })
 
+  dat <- dat %>%
+    dplyr::rename_with(dplyr::recode,
+        "uf" = "state",
+        "municipality" = "city",
+    )
+
   ## Create Longer Data - Years as a Variable
 
   dat <- dat %>%
@@ -139,7 +145,7 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
         id_cols = dplyr::any_of(c(
           "geo_code", "city",
           "state", "year",
-          "biome", "state"
+          "biome"
         )),
         names_from = paste0("level_", param$cover_level),
         values_from = value,
