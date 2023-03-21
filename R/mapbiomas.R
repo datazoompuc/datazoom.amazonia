@@ -49,7 +49,7 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
 
   survey <- link <- x1985 <- x2019 <- NULL
   ano <- bioma <- category <- cidade <- city <- class_id <- country <- estado <- feature_id <- group <- terra_indigena <- NULL
-  id <- indigenous_land <- level_2 <- level_3 <- name_pt_br <- pais <- x2020 <- NULL
+  id <- indigenous_land <- level_2 <- level_3 <- name_pt_br <- pais <- x2020 <- code <- name <- NULL
   territory_id <- municipality <- state <- year <- value <- state_lower <- level_4 <- from_class <- to_class <- NULL
   abbrev_state <- code_muni <- name_state <- geo_code <- municipality_mapbiomas <- NULL
   x1985_to_1986 <- x2018_to_2019 <- x1988 <- x2017 <- x2000 <- x2010 <- x2018 <- biome <- level_1 <- NULL
@@ -121,6 +121,44 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
   ## Data Engineering ##
   ######################
 
+  ## Treat mapbiomas_water
+  if (param$dataset == "mapbiomas_water") {
+
+    dat_mod <- dat %>%
+      dplyr::relocate(dplyr::any_of(c("year", "name")))
+
+    if (param$geo_level != "municipality") dat_mod <- dat_mod %>% dplyr::select(-code)
+    if (param$geo_level == "biome") dat_mod <- dat_mod %>% dplyr::rename(biome = name)
+
+    if (param$language == "pt") {
+      dat_mod <- dat_mod %>%
+        dplyr::rename_with(dplyr::recode,
+                           "code" = "cod_municipio",
+                           "state" = "estado",
+                           "name" = "estado",
+                           "year" = "ano",
+                           "area_ha" = "valor",
+                           "city" = "municipio",
+                           "biome" = "bioma"
+        )
+    }
+
+    if (param$language == "eng") {
+      dat_mod <- dat_mod %>%
+        dplyr::rename_with(dplyr::recode,
+                           "code" = "municipality_code",
+                           "name" = "state",
+                           "area_ha" = "value",
+                           "city" = "municipality"
+        )
+    }
+
+    return(dat_mod)
+
+  }
+
+
+  ## Else
   dat <- dat %>%
     janitor::clean_names() %>%
     tibble::as_tibble() %>%
