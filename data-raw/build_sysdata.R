@@ -11,6 +11,7 @@ municipalities <- geo_municipalities %>%
   sf::st_drop_geometry()
 
 municipality_mapbiomas <- read_csv("data-raw/municipalities_mapbiomas.csv")
+biome_munic_mapbiomas <- read_csv("data-raw/biome_munic_mapbiomas.csv")
 
 ## Importing Legal Amazon municipalities
 
@@ -55,12 +56,31 @@ municipalities <- municipalities %>%
     )
   ) %>%
   dplyr::mutate(dplyr::across(contains("name"), tolower)) %>%
-  left_join(municipality_mapbiomas)
+  left_join(municipality_mapbiomas, by = join_by(code_muni))
+
+
+municipalities_biomes <- biome_munic_mapbiomas %>%
+  dplyr::mutate(
+    dplyr::across(
+      is.character,
+      ~ stringi::stri_trans_general(., id = "Latin-ASCII")
+    )
+  ) %>%
+  right_join(municipalities %>% select(abbrev_state, municipality_mapbiomas, code_muni),
+             multiple = "all",
+             by = join_by(abbrev_state, municipality_mapbiomas))
+
 
 ## Adding to sysdata
 
 usethis::use_data(
   municipalities,
+  internal = FALSE,
+  overwrite = TRUE
+)
+
+usethis::use_data(
+  municipalities_biomes,
   internal = FALSE,
   overwrite = TRUE
 )

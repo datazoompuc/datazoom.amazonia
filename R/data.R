@@ -20,3 +20,19 @@
 #' }
 #' @source Package \code{geobr} and \url{https://www.ibge.gov.br/geociencias/cartas-e-mapas/mapas-regionais/15819-amazonia-legal.html?=&t=acesso-ao-produto}
 "municipalities"
+
+
+#' IBGE codes and MAPBIOMAS id of Brazilian municipalities and biomes
+#'
+#' A dataset containing each municipality-biome's IBGE code, state, biome, name and MAPBIOMAS ID. Mostly for our functions' internal use.
+#'
+#' @format A data frame with 6537 rows and 4 variables:
+#' \describe{
+#'   \item{feature_id}{MAPBIOMAS biome-municipality ID}
+#'   \item{code_muni}{IBGE 7-digit municipality code}
+#'   \item{abbrev_state}{state abbreviations (e.g. "AM")}
+#'   \item{municipality_mapbiomas}{municipality name in MAPBIOMAS data}
+#'   \item{biome}{biome}
+#' }
+#' @source Package \code{geobr} and \url{https://mapbiomas.org/}
+"municipalities_biomes"
