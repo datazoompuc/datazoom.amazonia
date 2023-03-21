@@ -48,7 +48,7 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
   survey <- link <- x1985 <- x2019 <- NULL
   ano <- bioma <- category <- cidade <- city <- class_id <- country <- estado <- feature_id <- group <- terra_indigena <- NULL
   id <- indigenous_land <- level_2 <- level_3 <- name_pt_br <- pais <- x2020 <- NULL
-  territory_id <- municipality <- state <- year <- value <- state_lower <- NULL
+  territory_id <- municipality <- state <- year <- value <- state_lower <- level_4 <- from_class <- to_class <- NULL
   abbrev_state <- code_muni <- name_state <- geo_code <- municipality_mapbiomas <- NULL
   x1985_to_1986 <- x2018_to_2019 <- x1988 <- x2017 <- x2000 <- x2010 <- x2018 <- biome <- level_1 <- NULL
 
@@ -139,6 +139,27 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
       dplyr::left_join(munic_biomes, by = dplyr::join_by(feature_id))
   }
 
+
+  ## Add transition columns
+  if (param$dataset == "mapbiomas_transition" & param$geo_level == "municipality") {
+    classes_mapbiomas <- dat %>%
+      dplyr::select(class_id:level_4) %>%
+      unique()
+
+    from_classes <- classes_mapbiomas %>%
+      dplyr::rename(from_class = class_id) %>%
+      dplyr::rename_with(~paste0("from_", .x), dplyr::starts_with("level_"))
+
+    to_classes <- classes_mapbiomas %>%
+      dplyr::rename(to_class = class_id) %>%
+      dplyr::rename_with(~paste0("to_", .x), dplyr::starts_with("level_"))
+
+    dat <- dat %>%
+      dplyr::left_join(from_classes, by = dplyr::join_by(from_class)) %>%
+      dplyr::left_join(to_classes, by = dplyr::join_by(to_class)) %>%
+      dplyr::select(-dplyr::starts_with("level_"))
+
+  }
 
   ## Create Longer Data - Years as a Variable
 
