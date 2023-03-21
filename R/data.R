@@ -12,6 +12,7 @@
 #'   \item{code_region}{1-digit regional code}
 #'   \item{name_region}{name of the region}
 #'   \item{legal_amazon}{takes value 1 for municipalities in the legal amazon, 0 otherwise}
+#'   \item{municipality_mapbiomas}{municipality name in MAPBIOMAS data}
 #'   \item{code_micro}{5-digit microregion code}
 #'   \item{name_micro}{name of the microregion}
 #'   \item{code_meso}{4-digit mesoregion code}
