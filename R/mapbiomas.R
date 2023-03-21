@@ -2,11 +2,12 @@
 #'
 #' @description Loads information about land cover and use
 #'
-#' @param dataset A dataset name ("mapbiomas_cover", "mapbiomas_transition", "mapbiomas_irrigation", "mapbiomas_deforestation_regeneration", "mapbiomas_grazing_quality", or "mapbiomas_mining")
+#' @param dataset A dataset name ("mapbiomas_cover", "mapbiomas_transition", "mapbiomas_irrigation", "mapbiomas_deforestation_regeneration", or "mapbiomas_mining")
 #' @inheritParams load_baci
 #' @param geo_level A \code{string} that defines the geographic level of the data.
-#'   * For datasets "mapbiomas_cover" and "mapbiomas_transition", can be "municipality" or "state" (faster download).
-#'   * For dataset "mapbiomas_mining", can be "biome" or "indigenous_land".
+#'   * For datasets "mapbiomas_cover", "mapbiomas_transition" and "mapbiomas_deforestation_regeneration", can be "municipality" or "state" (faster download).
+#'   * For dataset "mapbiomas_mining", can be "indigenous_land", "municipality", "state", "biome" or "country".
+#'   * For dataset "mapbiomas_irrigation", can be "state" or "biome".
 #' @param cover_level A \code{numeric} or \code{string} that indicates the cover aggregation level. Can be "0", "1", "2", "3", "4", or "none", which means no aggregation. Aggregation only supported for "mapbiomas_cover" and "mapbiomas_grazing_quality" datasets.
 #'
 #' @return A \code{tibble}.
@@ -138,18 +139,6 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
       dplyr::left_join(munic_biomes, by = dplyr::join_by(feature_id))
   }
 
-  if (param$geo_level == "state") {
-    state_codes <- datazoom.amazonia::municipalities %>%
-      dplyr::select(state_lower = name_state, geo_code = code_muni) %>%
-      dplyr::mutate(geo_code = substr(geo_code, 1, 2) %>% as.numeric()) %>%
-      unique()
-
-    dat <- dat %>%
-      dplyr::mutate(state_lower = tolower(state)) %>%
-      dplyr::left_join(state_codes, by = dplyr::join_by(state_lower)) %>%
-      dplyr::select(-state_lower)
-  }
-
 
   ## Create Longer Data - Years as a Variable
 
@@ -190,7 +179,7 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
     dplyr::select(-dplyr::any_of("category"))
 
   ## Aggregate by geo_level
-  if (param$geo_level == "municipality" & param$dataset == "mapbiomas_transition") {
+  if (param$dataset == "mapbiomas_transition") {
     dat <- dat %>%
       dplyr::group_by(dplyr::across(-c(feature_id, biome, value))) %>%
       dplyr::summarise(value = sum(value, na.rm = TRUE),
