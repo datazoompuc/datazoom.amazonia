@@ -9,6 +9,7 @@
 #'   * For dataset "mapbiomas_mining", can be "indigenous_land", "municipality", "state", "biome" or "country".
 #'   * For dataset "mapbiomas_irrigation", can be "state" or "biome".
 #'   * For dataset "mapbiomas_water", can be "municipality", "state" or "biome".
+#'   * Does not apply to other datasets.
 #' @param cover_level A \code{numeric} or \code{string} that indicates the cover aggregation level. Can be "0", "1", "2", "3", "4", or "none", which means no aggregation. Aggregation only supported for "mapbiomas_cover" and "mapbiomas_grazing_quality" datasets.
 #'
 #' @return A \code{tibble}.

@@ -23,6 +23,7 @@ load_mapbiomas(
 \item For dataset "mapbiomas_mining", can be "indigenous_land", "municipality", "state", "biome" or "country".
 \item For dataset "mapbiomas_irrigation", can be "state" or "biome".
 \item For dataset "mapbiomas_water", can be "municipality", "state" or "biome".
+\item Does not apply to other datasets.
 }}
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.}
