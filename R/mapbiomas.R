@@ -142,7 +142,8 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
       dplyr::left_join(munic_codes, by = dplyr::join_by(city, state))
   }
 
-  if (param$geo_level == "municipality" & param$dataset == "mapbiomas_transition") {
+  if (param$geo_level == "municipality" &
+      (param$dataset == "mapbiomas_transition" | param$dataset == "mapbiomas_deforestation_regeneration") ) {
     munic_biomes <- datazoom.amazonia::municipalities_biomes %>%
       dplyr::select(feature_id, city = municipality_mapbiomas, geo_code = code_muni)
 
@@ -212,7 +213,7 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
     dplyr::select(-dplyr::any_of("category"))
 
   ## Aggregate by geo_level
-  if (param$dataset == "mapbiomas_transition") {
+  if (param$dataset == "mapbiomas_transition" | param$dataset == "mapbiomas_deforestation_regeneration") {
     dat <- dat %>%
       dplyr::group_by(dplyr::across(-c(feature_id, biome, value))) %>%
       dplyr::summarise(value = sum(value, na.rm = TRUE),
