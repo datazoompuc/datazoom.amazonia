@@ -96,6 +96,10 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
     dplyr::select(sheet) %>%
     unlist()
 
+  if (length(sheet) != 1) {
+    stop("`geo_level` not available for this dataset.")
+  }
+
   #################
   ## Downloading ##
   #################
