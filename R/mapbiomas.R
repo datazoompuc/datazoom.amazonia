@@ -2,12 +2,13 @@
 #'
 #' @description Loads information about land cover and use
 #'
-#' @param dataset A dataset name ("mapbiomas_cover", "mapbiomas_transition", "mapbiomas_irrigation", "mapbiomas_deforestation_regeneration", or "mapbiomas_mining")
+#' @param dataset A dataset name ("mapbiomas_cover", "mapbiomas_transition", "mapbiomas_irrigation", "mapbiomas_deforestation_regeneration", "mapbiomas_mining", "mapbiomas_grazing_quality", "mapbiomas_water" or "mapbiomas_fire")
 #' @inheritParams load_baci
 #' @param geo_level A \code{string} that defines the geographic level of the data.
-#'   * For datasets "mapbiomas_cover", "mapbiomas_transition" and "mapbiomas_deforestation_regeneration", can be "municipality" or "state" (faster download).
+#'   * For datasets "mapbiomas_cover", "mapbiomas_transition", "mapbiomas_deforestation_regeneration" and "mapbiomas_fire", can be "municipality" or "state" (faster download).
 #'   * For dataset "mapbiomas_mining", can be "indigenous_land", "municipality", "state", "biome" or "country".
 #'   * For dataset "mapbiomas_irrigation", can be "state" or "biome".
+#'   * For dataset "mapbiomas_water", can be "municipality", "state" or "biome".
 #' @param cover_level A \code{numeric} or \code{string} that indicates the cover aggregation level. Can be "0", "1", "2", "3", "4", or "none", which means no aggregation. Aggregation only supported for "mapbiomas_cover" and "mapbiomas_grazing_quality" datasets.
 #'
 #' @return A \code{tibble}.
@@ -77,7 +78,13 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
     "mapbiomas_mining", "state", "UF",
     "mapbiomas_mining", "biome", "BIOME",
     "mapbiomas_mining", "municipality", "MUN",
-    "mapbiomas_mining", "indigenous_land", "TI"
+    "mapbiomas_mining", "indigenous_land", "TI",
+    "mapbiomas_water", "state", "states_annual",
+    "mapbiomas_water", "biome", "biomes_annual",
+    "mapbiomas_water", "municipality", "mun_annual",
+    "mapbiomas_fire", "state", "MUNICIPIOS-UF",
+    "mapbiomas_fire", "biome", "BIOMAS",
+    "mapbiomas_fire", "municipality", "MUNICIPIOS-UF"
   )
 
   sheet <- sheets %>%

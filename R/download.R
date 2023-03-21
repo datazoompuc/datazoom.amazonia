@@ -391,6 +391,12 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     if (dataset == "mapbiomas_mining") {
       path <- paste(param$url, "Estat%C3%ADsticas/Colecao_7_Mining_BR_UF_Biome_Mun_TI_SITE__3_.xlsx", sep = "")
     }
+    if (dataset == "mapbiomas_water") {
+      path <- paste(param$url, "Estat%C3%ADsticas/Estatisticas_Superficie%C3%81gua_Col2_SITE.xlsx", sep = "")
+    }
+    if (dataset == "mapbiomas_fire") {
+      path <- paste(param$url, "Estat%C3%ADsticas/mapbiomas-FIRE-ANUAL_Biome_UF_city-SITE.xlsx", sep = "")
+    }
   }
 
   ## SEEG
@@ -631,13 +637,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       names(dat) <- param$year
     }
 
-    if (param$source == "mapbiomas") {
-
-      # extracting the one file we care about from the unzipped file
-      file <- list.files(dir, pattern = "1-ESTATISTICAS_MapBiomas_COL6.0_UF-MUNICIPIOS_*", full.names = TRUE)
-
-      dat <- readxl::read_xlsx(file, sheet = param$sheet)
-    }
   }
 
   if (param$source == "EPE" & param$dataset == "energy_consumption_per_class") {
@@ -850,7 +849,9 @@ datasets_link <- function() {
     "MAPBIOMAS", "mapbiomas_deforestation_regeneration", NA, "1988-2017", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
     "MAPBIOMAS", "mapbiomas_irrigation", NA, "2000-2019", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
     "MAPBIOMAS", "mapbiomas_grazing_quality", NA, "2010 & 2018", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
-    "MAPBIOMAS", "mapbiomas_mining", NA, "1985-2020", "country, state, municipality, biome, indigenous", "https://mapbiomas-br-site.s3.amazonaws.com/",
+    "MAPBIOMAS", "mapbiomas_mining", NA, "1985-2020", "Country, State, Municipality, Biome, Indigenous", "https://mapbiomas-br-site.s3.amazonaws.com/",
+    "MAPBIOMAS", "mapbiomas_fire", NA, "1985-2020", "State, Municipality", "https://mapbiomas-br-site.s3.amazonaws.com/",
+    "MAPBIOMAS", "mapbiomas_water", NA, "1985-2022", "State, Municipality, Biome", "https://mapbiomas-br-site.s3.amazonaws.com/",
 
     #############
     ## SIGMINE ##
