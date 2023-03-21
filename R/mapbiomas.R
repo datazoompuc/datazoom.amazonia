@@ -47,7 +47,7 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
   survey <- link <- x1985 <- x2019 <- NULL
   ano <- bioma <- category <- cidade <- city <- class_id <- country <- estado <- feature_id <- group <- terra_indigena <- NULL
   id <- indigenous_land <- level_2 <- level_3 <- name_pt_br <- pais <- x2020 <- NULL
-  territory_id <- municipality <- state <- year <- value <- NULL
+  territory_id <- municipality <- state <- year <- value <- state_lower <- NULL
   abbrev_state <- code_muni <- name_state <- geo_code <- municipality_mapbiomas <- NULL
   x1985_to_1986 <- x2018_to_2019 <- x1988 <- x2017 <- x2000 <- x2010 <- x2018 <- biome <- level_1 <- NULL
 
@@ -121,12 +121,21 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
         "municipality" = "city",
     )
 
-  if (param$geo_level == "municipality") {
+  if (param$geo_level == "municipality" & param$dataset != "mapbiomas_transition") {
     munic_codes <- datazoom.amazonia::municipalities %>%
       dplyr::select(state = abbrev_state, city = municipality_mapbiomas, geo_code = code_muni)
 
     dat <- dat %>%
       dplyr::left_join(munic_codes, by = dplyr::join_by(city, state))
+  }
+
+  if (param$geo_level == "municipality" & param$dataset == "mapbiomas_transition") {
+    munic_biomes <- datazoom.amazonia::municipalities_biomes %>%
+      dplyr::select(feature_id, city = municipality_mapbiomas, geo_code = code_muni)
+
+    dat <- dat %>%
+      dplyr::select(-city) %>%
+      dplyr::left_join(munic_biomes, by = dplyr::join_by(feature_id))
   }
 
   if (param$geo_level == "state") {
