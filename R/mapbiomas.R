@@ -176,7 +176,7 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
         id_cols = dplyr::any_of(c(
           "geo_code", "city",
           "state", "year",
-          "biome"
+          "biome", "feature_id"
         )),
         names_from = paste0("level_", param$cover_level),
         values_from = value,
@@ -188,6 +188,23 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
 
   dat <- dat %>%
     dplyr::select(-dplyr::any_of("category"))
+
+  ## Aggregate by geo_level
+  if (param$geo_level == "municipality" & param$dataset == "mapbiomas_transition") {
+    dat <- dat %>%
+      dplyr::group_by(dplyr::across(-c(feature_id, biome, value))) %>%
+      dplyr::summarise(value = sum(value, na.rm = TRUE),
+                       state = unique(state))
+  }
+
+  if (param$dataset == "mapbiomas_cover") {
+    dat <- dat %>%
+      dplyr::group_by(dplyr::across(-c(feature_id, biome, dplyr::starts_with("x")))) %>%
+      dplyr::summarise(dplyr::across(dplyr::starts_with("x"), ~sum(.x, na.rm = TRUE)),
+                       state = unique(state))
+  }
+
+
 
   #################
   ## Translation ##
