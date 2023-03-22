@@ -373,23 +373,29 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source == "mapbiomas") {
     if (dataset %in% c("mapbiomas_cover", "mapbiomas_transition")) {
       if (param$geo_level == "state") {
-        path <- paste(param$url, "Estat%C3%ADsticas/Cole%C3%A7%C3%A3o%206/1-ESTATISTICAS_MapBiomas_COL6.0_UF-BIOMAS_v12_SITE.xlsx", sep = "")
+        path <- paste(param$url, "Estat%C3%ADsticas/1_-_TABELA_GERAL_COL7_MAPBIOMAS_BIOMAS_UF_FINAL.xlsx", sep = "")
       }
       if (param$geo_level == "municipality") {
-        path <- "https://drive.google.com/uc?export=download&id=1RT7J2jS6LKyISM49ctfRO31ynJZXX_TY"
+        path <- "https://storage.googleapis.com/mapbiomas-public/brasil/downloads/1-tabela-geral-col7-mapbiomas-biomas-municipio-final.xlsx"
       }
     }
     if (dataset == "mapbiomas_deforestation_regeneration") {
-      path <- paste(param$url, "Estat%C3%ADsticas/BD-DESM_e_REG_COL5_V8h__SITE.xlsx", sep = "")
+      path <- paste(param$url, "Estat%C3%ADsticas/TABELA_GERAL_COL7_MAPBIOMAS_DESMAT_VEGSEC_UF.xlsx", sep = "")
     }
     if (dataset == "mapbiomas_irrigation") {
-      path <- paste(param$url, "Estat%C3%ADsticas/MapBIomas_COL5_IRRIGACAO-biomas-estados-SITE.xlsx", sep = "")
+      path <- paste(param$url, "Colecao_7_Irrigacao_Biomes_UF.xlsx", sep = "")
     }
     if (dataset == "mapbiomas_grazing_quality") {
       path <- paste(param$url, "Estat%C3%ADsticas/MapBIomas_COL5_QUALIDADE_PASTAGEM-biomas-estados-SITE.xlsx", sep = "")
     }
     if (dataset == "mapbiomas_mining") {
-      path <- paste(param$url, "Estat%C3%ADsticas/Cole%C3%A7%C3%A3o%206/Colecao_6_Mining_BR_UF_Biome_Mun_TI_SITE.xlsx", sep = "")
+      path <- paste(param$url, "Colecao_7_Mining_BR_UF_Biome_Mun_TI_SITE__3_.xlsx", sep = "")
+    }
+    if (dataset == "mapbiomas_water") {
+      path <- paste(param$url, "Estat%C3%ADsticas/Estatisticas_Superficie%C3%81gua_Col2_SITE.xlsx", sep = "")
+    }
+    if (dataset == "mapbiomas_fire") {
+      path <- paste(param$url, "Estat%C3%ADsticas/mapbiomas-FIRE-ANUAL_Biome_UF_city-SITE.xlsx", sep = "")
     }
   }
 
@@ -481,11 +487,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   # googledrive links do not contain the file extension, for example
 
-  if (source == "mapbiomas" & dataset %in% c("mapbiomas_cover", "mapbiomas_transition")) {
-    if (param$geo_level == "municipality") {
-      file_extension <- ".zip"
-    }
-  }
   if (source == "cipo") {
     file_extension <- ".csv"
   }
@@ -557,11 +558,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   }
   if (source == "seeg") {
     if (geo_level == "municipality") {
-      download_method <- "googledrive"
-    }
-  }
-  if (source == "mapbiomas") {
-    if (dataset %in% c("mapbiomas_cover", "mapbiomas_transition") & param$geo_level == "municipality") {
       download_method <- "googledrive"
     }
   }
@@ -641,13 +637,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       names(dat) <- param$year
     }
 
-    if (param$source == "mapbiomas") {
-
-      # extracting the one file we care about from the unzipped file
-      file <- list.files(dir, pattern = "1-ESTATISTICAS_MapBiomas_COL6.0_UF-MUNICIPIOS_*", full.names = TRUE)
-
-      dat <- readxl::read_xlsx(file, sheet = param$sheet)
-    }
   }
 
   if (param$source == "EPE" & param$dataset == "energy_consumption_per_class") {
@@ -860,7 +849,9 @@ datasets_link <- function() {
     "MAPBIOMAS", "mapbiomas_deforestation_regeneration", NA, "1988-2017", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
     "MAPBIOMAS", "mapbiomas_irrigation", NA, "2000-2019", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
     "MAPBIOMAS", "mapbiomas_grazing_quality", NA, "2010 & 2018", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
-    "MAPBIOMAS", "mapbiomas_mining", NA, "1985-2020", "country, state, municipality, biome, indigenous", "https://mapbiomas-br-site.s3.amazonaws.com/",
+    "MAPBIOMAS", "mapbiomas_mining", NA, "1985-2020", "Country, State, Municipality, Biome, Indigenous", "https://mapbiomas-br-site.s3.amazonaws.com/",
+    "MAPBIOMAS", "mapbiomas_fire", NA, "1985-2020", "State, Municipality", "https://mapbiomas-br-site.s3.amazonaws.com/",
+    "MAPBIOMAS", "mapbiomas_water", NA, "1985-2022", "State, Municipality, Biome", "https://mapbiomas-br-site.s3.amazonaws.com/",
 
     #############
     ## SIGMINE ##

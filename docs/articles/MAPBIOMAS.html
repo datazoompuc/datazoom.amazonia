@@ -185,6 +185,10 @@ and forest regeneration</li>
 <code>"mapbiomas_grazing_quality"</code>: grazing quality</li>
 <li>
 <code>"mapbiomas_mining"</code>: areas used for mining</li>
+<li>
+<code>"mapbiomas_water"</code>: areas of water surface</li>
+<li>
+<code>"mapbiomas_fire"</code>: areas of wildfire burn scars</li>
 </ul>
 </li>
 <li>
@@ -200,11 +204,20 @@ data.</li>
 <li>
 <p><strong>geo_level</strong>:</p>
 <ul>
-<li>For datasets <code>"mapbiomas_cover"</code> and
-<code>"mapbiomas_transition"</code>, can be <code>"municipality"</code>
-or <code>"state"</code> (faster download).</li>
+<li>For datasets <code>"mapbiomas_cover"</code>,
+<code>"mapbiomas_transition"</code>,
+<code>"mapbiomas_deforestation_regeneration"</code> and
+<code>"mapbiomas_fire"</code>, can be <code>"municipality"</code> or
+<code>"state"</code> (faster download).</li>
 <li>For dataset <code>"mapbiomas_mining"</code>, can be
-<code>"biome"</code> or <code>"indigenous_land"</code>.</li>
+<code>"indigenous_land"</code>, <code>"municipality"</code>,
+<code>"state"</code>, <code>"biome"</code> or
+<code>"country"</code>.</li>
+<li>For dataset <code>"mapbiomas_irrigation"</code>, can be
+<code>"state"</code> or <code>"biome"</code>.</li>
+<li>For dataset <code>"mapbiomas_water"</code>, can be
+<code>"municipality"</code>, <code>"state"</code> or
+<code>"biome"</code>.</li>
 <li>Does not apply to other datasets.</li>
 </ul>
 </li>
@@ -273,7 +286,7 @@ and Dune, Forest Formation, Forest Plantation</li>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

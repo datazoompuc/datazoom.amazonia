@@ -382,6 +382,8 @@ from the year 1989.
     - `"mapbiomas_irrigation"`: irrigated areas
     - `"mapbiomas_grazing_quality"`: grazing quality
     - `"mapbiomas_mining"`: areas used for mining
+    - `"mapbiomas_water"`: areas of water surface
+    - `"mapbiomas_fire"`: areas of wildfire burn scars
 
 2.  **raw_data**: there are two options:
 
@@ -390,10 +392,15 @@ from the year 1989.
 
 3.  **geo_level**:
 
-    - For datasets `"mapbiomas_cover"` and `"mapbiomas_transition"`, can
-      be `"municipality"` or `"state"` (faster download).
-    - For dataset `"mapbiomas_mining"`, can be `"biome"` or
-      `"indigenous_land"`.
+    - For datasets `"mapbiomas_cover"`, `"mapbiomas_transition"`,
+      `"mapbiomas_deforestation_regeneration"` and `"mapbiomas_fire"`,
+      can be `"municipality"` or `"state"` (faster download).
+    - For dataset `"mapbiomas_mining"`, can be `"indigenous_land"`,
+      `"municipality"`, `"state"`, `"biome"` or `"country"`.
+    - For dataset `"mapbiomas_irrigation"`, can be `"state"` or
+      `"biome"`.
+    - For dataset `"mapbiomas_water"`, can be `"municipality"`,
+      `"state"` or `"biome"`.
     - Does not apply to other datasets.
 
 4.  **language**: you can choose between Portuguese `("pt")` and English
