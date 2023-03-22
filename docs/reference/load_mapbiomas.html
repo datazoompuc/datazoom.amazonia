@@ -141,7 +141,7 @@
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>dataset</dt>
-<dd><p>A dataset name ("mapbiomas_cover", "mapbiomas_transition", "mapbiomas_irrigation", "mapbiomas_deforestation_regeneration", "mapbiomas_grazing_quality", or "mapbiomas_mining")</p></dd>
+<dd><p>A dataset name ("mapbiomas_cover", "mapbiomas_transition", "mapbiomas_irrigation", "mapbiomas_deforestation_regeneration", "mapbiomas_mining", "mapbiomas_grazing_quality", "mapbiomas_water" or "mapbiomas_fire")</p></dd>
 
 
 <dt>raw_data</dt>
@@ -149,8 +149,11 @@
 
 
 <dt>geo_level</dt>
-<dd><p>A <code>string</code> that defines the geographic level of the data.</p><ul><li><p>For datasets "mapbiomas_cover" and "mapbiomas_transition", can be "municipality" or "state" (faster download).</p></li>
-<li><p>For dataset "mapbiomas_mining", can be "biome" or "indigenous_land".</p></li>
+<dd><p>A <code>string</code> that defines the geographic level of the data.</p><ul><li><p>For datasets "mapbiomas_cover", "mapbiomas_transition", "mapbiomas_deforestation_regeneration" and "mapbiomas_fire", can be "municipality" or "state" (faster download).</p></li>
+<li><p>For dataset "mapbiomas_mining", can be "indigenous_land", "municipality", "state", "biome" or "country".</p></li>
+<li><p>For dataset "mapbiomas_irrigation", can be "state" or "biome".</p></li>
+<li><p>For dataset "mapbiomas_water", can be "municipality", "state" or "biome".</p></li>
+<li><p>Does not apply to other datasets.</p></li>
 </ul></dd>
 
 
@@ -208,7 +211,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>
