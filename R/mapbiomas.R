@@ -51,7 +51,7 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
   ano <- bioma <- category <- cidade <- city <- class_id <- country <- estado <- feature_id <- group <- terra_indigena <- NULL
   id <- indigenous_land <- level_2 <- level_3 <- name_pt_br <- pais <- x2020 <- code <- name <- NULL
   territory_id <- municipality <- state <- year <- value <- state_lower <- level_4 <- from_class <- to_class <- NULL
-  abbrev_state <- code_muni <- name_state <- geo_code <- municipality_mapbiomas <- NULL
+  abbrev_state <- code_muni <- name_state <- geo_code <- municipality_mapbiomas <- index <- NULL
   x1985_to_1986 <- x2018_to_2019 <- x1988 <- x2017 <- x2000 <- x2010 <- x2018 <- biome <- level_1 <- NULL
 
   #############################
@@ -172,9 +172,25 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
         "municipality" = "city",
     )
 
-  if (param$geo_level == "municipality" & param$dataset != "mapbiomas_transition") {
+  if (param$geo_level == "municipality" &
+      !(param$dataset %in% c("mapbiomas_transition",
+                             "mapbiomas_deforestation_regeneration",
+                             "mapbiomas_fire"))) {
+
     munic_codes <- datazoom.amazonia::municipalities %>%
       dplyr::select(state = abbrev_state, city = municipality_mapbiomas, geo_code = code_muni)
+
+    dat <- dat %>%
+      dplyr::left_join(munic_codes, by = dplyr::join_by(city, state))
+  }
+
+  if (param$geo_level == "municipality" & param$dataset == "mapbiomas_fire") {
+
+    munic_codes <- datazoom.amazonia::municipalities %>%
+      dplyr::select(state = name_state, city = municipality_mapbiomas, geo_code = code_muni) %>%
+      dplyr::mutate(state = toupper(state),
+                    city = toupper(city))
+
 
     dat <- dat %>%
       dplyr::left_join(munic_codes, by = dplyr::join_by(city, state))
@@ -262,6 +278,13 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
     dat <- dat %>%
       dplyr::group_by(dplyr::across(-c(feature_id, biome, dplyr::starts_with("x")))) %>%
       dplyr::summarise(dplyr::across(dplyr::starts_with("x"), ~sum(.x, na.rm = TRUE)),
+                       state = unique(state))
+  }
+
+  if (param$dataset == "mapbiomas_fire" & param$geo_level == "state") {
+    dat <- dat %>%
+      dplyr::group_by(dplyr::across(-c(feature_id, city, geo_code, index, value))) %>%
+      dplyr::summarise(value = sum(value, na.rm = TRUE),
                        state = unique(state))
   }
 
