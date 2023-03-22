@@ -37,13 +37,13 @@ The datazoom.amazonia package facilitates access to official Brazilian Amazon da
 You can install the released version of `datazoom.amazonia` from
 [CRAN](https://CRAN.R-project.org/package=datazoom.amazonia) with:
 
-``` r
+``` {r, eval=FALSE}
 install.packages("datazoom.amazonia")
 ```
 
 And the development version from GitHub with:
 
-``` r
+``` {r, eval=FALSE}
 # install.packages("devtools")
 devtools::install_github("datazoompuc/datazoom.amazonia")
 ```
@@ -164,8 +164,6 @@ devtools::load_all()
 
 ```{r child = "vignettes/MAPBIOMAS.Rmd"}
 ```
-
-&#x1F534; This function uses the `googledrive` package to download data for datasets `"mapbiomas_cover"` and `"mapbiomas_transition"` at the municipality level. In case of authentication errors, see [googledrive](#googledrive).
 
 ## CIPO
 

@@ -445,11 +445,6 @@ data <- load_mapbiomas("mapbiomas_mining",
                        geo_level = "indigenous_land")
 ```
 
-🔴 This function uses the `googledrive` package to download data for
-datasets `"mapbiomas_cover"` and `"mapbiomas_transition"` at the
-municipality level. In case of authentication errors, see
-[googledrive](#googledrive).
-
 ## CIPO
 
 Mappings by [Plataforma CIPÓ](https://plataformacipo.org/) on
