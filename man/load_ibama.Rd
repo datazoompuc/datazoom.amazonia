@@ -7,7 +7,7 @@
 load_ibama(dataset, raw_data = FALSE, states = "all", language = "eng")
 }
 \arguments{
-\item{dataset}{A dataset name ("areas_embargadas", "distributed_fines", or "collected_fines")}
+\item{dataset}{A dataset name ("embargoed_areas", "distributed_fines", or "collected_fines")}
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
@@ -25,7 +25,7 @@ Loads information on environmental fines in the Amazon region
 \dontrun{
 # Download treated embargoes data (raw_data = FALSE) in english (language = "eng")
 data <- load_ibama(
-  dataset = "areas_embargadas", raw_data = FALSE,
+  dataset = "embargoed_areas", raw_data = FALSE,
   language = "eng"
 )
 

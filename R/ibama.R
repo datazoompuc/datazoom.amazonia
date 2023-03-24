@@ -2,7 +2,7 @@
 #'
 #' @description Loads information on environmental fines in the Amazon region
 #'
-#' @param dataset A dataset name ("areas_embargadas", "distributed_fines", or "collected_fines")
+#' @param dataset A dataset name ("embargoed_areas", "distributed_fines", or "collected_fines")
 #' @inheritParams load_baci
 #' @param states A \code{string} specifying for which states to download the data. It is "all" by default, but can be a single state such as "AC" or any vector such as c("AC", "AM"). Does not apply to the "areas_embargadas" dataset.
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported.
@@ -13,7 +13,7 @@
 #' \dontrun{
 #' # Download treated embargoes data (raw_data = FALSE) in english (language = "eng")
 #' data <- load_ibama(
-#'   dataset = "areas_embargadas", raw_data = FALSE,
+#'   dataset = "embargoed_areas", raw_data = FALSE,
 #'   language = "eng"
 #' )
 #'
@@ -57,7 +57,7 @@ load_ibama <- function(dataset,
   if (states == "all") {
     param$states <- c("RO", "AC", "AM", "RR", "PA", "AP", "TO", "MA", "PI", "CE", "RN", "PB", "PE", "AL", "SE", "BA", "MG", "ES", "RJ", "SP", "PR", "SC", "RS", "MS", "MT", "GO", "DF")
   }
-  if (dataset == "areas_embargadas") {
+  if (dataset == "embargoed_areas") {
     param$states <- "all"
   }
 
@@ -190,7 +190,7 @@ load_ibama <- function(dataset,
       )
   }
 
-  if (dataset == "areas_embargadas") {
+  if (dataset == "embargoed_areas") {
 
     ## Aggregate to municipality-level
     dat <- dat %>%
@@ -243,7 +243,7 @@ load_ibama <- function(dataset,
   ## Harmonizing Variable Names ##
   ################################
 
-  if (dataset == "areas_embargadas") {
+  if (dataset == "embargoed_areas") {
     if (param$language == "pt") {
       dat_mod <- dat %>%
         dplyr::select(

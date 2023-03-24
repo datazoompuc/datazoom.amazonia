@@ -417,7 +417,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   # Download path depends on state
 
   if (source == "ibama") {
-    if (dataset == "areas_embargadas") {
+    if (dataset == "embargoed_areas") {
       path <- param$url
     } else if (dataset == "distributed_fines") {
       path <- paste0(param$url, param$state, "/Quantidade/multasDistribuidasBensTutelados.csv")
@@ -503,7 +503,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     file_extension <- ".zip"
   }
   if (source == "ibama") {
-    if (dataset == "areas_embargadas") {
+    if (dataset == "embargoed_areas") {
       file_extension <- ".zip"
     } else {
       file_extension <- ".csv"
@@ -880,7 +880,7 @@ datasets_link <- function() {
     ## IBAMA ##
     ###########
 
-    "IBAMA", "areas_embargadas", NA, NA, "Municipality", "https://servicos.ibama.gov.br/ctf/publico/areasembargadas/downloadListaAreasEmbargadas.php",
+    "IBAMA", "embargoed_areas", NA, NA, "Municipality", "https://servicos.ibama.gov.br/ctf/publico/areasembargadas/downloadListaAreasEmbargadas.php",
     "IBAMA", "distributed_fines", NA, NA, "Municipality", "https://dadosabertos.ibama.gov.br/dados/SICAFI/",
     "IBAMA", "collected_fines", NA, NA, "Municipality", "https://dadosabertos.ibama.gov.br/dados/SICAFI/",
 

@@ -324,7 +324,7 @@ regarding distributed and collected fines across municipalities
 
 1.  **dataset**: there are three possible choices.
 
-    - `"areas_embargadas"`: embargoed areas
+    - `"embargoed_areas"`: embargoed areas
     - `"distributed_fines"`: fines that have not been paid by
       individuals or corporations
     - `"collected_fines"`: fines that have been paid by individuals or
@@ -338,7 +338,7 @@ regarding distributed and collected fines across municipalities
 3.  **states**: specifies for which states to download the data. It is
     “all” by default, but can be a single state such as `"AC"` or any
     vector such as `c("AC", "AM")`. Does not apply to the
-    `"areas_embargadas"` dataset.
+    `"embargoed_areas"` dataset.
 
 4.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`
@@ -351,7 +351,7 @@ regarding distributed and collected fines across municipalities
 library(datazoom.amazonia)
 
 # Download treated embargoes data (raw_data = FALSE) in english (language = "eng")
-data <- load_ibama(dataset = "areas_embargadas", raw_data = FALSE, 
+data <- load_ibama(dataset = "embargoed_areas", raw_data = FALSE, 
                    language = "eng")
 
 # Download treated collected fines data from "BA"
