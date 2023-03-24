@@ -417,7 +417,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   # Download path depends on state
 
   if (source == "ibama") {
-    if (dataset == "areas_embargadas") {
+    if (dataset == "embargoed_areas") {
       path <- param$url
     } else if (dataset == "distributed_fines") {
       path <- paste0(param$url, param$state, "/Quantidade/multasDistribuidasBensTutelados.csv")
@@ -503,7 +503,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     file_extension <- ".zip"
   }
   if (source == "ibama") {
-    if (dataset == "areas_embargadas") {
+    if (dataset == "embargoed_areas") {
       file_extension <- ".zip"
     } else {
       file_extension <- ".csv"
@@ -552,8 +552,13 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     download_method <- "curl"
     quiet <- FALSE
   }
-  if (source %in% c("ibama", "datasus")) {
+  if (source == "datasus") {
     download_method <- "curl"
+    quiet <- TRUE
+  }
+  if (source == "ibama") {
+    download_method <- "curl"
+    options(download.file.method = "curl", download.file.extra = "-k -L") # https://stackoverflow.com/questions/69716835/turning-ssl-verification-off-inside-download-file
     quiet <- TRUE
   }
   if (source == "seeg") {
@@ -875,7 +880,7 @@ datasets_link <- function() {
     ## IBAMA ##
     ###########
 
-    "IBAMA", "areas_embargadas", NA, NA, "Municipality", "https://servicos.ibama.gov.br/ctf/publico/areasembargadas/downloadListaAreasEmbargadas.php",
+    "IBAMA", "embargoed_areas", NA, NA, "Municipality", "https://servicos.ibama.gov.br/ctf/publico/areasembargadas/downloadListaAreasEmbargadas.php",
     "IBAMA", "distributed_fines", NA, NA, "Municipality", "https://dadosabertos.ibama.gov.br/dados/SICAFI/",
     "IBAMA", "collected_fines", NA, NA, "Municipality", "https://dadosabertos.ibama.gov.br/dados/SICAFI/",
 
