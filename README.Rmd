@@ -37,13 +37,13 @@ The datazoom.amazonia package facilitates access to official Brazilian Amazon da
 You can install the released version of `datazoom.amazonia` from
 [CRAN](https://CRAN.R-project.org/package=datazoom.amazonia) with:
 
-``` r
+``` {r, eval=FALSE}
 install.packages("datazoom.amazonia")
 ```
 
 And the development version from GitHub with:
 
-``` r
+``` {r, eval=FALSE}
 # install.packages("devtools")
 devtools::install_github("datazoompuc/datazoom.amazonia")
 ```
@@ -165,8 +165,6 @@ devtools::load_all()
 ```{r child = "vignettes/MAPBIOMAS.Rmd"}
 ```
 
-&#x1F534; This function uses the `googledrive` package to download data for datasets `"mapbiomas_cover"` and `"mapbiomas_transition"` at the municipality level. In case of authentication errors, see [googledrive](#googledrive).
-
 ## CIPO
 
 ```{r child = "vignettes/CIPO.Rmd"}
@@ -276,3 +274,19 @@ devtools::load_all()
 
 DataZoom is developed by a team at Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio), Department of Economics. Our official website is at: <https://www.econ.puc-rio.br/datazoom/>.
 
+To cite package `datazoom.amazonia` in publications use:
+
+> Data Zoom (2023). Data Zoom: Simplifying Access To Brazilian Microdata.  
+> https://www.econ.puc-rio.br/datazoom/english/index.html
+
+A BibTeX entry for LaTeX users is:
+
+``` 
+@Unpublished{DataZoom2023,
+	author = {Data Zoom},
+	title = {Data Zoom: Simplifying Access To Brazilian Microdata},
+	url = {https://www.econ.puc-rio.br/datazoom/english/index.html},
+	year = {2023},
+}
+
+```

@@ -79,11 +79,13 @@ load_cipo <- function(dataset = "brazilian_actors", raw_data = FALSE,
 
   # only modification is to filter rows that include the 'search' parameter
 
-  dat <- dat %>%
-    tidyr::unite(aux, sep = " ", remove = FALSE) %>%
-    dplyr::mutate(dplyr::across(aux, clean_text)) %>%
-    dplyr::filter(stringr::str_detect(aux, param$search)) %>%
-    dplyr::select(-aux)
+  if (param$search != "") {
+    dat <- dat %>%
+      tidyr::unite(aux, sep = " ", remove = FALSE) %>%
+      dplyr::mutate(dplyr::across(aux, clean_text)) %>%
+      dplyr::filter(stringr::str_detect(aux, param$search)) %>%
+      dplyr::select(-aux)
+  }
 
   # no translation as everything is text-based
 
