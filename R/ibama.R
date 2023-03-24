@@ -43,6 +43,12 @@ load_ibama <- function(dataset,
   municipio_infracao <- uf_infracao <- uf <- NULL
   municipio <- name_muni <- code_muni <- municipality <- NULL
   data_auto <- abbrev_state <- ultima_atualizacao_relatorio <- tipo_auto <- valor_do_auto <- NULL
+  acao_fiscalizatoria <- amazonia_legal <- cod_tipo_bioma <- cod_uf_tad <- cpf_cnpj_embargado <- NULL
+  dat_embargo <- dat_impressao <- dat_ult_alter_geom <- data_embargo <- data_impressao <- NULL
+  data_ult_alter_geom <- des_infracao <- des_localizacao <- des_tad <- hora_embargo <- NULL
+  hora_impressao <- hora_ult_alter_geom <- nome_pessoa_embargada <- num_auto_infracao <- num_processo <- NULL
+  num_tad <- ordem_fiscalizacao <- qtd_area_desmatada <- qtd_area_embargada <- ser_auto_infracao <- NULL
+  ser_tad <- sit_desmatamento <- state <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -55,7 +61,9 @@ load_ibama <- function(dataset,
   param$states <- states
 
   if (states == "all") {
-    param$states <- c("RO", "AC", "AM", "RR", "PA", "AP", "TO", "MA", "PI", "CE", "RN", "PB", "PE", "AL", "SE", "BA", "MG", "ES", "RJ", "SP", "PR", "SC", "RS", "MS", "MT", "GO", "DF")
+    param$states <- c("RO", "AC", "AM", "RR", "PA", "AP", "TO", "MA", "PI", "CE", "RN",
+                      "PB", "PE", "AL", "SE", "BA", "MG", "ES", "RJ", "SP", "PR", "SC",
+                      "RS", "MS", "MT", "GO", "DF")
   }
   if (dataset == "embargoed_areas") {
     param$states <- "all"
@@ -96,38 +104,24 @@ load_ibama <- function(dataset,
     dplyr::bind_rows() %>%
     janitor::clean_names()
 
-  if (dataset %in% c("collected_fines", "distributed_fines")) {
-
-    # data come without municipality codes, only their names. +so we turn everything lowercase and remove accents to try and match.
-
-    dat <- dat %>%
-      dplyr::mutate( # removing accents from municipality names
+  # data come without municipality codes, only their names. +so we turn everything lowercase and remove accents to try and match.
+  dat <- dat %>%
+      dplyr::mutate(
+        name_muni = municipio,
+        # removing accents from municipality names
         dplyr::across(municipio, ~ stringi::stri_trans_general(., id = "Latin-ASCII"))
       ) %>%
       dplyr::mutate(dplyr::across(municipio, tolower)) # making all municipality names lowercase
 
-    geo <- municipalities %>%
+    geo <- datazoom.amazonia::municipalities %>%
       dplyr::select(
         code_muni,
-        name_muni,
+        "municipio" = name_muni,
         "uf" = abbrev_state,
         legal_amazon
       )
 
-    # Removing accents from the dataset with IBGE codes to make the city names compatible and merge
-
-    geo <- geo %>%
-      dplyr::mutate(
-        dplyr::across(
-          name_muni,
-          ~ stringi::stri_trans_general(., id = "Latin-ASCII"),
-          .names = "municipio"
-        )
-      ) %>%
-      dplyr::mutate(dplyr::across(municipio, tolower))
-
     # 41 municipalities don't match due to spelling inconsistencies
-
     dat <- dat %>%
       dplyr::mutate(
         municipio = dplyr::case_when(
@@ -179,65 +173,43 @@ load_ibama <- function(dataset,
         TRUE ~ uf
       ))
 
-    # Changing dates to date format
-
+    # Merging with IBGE municipalities
     dat <- dat %>%
-      dplyr::mutate(
-        dplyr::across(dplyr::any_of(c("data_auto", "data_pagamento")), as.Date, format = "%d/%m/%Y")
-      ) %>%
-      dplyr::mutate(
-        dplyr::across(ultima_atualizacao_relatorio, as.POSIXct, format = "%d/%m/%Y %H:%M")
-      )
-  }
+      dplyr::left_join(geo, by = c("municipio", "uf"))
 
-  if (dataset == "embargoed_areas") {
 
-    ## Aggregate to municipality-level
-    dat <- dat %>%
-      dplyr::select(
-        municipio_infracao, uf_infracao, julgamento,
-        infracao, data_de_insercao_na_lista,
-        cpf_ou_cnpj
-      ) %>%
-      dplyr::mutate(
-        julgamento = ifelse(julgamento == "pendente de julgamento", FALSE, TRUE),
-        data_de_insercao_na_lista = lubridate::dmy(data_de_insercao_na_lista),
-        ano = lubridate::year(data_de_insercao_na_lista),
-        mes = lubridate::month(data_de_insercao_na_lista)
-      ) %>%
-      dplyr::rename(
-        municipio = municipio_infracao,
-        uf = uf_infracao
-      ) %>%
-      dplyr::group_by(uf, municipio, ano, mes) %>%
-      dplyr::summarise(
-        n_ja_julgado = sum(!is.na(julgamento), na.rm = TRUE),
-        n_infracoes = dplyr::n(),
-        n_cpf_cnpj_unicos = length(unique(cpf_ou_cnpj)),
-        .groups = "drop"
-      )
+    if (dataset %in% c("collected_fines", "distributed_fines")) {
 
-    geo <- municipalities %>%
-      dplyr::select(
-        code_muni,
-        "municipio" = name_muni,
-        "uf" = abbrev_state,
-        legal_amazon
-      )
-  }
+      # Changing dates to date format
+      dat <- dat %>%
+        dplyr::mutate(
+          dplyr::across(dplyr::any_of(c("data_auto", "data_pagamento")), as.Date, format = "%d/%m/%Y")
+        ) %>%
+        dplyr::mutate(
+          dplyr::across(dplyr::where(is.character), ~dplyr::na_if(.x, "")),
+          dplyr::across(ultima_atualizacao_relatorio, as.POSIXct, format = "%d/%m/%Y %H:%M")
+        ) %>%
+        dplyr::mutate(dplyr::across(dplyr::starts_with("valor"), .fns = ~ gsub("[.]", "", .x))) %>%
+        dplyr::mutate(dplyr::across(dplyr::starts_with("valor"), ~ gsub("[,]", ".", .x) %>% as.numeric()))
 
-  ## Adding IBGE municipality codes
+    }
 
-  municipalities <- municipalities %>%
-    dplyr::select(
-      municipio = name_muni,
-      cod_municipio = code_muni
-    )
+    if (dataset == "embargoed_areas") {
 
-  # Merging with IBGE municipalities
+      ## Minor corrections
+      dat <- dat %>%
+        tidyr::separate(col = dat_embargo, into = c("data_embargo", "hora_embargo"), sep = " ") %>%
+        tidyr::separate(col = dat_impressao, into = c("data_impressao", "hora_impressao"), sep = " ") %>%
+        tidyr::separate(col = dat_ult_alter_geom, into = c("data_ult_alter_geom", "hora_ult_alter_geom"), sep = " ") %>%
+        suppressWarnings() %>%
+        dplyr::mutate(dplyr::across(dplyr::where(is.character), ~dplyr::na_if(.x, "")),
+                      data_embargo = as.Date(data_embargo, "%d/%m/%Y"),
+                      data_impressao = as.Date(data_impressao, "%d/%m/%Y"),
+                      data_ult_alter_geom = as.Date(data_ult_alter_geom, "%d/%m/%Y"),
+                      dplyr::across(dplyr::starts_with("qtd"), ~ gsub("[,]", ".", .x) %>% as.numeric())
+                      )
 
-  dat <- dat %>%
-    dplyr::left_join(geo, by = c("municipio", "uf"))
+    }
 
   ################################
   ## Harmonizing Variable Names ##
@@ -246,23 +218,44 @@ load_ibama <- function(dataset,
   if (dataset == "embargoed_areas") {
     if (param$language == "pt") {
       dat_mod <- dat %>%
-        dplyr::select(
-          ano, mes, uf, municipio, cod_municipio,
-          n_ja_julgado, n_infracoes, n_cpf_cnpj_unicos
-        ) %>%
-        dplyr::arrange(ano, mes, municipio)
+        dplyr::select(-municipio) %>%
+        dplyr::select(-cod_uf_tad) %>%
+        dplyr::rename(municipio = name_muni,
+                      cod_municipio = code_muni,
+                      amazonia_legal = legal_amazon) %>%
+        dplyr::relocate(c(municipio, cod_municipio, amazonia_legal), .before = uf)
     }
 
     if (param$language == "eng") {
       dat_mod <- dat %>%
-        dplyr::select(
-          year = ano, month = mes, state = uf,
-          municipality = municipio, municipality_code = cod_municipio,
-          n_already_judged = n_ja_julgado,
-          n_infringement = n_infracoes,
-          n_unique_cpf_cnpj = n_cpf_cnpj_unicos
-        ) %>%
-        dplyr::arrange(year, month, municipality)
+        dplyr::select(-municipio) %>%
+        dplyr::select(-cod_uf_tad) %>%
+        dplyr::rename(municipality = name_muni,
+                      municipality_code = code_muni,
+                      num_tad = num_tad,
+                      ser_tad = ser_tad,
+                      embargo_date = data_embargo,
+                      embargo_time = hora_embargo,
+                      embargoed_person_name = nome_pessoa_embargada,
+                      embargoed_cpf_cnpj = cpf_cnpj_embargado,
+                      process_number = num_processo,
+                      tad_description = des_tad,
+                      state = uf,
+                      location_description = des_localizacao,
+                      embargoed_area_amount = qtd_area_embargada,
+                      deforestation_status = sit_desmatamento,
+                      last_geom_update_date = data_ult_alter_geom,
+                      last_geom_update_time = hora_ult_alter_geom,
+                      infringement_number = num_auto_infracao,
+                      infringement_series = ser_auto_infracao,
+                      deforested_area_amount = qtd_area_desmatada,
+                      biome_type_code = cod_tipo_bioma,
+                      fiscal_action = acao_fiscalizatoria,
+                      fiscal_order = ordem_fiscalizacao,
+                      infringement_description = des_infracao,
+                      print_date = data_impressao,
+                      print_time = hora_impressao) %>%
+        dplyr::relocate(c(municipality, municipality_code, legal_amazon), .before = state)
     }
   }
 

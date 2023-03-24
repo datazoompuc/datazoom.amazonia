@@ -27,7 +27,6 @@ Imports:
     dplyr,
     Hmisc,
     janitor,
-    lubridate,
     magrittr,
     purrr,
     readr,
