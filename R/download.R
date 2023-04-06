@@ -894,7 +894,7 @@ datasets_link <- function() {
 
     ## Labor Market Info ##
 
-    "CEMPRE-IBGE", "cempre", "6449", "2006-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/cempre/tabelas",
+    "CEMPRE-IBGE", "cempre", "6449", "2006-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/cempre/tabelas",
 
     ##########
     ## CIPÓ ##
