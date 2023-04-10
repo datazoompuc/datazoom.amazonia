@@ -811,11 +811,11 @@ datasets_link <- function() {
 
     # Livestock
 
-    "PPM-IBGE", "ppm_livestock_inventory", "3939", "1974-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019",
-    "PPM-IBGE", "ppm_sheep_farming", "95", "1974-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019",
-    "PPM-IBGE", "ppm_animal_origin_production", "74", "1974-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019",
-    "PPM-IBGE", "ppm_cow_farming", "94", "1974-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019",
-    "PPM-IBGE", "ppm_aquaculture", "3940", "2013-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2019",
+    "PPM-IBGE", "ppm_livestock_inventory", "3939", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021",
+    "PPM-IBGE", "ppm_sheep_farming", "95", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021",
+    "PPM-IBGE", "ppm_animal_origin_production", "74", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021",
+    "PPM-IBGE", "ppm_cow_farming", "94", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021",
+    "PPM-IBGE", "ppm_aquaculture", "3940", "2013-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021",
 
     ##########
     ## PEVS ##
