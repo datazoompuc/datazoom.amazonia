@@ -957,11 +957,11 @@ datasets_link <- function() {
     ## SEEG ##
     ##########
 
-    "SEEG", "seeg_farming", NA, "1970-2019", "Country, State, Municipality", "http://seeg.eco.br/download",
-    "SEEG", "seeg_industry", NA, "1970-2019", "Country, State, Municipality", "http://seeg.eco.br/download",
-    "SEEG", "seeg_energy", NA, "1970-2019", "Country, State, Municipality", "http://seeg.eco.br/download",
-    "SEEG", "seeg_land", NA, "1970-2019", "Country, State, Municipality", "http://seeg.eco.br/download",
-    "SEEG", "seeg_residuals", NA, "1970-2019", "Country, State, Municipality", "http://seeg.eco.br/download",
+    "SEEG", "seeg_farming", NA, "1970-2021", "Country, State, Municipality", "http://seeg.eco.br/download",
+    "SEEG", "seeg_industry", NA, "1970-2021", "Country, State, Municipality", "http://seeg.eco.br/download",
+    "SEEG", "seeg_energy", NA, "1970-2021", "Country, State, Municipality", "http://seeg.eco.br/download",
+    "SEEG", "seeg_land", NA, "1970-2021", "Country, State, Municipality", "http://seeg.eco.br/download",
+    "SEEG", "seeg_residuals", NA, "1970-2021", "Country, State, Municipality", "http://seeg.eco.br/download",
 
     ##########
     ## BACI ##
