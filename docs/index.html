@@ -571,6 +571,50 @@
 <p>🔴 This function uses the <code>googledrive</code> package to download data for datasets <code>"mapbiomas_cover"</code> and <code>"mapbiomas_transition"</code> at the municipality level. In case of authentication errors, see <a href="#googledrive">googledrive</a>.</p>
 </div>
 <div class="section level2">
+<h2 id="cipo">CIPO<a class="anchor" aria-label="anchor" href="#cipo"></a>
+</h2>
+<p>Mappings by <a href="https://plataformacipo.org/" class="external-link">Plataforma CIPÓ</a> on environmental crimes. Each dataset available is a spreadsheet pertaining to a different aspect of environmental crimes, namely: the Brazilian institutions and organization involved in their prevention (the <code>"brazilian_actors"</code> dataset); the international agreements, treaties and conventions related to the subject (the <code>"international_cooperation"</code> dataset); and the arrangements regarding forest governance (the <code>"forest_governance"</code> dataset).</p>
+<hr>
+<p><strong>Options:</strong></p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>dataset</strong>: there are three choices:
+<ul>
+<li>
+<code>"brazilian_actors"</code>: mapping of Brazilian actors involved in preventing environmental crimes.</li>
+<li>
+<code>"international_cooperation"</code>: mapping of international agreements, treaties and conventions.</li>
+<li>
+<code>"forest_governance"</code>: mapping of forest governance arrangements.</li>
+</ul>
+</li>
+<li>
+<strong>raw_data</strong>: there are two options:
+<ul>
+<li>
+<code>TRUE</code>: if you want the data as it is originally.</li>
+<li>
+<code>FALSE</code>: if you want the treated version of the data.</li>
+</ul>
+</li>
+<li>
+<strong>search</strong>: Filters the dataset to the rows containing the chosen search parameter.</li>
+</ol>
+<hr>
+<p><strong>Examples:</strong></p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># download the spreacdsheet on Brazilian actors involved in fighting environmental crimes</span></span>
+<span><span class="va">brazilian_actors</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_cipo.html">load_cipo</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"brazilian_actors"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># searching only for entries containing IBAMA</span></span>
+<span><span class="va">actors_ibama</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_cipo.html">load_cipo</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"brazilian_actors"</span>,</span>
+<span>                          search <span class="op">=</span> <span class="st">"ibama"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># entries containing IBAMA or FUNAI</span></span>
+<span><span class="va">actors_ibama</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_cipo.html">load_cipo</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"brazilian_actors"</span>,</span>
+<span>                          search <span class="op">=</span> <span class="st">"ibama|funai"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="terraclimate">TerraClimate<a class="anchor" aria-label="anchor" href="#terraclimate"></a>
 </h2>
 <p>Spatial data on several climate variables, extracted from Climatology Lab’s <a href="https://www.climatologylab.org/terraclimate.html" class="external-link">TerraClimate</a>. The table below shows all possible variables to be extracted, which are chosen through the “dataset” parameter. Data ranges from 1958 to 2020.</p>
@@ -694,7 +738,7 @@
 </ol>
 <hr>
 <p><strong>Examples:</strong></p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Downloading maximum temperature data from 2000 to 2001</span></span>
 <span><span class="va">max_temp</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_climate.html">load_climate</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"max_temperature"</span>, time_period <span class="op">=</span> <span class="fl">2000</span><span class="op">:</span><span class="fl">2001</span><span class="op">)</span></span>
 <span></span>
@@ -741,7 +785,7 @@
 </ol>
 <hr>
 <p><strong>Examples:</strong></p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg") </span></span>
 <span><span class="co"># by state (geo_level = "state")</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_seeg.html">load_seeg</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"seeg"</span>, </span>
@@ -773,16 +817,27 @@
 </ul>
 </li>
 <li>
+<strong>raw_data</strong>: there are two options:
+<ul>
+<li>
+<code>TRUE</code>: if you want the data as it is originally.</li>
+<li>
+<code>FALSE</code>: if you want the treated version of the data.</li>
+</ul>
+</li>
+<li>
 <strong>search</strong>: Filters the dataset to the rows containing the chosen search parameter.</li>
 </ol>
 <hr>
 <p><strong>Examples:</strong></p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># download the spreacdsheet on Brazilian actors involved in fighting environmental crimes</span></span>
 <span><span class="va">brazilian_actors</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_cipo.html">load_cipo</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"brazilian_actors"</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># searching only for entries containing IBAMA</span></span>
 <span><span class="va">actors_ibama</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_cipo.html">load_cipo</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"brazilian_actors"</span>,</span>
 <span>                          search <span class="op">=</span> <span class="st">"ibama"</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># entries containing IBAMA or FUNAI</span></span>
 <span><span class="va">actors_ibama</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_cipo.html">load_cipo</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"brazilian_actors"</span>,</span>
 <span>                          search <span class="op">=</span> <span class="st">"ibama|funai"</span><span class="op">)</span></span></code></pre></div>
@@ -816,12 +871,12 @@
 <code>FALSE</code>: if you want the treated version of the data.</li>
 </ul>
 </li>
-<li><p><strong>time_period</strong>: picks the years for which the data will be downloaded</p></li>
+<li><p><strong>time_period</strong>: can be 2014, 2018, 2021, or a vector with some combination thereof</p></li>
 <li><p><strong>language</strong>: you can choose between Portuguese <code>("pt")</code> and English <code>("eng")</code></p></li>
 </ol>
 <hr>
 <p><strong>Examples:</strong></p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Download raw data from 2014 </span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_ips.html">load_ips</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"all"</span>, raw_data <span class="op">=</span> <span class="cn">TRUE</span>, time_period <span class="op">=</span> <span class="fl">2014</span><span class="op">)</span></span>
 <span></span>
@@ -878,7 +933,7 @@
 <p>Each original SIM data file contains rows corresponding to a declaration of death (DO), and columns with several characteristics of the person, the place of death, and the cause of death. The data comes from the main SIM-DO (Declarations of Death) dataset, which goes by the option <code>"datasus_sim_do"</code>. There are also 4 subsets of SIM-DO, namely SIM-DOFET (Fetal), SIM-DOMAT (Maternal), SIM-DOINF (Children), and SIM-DOEXT (External Causes), with corresponding dataset options <code>"datasus_sim_dofet", "datasus_sim_domat", "datasus_sim_doinf", "datasus_sim_doext"</code>. Note that only SIM-DO provides separate files for each state, so all other dataset options always contain data from the whole country.</p>
 <p>Below is an example of downloading the raw data, and also using the <code>raw_data = FALSE</code> option to obtain treated data. When this option is selected, we create several variables for deaths from each cause, which are encoded by their CID-10 codes. The function then returns, by default, the aggregated data of mortality sources at the municipality level. In this process, all the individual information such as age, sex, race, and schooling are lost, so we also offer the option of <code>keep_all = TRUE</code>, which creates all the indicator variables for cause of death, adds variable labels, and does not aggregate, thereby keeping all individual-level variables.</p>
 <p><strong>Examples:</strong></p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.econ.puc-rio.br/datazoom/" class="external-link">datazoom.amazonia</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># download raw data for the year 2010 in the state of AM. </span></span>
@@ -907,7 +962,7 @@
 <p>Provides information on health establishments, avaliable hospital beds, and active physicians. The data is split into 13 datasets: LT (Beds), ST (Establishments), DC (Complimentary data), EQ (Equipment), SR (Specialized services), HB (License), PF (Practitioner), EP (Teams), RC (Contractual Rules), IN (Incentives), EE (Teaching establishments), EF (Philanthropic establishments), and GM (Management and goals).</p>
 <p>Raw data is avaliable for all of them using the dataset option <code>datasus_cnes_lt, datasus_cnes_st</code>, and so on, and treated data is only avaliable for CNES - LT. When <code>raw_data = FALSE</code> is chosen, we return data on the number of total hospital beds and the ones avaliable through SUS, which can be aggregated by municipality (with option <code>keep_all = FALSE</code>) or keeping all original variables (<code>keep_all = TRUE</code>).</p>
 <p><strong>Examples:</strong></p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.econ.puc-rio.br/datazoom/" class="external-link">datazoom.amazonia</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># download treated data with the number of avaliable beds in AM and PA.</span></span>
@@ -921,7 +976,7 @@
 </h5>
 <p>Contains data on hospitalizations. Treated data only gains variable labels, with no extra manipulation. Beware that this is a much heavier dataset.</p>
 <p><strong>Examples:</strong></p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.econ.puc-rio.br/datazoom/" class="external-link">datazoom.amazonia</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># download raw data</span></span>
@@ -958,7 +1013,7 @@
 </ol>
 <hr>
 <p><strong>Examples:</strong></p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Download treated data</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_iema.html">load_iema</a></span><span class="op">(</span>raw_data <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>🔴 This function uses the <code>googledrive</code> package to download data. In case of authentication errors, see <a href="#googledrive">googledrive</a>.</p>
@@ -1002,7 +1057,7 @@
 </ol>
 <hr>
 <p><strong>Examples:</strong></p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># download treated (raw_data = FALSE) exports data by municipality (dataset = "comex_export_mun")</span></span>
 <span><span class="co"># from 2020 to 2021 (time_period = 2020:2021)</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_br_trade.html">load_br_trade</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"comex_export_mun"</span>, </span>
@@ -1043,7 +1098,7 @@
 </ol>
 <hr>
 <p><strong>Examples:</strong></p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># download treated data for 2016 (takes a long time to download)</span></span>
 <span><span class="va">clean_baci</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_baci.html">load_baci</a></span><span class="op">(</span></span>
 <span>  raw_data <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -1073,11 +1128,11 @@
 </ol>
 <hr>
 <p><strong>Examples:</strong></p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># download treated municipal GDP data at the state level for 2010 to 2012</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_pibmunic.html">load_pibmunic</a></span><span class="op">(</span>raw_data <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>                      geo_level <span class="op">=</span> <span class="st">"state"</span>,</span>
-<span>                      time_period <span class="op">=</span> <span class="fl">2010</span><span class="op">:</span><span class="fl">2010</span><span class="op">)</span></span></code></pre></div>
+<span>                      time_period <span class="op">=</span> <span class="fl">2010</span><span class="op">:</span><span class="fl">2012</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="cempre">CEMPRE<a class="anchor" aria-label="anchor" href="#cempre"></a>
@@ -1103,7 +1158,7 @@
 </ol>
 <hr>
 <p><strong>Examples:</strong></p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Download raw data (raw_data = TRUE) at the country level</span></span>
 <span><span class="co"># from 2008 to 2010 (time_period = 2008:2010).</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_cempre.html">load_cempre</a></span><span class="op">(</span></span>
@@ -1570,7 +1625,7 @@
 </tbody>
 </table>
 <p><strong>Examples:</strong></p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># download treated data at the state level from 2010 to 2011 for all crops</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_pam.html">load_pam</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"all_crops"</span>, </span>
 <span>                 raw_data <span class="op">=</span> <span class="cn">FALSE</span>, </span>
@@ -1613,7 +1668,7 @@
 </ol>
 <hr>
 <p><strong>Examples:</strong></p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Download treated (raw_data = FALSE) silviculture data (dataset = 'pevs_silviculture') </span></span>
 <span><span class="co"># by state (geo_level = 'state') from 2012 (time_period =  2012) </span></span>
 <span><span class="co"># in portuguese (language = "pt")</span></span>
@@ -1655,7 +1710,7 @@
 </ol>
 <hr>
 <p><strong>Examples:</strong></p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Download treated data (raw_data = FALSE) about aquaculture (dataset = "ppm_aquaculture") </span></span>
 <span><span class="co"># from 2013 to 2015 (time_period = 2013:2015) in english</span></span>
 <span><span class="co"># with the level of aggregation being the country (geo_level = "country"). </span></span>
@@ -1692,7 +1747,7 @@
 </ol>
 <hr>
 <p><strong>Examples:</strong></p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Download treated data (raw_data = FALSE) in portuguese (language = "pt").</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_sigmine.html">load_sigmine</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">'sigmine_active'</span>, </span>
 <span>                     raw_data <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -1702,7 +1757,7 @@
 <h2 id="aneel">ANEEL<a class="anchor" aria-label="anchor" href="#aneel"></a>
 </h2>
 <p>Loads data from the National Electrical Energy Agency (ANEEL), a Brazilian independent federal agency linked to the Ministry of Mines and Energy (MME). ANEEL works to provide favorable conditions for the Electrical Energy Market to develop with balance and for the benefit of society.</p>
-<p>As for now, there are two different datasets available for download: the Energy Development Budget and the Energy Generation.</p>
+<p>As for now, there are three different datasets available for download: the Energy Development Budget and the Energy Generation.</p>
 <div class="section level4">
 <h4 id="energy-development-budget">Energy Development Budget<a class="anchor" aria-label="anchor" href="#energy-development-budget"></a>
 </h4>
@@ -1716,16 +1771,25 @@
 <p>The Energy Generation dataset showcases information about ANEEL’s Generation Informations System (SIGA). SIGA provides information about the Brazilian electrical energy generation installed capacity.</p>
 <p>The dataset provides information at the individual venture/entity level. It contains information about the power, source, stage, type of permission, origin and final fuel with which each venture/entity operates, as well as other legal, technical and geographical information.* Operation start dates contained in the dataset go as far back as 1924 up to 2022.</p>
 <p>* For more details on each variable, access <a href="https://app.powerbi.com/view?r=eyJrIjoiNjc4OGYyYjQtYWM2ZC00YjllLWJlYmEtYzdkNTQ1MTc1NjM2IiwidCI6IjQwZDZmOWI4LWVjYTctNDZhMi05MmQ0LWVhNGU5YzAxNzBlMSIsImMiOjR9" class="external-link">This link</a> and select “Manual do Usuario”.</p>
+</div>
+<div class="section level4">
+<h4 id="energy-enterprises">Energy Enterprises<a class="anchor" aria-label="anchor" href="#energy-enterprises"></a>
+</h4>
+<p>The Energy Enterprises dataset showcases information about distributed micro and mini generators, covered by the Regulatory Resolution nº 482/2012. The list of projects is classified by variables that make up their identification, namely: connected distributor, project code, numerical nucleus of the project code, owner name, production class, subgroup, name of the owner, number of consumer units that receive credits, connection date, type of generating unit, source, installed power, municipality, and federative unit where it is located.</p>
+<p>The data is expressed in quantities and installed power in kW (kilowatt). The quantity corresponds to the number of distributed micro or mini generators installed in the specified period. The installed power is defined by the sum of the nominal active electric power of the generating units.</p>
+<p>* For more details on each variable, access <a href="https://dadosabertos.aneel.gov.br/dataset/relacao-de-empreendimentos-de-geracao-distribuida" class="external-link">This link</a> and select “Dicionário de dados”.</p>
 <hr>
 <p><strong>Options:</strong></p>
 <ol style="list-style-type: decimal">
 <li>
-<strong>dataset</strong>: there are two choices:
+<strong>dataset</strong>: there are three choices:
 <ul>
 <li>
 <code>"energy_development_budget"</code>: government spending towards energy sources</li>
 <li>
 <code>"energy_generation"</code>: energy generation by entity/corporation</li>
+<li>
+<code>"energy_enterprises_distributed"</code>: distributed micro and mini generators</li>
 </ul>
 </li>
 <li>
@@ -1743,7 +1807,7 @@
 </ol>
 <hr>
 <p><strong>Examples:</strong></p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># download treated data about energy generation</span></span>
 <span><span class="va">clean_aneel</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_aneel.html">load_aneel</a></span><span class="op">(</span></span>
 <span> dataset <span class="op">=</span> <span class="st">"energy generation"</span>,</span>
@@ -1805,7 +1869,7 @@
 </ol>
 <hr>
 <p><strong>Examples:</strong></p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># download treated data about energy consumption at the state level</span></span>
 <span><span class="va">clean_epe</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_epe.html">load_epe</a></span><span class="op">(</span></span>
 <span>  dataset <span class="op">=</span> <span class="st">"energy_consumption_per_class"</span>,</span>
@@ -1822,7 +1886,7 @@
 <h2 id="legal-amazon-municipalities">Legal Amazon Municipalities<a class="anchor" aria-label="anchor" href="#legal-amazon-municipalities"></a>
 </h2>
 <p>Many of our functions use a dataset with Brazilian municipalities, their municipality codes, whether they belong to the Legal Amazon, their state, and some more variables. It was constructed from the <a href="https://www.ibge.gov.br/geociencias/cartas-e-mapas/mapas-regionais/15819-amazonia-legal.html?=&amp;t=acesso-ao-produto" class="external-link">IBGE spreadsheet</a> with Legal Amazon municipalities, along with a data frame from the ‘geobr’ package. For more information on the columns, run <code>??datazoom.amazonia::municipalities</code>.</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># load Brazilian municipalities dataset</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">datazoom.amazonia</span><span class="fu">::</span><span class="va"><a href="reference/municipalities.html">municipalities</a></span></span></code></pre></div>
 </div>
@@ -1833,7 +1897,7 @@
 <p>For some of our functions, the original data is stored in Google Drive and exceeds the file size limit for which direct downloads are possible. As a result, the <code>googledrive</code> package is required to download the data though the Google Drive API and run the function.</p>
 <p>The first time the package is called, it requires you to link your Google account and grant permissions to be able to download data through the Google Drive API.</p>
 <p>You <strong>must</strong> tick all boxes when the permissions page opens, or else the following error will occur:</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#Error in `gargle_abort_request_failed()`:</span></span>
 <span><span class="co">#! Client error: (403) Forbidden</span></span>
 <span><span class="co">#Insufficient Permission: Request had insufficient authentication scopes.</span></span>
@@ -1848,6 +1912,17 @@
 <h2 id="credits">Credits<a class="anchor" aria-label="anchor" href="#credits"></a>
 </h2>
 <p>DataZoom is developed by a team at Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio), Department of Economics. Our official website is at: <a href="https://www.econ.puc-rio.br/datazoom/" class="external-link uri">https://www.econ.puc-rio.br/datazoom/</a>.</p>
+<p>To cite package <code>datazoom.amazonia</code> in publications use:</p>
+<blockquote>
+<p>Data Zoom (2023). Data Zoom: Simplifying Access To Brazilian Microdata.<br><a href="https://www.econ.puc-rio.br/datazoom/english/index.html" class="external-link uri">https://www.econ.puc-rio.br/datazoom/english/index.html</a></p>
+</blockquote>
+<p>A BibTeX entry for LaTeX users is:</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="sc">@</span>Unpublished{DataZoom2023,</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    author <span class="ot">=</span> {Data Zoom},</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    title <span class="ot">=</span> {Data Zoom<span class="sc">:</span> Simplifying Access To Brazilian Microdata},</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    url <span class="ot">=</span> {https<span class="sc">:</span><span class="er">//</span>www.econ.puc<span class="sc">-</span>rio.br<span class="sc">/</span>datazoom<span class="sc">/</span>english<span class="sc">/</span>index.html},</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    year <span class="ot">=</span> {<span class="dv">2023</span>},</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 </div>
 </div>
 
@@ -1917,7 +1992,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

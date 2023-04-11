@@ -165,8 +165,8 @@ Brazilian independent federal agency linked to the Ministry of Mines and
 Energy (MME). ANEEL works to provide favorable conditions for the
 Electrical Energy Market to develop with balance and for the benefit of
 society.</p>
-<p>As for now, there are two different datasets available for download:
-the Energy Development Budget and the Energy Generation.</p>
+<p>As for now, there are three different datasets available for
+download: the Energy Development Budget and the Energy Generation.</p>
 <div class="section level4">
 <h4 id="energy-development-budget">Energy Development Budget<a class="anchor" aria-label="anchor" href="#energy-development-budget"></a>
 </h4>
@@ -194,11 +194,31 @@ information.* Operation start dates contained in the dataset go as far
 back as 1924 up to 2022.</p>
 <p>* For more details on each variable, access <a href="https://app.powerbi.com/view?r=eyJrIjoiNjc4OGYyYjQtYWM2ZC00YjllLWJlYmEtYzdkNTQ1MTc1NjM2IiwidCI6IjQwZDZmOWI4LWVjYTctNDZhMi05MmQ0LWVhNGU5YzAxNzBlMSIsImMiOjR9" class="external-link">This
 link</a> and select “Manual do Usuario”.</p>
+</div>
+<div class="section level4">
+<h4 id="energy-enterprises">Energy Enterprises<a class="anchor" aria-label="anchor" href="#energy-enterprises"></a>
+</h4>
+<p>The Energy Enterprises dataset showcases information about
+distributed micro and mini generators, covered by the Regulatory
+Resolution nº 482/2012. The list of projects is classified by variables
+that make up their identification, namely: connected distributor,
+project code, numerical nucleus of the project code, owner name,
+production class, subgroup, name of the owner, number of consumer units
+that receive credits, connection date, type of generating unit, source,
+installed power, municipality, and federative unit where it is
+located.</p>
+<p>The data is expressed in quantities and installed power in kW
+(kilowatt). The quantity corresponds to the number of distributed micro
+or mini generators installed in the specified period. The installed
+power is defined by the sum of the nominal active electric power of the
+generating units.</p>
+<p>* For more details on each variable, access <a href="https://dadosabertos.aneel.gov.br/dataset/relacao-de-empreendimentos-de-geracao-distribuida" class="external-link">This
+link</a> and select “Dicionário de dados”.</p>
 <hr>
 <p><strong>Options:</strong></p>
 <ol style="list-style-type: decimal">
 <li>
-<strong>dataset</strong>: there are two choices:
+<strong>dataset</strong>: there are three choices:
 <ul>
 <li>
 <code>"energy_development_budget"</code>: government spending
@@ -206,6 +226,9 @@ towards energy sources</li>
 <li>
 <code>"energy_generation"</code>: energy generation by
 entity/corporation</li>
+<li>
+<code>"energy_enterprises_distributed"</code>: distributed micro and
+mini generators</li>
 </ul>
 </li>
 <li>
@@ -249,7 +272,7 @@ data.</li>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

@@ -1428,8 +1428,8 @@ Energy (MME). ANEEL works to provide favorable conditions for the
 Electrical Energy Market to develop with balance and for the benefit of
 society.
 
-As for now, there are two different datasets available for download: the
-Energy Development Budget and the Energy Generation.
+As for now, there are three different datasets available for download:
+the Energy Development Budget and the Energy Generation.
 
 #### Energy Development Budget
 
@@ -1461,14 +1461,37 @@ back as 1924 up to 2022.
 link](https://app.powerbi.com/view?r=eyJrIjoiNjc4OGYyYjQtYWM2ZC00YjllLWJlYmEtYzdkNTQ1MTc1NjM2IiwidCI6IjQwZDZmOWI4LWVjYTctNDZhMi05MmQ0LWVhNGU5YzAxNzBlMSIsImMiOjR9)
 and select “Manual do Usuario”.
 
+#### Energy Enterprises
+
+The Energy Enterprises dataset showcases information about distributed
+micro and mini generators, covered by the Regulatory Resolution nº
+482/2012. The list of projects is classified by variables that make up
+their identification, namely: connected distributor, project code,
+numerical nucleus of the project code, owner name, production class,
+subgroup, name of the owner, number of consumer units that receive
+credits, connection date, type of generating unit, source, installed
+power, municipality, and federative unit where it is located.
+
+The data is expressed in quantities and installed power in kW
+(kilowatt). The quantity corresponds to the number of distributed micro
+or mini generators installed in the specified period. The installed
+power is defined by the sum of the nominal active electric power of the
+generating units.
+
+\* For more details on each variable, access [This
+link](https://dadosabertos.aneel.gov.br/dataset/relacao-de-empreendimentos-de-geracao-distribuida)
+and select “Dicionário de dados”.
+
 ------------------------------------------------------------------------
 
 **Options:**
 
-1.  **dataset**: there are two choices:
+1.  **dataset**: there are three choices:
     - `"energy_development_budget"`: government spending towards energy
       sources
     - `"energy_generation"`: energy generation by entity/corporation
+    - `"energy_enterprises_distributed"`: distributed micro and mini
+      generators
 2.  **raw_data**: there are two options:
     - `TRUE`: if you want the data as it is originally.
     - `FALSE`: if you want the treated version of the data.
