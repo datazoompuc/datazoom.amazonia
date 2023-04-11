@@ -22,7 +22,7 @@ The function returns either the raw data or a data frame with aggregates conside
 **Options:**
 
   1. **dataset**: there are three possible choices.
-      * `"areas_embargadas"`: embargoed areas
+      * `"embargoed_areas"`: embargoed areas
       * `"distributed_fines"`: fines that have not been paid by individuals or corporations
       * `"collected_fines"`: fines that have been paid by individuals or corporations
 
@@ -30,7 +30,7 @@ The function returns either the raw data or a data frame with aggregates conside
       * `TRUE`: if you want the data as it is originally.
       * `FALSE`: if you want the treated version of the data. 
   
-  3. **states**: specifies for which states to download the data. It is "all" by default, but can be a single state such as `"AC"` or any vector such as `c("AC", "AM")`. Does not apply to the `"areas_embargadas"` dataset.
+  3. **states**: specifies for which states to download the data. It is "all" by default, but can be a single state such as `"AC"` or any vector such as `c("AC", "AM")`. Does not apply to the `"embargoed_areas"` dataset.
 
   4. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
   
@@ -42,7 +42,7 @@ The function returns either the raw data or a data frame with aggregates conside
 library(datazoom.amazonia)
 
 # Download treated embargoes data (raw_data = FALSE) in english (language = "eng")
-data <- load_ibama(dataset = "areas_embargadas", raw_data = FALSE, 
+data <- load_ibama(dataset = "embargoed_areas", raw_data = FALSE, 
                    language = "eng")
 
 # Download treated collected fines data from "BA"

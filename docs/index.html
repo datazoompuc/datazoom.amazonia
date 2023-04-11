@@ -456,7 +456,7 @@
 <p><strong>dataset</strong>: there are three possible choices.</p>
 <ul>
 <li>
-<code>"areas_embargadas"</code>: embargoed areas</li>
+<code>"embargoed_areas"</code>: embargoed areas</li>
 <li>
 <code>"distributed_fines"</code>: fines that have not been paid by individuals or corporations</li>
 <li>
@@ -472,7 +472,7 @@
 <code>FALSE</code>: if you want the treated version of the data.</li>
 </ul>
 </li>
-<li><p><strong>states</strong>: specifies for which states to download the data. It is “all” by default, but can be a single state such as <code>"AC"</code> or any vector such as <code>c("AC", "AM")</code>. Does not apply to the <code>"areas_embargadas"</code> dataset.</p></li>
+<li><p><strong>states</strong>: specifies for which states to download the data. It is “all” by default, but can be a single state such as <code>"AC"</code> or any vector such as <code>c("AC", "AM")</code>. Does not apply to the <code>"embargoed_areas"</code> dataset.</p></li>
 <li><p><strong>language</strong>: you can choose between Portuguese <code>("pt")</code> and English <code>("eng")</code></p></li>
 </ol>
 <hr>
@@ -481,7 +481,7 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.econ.puc-rio.br/datazoom/" class="external-link">datazoom.amazonia</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Download treated embargoes data (raw_data = FALSE) in english (language = "eng")</span></span>
-<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_ibama.html">load_ibama</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"areas_embargadas"</span>, raw_data <span class="op">=</span> <span class="cn">FALSE</span>, </span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_ibama.html">load_ibama</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"embargoed_areas"</span>, raw_data <span class="op">=</span> <span class="cn">FALSE</span>, </span>
 <span>                   language <span class="op">=</span> <span class="st">"eng"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Download treated collected fines data from "BA"</span></span>
@@ -511,6 +511,10 @@
 <code>"mapbiomas_grazing_quality"</code>: grazing quality</li>
 <li>
 <code>"mapbiomas_mining"</code>: areas used for mining</li>
+<li>
+<code>"mapbiomas_water"</code>: areas of water surface</li>
+<li>
+<code>"mapbiomas_fire"</code>: areas of wildfire burn scars</li>
 </ul>
 </li>
 <li>
@@ -525,8 +529,10 @@
 <li>
 <p><strong>geo_level</strong>:</p>
 <ul>
-<li>For datasets <code>"mapbiomas_cover"</code> and <code>"mapbiomas_transition"</code>, can be <code>"municipality"</code> or <code>"state"</code> (faster download).</li>
-<li>For dataset <code>"mapbiomas_mining"</code>, can be <code>"biome"</code> or <code>"indigenous_land"</code>.</li>
+<li>For datasets <code>"mapbiomas_cover"</code>, <code>"mapbiomas_transition"</code>, <code>"mapbiomas_deforestation_regeneration"</code> and <code>"mapbiomas_fire"</code>, can be <code>"municipality"</code> or <code>"state"</code> (faster download).</li>
+<li>For dataset <code>"mapbiomas_mining"</code>, can be <code>"indigenous_land"</code>, <code>"municipality"</code>, <code>"state"</code>, <code>"biome"</code> or <code>"country"</code>.</li>
+<li>For dataset <code>"mapbiomas_irrigation"</code>, can be <code>"state"</code> or <code>"biome"</code>.</li>
+<li>For dataset <code>"mapbiomas_water"</code>, can be <code>"municipality"</code>, <code>"state"</code> or <code>"biome"</code>.</li>
 <li>Does not apply to other datasets.</li>
 </ul>
 </li>
@@ -568,7 +574,50 @@
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_mapbiomas.html">load_mapbiomas</a></span><span class="op">(</span><span class="st">"mapbiomas_mining"</span>,</span>
 <span>                       raw_data <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>                       geo_level <span class="op">=</span> <span class="st">"indigenous_land"</span><span class="op">)</span></span></code></pre></div>
-<p>🔴 This function uses the <code>googledrive</code> package to download data for datasets <code>"mapbiomas_cover"</code> and <code>"mapbiomas_transition"</code> at the municipality level. In case of authentication errors, see <a href="#googledrive">googledrive</a>.</p>
+</div>
+<div class="section level2">
+<h2 id="cipo">CIPO<a class="anchor" aria-label="anchor" href="#cipo"></a>
+</h2>
+<p>Mappings by <a href="https://plataformacipo.org/" class="external-link">Plataforma CIPÓ</a> on environmental crimes. Each dataset available is a spreadsheet pertaining to a different aspect of environmental crimes, namely: the Brazilian institutions and organization involved in their prevention (the <code>"brazilian_actors"</code> dataset); the international agreements, treaties and conventions related to the subject (the <code>"international_cooperation"</code> dataset); and the arrangements regarding forest governance (the <code>"forest_governance"</code> dataset).</p>
+<hr>
+<p><strong>Options:</strong></p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>dataset</strong>: there are three choices:
+<ul>
+<li>
+<code>"brazilian_actors"</code>: mapping of Brazilian actors involved in preventing environmental crimes.</li>
+<li>
+<code>"international_cooperation"</code>: mapping of international agreements, treaties and conventions.</li>
+<li>
+<code>"forest_governance"</code>: mapping of forest governance arrangements.</li>
+</ul>
+</li>
+<li>
+<strong>raw_data</strong>: there are two options:
+<ul>
+<li>
+<code>TRUE</code>: if you want the data as it is originally.</li>
+<li>
+<code>FALSE</code>: if you want the treated version of the data.</li>
+</ul>
+</li>
+<li>
+<strong>search</strong>: Filters the dataset to the rows containing the chosen search parameter.</li>
+</ol>
+<hr>
+<p><strong>Examples:</strong></p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># download the spreacdsheet on Brazilian actors involved in fighting environmental crimes</span></span>
+<span><span class="va">brazilian_actors</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_cipo.html">load_cipo</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"brazilian_actors"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># searching only for entries containing IBAMA</span></span>
+<span><span class="va">actors_ibama</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_cipo.html">load_cipo</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"brazilian_actors"</span>,</span>
+<span>                          search <span class="op">=</span> <span class="st">"ibama"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># entries containing IBAMA or FUNAI</span></span>
+<span><span class="va">actors_ibama</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/load_cipo.html">load_cipo</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"brazilian_actors"</span>,</span>
+<span>                          search <span class="op">=</span> <span class="st">"ibama|funai"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="cipo">CIPO<a class="anchor" aria-label="anchor" href="#cipo"></a>

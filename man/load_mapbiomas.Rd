@@ -13,14 +13,17 @@ load_mapbiomas(
 )
 }
 \arguments{
-\item{dataset}{A dataset name ("mapbiomas_cover", "mapbiomas_transition", "mapbiomas_irrigation", "mapbiomas_deforestation_regeneration", "mapbiomas_grazing_quality", or "mapbiomas_mining")}
+\item{dataset}{A dataset name ("mapbiomas_cover", "mapbiomas_transition", "mapbiomas_irrigation", "mapbiomas_deforestation_regeneration", "mapbiomas_mining", "mapbiomas_grazing_quality", "mapbiomas_water" or "mapbiomas_fire")}
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
 \item{geo_level}{A \code{string} that defines the geographic level of the data.
 \itemize{
-\item For datasets "mapbiomas_cover" and "mapbiomas_transition", can be "municipality" or "state" (faster download).
-\item For dataset "mapbiomas_mining", can be "biome" or "indigenous_land".
+\item For datasets "mapbiomas_cover", "mapbiomas_transition", "mapbiomas_deforestation_regeneration" and "mapbiomas_fire", can be "municipality" or "state" (faster download).
+\item For dataset "mapbiomas_mining", can be "indigenous_land", "municipality", "state", "biome" or "country".
+\item For dataset "mapbiomas_irrigation", can be "state" or "biome".
+\item For dataset "mapbiomas_water", can be "municipality", "state" or "biome".
+\item Does not apply to other datasets.
 }}
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.}
