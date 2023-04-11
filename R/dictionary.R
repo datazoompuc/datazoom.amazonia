@@ -1162,6 +1162,37 @@ load_dictionary <- function(dataset) {
     )
   }
 
+  if (dataset == "energy_enterprises_distributed") {
+    harmonization_dat <- tibble::tribble(
+      ~variable, ~var_code, ~label_pt, ~label_eng,
+      "dsc_classe_consumo", "Residencial", "Residencial", "Residential",
+      "dsc_classe_consumo", "Poder Publico", "Poder Publico", "Public Sector",
+      "dsc_classe_consumo", "Servico Publico", "Servico Publico", "Public Service",
+      "dsc_classe_consumo", "Iluminacao publica", "Iluminacao publica", "Public lighting",
+      "dsc_fonte_geracao",  "Radiacao solar", "Radiacao solar", "Solar radiation",
+      "dsc_fonte_geracao",  "Gas de Alto Forno - Biomassa", "Gas de Alto Forno - Biomassa", "Blast Furnace Gas - Biomass",
+      "dsc_fonte_geracao",  "Cinetica do vento", "Cinetica do vento", "Wind Kinetics",
+      "dsc_fonte_geracao",  "Gas Natural", "Gas Natural", "Natural Gas",
+      "dsc_fonte_geracao",  "Bagaco de Cana de Acucar", "Bagaco de Cana de Acucar", "Sugarcane Bagasse",
+      "dsc_fonte_geracao",  "Biogas-AGR", "Biogas-AGR", "Biogas-AGR",
+      "dsc_fonte_geracao",  "Biogas - RA", "Biogas - RA", "Biogas - RA",
+      "dsc_fonte_geracao",  "Potencial hidraulico", "Potencial hidraulico", "Hydraulic potential",
+      "dsc_fonte_geracao",  "Biogas - Floresta", "Biogas - Floresta", "Biogas - Forest",
+      "dsc_fonte_geracao",  "Biogas - RU", "Biogas - RU", "Biogas - RU",
+      "dsc_fonte_geracao",  "Residuos Solidos Urbanos - RU", "Residuos Solidos Urbanos - RU", "Urban Solid Waste - RU",
+      "dsc_fonte_geracao",  "Lenha", "Lenha", "Firewood",
+      "dsc_fonte_geracao",  "Residuos Florestais", "Residuos Florestais", "Forest Residues",
+      "dsc_fonte_geracao",  "Casca de Arroz", "Casca de Arroz", "Rice Husk",
+      "dsc_porte", "Microgeracao", "Microgeracao", "Micro generation",
+      "dsc_porte", "Minigeracao", "Minigeracao", "Mini generation",
+      "dsc_modalidade_habilitado", "Com Microgeracao ou Minigeracao distribuida", "Com Microgeracao ou Minigeracao distribuida", "With Distributed Microgeneration or Minigeneration",
+      "dsc_modalidade_habilitado", "Caracterizada como Autoconsumo remoto", "Caracterizada como Autoconsumo remoto", "Characterized as Remote Self-Consumption",
+      "dsc_modalidade_habilitado", "Caracterizada como Geracao compartilhada", "Caracterizada como Geracao compartilhada", "Characterized as Shared Generation",
+      "dsc_modalidade_habilitado", "Integrante de empreendimento de Multiplas UC", "Integrante de empreendimento de Multiplas UC", "Part of Multiple UC Enterprise"
+
+    )
+  }
+
   if (dataset == "energy_generation") {
     harmonization_dat <- tibble::tribble(
       ~variable, ~var_code, ~label_pt, ~label_eng,

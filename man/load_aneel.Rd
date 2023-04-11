@@ -7,7 +7,7 @@
 load_aneel(dataset, raw_data = FALSE, language = "eng")
 }
 \arguments{
-\item{dataset}{A dataset name ("energy_development_budget" or "energy_generation")}
+\item{dataset}{A dataset name ("energy_development_budget", "energy_generation" or "energy_enterprises_distributed")}
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 

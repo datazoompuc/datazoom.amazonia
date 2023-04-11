@@ -524,6 +524,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     if (dataset == "energy_generation") {
       file_extension <- ".xlsx"
     }
+    if (dataset == "energy_enterprises_distributed") {
+      file_extension <- ".csv"
+    }
   }
 
   ## Define Empty Directory and Files For Download
@@ -541,6 +544,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source == "ANEEL") {
     if (dataset == "energy_development_budget") {
       download_method <- "googledrive"
+    }
+    if (dataset == "energy_enterprises_distributed") {
+      message("This may take a while.\n")
+      options(timeout = 1000) # increase timeout limit
     }
   }
   if (source == "EPE") {
@@ -662,6 +669,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     )
 
     names(dat) <- param$sheet
+  }
+  if (param$source == "ANEEL" & param$dataset == "energy_enterprises_distributed") {
+    dat <- data.table::fread(temp, encoding = "Latin-1")
   }
   if (param$source == "ips") {
     dat <- param$sheet %>%
@@ -988,6 +998,7 @@ datasets_link <- function() {
 
     "ANEEL", "energy_development_budget", NA, "2013-2022", NA, "https://drive.google.com/file/d/1h7mu-9qbKfISk1-k4JSrBhXKBMQHTOH9/view?usp=share_link",
     "ANEEL", "energy_generation", NA, "1908-2021", "Municipality", "https://git.aneel.gov.br/publico/centralconteudo/-/raw/main/relatorioseindicadores/geracao/BD_SIGA.xlsx?inline=false",
+    "ANEEL", "energy_enterprises_distributed", NA, NA, NA, "https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/b1bd71e7-d0ad-4214-9053-cbd58e9564a7/download/empreendimento-geracao-distribuida.csv",
 
     ## Shapefile from github repository
 
