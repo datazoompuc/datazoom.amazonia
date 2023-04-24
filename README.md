@@ -79,11 +79,12 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 <tr>
 <td>
 
-|                         |                                                         |
-|-------------------------|---------------------------------------------------------|
-| **[IPS](#ips)**         | *Amazon Social Progress Index*                          |
-| **[DATASUS](#datasus)** | *Causes of mortality and availability of hospital beds* |
-| **[IEMA](#iema)**       | *Access to electricity in the Amazon region*            |
+|                               |                                                         |
+|-------------------------------|---------------------------------------------------------|
+| **[IPS](#ips)**               | *Amazon Social Progress Index*                          |
+| **[DATASUS](#datasus)**       | *Causes of mortality and availability of hospital beds* |
+| **[IEMA](#iema)**             | *Access to electricity in the Amazon region*            |
+| **[Population](#population)** | *Population*                                            |
 
 </td>
 </tr>
@@ -902,6 +903,42 @@ data <- load_iema(raw_data = FALSE)
 
 🔴 This function uses the `googledrive` package to download data. In
 case of authentication errors, see [googledrive](#googledrive).
+
+## Population
+
+Loads IBGE information on estimated population (2001-2006, 2008-2009,
+2011-2021) or population (2007 and 2010) data. Data is available at
+country, state and municipality level and from 2001 to 2021.
+
+------------------------------------------------------------------------
+
+**Options:**
+
+1.  **dataset**: `"population"`
+
+2.  **raw_data**: there are two options:
+
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
+
+3.  **geo_level**: `"country"`, `"state"`, or `"municipality"`
+
+4.  **time_period**: picks the years for which the data will be
+    downloaded
+
+5.  **language**: you can choose between Portuguese `("pt")` and English
+    `("eng")`
+
+------------------------------------------------------------------------
+
+**Examples:**
+
+``` r
+# download treated population data at the state level for 2010 to 2012
+data <- load_population(raw_data = FALSE,
+                        geo_level = "state",
+                        time_period = 2010:2012)
+```
 
 # Economic Data
 

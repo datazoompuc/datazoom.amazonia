@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SEEG • datazoom.amazonia</title>
+<title>POPULATION • datazoom.amazonia</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
@@ -17,7 +17,7 @@
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="SEEG">
+<script src="../pkgdown.js"></script><meta property="og:title" content="POPULATION">
 <meta property="og:description" content="datazoom.amazonia">
 <meta property="og:image" content="/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -153,57 +153,23 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>SEEG</h1>
+      <h1 data-toc-skip>POPULATION</h1>
             
       
       
-      <div class="hidden name"><code>SEEG.Rmd</code></div>
+      <div class="hidden name"><code>POPULATION.Rmd</code></div>
 
     </div>
 
     
     
-<p>Loads estimates of emission of greenhouse gases of Brazilian cities
-and states from SEEG. SEEG is the System of Estimates of Emissions and
-Removals of Greenhouse Gases (SEEG), an initiative of the Observatório
-do Clima, a network of institutions focused on climate change research
-in Brazil.</p>
-<p>The data provided in SEEG’s Collection 9 is a series covering the
-period from 1970 to 2020, except for the Land Use Change Sector that has
-the series from 1990 to 2020.</p>
-<p>Using data collected from government entities, institutes, research
-centers, NGOs and other institutions, the estimates are created using
-the methodology of the Brazilian Inventory of Anthropic Emissions and
-Removals of Greenhouse Gases, assembled by the Ministry of Science,
-Technology and Innovation (MCTI), and the directives of
-Intergovernmental Panel on Climate Change (IPCC)</p>
-<p>Emissions are divided in five main sources: Agricultural and Cattle
-Raising, Energy, Changes in Use of Land, Industrial Processes and
-Residues. All greenhouse gases contained in the national inventory are
-considered, encompassing CO2, CH4, N2O and the HFCs, with the conversion
-to carbon equivalence (CO2e) also included, both in the metric of GWP
-(Global Warming Potential) and GTP (Global Temperature Potential).</p>
-<p>The data is downloaded from the SEEG website in the form of one
-single file, so the option to select a certain range of years is not
-available. Also, due to the size of the file, a stable internet
-connection is necessary, and the function may take time to run.</p>
+<p>Loads IBGE information on estimated population (2001-2006, 2008-2009,
+2011-2021) or population (2007 and 2010) data. Data is available at
+country, state and municipality level and from 2001 to 2021.</p>
 <hr>
 <p><strong>Options:</strong></p>
 <ol style="list-style-type: decimal">
-<li>
-<p><strong>dataset</strong>: there are six choices:</p>
-<ul>
-<li>
-<code>"seeg"</code>: provides all sectors in a same dataframe. Only
-works with <code>raw_data = TRUE</code>
-</li>
-<li><code>"seeg_farming"</code></li>
-<li><code>"seeg_industry"</code></li>
-<li><code>"seeg_energy"</code></li>
-<li><code>"seeg_land"</code></li>
-<li><code>"seeg_residuals"</code></li>
-</ul>
-</li>
+<li><p><strong>dataset</strong>: <code>"population"</code></p></li>
 <li>
 <p><strong>raw_data</strong>: there are two options:</p>
 <ul>
@@ -216,22 +182,18 @@ data.</li>
 </li>
 <li><p><strong>geo_level</strong>: <code>"country"</code>,
 <code>"state"</code>, or <code>"municipality"</code></p></li>
+<li><p><strong>time_period</strong>: picks the years for which the data
+will be downloaded</p></li>
 <li><p><strong>language</strong>: you can choose between Portuguese
 <code>("pt")</code> and English <code>("eng")</code></p></li>
 </ol>
 <hr>
 <p><strong>Examples:</strong></p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg") </span></span>
-<span><span class="co"># by state (geo_level = "state")</span></span>
-<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_seeg.html">load_seeg</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"seeg"</span>, </span>
-<span>                  raw_data <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                  geo_level <span class="op">=</span> <span class="st">"state"</span><span class="op">)</span></span>
-<span>  </span>
-<span><span class="co"># Download treated data (raw_data = FALSE) of industry greenhouse gases (dataset = "seeg_industry")</span></span>
-<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_seeg.html">load_seeg</a></span><span class="op">(</span>dataset <span class="op">=</span> <span class="st">"seeg_industry"</span>, </span>
-<span>                  raw_data <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>                  geo_level <span class="op">=</span> <span class="st">"state"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># download treated population data at the state level for 2010 to 2012</span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_population.html">load_population</a></span><span class="op">(</span>raw_data <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>                        geo_level <span class="op">=</span> <span class="st">"state"</span>,</span>
+<span>                        time_period <span class="op">=</span> <span class="fl">2010</span><span class="op">:</span><span class="fl">2012</span><span class="op">)</span></span></code></pre></div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

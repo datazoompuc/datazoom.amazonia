@@ -89,6 +89,7 @@ devtools::load_all()
 | **[IPS](#ips)** | _Amazon Social Progress Index_ |
 | **[DATASUS](#datasus)** | _Causes of mortality and availability of hospital beds_ |
 | **[IEMA](#iema)** | _Access to electricity in the Amazon region_ |
+| **[Population](#population)** | _Population_ |
 
 </td></tr> </table>
 
@@ -205,6 +206,12 @@ devtools::load_all()
 ```
 
 &#x1F534; This function uses the `googledrive` package to download data. In case of authentication errors, see [googledrive](#googledrive).
+
+## Population
+
+```{r child = "vignettes/POPULATION.Rmd"}
+```
+
 
 # Economic Data
 

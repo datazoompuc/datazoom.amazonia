@@ -76,6 +76,9 @@
     <loc>/articles/PIBMUNIC.html</loc>
   </url>
   <url>
+    <loc>/articles/POPULATION.html</loc>
+  </url>
+  <url>
     <loc>/articles/PPM.html</loc>
   </url>
   <url>
@@ -215,6 +218,9 @@
   </url>
   <url>
     <loc>/reference/load_pibmunic.html</loc>
+  </url>
+  <url>
+    <loc>/reference/load_population.html</loc>
   </url>
   <url>
     <loc>/reference/load_ppm.html</loc>
