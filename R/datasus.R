@@ -71,7 +71,7 @@ load_datasus <- function(dataset,
   . <- abbrev_state <- code_muni <- code_muni_6 <- code_state <- codmunocor <- NULL
   codufmun <- dtobito <- file_name <- is_cid_code <- label_eng <- label_pt <- NULL
   legal_amazon <- link <- month <- name_muni <- qt_exist <- qt_nsus <- value <- NULL
-  var_code <- year <- qt_sus <- causabas <- NULL
+  var_code <- year <- qt_sus <- causabas <- available_time <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -93,6 +93,23 @@ load_datasus <- function(dataset,
 
   param$skip_rows <- NULL
   param$filenames <- NULL
+
+  # Check time period
+  year_check <- datasets_link() %>%
+    dplyr::filter(dataset == param$dataset) %>%
+    dplyr::select(available_time) %>%
+    unlist() %>%
+    as.character() %>%
+    stringr::str_split(pattern = "-") %>%
+    unlist() %>%
+    as.numeric()
+
+  if (min(time_period) < year_check[1]) {
+    stop("Provided time period less than supported. Check documentation for time availability.")
+  }
+  if (max(time_period) > year_check[2]) {
+    stop("Provided time period greater than supported. Check documentation for time availability.")
+  }
 
   ######################
   ## Downloading Data ##
