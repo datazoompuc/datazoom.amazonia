@@ -101,6 +101,29 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
   }
 
   #################
+  ##   Message   ##
+  #################
+  if(dataset %in% c("mapbiomas_cover",
+                    "mapbiomas_transition",
+                    "mapbiomas_deforestation_regeneration",
+                    "mapbiomas_irrigation",
+                    "mapbiomas_mining")) {
+    message("Data from Mapbiomas - Collection 7")
+    message("")
+  }
+
+  if(dataset %in% c("mapbiomas_grazing_quality")) {
+    message("Data from Mapbiomas - Collection 5")
+    message("")
+  }
+
+  if(dataset %in% c("mapbiomas_water", "mapbiomas_fire")) {
+    message("Data from Mapbiomas - Collection 2")
+    message("")
+  }
+
+
+  #################
   ## Downloading ##
   #################
 
