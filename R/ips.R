@@ -3,7 +3,7 @@
 #' @description Loads information on the social and environmental performance of the Legal Amazon.
 #'
 #' @param dataset A dataset name ("all", "life_quality", "sanit_habit", "violence", "educ", "communic", "mortality", or "deforest")
-#' @param time_period Year to download. Can be 2014, 2018, 2021, or a vector with some combination thereof
+#' @param time_period Year to download. Can be 2014, 2018, 2021, 2023, or a vector with some combination thereof
 #' @inheritParams load_baci
 #'
 #' @return A \code{tibble}.
@@ -22,7 +22,7 @@
 #' @export
 
 load_ips <- function(dataset = "all", raw_data = FALSE,
-                     time_period = c(2014, 2018, 2021), language = "eng") {
+                     time_period = c(2014, 2018, 2021, 2023), language = "eng") {
 
   ###########################
   ## Bind Global Variables ##
@@ -93,7 +93,8 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
   sheet_list <- c(
     "2014" = "IPS 2014",
     "2018" = "IPS 2018 ",
-    "2021" = "IPS 2021"
+    "2021" = "IPS 2021",
+    "2023" = "IPS 2023"
   )
 
   sheets <- param$time_period %>%
@@ -131,7 +132,7 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
 
   # removing years from column names to be able to match columns from different years
 
-  strs_to_remove <- paste0("_", 2012:2021, collapse = "|")
+  strs_to_remove <- paste0("_", 2012:2023, collapse = "|")
 
   dat <- dat %>%
     purrr::map(
