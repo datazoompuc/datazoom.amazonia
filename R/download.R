@@ -690,8 +690,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (param$source == "ips") {
     dat <- param$sheet %>%
       purrr::map(
-        ~ readxl::read_xlsx(temp, sheet = .)
-      )
+        ~ readxl::read_xlsx(temp, sheet = .),
+      download_method <- "googledrive")
   }
 
   ## Now the rest of the functions
