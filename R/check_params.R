@@ -1,6 +1,14 @@
 check_params <- function(param, source){
 
-  ## checking if dataset is supported
+  ###########################
+  ## Bind Global Variables ##
+  ###########################
+
+  survey <- dataset <- available_time <- available_geo <- . <- NULL
+
+  ###################
+  ## Dataset check ##
+  ###################
 
   # extracting the supported datasets from datasets_link
 
@@ -16,7 +24,9 @@ check_params <- function(param, source){
     stop(dataset_error)
   }
 
-  ## checking if time_period is supported
+  #######################
+  ## Time period check ##
+  #######################
 
   if (!is.null(param$time_period)){
 
@@ -24,7 +34,7 @@ check_params <- function(param, source){
 
     supp_time_period_str <- datasets_link() %>%
       dplyr::filter(survey == source, dataset == param$dataset) %>%
-      select(available_time) %>%
+      dplyr::select(available_time) %>%
       unlist()
 
     # separating by commas: 2003, 2007, 2014 -> c(2003, 2007, 2014)
@@ -47,7 +57,9 @@ check_params <- function(param, source){
 
   }
 
-  ## checking if geo_level is supported
+  #####################
+  ## Geo level check ##
+  #####################
 
   if (!(is.null(param$geo_level))) {
 

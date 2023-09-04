@@ -40,6 +40,8 @@ load_aneel <- function(dataset, raw_data = FALSE, language = "eng") {
     # skips first row of excel sheet for this dataset
   }
 
+  check_params(param, "ANEEL")
+
   #################
   ## Downloading ##
   #################
