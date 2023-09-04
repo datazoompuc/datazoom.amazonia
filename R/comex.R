@@ -64,6 +64,10 @@ load_br_trade <- function(dataset, raw_data = FALSE,
   # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncmv2/IMP_2012_V2.csv
   # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm/EXP_2010.csv
 
+  # check if dataset and time_period are valid
+
+  check_params(param, "COMEX")
+
   ##############
   ## Download ##
   ##############

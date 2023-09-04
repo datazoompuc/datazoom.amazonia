@@ -855,10 +855,10 @@ datasets_link <- function() {
     ## COMEX ##
     ###########
 
-    "COMEX-EXP-PROD_NCM", "comex_export_prod", NA, "1997-2021", NA, "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm",
-    "COMEX-IMP-PROD_NCM", "comex_import_prod", NA, "1997-2021", NA, "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm",
-    "COMEX-EXP-MUNIC_FIRM", "comex_export_mun", NA, "1997-2021", NA, "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun",
-    "COMEX-IMP-MUNIC_FIRM", "comex_import_mun", NA, "1997-2021", NA, "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun",
+    "COMEX", "comex_export_prod", NA, "1997-2023", NA, "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm",
+    "COMEX", "comex_import_prod", NA, "1997-2023", NA, "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm",
+    "COMEX", "comex_export_mun", NA, "1997-2023", NA, "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun",
+    "COMEX", "comex_import_mun", NA, "1997-2023", NA, "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun",
 
     ##########
     ## INPE ##
