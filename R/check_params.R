@@ -10,6 +10,9 @@ check_params <- function(param, source){
   ## Dataset check ##
   ###################
 
+  if (is.numeric(param$dataset)) return(invisible(NULL)) # edge case for numeric datasets,
+                                                    # which aren't listed in datasets_link
+
   # extracting the supported datasets from datasets_link
 
   supp_datasets <- datasets_link() %>%
