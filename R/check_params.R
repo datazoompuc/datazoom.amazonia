@@ -68,7 +68,8 @@ check_params <- function(param, source){
     supp_geo_level_str <- datasets_link() %>%
       dplyr::filter(survey == source, dataset == param$dataset) %>%
       dplyr::select(available_geo) %>%
-      unlist()
+      unlist() %>%
+      tolower()
 
     supp_geo_level <- supp_geo_level_str %>%
       stringr::str_split(",", simplify = TRUE) %>%

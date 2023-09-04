@@ -45,23 +45,9 @@ load_baci <- function(dataset = "HS92", raw_data = FALSE, time_period,
   param$time_period <- time_period
   param$language <- language
 
-  ## Check if year is acceptable
+  # check if dataset and time_period are valid
 
-  year_check <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(available_time) %>%
-    unlist() %>%
-    as.character() %>%
-    stringr::str_split(pattern = "-") %>%
-    unlist() %>%
-    as.numeric()
-
-  if (min(time_period) < year_check[1]) {
-    stop("Provided time period less than supported. Check documentation for time availability.")
-  }
-  if (max(time_period) > year_check[2]) {
-    stop("Provided time period greater than supported. Check documentation for time availability.")
-  }
+  check_params(param, "BACI")
 
   #################
   ## Downloading ##

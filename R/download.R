@@ -877,7 +877,7 @@ datasets_link <- function() {
     "MAPBIOMAS", "mapbiomas_transition", NA, "1985-2019", "Municipality, State", "https://mapbiomas-br-site.s3.amazonaws.com/",
     "MAPBIOMAS", "mapbiomas_deforestation_regeneration", NA, "1988-2017", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
     "MAPBIOMAS", "mapbiomas_irrigation", NA, "2000-2019", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
-    "MAPBIOMAS", "mapbiomas_grazing_quality", NA, "2010 & 2018", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
+    "MAPBIOMAS", "mapbiomas_grazing_quality", NA, "2010, 2018", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
     "MAPBIOMAS", "mapbiomas_mining", NA, "1985-2020", "Country, State, Municipality, Biome, Indigenous", "https://mapbiomas-br-site.s3.amazonaws.com/",
     "MAPBIOMAS", "mapbiomas_fire", NA, "1985-2020", "State, Municipality", "https://mapbiomas-br-site.s3.amazonaws.com/",
     "MAPBIOMAS", "mapbiomas_water", NA, "1985-2022", "State, Municipality, Biome", "https://mapbiomas-br-site.s3.amazonaws.com/",
@@ -898,7 +898,7 @@ datasets_link <- function() {
     ## IPS ##
     #########
 
-    "IPS", "ips", NA, "2014 and/or 2018 and/or 2021", NA, "http://www.ipsamazonia.org.br/assets/IPS_Tabela_Completa-1df30fcea79209e3c7e8634a586f95e6.xlsx",
+    "IPS", "ips", NA, "2014, 2018, 2021", NA, "http://www.ipsamazonia.org.br/assets/IPS_Tabela_Completa-1df30fcea79209e3c7e8634a586f95e6.xlsx",
 
     ###########
     ## IBAMA ##
