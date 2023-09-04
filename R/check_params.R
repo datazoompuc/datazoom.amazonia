@@ -16,7 +16,7 @@ check_params <- function(param, source){
     stop(dataset_error)
   }
 
-  # checking if time_period is supported
+  ## checking if time_period is supported
 
   if (!is.null(param$time_period)){
 
@@ -24,7 +24,8 @@ check_params <- function(param, source){
 
     supp_time_period_str <- datasets_link() %>%
       dplyr::filter(survey == source, dataset == param$dataset) %>%
-      select(available_time)
+      select(available_time) %>%
+      unlist()
 
     # separating by commas: 2003, 2007, 2014 -> c(2003, 2007, 2014)
 
@@ -38,11 +39,33 @@ check_params <- function(param, source){
       parse(text = .) %>%
       eval()
 
-    if (!(param$time_period %in% supp_time_period)) {
-      time_period_error <- paste("Time period", param$time_period, "not supported.",
-                             "Time period must be in", supp_time_period_str)
+    if (!all(param$time_period %in% supp_time_period)) {
+      time_period_error <- paste("Option time_period must be in", supp_time_period_str)
 
       stop(time_period_error)
+    }
+
+  }
+
+  ## checking if geo_level is supported
+
+  if (!(is.null(param$geo_level))) {
+
+    # constructing vector of supported geo_levels
+
+    supp_geo_level_str <- datasets_link() %>%
+      dplyr::filter(survey == source, dataset == param$dataset) %>%
+      dplyr::select(available_geo) %>%
+      unlist()
+
+    supp_geo_level <- supp_geo_level_str %>%
+      stringr::str_split(",", simplify = TRUE) %>%
+      stringr::str_trim()
+
+    if (!(param$geo_level %in% supp_geo_level)) {
+      geo_level_error <- paste("Option geo_level must be one of", supp_geo_level_str)
+
+      stop(geo_level_error)
     }
 
   }
