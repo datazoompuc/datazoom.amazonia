@@ -936,20 +936,20 @@ datasets_link <- function() {
     ## TerraClimate ##
     ##################
 
-    "TerraClimate", "max_temperature", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "TerraClimate", "min_temperature", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "TerraClimate", "wind_speed", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "TerraClimate", "vapor_pressure_deficit", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "TerraClimate", "vapor_pressure", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "TerraClimate", "snow_water_equivalent", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "TerraClimate", "shortwave_radiation_flux", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "TerraClimate", "soil_moisture", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "TerraClimate", "runoff", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "TerraClimate", "precipitation", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "TerraClimate", "potential_evaporation", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "TerraClimate", "climatic_water_deficit", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "TerraClimate", "water_evaporation", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "TerraClimate", "palmer_drought_severity_index", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "max_temperature", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "min_temperature", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "wind_speed", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "vapor_pressure_deficit", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "vapor_pressure", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "snow_water_equivalent", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "shortwave_radiation_flux", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "soil_moisture", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "runoff", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "precipitation", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "potential_evaporation", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "climatic_water_deficit", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "water_evaporation", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "TerraClimate", "palmer_drought_severity_index", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
 
     #####################
     ## Health Datasets ##

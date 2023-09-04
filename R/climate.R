@@ -48,7 +48,8 @@ load_climate <- function(dataset, raw_data = FALSE,
 
   param <- list()
 
-  param$dataset_name <- dataset
+  param$dataset <- dataset
+  param$time_period <- time_period
   param$raw_data <- raw_data
   param$language <- language
   param$initial_time <- min(time_period)
@@ -92,7 +93,7 @@ load_climate <- function(dataset, raw_data = FALSE,
     "palmer_drought_severity_index" = "PDSI"
   )
 
-  param$dataset_code <- param$dataset_name %>%
+  param$dataset_code <- param$dataset %>%
     dplyr::recode(!!!dataset_names)
 
   # tmax - Maximum 2-m Temperature; air_temperature (degC)
@@ -110,9 +111,9 @@ load_climate <- function(dataset, raw_data = FALSE,
   # aet - Actual Evapotranspiration; water_evaporation_amount (mm)
   # PDSI - Palmer Drought Severity Index; palmer_drought_severity_index (unitless)
 
-  if (param$dataset_name == param$dataset_code) {
-    base::stop("Invalid dataset")
-  }
+  # check if dataset and time_period are valid
+
+  check_params(param, "TerraClimate")
 
   # time range choices - 1958-01 to 2017-01
   param$initial_time <- ifelse(
@@ -134,7 +135,7 @@ load_climate <- function(dataset, raw_data = FALSE,
 
   dat <- external_download(
     source = "terraclimate",
-    dataset = param$dataset_name,
+    dataset = param$dataset,
     dataset_code = param$dataset_code,
     coords = list(
       "lat_min" = LAT_MIN,
@@ -204,7 +205,7 @@ load_climate <- function(dataset, raw_data = FALSE,
     tidyr::pivot_longer(dplyr::starts_with(param$dataset_code),
       names_prefix = paste0(param$dataset_code, "_"),
       names_to = "date",
-      values_to = param$dataset_name
+      values_to = param$dataset
     )
 
   ## Restoring correct dates

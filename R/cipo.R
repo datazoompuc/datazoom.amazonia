@@ -45,6 +45,10 @@ load_cipo <- function(dataset = "brazilian_actors", raw_data = FALSE,
   param$raw_data <- raw_data
   param$search <- clean_text(search)
 
+  # check if dataset is valid
+
+  check_params(param, "CIPO")
+
   ######################
   ## Downloading Data ##
   ######################
