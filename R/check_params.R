@@ -22,7 +22,7 @@ check_params <- function(param, source){
 
   if (!(param$dataset %in% supp_datasets)) {
     dataset_error <- paste("Dataset", param$dataset, "not supported.",
-                           "Dataset must be one of", paste(supp_datasets, collapse = " "))
+                           "Dataset must be one of:", "\n", paste(supp_datasets, collapse = "\n"))
 
     stop(dataset_error)
   }
