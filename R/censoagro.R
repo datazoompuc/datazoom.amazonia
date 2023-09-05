@@ -4,7 +4,7 @@
 #'
 #' @param dataset A dataset name ("censoagro").
 #' @inheritParams load_baci
-#' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state" or "municipality".
+#' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state" , "region" or "municipality".
 #'
 #' @return A \code{tibble}.
 #'
@@ -24,10 +24,11 @@
 #'   dataset = "production_temporary_crops",
 #'   raw_data = FALSE,
 #'   geo_level = "state",
-#'   time_period = 2008:2010,
+#'   time_period = 1996,
 #'   language = "pt"
 #' )
 #' }
+#'## We should include support for microregion/mesoregion
 #'
 #' @export
 
@@ -75,12 +76,14 @@ load_censoagro <- function(dataset = "censoagro", raw_data = FALSE,
     unlist() %>%
     as.numeric()
 
-  if (min(time_period) < year_check[1]) {
-    stop("Provided time period less than supported. Check documentation for time availability.")
-  }
-  if (max(time_period) > year_check[2]) {
-    stop("Provided time period greater than supported. Check documentation for time availability.")
-  }
+  # if (min(time_period) < year_check[1]) {
+  #  stop("Provided time period less than supported. Check documentation for time availability.")
+  #}
+  #if (max(time_period) > year_check[2]) {
+  # stop(
+  #  "Provided time period greater than supported. Check documentation for time availability."
+  #)
+  #}
 
   ##############
   ## Download ##
@@ -134,14 +137,22 @@ load_censoagro <- function(dataset = "censoagro", raw_data = FALSE,
     dat <- dplyr::select(dat, -"brasil_codigo", -"brasil")
   }
 
+  if (geo_level == "region") {
+    dat$geo_id <- dat$municipio_codigo
+    dat <- dplyr::select(dat, -"regiao", -"regiao_codigo")
+  }
+
   if (geo_level == "state") {
     dat$geo_id <- dat$unidade_da_federacao_codigo
     dat <- dplyr::select(dat, -"unidade_da_federacao_codigo", -"unidade_da_federacao")
   }
+
   if (geo_level == "municipality") {
     dat$geo_id <- dat$municipio_codigo
     dat <- dplyr::select(dat, -"municipio", -"municipio_codigo")
   }
+
+
 
   ################################
   ## Harmonizing Variable Names ##
