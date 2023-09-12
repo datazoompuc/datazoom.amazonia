@@ -42,6 +42,10 @@ load_iema <- function(dataset = "iema", raw_data = FALSE, language = "eng") {
   param$language <- language
   param$raw_data <- raw_data
 
+  # check if dataset is valid
+
+  check_params(param, "IEMA")
+
   ##############
   ## Download ##
   ##############

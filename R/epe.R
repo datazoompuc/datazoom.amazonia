@@ -37,6 +37,10 @@ load_epe <- function(dataset, raw_data = FALSE,
   param$language <- language
   param$geo_level <- geo_level
 
+  # check if dataset is valid
+
+  check_params(param, "EPE")
+
   #################
   ## Downloading ##
   #################

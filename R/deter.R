@@ -40,6 +40,10 @@ load_deter <- function(dataset, raw_data = FALSE,
   param$language <- language
   param$raw_data <- raw_data
 
+  # check if dataset is valid
+
+  check_params(param, "DETER-INPE")
+
   #################
   ## Downloading ##
   #################

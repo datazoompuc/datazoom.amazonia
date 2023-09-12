@@ -60,6 +60,10 @@ load_ibama <- function(dataset,
   param$raw_data <- raw_data
   param$states <- states
 
+  # check if dataset is valid
+
+  check_params(param, "IBAMA")
+
   if (states == "all") {
     param$states <- c("RO", "AC", "AM", "RR", "PA", "AP", "TO", "MA", "PI", "CE", "RN",
                       "PB", "PE", "AL", "SE", "BA", "MG", "ES", "RJ", "SP", "PR", "SC",

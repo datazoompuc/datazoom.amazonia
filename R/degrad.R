@@ -47,6 +47,10 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
   param$language <- language
   param$raw_data <- raw_data
 
+  # check if dataset and time_period are valid
+
+  check_params(param, "DEGRAD-INPE")
+
   # .shp file names for each year
 
   file_list <- c(
