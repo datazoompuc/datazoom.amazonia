@@ -1635,6 +1635,56 @@ clean_epe <- load_epe(
 )
 ```
 
+## Censo Agropecuario
+
+The census of agriculture collects information about agricultural establishments
+and the agricultural activities carried out there, covering characteristics of the
+producer and establishment, economy and employment in rural areas, livestock, 
+farming and agroindustry. 
+
+Data is collected by IBGE and is available at
+country, state and municipality level.
+
+------------------------------------------------------------------------
+
+**Options:**
+
+1.  **dataset**: `"censoagro"`
+
+2.  **raw_data**: there are two options:
+
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
+
+3.  **time_period**: picks the years for which the data will be
+    downloaded
+
+4.  **language**: you can choose between Portuguese `("pt")` and English
+    `("eng")`
+
+------------------------------------------------------------------------
+
+**Examples:**
+
+``` r
+# Download total land area data at the country level in year 2006' data <- load_censoagro(
+   dataset = "land_area_total",
+   raw_data = TRUE,
+   geo_level = "country",
+   time_period = 2006
+ )
+
+ # Download temporary production crops data by state (geo_level = "state") in year 2006
+   in portuguese (language = "pt").
+ data <- load_censoagro(
+   dataset = "production_temporary_crops",
+   raw_data = FALSE,
+   geo_level = "state",
+   time_period = 1996,
+   language = "pt"
+ ) 
+```
+
 # Other tools
 
 ## Legal Amazon Municipalities
