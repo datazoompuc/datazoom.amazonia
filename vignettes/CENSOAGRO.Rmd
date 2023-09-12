@@ -1,0 +1,52 @@
+---
+title: "CENSO_AGRO-IBGE"
+output:
+  html_document:
+    df_print: paged
+vignette: "%\\VignetteIndexEntry{CENSO_AGRO-IBGE} %\\VignetteEngine{knitr::rmarkdown}
+  %\\VignetteEncoding{UTF-8}\n"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+The census of agriculture collects information about agricultural establishments
+and the agricultural activities carried out there, covering characteristics of the
+producer and establishment, economy and employment in rural areas, livestock, 
+farming and agroindustry. 
+
+Data is collected by IBGE and is available at
+country, state and municipality level.
+
+------------------------------------------------------------------------
+
+**Options:**
+
+1.  **dataset**: `"land_area_total"`,`"area_use"`,`"employess_tractors"`,
+`"land_area_producer_condition"`,`"animal_specie_production"`,
+`"vegetable_production_area_type"`,`"land_area_total_mean"`,`"use_type"`,
+`"employess_total_mean"`,`"tractors_total_mean"`,`"bovine_area_mean"`,
+`"animal_herd_type"`,`"income_mean_vegetable_type"`,
+`"vegetable_area_income_coffee_orange"`,`"production_permanent_crops"`,
+`"production_temporary_crops"`,`"livestock_production"`
+
+2.  **raw_data**: there are two options:
+
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
+
+3.  **time_period**: picks the years for which the data will be
+    downloaded
+
+4.  **language**: you can choose between Portuguese `("pt")` and English
+    `("eng")`
+    

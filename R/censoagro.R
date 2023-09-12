@@ -2,7 +2,7 @@
 #'
 #' @description Loads information on
 #'
-#' @param dataset A dataset name ("censoagro").
+#'#' @param dataset A dataset name ("land_area_total").
 #' @inheritParams load_baci
 #' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state" , "region" or "municipality".
 #'
@@ -32,7 +32,7 @@
 #'
 #' @export
 
-load_censoagro <- function(dataset = "censoagro", raw_data = FALSE,
+load_censoagro <- function(dataset = "land_area_total",raw_data = FALSE,
                             geo_level, time_period, language = "eng") {
 
   ###########################
