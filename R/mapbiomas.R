@@ -65,6 +65,10 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
   param$raw_data <- raw_data
   param$cover_level <- cover_level
 
+  # check if dataset and geo_level are supported
+
+  check_params(param, "MAPBIOMAS")
+
   sheets <- tibble::tribble(
     ~dataset, ~geo_level, ~sheet,
     "mapbiomas_cover", "any", "COBERTURA_COL7",

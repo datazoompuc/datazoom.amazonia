@@ -37,7 +37,7 @@ load_epe <- function(dataset, raw_data = FALSE,
   param$language <- language
   param$geo_level <- geo_level
 
-  # check if dataset is valid
+  # check if dataset and geo_level valid
 
   check_params(param, "EPE")
 
@@ -46,6 +46,8 @@ load_epe <- function(dataset, raw_data = FALSE,
   #################
 
   # Choosing which sheets to read
+
+  sheets_selected <- NULL # for when geo_level is not state, region, or subsystem
 
   if (param$geo_level == "state") {
     sheets_selected <- c(

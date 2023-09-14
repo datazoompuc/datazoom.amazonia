@@ -42,6 +42,10 @@ load_prodes <- function(dataset = "prodes", raw_data = FALSE,
   param$time_period <- time_period
   param$language <- language
 
+  # check if dataset and time_period are supported
+
+  check_params(param, "PRODES-INPE")
+
   ###################
   ## Download Data ##
   ###################

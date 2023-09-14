@@ -875,10 +875,10 @@ datasets_link <- function() {
 
     "MAPBIOMAS", "mapbiomas_cover", NA, "1985-2019", "Municipality, State", "https://mapbiomas-br-site.s3.amazonaws.com/",
     "MAPBIOMAS", "mapbiomas_transition", NA, "1985-2019", "Municipality, State", "https://mapbiomas-br-site.s3.amazonaws.com/",
-    "MAPBIOMAS", "mapbiomas_deforestation_regeneration", NA, "1988-2017", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
-    "MAPBIOMAS", "mapbiomas_irrigation", NA, "2000-2019", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
-    "MAPBIOMAS", "mapbiomas_grazing_quality", NA, "2010, 2018", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
-    "MAPBIOMAS", "mapbiomas_mining", NA, "1985-2020", "Country, State, Municipality, Biome, Indigenous", "https://mapbiomas-br-site.s3.amazonaws.com/",
+    "MAPBIOMAS", "mapbiomas_deforestation_regeneration", NA, "1988-2017", "Municipality, State", "https://mapbiomas-br-site.s3.amazonaws.com/",
+    "MAPBIOMAS", "mapbiomas_irrigation", NA, "2000-2019", "State, Biome", "https://mapbiomas-br-site.s3.amazonaws.com/",
+    "MAPBIOMAS", "mapbiomas_grazing_quality", NA, "2010, 2018", NA, "https://mapbiomas-br-site.s3.amazonaws.com/",
+    "MAPBIOMAS", "mapbiomas_mining", NA, "1985-2020", "Country, State, Municipality, Biome, Indigenous_Land", "https://mapbiomas-br-site.s3.amazonaws.com/",
     "MAPBIOMAS", "mapbiomas_fire", NA, "1985-2020", "State, Municipality", "https://mapbiomas-br-site.s3.amazonaws.com/",
     "MAPBIOMAS", "mapbiomas_water", NA, "1985-2022", "State, Municipality, Biome", "https://mapbiomas-br-site.s3.amazonaws.com/",
 
@@ -1008,7 +1008,7 @@ datasets_link <- function() {
     #########
 
     "EPE", "energy_consumption_per_class", NA, "2004-2021", "Region, Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/Documents/CONSUMO%20MENSAL%20DE%20ENERGIA%20EL%c3%89TRICA%20POR%20CLASSE.xls",
-    "EPE", "national_energy_balance", NA, "2011-2022", "Region, Municipality", "https://drive.google.com/file/d/1_JTYyAPdbQayR-nrURts6OmbKcm2cLix/view?usp=share_link",
+    "EPE", "national_energy_balance", NA, "2011-2022", NA, "https://drive.google.com/file/d/1_JTYyAPdbQayR-nrURts6OmbKcm2cLix/view?usp=share_link",
 
     ###########
     ## ANEEL ##

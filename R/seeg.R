@@ -65,6 +65,10 @@ load_seeg <- function(dataset, raw_data = FALSE,
   param$language <- language
   param$raw_data <- raw_data
 
+  # check if dataset and geo_level are supported
+
+  check_params(param, "SEEG")
+
   if (!is.numeric(param$dataset)) {
     param$code <- datasets_link() %>%
       dplyr::filter(dataset == param$dataset) %>%

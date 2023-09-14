@@ -36,6 +36,10 @@ load_sigmine <- function(dataset = "sigmine_active",
   param$language <- language
   param$raw_data <- raw_data
 
+  # check if dataset is supported
+
+  check_params(param, "ANM-SIGMINE")
+
   ######################
   ## Downloading Data ##
   ######################

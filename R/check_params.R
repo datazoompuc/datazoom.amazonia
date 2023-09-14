@@ -81,7 +81,10 @@ check_params <- function(param, source){
     if (!(param$geo_level %in% supp_geo_level)) {
       geo_level_error <- paste("Option geo_level must be one of", supp_geo_level_str)
 
-      stop(geo_level_error)
+      if(!any(is.na(supp_geo_level))) stop(geo_level_error)
+      # edge case for when geo_level exists for only some datasets.
+      # for the datasets without geo_level, avaliable_geo should be NA
+      # if avaliable_geo is NA, then any geo_level works
     }
 
   }
