@@ -690,8 +690,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (param$source == "ips") {
     dat <- param$sheet %>%
       purrr::map(
-        ~ readxl::read_xlsx(temp, sheet = .)
-      )
+        ~ readxl::read_xlsx(temp, sheet = .),
+      download_method <- "googledrive")
   }
 
   ## Now the rest of the functions
@@ -898,7 +898,7 @@ datasets_link <- function() {
     ## IPS ##
     #########
 
-    "IPS", "ips", NA, "2014 and/or 2018 and/or 2021", NA, "http://www.ipsamazonia.org.br/assets/IPS_Tabela_Completa-1df30fcea79209e3c7e8634a586f95e6.xlsx",
+    "IPS", "ips", NA, "2014 and/or 2018 and/or 2021 and/or 2023", NA, "https://drive.google.com/drive/folders/1EtSDn9E7BsYmy_toJDVU5UbWcyMDVNGg",
 
     ###########
     ## IBAMA ##
