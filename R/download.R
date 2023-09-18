@@ -552,7 +552,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   download_method <- "standard" # works for most functions
 
-  if (source %in% c("iema", "imazon_shp", "ips")) {
+  if (source %in% c("iema", "imazon_shp")) {
     download_method <- "googledrive"
   }
   if (source == "ANEEL") {
@@ -898,7 +898,7 @@ datasets_link <- function() {
     ## IPS ##
     #########
 
-    "IPS", "ips", NA, "2014 and/or 2018 and/or 2021 and/or 2023", NA, "https://drive.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN",
+    "IPS", "ips", NA, "2014 and/or 2018 and/or 2021 and/or 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
 
     ###########
     ## IBAMA ##

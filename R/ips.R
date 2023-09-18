@@ -24,17 +24,6 @@
 load_ips <- function(dataset = "all", raw_data = FALSE,
                      time_period = c(2014, 2018, 2021, 2023), language = "eng") {
 
-  #Checking for googledrive package (in Suggests)
-
-
-  if (!requireNamespace("googledrive", quietly = TRUE)) {
-    stop(
-      "Package \"googledrive\" must be installed to use this function.",
-      call. = FALSE
-    )
-  }
-
-
   ###########################
   ## Bind Global Variables ##
   ###########################
