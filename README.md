@@ -1,5 +1,5 @@
 
-<a href="https://github.com/datazoompuc/datazoom.amazonia"><img src="https://raw.githubusercontent.com/datazoompuc/datazoom.amazonia/master/logo.png?token=AU72KNQCGY4ZR6XLARTNSXLBXCPNG" align="left" width="100" hspace="10" vspace="6"/></a>
+<a href="https://github.com/datazoompuc/datazoom.amazonia"><img src="https://raw.githubusercontent.com/datazoompuc/datazoom.amazonia/master/logo.png?token=AU72KNQCGY4ZR6XLARTNSXLBXCPNG" align="left" width="100" hspace="10" vspace="6"></a>
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -23,7 +23,6 @@ Issues](https://img.shields.io/github/issues-raw/datazoompuc/datazoom.amazonia?s
 Issues](https://img.shields.io/github/issues-closed-raw/datazoompuc/datazoom.amazonia?style=flat)
 ![Files](https://img.shields.io/github/directory-file-count/datazoompuc/datazoom.amazonia?style=flat)
 ![Followers](https://img.shields.io/github/followers/datazoompuc?style=flat)
-
 <!-- badges: end -->
 
 The datazoom.amazonia package facilitates access to official Brazilian
@@ -47,41 +46,91 @@ And the development version from GitHub with:
 devtools::install_github("datazoompuc/datazoom.amazonia")
 ```
 
-    #> ── R CMD INSTALL ───────────────────────────────────────────────────────────────
-    #>   ─  installing *source* package 'datazoom.amazonia' ... (734ms)
-    #>      ** using staged installation
-    #>      ** libs
-    #>      gcc  -I"C:/PROGRA~1/R/R-42~1.2/include" -DNDEBUG  -I'C:/Users/breno/AppData/Local/R/win-library/4.2/Rcpp/include'   -I"C:/rtools42/x86_64-w64-mingw32.static.posix/include"     -O2 -Wall -gdwarf-2 -std=gnu99 -mfpmath=sse -msse2 -mstackrealign  -UNDEBUG -Wall -pedantic -g -O0 -c blast.c -o blast.o
-    #>      gcc  -I"C:/PROGRA~1/R/R-42~1.2/include" -DNDEBUG  -I'C:/Users/breno/AppData/Local/R/win-library/4.2/Rcpp/include'   -I"C:/rtools42/x86_64-w64-mingw32.static.posix/include"     -O2 -Wall -gdwarf-2 -std=gnu99 -mfpmath=sse -msse2 -mstackrealign  -UNDEBUG -Wall -pedantic -g -O0 -c datazoom.amazonia_init.c -o datazoom.amazonia_init.o
-    #>      gcc  -I"C:/PROGRA~1/R/R-42~1.2/include" -DNDEBUG  -I'C:/Users/breno/AppData/Local/R/win-library/4.2/Rcpp/include'   -I"C:/rtools42/x86_64-w64-mingw32.static.posix/include"     -O2 -Wall -gdwarf-2 -std=gnu99 -mfpmath=sse -msse2 -mstackrealign  -UNDEBUG -Wall -pedantic -g -O0 -c dbc2dbf.c -o dbc2dbf.o
-    #>      gcc -shared -static-libgcc -o datazoom.amazonia.dll tmp.def blast.o datazoom.amazonia_init.o dbc2dbf.o -LC:/rtools42/x86_64-w64-mingw32.static.posix/lib/x64 -LC:/rtools42/x86_64-w64-mingw32.static.posix/lib -LC:/PROGRA~1/R/R-42~1.2/bin/x64 -lR
-    #>      installing to C:/Users/breno/AppData/Local/Temp/Rtmp8cSban/devtools_install_cac04224395b/00LOCK-datazoom.amazonia/00new/datazoom.amazonia/libs/x64
-    #>   ─  DONE (datazoom.amazonia)
-    #> 
+**[1 - Environmental data](#environmental-data)**
 
-[**1 - Environmental data**](#environmental-data)
+<table>
+<tr>
+<td>
 
-|                                                                                                                                                                                                                                                                                           |                                                                                                                                                                                                                                                                                        |
-|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| \|\|\| \|---\|---\| \| \*\*[PRODES](#prodes)\*\* \| \_Yearly deforestation\_ \| \| \*\*[DETER](#deter)\*\* \| \_Alerts on forest cover changes\_ \| \| \*\*[DEGRAD](#degrad)\*\* \| \_Forest degradation\_ \| \| \*\*[Imazon](#imazon)\*\* \| \_Deforestation pressure in the Amazon\_ \| | \|\|\| \|---\|---\| \| \*\*[IBAMA](#ibama)\*\* \| \_Environmental fines\_ \| \| \*\*[MAPBIOMAS](#mapbiomas)\*\* \| \_Land cover and land use\_ \| \| \*\*[TerraClimate](#terraclimate)\*\* \| \_Climate data\_ \| \| \*\*[SEEG](#seeg)\*\* \| \_Greenhouse gas emission estimates\_ \| |
+|                       |                                        |
+|-----------------------|----------------------------------------|
+| **[PRODES](#prodes)** | *Yearly deforestation*                 |
+| **[DETER](#deter)**   | *Alerts on forest cover changes*       |
+| **[DEGRAD](#degrad)** | *Forest degradation*                   |
+| **[Imazon](#imazon)** | *Deforestation pressure in the Amazon* |
 
-[**2 - Social data**](#social-data)
+</td>
+<td>
 
-|                                                                                                                                                                                                                                                                                                                          |
-|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| \|\|\| \|---\|---\| \| \*\*[IPS](#ips)\*\* \| \_Amazon Social Progress Index\_ \| \| \*\*[DATASUS](#datasus)\*\* \| \_Causes of mortality and availability of hospital beds\_ \| \| \*\*[IEMA](#iema)\*\* \| \_Access to electricity in the Amazon region\_ \| \| \*\*[Population](#population)\*\* \| \_Population\_ \| |
+|                                   |                                     |
+|-----------------------------------|-------------------------------------|
+| **[IBAMA](#ibama)**               | *Environmental fines*               |
+| **[MAPBIOMAS](#mapbiomas)**       | *Land cover and land use*           |
+| **[TerraClimate](#terraclimate)** | *Climate data*                      |
+| **[SEEG](#seeg)**                 | *Greenhouse gas emission estimates* |
 
-[**3 - Economic data**](#economic-data)
+</td>
+</tr>
+</table>
 
-|                                                                                                                                                                                                                                                                                                                                               |                                                                                                                                                                                                                                                                                               |
-|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| \|\|\| \|---\|---\| \| \*\*[COMEX](#comex)\*\* \| \_Brazilian international trade\_ \| \| \*\*[BACI](#baci)\*\* \| \_Global international trade\_ \| \| \*\*[PIB-Munic](#pib-munic)\*\* \| \_Municipal GDP\_ \| \| \*\*[CEMPRE](#cempre)\*\* \| \_Central register of companies\_ \| \| \*\*[PAM](#pam)\*\* \| \_Agricultural production\_ \| | \|\|\| \|---\|---\| \| \*\*[PEVS](#pevs)\*\* \| \_Forestry and extraction\_ \| \| \*\*[PPM](#ppm)\*\* \| \_Livestock farming\_ \| \| \*\*[SIGMINE](#sigmine)\*\* \| \_Mining\_ \| \| \*\*[ANEEL](#aneel)\*\* \| \_Energy development\_ \| \| \*\*[EPE](#epe)\*\* \| \_Energy consumption\_ \| |
+**[2 - Social data](#social-data)**
 
-[**4 - Other tools**](#other-tools)
+<table>
+<tr>
+<td>
 
-|                                                                                                                                                                                                                                                                                                               |
-|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| \|\|\| \|---\|---\| \| \*\*[Legal Amazon Municipalities](#legal-amazon-municipalities)\*\* \| \_Dataset with brazilian cities and whether they belong to the Legal Amazon\_ \| \| \*\*[The ‘googledrive’ package](#googledrive)\*\* \| \_Troubleshooting and information for downloads from Google Drive\_ \| |
+|                               |                                                         |
+|-------------------------------|---------------------------------------------------------|
+| **[IPS](#ips)**               | *Amazon Social Progress Index*                          |
+| **[DATASUS](#datasus)**       | *Causes of mortality and availability of hospital beds* |
+| **[IEMA](#iema)**             | *Access to electricity in the Amazon region*            |
+| **[Population](#population)** | *Population*                                            |
+
+</td>
+</tr>
+</table>
+
+**[3 - Economic data](#economic-data)**
+
+<table>
+<tr>
+<td>
+
+|                             |                                 |
+|-----------------------------|---------------------------------|
+| **[COMEX](#comex)**         | *Brazilian international trade* |
+| **[BACI](#baci)**           | *Global international trade*    |
+| **[PIB-Munic](#pib-munic)** | *Municipal GDP*                 |
+| **[CEMPRE](#cempre)**       | *Central register of companies* |
+| **[PAM](#pam)**             | *Agricultural production*       |
+
+</td>
+<td>
+
+|                         |                           |
+|-------------------------|---------------------------|
+| **[PEVS](#pevs)**       | *Forestry and extraction* |
+| **[PPM](#ppm)**         | *Livestock farming*       |
+| **[SIGMINE](#sigmine)** | *Mining*                  |
+| **[ANEEL](#aneel)**     | *Energy development*      |
+| **[EPE](#epe)**         | *Energy consumption*      |
+
+</td>
+</tr>
+</table>
+
+**[4 - Other tools](#other-tools)**
+
+<table>
+<tr>
+<td>
+
+|                                                                 |                                                                             |
+|-----------------------------------------------------------------|-----------------------------------------------------------------------------|
+| **[Legal Amazon Municipalities](#legal-amazon-municipalities)** | *Dataset with brazilian cities and whether they belong to the Legal Amazon* |
+| **[The ‘googledrive’ package](#googledrive)**                   | *Troubleshooting and information for downloads from Google Drive*           |
+
+</table>
 
 # Environmental Data
 
@@ -669,10 +718,6 @@ data <- load_ips(dataset = "all", raw_data = TRUE, time_period = 2014)
 data <- load_ips(dataset = "deforest", raw_data = FALSE,
                  time_period = 2018, language = "pt")
 ```
-
-🔴 This function uses the `googledrive` package to download data at the
-municipality level. In case of authentication errors, see
-[googledrive](#googledrive).
 
 ## DATASUS
 
