@@ -507,7 +507,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source == "prodes") {
     file_extension <- ".txt"
   }
-  if (source %in% c("seeg", "iema")) {
+  if (source %in% c("seeg", "iema", "ips")) {
     file_extension <- ".xlsx"
   }
   if (source == "terraclimate") {
@@ -552,7 +552,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   download_method <- "standard" # works for most functions
 
-  if (source %in% c("iema", "imazon_shp")) {
+  if (source %in% c("iema", "imazon_shp", "ips")) {
     download_method <- "googledrive"
   }
   if (source == "ANEEL") {
@@ -898,7 +898,7 @@ datasets_link <- function() {
     ## IPS ##
     #########
 
-    "IPS", "ips", NA, "2014 and/or 2018 and/or 2021 and/or 2023", NA, "https://drive.google.com/drive/folders/1EtSDn9E7BsYmy_toJDVU5UbWcyMDVNGg",
+    "IPS", "ips", NA, "2014 and/or 2018 and/or 2021 and/or 2023", NA, "https://drive.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN",
 
     ###########
     ## IBAMA ##

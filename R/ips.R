@@ -102,10 +102,10 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
   # Picking which sheet to download
 
   sheet_list <- c(
-    "2014" = "IPS 2014",
-    "2018" = "IPS 2018 ",
-    "2021" = "IPS 2021",
-    "2023" = "IPS 2023"
+    "2014" = "2014",
+    "2018" = "2018 ",
+    "2021" = "2021",
+    "2023" = "2023"
   )
 
   sheets <- param$time_period %>%
