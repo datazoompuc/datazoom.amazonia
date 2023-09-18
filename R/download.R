@@ -49,10 +49,11 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
   if (param$sidra_code == 6579) {
 
     if (year == 2007) param$sidra_code <- 793  # https://sidra.ibge.gov.br/tabela/793
-    if (year == 2010) {
+    if (year == 2010){
       param$sidra_code <- 1378 # https://sidra.ibge.gov.br/tabela/1378
-      param$classific <- c("c1", "c2", "c287", "c455")
-      param$category <- list(0, 0, 0, 0)
+
+      param$classific <- "c1"
+      param$category <- list(0)
     }
 
   }
