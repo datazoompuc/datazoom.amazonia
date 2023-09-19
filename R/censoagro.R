@@ -2,7 +2,10 @@
 #'
 #' @description Loads information on
 #'
-#'#' @param dataset A dataset name ("land_area_total").
+#'#' @param dataset A dataset name ("land_area_total", "area_use", "employess_tractors","land_area_producer_condition","animal_specie_production",
+#'                                  "vegetable_production_area_type", "land_area_total_mean", "use_type", "employess_total_mean", "tractors_total_mean",
+#'                                  "bovine_area_mean", "animal_herd_type", "income_mean_vegetable_type", "vegetable_area_income_coffee_orange",
+#'                                  "production_permanent_crops", "production_temporary_crops", "livestock_production").
 #' @inheritParams load_baci
 #' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state" , "region" or "municipality".
 #'
@@ -32,7 +35,7 @@
 #'
 #' @export
 
-load_censoagro <- function(dataset = "land_area_total",raw_data = FALSE,
+load_censoagro <- function(dataset,raw_data = FALSE,
                             geo_level, time_period, language = "eng") {
 
   ###########################

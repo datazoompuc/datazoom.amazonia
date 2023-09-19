@@ -74,7 +74,7 @@ devtools::load_all()
 | **[MAPBIOMAS](#mapbiomas)** | _Land cover and land use_ |
 | **[TerraClimate](#terraclimate)** | _Climate data_ |
 | **[SEEG](#seeg)** | _Greenhouse gas emission estimates_ |
-
+| **[CENSOAGRO](#Censoagropecuario)** | _agriculture activities_ |
 
 </td></tr> </table>
 
@@ -186,6 +186,11 @@ devtools::load_all()
 ## CIPÓ
 
 ```{r child = "vignettes/CIPO.Rmd"}
+```
+
+## CENSO AGROPECUARIO
+
+```{r child = "vignettes/CENSOAGRO.Rmd"}
 ```
 
 # Social Data
