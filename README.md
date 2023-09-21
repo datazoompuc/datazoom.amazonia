@@ -62,12 +62,13 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 </td>
 <td>
 
-|                                   |                                     |
-|-----------------------------------|-------------------------------------|
-| **[IBAMA](#ibama)**               | *Environmental fines*               |
-| **[MAPBIOMAS](#mapbiomas)**       | *Land cover and land use*           |
-| **[TerraClimate](#terraclimate)** | *Climate data*                      |
-| **[SEEG](#seeg)**                 | *Greenhouse gas emission estimates* |
+|                                     |                                     |
+|-------------------------------------|-------------------------------------|
+| **[IBAMA](#ibama)**                 | *Environmental fines*               |
+| **[MAPBIOMAS](#mapbiomas)**         | *Land cover and land use*           |
+| **[TerraClimate](#terraclimate)**   | *Climate data*                      |
+| **[SEEG](#seeg)**                   | *Greenhouse gas emission estimates* |
+| **[CENSOAGRO](#Censoagropecuario)** | *agriculture activities*            |
 
 </td>
 </tr>
@@ -672,6 +673,73 @@ actors_ibama <- load_cipo(dataset = "brazilian_actors",
 actors_ibama <- load_cipo(dataset = "brazilian_actors",
                           search = "ibama|funai")
 ```
+
+## CENSO AGROPECUARIO
+
+The census of agriculture collects information about agricultural
+establishments and the agricultural activities carried out there,
+covering characteristics of the producer and establishment, economy and
+employment in rural areas, livestock, farming and agroindustry.
+
+Data is collected by IBGE and is available at country, state and
+municipality level.
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+**Options:**
+
+1.  **dataset**:
+    `"land_area_total"`,`"area_use"`,`"employess_tractors"`,
+    `"land_area_producer_condition"`,`"animal_specie_production"`,
+    `"vegetable_production_area_type"`,`"land_area_total_mean"`,`"use_type"`,
+    `"employess_total_mean"`,`"tractors_total_mean"`,`"bovine_area_mean"`,
+    `"animal_herd_type"`,`"income_mean_vegetable_type"`,
+    `"vegetable_area_income_coffee_orange"`,`"production_permanent_crops"`,
+    `"production_temporary_crops"`,`"livestock_production"`
+
+2.  **raw_data**: there are two options:
+
+<!-- -->
+
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
+
+3.  **geo_level**: `"country"`, `"state"`, or `"municipality"`
+
+4.  **time_period**: picks the years for which the data will be
+    downloaded
+
+5.  **language**: you can choose between Portuguese `("pt")` and English
+    `("eng")`
+
+------------------------------------------------------------------------
+
+**Examples:**
+
+``` r
+# Download total land area data at the country level in year 2006
+ data <- load_censoagro(
+   dataset = "land_area_total",
+   raw_data = TRUE,
+   geo_level = "country",
+   time_period = 2006
+ )
+
+ # Download temporary production crops data by state (geo_level = "state") in year 2006
+ # in portuguese (language = "pt")
+  data <- load_censoagro(
+   dataset = "production_temporary_crops",
+   raw_data = FALSE,
+   geo_level = "state",
+   time_period = 1996,
+   language = "pt"
+```
+
+🔴 This function uses the `googledrive` package to download data at the
+municipality level. In case of authentication errors, see
+[googledrive](#googledrive).
 
 # Social Data
 

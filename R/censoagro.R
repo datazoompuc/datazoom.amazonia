@@ -1,6 +1,6 @@
 #' @title Censo Agropecuario
 #'
-#' @description Loads information on
+#' @description Loads information on agricultural establishments and activities
 #'
 #'#' @param dataset A dataset name ("land_area_total", "area_use", "employess_tractors","land_area_producer_condition","animal_specie_production",
 #'                                  "vegetable_production_area_type", "land_area_total_mean", "use_type", "employess_total_mean", "tractors_total_mean",
@@ -31,12 +31,26 @@
 #'   language = "pt"
 #' )
 #' }
+#'
+#'
 #'## We should include support for microregion/mesoregion
 #'
+#'## In case of dataset = "livestock_production", use the googledrive package to download data
 #' @export
 
 load_censoagro <- function(dataset,raw_data = FALSE,
                             geo_level, time_period, language = "eng") {
+
+  if (dataset == "livestock_production") {
+  # Checking for googledrive package (in Suggests)
+
+  if (!requireNamespace("googledrive", quietly = TRUE)) {
+    stop(
+      "Package \"googledrive\" must be installed to use this function.",
+      call. = FALSE
+    )
+  }
+  }
 
   ###########################
   ## Bind Global Variables ##
@@ -85,6 +99,9 @@ load_censoagro <- function(dataset,raw_data = FALSE,
     }) %>%
     dplyr::bind_rows() %>%
     tibble::as_tibble()
+
+
+
 
   ## Return Raw Data
 
