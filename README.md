@@ -57,24 +57,18 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 | **[PRODES](#prodes)** | *Yearly deforestation*                 |
 | **[DETER](#deter)**   | *Alerts on forest cover changes*       |
 | **[DEGRAD](#degrad)** | *Forest degradation*                   |
+| **[Imazon](#imazon)** | *Deforestation pressure in the Amazon* |
 
 </td>
 <td>
 
 |                                   |                                     |
 |-----------------------------------|-------------------------------------|
-| **[Imazon](#imazon)** | *Deforestation pressure in the Amazon* |
 | **[IBAMA](#ibama)**               | *Environmental fines*               |
 | **[MAPBIOMAS](#mapbiomas)**       | *Land cover and land use*           |
-
-</td>
-<td>
-
-|                                   |                                     |
-|-----------------------------------|-------------------------------------|
 | **[TerraClimate](#terraclimate)** | *Climate data*                      |
 | **[SEEG](#seeg)**                 | *Greenhouse gas emission estimates* |
-| **[CIPÓ](#cipó)**                 | *Environmental crimes*              |
+
 
 </tr>
 </table>
@@ -591,49 +585,6 @@ data <- load_seeg(dataset = "seeg_industry",
 municipality level. In case of authentication errors, see
 [googledrive](#googledrive).
 
-## CIPÓ
-
-Mappings by [Plataforma CIPÓ](https://plataformacipo.org/) on
-environmental crimes. Each dataset available is a spreadsheet pertaining
-to a different aspect of environmental crimes, namely: the Brazilian
-institutions and organization involved in their prevention (the
-`"brazilian_actors"` dataset); the international agreements, treaties
-and conventions related to the subject (the
-`"international_cooperation"` dataset); and the arrangements regarding
-forest governance (the `"forest_governance"` dataset).
-
-------------------------------------------------------------------------
-
-**Options:**
-
-1.  **dataset**: there are three choices:
-    - `"brazilian_actors"`: mapping of Brazilian actors involved in
-      preventing environmental crimes.
-    - `"international_cooperation"`: mapping of international
-      agreements, treaties and conventions.
-    - `"forest_governance"`: mapping of forest governance arrangements.
-2.  **raw_data**: there are two options:
-    - `TRUE`: if you want the data as it is originally.
-    - `FALSE`: if you want the treated version of the data.
-3.  **search**: Filters the dataset to the rows containing the chosen
-    search parameter.
-
-------------------------------------------------------------------------
-
-**Examples:**
-
-``` r
-# download the spreacdsheet on Brazilian actors involved in fighting environmental crimes
-brazilian_actors <- load_cipo(dataset = "brazilian_actors")
-
-# searching only for entries containing IBAMA
-actors_ibama <- load_cipo(dataset = "brazilian_actors",
-                          search = "ibama")
-
-# entries containing IBAMA or FUNAI
-actors_ibama <- load_cipo(dataset = "brazilian_actors",
-                          search = "ibama|funai")
-```
 
 # Social Data
 
