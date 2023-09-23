@@ -46,6 +46,9 @@ And the development version from GitHub with:
 devtools::install_github("datazoompuc/datazoom.amazonia")
 ```
 
+    #> Warning: Objects listed as exports, but not present in namespace:
+    #> • load_cipo
+
 **[1 - Environmental data](#environmental-data)**
 
 <table>
@@ -446,50 +449,6 @@ data <- load_mapbiomas("mapbiomas_mining",
                        geo_level = "indigenous_land")
 ```
 
-## CIPO
-
-Mappings by [Plataforma CIPÓ](https://plataformacipo.org/) on
-environmental crimes. Each dataset available is a spreadsheet pertaining
-to a different aspect of environmental crimes, namely: the Brazilian
-institutions and organization involved in their prevention (the
-`"brazilian_actors"` dataset); the international agreements, treaties
-and conventions related to the subject (the
-`"international_cooperation"` dataset); and the arrangements regarding
-forest governance (the `"forest_governance"` dataset).
-
-------------------------------------------------------------------------
-
-**Options:**
-
-1.  **dataset**: there are three choices:
-    - `"brazilian_actors"`: mapping of Brazilian actors involved in
-      preventing environmental crimes.
-    - `"international_cooperation"`: mapping of international
-      agreements, treaties and conventions.
-    - `"forest_governance"`: mapping of forest governance arrangements.
-2.  **raw_data**: there are two options:
-    - `TRUE`: if you want the data as it is originally.
-    - `FALSE`: if you want the treated version of the data.
-3.  **search**: Filters the dataset to the rows containing the chosen
-    search parameter.
-
-------------------------------------------------------------------------
-
-**Examples:**
-
-``` r
-# download the spreacdsheet on Brazilian actors involved in fighting environmental crimes
-brazilian_actors <- load_cipo(dataset = "brazilian_actors")
-
-# searching only for entries containing IBAMA
-actors_ibama <- load_cipo(dataset = "brazilian_actors",
-                          search = "ibama")
-
-# entries containing IBAMA or FUNAI
-actors_ibama <- load_cipo(dataset = "brazilian_actors",
-                          search = "ibama|funai")
-```
-
 ## TerraClimate
 
 Spatial data on several climate variables, extracted from Climatology
@@ -628,50 +587,6 @@ data <- load_seeg(dataset = "seeg_industry",
 🔴 This function uses the `googledrive` package to download data at the
 municipality level. In case of authentication errors, see
 [googledrive](#googledrive).
-
-## CIPÓ
-
-Mappings by [Plataforma CIPÓ](https://plataformacipo.org/) on
-environmental crimes. Each dataset available is a spreadsheet pertaining
-to a different aspect of environmental crimes, namely: the Brazilian
-institutions and organization involved in their prevention (the
-`"brazilian_actors"` dataset); the international agreements, treaties
-and conventions related to the subject (the
-`"international_cooperation"` dataset); and the arrangements regarding
-forest governance (the `"forest_governance"` dataset).
-
-------------------------------------------------------------------------
-
-**Options:**
-
-1.  **dataset**: there are three choices:
-    - `"brazilian_actors"`: mapping of Brazilian actors involved in
-      preventing environmental crimes.
-    - `"international_cooperation"`: mapping of international
-      agreements, treaties and conventions.
-    - `"forest_governance"`: mapping of forest governance arrangements.
-2.  **raw_data**: there are two options:
-    - `TRUE`: if you want the data as it is originally.
-    - `FALSE`: if you want the treated version of the data.
-3.  **search**: Filters the dataset to the rows containing the chosen
-    search parameter.
-
-------------------------------------------------------------------------
-
-**Examples:**
-
-``` r
-# download the spreacdsheet on Brazilian actors involved in fighting environmental crimes
-brazilian_actors <- load_cipo(dataset = "brazilian_actors")
-
-# searching only for entries containing IBAMA
-actors_ibama <- load_cipo(dataset = "brazilian_actors",
-                          search = "ibama")
-
-# entries containing IBAMA or FUNAI
-actors_ibama <- load_cipo(dataset = "brazilian_actors",
-                          search = "ibama|funai")
-```
 
 # Social Data
 
