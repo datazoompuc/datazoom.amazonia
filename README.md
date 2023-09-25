@@ -46,9 +46,6 @@ And the development version from GitHub with:
 devtools::install_github("datazoompuc/datazoom.amazonia")
 ```
 
-    #> Warning: Objects listed as exports, but not present in namespace:
-    #> • load_cipo
-
 **[1 - Environmental data](#environmental-data)**
 
 <table>
