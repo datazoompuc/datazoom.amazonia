@@ -58,5 +58,5 @@ data <- load_censoagro(
 
 ## We should include support for microregion/mesoregion
 
-## In case of dataset = "livestock_production", use the googledrive package to download data
+
 }

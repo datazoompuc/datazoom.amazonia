@@ -35,22 +35,12 @@
 #'
 #'## We should include support for microregion/mesoregion
 #'
-#'## In case of dataset = "livestock_production", use the googledrive package to download data
+#'
 #' @export
 
 load_censoagro <- function(dataset,raw_data = FALSE,
                             geo_level, time_period, language = "eng") {
 
-  if (dataset == "livestock_production") {
-  # Checking for googledrive package (in Suggests)
-
-  if (!requireNamespace("googledrive", quietly = TRUE)) {
-    stop(
-      "Package \"googledrive\" must be installed to use this function.",
-      call. = FALSE
-    )
-  }
-  }
 
   ###########################
   ## Bind Global Variables ##

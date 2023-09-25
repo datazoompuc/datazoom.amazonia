@@ -129,8 +129,6 @@ devtools::load_all()
 ```{r child = "vignettes/CENSOAGRO.Rmd"}
 ```
 
-🔴 This function uses the `googledrive` package to download data at the municipality level. In case of authentication errors, see [googledrive](#googledrive).
-
 # Social Data {#social-data}
 
 ## IPS

@@ -587,11 +587,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       download_method <- "googledrive"
     }
   }
-  if (source == "censoagro") {
-    if (dataset == "livestock_production") {
-      download_method <- "googledrive"
-    }
-  }
 
   ## Downloading file by the selected method
 
@@ -950,7 +945,7 @@ datasets_link <- function() {
     "CENSO-AGRO-IBGE" , "vegetable_area_income_coffee_orange" , "1251" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
     "CENSO-AGRO-IBGE" , "production_permanent_crops" , "1730" , "1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Region, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
     "CENSO-AGRO-IBGE" , "production_temporary_crops" , "1731" , "1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Region, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "CENSO-AGRO-IBGE" , "livestock_production" , "6907" , "2017" , "Municipality" , "https://docs.google.com/spreadsheets/d/1IkCC_9gxhUY36oCx4mEP1rF89206eymE/edit?usp=drive_link&ouid=108716516405741972932&rtpof=true&sd=true" ,
+    "CENSO-AGRO-IBGE" , "livestock_production" , "6907" , "2017" , "Municipality" , "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6SFFzcZ8N648wjRz2olHllLqwkwJi99wIYxf_e5ucmIANVSm2rYqbe-LsT1Py3DMsZNm1sWutTBqT/pub?output=xlsx" ,
 
     ##########
     ## CIPÓ ##
