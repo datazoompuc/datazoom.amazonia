@@ -501,6 +501,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   # googledrive links do not contain the file extension, for example
 
+  if (source == "cipo") {
+    file_extension <- ".csv"
+  }
   if (source == "prodes") {
     file_extension <- ".txt"
   }
@@ -538,6 +541,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     if (dataset == "energy_enterprises_distributed") {
       file_extension <- ".csv"
     }
+  }
+  if ((source == "CENSO_AGRO-IBGE") & (dataset == "livestock_production")) {
+    file_extension <- ".xlsx"
   }
 
   ## Define Empty Directory and Files For Download
@@ -687,8 +693,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (param$source == "ips") {
     dat <- param$sheet %>%
       purrr::map(
-        ~ readxl::read_xlsx(temp, sheet = .),
-      download_method <- "googledrive")
+        ~ readxl::read_xlsx(temp, sheet = .)
+      )
   }
 
   ## Now the rest of the functions
@@ -895,7 +901,7 @@ datasets_link <- function() {
     ## IPS ##
     #########
 
-    "IPS", "ips", NA, "2014 and/or 2018 and/or 2021 and/or 2023", NA, "https://drive.google.com/drive/folders/1EtSDn9E7BsYmy_toJDVU5UbWcyMDVNGg",
+    "IPS", "ips", NA, "2014 and/or 2018 and/or 2021", NA, "http://www.ipsamazonia.org.br/assets/IPS_Tabela_Completa-1df30fcea79209e3c7e8634a586f95e6.xlsx",
 
     ###########
     ## IBAMA ##
@@ -943,6 +949,14 @@ datasets_link <- function() {
     "CENSO-AGRO-IBGE" , "production_permanent_crops" , "1730" , "1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Region, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
     "CENSO-AGRO-IBGE" , "production_temporary_crops" , "1731" , "1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Region, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
     "CENSO-AGRO-IBGE" , "livestock_production" , "6907" , "2017" , "Municipality" , "https://docs.google.com/uc?export=download&id=1IkCC_9gxhUY36oCx4mEP1rF89206eymE&format=xlsx" ,
+
+    ##########
+    ## CIPÓ ##
+    ##########
+
+    "CIPO", "brazilian_actors", NA, NA, NA, "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpRIu-paL_8rtXLpiT-kCTJRa2Tf_jCCPZxZBc3sjCwMHL8mkrhG2eqVeeIdWkxLTUKPru5uYAWG6g/pub?output=csv",
+    "CIPO", "international_cooperation", NA, NA, NA, "https://docs.google.com/spreadsheets/u/0/d/e/2PACX-1vSpyBina4qr3GG-5ZlKW8_fjQwgIP3lq5lxanpO5_bUZenCVFO6N-WrF3bTkpokVzNVpRnob9Jhn8qe/pub?output=csv",
+    "CIPO", "forest_governance", NA, NA, NA, "https://docs.google.com/spreadsheets/u/0/d/e/2PACX-1vTpnO9DEiy1mMRwBI5jAzBbYhFVBlcsX4TNRZyoDYBNUhEPZcLviexaynCJfY3JC-CCBGy00-Fs3jxu/pub?output=csv",
 
     ##################
     ## TerraClimate ##

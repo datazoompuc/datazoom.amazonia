@@ -91,6 +91,15 @@ load_censoagro <- function(dataset,raw_data = FALSE,
     tibble::as_tibble()
 
 
+  if (dataset == "livestock_production") {
+    dat <- external_download(
+      dataset = "livestock_production",
+      source = "CENSO_AGRO-IBGE",
+      geo_level = "municipality",
+      raw_data = TRUE,
+      sheet = sheets
+    )
+  }
 
 
   ## Return Raw Data
