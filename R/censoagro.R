@@ -77,6 +77,15 @@ load_censoagro <- function(dataset,raw_data = FALSE,
   ## Download ##
   ##############
 
+  if (dataset == "livestock_production") {
+    dat <- external_download(
+      dataset = "livestock_production",
+      source = "CENSO_AGRO-IBGE",
+      geo_level = "municipality"
+    )
+
+  } else {
+
   dat <- as.list(as.character(param$time_period)) %>%
     purrr::map(function(year_num) {
       suppressWarnings(
@@ -89,18 +98,7 @@ load_censoagro <- function(dataset,raw_data = FALSE,
     }) %>%
     dplyr::bind_rows() %>%
     tibble::as_tibble()
-
-
-  if (dataset == "livestock_production") {
-    dat <- external_download(
-      dataset = "livestock_production",
-      source = "CENSO_AGRO-IBGE",
-      geo_level = "municipality",
-      raw_data = TRUE,
-      sheet = sheets
-    )
   }
-
 
   ## Return Raw Data
 
