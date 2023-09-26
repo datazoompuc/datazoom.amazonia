@@ -306,16 +306,6 @@ load_seeg <- function(dataset, raw_data = FALSE,
         atividade_economica == "Outra_IND" ~ "Outra Industria",
         atividade_economica == "HFC" ~ "HFC"
       )) %>%
-      dplyr::mutate(estado = dplyr::case_when(
-        estado == "BA" ~ "BA",
-        estado == "ES" ~ "ES",
-        estado == "MA" ~ "MA",
-        estado == "NA" ~ as.character(NA),
-        estado == "PA" ~ "PA",
-        estado == "RJ" ~ "RJ",
-        estado == "RS" ~ "RS",
-        estado == "SP" ~ "SP"
-      )) %>%
       dplyr::mutate(produto = dplyr::case_when(
         produto == "ALU" ~ "Aluminio",
         produto == "ACO" ~ "Aco"

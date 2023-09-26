@@ -102,11 +102,6 @@ devtools::load_all()
 ```{r child = "vignettes/MAPBIOMAS.Rmd"}
 ```
 
-## CIPO
-
-```{r child = "vignettes/CIPO.Rmd"}
-```
-
 ## TerraClimate
 
 ```{r child = "vignettes/TERRACLIMATE.Rmd"}
@@ -119,10 +114,6 @@ devtools::load_all()
 
 🔴 This function uses the `googledrive` package to download data at the municipality level. In case of authentication errors, see [googledrive](#googledrive).
 
-## CIPÓ
-
-```{r child = "vignettes/CIPO.Rmd"}
-```
 
 ## CENSO AGROPECUARIO
 
