@@ -24,17 +24,6 @@
 load_ips <- function(dataset = "all", raw_data = FALSE,
                      time_period = c(2014, 2018, 2021, 2023), language = "eng") {
 
-  #Checking for googledrive package (in Suggests)
-
-
-  if (!requireNamespace("googledrive", quietly = TRUE)) {
-    stop(
-      "Package \"googledrive\" must be installed to use this function.",
-      call. = FALSE
-    )
-  }
-
-
   ###########################
   ## Bind Global Variables ##
   ###########################
@@ -102,10 +91,10 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
   # Picking which sheet to download
 
   sheet_list <- c(
-    "2014" = "IPS 2014",
-    "2018" = "IPS 2018 ",
-    "2021" = "IPS 2021",
-    "2023" = "IPS 2023"
+    "2014" = "2014",
+    "2018" = "2018 ",
+    "2021" = "2021",
+    "2023" = "2023"
   )
 
   sheets <- param$time_period %>%
