@@ -28,9 +28,8 @@ load_prodes <- function(dataset = "prodes", raw_data = FALSE,
   ## Bind Global Variables ##
   ###########################
 
-  survey <- link <- cod_ibge <- desmatado <- estado <- floresta <- hidrografia <- NULL
-  incremento <- lat <- latgms <- long <- longms <- municipio <- nao_floresta <- NULL
-  nao_observado <- nr <- nuvem <- soma <- NULL
+  year <- Municipio <- CodIbge <- Estado <- AreaKm2 <- increment <- NULL
+  municipality <- municipality_code <- state <- deforestation <- NULL
 
   #############################
   ## Define Basic Parameters ##
