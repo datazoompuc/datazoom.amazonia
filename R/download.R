@@ -618,7 +618,12 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       dat$year <- param$year
     }
     if (param$source == "deter") {
-      dat <- sf::read_sf(file.path(dir, "deter_public.shp"))
+      if (param$dataset == "deter_amz"){
+        dat <- sf::read_sf(file.path(dir, "deter-amz-deter-public.shp"))
+      }
+      if (param$dataset == "deter_cerrado"){
+        dat <- sf::read_sf(file.path(dir, "deter_public.shp"))
+      }
     }
     if (param$source == "sigmine") {
       dat <- sf::read_sf(file.path(dir, "BRASIL.shp"))
