@@ -492,7 +492,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   # For most functions, the file extension is automatically detected
 
-  file_extension <- sub(".*\\.", ".", path)
+  file_extension <- sub(".*\\.", ".", path) %>%
+    tolower()
 
   ##### Exceptions only #####
 
