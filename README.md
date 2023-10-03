@@ -453,6 +453,11 @@ Lab’s [TerraClimate](https://www.climatologylab.org/terraclimate.html).
 The table below shows all possible variables to be extracted, which are
 chosen through the “dataset” parameter. Data ranges from 1958 to 2020.
 
+<details>
+<summary>
+Click to see all dataset options
+</summary>
+
 | Dataset                       | Code | Description                                      |  Units   |
 |:------------------------------|:----:|:-------------------------------------------------|:--------:|
 | max_temperature               | tmax | Maximum 2-m Temperature                          |   degC   |
@@ -470,13 +475,20 @@ chosen through the “dataset” parameter. Data ranges from 1958 to 2020.
 | water_evaporation             | aet  | Actual Evapotranspiration                        |    mm    |
 | palmer_drought_severity_index | PDSI | Palmer Drought Severity Index                    | unitless |
 
+</details>
+
 Netcdf files are downloaded from the
 [THREDDS](http://thredds.northwestknowledge.net:8080/thredds/terraclimate_catalog.html)
 web server, as recommended for rectangular subsets of the global data.
 
 ------------------------------------------------------------------------
 
+<details>
+<summary>
+
 **Options:**
+
+</summary>
 
 1.  **dataset**: picks the variable to be read. Possible options are
     shown in the table above.
@@ -495,9 +507,16 @@ web server, as recommended for rectangular subsets of the global data.
 5.  **legal_amazon_only**: if set to `TRUE`, only downloads data from
     the Legal Amazon region
 
+</details>
+
 ------------------------------------------------------------------------
 
+<details>
+<summary>
+
 **Examples:**
+
+</summary>
 
 ``` r
 # Downloading maximum temperature data from 2000 to 2001
@@ -508,6 +527,8 @@ amz_precipitation <- load_climate(dataset = "precipitation",
                                   time_period = 2010,
                                   legal_amazon_only = TRUE)
 ```
+
+</details>
 
 ## SEEG
 
@@ -1104,8 +1125,12 @@ link](https://www.ibge.gov.br/estatisticas/economicas/agricultura-e-pecuaria/911
 
 The datasets supported are shown in the tables below, made up of both
 the original databases and their narrower subsets. Note that downloading
-only specific crops is considerably faster. First, the datasets provided
-by IBGE in their entirety:
+only specific crops is considerably faster.
+
+<details>
+<summary>
+Full datasets provided by IBGE:
+</summary>
 
 | dataset         |
 |:----------------|
@@ -1117,7 +1142,11 @@ by IBGE in their entirety:
 | peanut          |
 | beans           |
 
+</details>
+<details>
+<summary>
 Datasets generated from Temporary Crops:
+</summary>
 
 | dataset           |          Name (pt)           |          Name (eng)           |
 |:------------------|:----------------------------:|:-----------------------------:|
@@ -1156,7 +1185,11 @@ Datasets generated from Temporary Crops:
 | triticale         |     Triticale (em Grao)      |     Triticale (in grain)      |
 | temporary_total   |            Total             |             Total             |
 
+</details>
+<details>
+<summary>
 Datasets generated from Permanent Crops:
+</summary>
 
 | dataset                 |          Name (pt)          |         Name (eng)         |
 |:------------------------|:---------------------------:|:--------------------------:|
@@ -1199,6 +1232,8 @@ Datasets generated from Permanent Crops:
 | annatto_seeds           |      Urucum (Semente)       |       Annatto (Seed)       |
 | grape                   |             Uva             |           Grape            |
 | permanent_total         |            Total            |           Total            |
+
+</details>
 
 **Examples:**
 
