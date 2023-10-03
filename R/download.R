@@ -56,6 +56,10 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
     }
 
   }
+  if (param$sidra_code == 6907) {
+    param$classific <- c("c12443")
+    param$category <- list(110056)
+  }
 
 
   ##################################
@@ -948,7 +952,7 @@ datasets_link <- function() {
     "CENSO-AGRO-IBGE" , "vegetable_area_income_coffee_orange" , "1251" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
     "CENSO-AGRO-IBGE" , "production_permanent_crops" , "1730" , "1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Region, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
     "CENSO-AGRO-IBGE" , "production_temporary_crops" , "1731" , "1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Region, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "CENSO-AGRO-IBGE" , "livestock_production" , "6907" , "2017" , "Municipality" , "https://docs.google.com/uc?export=download&id=1IkCC_9gxhUY36oCx4mEP1rF89206eymE&format=xlsx" ,
+    "CENSO-AGRO-IBGE" , "livestock_production" , "6907" , "2017" , "Municipality" , "https://sidra.ibge.gov.br/tabela/6907" ,
 
     ##########
     ## CIPÓ ##

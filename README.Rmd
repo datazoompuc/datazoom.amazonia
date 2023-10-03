@@ -74,7 +74,7 @@ devtools::load_all()
 | **[MAPBIOMAS](#mapbiomas)** | _Land cover and land use_ |
 | **[TerraClimate](#terraclimate)** | _Climate data_ |
 | **[SEEG](#seeg)** | _Greenhouse gas emission estimates_ |
-| **[CENSOAGRO](#censoagropecuario)** | _Agriculture activities_ |
+| **[CENSOAGRO](#censoagro)** | _Agriculture activities_ |
 
 </td></tr> </table>
 
@@ -178,7 +178,7 @@ devtools::load_all()
 
 &#x1F534; This function uses the `googledrive` package to download data at the municipality level. In case of authentication errors, see [googledrive](#googledrive).
 
-## CENSO AGROPECUARIO
+## CENSOAGRO
 
 ```{r child = "vignettes/CENSOAGRO.Rmd"}
 ```

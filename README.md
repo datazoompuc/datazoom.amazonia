@@ -62,13 +62,13 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 </td>
 <td>
 
-|                                     |                                     |
-|-------------------------------------|-------------------------------------|
-| **[IBAMA](#ibama)**                 | *Environmental fines*               |
-| **[MAPBIOMAS](#mapbiomas)**         | *Land cover and land use*           |
-| **[TerraClimate](#terraclimate)**   | *Climate data*                      |
-| **[SEEG](#seeg)**                   | *Greenhouse gas emission estimates* |
-| **[CENSOAGRO](#censoagropecuario)** | *Agriculture activities*            |
+|                                   |                                     |
+|-----------------------------------|-------------------------------------|
+| **[IBAMA](#ibama)**               | *Environmental fines*               |
+| **[MAPBIOMAS](#mapbiomas)**       | *Land cover and land use*           |
+| **[TerraClimate](#terraclimate)** | *Climate data*                      |
+| **[SEEG](#seeg)**                 | *Greenhouse gas emission estimates* |
+| **[CENSOAGRO](#censoagro)**       | *Agriculture activities*            |
 
 </td>
 </tr>
@@ -454,6 +454,11 @@ Lab’s [TerraClimate](https://www.climatologylab.org/terraclimate.html).
 The table below shows all possible variables to be extracted, which are
 chosen through the “dataset” parameter. Data ranges from 1958 to 2020.
 
+<details>
+<summary>
+a
+</summary>
+
 | Dataset                       | Code | Description                                      |  Units   |
 |:------------------------------|:----:|:-------------------------------------------------|:--------:|
 | max_temperature               | tmax | Maximum 2-m Temperature                          |   degC   |
@@ -470,6 +475,8 @@ chosen through the “dataset” parameter. Data ranges from 1958 to 2020.
 | climatic_water_deficit        | def  | Climatic Water Deficit                           |    mm    |
 | water_evaporation             | aet  | Actual Evapotranspiration                        |    mm    |
 | palmer_drought_severity_index | PDSI | Palmer Drought Severity Index                    | unitless |
+
+</details>
 
 Netcdf files are downloaded from the
 [THREDDS](http://thredds.northwestknowledge.net:8080/thredds/terraclimate_catalog.html)
@@ -586,7 +593,7 @@ data <- load_seeg(dataset = "seeg_industry",
 municipality level. In case of authentication errors, see
 [googledrive](#googledrive).
 
-## CENSO AGROPECUARIO
+## CENSOAGRO
 
 The census of agriculture collects information about agricultural
 establishments and the agricultural activities carried out there,
@@ -598,25 +605,32 @@ municipality level.
 
 ------------------------------------------------------------------------
 
-------------------------------------------------------------------------
-
 **Options:**
 
 1.  **dataset**:
-    `"land_area_total"`,`"area_use"`,`"employess_tractors"`,
-    `"land_area_producer_condition"`,`"animal_species_production"`,
-    `"vegetable_production_area_type"`,`"land_area_total_mean"`,`"use_type"`,
-    `"employess_total_mean"`,`"tractors_total_mean"`,`"bovine_area_mean"`,
-    `"animal_herd_type"`,`"income_mean_vegetable_type"`,
-    `"vegetable_area_income_coffee_orange"`,`"production_permanent_crops"`,
-    `"production_temporary_crops"`,`"livestock_production"`
+
+    - `"land_area_total"`
+    - `"area_use"`
+    - `"employess_tractors"`
+    - `"land_area_producer_condition"`
+    - `"animal_species_production"`
+    - `"vegetable_production_area_type"`
+    - `"land_area_total_mean"`
+    - `"use_type"`
+    - `"employess_total_mean"`
+    - `"tractors_total_mean"`
+    - `"bovine_area_mean"`
+    - `"animal_herd_type"`
+    - `"income_mean_vegetable_type"`
+    - `"vegetable_area_income_coffee_orange"`
+    - `"production_permanent_crops"`
+    - `"production_temporary_crops"`
+    - `"livestock_production"`
 
 2.  **raw_data**: there are two options:
 
-<!-- -->
-
-    * `TRUE`: if you want the data as it is originally.
-    * `FALSE`: if you want the treated version of the data.
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
 
 3.  **geo_level**: `"country"`, `"state"`, or `"municipality"`
 
