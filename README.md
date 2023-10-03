@@ -68,7 +68,7 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 | **[MAPBIOMAS](#mapbiomas)**         | *Land cover and land use*           |
 | **[TerraClimate](#terraclimate)**   | *Climate data*                      |
 | **[SEEG](#seeg)**                   | *Greenhouse gas emission estimates* |
-| **\[CENSOAGRO(#censoagropecuario)** | *agriculture activities*\]          |
+| **[CENSOAGRO](#censoagropecuario)** | *Agriculture activities*            |
 
 </td>
 </tr>
@@ -604,7 +604,7 @@ municipality level.
 
 1.  **dataset**:
     `"land_area_total"`,`"area_use"`,`"employess_tractors"`,
-    `"land_area_producer_condition"`,`"animal_specie_production"`,
+    `"land_area_producer_condition"`,`"animal_species_production"`,
     `"vegetable_production_area_type"`,`"land_area_total_mean"`,`"use_type"`,
     `"employess_total_mean"`,`"tractors_total_mean"`,`"bovine_area_mean"`,
     `"animal_herd_type"`,`"income_mean_vegetable_type"`,
@@ -615,8 +615,8 @@ municipality level.
 
 <!-- -->
 
-    - `TRUE`: if you want the data as it is originally.
-    - `FALSE`: if you want the treated version of the data.
+    * `TRUE`: if you want the data as it is originally.
+    * `FALSE`: if you want the treated version of the data.
 
 3.  **geo_level**: `"country"`, `"state"`, or `"municipality"`
 
