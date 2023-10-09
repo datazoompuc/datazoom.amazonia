@@ -4,7 +4,7 @@
 #'
 #' @param dataset A dataset name ("embargoed_areas", "distributed_fines", or "collected_fines")
 #' @inheritParams load_baci
-#' @param states A \code{string} specifying for which states to download the data. It is "all" by default, but can be a single state such as "AC" or any vector such as c("AC", "AM"). Does not apply to the "areas_embargadas" dataset.
+#' @param states A \code{string} specifying for which states to download the data. It is "all" by default, but can be a single state such as "AC" or any vector such as c("AC", "AM"). Does not apply to the "embargoed_areas" dataset.
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported.
 #'
 #' @return A \code{tibble}.
@@ -210,6 +210,9 @@ load_ibama <- function(dataset,
                       )
 
     }
+
+    dat <- dat %>%
+      tibble::as_tibble()
 
   ################################
   ## Harmonizing Variable Names ##
