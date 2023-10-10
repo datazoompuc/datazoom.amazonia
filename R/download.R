@@ -49,10 +49,11 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
   if (param$sidra_code == 6579) {
 
     if (year == 2007) param$sidra_code <- 793  # https://sidra.ibge.gov.br/tabela/793
-    if (year == 2010) {
+    if (year == 2010){
       param$sidra_code <- 1378 # https://sidra.ibge.gov.br/tabela/1378
-      param$classific <- c("c1", "c2", "c287", "c455")
-      param$category <- list(0, 0, 0, 0)
+
+      param$classific <- "c1"
+      param$category <- list(0)
     }
 
   }
@@ -401,13 +402,13 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       path <- paste(param$url, "Estat%C3%ADsticas/TABELA_GERAL_COL7_MAPBIOMAS_DESMAT_VEGSEC_UF.xlsx", sep = "")
     }
     if (dataset == "mapbiomas_irrigation") {
-      path <- paste(param$url, "Colecao_7_Irrigacao_Biomes_UF.xlsx", sep = "")
+      path <- paste(param$url, "downloads/Estatisticas%20/Colecao_7_Irrigacao_Biomes_UF.xlsx", sep = "")
     }
     if (dataset == "mapbiomas_grazing_quality") {
       path <- paste(param$url, "Estat%C3%ADsticas/MapBIomas_COL5_QUALIDADE_PASTAGEM-biomas-estados-SITE.xlsx", sep = "")
     }
     if (dataset == "mapbiomas_mining") {
-      path <- paste(param$url, "Colecao_7_Mining_BR_UF_Biome_Mun_TI_SITE__3_.xlsx", sep = "")
+      path <- "https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2023/09/TABELA-MINERACAO-MAPBIOMAS-COL8.0.xlsx"
     }
     if (dataset == "mapbiomas_water") {
       path <- paste(param$url, "Estat%C3%ADsticas/Estatisticas_Superficie%C3%81gua_Col2_SITE.xlsx", sep = "")
@@ -496,7 +497,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   # For most functions, the file extension is automatically detected
 
-  file_extension <- sub(".*\\.", ".", path)
+  file_extension <- sub(".*\\.", ".", path) %>%
+    tolower()
 
   ##### Exceptions only #####
 
@@ -511,7 +513,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source == "prodes") {
     file_extension <- ".txt"
   }
-  if (source %in% c("seeg", "iema")) {
+  if (source %in% c("seeg", "iema", "ips")) {
     file_extension <- ".xlsx"
   }
   if (source == "terraclimate") {
@@ -628,7 +630,12 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       dat$year <- param$year
     }
     if (param$source == "deter") {
-      dat <- sf::read_sf(file.path(dir, "deter_public.shp"))
+      if (param$dataset == "deter_amz"){
+        dat <- sf::read_sf(file.path(dir, "deter-amz-deter-public.shp"))
+      }
+      if (param$dataset == "deter_cerrado"){
+        dat <- sf::read_sf(file.path(dir, "deter_public.shp"))
+      }
     }
     if (param$source == "sigmine") {
       dat <- sf::read_sf(file.path(dir, "BRASIL.shp"))
@@ -905,7 +912,9 @@ datasets_link <- function() {
     ## IPS ##
     #########
 
-    "IPS", "ips", NA, "2014 and/or 2018 and/or 2021", NA, "http://www.ipsamazonia.org.br/assets/IPS_Tabela_Completa-1df30fcea79209e3c7e8634a586f95e6.xlsx",
+
+    "IPS", "ips", NA, "2014 and/or 2018 and/or 2021 and/or 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
+
 
     ###########
     ## IBAMA ##
