@@ -17,7 +17,7 @@ load_censoagro(
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
-\item{geo_level}{A \code{string} that defines the geographic level of the data. Can be one of "country", "state" , "region" or "municipality".}
+\item{geo_level}{A \code{string} that defines the geographic level of the data. Can be one of "country", "state", or "municipality".}
 
 \item{time_period}{A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.}
 
@@ -29,7 +29,7 @@ A \code{tibble}.
 \description{
 Loads information on agricultural establishments and activities
 
-#' @param dataset A dataset name ("land_area_total", "area_use", "employess_tractors","land_area_producer_condition","animal_specie_production",
+#' @param dataset A dataset name ("land_area_total", "area_use", "employess_tractors","land_area_producer_condition","animal_species_production",
 "vegetable_production_area_type", "land_area_total_mean", "use_type", "employess_total_mean", "tractors_total_mean",
 "bovine_area_mean", "animal_herd_type", "income_mean_vegetable_type", "vegetable_area_income_coffee_orange",
 "production_permanent_crops", "production_temporary_crops", "livestock_production").

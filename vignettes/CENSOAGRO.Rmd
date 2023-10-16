@@ -26,7 +26,7 @@ country, state and municipality level.
 ***
 **Options:**
 
-  1.  **dataset**: 
+  1.  **dataset**:there are 17 possible choices:
       * `"land_area_total"`
       * `"area_use"`
       * `"employess_tractors"`

@@ -507,9 +507,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   # googledrive links do not contain the file extension, for example
 
-  if (source == "cipo") {
-    file_extension <- ".csv"
-  }
   if (source == "prodes") {
     file_extension <- ".txt"
   }
@@ -944,32 +941,24 @@ datasets_link <- function() {
     ## Censo Agropecuario - Time Series ##
     ######################################
 
-    "CENSO_AGRO-IBGE" , "land_area_total" , "263" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Region, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "CENSO_AGRO-IBGE" , "area_use" , "264" , "1970, 1975, 1980, 1985, 1995, 2006" , "Country, Region, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "CENSO_AGRO-IBGE" , "employess_tractors" , "265" , "1970, 1975, 1980, 1985, 1995, 2006" , "Country, Region, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "CENSO_AGRO-IBGE" , "land_area_producer_condition" , "280" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Region, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "CENSO_AGRO-IBGE" , "animal_species_production" , "281" , "1970, 1975, 1980, 1985, 1995, 2006" , "Country, Region, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "CENSO_AGRO-IBGE" , "animal_production_type" , "282" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Region, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "CENSO_AGRO-IBGE" , "vegetable_production_area_type" , "283" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Region, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "CENSO-AGRO-IBGE" , "land_area_total_mean" , "1030" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "CENSO-AGRO-IBGE" , "use_type" , "1031" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Region, State, Municipality, Microregion, Mesoregion" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "CENSO-AGRO-IBGE" , "employess_total_mean" , "1032" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais"  ,
-    "CENSO-AGRO-IBGE" , "tractors_total_mean" , "1033" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "CENSO-AGRO-IBGE" , "bovine_area_mean" , "1034" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "CENSO-AGRO-IBGE" , "animal_herd_type" , "1035" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "CENSO-AGRO-IBGE" , "income_mean_vegetable_type" , "1250" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "CENSO-AGRO-IBGE" , "vegetable_area_income_coffee_orange" , "1251" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "CENSO-AGRO-IBGE" , "production_permanent_crops" , "1730" , "1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Region, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "CENSO-AGRO-IBGE" , "production_temporary_crops" , "1731" , "1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Region, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "CENSO_AGRO-IBGE" , "land_area_total" , "263" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Municipality, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "CENSO_AGRO-IBGE" , "area_use" , "264" , "1970, 1975, 1980, 1985, 1995, 2006" , "Country, Municipality, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "CENSO_AGRO-IBGE" , "employess_tractors" , "265" , "1970, 1975, 1980, 1985, 1995, 2006" , "Country, Municipality, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "CENSO_AGRO-IBGE" , "land_area_producer_condition" , "280" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Municipality, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "CENSO_AGRO-IBGE" , "animal_species_production" , "281" , "1970, 1975, 1980, 1985, 1995, 2006" , "Country, Municipality, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "CENSO_AGRO-IBGE" , "animal_production_type" , "282" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Municipality, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "CENSO_AGRO-IBGE" , "vegetable_production_area_type" , "283" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Municipality, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "CENSO-AGRO-IBGE" , "land_area_total_mean" , "1030" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Municipality, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "CENSO-AGRO-IBGE" , "use_type" , "1031" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Municipality, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "CENSO-AGRO-IBGE" , "employess_total_mean" , "1032" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Municipality, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais"  ,
+    "CENSO-AGRO-IBGE" , "tractors_total_mean" , "1033" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Municipality, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "CENSO-AGRO-IBGE" , "bovine_area_mean" , "1034" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Municipality, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "CENSO-AGRO-IBGE" , "animal_herd_type" , "1035" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Municipality, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "CENSO-AGRO-IBGE" , "income_mean_vegetable_type" , "1250" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Municipality, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "CENSO-AGRO-IBGE" , "vegetable_area_income_coffee_orange" , "1251" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Municipality, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "CENSO-AGRO-IBGE" , "production_permanent_crops" , "1730" , "1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Municipality, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "CENSO-AGRO-IBGE" , "production_temporary_crops" , "1731" , "1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, Municipality, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
     "CENSO-AGRO-IBGE" , "livestock_production" , "6907" , "2017" , "Municipality" , "https://sidra.ibge.gov.br/tabela/6907" ,
-
-    ##########
-    ## CIPÓ ##
-    ##########
-
-    "CIPO", "brazilian_actors", NA, NA, NA, "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpRIu-paL_8rtXLpiT-kCTJRa2Tf_jCCPZxZBc3sjCwMHL8mkrhG2eqVeeIdWkxLTUKPru5uYAWG6g/pub?output=csv",
-    "CIPO", "international_cooperation", NA, NA, NA, "https://docs.google.com/spreadsheets/u/0/d/e/2PACX-1vSpyBina4qr3GG-5ZlKW8_fjQwgIP3lq5lxanpO5_bUZenCVFO6N-WrF3bTkpokVzNVpRnob9Jhn8qe/pub?output=csv",
-    "CIPO", "forest_governance", NA, NA, NA, "https://docs.google.com/spreadsheets/u/0/d/e/2PACX-1vTpnO9DEiy1mMRwBI5jAzBbYhFVBlcsX4TNRZyoDYBNUhEPZcLviexaynCJfY3JC-CCBGy00-Fs3jxu/pub?output=csv",
 
     ##################
     ## TerraClimate ##

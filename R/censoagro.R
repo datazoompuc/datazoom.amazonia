@@ -7,7 +7,7 @@
 #'                                  "bovine_area_mean", "animal_herd_type", "income_mean_vegetable_type", "vegetable_area_income_coffee_orange",
 #'                                  "production_permanent_crops", "production_temporary_crops", "livestock_production").
 #' @inheritParams load_baci
-#' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state" , "region" or "municipality".
+#' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state", or "municipality".
 #'
 #' @return A \code{tibble}.
 #'
@@ -72,7 +72,6 @@ load_censoagro <- function(dataset,raw_data = FALSE,
     param$code <- param$dataset
   }
 
-
   ##############
   ## Download ##
   ##############
@@ -114,7 +113,7 @@ load_censoagro <- function(dataset,raw_data = FALSE,
   ## Only Keep Valid Observations
 
   dat <- dat %>%
-    dplyr::filter(!is.na(valor))
+    tidyr::drop_na(valor)
 
   #########################################
   ## Create Geographical Unit Identifier ##
@@ -123,11 +122,6 @@ load_censoagro <- function(dataset,raw_data = FALSE,
   if (geo_level == "country") {
     dat$geo_id <- dat$brasil
     dat <- dplyr::select(dat, -"brasil_codigo", -"brasil")
-  }
-
-  if (geo_level == "region") {
-    dat$geo_id <- dat$municipio_codigo
-    dat <- dplyr::select(dat, -"regiao", -"regiao_codigo")
   }
 
   if (geo_level == "state") {
@@ -139,8 +133,6 @@ load_censoagro <- function(dataset,raw_data = FALSE,
     dat$geo_id <- dat$municipio_codigo
     dat <- dplyr::select(dat, -"municipio", -"municipio_codigo")
   }
-
-
 
   ################################
   ## Harmonizing Variable Names ##
