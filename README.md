@@ -453,6 +453,10 @@ Lab’s [TerraClimate](https://www.climatologylab.org/terraclimate.html).
 The table below shows all possible variables to be extracted, which are
 chosen through the “dataset” parameter. Data ranges from 1958 to 2020.
 
+Netcdf files are downloaded from the
+[THREDDS](http://thredds.northwestknowledge.net:8080/thredds/terraclimate_catalog.html)
+web server, as recommended for rectangular subsets of the global data.
+
 <details>
 <summary>
 Click to see all dataset options
@@ -477,18 +481,9 @@ Click to see all dataset options
 
 </details>
 
-Netcdf files are downloaded from the
-[THREDDS](http://thredds.northwestknowledge.net:8080/thredds/terraclimate_catalog.html)
-web server, as recommended for rectangular subsets of the global data.
-
 ------------------------------------------------------------------------
 
-<details>
-<summary>
-
 **Options:**
-
-</summary>
 
 1.  **dataset**: picks the variable to be read. Possible options are
     shown in the table above.
@@ -505,18 +500,9 @@ web server, as recommended for rectangular subsets of the global data.
     `("eng")`
 
 5.  **legal_amazon_only**: if set to `TRUE`, only downloads data from
-    the Legal Amazon region
-
-</details>
-
-------------------------------------------------------------------------
-
-<details>
-<summary>
+    the Legal Amazon region \*\*\*
 
 **Examples:**
-
-</summary>
 
 ``` r
 # Downloading maximum temperature data from 2000 to 2001
@@ -527,8 +513,6 @@ amz_precipitation <- load_climate(dataset = "precipitation",
                                   time_period = 2010,
                                   legal_amazon_only = TRUE)
 ```
-
-</details>
 
 ## SEEG
 

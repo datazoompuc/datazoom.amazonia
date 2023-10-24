@@ -16,6 +16,8 @@ knitr::opts_chunk$set(
 
 Spatial data on several climate variables, extracted from Climatology Lab's [TerraClimate](https://www.climatologylab.org/terraclimate.html). The table below shows all possible variables to be extracted, which are chosen through the "dataset" parameter. Data ranges from 1958 to 2020.
 
+Netcdf files are downloaded from the [THREDDS](http://thredds.northwestknowledge.net:8080/thredds/terraclimate_catalog.html) web server, as recommended for rectangular subsets of the global data.
+
 <details>
 <summary>
 Click to see all dataset options
@@ -38,15 +40,9 @@ Click to see all dataset options
 | palmer_drought_severity_index | PDSI | Palmer Drought Severity Index | unitless |
 </details>
 
-Netcdf files are downloaded from the [THREDDS](http://thredds.northwestknowledge.net:8080/thredds/terraclimate_catalog.html) web server, as recommended for rectangular subsets of the global data.
-
 ***
-<details>
-<summary>
 
 **Options:**
-
-</summary>
 
   1. **dataset**: picks the variable to be read. Possible options are shown in the table above.
 
@@ -59,15 +55,9 @@ Netcdf files are downloaded from the [THREDDS](http://thredds.northwestknowledge
   4. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
   
   5. **legal_amazon_only**: if set to `TRUE`, only downloads data from the Legal Amazon region
-</details>  
 ***
 
-<details>
-<summary>
-
 **Examples:**
-
-</summary>
 
 ```{r, eval=FALSE}
 # Downloading maximum temperature data from 2000 to 2001
@@ -78,4 +68,3 @@ amz_precipitation <- load_climate(dataset = "precipitation",
                                   time_period = 2010,
                                   legal_amazon_only = TRUE)
 ```
-</details>
