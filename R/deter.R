@@ -1,6 +1,3 @@
-utils::globalVariables("where") # the selection helper 'where' is not exported from tidyselect, so this must be used to avoid notes
-# they've recently made the move to export it, but it's still not is CRAN
-
 #' @title DETER - Forest Degradation in the Brazilian Amazon
 #'
 #' @description Loads information on changes in forest cover in the Amazon.
@@ -62,7 +59,7 @@ load_deter <- function(dataset, raw_data = FALSE,
   dat <- dat %>%
     dplyr::mutate(
       dplyr::across(
-        where(is.character),
+        dplyr::where(is.character),
         ~ stringi::stri_trans_general(., id = "Latin-ASCII")
       )
     )
