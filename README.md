@@ -501,7 +501,9 @@ Click to see all dataset options
     `("eng")`
 
 5.  **legal_amazon_only**: if set to `TRUE`, only downloads data from
-    the Legal Amazon region \*\*\*
+    the Legal Amazon region
+
+------------------------------------------------------------------------
 
 **Examples:**
 

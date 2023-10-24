@@ -55,6 +55,7 @@ Click to see all dataset options
   4. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
   
   5. **legal_amazon_only**: if set to `TRUE`, only downloads data from the Legal Amazon region
+  
 ***
 
 **Examples:**
