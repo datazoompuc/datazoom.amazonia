@@ -607,25 +607,25 @@ municipality level.
 
 **Options:**
 
-1.  **dataset**:
+1.  **dataset**:there are 17 possible choices:
 
-    - `"land_area_total"`
-    - `"area_use"`
-    - `"employess_tractors"`
-    - `"land_area_producer_condition"`
-    - `"animal_species_production"`
-    - `"vegetable_production_area_type"`
-    - `"land_area_total_mean"`
-    - `"use_type"`
-    - `"employess_total_mean"`
-    - `"tractors_total_mean"`
-    - `"bovine_area_mean"`
-    - `"animal_herd_type"`
-    - `"income_mean_vegetable_type"`
-    - `"vegetable_area_income_coffee_orange"`
-    - `"production_permanent_crops"`
-    - `"production_temporary_crops"`
-    - `"livestock_production"`
+    - `"agricultural_land_area"`: area and number of agricultural
+      properties
+    - `"agricultural_area_use"`: area of agricultural properties by use
+    - `"agricultural_employees_tractors"`: number of employees and
+      tractors in agricultural properties
+    - `"agricultural_producer_condition"`: condition of agricultural
+      producer, whether they own the land
+    - `"animal_production"`: number of animals farmed, by species
+    - `"animal_products"`: amount of animal products, by product type
+    - `"vegetable_production_area"`: area and amount produced, by
+      vegetable product
+    - `"vegetable_production_temporary"`: amount produced, by temporary
+      crop
+    - `"vegetable_production_permanent"`: amount produced, by permanent
+      crop
+    - `"livestock_production"`: amount of bovine cattle, and number of
+      agricultural properties
 
 2.  **raw_data**: there are two options:
 

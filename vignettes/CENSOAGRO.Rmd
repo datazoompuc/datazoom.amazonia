@@ -26,34 +26,31 @@ country, state and municipality level.
 ***
 **Options:**
 
-  1.  **dataset**:there are 17 possible choices:
-      * `"land_area_total"`: area and number of agricultural properties
-      * `"area_use"`
-      * `"employess_tractors"`
-      * `"land_area_producer_condition"`
-      * `"animal_species_production"`
-      * `"vegetable_production_area_type"`
-      * `"land_area_total_mean"`
-      * `"use_type"`
-      * `"employess_total_mean"`
-      * `"tractors_total_mean"`
-      * `"bovine_area_mean"`
-      * `"animal_herd_type"`
-      * `"income_mean_vegetable_type"`
-      * `"vegetable_area_income_coffee_orange"`
-      * `"production_permanent_crops"`
-      * `"production_temporary_crops"`
-      * `"livestock_production"`
+  1.  **dataset**:there are 10 possible choices:
+      * `"agricultural_land_area"`: area and number of agricultural properties
+      * `"agricultural_area_use"`: area of agricultural properties by use
+      * `"agricultural_employees_tractors"`: number of employees and tractors in agricultural properties
+      * `"agricultural_producer_condition"`: condition of agricultural producer, whether they own the land
+      * `"animal_production"`: number of animals farmed, by species
+      * `"animal_products"`: amount of animal products, by product type
+      * `"vegetable_production_area"`: area and amount produced, by vegetable product
+      * `"vegetable_production_temporary"`: amount produced, by temporary crop
+      * `"vegetable_production_permanent"`: amount produced, by permanent crop
+      * `"livestock_production"`: amount of bovine cattle, and number of agricultural properties
 
   2.  **raw_data**: there are two options:
 
       * `TRUE`: if you want the data as it is originally.
       * `FALSE`: if you want the treated version of the data.
 
-  3. **geo_level**: `"country"`, `"state"`, or `"municipality"`    
+  3. **geo_level**: `"country"` or `"state"`. For dataset `"livestock_production"`, it can also be `"municipality"`   
   
   4.  **time_period**: picks the years for which the data will be
-    downloaded
+    downloaded:
+      * For datasets `"agricultural_land_area"`, `"agricultural_producer_condition"`, `"animal_products"`, and `"vegetable_production_area"`, it can be one of 1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, or 2006.
+      * For datasets `"vegetable_production_permanent"` and `"vegetable_production_permanent"`, it can only be from 1940 onwards
+      * For datasets `"agricultural_area_use"`, `"agricultural_employees_tractors"`, `"animal_production"`, it can only be from 1970 onwards
+      * For dataset `"livestock_production"`, it can only be 2017
 
   5.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`

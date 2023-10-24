@@ -2,12 +2,10 @@
 #'
 #' @description Loads information on agricultural establishments and activities
 #'
-#'#' @param dataset A dataset name ("land_area_total", "area_use", "employess_tractors","land_area_producer_condition","animal_species_production",
-#'                                  "vegetable_production_area_type", "land_area_total_mean", "use_type", "employess_total_mean", "tractors_total_mean",
-#'                                  "bovine_area_mean", "animal_herd_type", "income_mean_vegetable_type", "vegetable_area_income_coffee_orange",
-#'                                  "production_permanent_crops", "production_temporary_crops", "livestock_production").
+#' @param dataset A dataset name ("agricultural_land_area", "agricultural_area_use", "agricultural_employees_tractors", "agricultural_producer_condition", "animal_species", "animal_products", "vegetable_production_area", "vegetable_production_permanent", "vegetable_production_temporary", "livestock_production").
 #' @inheritParams load_baci
-#' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state", or "municipality".
+#' @param geo_level A \code{string} that defines the geographic level of the data. Can be of "country" or "state".
+#'    * For dataset "livestock_production", can be one of "country", "state", or "municipality"
 #'
 #' @return A \code{tibble}.
 #'
@@ -49,6 +47,7 @@ load_censoagro <- function(dataset,raw_data = FALSE,
   sidra_code <- available_time <- legal_amazon <- municipio_codigo <- ano <- NULL
   ano_codigo <- geo_id <- nivel_territorial <- nivel_territorial_codigo <- NULL
   unidade_de_medida <- unidade_de_medida_codigo <- valor <- variavel <- variavel_codigo <- NULL
+  group_id <- unit_id <- NULL
 
 
   #############################
@@ -112,14 +111,15 @@ load_censoagro <- function(dataset,raw_data = FALSE,
   # grouping variable, with classifics, when applicable
 
   if (param$dataset %in% c("land_area_total", "area_use", "land_area_producer_condition",
-                           "animal_species", "animal_products", "vegetable_products")) {
+                           "animal_production", "animal_products", "vegetable_production_area",
+                           "vegetable_production_temporary", "vegetable_production_permanent")) {
     dat <- dat %>%
       dplyr::rename("group_id" = dplyr::last_col())
   }
 
   # standardizing measuring units
 
-  if (param$dataset == "animal_species") {
+  if (param$dataset == "animal_production") {
     dat <- dat %>%
       dplyr::mutate(
         valor = dplyr::case_when(
@@ -128,7 +128,8 @@ load_censoagro <- function(dataset,raw_data = FALSE,
         )
       )
   }
-  if (param$dataset %in% c("animal_products", "vegetable_products")) {
+  if (param$dataset %in% c("animal_production", "vegetable_production_area",
+                           "vegetable_production_temporary", "vegetable_production_permanent")) {
     dat <- dat %>%
       dplyr::mutate(
         "unit_id" = dplyr::case_when(variavel_codigo != 216 ~ unidade_de_medida)
