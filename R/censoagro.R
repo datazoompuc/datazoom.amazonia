@@ -1,10 +1,11 @@
 #' @title Censo Agropecuario
 #'
-#' @description Loads information on
+#' @description Loads information on agricultural establishments and activities
 #'
-#' @param dataset A dataset name ("censoagro").
+#' @param dataset A dataset name ("agricultural_land_area", "agricultural_area_use", "agricultural_employees_tractors", "agricultural_producer_condition", "animal_species", "animal_products", "vegetable_production_area", "vegetable_production_permanent", "vegetable_production_temporary", "livestock_production").
 #' @inheritParams load_baci
-#' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state" or "municipality".
+#' @param geo_level A \code{string} that defines the geographic level of the data. Can be of "country" or "state".
+#'    * For dataset "livestock_production", can be one of "country", "state", or "municipality"
 #'
 #' @return A \code{tibble}.
 #'
@@ -12,7 +13,7 @@
 #' \dontrun{
 #' # Download total land area data at the country level in year 2006
 #' data <- load_censoagro(
-#'   dataset = "land_area_total",
+#'   dataset = "agricultural_land_area",
 #'   raw_data = TRUE,
 #'   geo_level = "country",
 #'   time_period = 2006
@@ -21,18 +22,23 @@
 #' # Download temporary production crops data by state (geo_level = "state") in year 2006
 #'   in portuguese (language = "pt").
 #' data <- load_censoagro(
-#'   dataset = "production_temporary_crops",
+#'   dataset = "vegetable_production_temporary",
 #'   raw_data = FALSE,
 #'   geo_level = "state",
-#'   time_period = 2008:2010,
+#'   time_period = 1996,
 #'   language = "pt"
 #' )
 #' }
 #'
+#'
+#'## We should include support for microregion/mesoregion
+#'
+#'
 #' @export
 
-load_censoagro <- function(dataset = "censoagro", raw_data = FALSE,
+load_censoagro <- function(dataset,raw_data = FALSE,
                             geo_level, time_period, language = "eng") {
+
 
   ###########################
   ## Bind Global Variables ##
@@ -41,6 +47,7 @@ load_censoagro <- function(dataset = "censoagro", raw_data = FALSE,
   sidra_code <- available_time <- legal_amazon <- municipio_codigo <- ano <- NULL
   ano_codigo <- geo_id <- nivel_territorial <- nivel_territorial_codigo <- NULL
   unidade_de_medida <- unidade_de_medida_codigo <- valor <- variavel <- variavel_codigo <- NULL
+  group_id <- unit_id <- NULL
 
 
   #############################
@@ -62,24 +69,6 @@ load_censoagro <- function(dataset = "censoagro", raw_data = FALSE,
       as.numeric()
   } else {
     param$code <- param$dataset
-  }
-
-  ## Check if year is acceptable
-
-  year_check <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(available_time) %>%
-    unlist() %>%
-    as.character() %>%
-    stringr::str_split(pattern = "-") %>%
-    unlist() %>%
-    as.numeric()
-
-  if (min(time_period) < year_check[1]) {
-    stop("Provided time period less than supported. Check documentation for time availability.")
-  }
-  if (max(time_period) > year_check[2]) {
-    stop("Provided time period greater than supported. Check documentation for time availability.")
   }
 
   ##############
@@ -117,13 +106,43 @@ load_censoagro <- function(dataset = "censoagro", raw_data = FALSE,
 
   dat <- dat %>%
     dplyr::select(-c(nivel_territorial_codigo, nivel_territorial, ano_codigo)) %>%
-    dplyr::mutate(valor = as.numeric(valor)) %>%
-    dplyr::select(unidade_de_medida_codigo:variavel)
+    dplyr::mutate(valor = as.numeric(valor))
+
+  # grouping variable, with classifics, when applicable
+
+  if (param$dataset %in% c("land_area_total", "area_use", "land_area_producer_condition",
+                           "animal_production", "animal_products", "vegetable_production_area",
+                           "vegetable_production_temporary", "vegetable_production_permanent")) {
+    dat <- dat %>%
+      dplyr::rename("group_id" = dplyr::last_col())
+  }
+
+  # standardizing measuring units
+
+  if (param$dataset == "animal_production") {
+    dat <- dat %>%
+      dplyr::mutate(
+        valor = dplyr::case_when(
+          unidade_de_medida_codigo == 1620 ~ 1000 * valor,
+          .default = valor
+        )
+      )
+  }
+  if (param$dataset %in% c("animal_production", "vegetable_production_area",
+                           "vegetable_production_temporary", "vegetable_production_permanent")) {
+    dat <- dat %>%
+      dplyr::mutate(
+        "unit_id" = dplyr::case_when(variavel_codigo != 216 ~ unidade_de_medida)
+      ) %>%
+      dplyr::group_by(ano, group_id) %>%
+      tidyr::fill(unit_id) %>%
+      dplyr::ungroup()
+  }
 
   ## Only Keep Valid Observations
 
   dat <- dat %>%
-    dplyr::filter(!is.na(valor))
+    tidyr::drop_na(valor)
 
   #########################################
   ## Create Geographical Unit Identifier ##
@@ -138,40 +157,35 @@ load_censoagro <- function(dataset = "censoagro", raw_data = FALSE,
     dat$geo_id <- dat$unidade_da_federacao_codigo
     dat <- dplyr::select(dat, -"unidade_da_federacao_codigo", -"unidade_da_federacao")
   }
+
   if (geo_level == "municipality") {
     dat$geo_id <- dat$municipio_codigo
     dat <- dplyr::select(dat, -"municipio", -"municipio_codigo")
   }
 
-  ################################
-  ## Harmonizing Variable Names ##
-  ################################
-
   dat <- dat %>%
     dplyr::select(-unidade_de_medida, -unidade_de_medida_codigo)
-
 
   dat <- dat %>%
     dplyr::arrange(variavel_codigo, variavel) %>%
     tidyr::pivot_wider(
-      id_cols = c(ano, geo_id),
+      id_cols = dplyr::any_of(c("ano", "geo_id", "group_id", "unit_id")),
       names_from = variavel:variavel_codigo,
       values_from = valor,
       names_sep = "_V",
-      values_fn = sum,
       values_fill = NA
     ) %>%
     janitor::clean_names()
 
+  ################################
+  ## Harmonizing Variable Names ##
+  ################################
 
-  if (language == "eng") {
-    dat <- dat %>%
-      dplyr::rename(year = ano)
-  }
+  dat_mod <- dat
 
   ##########################
   ## Returning Data Frame ##
   ##########################
 
-  return(dat)
+  return(dat_mod)
 }
