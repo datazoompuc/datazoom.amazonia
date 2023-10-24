@@ -607,7 +607,7 @@ municipality level.
 
 **Options:**
 
-1.  **dataset**:there are 17 possible choices:
+1.  **dataset**:there are 10 possible choices:
 
     - `"agricultural_land_area"`: area and number of agricultural
       properties
@@ -632,10 +632,23 @@ municipality level.
     - `TRUE`: if you want the data as it is originally.
     - `FALSE`: if you want the treated version of the data.
 
-3.  **geo_level**: `"country"`, `"state"`, or `"municipality"`
+3.  **geo_level**: `"country"` or `"state"`. For dataset
+    `"livestock_production"`, it can also be `"municipality"`
 
 4.  **time_period**: picks the years for which the data will be
-    downloaded
+    downloaded:
+
+    - For datasets `"agricultural_land_area"`,
+      `"agricultural_producer_condition"`, `"animal_products"`, and
+      `"vegetable_production_area"`, it can be one of 1920, 1940, 1950,
+      1960, 1970, 1975, 1980, 1985, 1995, or 2006.
+    - For datasets `"vegetable_production_permanent"` and
+      `"vegetable_production_permanent"`, it can only be from 1940
+      onwards
+    - For datasets `"agricultural_area_use"`,
+      `"agricultural_employees_tractors"`, `"animal_production"`, it can
+      only be from 1970 onwards
+    - For dataset `"livestock_production"`, it can only be 2017
 
 5.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`
@@ -647,7 +660,7 @@ municipality level.
 ``` r
 # Download total land area data at the country level in year 2006
  data <- load_censoagro(
-   dataset = "land_area_total",
+   dataset = "agricultural_land_area",
    raw_data = TRUE,
    geo_level = "country",
    time_period = 2006
@@ -656,7 +669,7 @@ municipality level.
  # Download temporary production crops data by state (geo_level = "state") in year 2006
  # in portuguese (language = "pt")
   data <- load_censoagro(
-   dataset = "production_temporary_crops",
+   dataset = "vegetable_production_temporary",
    raw_data = FALSE,
    geo_level = "state",
    time_period = 1996,
