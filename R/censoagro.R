@@ -107,8 +107,36 @@ load_censoagro <- function(dataset,raw_data = FALSE,
 
   dat <- dat %>%
     dplyr::select(-c(nivel_territorial_codigo, nivel_territorial, ano_codigo)) %>%
-    dplyr::mutate(valor = as.numeric(valor)) %>%
-    dplyr::select(unidade_de_medida_codigo:variavel)
+    dplyr::mutate(valor = as.numeric(valor))
+
+  # grouping variable, with classifics, when applicable
+
+  if (param$dataset %in% c("land_area_total", "area_use", "land_area_producer_condition",
+                           "animal_species", "animal_products", "vegetable_products")) {
+    dat <- dat %>%
+      dplyr::rename("group_id" = dplyr::last_col())
+  }
+
+  # standardizing measuring units
+
+  if (param$dataset == "animal_species") {
+    dat <- dat %>%
+      dplyr::mutate(
+        valor = dplyr::case_when(
+          unidade_de_medida_codigo == 1620 ~ 1000 * valor,
+          .default = valor
+        )
+      )
+  }
+  if (param$dataset %in% c("animal_products", "vegetable_products")) {
+    dat <- dat %>%
+      dplyr::mutate(
+        "unit_id" = dplyr::case_when(variavel_codigo != 216 ~ unidade_de_medida)
+      ) %>%
+      dplyr::group_by(ano, group_id) %>%
+      tidyr::fill(unit_id) %>%
+      dplyr::ungroup()
+  }
 
   ## Only Keep Valid Observations
 
@@ -134,35 +162,29 @@ load_censoagro <- function(dataset,raw_data = FALSE,
     dat <- dplyr::select(dat, -"municipio", -"municipio_codigo")
   }
 
-  ################################
-  ## Harmonizing Variable Names ##
-  ################################
-
   dat <- dat %>%
     dplyr::select(-unidade_de_medida, -unidade_de_medida_codigo)
-
 
   dat <- dat %>%
     dplyr::arrange(variavel_codigo, variavel) %>%
     tidyr::pivot_wider(
-      id_cols = c(ano, geo_id),
+      id_cols = dplyr::any_of(c("ano", "geo_id", "group_id", "unit_id")),
       names_from = variavel:variavel_codigo,
       values_from = valor,
       names_sep = "_V",
-      values_fn = sum,
       values_fill = NA
     ) %>%
     janitor::clean_names()
 
+  ################################
+  ## Harmonizing Variable Names ##
+  ################################
 
-  if (language == "eng") {
-    dat <- dat %>%
-      dplyr::rename(year = ano)
-  }
+  dat_mod <- dat
 
   ##########################
   ## Returning Data Frame ##
   ##########################
 
-  return(dat)
+  return(dat_mod)
 }

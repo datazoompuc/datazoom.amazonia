@@ -27,7 +27,7 @@ country, state and municipality level.
 **Options:**
 
   1.  **dataset**:there are 17 possible choices:
-      * `"land_area_total"`
+      * `"land_area_total"`: area and number of agricultural properties
       * `"area_use"`
       * `"employess_tractors"`
       * `"land_area_producer_condition"`
