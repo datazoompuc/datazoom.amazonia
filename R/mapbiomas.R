@@ -67,11 +67,11 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
 
   sheets <- tibble::tribble(
     ~dataset, ~geo_level, ~sheet,
-    "mapbiomas_cover", "any", "COBERTURA_COL7",
-    "mapbiomas_transition", "state", "TRANSICOES_COL7",
-    "mapbiomas_transition", "municipality", "TRANSICAO_COL7",
-    "mapbiomas_deforestation_regeneration", "state", "DESMAT_VEGSEC_UF_COL7",
-    "mapbiomas_deforestation_regeneration", "municipality", "DESMAT_VEGSEC_CITY_COL7",
+    "mapbiomas_cover", "any", "COBERTURA_COL8.0",
+    "mapbiomas_transition", "state", "TRANSICOES_COL8.0",
+    "mapbiomas_transition", "municipality", "TRANSICOES_COL8.0",
+    "mapbiomas_deforestation_regeneration", "state", "CITY STATE BIOME",
+    "mapbiomas_deforestation_regeneration", "municipality", "CITY STATE BIOME",
     "mapbiomas_irrigation", "state", "UF",
     "mapbiomas_irrigation", "biome", "BIOME",
     "mapbiomas_grazing_quality", "any", "BD_Qualidade",
@@ -108,15 +108,16 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
   #################
   ##   Message   ##
   #################
-  if(dataset %in% c("mapbiomas_mining")) {
-    message("Data from Mapbiomas - Collection 8")
-    message("")
-  }
 
   if(dataset %in% c("mapbiomas_cover",
                     "mapbiomas_transition",
                     "mapbiomas_deforestation_regeneration",
-                    "mapbiomas_irrigation")) {
+                    "mapbiomas_mining")) {
+    message("Data from Mapbiomas - Collection 8")
+    message("")
+  }
+
+  if(dataset %in% c("mapbiomas_irrigation")) {
     message("Data from Mapbiomas - Collection 7")
     message("")
   }
@@ -183,12 +184,21 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
                            "area_ha" = "value",
                            "city" = "municipality"
         )
+      if (sheet == "mun_annual") {
+        (dplyr::rename_with(dplyr::recode,
+                            "name" = "biome"))
+      }
     }
 
     return(dat_mod)
 
   }
 
+  if((param$dataset %in% c("mapbiomas_cover","mapbiomas_transition")) & (param$geo_level == "municipality")) {
+    dat <- dat %>%
+      dplyr::rename_with(dplyr::recode,
+                         "state_acronym" = "state")
+  }
 
   ## Else
   dat <- dat %>%
