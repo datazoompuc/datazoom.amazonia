@@ -454,9 +454,13 @@ Lab’s [TerraClimate](https://www.climatologylab.org/terraclimate.html).
 The table below shows all possible variables to be extracted, which are
 chosen through the “dataset” parameter. Data ranges from 1958 to 2020.
 
+Netcdf files are downloaded from the
+[THREDDS](http://thredds.northwestknowledge.net:8080/thredds/terraclimate_catalog.html)
+web server, as recommended for rectangular subsets of the global data.
+
 <details>
 <summary>
-a
+Click to see all dataset options
 </summary>
 
 | Dataset                       | Code | Description                                      |  Units   |
@@ -477,10 +481,6 @@ a
 | palmer_drought_severity_index | PDSI | Palmer Drought Severity Index                    | unitless |
 
 </details>
-
-Netcdf files are downloaded from the
-[THREDDS](http://thredds.northwestknowledge.net:8080/thredds/terraclimate_catalog.html)
-web server, as recommended for rectangular subsets of the global data.
 
 ------------------------------------------------------------------------
 
@@ -1195,8 +1195,12 @@ link](https://www.ibge.gov.br/estatisticas/economicas/agricultura-e-pecuaria/911
 
 The datasets supported are shown in the tables below, made up of both
 the original databases and their narrower subsets. Note that downloading
-only specific crops is considerably faster. First, the datasets provided
-by IBGE in their entirety:
+only specific crops is considerably faster.
+
+<details>
+<summary>
+Full datasets provided by IBGE:
+</summary>
 
 | dataset         |
 |:----------------|
@@ -1208,7 +1212,11 @@ by IBGE in their entirety:
 | peanut          |
 | beans           |
 
+</details>
+<details>
+<summary>
 Datasets generated from Temporary Crops:
+</summary>
 
 | dataset           |          Name (pt)           |          Name (eng)           |
 |:------------------|:----------------------------:|:-----------------------------:|
@@ -1247,7 +1255,11 @@ Datasets generated from Temporary Crops:
 | triticale         |     Triticale (em Grao)      |     Triticale (in grain)      |
 | temporary_total   |            Total             |             Total             |
 
+</details>
+<details>
+<summary>
 Datasets generated from Permanent Crops:
+</summary>
 
 | dataset                 |          Name (pt)          |         Name (eng)         |
 |:------------------------|:---------------------------:|:--------------------------:|
@@ -1290,6 +1302,8 @@ Datasets generated from Permanent Crops:
 | annatto_seeds           |      Urucum (Semente)       |       Annatto (Seed)       |
 | grape                   |             Uva             |           Grape            |
 | permanent_total         |            Total            |           Total            |
+
+</details>
 
 **Examples:**
 

@@ -16,6 +16,12 @@ knitr::opts_chunk$set(
 
 Spatial data on several climate variables, extracted from Climatology Lab's [TerraClimate](https://www.climatologylab.org/terraclimate.html). The table below shows all possible variables to be extracted, which are chosen through the "dataset" parameter. Data ranges from 1958 to 2020.
 
+Netcdf files are downloaded from the [THREDDS](http://thredds.northwestknowledge.net:8080/thredds/terraclimate_catalog.html) web server, as recommended for rectangular subsets of the global data.
+
+<details>
+<summary>
+Click to see all dataset options
+</summary>
 | Dataset | Code | Description | Units |
 |:--------|:----:|:------------|:-----:|
 | max_temperature | tmax | Maximum 2-m Temperature | degC |
@@ -32,10 +38,10 @@ Spatial data on several climate variables, extracted from Climatology Lab's [Ter
 | climatic_water_deficit | def  | Climatic Water Deficit | mm |
 | water_evaporation | aet  | Actual Evapotranspiration | mm |
 | palmer_drought_severity_index | PDSI | Palmer Drought Severity Index | unitless |
-
-Netcdf files are downloaded from the [THREDDS](http://thredds.northwestknowledge.net:8080/thredds/terraclimate_catalog.html) web server, as recommended for rectangular subsets of the global data.
+</details>
 
 ***
+
 **Options:**
 
   1. **dataset**: picks the variable to be read. Possible options are shown in the table above.

@@ -39,8 +39,10 @@ The data available has a yearly frequency and is available from 1974 to the pres
   
 ***
 
-The datasets supported are shown in the tables below, made up of both the original databases and their narrower subsets. Note that downloading only specific crops is considerably faster. First, the datasets provided by IBGE in their entirety:
+The datasets supported are shown in the tables below, made up of both the original databases and their narrower subsets. Note that downloading only specific crops is considerably faster.
 
+<details>
+<summary> Full datasets provided by IBGE: </summary>
 | dataset |
 |:--------|
 |all_crops|
@@ -50,8 +52,10 @@ The datasets supported are shown in the tables below, made up of both the origin
 |potato|
 |peanut|
 |beans|
+</details>
 
-Datasets generated from Temporary Crops:
+<details>
+<summary> Datasets generated from Temporary Crops: </summary>
 
 | dataset | Name (pt) | Name (eng) |
 |:--------|:---------:|:----------:|
@@ -89,8 +93,10 @@ Datasets generated from Temporary Crops:
 | wheat |Trigo (em Grao)| Wheat in grain)|
 | triticale |Triticale (em Grao)| Triticale (in grain)|
 | temporary_total |Total| Total|
+</details>
 
-Datasets generated from Permanent Crops:
+<details>
+<summary> Datasets generated from Permanent Crops: </summary>
 
 | dataset | Name (pt) | Name (eng) |
 |:--------|:---------:|:----------:|
@@ -133,6 +139,7 @@ Datasets generated from Permanent Crops:
 | annatto_seeds |Urucum (Semente)|Annatto (Seed)| 
 | grape |Uva|Grape| 
 | permanent_total |Total|Total|
+</details>
 
 **Examples:**
 
