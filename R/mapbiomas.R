@@ -79,11 +79,11 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
     "mapbiomas_irrigation", "state", "UF",
     "mapbiomas_irrigation", "biome", "BIOME",
     "mapbiomas_grazing_quality", "any", "BD_Qualidade",
-    "mapbiomas_mining", "country", "BR",
-    "mapbiomas_mining", "state", "UF",
-    "mapbiomas_mining", "biome", "BIOME",
-    "mapbiomas_mining", "municipality", "MUN",
-    "mapbiomas_mining", "indigenous_land", "TI",
+    "mapbiomas_mining", "country", "CITY_STATE_BIOME",
+    "mapbiomas_mining", "state", "CITY_STATE_BIOME",
+    "mapbiomas_mining", "biome", "CITY_STATE_BIOME",
+    "mapbiomas_mining", "municipality", "CITY_STATE_BIOME",
+    "mapbiomas_mining", "indigenous_land", "IL",
     "mapbiomas_water", "state", "states_annual",
     "mapbiomas_water", "biome", "biomes_annual",
     "mapbiomas_water", "municipality", "mun_annual",
@@ -104,14 +104,23 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
     stop("Please check if `dataset` and `geo_level` are supported.")
   }
 
+  if (param$dataset == "mapbiomas_mining" & !param$raw_data){
+    message("Treated data currently unavailable for mapbiomas_mining. Returning raw data instead.")
+    param$raw_data <- TRUE
+  }
+
   #################
   ##   Message   ##
   #################
+  if(dataset %in% c("mapbiomas_mining")) {
+    message("Data from Mapbiomas - Collection 8")
+    message("")
+  }
+
   if(dataset %in% c("mapbiomas_cover",
                     "mapbiomas_transition",
                     "mapbiomas_deforestation_regeneration",
-                    "mapbiomas_irrigation",
-                    "mapbiomas_mining")) {
+                    "mapbiomas_irrigation")) {
     message("Data from Mapbiomas - Collection 7")
     message("")
   }
@@ -202,7 +211,8 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
   if (param$geo_level == "municipality" &
       !(param$dataset %in% c("mapbiomas_transition",
                              "mapbiomas_deforestation_regeneration",
-                             "mapbiomas_fire"))) {
+                             "mapbiomas_fire",
+                             "mapbiomas_grazing_quality"))) {
 
     munic_codes <- datazoom.amazonia::municipalities %>%
       dplyr::select(state = abbrev_state, city = municipality_mapbiomas, geo_code = code_muni)

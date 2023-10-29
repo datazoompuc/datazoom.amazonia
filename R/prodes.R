@@ -28,9 +28,8 @@ load_prodes <- function(dataset = "prodes", raw_data = FALSE,
   ## Bind Global Variables ##
   ###########################
 
-  survey <- link <- cod_ibge <- desmatado <- estado <- floresta <- hidrografia <- NULL
-  incremento <- lat <- latgms <- long <- longms <- municipio <- nao_floresta <- NULL
-  nao_observado <- nr <- nuvem <- soma <- NULL
+  year <- Municipio <- CodIbge <- Estado <- AreaKm2 <- increment <- NULL
+  municipality <- municipality_code <- state <- deforestation <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -52,13 +51,10 @@ load_prodes <- function(dataset = "prodes", raw_data = FALSE,
 
   ## Column Names come with numbers at the side - we need to clean those
 
-  dat <- as.list(param$time_period) %>%
-    purrr::map(
-      function(t) {
-        external_download(dataset = param$dataset, source = "prodes", year = t) %>%
-          dplyr::mutate(ano = t) # Adding year variable to each dataframe
-      }
-    )
+  dat <- external_download(
+    dataset = param$dataset,
+    source = "prodes",
+    year = 2022)
 
   ## Return Raw Data
 
@@ -70,49 +66,56 @@ load_prodes <- function(dataset = "prodes", raw_data = FALSE,
   ## Data Engineering ##
   ######################
 
-  # Removing years from each data frame's column names
+  dat <- dat %>%
+    dplyr::bind_rows() %>%
+    dplyr::rename("incremento2000" = "Desmatamento2000") %>%
+    tidyr::pivot_longer(
+      dplyr::starts_with("incremento"),
+      names_prefix = "incremento",
+      names_to = "year",
+      values_to = "increment"
+    ) %>%
+    dplyr::select(
+      year,
+      "municipality" = Municipio,
+      "municipality_code" = CodIbge,
+      "state" = Estado,
+      "area" = AreaKm2,
+      increment
+    )
+
+  # calcutating cumulative deforestation
 
   dat <- dat %>%
-    purrr::map(
-      dplyr::rename_with,
-      .fn = ~ gsub("(.*)\\d{4}?", "\\1", .)
+    dplyr::arrange(municipality, year) %>%
+    dplyr::mutate(
+      deforestation = cumsum(increment),
+      .by = municipality_code
     )
 
   dat <- dat %>%
-    dplyr::bind_rows() %>%
-    tibble::as_tibble() %>%
-    janitor::clean_names()
-
-  # Removing coordinate variables
-
-  dat <- dat %>%
-    dplyr::select(-c(nr, lat, long, latgms, longms))
+    dplyr::mutate(
+      increment = dplyr::case_when(
+        year == 2000 ~ NA, .default = increment
+      )
+    )
 
   ################################
   ## Harmonizing Variable Names ##
   ################################
 
   if (param$language == "eng") {
-    dat_mod <- dat %>%
-      dplyr::rename(
-        "municipality" = municipio,
-        "municipality_code" = cod_ibge,
-        "state" = estado,
-        "deforestation" = desmatado,
-        "increment" = incremento,
-        "forest" = floresta,
-        "cloud" = nuvem,
-        "not_observed" = nao_observado,
-        "not_forest" = nao_floresta,
-        "hydrography" = hidrografia,
-        "sum" = soma
-      )
+    dat_mod <- dat
   }
   if (param$language == "pt") {
     dat_mod <- dat %>%
       dplyr::rename(
-        "cod_municipio" = cod_ibge,
-        "uf" = estado
+        "ano" = year,
+        "municipio" = municipality,
+        "cod_municipio" = municipality_code,
+        "uf" = state,
+        "incremento" = increment,
+        "desmatamento" = deforestation
       )
   }
 

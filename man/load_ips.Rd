@@ -7,7 +7,7 @@
 load_ips(
   dataset = "all",
   raw_data = FALSE,
-  time_period = c(2014, 2018, 2021),
+  time_period = c(2014, 2018, 2021, 2023),
   language = "eng"
 )
 }
@@ -16,7 +16,7 @@ load_ips(
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
-\item{time_period}{Year to download. Can be 2014, 2018, 2021, or a vector with some combination thereof}
+\item{time_period}{Year to download. Can be 2014, 2018, 2021, 2023, or a vector with some combination thereof}
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.}
 }

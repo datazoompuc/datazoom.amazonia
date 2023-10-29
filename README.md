@@ -68,6 +68,7 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 | **[MAPBIOMAS](#mapbiomas)**       | *Land cover and land use*           |
 | **[TerraClimate](#terraclimate)** | *Climate data*                      |
 | **[SEEG](#seeg)**                 | *Greenhouse gas emission estimates* |
+| **[CENSOAGRO](#censoagro)**       | *Agriculture activities*            |
 
 </td>
 </tr>
@@ -446,56 +447,21 @@ data <- load_mapbiomas("mapbiomas_mining",
                        geo_level = "indigenous_land")
 ```
 
-## CIPO
-
-Mappings by [Plataforma CIPÓ](https://plataformacipo.org/) on
-environmental crimes. Each dataset available is a spreadsheet pertaining
-to a different aspect of environmental crimes, namely: the Brazilian
-institutions and organization involved in their prevention (the
-`"brazilian_actors"` dataset); the international agreements, treaties
-and conventions related to the subject (the
-`"international_cooperation"` dataset); and the arrangements regarding
-forest governance (the `"forest_governance"` dataset).
-
-------------------------------------------------------------------------
-
-**Options:**
-
-1.  **dataset**: there are three choices:
-    - `"brazilian_actors"`: mapping of Brazilian actors involved in
-      preventing environmental crimes.
-    - `"international_cooperation"`: mapping of international
-      agreements, treaties and conventions.
-    - `"forest_governance"`: mapping of forest governance arrangements.
-2.  **raw_data**: there are two options:
-    - `TRUE`: if you want the data as it is originally.
-    - `FALSE`: if you want the treated version of the data.
-3.  **search**: Filters the dataset to the rows containing the chosen
-    search parameter.
-
-------------------------------------------------------------------------
-
-**Examples:**
-
-``` r
-# download the spreacdsheet on Brazilian actors involved in fighting environmental crimes
-brazilian_actors <- load_cipo(dataset = "brazilian_actors")
-
-# searching only for entries containing IBAMA
-actors_ibama <- load_cipo(dataset = "brazilian_actors",
-                          search = "ibama")
-
-# entries containing IBAMA or FUNAI
-actors_ibama <- load_cipo(dataset = "brazilian_actors",
-                          search = "ibama|funai")
-```
-
 ## TerraClimate
 
 Spatial data on several climate variables, extracted from Climatology
 Lab’s [TerraClimate](https://www.climatologylab.org/terraclimate.html).
 The table below shows all possible variables to be extracted, which are
 chosen through the “dataset” parameter. Data ranges from 1958 to 2020.
+
+Netcdf files are downloaded from the
+[THREDDS](http://thredds.northwestknowledge.net:8080/thredds/terraclimate_catalog.html)
+web server, as recommended for rectangular subsets of the global data.
+
+<details>
+<summary>
+Click to see all dataset options
+</summary>
 
 | Dataset                       | Code | Description                                      |  Units   |
 |:------------------------------|:----:|:-------------------------------------------------|:--------:|
@@ -514,9 +480,7 @@ chosen through the “dataset” parameter. Data ranges from 1958 to 2020.
 | water_evaporation             | aet  | Actual Evapotranspiration                        |    mm    |
 | palmer_drought_severity_index | PDSI | Palmer Drought Severity Index                    | unitless |
 
-Netcdf files are downloaded from the
-[THREDDS](http://thredds.northwestknowledge.net:8080/thredds/terraclimate_catalog.html)
-web server, as recommended for rectangular subsets of the global data.
+</details>
 
 ------------------------------------------------------------------------
 
@@ -629,48 +593,87 @@ data <- load_seeg(dataset = "seeg_industry",
 municipality level. In case of authentication errors, see
 [googledrive](#googledrive).
 
-## CIPÓ
+## CENSOAGRO
 
-Mappings by [Plataforma CIPÓ](https://plataformacipo.org/) on
-environmental crimes. Each dataset available is a spreadsheet pertaining
-to a different aspect of environmental crimes, namely: the Brazilian
-institutions and organization involved in their prevention (the
-`"brazilian_actors"` dataset); the international agreements, treaties
-and conventions related to the subject (the
-`"international_cooperation"` dataset); and the arrangements regarding
-forest governance (the `"forest_governance"` dataset).
+The census of agriculture collects information about agricultural
+establishments and the agricultural activities carried out there,
+covering characteristics of the producer and establishment, economy and
+employment in rural areas, livestock, farming and agroindustry.
+
+Data is collected by IBGE and is available at country, state and
+municipality level.
 
 ------------------------------------------------------------------------
 
 **Options:**
 
-1.  **dataset**: there are three choices:
-    - `"brazilian_actors"`: mapping of Brazilian actors involved in
-      preventing environmental crimes.
-    - `"international_cooperation"`: mapping of international
-      agreements, treaties and conventions.
-    - `"forest_governance"`: mapping of forest governance arrangements.
+1.  **dataset**:there are 10 possible choices:
+
+    - `"agricultural_land_area"`: area and number of agricultural
+      properties
+    - `"agricultural_area_use"`: area of agricultural properties by use
+    - `"agricultural_employees_tractors"`: number of employees and
+      tractors in agricultural properties
+    - `"agricultural_producer_condition"`: condition of agricultural
+      producer, whether they own the land
+    - `"animal_production"`: number of animals farmed, by species
+    - `"animal_products"`: amount of animal products, by product type
+    - `"vegetable_production_area"`: area and amount produced, by
+      vegetable product
+    - `"vegetable_production_temporary"`: amount produced, by temporary
+      crop
+    - `"vegetable_production_permanent"`: amount produced, by permanent
+      crop
+    - `"livestock_production"`: amount of bovine cattle, and number of
+      agricultural properties
+
 2.  **raw_data**: there are two options:
+
     - `TRUE`: if you want the data as it is originally.
     - `FALSE`: if you want the treated version of the data.
-3.  **search**: Filters the dataset to the rows containing the chosen
-    search parameter.
+
+3.  **geo_level**: `"country"` or `"state"`. For dataset
+    `"livestock_production"`, it can also be `"municipality"`
+
+4.  **time_period**: picks the years for which the data will be
+    downloaded:
+
+    - For datasets `"agricultural_land_area"`,
+      `"agricultural_producer_condition"`, `"animal_products"`, and
+      `"vegetable_production_area"`, it can be one of 1920, 1940, 1950,
+      1960, 1970, 1975, 1980, 1985, 1995, or 2006.
+    - For datasets `"vegetable_production_permanent"` and
+      `"vegetable_production_permanent"`, it can only be from 1940
+      onwards
+    - For datasets `"agricultural_area_use"`,
+      `"agricultural_employees_tractors"`, `"animal_production"`, it can
+      only be from 1970 onwards
+    - For dataset `"livestock_production"`, it can only be 2017
+
+5.  **language**: you can choose between Portuguese `("pt")` and English
+    `("eng")`
 
 ------------------------------------------------------------------------
 
 **Examples:**
 
 ``` r
-# download the spreacdsheet on Brazilian actors involved in fighting environmental crimes
-brazilian_actors <- load_cipo(dataset = "brazilian_actors")
+# Download total land area data at the country level in year 2006
+ data <- load_censoagro(
+   dataset = "agricultural_land_area",
+   raw_data = TRUE,
+   geo_level = "country",
+   time_period = 2006
+ )
 
-# searching only for entries containing IBAMA
-actors_ibama <- load_cipo(dataset = "brazilian_actors",
-                          search = "ibama")
-
-# entries containing IBAMA or FUNAI
-actors_ibama <- load_cipo(dataset = "brazilian_actors",
-                          search = "ibama|funai")
+ # Download temporary production crops data by state (geo_level = "state") in year 2006
+ # in portuguese (language = "pt")
+  data <- load_censoagro(
+   dataset = "vegetable_production_temporary",
+   raw_data = FALSE,
+   geo_level = "state",
+   time_period = 1996,
+   language = "pt"
 ```
 
 # Social Data
@@ -1192,8 +1195,12 @@ link](https://www.ibge.gov.br/estatisticas/economicas/agricultura-e-pecuaria/911
 
 The datasets supported are shown in the tables below, made up of both
 the original databases and their narrower subsets. Note that downloading
-only specific crops is considerably faster. First, the datasets provided
-by IBGE in their entirety:
+only specific crops is considerably faster.
+
+<details>
+<summary>
+Full datasets provided by IBGE:
+</summary>
 
 | dataset         |
 |:----------------|
@@ -1205,7 +1212,11 @@ by IBGE in their entirety:
 | peanut          |
 | beans           |
 
+</details>
+<details>
+<summary>
 Datasets generated from Temporary Crops:
+</summary>
 
 | dataset           |          Name (pt)           |          Name (eng)           |
 |:------------------|:----------------------------:|:-----------------------------:|
@@ -1244,7 +1255,11 @@ Datasets generated from Temporary Crops:
 | triticale         |     Triticale (em Grao)      |     Triticale (in grain)      |
 | temporary_total   |            Total             |             Total             |
 
+</details>
+<details>
+<summary>
 Datasets generated from Permanent Crops:
+</summary>
 
 | dataset                 |          Name (pt)          |         Name (eng)         |
 |:------------------------|:---------------------------:|:--------------------------:|
@@ -1287,6 +1302,8 @@ Datasets generated from Permanent Crops:
 | annatto_seeds           |      Urucum (Semente)       |       Annatto (Seed)       |
 | grape                   |             Uva             |           Grape            |
 | permanent_total         |            Total            |           Total            |
+
+</details>
 
 **Examples:**
 

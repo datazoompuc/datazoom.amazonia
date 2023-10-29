@@ -49,12 +49,17 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
   if (param$sidra_code == 6579) {
 
     if (year == 2007) param$sidra_code <- 793  # https://sidra.ibge.gov.br/tabela/793
-    if (year == 2010) {
+    if (year == 2010){
       param$sidra_code <- 1378 # https://sidra.ibge.gov.br/tabela/1378
-      param$classific <- c("c1", "c2", "c287", "c455")
-      param$category <- list(0, 0, 0, 0)
+
+      param$classific <- "c1"
+      param$category <- list(0)
     }
 
+  }
+  if (param$sidra_code == 6907) {
+    param$classific <- c("c12443")
+    param$category <- list(110056)
   }
 
 
@@ -397,13 +402,13 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       path <- paste(param$url, "Estat%C3%ADsticas/TABELA_GERAL_COL7_MAPBIOMAS_DESMAT_VEGSEC_UF.xlsx", sep = "")
     }
     if (dataset == "mapbiomas_irrigation") {
-      path <- paste(param$url, "Colecao_7_Irrigacao_Biomes_UF.xlsx", sep = "")
+      path <- paste(param$url, "downloads/Estatisticas%20/Colecao_7_Irrigacao_Biomes_UF.xlsx", sep = "")
     }
     if (dataset == "mapbiomas_grazing_quality") {
       path <- paste(param$url, "Estat%C3%ADsticas/MapBIomas_COL5_QUALIDADE_PASTAGEM-biomas-estados-SITE.xlsx", sep = "")
     }
     if (dataset == "mapbiomas_mining") {
-      path <- paste(param$url, "Colecao_7_Mining_BR_UF_Biome_Mun_TI_SITE__3_.xlsx", sep = "")
+      path <- "https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2023/09/TABELA-MINERACAO-MAPBIOMAS-COL8.0.xlsx"
     }
     if (dataset == "mapbiomas_water") {
       path <- paste(param$url, "Estat%C3%ADsticas/Estatisticas_Superficie%C3%81gua_Col2_SITE.xlsx", sep = "")
@@ -492,7 +497,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   # For most functions, the file extension is automatically detected
 
-  file_extension <- sub(".*\\.", ".", path)
+  file_extension <- sub(".*\\.", ".", path) %>%
+    tolower()
 
   ##### Exceptions only #####
 
@@ -501,13 +507,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   # googledrive links do not contain the file extension, for example
 
-  if (source == "cipo") {
-    file_extension <- ".csv"
-  }
   if (source == "prodes") {
     file_extension <- ".txt"
   }
-  if (source %in% c("seeg", "iema")) {
+  if (source %in% c("seeg", "iema", "ips")) {
     file_extension <- ".xlsx"
   }
   if (source == "terraclimate") {
@@ -541,6 +544,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     if (dataset == "energy_enterprises_distributed") {
       file_extension <- ".csv"
     }
+  }
+  if ((source == "CENSO_AGRO-IBGE") & (dataset == "livestock_production")) {
+    file_extension <- ".xlsx"
   }
 
   ## Define Empty Directory and Files For Download
@@ -621,7 +627,12 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       dat$year <- param$year
     }
     if (param$source == "deter") {
-      dat <- sf::read_sf(file.path(dir, "deter_public.shp"))
+      if (param$dataset == "deter_amz"){
+        dat <- sf::read_sf(file.path(dir, "deter-amz-deter-public.shp"))
+      }
+      if (param$dataset == "deter_cerrado"){
+        dat <- sf::read_sf(file.path(dir, "deter_public.shp"))
+      }
     }
     if (param$source == "sigmine") {
       dat <- sf::read_sf(file.path(dir, "BRASIL.shp"))
@@ -898,7 +909,7 @@ datasets_link <- function() {
     ## IPS ##
     #########
 
-    "IPS", "ips", NA, "2014, 2018, 2021", NA, "http://www.ipsamazonia.org.br/assets/IPS_Tabela_Completa-1df30fcea79209e3c7e8634a586f95e6.xlsx",
+    "IPS", "ips", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
 
     ###########
     ## IBAMA ##
@@ -924,13 +935,20 @@ datasets_link <- function() {
 
     "POPULATION-IBGE", "population", "6579", "2001-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/estimapop/tabelas",
 
-    ##########
-    ## CIPÓ ##
-    ##########
+    ######################################
+    ## Censo Agropecuario - Time Series ##
+    ######################################
 
-    "CIPO", "brazilian_actors", NA, NA, NA, "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpRIu-paL_8rtXLpiT-kCTJRa2Tf_jCCPZxZBc3sjCwMHL8mkrhG2eqVeeIdWkxLTUKPru5uYAWG6g/pub?output=csv",
-    "CIPO", "international_cooperation", NA, NA, NA, "https://docs.google.com/spreadsheets/u/0/d/e/2PACX-1vSpyBina4qr3GG-5ZlKW8_fjQwgIP3lq5lxanpO5_bUZenCVFO6N-WrF3bTkpokVzNVpRnob9Jhn8qe/pub?output=csv",
-    "CIPO", "forest_governance", NA, NA, NA, "https://docs.google.com/spreadsheets/u/0/d/e/2PACX-1vTpnO9DEiy1mMRwBI5jAzBbYhFVBlcsX4TNRZyoDYBNUhEPZcLviexaynCJfY3JC-CCBGy00-Fs3jxu/pub?output=csv",
+    "CENSO_AGRO-IBGE" , "agricultural_land_area" , "263" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "CENSO_AGRO-IBGE" , "agricultural_area_use" , "264" , "1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "CENSO_AGRO-IBGE" , "agricultural_employees_tractors" , "265" , "1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "CENSO_AGRO-IBGE" , "agricultural_producer_condition" , "280" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "CENSO_AGRO-IBGE" , "animal_production" , "281" , "1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "CENSO_AGRO-IBGE" , "animal_products" , "282" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "CENSO_AGRO-IBGE" , "vegetable_production_area" , "283" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "CENSO-AGRO-IBGE" , "vegetable_production_permanent" , "1730" , "1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "CENSO-AGRO-IBGE" , "vegetable_production_temporary" , "1731" , "1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "CENSO-AGRO-IBGE" , "livestock_production" , "6907" , "2017" , "Municipality" , "https://sidra.ibge.gov.br/tabela/6907" ,
 
     ##################
     ## TerraClimate ##
