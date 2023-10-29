@@ -51,6 +51,7 @@ load_cempre <- function(dataset = "cempre", raw_data = FALSE,
   #############################
 
   param <- list()
+  param$source <- "cempre"
   param$dataset <- dataset
   param$raw_data <- raw_data
   param$geo_level <- geo_level
@@ -69,7 +70,7 @@ load_cempre <- function(dataset = "cempre", raw_data = FALSE,
 
   # check if dataset, time_period, and geo_level are valid
 
-  check_params(param, "CEMPRE-IBGE")
+  check_params(param)
 
   ##############
   ## Download ##

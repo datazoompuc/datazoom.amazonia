@@ -32,19 +32,20 @@ load_sigmine <- function(dataset = "sigmine_active",
   #############################
 
   param <- list()
+  param$source <- "sigmine"
   param$dataset <- dataset
   param$language <- language
   param$raw_data <- raw_data
 
   # check if dataset is supported
 
-  check_params(param, "ANM-SIGMINE")
+  check_params(param)
 
   ######################
   ## Downloading Data ##
   ######################
 
-  dat <- external_download(dataset = param$dataset, source = "sigmine") %>%
+  dat <- external_download(dataset = param$dataset, source = param$source) %>%
     janitor::clean_names()
 
   ## Return Raw Data

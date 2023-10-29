@@ -40,6 +40,7 @@ load_baci <- function(dataset = "HS92", raw_data = FALSE, time_period,
   #############################
 
   param <- list()
+  param$source <- "baci"
   param$dataset <- dataset
   param$raw_data <- raw_data
   param$time_period <- time_period
@@ -47,7 +48,7 @@ load_baci <- function(dataset = "HS92", raw_data = FALSE, time_period,
 
   # check if dataset and time_period are valid
 
-  check_params(param, "BACI")
+  check_params(param)
 
   #################
   ## Downloading ##
@@ -56,7 +57,7 @@ load_baci <- function(dataset = "HS92", raw_data = FALSE, time_period,
   base::message(base::cat("The download can take some time (~10-30mins)"))
 
   dat <- external_download(
-    source = "baci",
+    source = param$source,
     dataset = param$dataset,
     year = param$time_period,
   )

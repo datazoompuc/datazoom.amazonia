@@ -1,4 +1,4 @@
-check_params <- function(param, source){
+check_params <- function(param){
 
   ###########################
   ## Bind Global Variables ##
@@ -15,10 +15,8 @@ check_params <- function(param, source){
 
   # extracting the supported datasets from datasets_link
 
-  supp_datasets <- datasets_link() %>%
-    dplyr::filter(survey == source) %>%
-    dplyr::select(dataset) %>%
-    unlist() # vector with all possible datasets
+  supp_datasets <- datasets_link(source = param$source) %>%
+    purrr::pluck("dataset") # vector with all possible datasets
 
   if (!(param$dataset %in% supp_datasets)) {
     dataset_error <- paste("Dataset", param$dataset, "not supported.",
@@ -35,10 +33,8 @@ check_params <- function(param, source){
 
     # constructing vector of supported years
 
-    supp_time_period_str <- datasets_link() %>%
-      dplyr::filter(survey == source, dataset == param$dataset) %>%
-      dplyr::select(available_time) %>%
-      unlist()
+    supp_time_period_str <- datasets_link(source = param$source, dataset = param$dataset) %>%
+      purrr::pluck("available_time")
 
     # separating by commas: 2003, 2007, 2014 -> c(2003, 2007, 2014)
 
@@ -68,10 +64,8 @@ check_params <- function(param, source){
 
     # constructing vector of supported geo_levels
 
-    supp_geo_level_str <- datasets_link() %>%
-      dplyr::filter(survey == source, dataset == param$dataset) %>%
-      dplyr::select(available_geo) %>%
-      unlist() %>%
+    supp_geo_level_str <- datasets_link(source = param$source, dataset = param$dataset) %>%
+      purrr::pluck("available_geo") %>%
       tolower()
 
     supp_geo_level <- supp_geo_level_str %>%

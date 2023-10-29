@@ -36,13 +36,14 @@ load_imazon <- function(dataset = "imazon_shp", raw_data = FALSE, language = "en
   #############################
 
   param <- list()
+  param$source <- "imazon"
   param$dataset <- dataset
   param$language <- language
   param$raw_data <- raw_data
 
   # check if dataset is valid
 
-  check_params(param, "Imazon")
+  check_params(param)
 
   ######################
   ## Downloading Data ##
@@ -50,7 +51,7 @@ load_imazon <- function(dataset = "imazon_shp", raw_data = FALSE, language = "en
 
   dat <- external_download(
     dataset = param$dataset,
-    source = "imazon_shp"
+    source = param$source
   )
 
   ## Return Raw Data

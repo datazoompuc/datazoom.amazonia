@@ -49,6 +49,7 @@ load_ppm <- function(dataset, raw_data = FALSE,
   #############################
 
   param <- list()
+  param$source <- "ppm"
   param$dataset <- dataset
   param$geo_level <- geo_level
   param$time_period <- time_period
@@ -67,7 +68,7 @@ load_ppm <- function(dataset, raw_data = FALSE,
 
   # check if dataset, geo_level, and time_period are supported
 
-  check_params(param, "PPM-IBGE")
+  check_params(param)
 
   ## Dataset
 

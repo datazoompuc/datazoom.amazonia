@@ -32,6 +32,7 @@ load_epe <- function(dataset, raw_data = FALSE,
   #############################
 
   param <- list()
+  param$source <- "epe"
   param$dataset <- dataset
   param$raw_data <- raw_data
   param$language <- language
@@ -39,7 +40,7 @@ load_epe <- function(dataset, raw_data = FALSE,
 
   # check if dataset and geo_level valid
 
-  check_params(param, "EPE")
+  check_params(param)
 
   #################
   ## Downloading ##
@@ -77,7 +78,7 @@ load_epe <- function(dataset, raw_data = FALSE,
   }
 
   dat <- external_download(
-    source = "EPE",
+    source = param$source,
     dataset = param$dataset,
     year = param$time_period,
     sheet = sheets_selected

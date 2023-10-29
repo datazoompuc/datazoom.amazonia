@@ -48,6 +48,7 @@ load_climate <- function(dataset, raw_data = FALSE,
 
   param <- list()
 
+  param$source <- "terraclimate"
   param$dataset <- dataset
   param$time_period <- time_period
   param$raw_data <- raw_data
@@ -113,7 +114,7 @@ load_climate <- function(dataset, raw_data = FALSE,
 
   # check if dataset and time_period are valid
 
-  check_params(param, "TerraClimate")
+  check_params(param)
 
   # time range choices - 1958-01 to 2017-01
   param$initial_time <- ifelse(
@@ -134,7 +135,7 @@ load_climate <- function(dataset, raw_data = FALSE,
   base::message("Downloading TerraClimate data")
 
   dat <- external_download(
-    source = "terraclimate",
+    source = param$source,
     dataset = param$dataset,
     dataset_code = param$dataset_code,
     coords = list(

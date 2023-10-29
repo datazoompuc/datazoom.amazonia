@@ -83,6 +83,7 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
   #############################
 
   param <- list()
+  param$source <- "ips"
   param$dataset <- dataset
   param$time_period <- time_period
   param$language <- language
@@ -90,7 +91,7 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
 
   # check if dataset and time_period are valid
 
-  check_params(param, "IPS")
+  check_params(param)
 
   # Picking which sheet to download
 
@@ -114,8 +115,8 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
   ##############
 
   dat <- external_download(
-    dataset = "ips",
-    source = "ips",
+    dataset = param$dataset,
+    source = param$source,
     sheet = sheets
   )
 

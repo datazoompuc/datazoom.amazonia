@@ -46,6 +46,7 @@ load_pam <- function(dataset, raw_data = FALSE,
   #############################
 
   param <- list()
+  param$source <- "pam"
   param$dataset <- dataset
   param$geo_level <- geo_level
   param$time_period <- time_period
@@ -54,7 +55,7 @@ load_pam <- function(dataset, raw_data = FALSE,
 
   # check if dataset, geo_level, and time_period are supported
 
-  check_params(param, "PAM-IBGE")
+  check_params(param)
 
   # Extracting sidra info in the form code/classific/category
 

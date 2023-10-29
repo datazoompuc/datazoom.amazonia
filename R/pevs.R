@@ -51,6 +51,7 @@ load_pevs <- function(dataset, raw_data = FALSE,
   #############################
 
   param <- list()
+  param$source <- "pevs"
   param$dataset <- dataset
   param$geo_level <- geo_level
   param$time_period <- time_period
@@ -59,7 +60,7 @@ load_pevs <- function(dataset, raw_data = FALSE,
 
   # check if dataset, geo_level, and time_period are supported
 
-  check_params(param, "PEVS-IBGE")
+  check_params(param)
 
   if (!is.numeric(param$dataset)) {
     param$code <- datasets_link() %>%

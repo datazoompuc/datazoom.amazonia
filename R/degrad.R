@@ -42,6 +42,7 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
   #############################
 
   param <- list()
+  param$source <- "degrad"
   param$dataset <- dataset
   param$time_period <- time_period
   param$language <- language
@@ -49,7 +50,7 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
 
   # check if dataset and time_period are valid
 
-  check_params(param, "DEGRAD-INPE")
+  check_params(param)
 
   # .shp file names for each year
 
@@ -79,7 +80,7 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
     function(year, file) {
       external_download(
         dataset = param$dataset,
-        source = "degrad",
+        source = param$source,
         year = year,
         file_name = file
       ) %>%

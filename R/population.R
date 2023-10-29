@@ -47,6 +47,7 @@ load_population <- function(dataset = "population", raw_data = FALSE,
   #############################
 
   param <- list()
+  param$source <- "population"
   param$dataset <- dataset
   param$raw_data <- raw_data
   param$geo_level <- geo_level
@@ -65,7 +66,7 @@ load_population <- function(dataset = "population", raw_data = FALSE,
 
   # check if dataset, geo_level, and time_period are supported
 
-  check_params(param, "POPULATION-IBGE")
+  check_params(param)
 
   ##############
   ## Download ##

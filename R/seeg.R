@@ -60,6 +60,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
   #############################
 
   param <- list()
+  param$source <- "seeg"
   param$dataset <- dataset
   param$geo_level <- geo_level
   param$language <- language
@@ -67,7 +68,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
 
   # check if dataset and geo_level are supported
 
-  check_params(param, "SEEG")
+  check_params(param)
 
   if (!is.numeric(param$dataset)) {
     param$code <- datasets_link() %>%
@@ -116,7 +117,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
 
   dat <- external_download(
     dataset = param$dataset,
-    source = "seeg",
+    source = param$source,
     geo_level = param$geo_level,
     sheet = sheet
   )

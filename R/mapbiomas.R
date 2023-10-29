@@ -59,6 +59,7 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
   #############################
 
   param <- list()
+  param$source <- "mapbiomas"
   param$dataset <- dataset
   param$geo_level <- geo_level
   param$language <- language
@@ -67,7 +68,7 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
 
   # check if dataset and geo_level are supported
 
-  check_params(param, "MAPBIOMAS")
+  check_params(param)
 
   sheets <- tibble::tribble(
     ~dataset, ~geo_level, ~sheet,
@@ -142,7 +143,7 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
 
   dat <- external_download(
     dataset = param$dataset,
-    source = "mapbiomas",
+    source = param$source,
     geo_level = param$geo_level,
     sheet = sheet
   )

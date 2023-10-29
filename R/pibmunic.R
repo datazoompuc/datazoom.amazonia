@@ -35,6 +35,7 @@ load_pibmunic <- function(dataset = "pibmunic", raw_data = FALSE,
   #############################
 
   param <- list()
+  param$source <- "pibmunic"
   param$dataset <- dataset
   param$geo_level <- geo_level
   param$time_period <- time_period
@@ -43,7 +44,7 @@ load_pibmunic <- function(dataset = "pibmunic", raw_data = FALSE,
 
   # check if dataset, geo_level, and time_period are supported
 
-  check_params(param, "PIB_MUNIC-IBGE")
+  check_params(param)
 
   if (!is.numeric(param$dataset)) {
     param$code <- datasets_link() %>%

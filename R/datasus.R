@@ -79,6 +79,7 @@ load_datasus <- function(dataset,
 
   param <- list()
 
+  param$source <- "datasus"
   param$dataset <- dataset
   param$raw_data <- raw_data
   param$language <- language
@@ -96,7 +97,7 @@ load_datasus <- function(dataset,
 
   # check if dataset and time_period are valid
 
-  check_params(param, "DATASUS")
+  check_params(param)
 
   ######################
   ## Downloading Data ##
@@ -181,7 +182,7 @@ load_datasus <- function(dataset,
         base::message(paste0("Downloading file ", file_name, " (", iteration, " out of ", length(filenames), ")"))
 
         external_download(
-          source = "datasus",
+          source = param$source,
           dataset = param$dataset,
           skip_rows = param$skip_rows,
           file_name = file_name
