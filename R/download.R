@@ -349,7 +349,11 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   }
   if (!is.null(param$state)) {
     path <- path %>%
-      stringr::str_replace("\\$state\\$", as.character(param$state))
+      stringr::str_replace("\\$state\\$", param$state)
+  }
+  if (!is.null(param$file_name)) {
+    path <- path %>%
+      stringr::str_replace("\\$file_name\\$", param$file_name)
   }
 
   # Below are the exceptions, for which manipulation is needed
