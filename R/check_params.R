@@ -44,9 +44,16 @@ check_params <- function(param){
     # separating by hyphens: 2003 - 2007 -> 2003:2007
 
     supp_time_period <- supp_time_period %>%
-      stringr::str_replace("-", ":") %>%
-      parse(text = .) %>%
-      eval()
+      purrr::map(
+        function(str) {
+          str %>%
+            stringr::str_replace("-", ":") %>%
+            parse(text = .) %>%
+            eval()
+        }
+      ) %>%
+      unlist()
+
 
     if (!all(param$time_period %in% supp_time_period)) {
       time_period_error <- paste("Option time_period must be in", supp_time_period_str)

@@ -479,7 +479,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       file_extension <- ".csv"
     }
   }
-  if (source == "imazon_shp") {
+  if (source == "imazon") {
     file_extension <- ".rds"
   }
   if (source == "epe") {
@@ -508,7 +508,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   download_method <- "standard" # works for most functions
 
-  if (source %in% c("iema", "imazon_shp")) {
+  if (source %in% c("iema", "imazon")) {
     download_method <- "googledrive"
   }
   if (source == "aneel") {
@@ -785,7 +785,14 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
     ## IPS
 
-    "ips", "ips", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
+    "ips", "all", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
+    "ips", "life_quality", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
+    "ips", "sanit_habit", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
+    "ips", "violence", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
+    "ips", "educ", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
+    "ips", "communic", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
+    "ips", "mortality", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
+    "ips", "deforest", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
 
     ## DATASUS
 
