@@ -29,6 +29,7 @@ load_aneel <- function(dataset, raw_data = FALSE, language = "eng") {
   #############################
 
   param <- list()
+  param$source <- "aneel"
   param$dataset <- dataset
   param$raw_data <- raw_data
   param$language <- language
@@ -40,12 +41,16 @@ load_aneel <- function(dataset, raw_data = FALSE, language = "eng") {
     # skips first row of excel sheet for this dataset
   }
 
+  # check if dataset is valid
+
+  check_params(param)
+
   #################
   ## Downloading ##
   #################
 
   dat <- external_download(
-    source = "ANEEL",
+    source = param$source,
     dataset = param$dataset,
     skip_rows = skip
   )

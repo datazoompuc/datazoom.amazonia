@@ -36,10 +36,15 @@ load_prodes <- function(dataset = "prodes", raw_data = FALSE,
   #############################
 
   param <- list()
+  param$source <- "prodes"
   param$dataset <- dataset
   param$raw_data <- raw_data
   param$time_period <- time_period
   param$language <- language
+
+  # check if dataset and time_period are supported
+
+  check_params(param)
 
   ###################
   ## Download Data ##
@@ -49,7 +54,7 @@ load_prodes <- function(dataset = "prodes", raw_data = FALSE,
 
   dat <- external_download(
     dataset = param$dataset,
-    source = "prodes",
+    source = param$source,
     year = 2022)
 
   ## Return Raw Data

@@ -35,11 +35,16 @@ load_pibmunic <- function(dataset = "pibmunic", raw_data = FALSE,
   #############################
 
   param <- list()
+  param$source <- "pibmunic"
   param$dataset <- dataset
   param$geo_level <- geo_level
   param$time_period <- time_period
   param$language <- language
   param$raw_data <- raw_data
+
+  # check if dataset, geo_level, and time_period are supported
+
+  check_params(param)
 
   if (!is.numeric(param$dataset)) {
     param$code <- datasets_link() %>%
@@ -49,24 +54,6 @@ load_pibmunic <- function(dataset = "pibmunic", raw_data = FALSE,
       as.numeric()
   } else {
     param$code <- param$dataset
-  }
-
-  ## Check if year is acceptable
-
-  year_check <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(available_time) %>%
-    unlist() %>%
-    as.character() %>%
-    stringr::str_split(pattern = "-") %>%
-    unlist() %>%
-    as.numeric()
-
-  if (min(time_period) < year_check[1]) {
-    stop("Provided time period less than supported. Check documentation for time availability.")
-  }
-  if (max(time_period) > year_check[2]) {
-    stop("Provided time period greater than supported. Check documentation for time availability.")
   }
 
   ##############

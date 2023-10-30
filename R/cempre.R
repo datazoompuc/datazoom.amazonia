@@ -51,6 +51,7 @@ load_cempre <- function(dataset = "cempre", raw_data = FALSE,
   #############################
 
   param <- list()
+  param$source <- "cempre"
   param$dataset <- dataset
   param$raw_data <- raw_data
   param$geo_level <- geo_level
@@ -67,23 +68,9 @@ load_cempre <- function(dataset = "cempre", raw_data = FALSE,
     param$code <- param$dataset
   }
 
-  ## Check if year is acceptable
+  # check if dataset, time_period, and geo_level are valid
 
-  year_check <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(available_time) %>%
-    unlist() %>%
-    as.character() %>%
-    stringr::str_split(pattern = "-") %>%
-    unlist() %>%
-    as.numeric()
-
-  if (min(time_period) < year_check[1]) {
-    stop("Provided time period less than supported. Check documentation for time availability.")
-  }
-  if (max(time_period) > year_check[2]) {
-    stop("Provided time period greater than supported. Check documentation for time availability.")
-  }
+  check_params(param)
 
   ##############
   ## Download ##

@@ -55,6 +55,7 @@ load_censoagro <- function(dataset,raw_data = FALSE,
   #############################
 
   param <- list()
+  param$source <- "censoagro"
   param$dataset <- dataset
   param$raw_data <- raw_data
   param$geo_level <- geo_level
@@ -70,6 +71,10 @@ load_censoagro <- function(dataset,raw_data = FALSE,
   } else {
     param$code <- param$dataset
   }
+
+  # check if dataset and time_period are valid
+
+  check_params(param)
 
   ##############
   ## Download ##

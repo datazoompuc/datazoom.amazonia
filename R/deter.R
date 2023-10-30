@@ -33,9 +33,14 @@ load_deter <- function(dataset, raw_data = FALSE,
   #############################
 
   param <- list()
+  param$source <- "deter"
   param$dataset <- dataset
   param$language <- language
   param$raw_data <- raw_data
+
+  # check if dataset is valid
+
+  check_params(param)
 
   #################
   ## Downloading ##
@@ -43,7 +48,7 @@ load_deter <- function(dataset, raw_data = FALSE,
 
   dat <- external_download(
     dataset = param$dataset,
-    source = "deter"
+    source = param$source
   )
 
   ## Return Raw Data

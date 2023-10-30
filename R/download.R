@@ -322,23 +322,39 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   if (is.null(param$skip_rows)) param$skip_rows <- 0 # makes it more error-proof
 
-  ## Create Basic Url
-
-  dat_url <- datasets_link()
-
-  param$url <- dat_url %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(link) %>%
-    base::unlist() %>%
-    as.character()
-
   #####################
   ## Construct Links ##
   #####################
 
+  ## Pull URL from datasets_link
+
+  param$url <- datasets_link(
+    source = param$source,
+    dataset = param$dataset,
+    url = TRUE
+  )
+
   # For most sources, the URL in datasets_link is already the URL needed for the download
 
   path <- param$url
+
+  ## Filling in URLs
+
+  # Some URLs are in the form www.data/$year$_$dataset$.csv, where expression
+  # surrounded by $ are placeholders. The code below subs them in for actual parameters
+
+  if (!is.null(param$year)) {
+    path <- path %>%
+      stringr::str_replace("\\$year\\$", as.character(param$year))
+  }
+  if (!is.null(param$state)) {
+    path <- path %>%
+      stringr::str_replace("\\$state\\$", param$state)
+  }
+  if (!is.null(param$file_name)) {
+    path <- path %>%
+      stringr::str_replace("\\$file_name\\$", param$file_name)
+  }
 
   # Below are the exceptions, for which manipulation is needed
 
@@ -346,44 +362,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   # If the datasets_link URL is the download path you need,
   # do not change this section for a new function
-
-  ## Comex
-
-  # Download path depends on the dataset and year
-
-  if (source == "comex") {
-    if (dataset == "comex_export_mun") {
-      path <- paste(param$url, "/EXP_", param$year, "_MUN.csv", sep = "")
-    }
-    if (dataset == "comex_import_mun") {
-      path <- paste(param$url, "/IMP_", param$year, "_MUN.csv", sep = "")
-    }
-    if (dataset == "comex_export_prod") {
-      path <- paste(param$url, "/EXP_", param$year, ".csv", sep = "")
-    }
-    if (dataset == "comex_import_prod") {
-      path <- paste(param$url, "/IMP_", param$year, ".csv", sep = "")
-    }
-  }
-
-  ## Prodes
-
-  # Download path depends on the year
-
-  if (source == "prodes") {
-    path <- paste(param$url, "/tabelatxt.php?ano=", param$year, "&estado=&ordem=MUNICIPIO&type=tabela&output=txt&", sep = "")
-  }
-
-
-  ## Degrad
-
-  # Download path depends on the year
-
-  if (source == "degrad") {
-    if (dataset == "degrad") {
-      path <- paste(param$url, "/arquivos/degrad", param$year, "_final_shp.zip", sep = "")
-    }
-  }
 
   ## MapBiomas
 
@@ -426,23 +404,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     if (geo_level == "municipality") {
       path <- "https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd"
     }
-    if (geo_level == "state" | geo_level == "country") {
-      path <- "https://seeg-br.s3.amazonaws.com/Estat%C3%ADsticas/SEEG10/1-SEEG10_GERAL-BR_UF_2022.10.27-FINAL-SITE.xlsx"
-    }
-  }
-
-  ## IBAMA
-
-  # Download path depends on state
-
-  if (source == "ibama") {
-    if (dataset == "embargoed_areas") {
-      path <- param$url
-    } else if (dataset == "distributed_fines") {
-      path <- paste0(param$url, param$state, "/Quantidade/multasDistribuidasBensTutelados.csv")
-    } else if (dataset == "collected_fines") {
-      path <- paste0(param$url, param$state, "/Arrecadacao/arrecadacaobenstutelados.csv")
-    }
   }
 
   ## TerraClimate
@@ -479,14 +440,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       "&timeStride=1",
       "&disableProjSubset=on&addLatLon=true&accept=netcdf"
     )
-  }
-
-  ## Datasus
-
-  # Download path depends on the specific file wanted
-
-  if (source == "datasus") {
-    path <- paste0(param$url, param$file_name)
   }
 
   #######################
@@ -526,15 +479,15 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       file_extension <- ".csv"
     }
   }
-  if (source == "imazon_shp") {
+  if (source == "imazon") {
     file_extension <- ".rds"
   }
-  if (source == "EPE") {
+  if (source == "epe") {
     if (param$dataset == "national_energy_balance") {
       file_extension <- ".csv"
     }
   }
-  if (source == "ANEEL") {
+  if (source == "aneel") {
     if (dataset == "energy_development_budget") {
       file_extension <- ".rds"
     }
@@ -544,9 +497,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     if (dataset == "energy_enterprises_distributed") {
       file_extension <- ".csv"
     }
-  }
-  if ((source == "CENSO_AGRO-IBGE") & (dataset == "livestock_production")) {
-    file_extension <- ".xlsx"
   }
 
   ## Define Empty Directory and Files For Download
@@ -558,10 +508,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   download_method <- "standard" # works for most functions
 
-  if (source %in% c("iema", "imazon_shp")) {
+  if (source %in% c("iema", "imazon")) {
     download_method <- "googledrive"
   }
-  if (source == "ANEEL") {
+  if (source == "aneel") {
     if (dataset == "energy_development_budget") {
       download_method <- "googledrive"
     }
@@ -570,7 +520,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       options(timeout = 1000) # increase timeout limit
     }
   }
-  if (source == "EPE") {
+  if (source == "epe") {
     if (dataset == "national_energy_balance") {
       download_method <- "googledrive"
     }
@@ -676,7 +626,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   }
 
-  if (param$source == "EPE" & param$dataset == "energy_consumption_per_class") {
+  if (param$source == "epe" & param$dataset == "energy_consumption_per_class") {
 
     # param$sheet contains the selected sheets
 
@@ -695,7 +645,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
     names(dat) <- param$sheet
   }
-  if (param$source == "ANEEL" & param$dataset == "energy_enterprises_distributed") {
+  if (param$source == "aneel" & param$dataset == "energy_enterprises_distributed") {
     dat <- data.table::fread(temp, encoding = "Latin-1")
   }
   if (param$source == "ips") {
@@ -747,302 +697,298 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   return(dat)
 }
 
-datasets_link <- function() {
-
-  ## Add file type at the end in order to set the Curl Process
+datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
   link <- tibble::tribble(
     ~survey, ~dataset, ~sidra_code, ~available_time, ~available_geo, ~link,
-    "PAM-IBGE", "all_crops", "5457/all/all", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "permanent_crops", "1613/all/all", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "temporary_crops", "1612/all/all", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "corn", "839/all/all", "2003-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "potato", "1001/all/all", "2003-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "peanut", "1000/all/all", "2003-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "beans", "1002/all/all", "2003-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
 
-    ### Categories within temporary crops
+    ########################
+    ## Environmental data ##
+    ########################
 
-    "PAM-IBGE", "temporary_total", "1612/c81/0", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "pineapple", "1612/c81/2688", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "alfafa", "1612/c81/40471", "1974-1987", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "cotton_herbaceous", "1612/c81/2689", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "garlic", "1612/c81/2690", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "peanut_temporary", "1612/c81/2691", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "rice", "1612/c81/2692", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "oats", "1612/c81/2693", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "sweet_potato", "1612/c81/2694", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "potato_temporary", "1612/c81/2695", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "sugar_cane", "1612/c81/2696", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "forage_cane", "1612/c81/40470", "1974-1987", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "onion", "1612/c81/2697", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "rye", "1612/c81/2698", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "barley", "1612/c81/2699", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "pea", "1612/c81/2700", "1988-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "broad_bean", "1612/c81/2701", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "beans_temporary", "1612/c81/2702", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "tobacco", "1612/c81/2703", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "sunflower_seeds", "1612/c81/109179", "2005-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "jute_fiber", "1612/c81/2704", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "linen_seeds", "1612/c81/2705", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "malva_fiber", "1612/c81/2706", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "castor_bean", "1612/c81/2707", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "cassava", "1612/c81/2708", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "watermelon", "1612/c81/2709", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "melon", "1612/c81/2710", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "corn_temporary", "1612/c81/2711", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "ramie_fiber", "1612/c81/2712", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "soybean", "1612/c81/2713", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "sorghum", "1612/c81/2714", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "tomato", "1612/c81/2715", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "wheat", "1612/c81/2716", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "triticale", "1612/c81/109180", "2005-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    ## PRODES
 
-    ### Categories within permanent crops
+    "prodes", "prodes", NA, "2000-2022", NA, "http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=$year$&estado=&ordem=MUNICIPIO&type=tabela&output=txt&",
 
-    "PAM-IBGE", "permanent_total", "1613/c82/0", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "avocado", "1613/c82/2717", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "cotton_arboreo", "1613/c82/2718", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "acai", "1613/c82/45981", "2015-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "olive", "1613/c82/2719", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "banana", "1613/c82/2720", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "rubber_coagulated_latex", "1613/c82/2721", "1981-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "rubber_liquid_latex", "1613/c82/40472", "1981-1987", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "cocoa_beans", "1613/c82/2722", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "coffee_total", "1613/c82/2723", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "coffee_arabica", "1613/c82/31619", "2012-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "coffee_canephora", "1613/c82/31620", "2012-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "cashew", "1613/c82/40473", "1974-1987", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "khaki", "1613/c82/2724", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "cashew_nut", "1613/c82/2725", "1988-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "india_tea", "1613/c82/2726", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "coconut", "1613/c82/2727", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "coconut_bunch", "1613/c82/2728", "1988-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "yerba_mate", "1613/c82/2729", "1981-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "fig", "1613/c82/2730", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "guava", "1613/c82/2731", "1988-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "guarana_seeds", "1613/c82/2732", "1981-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "orange", "1613/c82/2733", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "lemon", "1613/c82/2734", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "apple", "1613/c82/2735", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "papaya", "1613/c82/2736", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "mango", "1613/c82/2737", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "passion_fruit", "1613/c82/2738", "1988-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "quince", "1613/c82/2739", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "walnut", "1613/c82/2740", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "heart_of_palm", "1613/c82/90001", "1981-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "pear", "1613/c82/2741", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "peach", "1613/c82/2742", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "black_pepper", "1613/c82/2743", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "sisal_or_agave", "1613/c82/2744", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "tangerine", "1613/c82/2745", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "tung", "1613/c82/2746", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "annatto_seeds", "1613/c82/2747", "1981-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "PAM-IBGE", "grape", "1613/c82/2748", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    ## DETER
 
-    #########
-    ## PPM ##
-    #########
+    "deter", "deter_amz", NA, NA, NA, "http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-amz/shape",
+    "deter", "deter_cerrado", NA, NA, NA, "http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-cerrado/shape",
 
-    # Livestock
+    ## DEGRAD
 
-    "PPM-IBGE", "ppm_livestock_inventory", "3939", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021",
-    "PPM-IBGE", "ppm_sheep_farming", "95", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021",
-    "PPM-IBGE", "ppm_animal_origin_production", "74", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021",
-    "PPM-IBGE", "ppm_cow_farming", "94", "1974-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021",
-    "PPM-IBGE", "ppm_aquaculture", "3940", "2013-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021",
+    "degrad", "degrad", NA, "2007-2016", NA, "http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip",
 
-    ##########
-    ## PEVS ##
-    ##########
+    ## Imazon
 
-    ## Vegetal Extraction
+    "imazon", "imazon_shp", NA, "2020", "Municipality", "https://docs.google.com/uc?export=download&id=1JHc2J_U8VXHVuWVsi8wVBnNzZ37y1ehv",
 
-    "PEVS-IBGE", "pevs_forest_crops", "289", "1986-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
-    "PEVS-IBGE", "pevs_silviculture", "291", "1986-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
-    "PEVS-IBGE", "pevs_silviculture_area", "5930", "2013-2019", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
+    ## IBAMA
 
-    ###########
-    ## COMEX ##
-    ###########
+    "ibama", "embargoed_areas", NA, NA, "Municipality", "https://servicos.ibama.gov.br/ctf/publico/areasembargadas/downloadListaAreasEmbargadas.php",
+    "ibama", "distributed_fines", NA, NA, "Municipality", "https://dadosabertos.ibama.gov.br/dados/SICAFI/$state$/Quantidade/multasDistribuidasBensTutelados.csv",
+    "ibama", "collected_fines", NA, NA, "Municipality", "https://dadosabertos.ibama.gov.br/dados/SICAFI/$state$/Arrecadacao/arrecadacaobenstutelados.csv",
 
-    "COMEX-EXP-PROD_NCM", "comex_export_prod", NA, "1997-2021", NA, "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm",
-    "COMEX-IMP-PROD_NCM", "comex_import_prod", NA, "1997-2021", NA, "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm",
-    "COMEX-EXP-MUNIC_FIRM", "comex_export_mun", NA, "1997-2021", NA, "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun",
-    "COMEX-IMP-MUNIC_FIRM", "comex_import_mun", NA, "1997-2021", NA, "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun",
+    ## MapBiomas
 
-    ##########
-    ## INPE ##
-    ##########
+    "mapbiomas", "mapbiomas_cover", NA, "1985-2019", "Municipality, State", "https://mapbiomas-br-site.s3.amazonaws.com/",
+    "mapbiomas", "mapbiomas_transition", NA, "1985-2019", "Municipality, State", "https://mapbiomas-br-site.s3.amazonaws.com/",
+    "mapbiomas", "mapbiomas_deforestation_regeneration", NA, "1988-2017", "Municipality, State", "https://mapbiomas-br-site.s3.amazonaws.com/",
+    "mapbiomas", "mapbiomas_irrigation", NA, "2000-2019", "State, Biome", "https://mapbiomas-br-site.s3.amazonaws.com/",
+    "mapbiomas", "mapbiomas_grazing_quality", NA, "2010, 2018", NA, "https://mapbiomas-br-site.s3.amazonaws.com/",
+    "mapbiomas", "mapbiomas_mining", NA, "1985-2020", "Country, State, Municipality, Biome, Indigenous_Land", "https://mapbiomas-br-site.s3.amazonaws.com/",
+    "mapbiomas", "mapbiomas_fire", NA, "1985-2020", "State, Municipality", "https://mapbiomas-br-site.s3.amazonaws.com/",
+    "mapbiomas", "mapbiomas_water", NA, "1985-2022", "State, Municipality, Biome", "https://mapbiomas-br-site.s3.amazonaws.com/",
 
-    "PRODES-INPE", "prodes", NA, "2000-2020", NA, "http://www.dpi.inpe.br/prodesdigital",
-    "DETER-INPE", "deter_amz", NA, NA, NA, "http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-amz/shape",
-    "DETER-INPE", "deter_cerrado", NA, NA, NA, "http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-cerrado/shape",
-    "DEGRAD-INPE", "degrad", NA, "2007-2016", NA, "http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad",
+    ## TerraClimate
 
-    ###############
-    ## MapBiomas ##
-    ###############
+    "terraclimate", "max_temperature", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "terraclimate", "min_temperature", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "terraclimate", "wind_speed", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "terraclimate", "vapor_pressure_deficit", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "terraclimate", "vapor_pressure", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "terraclimate", "snow_water_equivalent", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "terraclimate", "shortwave_radiation_flux", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "terraclimate", "soil_moisture", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "terraclimate", "runoff", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "terraclimate", "precipitation", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "terraclimate", "potential_evaporation", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "terraclimate", "climatic_water_deficit", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "terraclimate", "water_evaporation", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "terraclimate", "palmer_drought_severity_index", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
 
-    "MAPBIOMAS", "mapbiomas_cover", NA, "1985-2019", "Municipality, State", "https://mapbiomas-br-site.s3.amazonaws.com/",
-    "MAPBIOMAS", "mapbiomas_transition", NA, "1985-2019", "Municipality, State", "https://mapbiomas-br-site.s3.amazonaws.com/",
-    "MAPBIOMAS", "mapbiomas_deforestation_regeneration", NA, "1988-2017", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
-    "MAPBIOMAS", "mapbiomas_irrigation", NA, "2000-2019", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
-    "MAPBIOMAS", "mapbiomas_grazing_quality", NA, "2010 & 2018", "State", "https://mapbiomas-br-site.s3.amazonaws.com/",
-    "MAPBIOMAS", "mapbiomas_mining", NA, "1985-2020", "Country, State, Municipality, Biome, Indigenous", "https://mapbiomas-br-site.s3.amazonaws.com/",
-    "MAPBIOMAS", "mapbiomas_fire", NA, "1985-2020", "State, Municipality", "https://mapbiomas-br-site.s3.amazonaws.com/",
-    "MAPBIOMAS", "mapbiomas_water", NA, "1985-2022", "State, Municipality, Biome", "https://mapbiomas-br-site.s3.amazonaws.com/",
+    ## SEEG
 
-    #############
-    ## SIGMINE ##
-    #############
+    "seeg", "seeg", NA, "1970-2021", "Country, State, Municipality", "https://seeg-br.s3.amazonaws.com/Estat%C3%ADsticas/SEEG10/1-SEEG10_GERAL-BR_UF_2022.10.27-FINAL-SITE.xlsx",
+    "seeg", "seeg_farming", NA, "1970-2021", "Country, State, Municipality", "https://seeg-br.s3.amazonaws.com/Estat%C3%ADsticas/SEEG10/1-SEEG10_GERAL-BR_UF_2022.10.27-FINAL-SITE.xlsx",
+    "seeg", "seeg_industry", NA, "1970-2021", "Country, State, Municipality", "https://seeg-br.s3.amazonaws.com/Estat%C3%ADsticas/SEEG10/1-SEEG10_GERAL-BR_UF_2022.10.27-FINAL-SITE.xlsx",
+    "seeg", "seeg_energy", NA, "1970-2021", "Country, State, Municipality", "https://seeg-br.s3.amazonaws.com/Estat%C3%ADsticas/SEEG10/1-SEEG10_GERAL-BR_UF_2022.10.27-FINAL-SITE.xlsx",
+    "seeg", "seeg_land", NA, "1970-2021", "Country, State, Municipality", "https://seeg-br.s3.amazonaws.com/Estat%C3%ADsticas/SEEG10/1-SEEG10_GERAL-BR_UF_2022.10.27-FINAL-SITE.xlsx",
+    "seeg", "seeg_residuals", NA, "1970-2021", "Country, State, Municipality", "https://seeg-br.s3.amazonaws.com/Estat%C3%ADsticas/SEEG10/1-SEEG10_GERAL-BR_UF_2022.10.27-FINAL-SITE.xlsx",
 
-    "ANM-SIGMINE", "sigmine_active", NA, NA, NA, "https://app.anm.gov.br/dadosabertos/SIGMINE/PROCESSOS_MINERARIOS/BRASIL.zip",
+    ## Censo Agro
 
-    ##########
-    ## SEEG ##
-    ##########
+    "censoagro" , "agricultural_land_area" , "263" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "censoagro" , "agricultural_area_use" , "264" , "1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "censoagro" , "agricultural_employees_tractors" , "265" , "1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "censoagro" , "agricultural_producer_condition" , "280" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "censoagro" , "animal_production" , "281" , "1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "censoagro" , "animal_products" , "282" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "censoagro" , "vegetable_production_area" , "283" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "censoagro" , "vegetable_production_permanent" , "1730" , "1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "censoagro" , "vegetable_production_temporary" , "1731" , "1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
+    "censoagro" , "livestock_production" , "6907" , "2017" , "Municipality" , "https://sidra.ibge.gov.br/tabela/6907" ,
 
-    "SEEG", "seeg", NA, NA, "Country, State, Municipality", "http://seeg.eco.br/download",
+    #################
+    ## Social data ##
+    #################
 
-    #########
-    ## IPS ##
-    #########
+    ## IPS
 
+    "ips", "all", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
+    "ips", "life_quality", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
+    "ips", "sanit_habit", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
+    "ips", "violence", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
+    "ips", "educ", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
+    "ips", "communic", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
+    "ips", "mortality", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
+    "ips", "deforest", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
 
-    "IPS", "ips", NA, "2014 and/or 2018 and/or 2021 and/or 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
+    ## DATASUS
 
+    "datasus", "datasus_sim_do", NA, "1996-2021", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DORES/$file_name$",
+    "datasus", "datasus_sim_dofet", NA, "1996-2021", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DOFET/$file_name$",
+    "datasus", "datasus_sim_doext", NA, "1996-2021", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DOFET/$file_name$",
+    "datasus", "datasus_sim_doinf", NA, "1996-2021", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DOFET/$file_name$",
+    "datasus", "datasus_sim_domat", NA, "1996-2021", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DOFET/$file_name$",
+    "datasus", "datasus_cnes_lt", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/LT/$file_name$",
+    "datasus", "datasus_cnes_st", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/ST/$file_name$",
+    "datasus", "datasus_cnes_dc", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/DC/$file_name$",
+    "datasus", "datasus_cnes_eq", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/EQ/$file_name$",
+    "datasus", "datasus_cnes_sr", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/SR/$file_name$",
+    "datasus", "datasus_cnes_hb", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/HB/$file_name$",
+    "datasus", "datasus_cnes_pf", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/PF/$file_name$",
+    "datasus", "datasus_cnes_ep", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/EP/$file_name$",
+    "datasus", "datasus_cnes_rc", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/RC/$file_name$",
+    "datasus", "datasus_cnes_in", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/IN/$file_name$",
+    "datasus", "datasus_cnes_ee", NA, "2007-2021", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/EE/$file_name$",
+    "datasus", "datasus_cnes_ef", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/EF/$file_name$",
+    "datasus", "datasus_cnes_gm", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/GM/$file_name$",
+    "datasus", "datasus_sih", NA, "2008-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIHSUS/200801_/dados/$file_name$",
 
-    ###########
-    ## IBAMA ##
-    ###########
+    ## IEMA
 
-    "IBAMA", "embargoed_areas", NA, NA, "Municipality", "https://servicos.ibama.gov.br/ctf/publico/areasembargadas/downloadListaAreasEmbargadas.php",
-    "IBAMA", "distributed_fines", NA, NA, "Municipality", "https://dadosabertos.ibama.gov.br/dados/SICAFI/",
-    "IBAMA", "collected_fines", NA, NA, "Municipality", "https://dadosabertos.ibama.gov.br/dados/SICAFI/",
+    "iema", "iema", NA, "2018", "Municipality", "https://drive.google.com/uc?export=download&id=10JMRtzu3k95vl8cQmHkVMQ9nJovvIeNl",
 
-    #################################################################
-    ## Other Economics Datasets IBGE - GDP Munic, Employment, Wage ##
-    #################################################################
+    ## Population
 
-    ## Municipal GDP ##
+    "population", "population", "6579", "2001-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/estimapop/tabelas",
 
-    "PIB_MUNIC-IBGE", "pibmunic", "5938", "2002-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pib-munic/tabelas",
+    ###################
+    ## Economic data ##
+    ###################
 
-    ## Labor Market Info ##
+    ## Comex
 
-    "CEMPRE-IBGE", "cempre", "6449", "2006-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/cempre/tabelas",
+    "comex", "comex_export_prod", NA, "1997-2023", NA, "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm/EXP_$year$.csv",
+    "comex", "comex_import_prod", NA, "1997-2023", NA, "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm/IMP_$year$.csv",
+    "comex", "comex_export_mun", NA, "1997-2023", NA, "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/EXP_$year$_MUN.csv",
+    "comex", "comex_import_mun", NA, "1997-2023", NA, "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/IMP_$year$_MUN.csv",
 
-    ## Population ##
+    ## BACI
 
-    "POPULATION-IBGE", "population", "6579", "2001-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/estimapop/tabelas",
+    "baci", "HS92", NA, "1995-2020", "Country", "http://www.cepii.fr/DATA_DOWNLOAD/baci/data/baci_HS92_V202201.zip",
 
-    ######################################
-    ## Censo Agropecuario - Time Series ##
-    ######################################
+    ## PIB-Munic
 
-    "CENSO_AGRO-IBGE" , "agricultural_land_area" , "263" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "CENSO_AGRO-IBGE" , "agricultural_area_use" , "264" , "1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "CENSO_AGRO-IBGE" , "agricultural_employees_tractors" , "265" , "1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "CENSO_AGRO-IBGE" , "agricultural_producer_condition" , "280" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "CENSO_AGRO-IBGE" , "animal_production" , "281" , "1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "CENSO_AGRO-IBGE" , "animal_products" , "282" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "CENSO_AGRO-IBGE" , "vegetable_production_area" , "283" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "CENSO-AGRO-IBGE" , "vegetable_production_permanent" , "1730" , "1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "CENSO-AGRO-IBGE" , "vegetable_production_temporary" , "1731" , "1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "CENSO-AGRO-IBGE" , "livestock_production" , "6907" , "2017" , "Municipality" , "https://sidra.ibge.gov.br/tabela/6907" ,
+    "pibmunic", "pibmunic", "5938", "2002-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pib-munic/tabelas",
 
-    ##################
-    ## TerraClimate ##
-    ##################
+    ## CEMPRE
 
-    "TerraClimate", "max_temperature", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "TerraClimate", "min_temperature", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "TerraClimate", "wind_speed", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "TerraClimate", "vapor_pressure_deficit", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "TerraClimate", "vapor_pressure", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "TerraClimate", "snow_water_equivalent", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "TerraClimate", "shortwave_radiation_flux", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "TerraClimate", "soil_moisture", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "TerraClimate", "runoff", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "TerraClimate", "precipitation", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "TerraClimate", "potential_evaporation", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "TerraClimate", "climatic_water_deficit", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "TerraClimate", "water_evaporation", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "TerraClimate", "palmer_drought_severity_index", NA, "1958-2020", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
+    "cempre", "cempre", "6449", "2006-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/cempre/tabelas",
 
-    #####################
-    ## Health Datasets ##
-    #####################
+    ## PAM
 
-    "DATASUS", "datasus_sim_do", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DORES/",
-    "DATASUS", "datasus_sim_dofet", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DOFET/",
-    "DATASUS", "datasus_sim_doext", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DOFET/",
-    "DATASUS", "datasus_sim_doinf", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DOFET/",
-    "DATASUS", "datasus_sim_domat", NA, "1996-2020", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DOFET/",
-    "DATASUS", "datasus_cnes_lt", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/LT/",
-    "DATASUS", "datasus_cnes_st", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/ST/",
-    "DATASUS", "datasus_cnes_dc", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/DC/",
-    "DATASUS", "datasus_cnes_eq", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/EQ/",
-    "DATASUS", "datasus_cnes_sr", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/SR/",
-    "DATASUS", "datasus_cnes_hb", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/HB/",
-    "DATASUS", "datasus_cnes_pf", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/PF/",
-    "DATASUS", "datasus_cnes_ep", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/EP/",
-    "DATASUS", "datasus_cnes_rc", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/RC/",
-    "DATASUS", "datasus_cnes_in", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/IN/",
-    "DATASUS", "datasus_cnes_ee", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/EE",
-    "DATASUS", "datasus_cnes_ef", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/EF/",
-    "DATASUS", "datasus_cnes_gm", NA, "2005-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/GM/",
-    "DATASUS", "datasus_sih", NA, "2008-2022", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIHSUS/200801_/dados/",
+    "pam", "all_crops", "5457/all/all", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "permanent_crops", "1613/all/all", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "temporary_crops", "1612/all/all", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "corn", "839/all/all", "2003-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "potato", "1001/all/all", "2003-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "peanut", "1000/all/all", "2003-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "beans", "1002/all/all", "2003-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
 
-    ##########
-    ## IEMA ##
-    ##########
+    # Categories within temporary crops
 
-    "IEMA", "iema", NA, "2018", "Municipality", "https://drive.google.com/uc?export=download&id=10JMRtzu3k95vl8cQmHkVMQ9nJovvIeNl",
+    "pam", "temporary_total", "1612/c81/0", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "pineapple", "1612/c81/2688", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "alfafa", "1612/c81/40471", "1974-1987", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "cotton_herbaceous", "1612/c81/2689", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "garlic", "1612/c81/2690", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "peanut_temporary", "1612/c81/2691", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "rice", "1612/c81/2692", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "oats", "1612/c81/2693", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "sweet_potato", "1612/c81/2694", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "potato_temporary", "1612/c81/2695", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "sugar_cane", "1612/c81/2696", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "forage_cane", "1612/c81/40470", "1974-1987", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "onion", "1612/c81/2697", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "rye", "1612/c81/2698", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "barley", "1612/c81/2699", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "pea", "1612/c81/2700", "1988-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "broad_bean", "1612/c81/2701", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "beans_temporary", "1612/c81/2702", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "tobacco", "1612/c81/2703", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "sunflower_seeds", "1612/c81/109179", "2005-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "jute_fiber", "1612/c81/2704", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "linen_seeds", "1612/c81/2705", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "malva_fiber", "1612/c81/2706", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "castor_bean", "1612/c81/2707", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "cassava", "1612/c81/2708", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "watermelon", "1612/c81/2709", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "melon", "1612/c81/2710", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "corn_temporary", "1612/c81/2711", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "ramie_fiber", "1612/c81/2712", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "soybean", "1612/c81/2713", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "sorghum", "1612/c81/2714", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "tomato", "1612/c81/2715", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "wheat", "1612/c81/2716", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "triticale", "1612/c81/109180", "2005-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
 
-    ##########
-    ## SEEG ##
-    ##########
+    # Categories within permanent crops
 
-    "SEEG", "seeg_farming", NA, "1970-2021", "Country, State, Municipality", "http://seeg.eco.br/download",
-    "SEEG", "seeg_industry", NA, "1970-2021", "Country, State, Municipality", "http://seeg.eco.br/download",
-    "SEEG", "seeg_energy", NA, "1970-2021", "Country, State, Municipality", "http://seeg.eco.br/download",
-    "SEEG", "seeg_land", NA, "1970-2021", "Country, State, Municipality", "http://seeg.eco.br/download",
-    "SEEG", "seeg_residuals", NA, "1970-2021", "Country, State, Municipality", "http://seeg.eco.br/download",
+    "pam", "permanent_total", "1613/c82/0", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "avocado", "1613/c82/2717", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "cotton_arboreo", "1613/c82/2718", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "acai", "1613/c82/45981", "2015-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "olive", "1613/c82/2719", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "banana", "1613/c82/2720", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "rubber_coagulated_latex", "1613/c82/2721", "1981-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "rubber_liquid_latex", "1613/c82/40472", "1981-1987", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "cocoa_beans", "1613/c82/2722", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "coffee_total", "1613/c82/2723", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "coffee_arabica", "1613/c82/31619", "2012-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "coffee_canephora", "1613/c82/31620", "2012-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "cashew", "1613/c82/40473", "1974-1987", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "khaki", "1613/c82/2724", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "cashew_nut", "1613/c82/2725", "1988-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "india_tea", "1613/c82/2726", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "coconut", "1613/c82/2727", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "coconut_bunch", "1613/c82/2728", "1988-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "yerba_mate", "1613/c82/2729", "1981-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "fig", "1613/c82/2730", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "guava", "1613/c82/2731", "1988-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "guarana_seeds", "1613/c82/2732", "1981-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "orange", "1613/c82/2733", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "lemon", "1613/c82/2734", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "apple", "1613/c82/2735", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "papaya", "1613/c82/2736", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "mango", "1613/c82/2737", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "passion_fruit", "1613/c82/2738", "1988-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "quince", "1613/c82/2739", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "walnut", "1613/c82/2740", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "heart_of_palm", "1613/c82/90001", "1981-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "pear", "1613/c82/2741", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "peach", "1613/c82/2742", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "black_pepper", "1613/c82/2743", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "sisal_or_agave", "1613/c82/2744", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "tangerine", "1613/c82/2745", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "tung", "1613/c82/2746", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "annatto_seeds", "1613/c82/2747", "1981-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
+    "pam", "grape", "1613/c82/2748", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
 
-    ##########
-    ## BACI ##
-    ##########
+    ## PEVS
 
-    "BACI", "HS92", NA, "1995-2020", "Country", "http://www.cepii.fr/DATA_DOWNLOAD/baci/data/BACI_HS92_V202201.zip",
+    "pevs", "pevs_forest_crops", "289", "1986-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
+    "pevs", "pevs_silviculture", "291", "1986-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
+    "pevs", "pevs_silviculture_area", "5930", "2013-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
 
-    ############
-    ## IMAZON ##
-    ############
+    ## PPM
 
-    "Imazon", "imazon_shp", NA, "2020", "Municipality", "https://docs.google.com/uc?export=download&id=1JHc2J_U8VXHVuWVsi8wVBnNzZ37y1ehv",
+    "ppm", "ppm_livestock_inventory", "3939", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021",
+    "ppm", "ppm_sheep_farming", "95", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021",
+    "ppm", "ppm_animal_origin_production", "74", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021",
+    "ppm", "ppm_cow_farming", "94", "1974-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021",
+    "ppm", "ppm_aquaculture", "3940", "2013-2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021",
 
-    #########
-    ## EPE ##
-    #########
+    ## SIGMINE
 
-    "EPE", "energy_consumption_per_class", NA, "2004-2021", "Region, Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/Documents/CONSUMO%20MENSAL%20DE%20ENERGIA%20EL%c3%89TRICA%20POR%20CLASSE.xls",
-    "EPE", "national_energy_balance", NA, "2011-2022", "Region, Municipality", "https://drive.google.com/file/d/1_JTYyAPdbQayR-nrURts6OmbKcm2cLix/view?usp=share_link",
+    "sigmine", "sigmine_active", NA, NA, NA, "https://app.anm.gov.br/dadosabertos/SIGMINE/PROCESSOS_MINERARIOS/BRASIL.zip",
 
-    ###########
-    ## ANEEL ##
-    ###########
+    ## ANEEL
 
-    "ANEEL", "energy_development_budget", NA, "2013-2022", NA, "https://drive.google.com/file/d/1h7mu-9qbKfISk1-k4JSrBhXKBMQHTOH9/view?usp=share_link",
-    "ANEEL", "energy_generation", NA, "1908-2021", "Municipality", "https://git.aneel.gov.br/publico/centralconteudo/-/raw/main/relatorioseindicadores/geracao/BD_SIGA.xlsx?inline=false",
-    "ANEEL", "energy_enterprises_distributed", NA, NA, NA, "https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/b1bd71e7-d0ad-4214-9053-cbd58e9564a7/download/empreendimento-geracao-distribuida.csv",
+    "aneel", "energy_development_budget", NA, "2013-2022", NA, "https://drive.google.com/file/d/1h7mu-9qbKfISk1-k4JSrBhXKBMQHTOH9/view?usp=share_link",
+    "aneel", "energy_generation", NA, "1908-2021", "Municipality", "https://git.aneel.gov.br/publico/centralconteudo/-/raw/main/relatorioseindicadores/geracao/BD_SIGA.xlsx?inline=false",
+    "aneel", "energy_enterprises_distributed", NA, NA, NA, "https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/b1bd71e7-d0ad-4214-9053-cbd58e9564a7/download/empreendimento-geracao-distribuida.csv",
+
+    ## EPE
+
+    "epe", "energy_consumption_per_class", NA, "2004-2021", "Region, Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/Documents/CONSUMO%20MENSAL%20DE%20ENERGIA%20EL%c3%89TRICA%20POR%20CLASSE.xls",
+    "epe", "national_energy_balance", NA, "2011-2022", NA, "https://drive.google.com/file/d/1_JTYyAPdbQayR-nrURts6OmbKcm2cLix/view?usp=share_link",
 
     ## Shapefile from github repository
 
 
-    "Internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds",
+    "internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds",
   )
+
+  # returns only the desired rows
+
+  if (!is.null(source)) {
+
+    link <- link %>%
+      dplyr::filter(survey == source)
+  }
+
+  if (!is.null(dataset)) {
+
+    link <- link %>%
+      dplyr::filter(dataset == !!dataset)
+  }
+
+  if(url) {
+    link <- link %>%
+      purrr::pluck("link")
+  }
 
   return(link)
 }
