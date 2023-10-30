@@ -4,19 +4,12 @@
 \alias{load_prodes}
 \title{PRODES - Deforestation Monitoring Project in the Legal Amazon by Satellite}
 \usage{
-load_prodes(
-  dataset = "prodes",
-  raw_data = FALSE,
-  time_period,
-  language = "eng"
-)
+load_prodes(dataset, raw_data = FALSE, language = "eng")
 }
 \arguments{
-\item{dataset}{A dataset name ("prodes").}
+\item{dataset}{A dataset name ("deforestation").}
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
-
-\item{time_period}{A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.}
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.}
 }
@@ -24,15 +17,14 @@ load_prodes(
 A \code{tibble} with the selected data.
 }
 \description{
-Loads information on clearcut deforestation in the Legal Amazon and annual deforestation rates in the region.
+Loads data on deforestation in the Legal Amazon region.
 }
 \examples{
 \dontrun{
-# Download treated data (raw_data = FALSE) from 2010 (time_period = 2010)
+# Download treated data (raw_data = FALSE)
 # in portuguese (language = 'pt').
 data <- load_prodes(
   raw_data = FALSE,
-  time_period = 2010,
   language = "pt"
 )
 }

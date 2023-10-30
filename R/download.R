@@ -463,6 +463,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source %in% c("seeg", "iema", "ips")) {
     file_extension <- ".xlsx"
   }
+  if (source == "prodes") {
+    file_extension <- ".txt"
+  }
   if (source == "terraclimate") {
     file_extension <- ".nc"
   }
@@ -569,10 +572,20 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ##### Exceptions only #####
 
   if (file_extension == ".zip") {
-    if (param$source %in% c("degrad", "deter", "sigmine", "prodes")) {
-      # reading shapefile
-      file <- list.files(dir, pattern = "*.shp", full.names = TRUE)
-      dat <- sf::read_sf(file)
+    if (param$dataset == "degrad") {
+      dat <- sf::read_sf(file.path(dir, param$file_name))
+      dat$year <- param$year
+    }
+    if (param$source == "deter") {
+      if (param$dataset == "deter_amz"){
+        dat <- sf::read_sf(file.path(dir, "deter-amz-deter-public.shp"))
+      }
+      if (param$dataset == "deter_cerrado"){
+        dat <- sf::read_sf(file.path(dir, "deter_public.shp"))
+      }
+    }
+    if (param$source == "sigmine") {
+      dat <- sf::read_sf(file.path(dir, "BRASIL.shp"))
     }
 
     if (param$source == "ibama") {
@@ -652,7 +665,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       dat <- data.table::fread(temp)
     }
     if (file_extension == ".txt") {
-      dat <- readr::read_csv(temp, locale = readr::locale(encoding = "latin1"))
+      dat <- readr::read_csv(temp)
     }
     if (file_extension == ".nc") {
       dat <- terra::rast(temp)
@@ -696,8 +709,7 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
     ## PRODES
 
-    "prodes", "cumulative_deforestation", NA, "2007-2022", NA, "http://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/vector/accumulated_deforestation_2007.zip",
-    "prodes", "yearly_deforestation", NA, "2008-2022", NA, "http://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/vector/yearly_deforestation.zip",
+    "prodes", "deforestation", NA, "2000-2022", "Municipality", "http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2022&estado=&ordem=MUNICIPIO&type=tabela&output=txt&",
 
     ## DETER
 

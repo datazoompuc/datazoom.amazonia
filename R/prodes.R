@@ -1,19 +1,18 @@
 #' @title PRODES - Deforestation Monitoring Project in the Legal Amazon by Satellite
 #'
-#' @description Loads satellite data on deforestation in the Legal Amazon region.
+#' @description Loads data on deforestation in the Legal Amazon region.
 #'
-#' @param dataset A dataset name ("prodes").
+#' @param dataset A dataset name ("deforestation").
 #' @inheritParams load_baci
 #'
 #' @return A \code{tibble} with the selected data.
 #'
 #' @examples
 #' \dontrun{
-#' # Download treated data (raw_data = FALSE) from 2010 (time_period = 2010)
+#' # Download treated data (raw_data = FALSE)
 #' # in portuguese (language = 'pt').
 #' data <- load_prodes(
 #'   raw_data = FALSE,
-#'   time_period = 2010,
 #'   language = "pt"
 #' )
 #' }
@@ -65,31 +64,32 @@ load_prodes <- function(dataset, raw_data = FALSE,
   ## Data Engineering ##
   ######################
 
+  # keep only deforestation-related variables
+
   dat <- dat %>%
-    dplyr::bind_rows() %>%
-    dplyr::rename("incremento2000" = "Desmatamento2000") %>%
+    janitor::clean_names() %>%
+    dplyr::select(
+      municipio, cod_ibge, estado, area_km2, desmatamento2000, dplyr::starts_with("incremento")
+      )
+
+  # change to long format with increment variable
+
+  dat <- dat %>%
+    dplyr::rename("incremento2000" = "desmatamento2000") %>%
     tidyr::pivot_longer(
       dplyr::starts_with("incremento"),
       names_prefix = "incremento",
       names_to = "year",
       values_to = "increment"
-    ) %>%
-    dplyr::select(
-      year,
-      "municipality" = Municipio,
-      "municipality_code" = CodIbge,
-      "state" = Estado,
-      "area" = AreaKm2,
-      increment
     )
 
-  # calcutating cumulative deforestation
+  # calculating cumulative deforestation
 
   dat <- dat %>%
-    dplyr::arrange(municipality, year) %>%
+    dplyr::arrange(municipio, year) %>%
     dplyr::mutate(
       deforestation = cumsum(increment),
-      .by = municipality_code
+      .by = municipio
     )
 
   dat <- dat %>%
@@ -104,15 +104,19 @@ load_prodes <- function(dataset, raw_data = FALSE,
   ################################
 
   if (param$language == "eng") {
-    dat_mod <- dat
+    dat_mod <- dat %>%
+      dplyr::rename(
+        "municipality" = municipio,
+        "municipality_code" = cod_ibge,
+        "state" = estado
+      )
   }
   if (param$language == "pt") {
     dat_mod <- dat %>%
       dplyr::rename(
         "ano" = year,
-        "municipio" = municipality,
-        "cod_municipio" = municipality_code,
-        "uf" = state,
+        "cod_municipio" = "cod_ibge",
+        "uf" = estado,
         "incremento" = increment,
         "desmatamento" = deforestation
       )
