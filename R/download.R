@@ -700,6 +700,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
 datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
+  survey <- NULL
+
   link <- tibble::tribble(
     ~survey, ~dataset, ~sidra_code, ~available_time, ~available_geo, ~link,
 
@@ -713,8 +715,8 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
     ## DETER
 
-    "deter", "deter_amz", NA, NA, NA, "http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-amz/shape",
-    "deter", "deter_cerrado", NA, NA, NA, "http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-cerrado/shape",
+    "deter", "deter_amz", NA, "2016-2022", "Municipality", "http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-amz/shape",
+    "deter", "deter_cerrado", NA, "2018-2022", "Municipality", "http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-cerrado/shape",
 
     ## DEGRAD
 

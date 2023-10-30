@@ -26,8 +26,8 @@ load_prodes <- function(dataset, raw_data = FALSE,
   ## Bind Global Variables ##
   ###########################
 
-  year <- Municipio <- CodIbge <- Estado <- AreaKm2 <- increment <- NULL
-  municipality <- municipality_code <- state <- deforestation <- NULL
+  year <- municipio <- cod_ibge <- estado <- area_km2 <- increment <- NULL
+  municipality <- municipality_code <- state <- deforestation <- desmatamento2000 <- NULL
 
   #############################
   ## Define Basic Parameters ##

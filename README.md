@@ -190,7 +190,7 @@ onward in the Cerrado.
 The raw DETER data shows one warning per row, with each row also
 containing a municipality. However, many warnings actually overlap with
 2 or up to 4 municipalities, which are not shown in the original data.
-Therefore, when the option `raw_data = TRUE` is selected, the original
+Therefore, when the option `raw_data = FALSE` is selected, the original
 spatial information is intersected with a municipalities map of Brazil,
 and each warning can be split into more than one row, with each row
 corresponding to a municipality.

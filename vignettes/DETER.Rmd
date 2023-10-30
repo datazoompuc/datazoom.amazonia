@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 [DETER](http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter) uses satellite surveillance to detect and report changes in forest cover across the Legal Amazon and the Cerrado biome. Each data point consists of a warning, describing which type of change has affected a certain area of forest at a given date. Broadly speaking, it makes a distinction between events of deforestation, degradation and logging. The data extracted here spans from 2016 onward in the Amazon, and from 2018 onward in the Cerrado.
 
-The raw DETER data shows one warning per row, with each row also containing a municipality. However, many warnings actually overlap with 2 or up to 4 municipalities, which are not shown in the original data. Therefore, when the option `raw_data = TRUE` is selected, the original spatial information is intersected with a municipalities map of Brazil, and each warning can be split into more than one row, with each row corresponding to a municipality.
+The raw DETER data shows one warning per row, with each row also containing a municipality. However, many warnings actually overlap with 2 or up to 4 municipalities, which are not shown in the original data. Therefore, when the option `raw_data = FALSE` is selected, the original spatial information is intersected with a municipalities map of Brazil, and each warning can be split into more than one row, with each row corresponding to a municipality.
 
 ***
 **Options:**
