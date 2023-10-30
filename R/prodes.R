@@ -1,6 +1,6 @@
 #' @title PRODES - Deforestation Monitoring Project in the Legal Amazon by Satellite
 #'
-#' @description Loads information on clearcut deforestation in the Legal Amazon and annual deforestation rates in the region.
+#' @description Loads satellite data on deforestation in the Legal Amazon region.
 #'
 #' @param dataset A dataset name ("prodes").
 #' @inheritParams load_baci
@@ -20,8 +20,7 @@
 #'
 #' @export
 
-load_prodes <- function(dataset = "prodes", raw_data = FALSE,
-                        time_period,
+load_prodes <- function(dataset, raw_data = FALSE,
                         language = "eng") {
 
   ###########################
@@ -39,7 +38,6 @@ load_prodes <- function(dataset = "prodes", raw_data = FALSE,
   param$source <- "prodes"
   param$dataset <- dataset
   param$raw_data <- raw_data
-  param$time_period <- time_period
   param$language <- language
 
   # check if dataset and time_period are supported
@@ -54,8 +52,8 @@ load_prodes <- function(dataset = "prodes", raw_data = FALSE,
 
   dat <- external_download(
     dataset = param$dataset,
-    source = param$source,
-    year = 2022)
+    source = param$source
+    )
 
   ## Return Raw Data
 

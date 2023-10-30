@@ -460,9 +460,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   # googledrive links do not contain the file extension, for example
 
-  if (source == "prodes") {
-    file_extension <- ".txt"
-  }
   if (source %in% c("seeg", "iema", "ips")) {
     file_extension <- ".xlsx"
   }
@@ -572,21 +569,12 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ##### Exceptions only #####
 
   if (file_extension == ".zip") {
-    if (param$dataset == "degrad") {
-      dat <- sf::read_sf(file.path(dir, param$file_name))
-      dat$year <- param$year
+    if (param$source %in% c("degrad", "deter", "sigmine", "prodes")) {
+      # reading shapefile
+      file <- list.files(dir, pattern = "*.shp", full.names = TRUE)
+      dat <- sf::read_sf(file)
     }
-    if (param$source == "deter") {
-      if (param$dataset == "deter_amz"){
-        dat <- sf::read_sf(file.path(dir, "deter-amz-deter-public.shp"))
-      }
-      if (param$dataset == "deter_cerrado"){
-        dat <- sf::read_sf(file.path(dir, "deter_public.shp"))
-      }
-    }
-    if (param$source == "sigmine") {
-      dat <- sf::read_sf(file.path(dir, "BRASIL.shp"))
-    }
+
     if (param$source == "ibama") {
 
       # get latest downloaded file (the name changes daily)
@@ -708,7 +696,8 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
     ## PRODES
 
-    "prodes", "prodes", NA, "2000-2022", NA, "http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=$year$&estado=&ordem=MUNICIPIO&type=tabela&output=txt&",
+    "prodes", "cumulative_deforestation", NA, "2007-2022", NA, "http://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/vector/accumulated_deforestation_2007.zip",
+    "prodes", "yearly_deforestation", NA, "2008-2022", NA, "http://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/vector/yearly_deforestation.zip",
 
     ## DETER
 
