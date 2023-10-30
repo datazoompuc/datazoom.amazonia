@@ -460,11 +460,11 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   # googledrive links do not contain the file extension, for example
 
-  if (source == "prodes") {
-    file_extension <- ".txt"
-  }
   if (source %in% c("seeg", "iema", "ips")) {
     file_extension <- ".xlsx"
+  }
+  if (source == "prodes") {
+    file_extension <- ".txt"
   }
   if (source == "terraclimate") {
     file_extension <- ".nc"
@@ -587,6 +587,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     if (param$source == "sigmine") {
       dat <- sf::read_sf(file.path(dir, "BRASIL.shp"))
     }
+
     if (param$source == "ibama") {
 
       # get latest downloaded file (the name changes daily)
@@ -664,7 +665,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       dat <- data.table::fread(temp)
     }
     if (file_extension == ".txt") {
-      dat <- readr::read_csv(temp, locale = readr::locale(encoding = "latin1"))
+      dat <- readr::read_csv(temp)
     }
     if (file_extension == ".nc") {
       dat <- terra::rast(temp)
@@ -699,6 +700,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
 datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
+  survey <- NULL
+
   link <- tibble::tribble(
     ~survey, ~dataset, ~sidra_code, ~available_time, ~available_geo, ~link,
 
@@ -708,12 +711,12 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
     ## PRODES
 
-    "prodes", "prodes", NA, "2000-2022", NA, "http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=$year$&estado=&ordem=MUNICIPIO&type=tabela&output=txt&",
+    "prodes", "deforestation", NA, "2000-2022", "Municipality", "http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2022&estado=&ordem=MUNICIPIO&type=tabela&output=txt&",
 
     ## DETER
 
-    "deter", "deter_amz", NA, NA, NA, "http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-amz/shape",
-    "deter", "deter_cerrado", NA, NA, NA, "http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-cerrado/shape",
+    "deter", "deter_amz", NA, "2016-2022", "Municipality", "http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-amz/shape",
+    "deter", "deter_cerrado", NA, "2018-2022", "Municipality", "http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-cerrado/shape",
 
     ## DEGRAD
 

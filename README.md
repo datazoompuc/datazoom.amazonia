@@ -139,33 +139,30 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 
 The PRODES project uses satellites to monitor deforestation in Brazil’s
 Legal Amazon. The raw data reports total and incremental (year-by-year)
-low-cut deforested area at the municipality level.
-
-The data made available in this package goes back to the year 2000, with
-ongoing updates. In line with INPE’s API, requesting data for an
-unavailable year does not yield an error, but rather a best effort
-response (columns regarding observation data are filled with default
-values).
+low-cut deforested area at the municipality level, going back to the
+year 2000.
 
 Data is collected based on the PRODES-year, which starts at August 1st
 and ends on July 31st. Accordingly, 2018 deforestation data covers the
 period from 01/08/2017 to 31/07/2018.
 
+INPE’s most recent data is now published at
+[TerraBrasilis](http://terrabrasilis.dpi.inpe.br/downloads/). We have
+refrained from updating to this new source, as it only contains detailed
+spatial data, rather than agregated, municipality-level data.
+
 ------------------------------------------------------------------------
 
 **Options:**
 
-1.  **dataset**: `"prodes"`
+1.  **dataset**: `"deforestation"`
 
 2.  **raw_data**: there are two options:
 
     - `TRUE`: if you want the data as it is originally.
     - `FALSE`: if you want the treated version of the data.
 
-3.  **time_period**: picks the years for which the data will be
-    downloaded
-
-4.  **language**: you can choose between Portuguese `("pt")` and English
+3.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`
 
 ------------------------------------------------------------------------
@@ -173,10 +170,9 @@ period from 01/08/2017 to 31/07/2018.
 **Examples:**
 
 ``` r
-# Download treated data (raw_data = FALSE) from 2010 (time_period = 2010) 
+# Download treated data (raw_data = FALSE)
 # in portuguese (language = 'pt').
 data <- load_prodes(raw_data = FALSE,
-                    time_period = 2010,
                     language = 'pt')  
 ```
 
@@ -194,7 +190,7 @@ onward in the Cerrado.
 The raw DETER data shows one warning per row, with each row also
 containing a municipality. However, many warnings actually overlap with
 2 or up to 4 municipalities, which are not shown in the original data.
-Therefore, when the option `raw_data = TRUE` is selected, the original
+Therefore, when the option `raw_data = FALSE` is selected, the original
 spatial information is intersected with a municipalities map of Brazil,
 and each warning can be split into more than one row, with each row
 corresponding to a municipality.
