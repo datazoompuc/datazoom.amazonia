@@ -70,8 +70,8 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
     "mapbiomas_cover", "any", "COBERTURA_COL8.0",
     "mapbiomas_transition", "state", "TRANSICOES_COL8.0",
     "mapbiomas_transition", "municipality", "TRANSICOES_COL8.0",
-    "mapbiomas_deforestation_regeneration", "state", "CITY STATE BIOME",
-    "mapbiomas_deforestation_regeneration", "municipality", "CITY STATE BIOME",
+    "mapbiomas_deforestation_regeneration", "state", "CITY_STATE_BIOME",
+    "mapbiomas_deforestation_regeneration", "municipality", "CITY_STATE_BIOME",
     "mapbiomas_irrigation", "state", "UF",
     "mapbiomas_irrigation", "biome", "BIOME",
     "mapbiomas_grazing_quality", "any", "BD_Qualidade",
@@ -253,15 +253,15 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
   ## Add transition columns
   if (param$dataset == "mapbiomas_transition" & param$geo_level == "municipality") {
     classes_mapbiomas <- dat %>%
-      dplyr::select(class_id:level_4) %>%
+      dplyr::select(class_id_to:level_4) %>%
       unique()
 
     from_classes <- classes_mapbiomas %>%
-      dplyr::rename(from_class = class_id) %>%
+      dplyr::rename(from_class = class_id_to) %>%
       dplyr::rename_with(~paste0("from_", .x), dplyr::starts_with("level_"))
 
     to_classes <- classes_mapbiomas %>%
-      dplyr::rename(to_class = class_id) %>%
+      dplyr::rename(to_class = class_id_to) %>%
       dplyr::rename_with(~paste0("to_", .x), dplyr::starts_with("level_"))
 
     dat <- dat %>%
