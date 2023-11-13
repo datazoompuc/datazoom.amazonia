@@ -23,6 +23,7 @@ URL: https://www.econ.puc-rio.br/datazoom/
 Depends: 
     R (>= 4.0)
 Imports:
+    withr,
     data.table,
     dplyr,
     Hmisc,
@@ -45,7 +46,9 @@ Suggests:
     knitr,
     RCurl,
     rmarkdown,
-    terra
+    terra,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
 LinkingTo: 
     Rcpp
 VignetteBuilder: 
