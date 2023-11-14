@@ -525,7 +525,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       download_method <- "googledrive"
     }
   }
-  if (source %in% c("deter", "terraclimate", "baci")) {
+  if (source %in% c("deter", "terraclimate", "baci", "sigmine")) {
     download_method <- "curl"
     quiet <- FALSE
   }
