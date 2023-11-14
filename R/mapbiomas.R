@@ -70,20 +70,16 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
     "mapbiomas_cover", "any", "COBERTURA_COL8.0",
     "mapbiomas_transition", "state", "TRANSICOES_COL8.0",
     "mapbiomas_transition", "municipality", "TRANSICOES_COL8.0",
-    "mapbiomas_deforestation_regeneration", "state", "CITY_STATE_BIOME",
     "mapbiomas_deforestation_regeneration", "municipality", "CITY_STATE_BIOME",
     "mapbiomas_irrigation", "state", "UF",
     "mapbiomas_irrigation", "biome", "BIOME",
     "mapbiomas_grazing_quality", "any", "BD_Qualidade",
-    "mapbiomas_mining", "country", "CITY_STATE_BIOME",
-    "mapbiomas_mining", "state", "CITY_STATE_BIOME",
-    "mapbiomas_mining", "biome", "CITY_STATE_BIOME",
     "mapbiomas_mining", "municipality", "CITY_STATE_BIOME",
     "mapbiomas_mining", "indigenous_land", "IL",
     "mapbiomas_water", "state", "states_annual",
     "mapbiomas_water", "biome", "biomes_annual",
     "mapbiomas_water", "municipality", "mun_annual",
-    "mapbiomas_fire", "state", "MUNICIPIOS-UF",
+    "mapbiomas_fire", "state", "ANNUAL",
     "mapbiomas_fire", "biome", "BIOMAS",
     "mapbiomas_fire", "municipality", "MUNICIPIOS-UF"
   )
@@ -227,33 +223,12 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
       dplyr::left_join(munic_codes, by = dplyr::join_by(city, state))
   }
 
-  if (param$geo_level == "municipality" & param$dataset == "mapbiomas_fire") {
-
-    munic_codes <- datazoom.amazonia::municipalities %>%
-      dplyr::select(state = name_state, city = municipality_mapbiomas, geo_code = code_muni) %>%
-      dplyr::mutate(state = toupper(state),
-                    city = toupper(city))
-
-
-    dat <- dat %>%
-      dplyr::left_join(munic_codes, by = dplyr::join_by(city, state))
-  }
-
-  if (param$geo_level == "municipality" &
-      (param$dataset == "mapbiomas_transition" | param$dataset == "mapbiomas_deforestation_regeneration") ) {
-    munic_biomes <- datazoom.amazonia::municipalities_biomes %>%
-      dplyr::select(feature_id, city = municipality_mapbiomas, geo_code = code_muni)
-
-    dat <- dat %>%
-      dplyr::select(-city) %>%
-      dplyr::left_join(munic_biomes, by = dplyr::join_by(feature_id))
-  }
-
 
   ## Add transition columns
+
   if (param$dataset == "mapbiomas_transition" & param$geo_level == "municipality") {
     classes_mapbiomas <- dat %>%
-      dplyr::select(class_id_to:level_4) %>%
+      dplyr::select(class_id_to:level_4_id_to) %>%
       unique()
 
     from_classes <- classes_mapbiomas %>%
@@ -323,15 +298,6 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
       dplyr::summarise(dplyr::across(dplyr::starts_with("x"), ~sum(.x, na.rm = TRUE)),
                        state = unique(state))
   }
-
-  if (param$dataset == "mapbiomas_fire" & param$geo_level == "state") {
-    dat <- dat %>%
-      dplyr::group_by(dplyr::across(-c(feature_id, city, geo_code, index, value))) %>%
-      dplyr::summarise(value = sum(value, na.rm = TRUE),
-                       state = unique(state))
-  }
-
-
 
   #################
   ## Translation ##
