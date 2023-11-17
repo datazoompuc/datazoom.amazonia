@@ -499,6 +499,8 @@ Click to see all dataset options
 5.  **legal_amazon_only**: if set to `TRUE`, only downloads data from
     the Legal Amazon region
 
+OBS: A good internet connection is needed, because the data is heavy.
+
 ------------------------------------------------------------------------
 
 **Examples:**
