@@ -188,39 +188,6 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
 
   }
 
-  if((param$dataset %in% c("mapbiomas_cover","mapbiomas_transition")) & (param$geo_level == "municipality")) {
-    dat <- dat %>%
-      dplyr::rename_with(dplyr::recode,
-                         "state_acronym" = "state")
-  }
-
-  ## Else
-  dat <- dat %>%
-    janitor::clean_names() %>%
-    tibble::as_tibble() %>%
-    dplyr::mutate_if(is.character, function(var) {
-      stringi::stri_trans_general(str = var, id = "Latin-ASCII")
-    })
-
-  dat <- dat %>%
-    dplyr::rename_with(dplyr::recode,
-        "uf" = "state",
-        "municipality" = "city",
-    )
-
-  if (param$geo_level == "municipality" &
-      !(param$dataset %in% c("mapbiomas_transition",
-                             "mapbiomas_deforestation_regeneration",
-                             "mapbiomas_fire"))) {
-
-    munic_codes <- datazoom.amazonia::municipalities %>%
-      dplyr::select(state = abbrev_state, city = municipality_mapbiomas, geo_code = code_muni)
-
-    dat <- dat %>%
-      dplyr::left_join(munic_codes, by = dplyr::join_by(city, state))
-  }
-
-
   ## Add transition columns
 
   if (param$dataset == "mapbiomas_transition" & param$geo_level == "municipality") {
@@ -253,41 +220,11 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
       values_to = "value"
     )
 
-  # Testing cover_level support
-  if (param$dataset == c("mapbiomas_cover") & param$cover_level != "none") {
-
-    ## Aggregating by Cover Level
-
-    dat <- dat %>%
-      tidyr::pivot_wider(
-        id_cols = dplyr::any_of(c(
-          "geo_code", "city",
-          "state", "year",
-          "biome", "feature_id"
-        )),
-        names_from = paste0("level_", param$cover_level),
-        values_from = value,
-        values_fn = ~sum(.x, na.rm = TRUE),
-        values_fill = NA
-      ) %>%
-      janitor::clean_names()
-  }
-
-  dat <- dat %>%
-    dplyr::select(-dplyr::any_of("category"))
-
   ## Aggregate by geo_level
   if (param$dataset == "mapbiomas_transition" | param$dataset == "mapbiomas_deforestation_regeneration") {
     dat <- dat %>%
       dplyr::group_by(dplyr::across(-c(feature_id, biome, value))) %>%
       dplyr::summarise(value = sum(value, na.rm = TRUE),
-                       state = unique(state))
-  }
-
-  if (param$dataset == "mapbiomas_cover") {
-    dat <- dat %>%
-      dplyr::group_by(dplyr::across(-c(feature_id, biome, dplyr::starts_with("x")))) %>%
-      dplyr::summarise(dplyr::across(dplyr::starts_with("x"), ~sum(.x, na.rm = TRUE)),
                        state = unique(state))
   }
 
