@@ -12,7 +12,7 @@
 #'   * For dataset "mapbiomas_water", can be "municipality", "state" or "biome".
 #'   * For dataset "mapbiomas_fire", can be only "state".
 #'   * Does not apply to other datasets.
-#' @param cover_level A \code{numeric} or \code{string} that indicates the cover aggregation level. Can be "0", "1", "2", "3", "4", or "none", which means no aggregation. Aggregation only supported for "mapbiomas_cover" dataset.
+#' @param cover_level A \code{numeric} or \code{string} that indicates the cover aggregation level. Can be "0", "1", "2", "3", "4", ranging from most to least aggregated. Aggregation only supported for "mapbiomas_cover" dataset.
 #'
 #' @return A \code{tibble}.
 #'
@@ -149,43 +149,42 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
   ## Data Engineering ##
   ######################
 
-  ## Treat mapbiomas_water
-  if (param$dataset == "mapbiomas_water") {
+  dat <- dat %>%
+    janitor::clean_names() %>%
+    dplyr::mutate_if(is.character, function(var) {
+      stringi::stri_trans_general(str = var, id = "Latin-ASCII")
+    })
 
-    dat_mod <- dat %>%
-      dplyr::relocate(dplyr::any_of(c("year", "name")))
+  if (param$dataset == "mapbiomas_cover") {
 
-    if (param$geo_level != "municipality") dat_mod <- dat_mod %>% dplyr::select(-code)
-    if (param$geo_level == "biome") dat_mod <- dat_mod %>% dplyr::rename(biome = name)
+    # Aggregate by cover_level
 
-    if (param$language == "pt") {
-      dat_mod <- dat_mod %>%
-        dplyr::rename_with(dplyr::recode,
-                           "code" = "cod_municipio",
-                           "state" = "estado",
-                           "name" = "estado",
-                           "year" = "ano",
-                           "area_ha" = "valor",
-                           "city" = "municipio",
-                           "biome" = "bioma"
-        )
+    if (param$cover_level != "4") {
+      # dropping higher cover levels
+      unwanted_levels <- paste0("level_", (as.numeric(param$cover_level)+1):4)
+      dat <- dat %>%
+        dplyr::select(-dplyr::all_of(unwanted_levels))
+
+    # sum all by-year variables up to the aggregation
+
+    dat <- dat %>%
+      dplyr::summarise(
+        dplyr::across(dplyr::starts_with("x"), ~ sum(., na.rm = TRUE)),
+        .by = c(
+          dplyr::any_of(c("municipality", "state", "biome", "geocode", "state_acronym"))
+          , dplyr::starts_with("level"))
+      )
     }
 
-    if (param$language == "eng") {
-      dat_mod <- dat_mod %>%
-        dplyr::rename_with(dplyr::recode,
-                           "code" = "municipality_code",
-                           "name" = "state",
-                           "area_ha" = "value",
-                           "city" = "municipality"
-        )
-      if (sheet == "mun_annual") {
-        (dplyr::rename_with(dplyr::recode,
-                            "name" = "biome"))
-      }
-    }
+    # reshaping
 
-    return(dat_mod)
+    dat <- dat %>%
+      tidyr::pivot_longer(
+        dplyr::starts_with("x"),
+        names_to = "year",
+        values_to = "value",
+        names_prefix = "x"
+      )
 
   }
 
@@ -292,9 +291,9 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
                        state = unique(state))
   }
 
-  #################
-  ## Translation ##
-  #################
+  ################################
+  ## Harmonizing Variable Names ##
+  ################################
 
   dat_mod <- dat %>%
     dplyr::rename_with(dplyr::recode,
