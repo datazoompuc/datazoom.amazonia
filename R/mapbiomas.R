@@ -47,6 +47,7 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
   ## Bind Global Variables ##
   ###########################
 
+  value <- NULL
 
   #############################
   ## Define Basic Parameters ##
