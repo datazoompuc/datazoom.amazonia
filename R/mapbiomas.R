@@ -155,7 +155,10 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
       stringi::stri_trans_general(str = var, id = "Latin-ASCII")
     })
 
-  if (param$dataset == "mapbiomas_cover") {
+  if (param$dataset %in% c("mapbiomas_cover", "mapbiomas_transition")) {
+
+    dat <- dat %>%
+      dplyr::select(-dplyr::contains("id"))
 
     # Aggregate by cover_level
 
@@ -163,7 +166,7 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
       # dropping higher cover levels
       unwanted_levels <- paste0("level_", (as.numeric(param$cover_level)+1):4)
       dat <- dat %>%
-        dplyr::select(-dplyr::all_of(unwanted_levels))
+        dplyr::select(-dplyr::contains(unwanted_levels))
 
     # sum all by-year variables up to the aggregation
 
@@ -172,7 +175,7 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
         dplyr::across(dplyr::starts_with("x"), ~ sum(., na.rm = TRUE)),
         .by = c(
           dplyr::any_of(c("municipality", "state", "biome", "geocode", "state_acronym"))
-          , dplyr::starts_with("level"))
+          , dplyr::contains("level"))
       )
     }
 
@@ -188,93 +191,32 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
 
   }
 
-  ## Add transition columns
-
-  if (param$dataset == "mapbiomas_transition" & param$geo_level == "municipality") {
-    classes_mapbiomas <- dat %>%
-      dplyr::select(class_id_to:level_4_id_to) %>%
-      unique()
-
-    from_classes <- classes_mapbiomas %>%
-      dplyr::rename(from_class = class_id_to) %>%
-      dplyr::rename_with(~paste0("from_", .x), dplyr::starts_with("level_"))
-
-    to_classes <- classes_mapbiomas %>%
-      dplyr::rename(to_class = class_id_to) %>%
-      dplyr::rename_with(~paste0("to_", .x), dplyr::starts_with("level_"))
-
-    dat <- dat %>%
-      dplyr::left_join(from_classes, by = dplyr::join_by(from_class)) %>%
-      dplyr::left_join(to_classes, by = dplyr::join_by(to_class)) %>%
-      dplyr::select(-dplyr::starts_with("level_"))
-
-  }
-
-  ## Create Longer Data - Years as a Variable
-
-  dat <- dat %>%
-    tidyr::pivot_longer(
-      cols = dplyr::starts_with("x"),
-      names_to = "year",
-      names_prefix = "x",
-      values_to = "value"
-    )
-
-  ## Aggregate by geo_level
-  if (param$dataset == "mapbiomas_transition" | param$dataset == "mapbiomas_deforestation_regeneration") {
-    dat <- dat %>%
-      dplyr::group_by(dplyr::across(-c(feature_id, biome, value))) %>%
-      dplyr::summarise(value = sum(value, na.rm = TRUE),
-                       state = unique(state))
-  }
-
   ################################
   ## Harmonizing Variable Names ##
   ################################
 
-  dat_mod <- dat %>%
-    dplyr::rename_with(dplyr::recode,
-      "name_pt_br" = param$geo_level
-    )
-
-  dat_mod <- dat_mod %>%
-    dplyr::relocate(dplyr::any_of(c("year", "state", "city", "geo_code", "biome", "indigenous_land")))
-
   if (param$language == "pt") {
     dat_mod <- dat_mod %>%
-      dplyr::rename_with(dplyr::recode,
-        "feature_id" = "id",
-        "class_id" = "id_classe",
-        "group" = "grupo",
-        "year" = "ano",
-        "value" = "valor",
-        "state" = "estado",
-        "municipality" = "municipio",
-        "city" = "municipio",
-        "geo_code" = "cod_municipio",
-        "biome" = "bioma",
-        "indigenous_land" = "terra_indigena",
+      dplyr::rename_with(~ dplyr::case_match(.,
+        "municipality" ~ "municipio",
+        "biome" ~ "bioma",
+        "geocode" ~ "cod_municipio",
+        "state_acronym" ~ "uf",
+        .default = .
       )
+    ) %>%
+      dplyr::rename_with(~ stringr::str_replace(., "to_level", "para_level")) %>%
+      dplyr::rename_with(~ stringr::str_replace(., "from_level", "de_level"))
   }
 
   if (param$language == "eng") {
     dat_mod <- dat_mod %>%
-      dplyr::rename_with(dplyr::recode,
-        "city" = "municipality",
-        "geo_code" = "municipality_code",
-        "codigobioma" = "biome_code",
-        "bioma" = "biome",
-        "uf" = "state",
-        "cod_tipo_mudanca_n1" = "code_type_change_l1",
-        "cod_tipo_mudanca_n2" = "code_type_change_l2",
-        "cod_classe_des_ou_reg" = "code_class_def_or_reg",
-        "tipo_mudanca_nivel1" = "type_change_level_1",
-        "tipo_mudanca_nivel2" = "type_change_level_2",
-        "cobertura_nivel_1" = "cover_level_1",
-        "cobertura_nivel_2" = "cover_level_2",
-        "cobertura_nivel_3" = "cover_level_3",
-        "cobertura_nivel_4" = "cover_level_4"
+      dplyr::rename_with(~ dplyr::case_match(.,
+        "geocode" ~ "municipality_code",
+        "state_acronym" ~ "state",
+        .default = .
       )
+    )
   }
 
   ####################
