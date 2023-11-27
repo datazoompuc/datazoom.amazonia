@@ -5,7 +5,7 @@
 \title{Censo Agropecuario}
 \usage{
 load_censoagro(
-  dataset = "censoagro",
+  dataset,
   raw_data = FALSE,
   geo_level,
   time_period,
@@ -13,11 +13,14 @@ load_censoagro(
 )
 }
 \arguments{
-\item{dataset}{A dataset name ("censoagro").}
+\item{dataset}{A dataset name ("agricultural_land_area", "agricultural_area_use", "agricultural_employees_tractors", "agricultural_producer_condition", "animal_species", "animal_products", "vegetable_production_area", "vegetable_production_permanent", "vegetable_production_temporary", "livestock_production").}
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
-\item{geo_level}{A \code{string} that defines the geographic level of the data. Can be one of "country", "state" or "municipality".}
+\item{geo_level}{A \code{string} that defines the geographic level of the data. Can be of "country" or "state".
+\itemize{
+\item For dataset "livestock_production", can be one of "country", "state", or "municipality"
+}}
 
 \item{time_period}{A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.}
 
@@ -27,13 +30,13 @@ load_censoagro(
 A \code{tibble}.
 }
 \description{
-Loads information on
+Loads information on agricultural establishments and activities
 }
 \examples{
 \dontrun{
 # Download total land area data at the country level in year 2006
 data <- load_censoagro(
-  dataset = "land_area_total",
+  dataset = "agricultural_land_area",
   raw_data = TRUE,
   geo_level = "country",
   time_period = 2006
@@ -42,12 +45,16 @@ data <- load_censoagro(
 # Download temporary production crops data by state (geo_level = "state") in year 2006
   in portuguese (language = "pt").
 data <- load_censoagro(
-  dataset = "production_temporary_crops",
+  dataset = "vegetable_production_temporary",
   raw_data = FALSE,
   geo_level = "state",
-  time_period = 2008:2010,
+  time_period = 1996,
   language = "pt"
 )
 }
+
+
+## We should include support for microregion/mesoregion
+
 
 }

@@ -55,12 +55,17 @@ load_ibama <- function(dataset,
   #############################
 
   param <- list()
+  param$source <- "ibama"
   param$dataset <- dataset
   param$language <- language
   param$raw_data <- raw_data
   param$states <- states
 
-  if (states == "all") {
+  # check if dataset is valid
+
+  check_params(param)
+
+  if (any(states == "all")) {
     param$states <- c("RO", "AC", "AM", "RR", "PA", "AP", "TO", "MA", "PI", "CE", "RN",
                       "PB", "PE", "AL", "SE", "BA", "MG", "ES", "RJ", "SP", "PR", "SC",
                       "RS", "MS", "MT", "GO", "DF")
@@ -81,7 +86,7 @@ load_ibama <- function(dataset,
         base::message(paste0("Downloading ", uf, " (", iteration, " out of ", length(param$states), ")"))
 
         external_download(
-          source = "ibama",
+          source = param$source,
           dataset = param$dataset,
           state = uf
         )

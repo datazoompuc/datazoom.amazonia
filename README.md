@@ -68,6 +68,7 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 | **[MAPBIOMAS](#mapbiomas)**       | *Land cover and land use*           |
 | **[TerraClimate](#terraclimate)** | *Climate data*                      |
 | **[SEEG](#seeg)**                 | *Greenhouse gas emission estimates* |
+| **[CENSOAGRO](#censoagro)**       | *Agriculture activities*            |
 
 </td>
 </tr>
@@ -138,33 +139,30 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 
 The PRODES project uses satellites to monitor deforestation in Brazil’s
 Legal Amazon. The raw data reports total and incremental (year-by-year)
-low-cut deforested area at the municipality level.
-
-The data made available in this package goes back to the year 2000, with
-ongoing updates. In line with INPE’s API, requesting data for an
-unavailable year does not yield an error, but rather a best effort
-response (columns regarding observation data are filled with default
-values).
+low-cut deforested area at the municipality level, going back to the
+year 2000.
 
 Data is collected based on the PRODES-year, which starts at August 1st
 and ends on July 31st. Accordingly, 2018 deforestation data covers the
 period from 01/08/2017 to 31/07/2018.
 
+INPE’s most recent data is now published at
+[TerraBrasilis](http://terrabrasilis.dpi.inpe.br/downloads/). We have
+refrained from updating to this new source, as it only contains detailed
+spatial data, rather than agregated, municipality-level data.
+
 ------------------------------------------------------------------------
 
 **Options:**
 
-1.  **dataset**: `"prodes"`
+1.  **dataset**: `"deforestation"`
 
 2.  **raw_data**: there are two options:
 
     - `TRUE`: if you want the data as it is originally.
     - `FALSE`: if you want the treated version of the data.
 
-3.  **time_period**: picks the years for which the data will be
-    downloaded
-
-4.  **language**: you can choose between Portuguese `("pt")` and English
+3.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`
 
 ------------------------------------------------------------------------
@@ -172,10 +170,9 @@ period from 01/08/2017 to 31/07/2018.
 **Examples:**
 
 ``` r
-# Download treated data (raw_data = FALSE) from 2010 (time_period = 2010) 
+# Download treated data (raw_data = FALSE)
 # in portuguese (language = 'pt').
 data <- load_prodes(raw_data = FALSE,
-                    time_period = 2010,
                     language = 'pt')  
 ```
 
@@ -193,7 +190,7 @@ onward in the Cerrado.
 The raw DETER data shows one warning per row, with each row also
 containing a municipality. However, many warnings actually overlap with
 2 or up to 4 municipalities, which are not shown in the original data.
-Therefore, when the option `raw_data = TRUE` is selected, the original
+Therefore, when the option `raw_data = FALSE` is selected, the original
 spatial information is intersected with a municipalities map of Brazil,
 and each warning can be split into more than one row, with each row
 corresponding to a municipality.
@@ -453,6 +450,15 @@ Lab’s [TerraClimate](https://www.climatologylab.org/terraclimate.html).
 The table below shows all possible variables to be extracted, which are
 chosen through the “dataset” parameter. Data ranges from 1958 to 2020.
 
+Netcdf files are downloaded from the
+[THREDDS](http://thredds.northwestknowledge.net:8080/thredds/terraclimate_catalog.html)
+web server, as recommended for rectangular subsets of the global data.
+
+<details>
+<summary>
+Click to see all dataset options
+</summary>
+
 | Dataset                       | Code | Description                                      |  Units   |
 |:------------------------------|:----:|:-------------------------------------------------|:--------:|
 | max_temperature               | tmax | Maximum 2-m Temperature                          |   degC   |
@@ -470,9 +476,7 @@ chosen through the “dataset” parameter. Data ranges from 1958 to 2020.
 | water_evaporation             | aet  | Actual Evapotranspiration                        |    mm    |
 | palmer_drought_severity_index | PDSI | Palmer Drought Severity Index                    | unitless |
 
-Netcdf files are downloaded from the
-[THREDDS](http://thredds.northwestknowledge.net:8080/thredds/terraclimate_catalog.html)
-web server, as recommended for rectangular subsets of the global data.
+</details>
 
 ------------------------------------------------------------------------
 
@@ -584,6 +588,89 @@ data <- load_seeg(dataset = "seeg_industry",
 🔴 This function uses the `googledrive` package to download data at the
 municipality level. In case of authentication errors, see
 [googledrive](#googledrive).
+
+## CENSOAGRO
+
+The census of agriculture collects information about agricultural
+establishments and the agricultural activities carried out there,
+covering characteristics of the producer and establishment, economy and
+employment in rural areas, livestock, farming and agroindustry.
+
+Data is collected by IBGE and is available at country, state and
+municipality level.
+
+------------------------------------------------------------------------
+
+**Options:**
+
+1.  **dataset**:there are 10 possible choices:
+
+    - `"agricultural_land_area"`: area and number of agricultural
+      properties
+    - `"agricultural_area_use"`: area of agricultural properties by use
+    - `"agricultural_employees_tractors"`: number of employees and
+      tractors in agricultural properties
+    - `"agricultural_producer_condition"`: condition of agricultural
+      producer, whether they own the land
+    - `"animal_production"`: number of animals farmed, by species
+    - `"animal_products"`: amount of animal products, by product type
+    - `"vegetable_production_area"`: area and amount produced, by
+      vegetable product
+    - `"vegetable_production_temporary"`: amount produced, by temporary
+      crop
+    - `"vegetable_production_permanent"`: amount produced, by permanent
+      crop
+    - `"livestock_production"`: amount of bovine cattle, and number of
+      agricultural properties
+
+2.  **raw_data**: there are two options:
+
+    - `TRUE`: if you want the data as it is originally.
+    - `FALSE`: if you want the treated version of the data.
+
+3.  **geo_level**: `"country"` or `"state"`. For dataset
+    `"livestock_production"`, it can also be `"municipality"`
+
+4.  **time_period**: picks the years for which the data will be
+    downloaded:
+
+    - For datasets `"agricultural_land_area"`,
+      `"agricultural_producer_condition"`, `"animal_products"`, and
+      `"vegetable_production_area"`, it can be one of 1920, 1940, 1950,
+      1960, 1970, 1975, 1980, 1985, 1995, or 2006.
+    - For datasets `"vegetable_production_permanent"` and
+      `"vegetable_production_permanent"`, it can only be from 1940
+      onwards
+    - For datasets `"agricultural_area_use"`,
+      `"agricultural_employees_tractors"`, `"animal_production"`, it can
+      only be from 1970 onwards
+    - For dataset `"livestock_production"`, it can only be 2017
+
+5.  **language**: you can choose between Portuguese `("pt")` and English
+    `("eng")`
+
+------------------------------------------------------------------------
+
+**Examples:**
+
+``` r
+# Download total land area data at the country level in year 2006
+ data <- load_censoagro(
+   dataset = "agricultural_land_area",
+   raw_data = TRUE,
+   geo_level = "country",
+   time_period = 2006
+ )
+
+ # Download temporary production crops data by state (geo_level = "state") in year 2006
+ # in portuguese (language = "pt")
+  data <- load_censoagro(
+   dataset = "vegetable_production_temporary",
+   raw_data = FALSE,
+   geo_level = "state",
+   time_period = 1996,
+   language = "pt"
+```
 
 # Social Data
 
@@ -1104,8 +1191,12 @@ link](https://www.ibge.gov.br/estatisticas/economicas/agricultura-e-pecuaria/911
 
 The datasets supported are shown in the tables below, made up of both
 the original databases and their narrower subsets. Note that downloading
-only specific crops is considerably faster. First, the datasets provided
-by IBGE in their entirety:
+only specific crops is considerably faster.
+
+<details>
+<summary>
+Full datasets provided by IBGE:
+</summary>
 
 | dataset         |
 |:----------------|
@@ -1117,7 +1208,11 @@ by IBGE in their entirety:
 | peanut          |
 | beans           |
 
+</details>
+<details>
+<summary>
 Datasets generated from Temporary Crops:
+</summary>
 
 | dataset           |          Name (pt)           |          Name (eng)           |
 |:------------------|:----------------------------:|:-----------------------------:|
@@ -1156,7 +1251,11 @@ Datasets generated from Temporary Crops:
 | triticale         |     Triticale (em Grao)      |     Triticale (in grain)      |
 | temporary_total   |            Total             |             Total             |
 
+</details>
+<details>
+<summary>
 Datasets generated from Permanent Crops:
+</summary>
 
 | dataset                 |          Name (pt)          |         Name (eng)         |
 |:------------------------|:---------------------------:|:--------------------------:|
@@ -1199,6 +1298,8 @@ Datasets generated from Permanent Crops:
 | annatto_seeds           |      Urucum (Semente)       |       Annatto (Seed)       |
 | grape                   |             Uva             |           Grape            |
 | permanent_total         |            Total            |           Total            |
+
+</details>
 
 **Examples:**
 

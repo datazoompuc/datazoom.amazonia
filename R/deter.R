@@ -1,11 +1,11 @@
 #' @title DETER - Forest Degradation in the Brazilian Amazon
 #'
-#' @description Loads information on changes in forest cover in the Amazon.
+#' @description Loads data on changes in forest cover in the Legal Amazon and the Cerrado biome.
 #'
-#' @param dataset A dataset name ("deter_amz", "deter_cerrado") with information about both Amazon and Cerrado
+#' @param dataset A dataset name ("deter_amz", "deter_cerrado") with information about the Legal Amazon and Cerrado, respectively
 #' @inheritParams load_baci
 #'
-#' @return A \code{tibble} (if \code{raw_data} = \code{TRUE}) or a \code{sf} object (if \code{raw_data} = \code{FALSE}).
+#' @return A \code{sf} object.
 #'
 #' @examples
 #' \dontrun{
@@ -25,7 +25,7 @@ load_deter <- function(dataset, raw_data = FALSE,
   ## Bind Global Variables ##
   ###########################
 
-  .data <- view_date <- name_muni <- code_muni <- sensor <- satellite <- NULL
+  .data <- view_date <- name_muni <- code_muni <- sensor <- satellite <- abbrev_state <- NULL
   uc <- classname <- path_row <- area <- quadrant <- geometry <- id_alerta <- NULL
 
   #############################
@@ -33,9 +33,14 @@ load_deter <- function(dataset, raw_data = FALSE,
   #############################
 
   param <- list()
+  param$source <- "deter"
   param$dataset <- dataset
   param$language <- language
   param$raw_data <- raw_data
+
+  # check if dataset is valid
+
+  check_params(param)
 
   #################
   ## Downloading ##
@@ -43,7 +48,7 @@ load_deter <- function(dataset, raw_data = FALSE,
 
   dat <- external_download(
     dataset = param$dataset,
-    source = "deter"
+    source = param$source
   )
 
   ## Return Raw Data
@@ -57,6 +62,7 @@ load_deter <- function(dataset, raw_data = FALSE,
   ######################
 
   dat <- dat %>%
+    janitor::clean_names() %>%
     dplyr::mutate(
       dplyr::across(
         dplyr::where(is.character),
@@ -95,8 +101,8 @@ load_deter <- function(dataset, raw_data = FALSE,
 
   dat <- dat %>%
     dplyr::select(
-      view_date, name_muni, code_muni, sensor, satellite,
-      classname, path_row, area, quadrant, geometry, id_alerta
+      view_date, name_muni, code_muni, abbrev_state,
+      area, geometry, id_alerta
     )
 
   ###################
@@ -109,9 +115,7 @@ load_deter <- function(dataset, raw_data = FALSE,
         "data" = view_date,
         "municipio" = name_muni,
         "cod_municipio" = code_muni,
-        "satelite" = satellite,
-        "classe" = classname,
-        "quadrante" = quadrant
+        "uf" = abbrev_state
       )
   }
 
@@ -121,7 +125,7 @@ load_deter <- function(dataset, raw_data = FALSE,
         "date" = view_date,
         "municipality" = name_muni,
         "municipality_code" = code_muni,
-        "class_name" = classname,
+        "state" = abbrev_state,
         "alert_id" = id_alerta
       )
   }

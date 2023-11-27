@@ -49,6 +49,7 @@ load_ppm <- function(dataset, raw_data = FALSE,
   #############################
 
   param <- list()
+  param$source <- "ppm"
   param$dataset <- dataset
   param$geo_level <- geo_level
   param$time_period <- time_period
@@ -65,25 +66,9 @@ load_ppm <- function(dataset, raw_data = FALSE,
     param$code <- param$dataset
   }
 
-  ## Check if year is acceptable
+  # check if dataset, geo_level, and time_period are supported
 
-  year_check <- datasets_link() %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(available_time) %>%
-    unlist() %>%
-    as.character() %>%
-    stringr::str_split(pattern = "-") %>%
-    unlist() %>%
-    as.numeric()
-
-  if (min(time_period) < year_check[1]) {
-    stop("Provided time period less than supported. Check documentation for time availability.")
-  }
-  if (max(time_period) > year_check[2]) {
-    stop("Provided time period greater than supported. Check documentation for time availability.")
-  }
-
-
+  check_params(param)
 
   ## Dataset
 

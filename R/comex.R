@@ -53,6 +53,7 @@ load_br_trade <- function(dataset, raw_data = FALSE,
   #############################
 
   param <- list()
+  param$source <- "comex"
   param$dataset <- dataset
   param$geo_level <- geo_level
   param$time_period <- time_period
@@ -64,6 +65,10 @@ load_br_trade <- function(dataset, raw_data = FALSE,
   # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncmv2/IMP_2012_V2.csv
   # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm/EXP_2010.csv
 
+  # check if dataset and time_period are valid
+
+  check_params(param)
+
   ##############
   ## Download ##
   ##############
@@ -73,7 +78,7 @@ load_br_trade <- function(dataset, raw_data = FALSE,
       function(t) {
         external_download(
           dataset = param$dataset,
-          source = "comex", year = t,
+          source = param$source, year = t,
           geo_level = param$geo_level
         )
       }

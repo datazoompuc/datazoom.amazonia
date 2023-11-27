@@ -32,16 +32,23 @@ load_epe <- function(dataset, raw_data = FALSE,
   #############################
 
   param <- list()
+  param$source <- "epe"
   param$dataset <- dataset
   param$raw_data <- raw_data
   param$language <- language
   param$geo_level <- geo_level
+
+  # check if dataset and geo_level valid
+
+  check_params(param)
 
   #################
   ## Downloading ##
   #################
 
   # Choosing which sheets to read
+
+  sheets_selected <- NULL # for when geo_level is not state, region, or subsystem
 
   if (param$geo_level == "state") {
     sheets_selected <- c(
@@ -71,7 +78,7 @@ load_epe <- function(dataset, raw_data = FALSE,
   }
 
   dat <- external_download(
-    source = "EPE",
+    source = param$source,
     dataset = param$dataset,
     year = param$time_period,
     sheet = sheets_selected
