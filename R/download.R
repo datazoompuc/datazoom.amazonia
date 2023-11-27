@@ -863,7 +863,6 @@ datasets_link <- function() {
     "MAPBIOMAS", "mapbiomas_transition", NA, "1985-2019", "Municipality, State", "https://brasil.mapbiomas.org/estatisticas/",
     "MAPBIOMAS", "mapbiomas_deforestation_regeneration", NA, "1988-2017", "State", "https://storage.googleapis.com/mapbiomas-public/initiatives/brasil/collection_8/downloads/tabela_desmatamento_vegetacao_secundaria_mapbiomas_col8.xlsx",
     "MAPBIOMAS", "mapbiomas_irrigation", NA, "2000-2019", "State", "https://mapbiomas-br-site.s3.amazonaws.com/downloads/Estatisticas%20/Colecao_7_Irrigacao_Biomes_UF.xlsx",
-    "MAPBIOMAS", "mapbiomas_grazing_quality", NA, "2010 & 2018", "State", "https://brasil.mapbiomas.org/estatisticas/Estat%C3%ADsticas/MapBIomas_COL5_QUALIDADE_PASTAGEM-biomas-estados-SITE.xlsx",
     "MAPBIOMAS", "mapbiomas_mining", NA, "1985-2020", "Country, State, Municipality, Biome, Indigenous", "https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2023/09/TABELA-MINERACAO-MAPBIOMAS-COL8.0.xlsx",
     "MAPBIOMAS", "mapbiomas_fire", NA, "1985-2020", "State, Municipality", "https://mapbiomas-br-site.s3.amazonaws.com/downloads/MB-Fogo-2-Biome-State.xlsx",
     "MAPBIOMAS", "mapbiomas_water", NA, "1985-2022", "State, Municipality, Biome", "https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Estatisticas_Superficie%C3%81gua_Col2_SITE.xlsx",

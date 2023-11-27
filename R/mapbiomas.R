@@ -2,15 +2,17 @@
 #'
 #' @description Loads information about land cover and use
 #'
-#' @param dataset A dataset name ("mapbiomas_cover", "mapbiomas_transition", "mapbiomas_irrigation", "mapbiomas_deforestation_regeneration", "mapbiomas_mining", "mapbiomas_grazing_quality", "mapbiomas_water" or "mapbiomas_fire")
+#' @param dataset A dataset name ("mapbiomas_cover", "mapbiomas_transition", "mapbiomas_irrigation", "mapbiomas_deforestation_regeneration", "mapbiomas_mining", "mapbiomas_water" or "mapbiomas_fire")
 #' @inheritParams load_baci
 #' @param geo_level A \code{string} that defines the geographic level of the data.
-#'   * For datasets "mapbiomas_cover", "mapbiomas_transition", "mapbiomas_deforestation_regeneration" and "mapbiomas_fire", can be "municipality" or "state" (faster download).
-#'   * For dataset "mapbiomas_mining", can be "indigenous_land", "municipality", "state", "biome" or "country".
+#'   * For datasets "mapbiomas_cover", "mapbiomas_transition" can be "municipality" or "state" (faster download).
+#'   * For dataset "mapbiomas_deforestation_regeneration" can be only "municipality".
+#'   * For dataset "mapbiomas_mining", can be "indigenous_land" or "municipality".
 #'   * For dataset "mapbiomas_irrigation", can be "state" or "biome".
 #'   * For dataset "mapbiomas_water", can be "municipality", "state" or "biome".
+#'   * For dataset "mapbiomas_fire", can be only "state".
 #'   * Does not apply to other datasets.
-#' @param cover_level A \code{numeric} or \code{string} that indicates the cover aggregation level. Can be "0", "1", "2", "3", "4", or "none", which means no aggregation. Aggregation only supported for "mapbiomas_cover" and "mapbiomas_grazing_quality" datasets.
+#' @param cover_level A \code{numeric} or \code{string} that indicates the cover aggregation level. Can be "0", "1", "2", "3", "4", or "none", which means no aggregation. Aggregation only supported for "mapbiomas_cover" dataset.
 #'
 #' @return A \code{tibble}.
 #'
@@ -73,15 +75,12 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
     "mapbiomas_deforestation_regeneration", "municipality", "CITY_STATE_BIOME",
     "mapbiomas_irrigation", "state", "UF",
     "mapbiomas_irrigation", "biome", "BIOME",
-    "mapbiomas_grazing_quality", "any", "BD_Qualidade",
     "mapbiomas_mining", "municipality", "CITY_STATE_BIOME",
     "mapbiomas_mining", "indigenous_land", "IL",
     "mapbiomas_water", "state", "states_annual",
     "mapbiomas_water", "biome", "biomes_annual",
     "mapbiomas_water", "municipality", "mun_annual",
     "mapbiomas_fire", "state", "ANNUAL",
-    "mapbiomas_fire", "biome", "BIOMAS",
-    "mapbiomas_fire", "municipality", "MUNICIPIOS-UF"
   )
 
   sheet <- sheets %>%
@@ -115,11 +114,6 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
 
   if(dataset %in% c("mapbiomas_irrigation")) {
     message("Data from Mapbiomas - Collection 7")
-    message("")
-  }
-
-  if(dataset %in% c("mapbiomas_grazing_quality")) {
-    message("Data from Mapbiomas - Collection 5")
     message("")
   }
 
@@ -213,8 +207,7 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
   if (param$geo_level == "municipality" &
       !(param$dataset %in% c("mapbiomas_transition",
                              "mapbiomas_deforestation_regeneration",
-                             "mapbiomas_fire",
-                             "mapbiomas_grazing_quality"))) {
+                             "mapbiomas_fire"))) {
 
     munic_codes <- datazoom.amazonia::municipalities %>%
       dplyr::select(state = abbrev_state, city = municipality_mapbiomas, geo_code = code_muni)
@@ -257,12 +250,7 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
     )
 
   # Testing cover_level support
-  if (param$dataset == "mapbiomas_grazing_quality" & !(param$cover_level %in% c(1, "1", "none"))) {
-    base::message("The \"mapbiomas_grazing_quality\" dataset only supports cover_level 1 or \"none\"")
-    param$cover_level <- 1
-  }
-
-  if (param$dataset %in% c("mapbiomas_cover", "mapbiomas_grazing_quality") & param$cover_level != "none") {
+  if (param$dataset == c("mapbiomas_cover") & param$cover_level != "none") {
 
     ## Aggregating by Cover Level
 
