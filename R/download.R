@@ -646,9 +646,17 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
     names(dat) <- param$sheet
   }
-  if (param$source == "aneel" & param$dataset == "energy_enterprises_distributed") {
-    dat <- data.table::fread(temp, encoding = "Latin-1")
+  if (param$source == "aneel") {
+
+    if (param$dataset == "energy_enterprises_distributed"){
+      dat <- data.table::fread(temp, encoding = "Latin-1")
+    }
+
+    else if (dataset == "energy_generation"){
+      dat <- readxl::read_xlsx(temp, sheet = param$sheet, skip = param$skip_rows, na = c("-", ""))
+    }
   }
+
   if (param$source == "ips") {
     dat <- param$sheet %>%
       purrr::map(
