@@ -39,9 +39,6 @@ For all datasets the unit of measurement is hectares(ha).
 
 
   3. **geo_level**:
-  
-  \vspace{0.1cm}
-  
      * For datasets `"mapbiomas_cover"`or `"mapbiomas_transition"` can be `"municipality"` or `"state"` (faster download).
      * For dataset `"mapbiomas_deforestation_regeneration"` can be only `"municipality"`.
      * For dataset `"mapbiomas_mining"`, can be `"indigenous_land"` or `"municipality"`.
