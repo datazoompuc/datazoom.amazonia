@@ -367,6 +367,8 @@ during given years.
 The data available has an yearly frequency and is available starting
 from the year 1989.
 
+For all datasets the unit of measurement is hectares(ha).
+
 ------------------------------------------------------------------------
 
 **Options:**
@@ -378,7 +380,6 @@ from the year 1989.
     - `"mapbiomas_deforestation_regeneration"`: deforestation and forest
       regeneration
     - `"mapbiomas_irrigation"`: irrigated areas
-    - `"mapbiomas_grazing_quality"`: grazing quality
     - `"mapbiomas_mining"`: areas used for mining
     - `"mapbiomas_water"`: areas of water surface
     - `"mapbiomas_fire"`: areas of wildfire burn scars
@@ -389,49 +390,32 @@ from the year 1989.
     - `FALSE`: if you want the treated version of the data.
 
 3.  **geo_level**:
-
-    - For datasets `"mapbiomas_cover"`, `"mapbiomas_transition"`,
-      `"mapbiomas_deforestation_regeneration"` and `"mapbiomas_fire"`,
-      can be `"municipality"` or `"state"` (faster download).
-    - For dataset `"mapbiomas_mining"`, can be `"indigenous_land"`,
-      `"municipality"`, `"state"`, `"biome"` or `"country"`.
+    - For datasets `"mapbiomas_cover"`or `"mapbiomas_transition"` can be
+      `"municipality"` or `"state"` (faster download).
+    - For dataset `"mapbiomas_deforestation_regeneration"` can be only
+      `"municipality"`.
+    - For dataset `"mapbiomas_mining"`, can be `"indigenous_land"` or
+      `"municipality"`.
     - For dataset `"mapbiomas_irrigation"`, can be `"state"` or
       `"biome"`.
     - For dataset `"mapbiomas_water"`, can be `"municipality"`,
       `"state"` or `"biome"`.
+    - For dataset `"mapbiomas_fire"`, can be only `"state"`.
     - Does not apply to other datasets.
 
 4.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`
-
-5.  **cover_level**: Aggregates the data to some level of land coverage.
-    Only applies to datasets `"mapbiomas_cover"` and
-    `"mapbiomas_grazing_quality"`:
-
-    - `cover_level = "none"`: no aggregation
-    - `cover_level = 0`: least aggregated, with categories of Anthropic
-      and Natural
-    - `cover_level = 1`: categories such as Forest, Non Forest Natural
-      Formation, Farming, Non Vegetated Area, Water, Non Observed
-    - `cover_level = 2`: categories such as Agriculture, Aquaculture,
-      Beach and Dune, Forest Plantation, Pasture, River, Lake and
-      Ocean  
-    - `cover_level = 3`: categories such as Aquaculture, Beach and Dune,
-      Forest Formation, Forest Plantation
-    - `cover_level = 4`: categories such as Aquaculture, Beach and Dune,
-      Forest Formation, Forest Plantation
 
 ------------------------------------------------------------------------
 
 **Examples:**
 
 ``` r
-# download treated Mapbiomas Cover data in english at the highest aggregation level
+# download treated Mapbiomas Cover data in english
 data <- load_mapbiomas(dataset = "mapbiomas_cover",
                        raw_data = FALSE,
                        geo_level = "municipality",
-                       language = "eng",
-                       cover_level = 0)
+                       language = "eng")
 
 # download treated Mapbiomas Transition data in portuguese
 data <- load_mapbiomas(dataset = "mapbiomas_transition", raw_data = FALSE,
