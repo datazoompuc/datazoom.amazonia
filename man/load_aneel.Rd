@@ -20,7 +20,7 @@ National Electric Energy Agency - ANEEL
 \dontrun{
 # download treated data about energy generation
 clean_aneel <- load_aneel(
-  dataset = "energy generation",
+  dataset = "energy_generation",
   raw_data = FALSE
 )
 }
