@@ -17,7 +17,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' # download treated Mapbiomas Cover data in english at the highest aggregation level
+#' # download treated Mapbiomas Cover data in english
 #' data <- load_mapbiomas(
 #'   dataset = "mapbiomas_cover",
 #'   raw_data = FALSE,
