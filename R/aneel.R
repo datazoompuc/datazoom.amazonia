@@ -155,8 +155,7 @@ load_aneel <- function(dataset, raw_data = FALSE, language = "eng") {
         "potencia_fiscalizada_k_w" = "potencia_fiscalizada_kw",
         "garantia_fisica_k_w" = "garantia_fisica_kw",
         "estado" = "sig_uf"
-      ) %>%
-      dplyr::mutate_all(~ ifelse(. == "-", NA, .))
+      )
   }
 
   if (param$language == "eng") {
@@ -219,8 +218,7 @@ load_aneel <- function(dataset, raw_data = FALSE, language = "eng") {
         "nom_sub_estacao" = "substation_name",
         "num_coord_e_sub" = "substation_east_coordinate",
         "num_coord_n_sub" = "substation_north_coordinate"
-      ) %>%
-      dplyr::mutate_all(~ ifelse(. == "-", NA, .))
+      )
   }
 
   ####################
