@@ -65,7 +65,7 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 |                                   |                                     |
 |-----------------------------------|-------------------------------------|
 | **[IBAMA](#ibama)**               | *Environmental fines*               |
-| **[MAPBIOMAS](#mapbiomas)**       | *Land cover and land use*           |
+| **[MapBiomas](#mapbiomas)**       | *Land cover and land use*           |
 | **[TerraClimate](#terraclimate)** | *Climate data*                      |
 | **[SEEG](#seeg)**                 | *Greenhouse gas emission estimates* |
 | **[CENSOAGRO](#censoagro)**       | *Agriculture activities*            |
@@ -357,31 +357,32 @@ data <- load_ibama(dataset = "collected_fines", raw_data = FALSE,
                    states = "BA", language = "pt")
 ```
 
-## MAPBIOMAS
+## MapBiomas
 
-The MAPBIOMAS project gathers data reporting the type of land covering
+The MapBiomas project gathers data reporting the type of land covering
 each year by area, that is, for example, the area used for a temporary
-crop of soybeans. It also reports the transition between coverings
-during given years.
+crop of soybeans. It also reports the transitions in land coverage
+between years.
 
-The data available has an yearly frequency and is available starting
-from the year 1989.
+The data has yearly frequency and is available starting from the year
+1989.
+
+For all datasets, areas are measured in hectares (ha).
 
 ------------------------------------------------------------------------
 
 **Options:**
 
-1.  **dataset**:
+1.  **dataset**: there are 7 possible choices:
 
-    - `"mapbiomas_cover"`: types of land cover
-    - `"mapbiomas_transition"`: changes in land cover
+    - `"mapbiomas_cover"`: types of land cover.
+    - `"mapbiomas_transition"`: changes in land cover.
     - `"mapbiomas_deforestation_regeneration"`: deforestation and forest
-      regeneration
-    - `"mapbiomas_irrigation"`: irrigated areas
-    - `"mapbiomas_grazing_quality"`: grazing quality
-    - `"mapbiomas_mining"`: areas used for mining
-    - `"mapbiomas_water"`: areas of water surface
-    - `"mapbiomas_fire"`: areas of wildfire burn scars
+      regeneration.
+    - `"mapbiomas_irrigation"`: irrigated areas.
+    - `"mapbiomas_mining"`: areas used for mining.
+    - `"mapbiomas_water"`: areas of water surface.
+    - `"mapbiomas_fire"`: areas of wildfire burn scars.
 
 2.  **raw_data**: there are two options:
 
@@ -390,52 +391,33 @@ from the year 1989.
 
 3.  **geo_level**:
 
-    - For datasets `"mapbiomas_cover"`, `"mapbiomas_transition"`,
-      `"mapbiomas_deforestation_regeneration"` and `"mapbiomas_fire"`,
-      can be `"municipality"` or `"state"` (faster download).
-    - For dataset `"mapbiomas_mining"`, can be `"indigenous_land"`,
-      `"municipality"`, `"state"`, `"biome"` or `"country"`.
+    - For dataset `"mapbiomas_cover"`, can be `"municipality"` or
+      `"state"` (faster download)
+    - For dataset `"mapbiomas_transition"`, can be `"municipality"` or
+      `"state"` (faster download)
+    - For dataset `"mapbiomas_deforestation_regeneration"`, can only be
+      `"municipality"`
+    - For dataset `"mapbiomas_mining"`, can be `"indigenous_land"` or
+      `"municipality"`
     - For dataset `"mapbiomas_irrigation"`, can be `"state"` or
-      `"biome"`.
+      `"biome"`
     - For dataset `"mapbiomas_water"`, can be `"municipality"`,
-      `"state"` or `"biome"`.
-    - Does not apply to other datasets.
+      `"state"` or `"biome"`
+    - For dataset `"mapbiomas_fire"`, can only be `"state"`
 
 4.  **language**: you can choose between Portuguese `("pt")` and English
-    `("eng")`
-
-5.  **cover_level**: Aggregates the data to some level of land coverage.
-    Only applies to datasets `"mapbiomas_cover"` and
-    `"mapbiomas_grazing_quality"`:
-
-    - `cover_level = "none"`: no aggregation
-    - `cover_level = 0`: least aggregated, with categories of Anthropic
-      and Natural
-    - `cover_level = 1`: categories such as Forest, Non Forest Natural
-      Formation, Farming, Non Vegetated Area, Water, Non Observed
-    - `cover_level = 2`: categories such as Agriculture, Aquaculture,
-      Beach and Dune, Forest Plantation, Pasture, River, Lake and
-      Ocean  
-    - `cover_level = 3`: categories such as Aquaculture, Beach and Dune,
-      Forest Formation, Forest Plantation
-    - `cover_level = 4`: categories such as Aquaculture, Beach and Dune,
-      Forest Formation, Forest Plantation
+    `("eng")`.
 
 ------------------------------------------------------------------------
 
 **Examples:**
 
 ``` r
-# download treated Mapbiomas Cover data in english at the highest aggregation level
+# download treated Mapbiomas Cover data in English
 data <- load_mapbiomas(dataset = "mapbiomas_cover",
                        raw_data = FALSE,
                        geo_level = "municipality",
-                       language = "eng",
-                       cover_level = 0)
-
-# download treated Mapbiomas Transition data in portuguese
-data <- load_mapbiomas(dataset = "mapbiomas_transition", raw_data = FALSE,
-                       geo_level = "state", language = "pt")
+                       language = "eng")
 
 # download treated data on mining on indigenous lands
 data <- load_mapbiomas("mapbiomas_mining",

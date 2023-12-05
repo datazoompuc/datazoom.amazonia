@@ -370,29 +370,11 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source == "mapbiomas") {
     if (dataset %in% c("mapbiomas_cover", "mapbiomas_transition")) {
       if (param$geo_level == "state") {
-        path <- paste(param$url, "Estat%C3%ADsticas/1_-_TABELA_GERAL_COL7_MAPBIOMAS_BIOMAS_UF_FINAL.xlsx", sep = "")
+        path <- "https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2023/08/TABELA-GERAL-MAPBIOMAS-COL8.0-BIOMASxESTADOS-1.xlsx"
       }
       if (param$geo_level == "municipality") {
-        path <- "https://storage.googleapis.com/mapbiomas-public/brasil/downloads/1-tabela-geral-col7-mapbiomas-biomas-municipio-final.xlsx"
+        path <- "https://storage.googleapis.com/mapbiomas-public/initiatives/brasil/collection_8/downloads/statistics/tabela_geral_mapbiomas_col8_biomas_municipios.xlsx"
       }
-    }
-    if (dataset == "mapbiomas_deforestation_regeneration") {
-      path <- paste(param$url, "Estat%C3%ADsticas/TABELA_GERAL_COL7_MAPBIOMAS_DESMAT_VEGSEC_UF.xlsx", sep = "")
-    }
-    if (dataset == "mapbiomas_irrigation") {
-      path <- paste(param$url, "downloads/Estatisticas%20/Colecao_7_Irrigacao_Biomes_UF.xlsx", sep = "")
-    }
-    if (dataset == "mapbiomas_grazing_quality") {
-      path <- paste(param$url, "Estat%C3%ADsticas/MapBIomas_COL5_QUALIDADE_PASTAGEM-biomas-estados-SITE.xlsx", sep = "")
-    }
-    if (dataset == "mapbiomas_mining") {
-      path <- "https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2023/09/TABELA-MINERACAO-MAPBIOMAS-COL8.0.xlsx"
-    }
-    if (dataset == "mapbiomas_water") {
-      path <- paste(param$url, "Estat%C3%ADsticas/Estatisticas_Superficie%C3%81gua_Col2_SITE.xlsx", sep = "")
-    }
-    if (dataset == "mapbiomas_fire") {
-      path <- paste(param$url, "Estat%C3%ADsticas/mapbiomas-FIRE-ANUAL_Biome_UF_city-SITE.xlsx", sep = "")
     }
   }
 
@@ -525,7 +507,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       download_method <- "googledrive"
     }
   }
-  if (source %in% c("deter", "terraclimate", "baci", "sigmine")) {
+  if (source %in% c("deter", "terraclimate", "baci", "sigmine", "mapbiomas")) {
     download_method <- "curl"
     quiet <- FALSE
   }
@@ -742,14 +724,14 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
     ## MapBiomas
 
-    "mapbiomas", "mapbiomas_cover", NA, "1985-2019", "Municipality, State", "https://mapbiomas-br-site.s3.amazonaws.com/",
-    "mapbiomas", "mapbiomas_transition", NA, "1985-2019", "Municipality, State", "https://mapbiomas-br-site.s3.amazonaws.com/",
-    "mapbiomas", "mapbiomas_deforestation_regeneration", NA, "1988-2017", "Municipality, State", "https://mapbiomas-br-site.s3.amazonaws.com/",
-    "mapbiomas", "mapbiomas_irrigation", NA, "2000-2019", "State, Biome", "https://mapbiomas-br-site.s3.amazonaws.com/",
-    "mapbiomas", "mapbiomas_grazing_quality", NA, "2010, 2018", NA, "https://mapbiomas-br-site.s3.amazonaws.com/",
-    "mapbiomas", "mapbiomas_mining", NA, "1985-2020", "Country, State, Municipality, Biome, Indigenous_Land", "https://mapbiomas-br-site.s3.amazonaws.com/",
-    "mapbiomas", "mapbiomas_fire", NA, "1985-2020", "State, Municipality", "https://mapbiomas-br-site.s3.amazonaws.com/",
-    "mapbiomas", "mapbiomas_water", NA, "1985-2022", "State, Municipality, Biome", "https://mapbiomas-br-site.s3.amazonaws.com/",
+    "mapbiomas", "mapbiomas_cover", NA, "1985-2019", "Municipality, State", "https://brasil.mapbiomas.org/estatisticas/",
+    "mapbiomas", "mapbiomas_transition", NA, "1985-2019", "Municipality, State", "https://brasil.mapbiomas.org/estatisticas/",
+    "mapbiomas", "mapbiomas_deforestation_regeneration", NA, "1988-2017", "Municipality", "https://storage.googleapis.com/mapbiomas-public/initiatives/brasil/collection_8/downloads/tabela_desmatamento_vegetacao_secundaria_mapbiomas_col8.xlsx",
+    "mapbiomas", "mapbiomas_irrigation", NA, "2000-2019", "State, Biome", "https://mapbiomas-br-site.s3.amazonaws.com/downloads/Estatisticas%20/Colecao_7_Irrigacao_Biomes_UF.xlsx",
+    "mapbiomas", "mapbiomas_mining", NA, "1985-2020", "Municipality, Indigenous_Land", "https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2023/09/TABELA-MINERACAO-MAPBIOMAS-COL8.0.xlsx",
+    "mapbiomas", "mapbiomas_fire", NA, "1985-2020", "State", "https://mapbiomas-br-site.s3.amazonaws.com/downloads/MB-Fogo-2-Biome-State.xlsx",
+    "mapbiomas", "mapbiomas_water", NA, "1985-2022", "State, Municipality, Biome", "https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Estatisticas_Superficie%C3%81gua_Col2_SITE.xlsx",
+
 
     ## TerraClimate
 
