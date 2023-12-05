@@ -65,7 +65,7 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 |                                   |                                     |
 |-----------------------------------|-------------------------------------|
 | **[IBAMA](#ibama)**               | *Environmental fines*               |
-| **[MAPBIOMAS](#mapbiomas)**       | *Land cover and land use*           |
+| **[MapBiomas](#mapbiomas)**       | *Land cover and land use*           |
 | **[TerraClimate](#terraclimate)** | *Climate data*                      |
 | **[SEEG](#seeg)**                 | *Greenhouse gas emission estimates* |
 | **[CENSOAGRO](#censoagro)**       | *Agriculture activities*            |
@@ -357,32 +357,32 @@ data <- load_ibama(dataset = "collected_fines", raw_data = FALSE,
                    states = "BA", language = "pt")
 ```
 
-## MAPBIOMAS
+## MapBiomas
 
-The MAPBIOMAS project gathers data reporting the type of land covering
+The MapBiomas project gathers data reporting the type of land covering
 each year by area, that is, for example, the area used for a temporary
-crop of soybeans. It also reports the transition between coverings
-during given years.
+crop of soybeans. It also reports the transitions in land coverage
+between years.
 
-The data available has an yearly frequency and is available starting
-from the year 1989.
+The data has yearly frequency and is available starting from the year
+1989.
 
-For all datasets the unit of measurement is hectares(ha).
+For all datasets, areas are measured in hectares (ha).
 
 ------------------------------------------------------------------------
 
 **Options:**
 
-1.  **dataset**:
+1.  **dataset**: there are 7 possible choices:
 
-    - `"mapbiomas_cover"`: types of land cover
-    - `"mapbiomas_transition"`: changes in land cover
+    - `"mapbiomas_cover"`: types of land cover.
+    - `"mapbiomas_transition"`: changes in land cover.
     - `"mapbiomas_deforestation_regeneration"`: deforestation and forest
-      regeneration
-    - `"mapbiomas_irrigation"`: irrigated areas
-    - `"mapbiomas_mining"`: areas used for mining
-    - `"mapbiomas_water"`: areas of water surface
-    - `"mapbiomas_fire"`: areas of wildfire burn scars
+      regeneration.
+    - `"mapbiomas_irrigation"`: irrigated areas.
+    - `"mapbiomas_mining"`: areas used for mining.
+    - `"mapbiomas_water"`: areas of water surface.
+    - `"mapbiomas_fire"`: areas of wildfire burn scars.
 
 2.  **raw_data**: there are two options:
 
@@ -390,36 +390,34 @@ For all datasets the unit of measurement is hectares(ha).
     - `FALSE`: if you want the treated version of the data.
 
 3.  **geo_level**:
-    - For datasets `"mapbiomas_cover"`or `"mapbiomas_transition"` can be
-      `"municipality"` or `"state"` (faster download).
-    - For dataset `"mapbiomas_deforestation_regeneration"` can be only
-      `"municipality"`.
+
+    - For dataset `"mapbiomas_cover"`, can be `"municipality"` or
+      `"state"` (faster download)
+    - For dataset `"mapbiomas_transition"`, can be `"municipality"` or
+      `"state"` (faster download)
+    - For dataset `"mapbiomas_deforestation_regeneration"`, can only be
+      `"municipality"`
     - For dataset `"mapbiomas_mining"`, can be `"indigenous_land"` or
-      `"municipality"`.
+      `"municipality"`
     - For dataset `"mapbiomas_irrigation"`, can be `"state"` or
-      `"biome"`.
+      `"biome"`
     - For dataset `"mapbiomas_water"`, can be `"municipality"`,
-      `"state"` or `"biome"`.
-    - For dataset `"mapbiomas_fire"`, can be only `"state"`.
-    - Does not apply to other datasets.
+      `"state"` or `"biome"`
+    - For dataset `"mapbiomas_fire"`, can only be `"state"`
 
 4.  **language**: you can choose between Portuguese `("pt")` and English
-    `("eng")`
+    `("eng")`.
 
 ------------------------------------------------------------------------
 
 **Examples:**
 
 ``` r
-# download treated Mapbiomas Cover data in english
+# download treated Mapbiomas Cover data in English
 data <- load_mapbiomas(dataset = "mapbiomas_cover",
                        raw_data = FALSE,
                        geo_level = "municipality",
                        language = "eng")
-
-# download treated Mapbiomas Transition data in portuguese
-data <- load_mapbiomas(dataset = "mapbiomas_transition", raw_data = FALSE,
-                       geo_level = "state", language = "pt")
 
 # download treated data on mining on indigenous lands
 data <- load_mapbiomas("mapbiomas_mining",

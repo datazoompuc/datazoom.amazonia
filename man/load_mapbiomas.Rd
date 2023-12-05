@@ -16,15 +16,15 @@ load_mapbiomas(
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
-\item{geo_level}{A \code{string} that defines the geographic level of the data.
+\item{geo_level}{A \code{string} that defines the geographic level of the data
 \itemize{
-\item For datasets "mapbiomas_cover", "mapbiomas_transition" can be "municipality" or "state" (faster download).
-\item For dataset "mapbiomas_deforestation_regeneration" can be only "municipality".
-\item For dataset "mapbiomas_mining", can be "indigenous_land" or "municipality".
-\item For dataset "mapbiomas_irrigation", can be "state" or "biome".
-\item For dataset "mapbiomas_water", can be "municipality", "state" or "biome".
-\item For dataset "mapbiomas_fire", can be only "state".
-\item Does not apply to other datasets.
+\item For dataset "mapbiomas_cover", can be "municipality" or "state" (faster download)
+\item For dataset "mapbiomas_transition", can be "municipality" or "state" (faster download)
+\item For dataset "mapbiomas_deforestation_regeneration", can only be "municipality"
+\item For dataset "mapbiomas_mining", can be "indigenous_land" or "municipality"
+\item For dataset "mapbiomas_irrigation", can be "state" or "biome"
+\item For dataset "mapbiomas_water", can be "municipality", "state" or "biome"
+\item For dataset "mapbiomas_fire", can only be "state"
 }}
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.}
@@ -37,18 +37,12 @@ Loads information about land cover and use
 }
 \examples{
 \dontrun{
-# download treated Mapbiomas Cover data in english at the highest aggregation level
+# download treated Mapbiomas Cover data in English
 data <- load_mapbiomas(
   dataset = "mapbiomas_cover",
   raw_data = FALSE,
   geo_level = "municipality",
   language = "eng"
-)
-
-# download treated Mapbiomas Transition data in portuguese
-data <- load_mapbiomas(
-  dataset = "mapbiomas_transition", raw_data = FALSE,
-  geo_level = "state", language = "pt"
 )
 
 # download treated data on mining on indigenous lands

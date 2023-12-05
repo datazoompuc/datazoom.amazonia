@@ -71,7 +71,7 @@ devtools::load_all()
 |||
 |---|---|
 | **[IBAMA](#ibama)** | _Environmental fines_ |
-| **[MAPBIOMAS](#mapbiomas)** | _Land cover and land use_ |
+| **[MapBiomas](#mapbiomas)** | _Land cover and land use_ |
 | **[TerraClimate](#terraclimate)** | _Climate data_ |
 | **[SEEG](#seeg)** | _Greenhouse gas emission estimates_ |
 | **[CENSOAGRO](#censoagro)** | _Agriculture activities_ |
@@ -161,7 +161,7 @@ devtools::load_all()
 ```{r child = "vignettes/IBAMA.Rmd"}
 ```
 
-## MAPBIOMAS
+## MapBiomas
 
 ```{r child = "vignettes/MAPBIOMAS.Rmd"}
 ```

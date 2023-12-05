@@ -4,31 +4,25 @@
 #'
 #' @param dataset A dataset name ("mapbiomas_cover", "mapbiomas_transition", "mapbiomas_irrigation", "mapbiomas_deforestation_regeneration", "mapbiomas_mining", "mapbiomas_water" or "mapbiomas_fire")
 #' @inheritParams load_baci
-#' @param geo_level A \code{string} that defines the geographic level of the data.
-#'   * For datasets "mapbiomas_cover", "mapbiomas_transition" can be "municipality" or "state" (faster download).
-#'   * For dataset "mapbiomas_deforestation_regeneration" can be only "municipality".
-#'   * For dataset "mapbiomas_mining", can be "indigenous_land" or "municipality".
-#'   * For dataset "mapbiomas_irrigation", can be "state" or "biome".
-#'   * For dataset "mapbiomas_water", can be "municipality", "state" or "biome".
-#'   * For dataset "mapbiomas_fire", can be only "state".
-#'   * Does not apply to other datasets.
+#' @param geo_level A \code{string} that defines the geographic level of the data
+#'   * For dataset "mapbiomas_cover", can be "municipality" or "state" (faster download)
+#'   * For dataset "mapbiomas_transition", can be "municipality" or "state" (faster download)
+#'   * For dataset "mapbiomas_deforestation_regeneration", can only be "municipality"
+#'   * For dataset "mapbiomas_mining", can be "indigenous_land" or "municipality"
+#'   * For dataset "mapbiomas_irrigation", can be "state" or "biome"
+#'   * For dataset "mapbiomas_water", can be "municipality", "state" or "biome"
+#'   * For dataset "mapbiomas_fire", can only be "state"
 #'
 #' @return A \code{tibble}.
 #'
 #' @examples
 #' \dontrun{
-#' # download treated Mapbiomas Cover data in english
+#' # download treated Mapbiomas Cover data in English
 #' data <- load_mapbiomas(
 #'   dataset = "mapbiomas_cover",
 #'   raw_data = FALSE,
 #'   geo_level = "municipality",
 #'   language = "eng"
-#' )
-#'
-#' # download treated Mapbiomas Transition data in portuguese
-#' data <- load_mapbiomas(
-#'   dataset = "mapbiomas_transition", raw_data = FALSE,
-#'   geo_level = "state", language = "pt"
 #' )
 #'
 #' # download treated data on mining on indigenous lands
