@@ -1,8 +1,8 @@
 Package: datazoom.amazonia
 Title: Simplify Access to Data from the Amazon Region
-Version: 1.0.0
+Version: 1.1.0
 Authors@R: c(
-    person("Francisco", "de Lima Cavalcanti", , "francisco.lima.cavalcanti@gmail.com", role = c("aut", "cre")),
+    person("Igor", "Rigolon Veiga", , "igor.rilave@hotmail.com", role = c("aut", "cre")),
     person("DataZoom (PUC-Rio)", , , "datazoom@econ.puc-rio.br", role = "fnd"),
     person("Guilherme", "Jardim", , "gnjardim1@gmail.com", role = "aut"),
     person("Daniel", "AC Barbosa", , "daniel.adrianocb@gmail.com", role = "aut"),
@@ -13,7 +13,7 @@ Authors@R: c(
     person("Victor", "Aliende da Matta", , "victor.al.matta@gmail.com", role = "aut"),
     person("Anna Carolina", "Dutra Saraiva", , "annadutrasaraiva@gmail.com", role = "aut"),
     person("Arthur", "Carvalho Brito", , "arthurcbps@gmail.com", role = "aut"),
-    person("Igor", "Rigolon Veiga", , "igor.rilave@hotmail.com", role = "aut"),
+    person("Francisco", "de Lima Cavalcanti", , "francisco.lima.cavalcanti@gmail.com", role = "aut"),
     person("Maria", "Mittelbach", , "mariamittelbach@gmail.com", role = "aut")
   )
 Description: Functions to download and treat data regarding the Brazilian

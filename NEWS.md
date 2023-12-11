@@ -1,3 +1,21 @@
+# datazoom.amazonia 1.1.0
+
+  * Added a citation template for work using the package
+  
+  * Added the `"energy_enterprises_distributed"` dataset to `load_aneel`
+  
+  * Updated `load_mapbiomas` to the Collection 8 data, with both new and reformed datasets
+  
+  * Added the `load_population` function with Brazilian population data and estimates
+  
+  * Added the `load_censoagro` function with data from the Census of Agriculture
+  
+  * Updated `load_ips` to include 2023 data
+  
+  * Removed the `load_cipo` function
+  
+  * Many small bug fixes
+
 # datazoom.amazonia 1.0.0
 
   * Adding new `load_epe` function for EPE data and adding new `load_aneel` function for ANEEL data
