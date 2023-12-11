@@ -32,7 +32,6 @@
 
 load_population <- function(dataset = "population", raw_data = FALSE,
                             geo_level, time_period, language = "eng") {
-
   ###########################
   ## Bind Global Variables ##
   ###########################
@@ -75,11 +74,11 @@ load_population <- function(dataset = "population", raw_data = FALSE,
   dat <- as.list(as.character(param$time_period)) %>%
     purrr::map(function(year_num) {
       suppressWarnings(
-      sidra_download(
-        sidra_code = param$code,
-        year = year_num,
-        geo_level = param$geo_level
-      )
+        sidra_download(
+          sidra_code = param$code,
+          year = year_num,
+          geo_level = param$geo_level
+        )
       )
     }) %>%
     dplyr::bind_rows() %>%
@@ -152,10 +151,10 @@ load_population <- function(dataset = "population", raw_data = FALSE,
   if (language == "eng") {
     dat <- dat %>%
       dplyr::rename_with(dplyr::recode,
-                         "ano" = "year",
-                         "populacao_residente_v93" = "population_v93",
-                         "populacao_residente_estimada_v9324" = "estimated_population_v9324"
-        )
+        "ano" = "year",
+        "populacao_residente_v93" = "population_v93",
+        "populacao_residente_estimada_v9324" = "estimated_population_v9324"
+      )
   }
 
   ##########################

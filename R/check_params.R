@@ -1,5 +1,4 @@
-check_params <- function(param){
-
+check_params <- function(param) {
   ###########################
   ## Bind Global Variables ##
   ###########################
@@ -10,8 +9,10 @@ check_params <- function(param){
   ## Dataset check ##
   ###################
 
-  if (is.numeric(param$dataset)) return(invisible(NULL)) # edge case for numeric datasets,
-                                                    # which aren't listed in datasets_link
+  if (is.numeric(param$dataset)) {
+    return(invisible(NULL))
+  } # edge case for numeric datasets,
+  # which aren't listed in datasets_link
 
   # extracting the supported datasets from datasets_link
 
@@ -19,8 +20,10 @@ check_params <- function(param){
     purrr::pluck("dataset") # vector with all possible datasets
 
   if (!(param$dataset %in% supp_datasets)) {
-    dataset_error <- paste("Dataset", param$dataset, "not supported.",
-                           "Dataset must be one of:", "\n", paste(supp_datasets, collapse = "\n"))
+    dataset_error <- paste(
+      "Dataset", param$dataset, "not supported.",
+      "Dataset must be one of:", "\n", paste(supp_datasets, collapse = "\n")
+    )
 
     stop(dataset_error)
   }
@@ -29,8 +32,7 @@ check_params <- function(param){
   ## Time period check ##
   #######################
 
-  if (!is.null(param$time_period)){
-
+  if (!is.null(param$time_period)) {
     # constructing vector of supported years
 
     supp_time_period_str <- datasets_link(source = param$source, dataset = param$dataset) %>%
@@ -60,7 +62,6 @@ check_params <- function(param){
 
       stop(time_period_error)
     }
-
   }
 
   #####################
@@ -68,7 +69,6 @@ check_params <- function(param){
   #####################
 
   if (!(is.null(param$geo_level))) {
-
     # constructing vector of supported geo_levels
 
     supp_geo_level_str <- datasets_link(source = param$source, dataset = param$dataset) %>%
@@ -82,12 +82,10 @@ check_params <- function(param){
     if (!(param$geo_level %in% supp_geo_level)) {
       geo_level_error <- paste("Option geo_level must be one of", supp_geo_level_str)
 
-      if(!any(is.na(supp_geo_level))) stop(geo_level_error)
+      if (!any(is.na(supp_geo_level))) stop(geo_level_error)
       # edge case for when geo_level exists for only some datasets.
       # for the datasets without geo_level, avaliable_geo should be NA
       # if avaliable_geo is NA, then any geo_level works
     }
-
   }
-
 }

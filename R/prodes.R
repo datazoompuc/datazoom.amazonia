@@ -21,7 +21,6 @@
 
 load_prodes <- function(dataset, raw_data = FALSE,
                         language = "eng") {
-
   ###########################
   ## Bind Global Variables ##
   ###########################
@@ -52,7 +51,7 @@ load_prodes <- function(dataset, raw_data = FALSE,
   dat <- external_download(
     dataset = param$dataset,
     source = param$source
-    )
+  )
 
   ## Return Raw Data
 
@@ -70,7 +69,7 @@ load_prodes <- function(dataset, raw_data = FALSE,
     janitor::clean_names() %>%
     dplyr::select(
       municipio, cod_ibge, estado, area_km2, desmatamento2000, dplyr::starts_with("incremento")
-      )
+    )
 
   # change to long format with increment variable
 
@@ -95,7 +94,8 @@ load_prodes <- function(dataset, raw_data = FALSE,
   dat <- dat %>%
     dplyr::mutate(
       increment = dplyr::case_when(
-        year == 2000 ~ NA, .default = increment
+        year == 2000 ~ NA,
+        .default = increment
       )
     )
 

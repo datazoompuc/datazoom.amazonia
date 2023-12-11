@@ -67,8 +67,9 @@ municipalities_biomes <- biome_munic_mapbiomas %>%
     )
   ) %>%
   right_join(municipalities %>% select(abbrev_state, municipality_mapbiomas, code_muni),
-             multiple = "all",
-             by = join_by(abbrev_state, municipality_mapbiomas))
+    multiple = "all",
+    by = join_by(abbrev_state, municipality_mapbiomas)
+  )
 
 
 ## Adding to sysdata

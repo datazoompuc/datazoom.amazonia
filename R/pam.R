@@ -24,7 +24,6 @@
 load_pam <- function(dataset, raw_data = FALSE,
                      geo_level, time_period,
                      language = "eng") {
-
   ##############################
   ## Binding Global Variables ##
   ##############################
@@ -296,7 +295,6 @@ load_pam <- function(dataset, raw_data = FALSE,
 
 
   if (language == "eng") {
-
     # f = dat %>%
     #   dplyr::mutate_at(vars(tidyr::matches(as.character(types[1]))),
     #                    ~ labelled::set_variable_labels(. = as.character(dic[dic$var_code == types[1],'var_eng']))

@@ -23,7 +23,6 @@
 
 load_ips <- function(dataset = "all", raw_data = FALSE,
                      time_period = c(2014, 2018, 2021, 2023), language = "eng") {
-
   ###########################
   ## Bind Global Variables ##
   ###########################
@@ -103,10 +102,12 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
   )
 
   sheets <- param$time_period %>%
-    {purrr::quietly(dplyr::recode)}(!!!sheet_list) %>%
+    {
+      purrr::quietly(dplyr::recode)
+    }(!!!sheet_list) %>%
     purrr::pluck("result")
 
-  if(any(is.na(sheets))) {
+  if (any(is.na(sheets))) {
     stop("Some of the years you request aren't available. Check documentation for time availability.")
   }
 

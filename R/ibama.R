@@ -30,7 +30,6 @@ load_ibama <- function(dataset,
                        raw_data = FALSE,
                        states = "all",
                        language = "eng") {
-
   ##############################
   ## Binding Global Variables ##
   ##############################
@@ -66,9 +65,11 @@ load_ibama <- function(dataset,
   check_params(param)
 
   if (any(states == "all")) {
-    param$states <- c("RO", "AC", "AM", "RR", "PA", "AP", "TO", "MA", "PI", "CE", "RN",
-                      "PB", "PE", "AL", "SE", "BA", "MG", "ES", "RJ", "SP", "PR", "SC",
-                      "RS", "MS", "MT", "GO", "DF")
+    param$states <- c(
+      "RO", "AC", "AM", "RR", "PA", "AP", "TO", "MA", "PI", "CE", "RN",
+      "PB", "PE", "AL", "SE", "BA", "MG", "ES", "RJ", "SP", "PR", "SC",
+      "RS", "MS", "MT", "GO", "DF"
+    )
   }
   if (dataset == "embargoed_areas") {
     param$states <- "all"
@@ -111,113 +112,109 @@ load_ibama <- function(dataset,
 
   # data come without municipality codes, only their names. +so we turn everything lowercase and remove accents to try and match.
   dat <- dat %>%
+    dplyr::mutate(
+      name_muni = municipio,
+      # removing accents from municipality names
+      dplyr::across(municipio, ~ stringi::stri_trans_general(., id = "Latin-ASCII"))
+    ) %>%
+    dplyr::mutate(dplyr::across(municipio, tolower)) # making all municipality names lowercase
+
+  geo <- datazoom.amazonia::municipalities %>%
+    dplyr::select(
+      code_muni,
+      "municipio" = name_muni,
+      "uf" = abbrev_state,
+      legal_amazon
+    )
+
+  # 41 municipalities don't match due to spelling inconsistencies
+  dat <- dat %>%
+    dplyr::mutate(
+      municipio = dplyr::case_when(
+        municipio == "sao luiz do anuaa" & uf == "RR" ~ "sao luiz",
+        municipio == "eldorado dos carajas" & uf == "PA" ~ "eldorado do carajas",
+        municipio == "santa isabel do para" & uf == "PA" ~ "santa izabel do para",
+        municipio == "couto de magalhaes" & uf == "TO" ~ "couto magalhaes",
+        municipio == "fortaleza do tabocao" & uf == "TO" ~ "tabocao",
+        municipio == "pau d arco" & uf == "TO" ~ "pau d'arco",
+        municipio == "sao valerio da natividade" & uf == "TO" ~ "sao valerio",
+        municipio == "governador edson lobao" & uf == "MA" ~ "governador edison lobao",
+        municipio == "assu" & uf == "RN" ~ "acu",
+        municipio == "presidente juscelino" & uf == "RN" ~ "serra caiada",
+        municipio == "olho-d'agua do borges" & uf == "RN" ~ "olho d'agua do borges",
+        municipio == "augusto severo" & uf == "RN" ~ "campo grande",
+        municipio == "campo de santana" & uf == "PB" ~ "tacima",
+        municipio == "santarem" & uf == "PB" ~ "joca claudino",
+        municipio == "sao domingos de pombal" & uf == "PB" ~ "sao domingos",
+        municipio == "lagoa do itaenga" & uf == "PE" ~ "lagoa de itaenga",
+        municipio == "iguaraci" & uf == "PE" ~ "iguaracy",
+        municipio == "belem de sao francisco" & uf == "PE" ~ "belem do sao francisco",
+        municipio == "amparo de sao francisco" & uf == "SE" ~ "amparo do sao francisco",
+        municipio == "santa teresinha" & uf == "BA" ~ "santa terezinha",
+        municipio == "muquem de sao francisco" & uf == "BA" ~ "muquem do sao francisco",
+        municipio == "brasopolis" & uf == "MG" ~ "brazopolis",
+        municipio == "passa-vinte" & uf == "MG" ~ "passa vinte",
+        municipio == "sao thome das letras" & uf == "MG" ~ "sao tome das letras",
+        municipio == "dona eusebia" & uf == "MG" ~ "dona euzebia",
+        municipio == "justinopolis" & uf == "MG" ~ "ribeirao das neves",
+        municipio == "trajano de morais" & uf == "RJ" ~ "trajano de moraes",
+        municipio == "embu" & uf == "SP" ~ "embu das artes",
+        municipio == "moji mirim" & uf == "SP" ~ "mogi mirim",
+        municipio == "florinia" & uf == "SP" ~ "florinea",
+        municipio == "biritiba-mirim" & uf == "SP" ~ "biritiba mirim",
+        municipio == "sao luis do paraitinga" & uf == "SP" ~ "sao luiz do paraitinga",
+        municipio == "grao para" & uf == "SC" ~ "grao-para",
+        municipio == "presidente castelo branco" & uf == "SC" ~ "presidente castello branco",
+        municipio == "passos de torres" & uf == "SC" ~ "passo de torres",
+        municipio == "santana do livramento" & uf == "RS" ~ "sant'ana do livramento",
+        municipio == "poxoreo" & uf == "MT" ~ "poxoreu",
+        municipio == "colinas de goiais" & uf == "GO" ~ "colinas do sul",
+        TRUE ~ municipio
+      )
+    )
+
+  dat <- dat %>%
+    dplyr::mutate(uf = dplyr::case_when(
+      municipio == "ponte alta do norte" & uf == "GO" ~ "SC",
+      TRUE ~ uf
+    ))
+
+  # Merging with IBGE municipalities
+  dat <- dat %>%
+    dplyr::left_join(geo, by = c("municipio", "uf"))
+
+
+  if (dataset %in% c("collected_fines", "distributed_fines")) {
+    # Changing dates to date format
+    dat <- dat %>%
       dplyr::mutate(
-        name_muni = municipio,
-        # removing accents from municipality names
-        dplyr::across(municipio, ~ stringi::stri_trans_general(., id = "Latin-ASCII"))
+        dplyr::across(dplyr::any_of(c("data_auto", "data_pagamento")), as.Date, format = "%d/%m/%Y")
       ) %>%
-      dplyr::mutate(dplyr::across(municipio, tolower)) # making all municipality names lowercase
-
-    geo <- datazoom.amazonia::municipalities %>%
-      dplyr::select(
-        code_muni,
-        "municipio" = name_muni,
-        "uf" = abbrev_state,
-        legal_amazon
-      )
-
-    # 41 municipalities don't match due to spelling inconsistencies
-    dat <- dat %>%
       dplyr::mutate(
-        municipio = dplyr::case_when(
-          municipio == "sao luiz do anuaa" & uf == "RR" ~ "sao luiz",
-          municipio == "eldorado dos carajas" & uf == "PA" ~ "eldorado do carajas",
-          municipio == "santa isabel do para" & uf == "PA" ~ "santa izabel do para",
-          municipio == "couto de magalhaes" & uf == "TO" ~ "couto magalhaes",
-          municipio == "fortaleza do tabocao" & uf == "TO" ~ "tabocao",
-          municipio == "pau d arco" & uf == "TO" ~ "pau d'arco",
-          municipio == "sao valerio da natividade" & uf == "TO" ~ "sao valerio",
-          municipio == "governador edson lobao" & uf == "MA" ~ "governador edison lobao",
-          municipio == "assu" & uf == "RN" ~ "acu",
-          municipio == "presidente juscelino" & uf == "RN" ~ "serra caiada",
-          municipio == "olho-d'agua do borges" & uf == "RN" ~ "olho d'agua do borges",
-          municipio == "augusto severo" & uf == "RN" ~ "campo grande",
-          municipio == "campo de santana" & uf == "PB" ~ "tacima",
-          municipio == "santarem" & uf == "PB" ~ "joca claudino",
-          municipio == "sao domingos de pombal" & uf == "PB" ~ "sao domingos",
-          municipio == "lagoa do itaenga" & uf == "PE" ~ "lagoa de itaenga",
-          municipio == "iguaraci" & uf == "PE" ~ "iguaracy",
-          municipio == "belem de sao francisco" & uf == "PE" ~ "belem do sao francisco",
-          municipio == "amparo de sao francisco" & uf == "SE" ~ "amparo do sao francisco",
-          municipio == "santa teresinha" & uf == "BA" ~ "santa terezinha",
-          municipio == "muquem de sao francisco" & uf == "BA" ~ "muquem do sao francisco",
-          municipio == "brasopolis" & uf == "MG" ~ "brazopolis",
-          municipio == "passa-vinte" & uf == "MG" ~ "passa vinte",
-          municipio == "sao thome das letras" & uf == "MG" ~ "sao tome das letras",
-          municipio == "dona eusebia" & uf == "MG" ~ "dona euzebia",
-          municipio == "justinopolis" & uf == "MG" ~ "ribeirao das neves",
-          municipio == "trajano de morais" & uf == "RJ" ~ "trajano de moraes",
-          municipio == "embu" & uf == "SP" ~ "embu das artes",
-          municipio == "moji mirim" & uf == "SP" ~ "mogi mirim",
-          municipio == "florinia" & uf == "SP" ~ "florinea",
-          municipio == "biritiba-mirim" & uf == "SP" ~ "biritiba mirim",
-          municipio == "sao luis do paraitinga" & uf == "SP" ~ "sao luiz do paraitinga",
-          municipio == "grao para" & uf == "SC" ~ "grao-para",
-          municipio == "presidente castelo branco" & uf == "SC" ~ "presidente castello branco",
-          municipio == "passos de torres" & uf == "SC" ~ "passo de torres",
-          municipio == "santana do livramento" & uf == "RS" ~ "sant'ana do livramento",
-          municipio == "poxoreo" & uf == "MT" ~ "poxoreu",
-          municipio == "colinas de goiais" & uf == "GO" ~ "colinas do sul",
-          TRUE ~ municipio
-        )
+        dplyr::across(dplyr::where(is.character), ~ dplyr::na_if(.x, "")),
+        dplyr::across(ultima_atualizacao_relatorio, as.POSIXct, format = "%d/%m/%Y %H:%M")
+      ) %>%
+      dplyr::mutate(dplyr::across(dplyr::starts_with("valor"), .fns = ~ gsub("[.]", "", .x))) %>%
+      dplyr::mutate(dplyr::across(dplyr::starts_with("valor"), ~ gsub("[,]", ".", .x) %>% as.numeric()))
+  }
+
+  if (dataset == "embargoed_areas") {
+    ## Minor corrections
+    dat <- dat %>%
+      tidyr::separate(col = dat_embargo, into = c("data_embargo", "hora_embargo"), sep = " ") %>%
+      tidyr::separate(col = dat_impressao, into = c("data_impressao", "hora_impressao"), sep = " ") %>%
+      tidyr::separate(col = dat_ult_alter_geom, into = c("data_ult_alter_geom", "hora_ult_alter_geom"), sep = " ") %>%
+      suppressWarnings() %>%
+      dplyr::mutate(dplyr::across(dplyr::where(is.character), ~ dplyr::na_if(.x, "")),
+        data_embargo = as.Date(data_embargo, "%d/%m/%Y"),
+        data_impressao = as.Date(data_impressao, "%d/%m/%Y"),
+        data_ult_alter_geom = as.Date(data_ult_alter_geom, "%d/%m/%Y"),
+        dplyr::across(dplyr::starts_with("qtd"), ~ gsub("[,]", ".", .x) %>% as.numeric())
       )
+  }
 
-    dat <- dat %>%
-      dplyr::mutate(uf = dplyr::case_when(
-        municipio == "ponte alta do norte" & uf == "GO" ~ "SC",
-        TRUE ~ uf
-      ))
-
-    # Merging with IBGE municipalities
-    dat <- dat %>%
-      dplyr::left_join(geo, by = c("municipio", "uf"))
-
-
-    if (dataset %in% c("collected_fines", "distributed_fines")) {
-
-      # Changing dates to date format
-      dat <- dat %>%
-        dplyr::mutate(
-          dplyr::across(dplyr::any_of(c("data_auto", "data_pagamento")), as.Date, format = "%d/%m/%Y")
-        ) %>%
-        dplyr::mutate(
-          dplyr::across(dplyr::where(is.character), ~dplyr::na_if(.x, "")),
-          dplyr::across(ultima_atualizacao_relatorio, as.POSIXct, format = "%d/%m/%Y %H:%M")
-        ) %>%
-        dplyr::mutate(dplyr::across(dplyr::starts_with("valor"), .fns = ~ gsub("[.]", "", .x))) %>%
-        dplyr::mutate(dplyr::across(dplyr::starts_with("valor"), ~ gsub("[,]", ".", .x) %>% as.numeric()))
-
-    }
-
-    if (dataset == "embargoed_areas") {
-
-      ## Minor corrections
-      dat <- dat %>%
-        tidyr::separate(col = dat_embargo, into = c("data_embargo", "hora_embargo"), sep = " ") %>%
-        tidyr::separate(col = dat_impressao, into = c("data_impressao", "hora_impressao"), sep = " ") %>%
-        tidyr::separate(col = dat_ult_alter_geom, into = c("data_ult_alter_geom", "hora_ult_alter_geom"), sep = " ") %>%
-        suppressWarnings() %>%
-        dplyr::mutate(dplyr::across(dplyr::where(is.character), ~dplyr::na_if(.x, "")),
-                      data_embargo = as.Date(data_embargo, "%d/%m/%Y"),
-                      data_impressao = as.Date(data_impressao, "%d/%m/%Y"),
-                      data_ult_alter_geom = as.Date(data_ult_alter_geom, "%d/%m/%Y"),
-                      dplyr::across(dplyr::starts_with("qtd"), ~ gsub("[,]", ".", .x) %>% as.numeric())
-                      )
-
-    }
-
-    dat <- dat %>%
-      tibble::as_tibble()
+  dat <- dat %>%
+    tibble::as_tibble()
 
   ################################
   ## Harmonizing Variable Names ##
@@ -228,9 +225,11 @@ load_ibama <- function(dataset,
       dat_mod <- dat %>%
         dplyr::select(-municipio) %>%
         dplyr::select(-cod_uf_tad) %>%
-        dplyr::rename(municipio = name_muni,
-                      cod_municipio = code_muni,
-                      amazonia_legal = legal_amazon) %>%
+        dplyr::rename(
+          municipio = name_muni,
+          cod_municipio = code_muni,
+          amazonia_legal = legal_amazon
+        ) %>%
         dplyr::relocate(c(municipio, cod_municipio, amazonia_legal), .before = uf)
     }
 
@@ -238,31 +237,33 @@ load_ibama <- function(dataset,
       dat_mod <- dat %>%
         dplyr::select(-municipio) %>%
         dplyr::select(-cod_uf_tad) %>%
-        dplyr::rename(municipality = name_muni,
-                      municipality_code = code_muni,
-                      num_tad = num_tad,
-                      ser_tad = ser_tad,
-                      embargo_date = data_embargo,
-                      embargo_time = hora_embargo,
-                      embargoed_person_name = nome_pessoa_embargada,
-                      embargoed_cpf_cnpj = cpf_cnpj_embargado,
-                      process_number = num_processo,
-                      tad_description = des_tad,
-                      state = uf,
-                      location_description = des_localizacao,
-                      embargoed_area_amount = qtd_area_embargada,
-                      deforestation_status = sit_desmatamento,
-                      last_geom_update_date = data_ult_alter_geom,
-                      last_geom_update_time = hora_ult_alter_geom,
-                      infringement_number = num_auto_infracao,
-                      infringement_series = ser_auto_infracao,
-                      deforested_area_amount = qtd_area_desmatada,
-                      biome_type_code = cod_tipo_bioma,
-                      fiscal_action = acao_fiscalizatoria,
-                      fiscal_order = ordem_fiscalizacao,
-                      infringement_description = des_infracao,
-                      print_date = data_impressao,
-                      print_time = hora_impressao) %>%
+        dplyr::rename(
+          municipality = name_muni,
+          municipality_code = code_muni,
+          num_tad = num_tad,
+          ser_tad = ser_tad,
+          embargo_date = data_embargo,
+          embargo_time = hora_embargo,
+          embargoed_person_name = nome_pessoa_embargada,
+          embargoed_cpf_cnpj = cpf_cnpj_embargado,
+          process_number = num_processo,
+          tad_description = des_tad,
+          state = uf,
+          location_description = des_localizacao,
+          embargoed_area_amount = qtd_area_embargada,
+          deforestation_status = sit_desmatamento,
+          last_geom_update_date = data_ult_alter_geom,
+          last_geom_update_time = hora_ult_alter_geom,
+          infringement_number = num_auto_infracao,
+          infringement_series = ser_auto_infracao,
+          deforested_area_amount = qtd_area_desmatada,
+          biome_type_code = cod_tipo_bioma,
+          fiscal_action = acao_fiscalizatoria,
+          fiscal_order = ordem_fiscalizacao,
+          infringement_description = des_infracao,
+          print_date = data_impressao,
+          print_time = hora_impressao
+        ) %>%
         dplyr::relocate(c(municipality, municipality_code, legal_amazon), .before = state)
     }
   }

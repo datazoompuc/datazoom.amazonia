@@ -17,7 +17,6 @@
 #' @export
 
 load_aneel <- function(dataset, raw_data = FALSE, language = "eng") {
-
   ###########################
   ## Bind Global Variables ##
   ###########################
@@ -72,11 +71,15 @@ load_aneel <- function(dataset, raw_data = FALSE, language = "eng") {
       dplyr::mutate_if(is.character, function(var) {
         stringi::stri_trans_general(str = var, id = "Latin-ASCII")
       }) %>%
-      dplyr::mutate(dplyr::across(dplyr::where(is.character), ~dplyr::na_if(.x, "")),
-                    dplyr::across(dplyr::starts_with("mda"), .fns = ~ gsub("[.]", "", .x)),
-                    dplyr::across(dplyr::starts_with("num_coord"), .fns = ~ gsub("[.]", "", .x))) %>%
-      dplyr::mutate(dplyr::across(dplyr::starts_with("mda"), ~ gsub("[,]", ".", .x) %>% as.numeric()),
-                    dplyr::across(dplyr::starts_with("num_coord"), ~ gsub("[,]", ".", .x) %>% as.numeric()))
+      dplyr::mutate(
+        dplyr::across(dplyr::where(is.character), ~ dplyr::na_if(.x, "")),
+        dplyr::across(dplyr::starts_with("mda"), .fns = ~ gsub("[.]", "", .x)),
+        dplyr::across(dplyr::starts_with("num_coord"), .fns = ~ gsub("[.]", "", .x))
+      ) %>%
+      dplyr::mutate(
+        dplyr::across(dplyr::starts_with("mda"), ~ gsub("[,]", ".", .x) %>% as.numeric()),
+        dplyr::across(dplyr::starts_with("num_coord"), ~ gsub("[,]", ".", .x) %>% as.numeric())
+      )
   } else {
     dat <- dat %>%
       janitor::clean_names() %>%

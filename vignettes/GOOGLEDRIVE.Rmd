@@ -21,14 +21,14 @@ The first time the package is called, it requires you to link your Google accoun
 You **must** tick all boxes when the permissions page opens, or else the following error will occur:
 
 ```{r}
-#Error in `gargle_abort_request_failed()`:
-#! Client error: (403) Forbidden
-#Insufficient Permission: Request had insufficient authentication scopes.
-#• domain: global
-#• reason: insufficientPermissions
-#• message: Insufficient Permission: Request had insufficient authentication
+# Error in `gargle_abort_request_failed()`:
+# ! Client error: (403) Forbidden
+# Insufficient Permission: Request had insufficient authentication scopes.
+# • domain: global
+# • reason: insufficientPermissions
+# • message: Insufficient Permission: Request had insufficient authentication
 #  scopes.
-#Run `rlang::last_error()` to see where the error occurred.
+# Run `rlang::last_error()` to see where the error occurred.
 ```
 
 For further information, click [here](https://googledrive.tidyverse.org/) to access the official package page.

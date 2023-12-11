@@ -26,7 +26,6 @@
 
 load_baci <- function(dataset = "HS92", raw_data = FALSE, time_period,
                       language = "eng") {
-
   ###########################
   ## Bind Global Variables ##
   ###########################
@@ -141,7 +140,6 @@ load_baci <- function(dataset = "HS92", raw_data = FALSE, time_period,
 
 
 load_baci_dic <- function(language) {
-
   # Bind Global Variables
 
   locale <- co_sh6 <- co_sh4 <- co_sh2 <- co_ncm_secrom <- no_sh6_ing <- no_sh4_ing <- no_sh2_ing <- no_sec_ing <- NULL

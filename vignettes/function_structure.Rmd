@@ -80,7 +80,7 @@ sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- ano <- ano_codi
 # dat = dat %>%
 #           janitor::clean_names() %>%
 #           dplyr::mutate_all(function(var){stringi::stri_trans_general(str=var,id="Latin-ASCII")})# %>%
-          # dplyr::mutate_all(clean_custom)
+# dplyr::mutate_all(clean_custom)
 #   dat = dat %>%
 #     dplyr::select(-c(nivel_territorial_codigo,nivel_territorial,ano_codigo)) %>%
 #     dplyr::mutate(valor=as.numeric(valor))
@@ -113,7 +113,7 @@ sidra_code <- available_time <- AMZ_LEGAL <- municipio_codigo <- ano <- ano_codi
 ```{r}
 # dic = load_dictionary(param$dataset)
 #  types = as.character(dic$var_code)
-#  types = types[types != "0"] 
+#  types = types[types != "0"]
 ```
 
 **7. Translation / add variables:** example from *load_degrad()*.This section translates the names of the columns of the original Data Frame.In this example, the original columns (variables) were in English and therefore we translated it to Portuguese in case the user chooses it.

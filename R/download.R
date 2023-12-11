@@ -1,6 +1,5 @@
 sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
                            classific = "all", category = "all") {
-
   ## Bind Global Variables
 
   code_state <- NULL
@@ -47,15 +46,13 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
   ### SPECIAL CASES: POPULATION FOR YEARS 2007 AND 2010
   ### CONTAGEM DA POPULACAO AND CENSO DEMOGRAFICO
   if (param$sidra_code == 6579) {
-
-    if (year == 2007) param$sidra_code <- 793  # https://sidra.ibge.gov.br/tabela/793
-    if (year == 2010){
+    if (year == 2007) param$sidra_code <- 793 # https://sidra.ibge.gov.br/tabela/793
+    if (year == 2010) {
       param$sidra_code <- 1378 # https://sidra.ibge.gov.br/tabela/1378
 
       param$classific <- "c1"
       param$category <- list(0)
     }
-
   }
   if (param$sidra_code == 6907) {
     param$classific <- c("c12443")
@@ -114,7 +111,6 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
   }
 
   if (param$geo_reg == "City") {
-
     ##############################
     ## Download at the UF Level ##
     ##############################
@@ -298,7 +294,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
                               geo_level = NULL, coords = NULL, dataset_code = NULL,
                               sheet = NULL, skip_rows = NULL, file_name = NULL,
                               state = NULL) {
-
   ## Bind Global Variables
 
   link <- NULL
@@ -559,10 +554,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       dat$year <- param$year
     }
     if (param$source == "deter") {
-      if (param$dataset == "deter_amz"){
+      if (param$dataset == "deter_amz") {
         dat <- sf::read_sf(file.path(dir, "deter-amz-deter-public.shp"))
       }
-      if (param$dataset == "deter_cerrado"){
+      if (param$dataset == "deter_cerrado") {
         dat <- sf::read_sf(file.path(dir, "deter_public.shp"))
       }
     }
@@ -571,7 +566,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
 
     if (param$source == "ibama") {
-
       # get latest downloaded file (the name changes daily)
       file <- file.info(list.files(dir, pattern = "rel_areas_embargadas_.*.xls"))
       file <- file[with(file, order(as.POSIXct(mtime))), ]
@@ -590,7 +584,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
 
     if (param$source == "baci") {
-
       # as year can be a vector, sets up expressions of the form "*YYYY_V202201.csv" for each year to match file names
       file_expression <- paste0("*", param$year, "_V202201.csv")
 
@@ -606,11 +599,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       # each data frame in the list is named after the corresponding year
       names(dat) <- param$year
     }
-
   }
 
   if (param$source == "epe" & param$dataset == "energy_consumption_per_class") {
-
     # param$sheet contains the selected sheets
 
     # Making a list with all the sheets
@@ -629,12 +620,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     names(dat) <- param$sheet
   }
   if (param$source == "aneel") {
-
-    if (param$dataset == "energy_enterprises_distributed"){
+    if (param$dataset == "energy_enterprises_distributed") {
       dat <- data.table::fread(temp, encoding = "Latin-1")
-    }
-
-    else if (dataset == "energy_generation"){
+    } else if (dataset == "energy_generation") {
       dat <- readxl::read_xlsx(temp, sheet = param$sheet, skip = param$skip_rows, na = c("-", ""))
     }
   }
@@ -689,7 +677,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 }
 
 datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
-
   survey <- NULL
 
   link <- tibble::tribble(
@@ -761,16 +748,16 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
     ## Censo Agro
 
-    "censoagro" , "agricultural_land_area" , "263" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "censoagro" , "agricultural_area_use" , "264" , "1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "censoagro" , "agricultural_employees_tractors" , "265" , "1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "censoagro" , "agricultural_producer_condition" , "280" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "censoagro" , "animal_production" , "281" , "1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "censoagro" , "animal_products" , "282" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "censoagro" , "vegetable_production_area" , "283" , "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "censoagro" , "vegetable_production_permanent" , "1730" , "1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "censoagro" , "vegetable_production_temporary" , "1731" , "1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006" , "Country, State" , "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais" ,
-    "censoagro" , "livestock_production" , "6907" , "2017" , "Municipality" , "https://sidra.ibge.gov.br/tabela/6907" ,
+    "censoagro", "agricultural_land_area", "263", "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006", "Country, State", "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais",
+    "censoagro", "agricultural_area_use", "264", "1970, 1975, 1980, 1985, 1995, 2006", "Country, State", "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais",
+    "censoagro", "agricultural_employees_tractors", "265", "1970, 1975, 1980, 1985, 1995, 2006", "Country, State", "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais",
+    "censoagro", "agricultural_producer_condition", "280", "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006", "Country, State", "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais",
+    "censoagro", "animal_production", "281", "1970, 1975, 1980, 1985, 1995, 2006", "Country, State", "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais",
+    "censoagro", "animal_products", "282", "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006", "Country, State", "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais",
+    "censoagro", "vegetable_production_area", "283", "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006", "Country, State", "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais",
+    "censoagro", "vegetable_production_permanent", "1730", "1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006", "Country, State", "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais",
+    "censoagro", "vegetable_production_temporary", "1731", "1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006", "Country, State", "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais",
+    "censoagro", "livestock_production", "6907", "2017", "Municipality", "https://sidra.ibge.gov.br/tabela/6907",
 
     #################
     ## Social data ##
@@ -967,18 +954,16 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
   # returns only the desired rows
 
   if (!is.null(source)) {
-
     link <- link %>%
       dplyr::filter(survey == source)
   }
 
   if (!is.null(dataset)) {
-
     link <- link %>%
       dplyr::filter(dataset == !!dataset)
   }
 
-  if(url) {
+  if (url) {
     link <- link %>%
       purrr::pluck("link")
   }

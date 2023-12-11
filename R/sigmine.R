@@ -20,7 +20,6 @@
 load_sigmine <- function(dataset = "sigmine_active",
                          raw_data = FALSE,
                          language = "eng") {
-
   ##############################
   ## Binding Global Variables ##
   ##############################

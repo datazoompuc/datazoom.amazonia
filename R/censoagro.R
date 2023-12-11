@@ -20,7 +20,7 @@
 #' )
 #'
 #' # Download temporary production crops data by state (geo_level = "state") in year 2006
-#'   in portuguese (language = "pt").
+#' # in portuguese (language = "pt")
 #' data <- load_censoagro(
 #'   dataset = "vegetable_production_temporary",
 #'   raw_data = FALSE,
@@ -30,16 +30,10 @@
 #' )
 #' }
 #'
-#'
-#'## We should include support for microregion/mesoregion
-#'
-#'
 #' @export
 
-load_censoagro <- function(dataset,raw_data = FALSE,
-                            geo_level, time_period, language = "eng") {
-
-
+load_censoagro <- function(dataset, raw_data = FALSE,
+                           geo_level, time_period, language = "eng") {
   ###########################
   ## Bind Global Variables ##
   ###########################
@@ -115,9 +109,11 @@ load_censoagro <- function(dataset,raw_data = FALSE,
 
   # grouping variable, with classifics, when applicable
 
-  if (param$dataset %in% c("land_area_total", "area_use", "land_area_producer_condition",
-                           "animal_production", "animal_products", "vegetable_production_area",
-                           "vegetable_production_temporary", "vegetable_production_permanent")) {
+  if (param$dataset %in% c(
+    "land_area_total", "area_use", "land_area_producer_condition",
+    "animal_production", "animal_products", "vegetable_production_area",
+    "vegetable_production_temporary", "vegetable_production_permanent"
+  )) {
     dat <- dat %>%
       dplyr::rename("group_id" = dplyr::last_col())
   }
@@ -133,8 +129,10 @@ load_censoagro <- function(dataset,raw_data = FALSE,
         )
       )
   }
-  if (param$dataset %in% c("animal_production", "vegetable_production_area",
-                           "vegetable_production_temporary", "vegetable_production_permanent")) {
+  if (param$dataset %in% c(
+    "animal_production", "vegetable_production_area",
+    "vegetable_production_temporary", "vegetable_production_permanent"
+  )) {
     dat <- dat %>%
       dplyr::mutate(
         "unit_id" = dplyr::case_when(variavel_codigo != 216 ~ unidade_de_medida)

@@ -38,7 +38,9 @@ INPE's most recent data is now published at [TerraBrasilis](http://terrabrasilis
 ```{r,eval=FALSE}
 # Download treated data (raw_data = FALSE)
 # in portuguese (language = 'pt').
-data <- load_prodes(raw_data = FALSE,
-                    language = 'pt')  
+data <- load_prodes(
+  raw_data = FALSE,
+  language = "pt"
+)
 ```
 

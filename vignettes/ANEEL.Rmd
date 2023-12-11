@@ -63,7 +63,7 @@ The data is expressed in quantities and installed power in kW (kilowatt). The qu
 ```{r eval=FALSE}
 # download treated data about energy generation
 clean_aneel <- load_aneel(
- dataset = "energy generation",
- raw_data = FALSE
+  dataset = "energy generation",
+  raw_data = FALSE
 )
 ```
