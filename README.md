@@ -172,8 +172,10 @@ spatial data, rather than agregated, municipality-level data.
 ``` r
 # Download treated data (raw_data = FALSE)
 # in portuguese (language = 'pt').
-data <- load_prodes(raw_data = FALSE,
-                    language = 'pt')  
+data <- load_prodes(
+  raw_data = FALSE,
+  language = "pt"
+)
 ```
 
 ## DETER
@@ -214,8 +216,10 @@ corresponding to a municipality.
 
 ``` r
 # Download treated data (raw_data = FALSE) from Amazonia (dataset = "deter_amz")
-deter_amz <- load_deter(dataset = 'deter_amz',
-                        raw_data = FALSE)
+deter_amz <- load_deter(
+  dataset = "deter_amz",
+  raw_data = FALSE
+)
 ```
 
 ## DEGRAD
@@ -264,10 +268,12 @@ assumed
 
 ``` r
 # download treated data (raw_data = TRUE) related to forest degradation
-# from 2010 to 2012 (time_period = 2010:2012). 
-data <- load_degrad(dataset = 'degrad', 
-                    raw_data = FALSE,
-                    time_period = 2010:2012)
+# from 2010 to 2012 (time_period = 2010:2012).
+data <- load_degrad(
+  dataset = "degrad",
+  raw_data = FALSE,
+  time_period = 2010:2012
+)
 ```
 
 ## Imazon
@@ -349,12 +355,16 @@ regarding distributed and collected fines across municipalities
 library(datazoom.amazonia)
 
 # Download treated embargoes data (raw_data = FALSE) in english (language = "eng")
-data <- load_ibama(dataset = "embargoed_areas", raw_data = FALSE, 
-                   language = "eng")
+data <- load_ibama(
+  dataset = "embargoed_areas", raw_data = FALSE,
+  language = "eng"
+)
 
 # Download treated collected fines data from "BA"
-data <- load_ibama(dataset = "collected_fines", raw_data = FALSE,
-                   states = "BA", language = "pt")
+data <- load_ibama(
+  dataset = "collected_fines", raw_data = FALSE,
+  states = "BA", language = "pt"
+)
 ```
 
 ## MapBiomas
@@ -414,15 +424,18 @@ For all datasets, areas are measured in hectares (ha).
 
 ``` r
 # download treated Mapbiomas Cover data in English
-data <- load_mapbiomas(dataset = "mapbiomas_cover",
-                       raw_data = FALSE,
-                       geo_level = "municipality",
-                       language = "eng")
+data <- load_mapbiomas(
+  dataset = "mapbiomas_cover",
+  raw_data = FALSE,
+  geo_level = "municipality",
+  language = "eng"
+)
 
 # download treated data on mining on indigenous lands
 data <- load_mapbiomas("mapbiomas_mining",
-                       raw_data = FALSE,
-                       geo_level = "indigenous_land")
+  raw_data = FALSE,
+  geo_level = "indigenous_land"
+)
 ```
 
 ## TerraClimate
@@ -492,9 +505,11 @@ OBS: A good internet connection is needed, because the data is heavy.
 max_temp <- load_climate(dataset = "max_temperature", time_period = 2000:2001)
 
 # Downloading precipitation data only for the legal Amazon in 2010
-amz_precipitation <- load_climate(dataset = "precipitation",
-                                  time_period = 2010,
-                                  legal_amazon_only = TRUE)
+amz_precipitation <- load_climate(
+  dataset = "precipitation",
+  time_period = 2010,
+  legal_amazon_only = TRUE
+)
 ```
 
 ## SEEG
@@ -557,16 +572,20 @@ necessary, and the function may take time to run.
 **Examples:**
 
 ``` r
-# Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg") 
+# Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg")
 # by state (geo_level = "state")
-data <- load_seeg(dataset = "seeg", 
-                  raw_data = TRUE,
-                  geo_level = "state")
-  
+data <- load_seeg(
+  dataset = "seeg",
+  raw_data = TRUE,
+  geo_level = "state"
+)
+
 # Download treated data (raw_data = FALSE) of industry greenhouse gases (dataset = "seeg_industry")
-data <- load_seeg(dataset = "seeg_industry", 
-                  raw_data = FALSE,
-                  geo_level = "state")
+data <- load_seeg(
+  dataset = "seeg_industry",
+  raw_data = FALSE,
+  geo_level = "state"
+)
 ```
 
 🔴 This function uses the `googledrive` package to download data at the
@@ -639,21 +658,22 @@ municipality level.
 
 ``` r
 # Download total land area data at the country level in year 2006
- data <- load_censoagro(
-   dataset = "agricultural_land_area",
-   raw_data = TRUE,
-   geo_level = "country",
-   time_period = 2006
- )
+data <- load_censoagro(
+  dataset = "agricultural_land_area",
+  raw_data = TRUE,
+  geo_level = "country",
+  time_period = 2006
+)
 
- # Download temporary production crops data by state (geo_level = "state") in year 2006
- # in portuguese (language = "pt")
-  data <- load_censoagro(
-   dataset = "vegetable_production_temporary",
-   raw_data = FALSE,
-   geo_level = "state",
-   time_period = 1996,
-   language = "pt"
+# Download temporary production crops data by state (geo_level = "state") in year 2006
+# in portuguese (language = "pt")
+data <- load_censoagro(
+  dataset = "vegetable_production_temporary",
+  raw_data = FALSE,
+  geo_level = "state",
+  time_period = 1996,
+  language = "pt"
+)
 ```
 
 # Social Data
@@ -694,12 +714,14 @@ level and data is available in 2014 and 2018.
 **Examples:**
 
 ``` r
-# Download raw data from 2014 
+# Download raw data from 2014
 data <- load_ips(dataset = "all", raw_data = TRUE, time_period = 2014)
 
 # Download treated deforest data from 2018 in portuguese
-data <- load_ips(dataset = "deforest", raw_data = FALSE,
-                 time_period = 2018, language = "pt")
+data <- load_ips(
+  dataset = "deforest", raw_data = FALSE,
+  time_period = 2018, language = "pt"
+)
 ```
 
 ## DATASUS
@@ -781,25 +803,31 @@ all individual-level variables.
 ``` r
 library(datazoom.amazonia)
 
-# download raw data for the year 2010 in the state of AM. 
-data <- load_datasus(dataset = "datasus_sim_do",
-                     time_period = 2010,
-                     states = "AM",
-                     raw_data = TRUE)
+# download raw data for the year 2010 in the state of AM.
+data <- load_datasus(
+  dataset = "datasus_sim_do",
+  time_period = 2010,
+  states = "AM",
+  raw_data = TRUE
+)
 
 # download treated data with the number of deaths by cause in AM and PA.
-data <- load_datasus(dataset = "datasus_sim_do",
-                    time_period = 2010,
-                    states = c("AM", "PA"),
-                    raw_data = FALSE)
+data <- load_datasus(
+  dataset = "datasus_sim_do",
+  time_period = 2010,
+  states = c("AM", "PA"),
+  raw_data = FALSE
+)
 
 # download treated data with the number of deaths by cause in AM and PA
 # keeping all individual variables.
-data <- load_datasus(dataset = "datasus_sim_do",
-                    time_period = 2010,
-                    states = c("AM", "PA"),
-                    raw_data = FALSE,
-                    keep_all = TRUE)
+data <- load_datasus(
+  dataset = "datasus_sim_do",
+  time_period = 2010,
+  states = c("AM", "PA"),
+  raw_data = FALSE,
+  keep_all = TRUE
+)
 ```
 
 ##### DATASUS - CNES (National Register of Health Establishments)
@@ -825,10 +853,12 @@ SUS, which can be aggregated by municipality (with option
 library(datazoom.amazonia)
 
 # download treated data with the number of avaliable beds in AM and PA.
-data <- load_datasus(dataset = "datasus_cnes_lt",
-                    time_period = 2010,
-                    states = c("AM", "PA"),
-                    raw_data = FALSE)
+data <- load_datasus(
+  dataset = "datasus_cnes_lt",
+  time_period = 2010,
+  states = c("AM", "PA"),
+  raw_data = FALSE
+)
 ```
 
 ##### DATASUS - SIH (System of Hospital Information)
@@ -843,16 +873,20 @@ dataset.
 library(datazoom.amazonia)
 
 # download raw data
-data <- load_datasus(dataset = "datasus_sih",
-                    time_period = 2010,
-                    states = "AM",
-                    raw_data = TRUE)
+data <- load_datasus(
+  dataset = "datasus_sih",
+  time_period = 2010,
+  states = "AM",
+  raw_data = TRUE
+)
 
 # download data in a single tibble, with variable labels
-data <- load_datasus(dataset = "datasus_sih",
-                    time_period = 2010,
-                    states = "AM",
-                    raw_data = FALSE)
+data <- load_datasus(
+  dataset = "datasus_sih",
+  time_period = 2010,
+  states = "AM",
+  raw_data = FALSE
+)
 ```
 
 ## IEMA
@@ -918,9 +952,11 @@ country, state and municipality level and from 2001 to 2021.
 
 ``` r
 # download treated population data at the state level for 2010 to 2012
-data <- load_population(raw_data = FALSE,
-                        geo_level = "state",
-                        time_period = 2010:2012)
+data <- load_population(
+  raw_data = FALSE,
+  geo_level = "state",
+  time_period = 2010:2012
+)
 ```
 
 # Economic Data
@@ -975,14 +1011,18 @@ granularity of location.
 ``` r
 # download treated (raw_data = FALSE) exports data by municipality (dataset = "comex_export_mun")
 # from 2020 to 2021 (time_period = 2020:2021)
-data <- load_br_trade(dataset = "comex_export_mun", 
-                      raw_data = FALSE, 
-                      time_period = 2020:2021)
+data <- load_br_trade(
+  dataset = "comex_export_mun",
+  raw_data = FALSE,
+  time_period = 2020:2021
+)
 # download treated(raw_data = FALSE) imports data by municipality (dataset = "comex_import_mun")
-# from 2020 to 2021 (time_period = 2020:2021) 
-data <- load_br_trade(dataset = "comex_import_mun",
-                      raw_data = FALSE, 
-                      time_period = 2020:2021)
+# from 2020 to 2021 (time_period = 2020:2021)
+data <- load_br_trade(
+  dataset = "comex_import_mun",
+  raw_data = FALSE,
+  time_period = 2020:2021
+)
 ```
 
 ## BACI
@@ -1061,9 +1101,11 @@ from 2002 to 2018.
 
 ``` r
 # download treated municipal GDP data at the state level for 2010 to 2012
-data <- load_pibmunic(raw_data = FALSE,
-                      geo_level = "state",
-                      time_period = 2010:2012)
+data <- load_pibmunic(
+  raw_data = FALSE,
+  geo_level = "state",
+  time_period = 2010:2012
+)
 ```
 
 ## CEMPRE
@@ -1106,17 +1148,19 @@ National Register of Legal Entities. Data is available between 2006 and
 # from 2008 to 2010 (time_period = 2008:2010).
 data <- load_cempre(
   raw_data = TRUE,
-  geo_level = "country", 
+  geo_level = "country",
   time_period = 2008:2010
-) 
-# Download treted data (raw_data = FALSE) by state (geo_level = "state") 
+)
+# Download treted data (raw_data = FALSE) by state (geo_level = "state")
 # from 2008 to 2010 (time_period = 2008:2010) in portuguese (language = "pt").
 # In this example, data is split by sector (sectors = TRUE)
-data <- load_cempre(raw_data = FALSE,
-                    geo_level = "state", 
-                    time_period = 2008:2010,
-                    language = "pt",
-                    sectors = TRUE) 
+data <- load_cempre(
+  raw_data = FALSE,
+  geo_level = "state",
+  time_period = 2008:2010,
+  language = "pt",
+  sectors = TRUE
+)
 ```
 
 ## PAM
@@ -1289,11 +1333,13 @@ Datasets generated from Permanent Crops:
 
 ``` r
 # download treated data at the state level from 2010 to 2011 for all crops
-data <- load_pam(dataset = "all_crops", 
-                 raw_data = FALSE, 
-                 geo_level = "state", 
-                 time_period = 2010:2011,
-                 language = "eng")
+data <- load_pam(
+  dataset = "all_crops",
+  raw_data = FALSE,
+  geo_level = "state",
+  time_period = 2010:2011,
+  language = "eng"
+)
 ```
 
 ## PEVS
@@ -1349,21 +1395,25 @@ link](https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fi
 **Examples:**
 
 ``` r
-# Download treated (raw_data = FALSE) silviculture data (dataset = 'pevs_silviculture') 
-# by state (geo_level = 'state') from 2012 (time_period =  2012) 
+# Download treated (raw_data = FALSE) silviculture data (dataset = 'pevs_silviculture')
+# by state (geo_level = 'state') from 2012 (time_period =  2012)
 # in portuguese (language = "pt")
-data <- load_pevs(dataset = 'pevs_silviculture', 
-                  raw_data = FALSE,
-                  geo_level = 'state', 
-                  time_period = 2012, 
-                  language = "pt")
+data <- load_pevs(
+  dataset = "pevs_silviculture",
+  raw_data = FALSE,
+  geo_level = "state",
+  time_period = 2012,
+  language = "pt"
+)
 
-# Download raw (raw_data = TRUE) forest crops data by region 
+# Download raw (raw_data = TRUE) forest crops data by region
 # from 2012 to 2013 in english
-data <- load_pevs(dataset = 'pevs_forest_crops', 
-                  raw_data = TRUE, 
-                  geo_level = "region", 
-                  time_period = 2012:2013)
+data <- load_pevs(
+  dataset = "pevs_forest_crops",
+  raw_data = TRUE,
+  geo_level = "region",
+  time_period = 2012:2013
+)
 ```
 
 ## PPM
@@ -1408,20 +1458,24 @@ link](https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fi
 **Examples:**
 
 ``` r
-# Download treated data (raw_data = FALSE) about aquaculture (dataset = "ppm_aquaculture") 
+# Download treated data (raw_data = FALSE) about aquaculture (dataset = "ppm_aquaculture")
 # from 2013 to 2015 (time_period = 2013:2015) in english
-# with the level of aggregation being the country (geo_level = "country"). 
-data <- load_ppm(dataset = "ppm_aquaculture", 
-                 raw_data = FALSE, 
-                 geo_level = "country", 
-                 time_period = 2013:2015)
+# with the level of aggregation being the country (geo_level = "country").
+data <- load_ppm(
+  dataset = "ppm_aquaculture",
+  raw_data = FALSE,
+  geo_level = "country",
+  time_period = 2013:2015
+)
 
 # Download raw data about sheep farming by state from 1980 to 1995 in portuguese (language = "pt")
-data <- load_ppm(dataset = "ppm_sheep_farming", 
-                 raw_data = TRUE, 
-                 geo_level = "state", 
-                 time_period = 1980:1995, 
-                 language = "pt")
+data <- load_ppm(
+  dataset = "ppm_sheep_farming",
+  raw_data = TRUE,
+  geo_level = "state",
+  time_period = 1980:1995,
+  language = "pt"
+)
 ```
 
 ## SIGMINE
@@ -1451,9 +1505,11 @@ Agency (ANM) is responsible for this survey.
 
 ``` r
 # Download treated data (raw_data = FALSE) in portuguese (language = "pt").
-data <- load_sigmine(dataset = 'sigmine_active', 
-                     raw_data = FALSE,
-                     language = "pt")
+data <- load_sigmine(
+  dataset = "sigmine_active",
+  raw_data = FALSE,
+  language = "pt"
+)
 ```
 
 ## ANEEL
@@ -1541,8 +1597,8 @@ and select “Dicionário de dados”.
 ``` r
 # download treated data about energy generation
 clean_aneel <- load_aneel(
- dataset = "energy generation",
- raw_data = FALSE
+  dataset = "energy generation",
+  raw_data = FALSE
 )
 ```
 
@@ -1664,14 +1720,14 @@ You **must** tick all boxes when the permissions page opens, or else the
 following error will occur:
 
 ``` r
-#Error in `gargle_abort_request_failed()`:
-#! Client error: (403) Forbidden
-#Insufficient Permission: Request had insufficient authentication scopes.
-#• domain: global
-#• reason: insufficientPermissions
-#• message: Insufficient Permission: Request had insufficient authentication
+# Error in `gargle_abort_request_failed()`:
+# ! Client error: (403) Forbidden
+# Insufficient Permission: Request had insufficient authentication scopes.
+# • domain: global
+# • reason: insufficientPermissions
+# • message: Insufficient Permission: Request had insufficient authentication
 #  scopes.
-#Run `rlang::last_error()` to see where the error occurred.
+# Run `rlang::last_error()` to see where the error occurred.
 ```
 
 For further information, click
