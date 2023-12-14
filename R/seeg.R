@@ -28,8 +28,6 @@
 #' }
 load_seeg <- function(dataset, raw_data = FALSE,
                       geo_level, language = "eng") {
-
-
   # Checking for googledrive package (in Suggests)
 
   if (!requireNamespace("googledrive", quietly = TRUE)) {
@@ -193,7 +191,6 @@ load_seeg <- function(dataset, raw_data = FALSE,
 
 
   if (param$dataset == "seeg_farming" & param$geo_level %in% c("country", "state") & param$language == "pt") {
-
     ## Create Longer Data - Years as a Variable
 
     dat <- dat %>%
@@ -284,7 +281,6 @@ load_seeg <- function(dataset, raw_data = FALSE,
 
 
   if (param$dataset == "seeg_industry" & param$geo_level %in% c("country", "state") & param$language == "pt") {
-
     ## Create Longer Data - Years as a Variable
 
     dat <- dat %>%
@@ -371,7 +367,6 @@ load_seeg <- function(dataset, raw_data = FALSE,
 
 
   if (param$dataset == "seeg_energy" & param$geo_level %in% c("country", "state") & param$language == "pt") {
-
     ## Create Longer Data - Years as a Variable
 
     dat <- dat %>%
@@ -538,7 +533,6 @@ load_seeg <- function(dataset, raw_data = FALSE,
 
 
   if (param$dataset == "seeg_residuals" & param$geo_level %in% c("country", "state") & param$language == "pt") {
-
     ## Create Longer Data - Years as a Variable
 
     dat <- dat %>%

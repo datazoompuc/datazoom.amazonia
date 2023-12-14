@@ -16,7 +16,6 @@
 #' @export
 
 load_iema <- function(dataset = "iema", raw_data = FALSE, language = "eng") {
-
   # Checking for googledrive package (in Suggests)
 
   if (!requireNamespace("googledrive", quietly = TRUE)) {

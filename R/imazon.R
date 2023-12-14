@@ -15,7 +15,6 @@
 #' @export
 
 load_imazon <- function(dataset = "imazon_shp", raw_data = FALSE, language = "eng") {
-
   # Checking for googledrive package (in Suggests)
 
   if (!requireNamespace("googledrive", quietly = TRUE)) {

@@ -37,6 +37,8 @@ The raw DETER data shows one warning per row, with each row also containing a mu
 
 ```{r,eval=FALSE}
 # Download treated data (raw_data = FALSE) from Amazonia (dataset = "deter_amz")
-deter_amz <- load_deter(dataset = 'deter_amz',
-                        raw_data = FALSE)
+deter_amz <- load_deter(
+  dataset = "deter_amz",
+  raw_data = FALSE
+)
 ```

@@ -21,7 +21,6 @@
 load_pibmunic <- function(dataset = "pibmunic", raw_data = FALSE,
                           geo_level, time_period,
                           language = "eng") {
-
   ##############################
   ## Binding Global Variables ##
   ##############################

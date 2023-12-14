@@ -36,7 +36,6 @@
 load_cempre <- function(dataset = "cempre", raw_data = FALSE,
                         geo_level, time_period,
                         language = "eng", sectors = FALSE) {
-
   ###########################
   ## Bind Global Variables ##
   ###########################

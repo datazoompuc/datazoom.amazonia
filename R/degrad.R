@@ -25,7 +25,6 @@
 load_degrad <- function(dataset = "degrad", raw_data = FALSE,
                         time_period,
                         language = "eng") {
-
   ##############################
   ## Binding Global Variables ##
   ##############################

@@ -45,7 +45,6 @@ load_datasus <- function(dataset,
                          raw_data = FALSE,
                          keep_all = FALSE,
                          language = "eng") {
-
   # Checking for foreign package (in Suggests)
 
   if (!requireNamespace("foreign", quietly = TRUE)) {
@@ -303,7 +302,6 @@ load_datasus <- function(dataset,
   #################
 
   if (stringr::str_detect(param$dataset, "datasus_sim") & !param$keep_all) {
-
     # Obtaining the mortality variables
 
     cid_vars <- load_dictionary(param$dataset) %>%

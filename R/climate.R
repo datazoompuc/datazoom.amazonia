@@ -26,7 +26,6 @@ load_climate <- function(dataset, raw_data = FALSE,
                          time_period,
                          language = "eng",
                          legal_amazon_only = FALSE) {
-
   # Checking for terra package (in Suggests)
 
   if (!requireNamespace("terra", quietly = TRUE)) {

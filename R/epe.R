@@ -93,7 +93,6 @@ load_epe <- function(dataset, raw_data = FALSE,
   ######################
 
   if (param$dataset == "energy_consumption_per_class") {
-
     # removing accents from each sheet
 
     dat <- dat %>%
@@ -104,7 +103,6 @@ load_epe <- function(dataset, raw_data = FALSE,
       )
 
     if (geo_level == "state") {
-
       # removes first three rows of each data frame + last row
 
       dat <- dat %>%
@@ -195,7 +193,6 @@ load_epe <- function(dataset, raw_data = FALSE,
     }
 
     if (param$geo_level %in% c("subsystem", "region")) {
-
       # removes first 3 rows of each sheet
 
       dat <- dat %>%

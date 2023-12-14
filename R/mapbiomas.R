@@ -36,7 +36,6 @@
 
 load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality",
                            language = "eng") {
-
   ###########################
   ## Bind Global Variables ##
   ###########################
@@ -86,18 +85,20 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
 
   ## MapBiomas collections
 
-  if(dataset %in% c("mapbiomas_cover",
-                    "mapbiomas_transition",
-                    "mapbiomas_deforestation_regeneration",
-                    "mapbiomas_mining")) {
+  if (dataset %in% c(
+    "mapbiomas_cover",
+    "mapbiomas_transition",
+    "mapbiomas_deforestation_regeneration",
+    "mapbiomas_mining"
+  )) {
     message("Data from MapBiomas - Collection 8\n")
   }
 
-  if(dataset %in% c("mapbiomas_irrigation")) {
+  if (dataset %in% c("mapbiomas_irrigation")) {
     message("Data from Mapbiomas - Collection 7\n")
   }
 
-  if(dataset %in% c("mapbiomas_water", "mapbiomas_fire")) {
+  if (dataset %in% c("mapbiomas_water", "mapbiomas_fire")) {
     message("Data from Mapbiomas - Collection 2\n")
   }
 
@@ -129,7 +130,6 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
     })
 
   if (param$dataset != "mapbiomas_water") {
-
     dat <- dat %>%
       dplyr::select(-dplyr::contains("id"))
 
@@ -143,9 +143,7 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
         names_prefix = "x"
       ) %>%
       tidyr::drop_na(value)
-  }
-
-  else {
+  } else {
     if (param$geo_level == "municipality") {
       dat <- dat %>%
         dplyr::rename("municipality_code" = "code")
@@ -198,8 +196,7 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
         "state_code" ~ "cod_uf",
         "state" ~ "uf",
         .default = .
-      )
-    ) %>%
+      )) %>%
       dplyr::rename_with(~ stringr::str_replace(., "to_level", "para_level")) %>%
       dplyr::rename_with(~ stringr::str_replace(., "from_level", "de_level"))
   }
@@ -214,8 +211,7 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
         "classe_irrig" ~ "irrigation_class",
         "il" ~ "indigenous_land",
         .default = .
-      )
-    )
+      ))
   }
 
   ####################

@@ -20,7 +20,6 @@
 
 load_deter <- function(dataset, raw_data = FALSE,
                        language = "eng") {
-
   ###########################
   ## Bind Global Variables ##
   ###########################
