@@ -1,3 +1,5 @@
+# datazoom.amazonia (development version)
+
 # datazoom.amazonia 1.1.0
 
   * Added a citation template for work using the package
