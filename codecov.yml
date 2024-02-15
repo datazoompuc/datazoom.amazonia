@@ -1,0 +1,20 @@
+comment: false
+
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1%
+        informational: true
+    patch:
+      default:
+        target: auto
+        threshold: 1%
+        informational: true
+
+jobs: 
+  - name: Upload coverage reports to Codecov
+    uses: codecov/codecov-action@v3
+    with:
+      token: ${{ secrets.CODECOV_TOKEN }}
