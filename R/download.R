@@ -441,7 +441,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     file_extension <- ".xlsx"
   }
   if (source == "prodes") {
-    file_extension <- ".txt"
+    if (dataset == "deforestation") {
+      file_extension <- ".txt"
+    }else{
+      file_extension <- ".rds"
   }
   if (source == "terraclimate") {
     file_extension <- ".nc"
@@ -502,6 +505,11 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       download_method <- "googledrive"
     }
   }
+  if (source == "prodes") {
+    if (dataset == "cloud") {
+      download_method <- "googledrive"
+    }
+  }
   if (source %in% c("deter", "terraclimate", "baci", "sigmine", "mapbiomas")) {
     download_method <- "curl"
     quiet <- FALSE
@@ -553,6 +561,12 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       dat <- sf::read_sf(file.path(dir, param$file_name))
       dat$year <- param$year
     }
+    if (param$source == "prodes") {
+      if (param$dataset == "cloud") {
+        list.files
+        
+        dat <- sf::read_sf(file.path(dir, "deter-amz-deter-public.shp"))
+      }
     if (param$source == "deter") {
       if (param$dataset == "deter_amz") {
         dat <- sf::read_sf(file.path(dir, "deter-amz-deter-public.shp"))
@@ -689,7 +703,8 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
     ## PRODES
 
     "prodes", "deforestation", NA, "2000-2022", "Municipality", "http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2022&estado=&ordem=MUNICIPIO&type=tabela&output=txt&",
-
+    "prodes", "cloud", NA, NA, "Municipality", "https://drive.google.com/uc?export=download&id=1bMDRs5-EYLQu-GRj6NREh9ukk_72HqKz",
+    
     ## DETER
 
     "deter", "deter_amz", NA, "2016-2022", "Municipality", "http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-amz/shape",
