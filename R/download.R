@@ -445,6 +445,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       file_extension <- ".txt"
     }else{
       file_extension <- ".rds"
+    }
   }
   if (source == "terraclimate") {
     file_extension <- ".nc"
@@ -561,12 +562,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       dat <- sf::read_sf(file.path(dir, param$file_name))
       dat$year <- param$year
     }
-    if (param$source == "prodes") {
-      if (param$dataset == "cloud") {
-        list.files
-        
-        dat <- sf::read_sf(file.path(dir, "deter-amz-deter-public.shp"))
-      }
     if (param$source == "deter") {
       if (param$dataset == "deter_amz") {
         dat <- sf::read_sf(file.path(dir, "deter-amz-deter-public.shp"))
