@@ -7,17 +7,12 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
   code_micro <- NULL
 
   # Obs: Sometimes there are non-catched municipalieis - user should check on IBGE SIDRA
-  # f = geo %>% filter(!(code_muni %in% unique(dat_uf$`Município (Código)`)))
+  # f = geo %>% filter(!(code_muni %in% unique(dat_uf$`MunicC-pio (CC3digo)`)))
 
   # ----------------------------------------------------
 
   ## Download from Sidra IBGE
-
-  ## Include Progress Bar
-  ## Omit Warnings
-  ## We should include support for microregion/mesoregion
-
-  # ------------------------------------------------------
+----------------
 
   ##############################
   ## Setting Basic Parameters ##
@@ -28,6 +23,11 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
   param$sidra_code <- sidra_code
   param$year <- year
   param$classific <- classific
+  ## Include Progress Bar
+  ## Omit Warnings
+  ## We should include support for microregion/mesoregion
+
+  # --------------------------------------
   param$category <- category
 
   if (geo_level == "country") {
@@ -484,7 +484,46 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   dir <- tempdir()
   temp <- tempfile(fileext = file_extension, tmpdir = dir)
-
+  
+  ## Define the download_data function
+  download_data <- function(dataset, source, year = NULL) {
+    if (source == "prodes") {
+      if (dataset == "cloud") {
+        download_method <- "googledrive"
+        
+        # Define the links for each year
+        links <- list(
+          "2016" = "https://drive.google.com/file/d/1bMDRs5-EYLQu-GRj6NREh9ukk_72HqKz/view?usp=sharing",
+          "2017" = "https://drive.google.com/file/d/1YvV-zSmdxuItNgHexzR5feTVozCZoS2t/view?usp=sharing",
+          "2018" = "https://drive.google.com/file/d/1k0BLOsFPnkW2LQQqO62ppWb6hcSPKsGA/view?usp=sharing",
+          "2019" = "https://drive.google.com/file/d/1OWFShUSk4mcg2G5HH_2gUnfvZgtTyf6Y/view?usp=sharing",
+          "2020" = "https://drive.google.com/file/d/1OggXwTbOjLo6w8sqiPI9PAj8TG4BlwVp/view?usp=sharing",
+          "2021" = "https://drive.google.com/file/d/1GbhWEPxXh9M_MHvYdoet-9CLDeLVFyuU/view?usp=sharing",
+          "2022" = "https://drive.google.com/file/d/1Ga0iVlq-F-kiUPwjQjt6n0h8dlSGyvcS/view?usp=sharing",
+          "2023" = "https://drive.google.com/file/d/1fbyFxLsxGygeDBaa7IKZf59IolqUdlHx/view?usp=sharing"              
+        )
+        
+        # Check if year is provided and valid
+        if (!is.null(year) && year %in% names(links)) {
+          file_link <- links[[as.character(year)]]
+        } else {
+          stop("Invalid or missing year for dataset 'cloud'. Please provide a valid year between 2016 and 2021.")
+        }
+        
+        # Download the file using the appropriate link
+        temp_file <- tempfile(fileext = ".rds")
+        googledrive::drive_download(as_id(file_link), path = temp_file, overwrite = TRUE)
+        
+        # Load the data
+        dat <- readRDS(temp_file)
+        return(dat)
+      }
+    }
+    
+    stop("Invalid source or dataset.")
+  }
+  
+  
   ## Picking the way to download the file
 
   download_method <- "standard" # works for most functions
@@ -508,7 +547,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   }
   if (source == "prodes") {
     if (dataset == "cloud") {
-      download_method <- "googledrive"
+      dat <- download_data(dataset = dataset, source = source, year = year)
+      return(dat) # Return the downloaded data
     }
   }
   if (source %in% c("deter", "terraclimate", "baci", "sigmine", "mapbiomas")) {
