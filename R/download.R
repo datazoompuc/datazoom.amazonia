@@ -485,45 +485,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   dir <- tempdir()
   temp <- tempfile(fileext = file_extension, tmpdir = dir)
   
-  ## Define the download_data function
-  download_data <- function(dataset, source, year = NULL) {
-    if (source == "prodes") {
-      if (dataset == "cloud") {
-        download_method <- "googledrive"
-        
-        # Define the links for each year
-        links <- list(
-          "2016" = "https://drive.google.com/file/d/1bMDRs5-EYLQu-GRj6NREh9ukk_72HqKz/view?usp=sharing",
-          "2017" = "https://drive.google.com/file/d/1YvV-zSmdxuItNgHexzR5feTVozCZoS2t/view?usp=sharing",
-          "2018" = "https://drive.google.com/file/d/1k0BLOsFPnkW2LQQqO62ppWb6hcSPKsGA/view?usp=sharing",
-          "2019" = "https://drive.google.com/file/d/1OWFShUSk4mcg2G5HH_2gUnfvZgtTyf6Y/view?usp=sharing",
-          "2020" = "https://drive.google.com/file/d/1OggXwTbOjLo6w8sqiPI9PAj8TG4BlwVp/view?usp=sharing",
-          "2021" = "https://drive.google.com/file/d/1GbhWEPxXh9M_MHvYdoet-9CLDeLVFyuU/view?usp=sharing",
-          "2022" = "https://drive.google.com/file/d/1Ga0iVlq-F-kiUPwjQjt6n0h8dlSGyvcS/view?usp=sharing",
-          "2023" = "https://drive.google.com/file/d/1fbyFxLsxGygeDBaa7IKZf59IolqUdlHx/view?usp=sharing"              
-        )
-        
-        # Check if year is provided and valid
-        if (!is.null(year) && year %in% names(links)) {
-          file_link <- links[[as.character(year)]]
-        } else {
-          stop("Invalid or missing year for dataset 'cloud'. Please provide a valid year between 2016 and 2021.")
-        }
-        
-        # Download the file using the appropriate link
-        temp_file <- tempfile(fileext = ".rds")
-        googledrive::drive_download(as_id(file_link), path = temp_file, overwrite = TRUE)
-        
-        # Load the data
-        dat <- readRDS(temp_file)
-        return(dat)
-      }
-    }
-    
-    stop("Invalid source or dataset.")
-  }
-  
-  
+ 
   ## Picking the way to download the file
 
   download_method <- "standard" # works for most functions
@@ -545,11 +507,35 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       download_method <- "googledrive"
     }
   }
+  
   if (source == "prodes") {
     if (dataset == "cloud") {
-      dat <- download_data(dataset = dataset, source = source, year = year)
-      return(dat) # Return the downloaded data
+      if (year == 2016){
+        path = "https://drive.google.com/file/d/1bMDRs5-EYLQu-GRj6NREh9ukk_72HqKz/view?usp=sharing"
+      }
+      if (year == 2017){
+        path = "https://drive.google.com/file/d/1YvV-zSmdxuItNgHexzR5feTVozCZoS2t/view?usp=sharing"
+      }
+      if (year == 2018){
+        path = "https://drive.google.com/file/d/1k0BLOsFPnkW2LQQqO62ppWb6hcSPKsGA/view?usp=sharing"
+      }
+      if (year == 2019){
+        path = "https://drive.google.com/file/d/1OWFShUSk4mcg2G5HH_2gUnfvZgtTyf6Y/view?usp=sharing"
+      }
+      if (year == 2020){
+        path = "https://drive.google.com/file/d/1OggXwTbOjLo6w8sqiPI9PAj8TG4BlwVp/view?usp=sharing"
+      }
+      if (year == 2021){
+        path = "https://drive.google.com/file/d/1GbhWEPxXh9M_MHvYdoet-9CLDeLVFyuU/view?usp=sharing"
+      }
+      if (year == 2022){
+        path = "https://drive.google.com/file/d/1Ga0iVlq-F-kiUPwjQjt6n0h8dlSGyvcS/view?usp=sharing"
+      }
+      if (year == 2023){
+        path = "https://drive.google.com/file/d/1fbyFxLsxGygeDBaa7IKZf59IolqUdlHx/view?usp=sharing"              
+      }
     }
+    download_method <- "googledrive"
   }
   if (source %in% c("deter", "terraclimate", "baci", "sigmine", "mapbiomas")) {
     download_method <- "curl"
@@ -569,6 +555,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       download_method <- "googledrive"
     }
   }
+  
 
   ## Downloading file by the selected method
 
