@@ -7,17 +7,12 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
   code_micro <- NULL
 
   # Obs: Sometimes there are non-catched municipalieis - user should check on IBGE SIDRA
-  # f = geo %>% filter(!(code_muni %in% unique(dat_uf$`Município (Código)`)))
+  # f = geo %>% filter(!(code_muni %in% unique(dat_uf$`MunicC-pio (CC3digo)`)))
 
   # ----------------------------------------------------
 
   ## Download from Sidra IBGE
-
-  ## Include Progress Bar
-  ## Omit Warnings
-  ## We should include support for microregion/mesoregion
-
-  # ------------------------------------------------------
+----------------
 
   ##############################
   ## Setting Basic Parameters ##
@@ -28,6 +23,11 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
   param$sidra_code <- sidra_code
   param$year <- year
   param$classific <- classific
+  ## Include Progress Bar
+  ## Omit Warnings
+  ## We should include support for microregion/mesoregion
+
+  # --------------------------------------
   param$category <- category
 
   if (geo_level == "country") {
@@ -418,7 +418,33 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       "&disableProjSubset=on&addLatLon=true&accept=netcdf"
     )
   }
-
+  
+  if (source == "prodes") {
+  if (year == 2016){
+    path = "https://drive.google.com/file/d/1bMDRs5-EYLQu-GRj6NREh9ukk_72HqKz/view?usp=sharing"
+  }
+  if (year == 2017){
+    path = "https://drive.google.com/file/d/1YvV-zSmdxuItNgHexzR5feTVozCZoS2t/view?usp=sharing"
+  }
+  if (year == 2018){
+    path = "https://drive.google.com/file/d/1k0BLOsFPnkW2LQQqO62ppWb6hcSPKsGA/view?usp=sharing"
+  }
+  if (year == 2019){
+    path = "https://drive.google.com/file/d/1OWFShUSk4mcg2G5HH_2gUnfvZgtTyf6Y/view?usp=sharing"
+  }
+  if (year == 2020){
+    path = "https://drive.google.com/file/d/1OggXwTbOjLo6w8sqiPI9PAj8TG4BlwVp/view?usp=sharing"
+  }
+  if (year == 2021){
+    path = "https://drive.google.com/file/d/1GbhWEPxXh9M_MHvYdoet-9CLDeLVFyuU/view?usp=sharing"
+  }
+  if (year == 2022){
+    path = "https://drive.google.com/file/d/1Ga0iVlq-F-kiUPwjQjt6n0h8dlSGyvcS/view?usp=sharing"
+  }
+  if (year == 2023){
+    path = "https://drive.google.com/file/d/1fbyFxLsxGygeDBaa7IKZf59IolqUdlHx/view?usp=sharing"              
+  }
+}
   #######################
   ## Initiate Download ##
   #######################
@@ -441,7 +467,11 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     file_extension <- ".xlsx"
   }
   if (source == "prodes") {
-    file_extension <- ".txt"
+    if (dataset == "deforestation") {
+      file_extension <- ".txt"
+    }else{
+      file_extension <- ".rds"
+    }
   }
   if (source == "terraclimate") {
     file_extension <- ".nc"
@@ -480,7 +510,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   dir <- tempdir()
   temp <- tempfile(fileext = file_extension, tmpdir = dir)
-
+  
+ 
   ## Picking the way to download the file
 
   download_method <- "standard" # works for most functions
@@ -502,6 +533,12 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       download_method <- "googledrive"
     }
   }
+  
+  if (source == "prodes") {
+    if (dataset == "cloud") {
+      download_method <- "googledrive"
+    }
+  }
   if (source %in% c("deter", "terraclimate", "baci", "sigmine", "mapbiomas")) {
     download_method <- "curl"
     quiet <- FALSE
@@ -520,6 +557,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       download_method <- "googledrive"
     }
   }
+  
 
   ## Downloading file by the selected method
 
@@ -689,7 +727,8 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
     ## PRODES
 
     "prodes", "deforestation", NA, "2000-2022", "Municipality", "http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2022&estado=&ordem=MUNICIPIO&type=tabela&output=txt&",
-
+    "prodes", "cloud", NA, NA, "Municipality", "https://drive.google.com/uc?export=download&id=1bMDRs5-EYLQu-GRj6NREh9ukk_72HqKz",
+    
     ## DETER
 
     "deter", "deter_amz", NA, "2016-2022", "Municipality", "http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-amz/shape",
