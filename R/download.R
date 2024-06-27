@@ -418,7 +418,33 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       "&disableProjSubset=on&addLatLon=true&accept=netcdf"
     )
   }
-
+  
+  if (source == "prodes") {
+  if (year == 2016){
+    path = "https://drive.google.com/file/d/1bMDRs5-EYLQu-GRj6NREh9ukk_72HqKz/view?usp=sharing"
+  }
+  if (year == 2017){
+    path = "https://drive.google.com/file/d/1YvV-zSmdxuItNgHexzR5feTVozCZoS2t/view?usp=sharing"
+  }
+  if (year == 2018){
+    path = "https://drive.google.com/file/d/1k0BLOsFPnkW2LQQqO62ppWb6hcSPKsGA/view?usp=sharing"
+  }
+  if (year == 2019){
+    path = "https://drive.google.com/file/d/1OWFShUSk4mcg2G5HH_2gUnfvZgtTyf6Y/view?usp=sharing"
+  }
+  if (year == 2020){
+    path = "https://drive.google.com/file/d/1OggXwTbOjLo6w8sqiPI9PAj8TG4BlwVp/view?usp=sharing"
+  }
+  if (year == 2021){
+    path = "https://drive.google.com/file/d/1GbhWEPxXh9M_MHvYdoet-9CLDeLVFyuU/view?usp=sharing"
+  }
+  if (year == 2022){
+    path = "https://drive.google.com/file/d/1Ga0iVlq-F-kiUPwjQjt6n0h8dlSGyvcS/view?usp=sharing"
+  }
+  if (year == 2023){
+    path = "https://drive.google.com/file/d/1fbyFxLsxGygeDBaa7IKZf59IolqUdlHx/view?usp=sharing"              
+  }
+}
   #######################
   ## Initiate Download ##
   #######################
@@ -510,32 +536,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   
   if (source == "prodes") {
     if (dataset == "cloud") {
-      if (year == 2016){
-        path = "https://drive.google.com/file/d/1bMDRs5-EYLQu-GRj6NREh9ukk_72HqKz/view?usp=sharing"
-      }
-      if (year == 2017){
-        path = "https://drive.google.com/file/d/1YvV-zSmdxuItNgHexzR5feTVozCZoS2t/view?usp=sharing"
-      }
-      if (year == 2018){
-        path = "https://drive.google.com/file/d/1k0BLOsFPnkW2LQQqO62ppWb6hcSPKsGA/view?usp=sharing"
-      }
-      if (year == 2019){
-        path = "https://drive.google.com/file/d/1OWFShUSk4mcg2G5HH_2gUnfvZgtTyf6Y/view?usp=sharing"
-      }
-      if (year == 2020){
-        path = "https://drive.google.com/file/d/1OggXwTbOjLo6w8sqiPI9PAj8TG4BlwVp/view?usp=sharing"
-      }
-      if (year == 2021){
-        path = "https://drive.google.com/file/d/1GbhWEPxXh9M_MHvYdoet-9CLDeLVFyuU/view?usp=sharing"
-      }
-      if (year == 2022){
-        path = "https://drive.google.com/file/d/1Ga0iVlq-F-kiUPwjQjt6n0h8dlSGyvcS/view?usp=sharing"
-      }
-      if (year == 2023){
-        path = "https://drive.google.com/file/d/1fbyFxLsxGygeDBaa7IKZf59IolqUdlHx/view?usp=sharing"              
-      }
+      download_method <- "googledrive"
     }
-    download_method <- "googledrive"
   }
   if (source %in% c("deter", "terraclimate", "baci", "sigmine", "mapbiomas")) {
     download_method <- "curl"
