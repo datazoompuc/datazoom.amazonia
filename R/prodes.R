@@ -19,13 +19,13 @@
 #'
 #' @export
 
-load_prodes <- function(dataset, raw_data = FALSE,
+load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
                         language = "eng") {
   ###########################
   ## Bind Global Variables ##
   ###########################
 
-  year <- municipio <- cod_ibge <- estado <- area_km2 <- increment <- NULL
+  year <- municipio <- cod_ibge <- estado <- area_km2 <- increment <- bioma <- NULL
   municipality <- municipality_code <- state <- deforestation <- desmatamento2000 <- NULL
 
   #############################
@@ -68,7 +68,7 @@ load_prodes <- function(dataset, raw_data = FALSE,
   dat <- dat %>%
     janitor::clean_names() %>%
     dplyr::select(
-      municipio, cod_ibge, estado, area_km2, desmatamento2000, dplyr::starts_with("incremento")
+      municipio, cod_ibge, estado, area_km2, bioma, desmatamento2000, dplyr::starts_with("incremento")
     )
 
   # change to long format with increment variable
@@ -88,7 +88,7 @@ load_prodes <- function(dataset, raw_data = FALSE,
     dplyr::arrange(municipio, year) %>%
     dplyr::mutate(
       deforestation = cumsum(increment),
-      .by = municipio
+      .by = c("municipio", "estado", "bioma")
     )
 
   dat <- dat %>%
@@ -108,7 +108,8 @@ load_prodes <- function(dataset, raw_data = FALSE,
       dplyr::rename(
         "municipality" = municipio,
         "municipality_code" = cod_ibge,
-        "state" = estado
+        "state" = estado,
+        "biome" = bioma
       )
   }
   if (param$language == "pt") {

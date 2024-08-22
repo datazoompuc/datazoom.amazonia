@@ -688,7 +688,7 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
     ## PRODES
 
-    "prodes", "deforestation", NA, "2000-2022", "Municipality", "http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2022&estado=&ordem=MUNICIPIO&type=tabela&output=txt&",
+    "prodes", "deforestation", NA, "2000-2023", "Municipality", "http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2023&estado=&ordem=MUNICIPIO&type=tabela&output=txt&",
 
     ## DETER
 

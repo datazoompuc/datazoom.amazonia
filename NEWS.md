@@ -1,4 +1,6 @@
-# datazoom.amazonia (development version)
+# datazoom.amazonia 1.1.0.9000 (development version)
+
+  * Updated `load_prodes` data cleaning and download to allow more recent data
 
 # datazoom.amazonia 1.1.0
 

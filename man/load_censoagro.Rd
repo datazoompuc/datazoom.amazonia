@@ -43,7 +43,7 @@ data <- load_censoagro(
 )
 
 # Download temporary production crops data by state (geo_level = "state") in year 2006
-  in portuguese (language = "pt").
+# in portuguese (language = "pt")
 data <- load_censoagro(
   dataset = "vegetable_production_temporary",
   raw_data = FALSE,
@@ -52,9 +52,5 @@ data <- load_censoagro(
   language = "pt"
 )
 }
-
-
-## We should include support for microregion/mesoregion
-
 
 }

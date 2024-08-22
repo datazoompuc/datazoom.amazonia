@@ -4,7 +4,7 @@
 \alias{load_prodes}
 \title{PRODES - Deforestation Monitoring Project in the Legal Amazon by Satellite}
 \usage{
-load_prodes(dataset, raw_data = FALSE, language = "eng")
+load_prodes(dataset = "deforestation", raw_data = FALSE, language = "eng")
 }
 \arguments{
 \item{dataset}{A dataset name ("deforestation").}
