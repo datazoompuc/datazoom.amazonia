@@ -584,10 +584,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
 
     if (param$source == "baci") {
-      # as year can be a vector, sets up expressions of the form "*YYYY_V202201.csv" for each year to match file names
-      file_expression <- paste0("*", param$year, "_V202201.csv")
+      # as year can be a vector, sets up expressions of the form "*YYYY_V202401b.csv" for each year to match file names
+      file_expression <- paste0("*", param$year, "_V202401b.csv")
 
-      # now turning into *XXXX_V202201.csv|YYYY_V202201.csv|ZZZZ_V202201.csv" to match as regex
+      # now turning into *XXXX_V202401b.csv|YYYY_V202401b.csv|ZZZZ_V202401b.csv" to match as regex
       file_expression <- paste0(file_expression, collapse = "|")
 
       file <- list.files(dir, pattern = file_expression, full.names = TRUE) %>%
@@ -817,7 +817,7 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
     ## BACI
 
-    "baci", "HS92", NA, "1995-2020", "Country", "http://www.cepii.fr/DATA_DOWNLOAD/baci/data/baci_HS92_V202201.zip",
+    "baci", "HS92", NA, "1995-2022", "Country", "https://www.cepii.fr/DATA_DOWNLOAD/baci/data/baci_HS92_V202401b.zip",
 
     ## PIB-Munic
 
