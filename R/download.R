@@ -817,8 +817,8 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
     ## BACI
 
-    "baci", "HS92", NA, "1995-2020", "Country", "https://www.cepii.fr/DATA_DOWNLOAD/baci/data/baci_HS92_V202401b.zip",
-                                                
+    "baci", "HS92", NA, "1995-2022", "Country", "https://www.cepii.fr/DATA_DOWNLOAD/baci/data/baci_HS92_V202401b.zip",
+
     ## PIB-Munic
 
     "pibmunic", "pibmunic", "5938", "2002-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pib-munic/tabelas",

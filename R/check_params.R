@@ -60,7 +60,7 @@ check_params <- function(param) {
     if (!all(param$time_period %in% supp_time_period)) {
       time_period_error <- paste("Option time_period must be in", supp_time_period_str)
 
-      stop(time_period_error)
+      warning(time_period_error)
     }
   }
 

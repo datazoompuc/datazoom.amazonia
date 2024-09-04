@@ -1,3 +1,7 @@
+# datazoom.amazonia 1.1.1.9000
+
+  * Updated `load_baci` to support the newest version of the data, fixing the previous broken download URL. (Thanks to @OlivazShai)
+
 # datazoom.amazonia 1.1.0.9000 (development version)
 
   * Updated `load_prodes` data cleaning and download to allow more recent data
