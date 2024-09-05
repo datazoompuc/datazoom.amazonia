@@ -419,6 +419,18 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     )
   }
 
+  ## BACI
+
+  # BACI data demands 'param$year' for cleaning, but data is downloaded from 
+  # a single url. If param$year is a vector, the code above would incorrectly 
+  # save 'path' as a vector of urls, failing the download.
+
+  # This exception ensures 'path' is the single url in 'param$url' for baci
+
+  if (source == "baci") {
+    path <- param$url
+  }
+
   #######################
   ## Initiate Download ##
   #######################
