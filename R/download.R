@@ -338,17 +338,19 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   # Some URLs are in the form www.data/$year$_$dataset$.csv, where expression
   # surrounded by $ are placeholders. The code below subs them in for actual parameters
 
-  if (!is.null(param$year)) {
-    path <- path %>%
-      stringr::str_replace("\\$year\\$", as.character(param$year))
-  }
-  if (!is.null(param$state)) {
-    path <- path %>%
-      stringr::str_replace("\\$state\\$", param$state)
-  }
-  if (!is.null(param$file_name)) {
-    path <- path %>%
-      stringr::str_replace("\\$file_name\\$", param$file_name)
+  if (stringr::str_detect(path, "\\$year\\$|\\$state\\$|\\$file_name\\$")) {
+    if (!is.null(param$year)) {
+      path <- path %>%
+        stringr::str_replace("\\$year\\$", as.character(param$year))
+    }
+    if (!is.null(param$state)) {
+      path <- path %>%
+        stringr::str_replace("\\$state\\$", param$state)
+    }
+    if (!is.null(param$file_name)) {
+      path <- path %>%
+        stringr::str_replace("\\$file_name\\$", param$file_name)
+    }
   }
 
   # Below are the exceptions, for which manipulation is needed
@@ -417,18 +419,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       "&timeStride=1",
       "&disableProjSubset=on&addLatLon=true&accept=netcdf"
     )
-  }
-
-  ## BACI
-
-  # BACI data demands 'param$year' for cleaning, but data is downloaded from 
-  # a single url. If param$year is a vector, the code above would incorrectly 
-  # save 'path' as a vector of urls, failing the download.
-
-  # This exception ensures 'path' is the single url in 'param$url' for baci
-
-  if (source == "baci") {
-    path <- param$url
   }
 
   #######################
