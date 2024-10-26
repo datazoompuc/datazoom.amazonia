@@ -687,7 +687,7 @@ Data from the Amazon Social Progress Index, an initiative from Imazon
 with support from the Social Progress Imperative that measures the
 social and environmental progress of its locations. Namely, the 772
 municipalities in the Amazon region. Survey is done at the municipal
-level and data is available in 2014 and 2018.
+level.
 
 ------------------------------------------------------------------------
 
@@ -703,7 +703,7 @@ level and data is available in 2014 and 2018.
     - `TRUE`: if you want the data as it is originally.
     - `FALSE`: if you want the treated version of the data.
 
-3.  **time_period**: can be 2014, 2018, 2021, or a vector with some
+3.  **time_period**: can be 2014, 2018, 2021, 2023 or a vector with some
     combination thereof
 
 4.  **language**: you can choose between Portuguese `("pt")` and English
@@ -1435,8 +1435,11 @@ link](https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fi
 **Options:**
 
 1.  **dataset**: there are five possible choices: \*
-    `"ppm_livestock_inventory"` \* `"ppm_sheep_farming"` \*
-    `"ppm_animal_orig_production"` \* `"ppm_cow_farming"` \*
+    `"ppm_livestock_inventory"`- information on the volume of animal
+    species raised and on the production of milk, wool, hen and quail
+    eggs, honey and silkworm cocoons, as well as on aquaculture (fish,
+    shrimp and mollusk farming) \* `"ppm_sheep_farming"`- \*
+    `"ppm_animal_origin_production"` \* `"ppm_cow_farming"` \*
     `"ppm_aquaculture"`
 
 2.  **raw_data**: there are two options:
