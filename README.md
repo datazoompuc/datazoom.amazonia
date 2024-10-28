@@ -1434,13 +1434,22 @@ link](https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fi
 
 **Options:**
 
-1.  **dataset**: there are five possible choices: \*
-    `"ppm_livestock_inventory"`- information on the volume of animal
-    species raised and on the production of milk, wool, hen and quail
-    eggs, honey and silkworm cocoons, as well as on aquaculture (fish,
-    shrimp and mollusk farming) \* `"ppm_sheep_farming"`- \*
-    `"ppm_animal_origin_production"` \* `"ppm_cow_farming"` \*
-    `"ppm_aquaculture"`
+1.  **dataset**: there are five possible choices:
+
+    - `"ppm_livestock_inventory"`: livestock herds, with the number of
+      animals by species.
+
+    - `"ppm_sheep_farming"`: total sheep reared and specific shearing
+      data.
+
+    - `"ppm_animal_origin_production"`: animal-origin products like
+      milk, eggs, and honey, as well as wool and other derivatives.
+
+    - `"ppm_cow_farming"`: dairy cow farming, with the number of milked
+      cows, their geographic distribution, and productivity rates.
+
+    - `"ppm_aquaculture"`: aquaculture activities, including fish
+      farming, shrimp farming, and mollusk farming.
 
 2.  **raw_data**: there are two options:
 
