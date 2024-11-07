@@ -804,12 +804,7 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
     ## Population
 
-    "population", "resident_estimated", "6579", "2001-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/estimapop/tabelas",
-    "population", "resident_race_census", "9605", "2010,2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/censo-demografico/demografico-2022/universo-populacao-por-cor-ou-raca",
-    "population", "resident_race_age", "9606", "2010,2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/censo-demografico/demografico-2022/universo-populacao-por-cor-ou-raca",
-    "population", "aging_race", "9756", "2010,2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/censo-demografico/demografico-2022/universo-populacao-por-cor-ou-raca",
-    "population", "indigenous_age_sex", "9608", "2010,2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/censo-demografico/demografico-2022/universo-populacao-por-cor-ou-raca",
-    "population", "aging_indigenous", "9757", "2010,2022", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/censo-demografico/demografico-2022/universo-populacao-por-cor-ou-raca",
+    "population", "population", "6579", "2001-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/estimapop/tabelas",
 
     ###################
     ## Economic data ##
