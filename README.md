@@ -80,12 +80,12 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 <tr>
 <td>
 
-|                               |                                                         |
-|-------------------------------|---------------------------------------------------------|
-| **[IPS](#ips)**               | *Amazon Social Progress Index*                          |
-| **[DATASUS](#datasus)**       | *Causes of mortality and availability of hospital beds* |
-| **[IEMA](#iema)**             | *Access to electricity in the Amazon region*            |
-| **[Population](#population)** | *Population*                                            |
+|                               |                                                           |
+|-------------------------------|-----------------------------------------------------------|
+| **[IPS](#ips)**               | *Amazon Social Progress Index*                            |
+| **[DATASUS](#datasus)**       | *Causes of mortality and availability of hospital beds*   |
+| **[IEMA](#iema)**             | *Access to electricity in the Amazon region*              |
+| **[Population](#population)** | *Population by color or race from the demographic census* |
 
 </td>
 </tr>
@@ -931,7 +931,20 @@ country, state and municipality level and from 2001 to 2021.
 
 **Options:**
 
-1.  **dataset**: `"population"`
+1.  **dataset**: there are 6 possible options:
+
+    - `"resident_estimated"`: Resident population in the Demographic
+      Census.
+    - `"resident_race_census"`: Resident population, by color or race,
+      in the Demographic Census.
+    - `"resident_race_age"`: Resident population, by color or race,
+      according to sex and age.
+    - `"aging_race"`: Aging index, median age, and sex ratio, by color
+      or race.
+    - `"indigenous_age_sex"`: Indigenous population, by age groups and
+      sex.
+    - `"aging_indigenous"`: Aging index, median age, and sex ratio of
+      the indigenous population, according to the declaration criterion.
 
 2.  **raw_data**: there are two options:
 
@@ -953,6 +966,7 @@ country, state and municipality level and from 2001 to 2021.
 ``` r
 # download treated population data at the state level for 2010 to 2012
 data <- load_population(
+  dataset = "resident_estimated",
   raw_data = FALSE,
   geo_level = "state",
   time_period = 2010:2012

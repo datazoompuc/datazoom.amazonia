@@ -89,7 +89,7 @@ devtools::load_all()
 | **[IPS](#ips)** | _Amazon Social Progress Index_ |
 | **[DATASUS](#datasus)** | _Causes of mortality and availability of hospital beds_ |
 | **[IEMA](#iema)** | _Access to electricity in the Amazon region_ |
-| **[Population](#population)** | _Population_ |
+| **[Population](#population)** | _Population by color or race from the demographic census_ |
 
 </td></tr> </table>
 

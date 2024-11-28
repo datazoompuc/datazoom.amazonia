@@ -2,7 +2,7 @@
 #'
 #' @description Loads information on (estimated) population
 #'
-#' @param dataset A dataset name ("population").
+#' @param dataset A dataset name ("resident_estimated","resident_race_census", "resident_race_age", "aging_race", "indigenous_age_sex", "aging_indigenous").
 #' @inheritParams load_baci
 #' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state" or "municipality".
 #'
@@ -11,16 +11,18 @@
 #' @examples
 #' \dontrun{
 #' # Download raw data (raw_data = TRUE) at the country level
-#' # from 2008 to 2010 (time_period = 2008:2010).
+#' # from 2008 to 2021 (time_period = 2008:2021).
 #' data <- load_population(
+#'   dataset = "resident_estimated",
 #'   raw_data = TRUE,
 #'   geo_level = "country",
-#'   time_period = 2008:2010
+#'   time_period = 2008:2021
 #' )
 #'
 #' # Download treted data (raw_data = FALSE) by state (geo_level = "state")
-#' # from 2008 to 2010 (time_period = 2008:2010) in portuguese (language = "pt").
+#' # from 2022 (time_period = 2022) in portuguese (language = "pt").
 #' data <- load_population(
+#'   dataset = "resident_race_census",
 #'   raw_data = FALSE,
 #'   geo_level = "state",
 #'   time_period = 2008:2010,
