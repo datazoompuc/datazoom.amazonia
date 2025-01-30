@@ -365,7 +365,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   # Download path depends on dataset and geo_level
 
   if (source == "mapbiomas") {
-    if (dataset %in% c("mapbiomas_cover", "mapbiomas_transition")) {
+    if (dataset == "mapbiomas_transition") {
       if (param$geo_level == "state") {
         path <- "https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2023/08/TABELA-GERAL-MAPBIOMAS-COL8.0-BIOMASxESTADOS-1.xlsx"
       }
@@ -713,7 +713,7 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
     ## MapBiomas
 
-    "mapbiomas", "mapbiomas_cover", NA, "1985-2019", "Municipality, State", "https://brasil.mapbiomas.org/estatisticas/",
+    "mapbiomas", "mapbiomas_cover", NA, "1985-2019", "Municipality" , "https://storage.googleapis.com/mapbiomas-public/initiatives/brasil/collection_9/statistics/mapbiomas_brazil_col_coverage_biome_state_municipality.xlsx",
     "mapbiomas", "mapbiomas_transition", NA, "1985-2019", "Municipality, State", "https://brasil.mapbiomas.org/estatisticas/",
     "mapbiomas", "mapbiomas_deforestation_regeneration", NA, "1988-2017", "Municipality", "https://storage.googleapis.com/mapbiomas-public/initiatives/brasil/collection_8/downloads/tabela_desmatamento_vegetacao_secundaria_mapbiomas_col8.xlsx",
     "mapbiomas", "mapbiomas_irrigation", NA, "2000-2019", "State, Biome", "https://mapbiomas-br-site.s3.amazonaws.com/downloads/Estatisticas%20/Colecao_7_Irrigacao_Biomes_UF.xlsx",
