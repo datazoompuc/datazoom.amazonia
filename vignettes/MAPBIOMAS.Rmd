@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 The MapBiomas project gathers data reporting the type of land covering each year by area, that is, for example, the area used for a temporary crop of soybeans. It also reports the transitions in land coverage between years.
 
-The data has yearly frequency and is available starting from the year 1989.
+The data has yearly frequency and is available starting from the year 1985.
 
 For all datasets, areas are measured in hectares (ha). 
 
@@ -40,8 +40,8 @@ For all datasets, areas are measured in hectares (ha).
 
   3. **geo_level**: 
   
-      * For dataset `"mapbiomas_cover"`, can be `"municipality"` or `"state"` (faster download)
-      * For dataset `"mapbiomas_transition"`, can be `"municipality"` or `"state"` (faster download)
+      * For dataset `"mapbiomas_cover"`, can only be `"municipality"`
+      * For dataset `"mapbiomas_transition"`, can be `"municipality"` or `"biome"` (faster download)
       * For dataset `"mapbiomas_deforestation_regeneration"`, can only be `"municipality"`
       * For dataset `"mapbiomas_mining"`, can be `"indigenous_land"` or `"municipality"`
       * For dataset `"mapbiomas_irrigation"`, can be `"state"` or `"biome"`

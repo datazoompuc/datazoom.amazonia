@@ -5,8 +5,8 @@
 #' @param dataset A dataset name ("mapbiomas_cover", "mapbiomas_transition", "mapbiomas_irrigation", "mapbiomas_deforestation_regeneration", "mapbiomas_mining", "mapbiomas_water" or "mapbiomas_fire")
 #' @inheritParams load_baci
 #' @param geo_level A \code{string} that defines the geographic level of the data
-#'   * For dataset "mapbiomas_cover", can be "municipality" or "state" (faster download)
-#'   * For dataset "mapbiomas_transition", can be "municipality" or "state" (faster download)
+#'   * For dataset "mapbiomas_cover", can only be "municipality"
+#'   * For dataset "mapbiomas_transition", can be "municipality" or "biome" (faster download)
 #'   * For dataset "mapbiomas_deforestation_regeneration", can only be "municipality"
 #'   * For dataset "mapbiomas_mining", can be "indigenous_land" or "municipality"
 #'   * For dataset "mapbiomas_irrigation", can be "state" or "biome"
@@ -57,13 +57,13 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
 
   check_params(param)
 
-  # plucking sheet correspinding to each dataset/geo_level
+  # plucking sheet corresponding to each dataset/geo_level
 
   sheets <- tibble::tribble(
     ~dataset, ~geo_level, ~sheet,
     "mapbiomas_cover", "any", "COVERAGE_9",
-    "mapbiomas_transition", "state", "TRANSICOES_COL8.0",
-    "mapbiomas_transition", "municipality", "TRANSICOES_COL8.0",
+    "mapbiomas_transition", "biome", "TRANSITION_9",
+    "mapbiomas_transition", "municipality", "TRANSITION_9",
     "mapbiomas_deforestation_regeneration", "municipality", "CITY_STATE_BIOME",
     "mapbiomas_irrigation", "state", "UF",
     "mapbiomas_irrigation", "biome", "BIOME",
@@ -88,10 +88,13 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
   if (dataset %in% c(
     "mapbiomas_cover",
     "mapbiomas_transition",
-    "mapbiomas_deforestation_regeneration",
-    "mapbiomas_mining"
+    "mapbiomas_deforestation_regeneration"
   )) {
-    message("Data from MapBiomas - Collection 8\n")
+    message("Data from MapBiomas - Collection 9\n")
+  }
+
+  if (dataset %in% c("mapbiomas_mining")) {
+    message("Data from Mapbiomas - Collection 8\n")
   }
 
   if (dataset %in% c("mapbiomas_irrigation")) {
