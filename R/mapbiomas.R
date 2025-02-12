@@ -9,8 +9,8 @@
 #'   * For dataset "mapbiomas_transition", can be "municipality" or "biome" (faster download)
 #'   * For dataset "mapbiomas_deforestation_regeneration", can only be "municipality"
 #'   * For dataset "mapbiomas_mining", can be "indigenous_land" or "municipality"
-#'   * For dataset "mapbiomas_irrigation", can be "state" or "biome"
-#'   * For dataset "mapbiomas_water", can be "municipality", "state" or "biome"
+#'   * For dataset "mapbiomas_irrigation" (temporarily unavailable, a new collection will be soon delivered), can be "state" or "biome"
+#'   * For dataset "mapbiomas_water"(temporarily unavailable, a new collection will be soon delivered), can be "municipality", "state" or "biome"
 #'   * For dataset "mapbiomas_fire", can only be "state"
 #'
 #' @return A \code{tibble}.
@@ -64,7 +64,7 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
     "mapbiomas_cover", "any", "COVERAGE_9",
     "mapbiomas_transition", "biome", "TRANSITION_9",
     "mapbiomas_transition", "municipality", "TRANSITION_9",
-    "mapbiomas_deforestation_regeneration", "municipality", "CITY_STATE_BIOME",
+    "mapbiomas_deforestation_regeneration", "municipality", "DEF_SECVEG",
     "mapbiomas_irrigation", "state", "UF",
     "mapbiomas_irrigation", "biome", "BIOME",
     "mapbiomas_mining", "municipality", "CITY_STATE_BIOME",
@@ -72,7 +72,7 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
     "mapbiomas_water", "state", "states_annual",
     "mapbiomas_water", "biome", "biomes_annual",
     "mapbiomas_water", "municipality", "mun_annual",
-    "mapbiomas_fire", "state", "ANNUAL",
+    "mapbiomas_fire", "state", "a_ANNUAL",
   )
 
   sheet <- sheets %>%
@@ -101,7 +101,11 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
     message("Data from Mapbiomas - Collection 7\n")
   }
 
-  if (dataset %in% c("mapbiomas_water", "mapbiomas_fire")) {
+  if (dataset %in% c("mapbiomas_fire")) {
+    message("Data from Mapbiomas - Collection 3\n")
+  }
+
+  if (dataset %in% c("mapbiomas_water")) {
     message("Data from Mapbiomas - Collection 2\n")
   }
 
