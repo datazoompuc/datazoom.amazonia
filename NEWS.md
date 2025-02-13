@@ -1,3 +1,7 @@
+# datazoom.amazonia 1.1.2.9000 (development version)
+
+  * Updated `load_mapbiomas` to download the newest Mapbiomas Collections and to warn about the currently unavailable download URL of the datasets water and irrigation.
+
 # datazoom.amazonia 1.1.1.9000
 
   * Updated `load_baci` to support the newest version of the data, fixing the previous broken download URL. (Thanks to @OlivazShai)
