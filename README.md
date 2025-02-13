@@ -391,7 +391,8 @@ For all datasets, areas are measured in hectares (ha).
       regeneration.
     - `"mapbiomas_irrigation"`: irrigated areas.
     - `"mapbiomas_mining"`: areas used for mining.
-    - `"mapbiomas_water"`: areas of water surface.
+    - `"mapbiomas_water"` (temporarily unavailable, a new collection
+      will be soon delivered): areas of water surface.
     - `"mapbiomas_fire"`: areas of wildfire burn scars.
 
 2.  **raw_data**: there are two options:
