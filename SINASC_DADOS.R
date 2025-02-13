@@ -37,6 +37,4 @@ filtro <- teste %>%
     PartoInduzido = recode(PartoInduzido,'1'="Sim",'2'="Não",'9'="Ignorado"),
     CesariaAntesParto = recode(CesariaAntesParto, '1'="Sim",'2'="Não",'3'="Não se aplica",'9'="Ignorado"),
     Nascimento_Asssistido = recode(Nascimento_Asssistido,'1'="Medico",'2'="Enfermeira/Obstetriz",'3'="Parteira",'4'="Outros",'9'="Ignorado"),
-
-
   )
