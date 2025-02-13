@@ -721,7 +721,6 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
     "mapbiomas", "mapbiomas_fire", NA, "1985-2023", "State", "https://storage.googleapis.com/mapbiomas-public/brasil/fire/collection_3_stats/MB-Fogo-3-Biome-State.xlsx",
     "mapbiomas", "mapbiomas_water", NA, "1985-2022", "State, Municipality, Biome", "https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Estatisticas_Superficie%C3%81gua_Col2_SITE.xlsx",
 
-
     ## TerraClimate
 
     "terraclimate", "max_temperature", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
