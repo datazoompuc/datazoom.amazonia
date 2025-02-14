@@ -389,7 +389,8 @@ For all datasets, areas are measured in hectares (ha).
     - `"mapbiomas_transition"`: changes in land cover.
     - `"mapbiomas_deforestation_regeneration"`: deforestation and forest
       regeneration.
-    - `"mapbiomas_irrigation"`: irrigated areas.
+    - `"mapbiomas_irrigation"` (temporarily unavailable, a new
+      collection will be soon delivered): irrigated areas.
     - `"mapbiomas_mining"`: areas used for mining.
     - `"mapbiomas_water"` (temporarily unavailable, a new collection
       will be soon delivered): areas of water surface.
