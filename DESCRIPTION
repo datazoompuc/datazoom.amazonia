@@ -4,6 +4,7 @@ Version: 1.1.1.9000
 Authors@R: c(
     person("Igor", "Rigolon Veiga", , "igor.rilave@hotmail.com", role = c("aut", "cre")),
     person("DataZoom (PUC-Rio)", , , "datazoom@econ.puc-rio.br", role = "fnd"),
+    person("Gustavo", "Gonzaga", , "gonzaga@econ.puc-rio.br", role = "aut"),
     person("Guilherme", "Jardim", , "gnjardim1@gmail.com", role = "aut"),
     person("Daniel", "AC Barbosa", , "daniel.adrianocb@gmail.com", role = "aut"),
     person("Bruno", "Alcantara Duarte", , "brunoalcanduarte@gmail.com", role = "aut"),
