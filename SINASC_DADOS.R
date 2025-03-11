@@ -48,36 +48,36 @@ teste <- datazoom.amazonia:::read.dbc(temp)
 
 filtro <- teste %>%
   janitor::clean_names() %>%
-  # renomeando as colunas
-  rename(origem_dados = origem, local_nascimento = locnasc, conjugal_mae = estcivmae, escolaridade_mae = escmae,
-         filhos_nascidos_vivos = qtdfilvivo, filhos_nascidos_mortos = qtdfilmort, municipio_residencia = codmunres,
-         consultas_pre_natal = consultas, peso_gramas = peso, anomalia_cognitiva = idanomal, data_cadastro_sistema = dtcadastro,
-         codigo_malformacao = codanomal, naturalidade_mae_municipio = codmunnatu, naturalidade_mae_uf = codufnatu,
-         escolaridade_mae_2010 = escmae2010, gestacoes_anteriores = qtdgestant, partos_vaginais_anteriores = qtdpartnor,
-         partos_cesareas_anteriores = qtdpartces, data_ultima_menstruacao = dtultmenst, semanas_gestacao = semagestac,
-         estimar_semanas_gestacao = tpmetestim, num_consultas_pre_natal = consprenat, mes_inicio_pre_natal = mesprenat,
-         parto_induzido = sttrabpart, cesaria_antes_parto = stcesparto, nascimento_assistido = tpnascassi) %>%
+  # Renomeando as colunas
+  rename(
+    origem_dados = origem, local_nascimento = locnasc, conjugal_mae = estcivmae, escolaridade_mae = escmae, filhos_nascidos_vivos = qtdfilvivo, filhos_nascidos_mortos = qtdfilmort,
+    municipio_residencia = codmunres, consultas_pre_natal = consultas, peso_gramas = peso, anomalia_cognitiva = idanomal, data_cadastro_sistema = dtcadastro, codigo_malformacao = codanomal,
+    naturalidade_mae_municipio = codmunnatu, naturalidade_mae_uf = codufnatu, escolaridade_mae_2010 = escmae2010, numero_gestacoes_anteriores = qtdgestant, numero_gestacoes_vaginais_anteriores = qtdpartnor,
+    numero_gestacoes_cesarias_anteriores = qtdpartces, data_ultima_menstruacao = dtultmenst, semanas_gestacao = semagestac, estimar_semanas_gestacao = tpmetestim, numero_consultas_pre_natal = consprenat,
+    mes_inicio_pre_natal = mesprenat, parto_induzido = sttrabpart, cesaria_antes_parto = stcesparto, nascimento_assistido = tpnascassi
+  ) %>%
 
-  # documentando as colunas
+  # Documentando as colunas
   mutate(
     origem_dados = recode(origem_dados, '1' = "oracle", '2' = "ftp", '3' = "sead"),
-    local_nascimento = recode(local_nascimento, '1' = "hospital", '2' = "outros estabelecimentos saude", '3' = "domicilio", '4' = "outros", '5' = "aldeia indigena", '9' = "ignorado"),
-    conjugal_mae = recode(conjugal_mae, '1' = "solteira", '2' = "casada", '3' = "viuva", '4' = "divorciada", '5' = "uniao estavel", '9' = "ignorado"),
+    local_nascimento = recode(local_nascimento, '1' = "hospital", '2' = "outros estabelecimentos de saude", '3' = "domicilio", '4' = "outros", '5' = "aldeia indigena", '9' = "ignorado"),
+    conjugal_mae = recode(conjugal_mae, '1' = "solteira", '2' = "casada", '3' = "viuva", '4' = "divorciada", '5' = "uniao estavel", '9' = "ignorada"),
     escolaridade_mae = recode(escolaridade_mae, '1' = "nenhuma", '2' = "1 a 2 anos", '3' = "4 a 7 anos", '4' = "8 a 11 anos", '5' = "12 e mais", '9' = "ignorado"),
-    gestacao = recode(gestacao, '1' = "menos 22 semanas", '2' = "22 a 27 semanas", '3' = "28 a 31 semanas", '4' = "32 a 36 semanas", '5' = "37 a 41 semanas", '6'= "42 semanas mais", '9'="ignorado"),
-    gravidez = recode(gravidez, '1' = "unica", '2' = "dupla", "3" = "tripla ou mais", '9' = "ignorado"),
-    parto = recode(parto, '1' = "vaginal", '2' = "cesario", '9'="ignorado"),
-    consultas_pre_natal = recode(consultas_pre_natal, '1' = "nenhuma", '2'="1 a 3", '3'="4 a 6", '4'="7 ou mais", '9'="ignorado"),
-    sexo = recode(sexo, '0' = "ignorado", '1'= "masculino", '2'="feminino"),
-    racacor = recode(racacor, '1'="branca", '2'="preta", '3'="amarela", '4'="parda", '5'="indigena"),
-    anomalia_cognitiva = recode(anomalia_cognitiva, '9' = "ignorado", '1'="sim", '2'="nao"),
-    escolaridade_mae_2010 = recode(escolaridade_mae_2010, '0' = "sem escolaridade", '1'="fundamental 1", '2'="fundamental 2", '3' = "medio", '4' = "superior incompleto", '5' = "superior completo", '9'="ignorado"),
+    gestacao = recode(gestacao, '1' = "menos de 22 semanas", '2' = "22 a 27 semanas", '3' = "28 a 31 semanas", '4' = "32 a 36 semanas", '5' = "37 a 41 semanas", '6' = "42 semanas e mais", '9' = "ignorado"),
+    gravidez = recode(gravidez, '1' = "unica", '2' = "dupla", '3' = "tripla ou mais", '9' = "ignorado"),
+    parto = recode(parto, '1' = "vaginal", '2' = "cesario", '9' = "ignorado"),
+    consultas_pre_natal = recode(consultas_pre_natal, '1' = "nenhuma", '2' = "de 1 a 3", '3' = "de 4 a 6", '4' = "7 e mais", '9' = "ignorado"),
+    sexo = recode(sexo, '0' = "ignorado", '1' = "masculino", '2' = "feminino"),
+    racacor = recode(racacor, '1' = "branca", '2' = "preta", '3' = "amarela", '4' = "parda", '5' = "indigena"),
+    anomalia_cognitiva = recode(anomalia_cognitiva, '9' = "ignorado", '1' = "sim", '2' = "nao"),
+    escolaridade_mae_2010 = recode(escolaridade_mae_2010, '0' = "sem escolaridade", '1' = "fundamental 1", '2' = "fundamental 2", '3' = "medio", '4' = "superior incompleto", '5' = "superior completo", '9' = "ignorado"),
     dtnascmae = dmy(as.character(dtnascmae)),
-    racacormae = recode(racacormae, '1'="branca", '2'="preta", '3'="amarela", '4'="parda", '5'="indigena"),
+    racacormae = recode(racacormae, '1' = "branca", '2' = "preta", '3' = "amarela", '4' = "parda", '5' = "indigena"),
     data_ultima_menstruacao = dmy(as.character(data_ultima_menstruacao)),
-    estimar_semanas_gestacao = recode(estimar_semanas_gestacao, '1'="exame fisico", '2'="outro metodo", '9'="ignorado"),
-    tipo_apresentacao = recode(tpapresent, '1'="cefalica", '2'="pelvica ou podalica", '3'="transversa", '9'="ignorado"),
-    parto_induzido = recode(parto_induzido, '1'="sim", '2'="nao", '9'="ignorado"),
-    cesaria_antes_parto = recode(cesaria_antes_parto, '1'="sim", '2'="nao", '3'="nao se aplica", '9'="ignorado"),
-    nascimento_assistido = recode(nascimento_assistido, '1'="medico", '2'="enfermeira obstetriz", '3'="parteira", '4'="outros", '9'="ignorado")
+    estimar_semanas_gestacao = recode(estimar_semanas_gestacao, '1' = "exame fisico", '2' = "outro metodo", '9' = "ignorado"),
+    tpapresent = recode(tpapresent, '1' = "cefalica", '2' = "pelvica ou podalica", '3' = "transversa", '9' = "ignorado"),
+    parto_induzido = recode(parto_induzido, '1' = "sim", '2' = "nao", '9' = "ignorado"),
+    cesaria_antes_parto = recode(cesaria_antes_parto, '1' = "sim", '2' = "nao", '3' = "nao se aplica", '9' = "ignorado"),
+    nascimento_assistido = recode(nascimento_assistido, '1' = "medico", '2' = "enfermeira obstetriz", '3' = "parteira", '4' = "outros", '9' = "ignorado")
   )
+
