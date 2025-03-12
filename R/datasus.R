@@ -278,13 +278,6 @@ load_datasus <- function(dataset,
   if( param$dataset == "datazoom_sinasc" ) {
 
     dat <- dat %>%
-      rename(
-        origem_dados = origem, local_nascimento = locnasc, conjugal_mae = estcivmae, escolaridade_mae = escmae, filhos_nascidos_vivos = qtdfilvivo, filhos_nascidos_mortos = qtdfilmort,
-        municipio_residencia = codmunres, consultas_pre_natal = consultas, peso_gramas = peso, anomalia_cognitiva = idanomal, data_cadastro_sistema = dtcadastro, codigo_malformacao = codanomal,
-        naturalidade_mae_municipio = codmunnatu, naturalidade_mae_uf = codufnatu, escolaridade_mae_2010 = escmae2010, numero_gestacoes_anteriores = qtdgestant, numero_gestacoes_vaginais_anteriores = qtdpartnor,
-        numero_gestacoes_cesarias_anteriores = qtdpartces, data_ultima_menstruacao = dtultmenst, semanas_gestacao = semagestac, estimar_semanas_gestacao = tpmetestim, numero_consultas_pre_natal = consprenat,
-        mes_inicio_pre_natal = mesprenat, parto_induzido = sttrabpart, cesaria_antes_parto = stcesparto, nascimento_assistido = tpnascassi
-      ) %>%
 
       # Documentando as colunas
       mutate(

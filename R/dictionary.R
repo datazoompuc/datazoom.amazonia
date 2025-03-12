@@ -739,6 +739,76 @@ load_dictionary <- function(dataset) {
     )
   }
 
+  if (stringr::str_detect(dataset, "datasus_sinasc")) {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~name_pt, ~name_eng, ~label_pt, ~label_eng,
+
+      # SINASC (Live Birth Information System)
+
+      "origem", "origem", "origem", "Origem dos dados", "Data source",
+      "locnasc", "locnasc", "locnasc", "Local de nascimento", "Place of birth",
+      "estcivmae", "estcivmae", "estcivmae", "Estado civil da mae", "Mother's marital status",
+      "escmae", "escmae", "escmae", "Escolaridade da mae", "Mother's education level",
+      "qtdfilvivo", "qtdfilvivo", "qtdfilvivo", "Filhos nascidos vivos", "Live-born children",
+      "qtdfilmort", "qtdfilmort", "qtdfilmort", "Filhos nascidos mortos", "Stillborn children",
+      "codmunres", "codmunres", "codmunres", "Municipio de residencia", "Municipality of residence",
+      "consultas", "consultas", "consultas", "Consultas pre natal", "Prenatal consultations",
+      "peso", "peso", "peso", "Peso ao nascer (gramas)", "Birth weight (grams)",
+      "idanomal", "idanomal", "idanomal", "Anomalia congenita", "Congenital anomaly",
+      "dtcadastro", "dtcadastro", "dtcadastro", "Data de cadastro no sistema", "System registration date",
+      "codanomal", "codanomal", "codanomal", "Descrever todas as anomalias congênitas observadas", "Describe all congenital anomalies observed",
+      "codmunnatu", "codmunnatu", "codmunnatu", "Municipio de naturalidade da mae", "Mother's municipality of origin",
+      "codufnatu", "codufnatu", "codufnatu", "UF de naturalidade da mae", "Mother's state of origin",
+      "escmae2010", "escmae2010", "escmae2010", "Escolaridade da mae 2010", "Mother's education level 2010",
+      "qtdgestant", "qtdgestant", "qtdgestant", "Numero de gestacoes anteriores", "Number of previous pregnancies",
+      "qtdpartnor", "qtdpartnor", "qtdpartnor", "Numero de partos normais anteriores", "Number of previous vaginal deliveries",
+      "qtdpartces", "qtdpartces", "qtdpartces", "Numero de partos cesareanos anteriores", "Number of previous C-sections",
+      "dtultmenst", "dtultmenst", "dtultmenst", "Data da ultima menstruacao", "Date of last menstruation",
+      "semagestac", "semagestac", "semagestac", "Semanas de gestacao", "Gestational weeks",
+      "tpmetestim", "tpmetestim", "tpmetestim", "Metodo de estimacao das semanas de gestacao", "Method of gestational age estimation",
+      "consprenat", "consprenat", "consprenat", "Numero de consultas pre-natal", "Number of prenatal consultations",
+      "mesprenat", "mesprenat", "mesprenat", "Mes de inicio do pre-natal", "Month of prenatal start",
+      "sttrabpart", "sttrabpart", "sttrabpart", "Parto induzido", "Induced labor",
+      "stcesparto", "stcesparto", "stcesparto", "Cesarea ocorreu antes do trabalho de parto iniciar", "Caesarean section occurred before labor began",
+      "tpnascassi", "tpnascassi", "tpnascassi", "Nascimento assistido por", "Birth assisted by",
+      "sexo", "sexo", "sexo", "Sexo do bebe", "Baby's sex",
+      "racacor", "racacor", "racacor", "Cor da raca", "Race color",
+      "racacormae", "racacormae", "racacormae", "Cor da raca da mae", "Mother's race color",
+      "dtnascmae", "dtnascmae", "dtnascmae", "Data de nascimento da mae", "Mother's date of birth",
+      "tpapresent", "tpapresent", "tpapresent", "Tipo de apresentacão do RN", "Type of presentation of the newborn",
+      "dtnasc", "dtnasc", "dtnasc", "Data do nascimento do recem nascido", "Date of birth of the newborn",
+      "horanasc", "horanasc","horanasc", "Horario exato ou aproximado do nascimento do recem nascido", "Exact or approximate time of birth of the newborn",
+      "apgar1", "apgar1", "apgar1", "Valor do indice de Apgar, medido no 1 minuto de vida", "Apgar Score Value, measured in the 1 minute of life",
+      "apgar5", "apgar5", "apgar5", "Valor do indice de Apgar, medido no 5 minuto de vida", "Apgar Score Value, measured in the 5 minute of life",
+      "codestab","codestab","codestab", "Codigo do Cadastro Nacional de estabelecimento onde ocorreu o nascimento", "National Registry Code of the establishment where the birth occurred",
+      "codmunnasc","codmunnasc","codmunnasc", "Codigo do município de nascimento", "Code of the municipality of birth",
+      "seriescmae","seriescmae","seriescmae", "Serie escolar da mae", "Mother's school series",
+      "codocupmae","codocupmae","codocupmae", "Codigo de ocupacao da mae conforme tabela do CBO (Código Brasileiro de Ocupacoes)","Mother's occupation code according to the CBO (Brazilian Occupation Code) table",
+      "idademae", "idademae", "idademae", "Idade da mae", "Mother's age",
+      "naturalmae", "naturalmae", "naturalmae", "Se a mae for estrangeira, constara o código do país de nascimento", "If the mother is a foreigner, the country of birth code will be included",
+      "idadepai", "idadepai", "idadepai", "Idade do pai", "Father's age",
+      "gestacao", "gestacao", "gestacao", "Semanas de gestacão agrupado", "Weeks of gestation grouped",
+      "gravidez", "gravidez", "gravidez", "Tipo de gravidez", "Type of pregnancy",
+      "parto", "parto", "parto", "Tipo de parto", "Type of delivery",
+      "dtdeclarac", "dtdeclarac", "dtdeclarac", "Data do preenchimento", "Date of completion",
+      "tpfuncrep", "tpfuncrep", "tpfuncrep", "Data do preenchimento da declaracao", "Date of completion of the declaration",
+      "tpdocresp", "tpdocresp", "tpdocresp", "Tipo de documento do responsavel pelo preenchimento da declaracao", "Type of document of the person responsible for completing the declaration",
+      "escmaeagr1", "escmaeagr1", "escmaeagr1", "Escolaridade da mae agregada", "Education level of the household mother",
+      "stdnepidem", "stdnepidem", "stdnepidem", "Status de DN Epidemiologica", "Epidemiological DN Status",
+      "stdnnova", "stdnnova", "stdnnova", "Status de DN Nova", "New DN Status",
+      "codpaisres", "codpaisres", "codpaisres", "Codigo do pais de residência", "Country of residence code",
+      "tprobson", "tprobson", "tprobson", "Codigo do Grupo de Robson, gerado pelo sistema", "Robson Group Code, generated by the system",
+      "paridade", "paridade", "paridade", "Variavel calculada pelo sistema", "Variable calculated by the system",
+      "kotelchuck", "kotelchuck", "kotelchuck", "Codigos de classificacao de adequacao ao pre natal, gerado pelo sistema", "Classification codes for suitability for prenatal care, generated by the system",
+      "dtrecoriga", "dtrecoriga", "dtrecoriga", "Data de recebimento original calculado pelo sistema", "Original receipt date calculated by system",
+      "difdata", "difdata", "difdata", "Diferenca entre a data de obito e data do recebimento original da DO ([dtnasc] –[dtrecorig])", "Difference between the date of death and the date of original receipt of the DO ([dtnasc] – [dtrecorig])",
+      "dtrecebim", "dtrecebim", "dtrecebim", "Data do ultimo recebimento do lote, dada pelo Sisnet", "Date of last receipt of the batch, given by Sisnet",
+      "versaosist", "versaosist", "versaosist", "Versao do sistema ", "System version",
+      "numerolote", "numerolote", "numerolote", "Numero do lote", "Lot number"
+
+    )
+  }
+
   if (dataset == "datasus_sih") {
     harmonization_dat <- tibble::tribble(
       ~var_code, ~name_pt, ~name_eng, ~label_pt, ~label_eng,
