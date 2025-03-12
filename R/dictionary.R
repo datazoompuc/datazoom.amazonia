@@ -804,7 +804,8 @@ load_dictionary <- function(dataset) {
       "difdata", "difdata", "difdata", "Diferenca entre a data de obito e data do recebimento original da DO ([dtnasc] –[dtrecorig])", "Difference between the date of death and the date of original receipt of the DO ([dtnasc] – [dtrecorig])",
       "dtrecebim", "dtrecebim", "dtrecebim", "Data do ultimo recebimento do lote, dada pelo Sisnet", "Date of last receipt of the batch, given by Sisnet",
       "versaosist", "versaosist", "versaosist", "Versao do sistema ", "System version",
-      "numerolote", "numerolote", "numerolote", "Numero do lote", "Lot number"
+      "numerolote", "numerolote", "numerolote", "Numero do lote", "Lot number",
+      "TPFUNCRESP","TPFUNCRESP","TPFUNCRESP", "Funcao exercida pelo responsável pelo preenchimento da declaracao", "Function performed by the person responsible for completing the declaration",
 
     )
   }
