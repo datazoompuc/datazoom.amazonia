@@ -275,7 +275,7 @@ load_datasus <- function(dataset,
       )
   }
 
-  if( param$dataset == "datazoom_sinasc" ) {
+  if( param$dataset == "datasus_sinasc" ) {
 
     dat <- dat %>%
 
