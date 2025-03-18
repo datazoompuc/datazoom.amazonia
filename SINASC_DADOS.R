@@ -92,3 +92,5 @@ filtro <- teste %>%
     nascimento_assistido = recode(nascimento_assistido, '1' = "medico", '2' = "enfermeira obstetriz", '3' = "parteira", '4' = "outros", '9' = "ignorado")
   )
 
+
+teste <- datasus
