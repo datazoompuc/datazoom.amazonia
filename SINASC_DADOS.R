@@ -1,5 +1,16 @@
-library(dplyr)
+install.packages("tidyverse")
+install.packages("lubridate")
+install.packages("devtools")
+
+
+library(devtools)
+library(tidyverse)
 library(lubridate)
+
+devtools::load_all()
+
+library("datazoom.amazonia")
+
 
 url <- "ftp://ftp.datasus.gov.br/dissemin/publicos/SINASC/1996_/Dados/DNRES/DNAC2023.dbc"
 temp <- tempfile()
