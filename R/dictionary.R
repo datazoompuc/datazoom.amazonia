@@ -811,7 +811,7 @@ load_dictionary <- function(dataset) {
       "dtrecebim", "dtrecebim", "dtrecebim", "Data do ultimo recebimento do lote, dada pelo Sisnet", "Date of last receipt of the batch, given by Sisnet",
       "versaosist", "versaosist", "versaosist", "Versao do sistema ", "System version",
       "numerolote", "numerolote", "numerolote", "Numero do lote", "Lot number",
-      "TPFUNCRESP","TPFUNCRESP","TPFUNCRESP", "Funcao exercida pelo responsável pelo preenchimento da declaracao", "Function performed by the person responsible for completing the declaration",
+      "tpfuncresp","tpfuncresp","tpfuncresp", "Funcao exercida pelo responsável pelo preenchimento da declaracao", "Function performed by the person responsible for completing the declaration",
 
     )
   }
