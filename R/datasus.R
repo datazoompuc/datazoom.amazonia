@@ -302,7 +302,6 @@ load_datasus <- function(dataset,
         stcesparto <- recode(stcesparto, '1' = "sim", '2' = "nao", '3' = "nao se aplica", '9' = "ignorado"),
         tpnascassi <- recode(tpnascassi, '1' = "medico", '2' = "enfermeira obstetriz", '3' = "parteira", '4' = "outros", '9' = "ignorado")
       )
-    return(dat)
   }
 
   if (!(param$dataset %in% c("datasus_sih", "datasus_sinasc"))) {
