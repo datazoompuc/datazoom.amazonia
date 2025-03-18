@@ -280,7 +280,7 @@ load_datasus <- function(dataset,
     dat <- dat %>%
 
       # Documentando as colunas
-      mutate(
+      dplyr::mutate(
         origem = recode(origem, '1' = "oracle", '2' = "ftp", '3' = "sead"),
         locnasc = recode(locnasc, '1' = "hospital", '2' = "outros estabelecimentos de saude", '3' = "domicilio", '4' = "outros", '5' = "aldeia indigena", '9' = "ignorado"),
         estcivmae = recode(estcivmae, '1' = "solteira", '2' = "casada", '3' = "viuva", '4' = "divorciada", '5' = "uniao estavel", '9' = "ignorada"),
