@@ -365,12 +365,12 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   # Download path depends on dataset and geo_level
 
   if (source == "mapbiomas") {
-    if (dataset %in% c("mapbiomas_cover", "mapbiomas_transition")) {
-      if (param$geo_level == "state") {
-        path <- "https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2023/08/TABELA-GERAL-MAPBIOMAS-COL8.0-BIOMASxESTADOS-1.xlsx"
+    if (dataset == "mapbiomas_transition") {
+      if (param$geo_level == "biome") {
+        path <- "https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2024/08/MAPBIOMAS_BRAZIL-COL.9-BIOMES.xlsx"
       }
       if (param$geo_level == "municipality") {
-        path <- "https://storage.googleapis.com/mapbiomas-public/initiatives/brasil/collection_8/downloads/statistics/tabela_geral_mapbiomas_col8_biomas_municipios.xlsx"
+        path <- "https://storage.googleapis.com/mapbiomas-public/initiatives/brasil/collection_9/downloads/mapbiomas_brasil_col9_state_municipality.xlsx"
       }
     }
   }
@@ -713,14 +713,13 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
     ## MapBiomas
 
-    "mapbiomas", "mapbiomas_cover", NA, "1985-2019", "Municipality, State", "https://brasil.mapbiomas.org/estatisticas/",
-    "mapbiomas", "mapbiomas_transition", NA, "1985-2019", "Municipality, State", "https://brasil.mapbiomas.org/estatisticas/",
-    "mapbiomas", "mapbiomas_deforestation_regeneration", NA, "1988-2017", "Municipality", "https://storage.googleapis.com/mapbiomas-public/initiatives/brasil/collection_8/downloads/tabela_desmatamento_vegetacao_secundaria_mapbiomas_col8.xlsx",
+    "mapbiomas", "mapbiomas_cover", NA, "1985-2023", "Municipality" , "https://storage.googleapis.com/mapbiomas-public/initiatives/brasil/collection_9/statistics/mapbiomas_brazil_col_coverage_biome_state_municipality.xlsx",
+    "mapbiomas", "mapbiomas_transition", NA, "1985-2023", "Municipality, Biome", "https://brasil.mapbiomas.org/estatisticas/",
+    "mapbiomas", "mapbiomas_deforestation_regeneration", NA, "1985-2023", "Municipality", "https://storage.googleapis.com/mapbiomas-public/initiatives/brasil/collection_9/downloads/mapbiomas_brasil_col9_deforestation_and_secondary_vegetation_state_municipality.xlsx",
     "mapbiomas", "mapbiomas_irrigation", NA, "2000-2019", "State, Biome", "https://mapbiomas-br-site.s3.amazonaws.com/downloads/Estatisticas%20/Colecao_7_Irrigacao_Biomes_UF.xlsx",
-    "mapbiomas", "mapbiomas_mining", NA, "1985-2020", "Municipality, Indigenous_Land", "https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2023/09/TABELA-MINERACAO-MAPBIOMAS-COL8.0.xlsx",
-    "mapbiomas", "mapbiomas_fire", NA, "1985-2020", "State", "https://mapbiomas-br-site.s3.amazonaws.com/downloads/MB-Fogo-2-Biome-State.xlsx",
+    "mapbiomas", "mapbiomas_mining", NA, "1985-2022", "Municipality, Indigenous_Land", "https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2023/09/TABELA-MINERACAO-MAPBIOMAS-COL8.0.xlsx",
+    "mapbiomas", "mapbiomas_fire", NA, "1985-2023", "State", "https://storage.googleapis.com/mapbiomas-public/brasil/fire/collection_3_stats/MB-Fogo-3-Biome-State.xlsx",
     "mapbiomas", "mapbiomas_water", NA, "1985-2022", "State, Municipality, Biome", "https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Estatisticas_Superficie%C3%81gua_Col2_SITE.xlsx",
-
 
     ## TerraClimate
 

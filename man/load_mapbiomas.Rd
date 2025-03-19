@@ -18,12 +18,12 @@ load_mapbiomas(
 
 \item{geo_level}{A \code{string} that defines the geographic level of the data
 \itemize{
-\item For dataset "mapbiomas_cover", can be "municipality" or "state" (faster download)
-\item For dataset "mapbiomas_transition", can be "municipality" or "state" (faster download)
+\item For dataset "mapbiomas_cover", can only be "municipality"
+\item For dataset "mapbiomas_transition", can be "municipality" or "biome" (faster download)
 \item For dataset "mapbiomas_deforestation_regeneration", can only be "municipality"
 \item For dataset "mapbiomas_mining", can be "indigenous_land" or "municipality"
-\item For dataset "mapbiomas_irrigation", can be "state" or "biome"
-\item For dataset "mapbiomas_water", can be "municipality", "state" or "biome"
+\item For dataset "mapbiomas_irrigation" (temporarily unavailable, a new collection will be soon delivered), can be "state" or "biome"
+\item For dataset "mapbiomas_water"(temporarily unavailable, a new collection will be soon delivered), can be "municipality", "state" or "biome"
 \item For dataset "mapbiomas_fire", can only be "state"
 }}
 

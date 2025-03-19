@@ -375,7 +375,7 @@ crop of soybeans. It also reports the transitions in land coverage
 between years.
 
 The data has yearly frequency and is available starting from the year
-1989.
+1985.
 
 For all datasets, areas are measured in hectares (ha).
 
@@ -389,9 +389,11 @@ For all datasets, areas are measured in hectares (ha).
     - `"mapbiomas_transition"`: changes in land cover.
     - `"mapbiomas_deforestation_regeneration"`: deforestation and forest
       regeneration.
-    - `"mapbiomas_irrigation"`: irrigated areas.
+    - `"mapbiomas_irrigation"` (temporarily unavailable, a new
+      collection will be soon delivered): irrigated areas.
     - `"mapbiomas_mining"`: areas used for mining.
-    - `"mapbiomas_water"`: areas of water surface.
+    - `"mapbiomas_water"` (temporarily unavailable, a new collection
+      will be soon delivered): areas of water surface.
     - `"mapbiomas_fire"`: areas of wildfire burn scars.
 
 2.  **raw_data**: there are two options:
@@ -401,10 +403,9 @@ For all datasets, areas are measured in hectares (ha).
 
 3.  **geo_level**:
 
-    - For dataset `"mapbiomas_cover"`, can be `"municipality"` or
-      `"state"` (faster download)
+    - For dataset `"mapbiomas_cover"`, can only be `"municipality"`
     - For dataset `"mapbiomas_transition"`, can be `"municipality"` or
-      `"state"` (faster download)
+      `"biome"` (faster download)
     - For dataset `"mapbiomas_deforestation_regeneration"`, can only be
       `"municipality"`
     - For dataset `"mapbiomas_mining"`, can be `"indigenous_land"` or

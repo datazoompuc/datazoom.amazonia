@@ -18,10 +18,6 @@
 #' )
 #' }
 #'
-#' @encoding UTF-8
-#'
-#' @importFrom magrittr %>%
-#'
 #' @export
 
 load_baci <- function(dataset = "HS92", raw_data = FALSE, time_period,

@@ -28,7 +28,6 @@
 #' The internal C code for \code{dbc2dbf} is based on \code{blast} decompressor and \code{blast-dbf} (see \emph{References}).
 #' @keywords dbc dbf
 #' @author Daniela Petruzalek, \email{daniela.petruzalek@gmail.com}
-#' @useDynLib datazoom.amazonia
 #' @seealso \code{read.dbc}
 #' @examples
 #' \dontrun{
@@ -52,7 +51,7 @@
 #'
 #' \code{blast-dbf}, DBC to DBF command-line decompression tool: \url{https://github.com/eaglebh/blast-dbf}
 #'
-dbc2dbf <- function(input.file, output.file) {
+dbc2dbf_wrapper <- function(input.file, output.file) {
   if (!file.exists(input.file)) {
     stop("Input file does not exist.")
   }
