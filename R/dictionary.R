@@ -746,11 +746,11 @@ load_dictionary <- function(dataset) {
       # SINASC (Live Birth Information System)
 
       "origem", "origem", "origem", "Origem dos dados", "Data source",
-      "code_muni", "code_muni", "code_muni", "Codigo do municipio", "Municipal code",
+      "code_muni", "code_muni", "code_muni", "Codigo IBGE do municipio", "IBGE Municipality code",
       "name_muni", "name_muni", "name_muni", "Nome do municipio", "City name",
       "code_state", "code_state", "code_state", "Codigo do estado", "State code",
       "abbrev_state", "abbrev_state", "abbrev_state", "Sigla do estado", "State abbreviation",
-      "legal_amazon", "legal_amazon", "legal_amazon", "Legalizacao da amazonia", "Legalization of the Amazon",
+      "legal_amazon", "legal_amazon", "legal_amazon", "Amazonia Legal", "Legal Amazon",
       "dtobito", "data_obito", "death_date", "Data do obito", "Date of death",
       "locnasc","local_nascimento", "birth_place", "Local de nascimento", "Place of birth",
       "estcivmae", "estado_civil_mae", "mother_marital_status", "Estado civil da mae", "Mother's marital status",
