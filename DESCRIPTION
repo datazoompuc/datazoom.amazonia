@@ -38,7 +38,9 @@ Imports:
     tibble,
     tidyr,
     utils,
-    XML
+    XML,
+    terra,
+    lubridate
 Suggests: 
     foreign,
     googledrive,
