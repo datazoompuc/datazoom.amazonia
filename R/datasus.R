@@ -72,6 +72,12 @@ load_datasus <- function(dataset,
   legal_amazon <- link <- month <- name_muni <- qt_exist <- qt_nsus <- value <- NULL
   var_code <- year <- qt_sus <- causabas <- available_time <- NULL
 
+  origem <- locnasc <- estcivmae <- escmae <- semagestac <- gravidez <- parto <- NULL
+    consprenat <- sexo <- racacor <- idanomal <- escmae2010 <- dtnascmae <- NULL
+    racacormae <- dtultmenst <- tpmetestim <- tpapresent <- sttrabpart <- NULL
+    stcesparto <- tpnascassi <- codmunnasc <- NULL
+
+
   #############################
   ## Define Basic Parameters ##
   #############################
