@@ -15,7 +15,7 @@ Authors@R: c(
     person("Anna Carolina", "Dutra Saraiva", email = "annadutrasaraiva@gmail.com", role = "aut"),
     person("Arthur", "Carvalho Brito", email = "arthurcbps@gmail.com", role = "aut"),
     person("Francisco", "de Lima Cavalcanti", email = "francisco.lima.cavalcanti@gmail.com", role = "aut"),
-    person("Maria", "Mittelbach", email = "mariamittelbach@gmail.com", role = "aut")
+    person("Maria", "Mittelbach", email = "mariamittelbach@gmail.com", role = "aut"),
     person("Felipe", "de Moraes Nunes", , "felipedmoraesn@gmail.com", role = "aut")
   )
 Description: Functions to download and treat data regarding the Brazilian
