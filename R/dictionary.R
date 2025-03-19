@@ -752,7 +752,7 @@ load_dictionary <- function(dataset) {
       "abbrev_state", "abbrev_state", "abbrev_state", "Sigla do estado", "State abbreviation",
       "legal_amazon", "legal_amazon", "legal_amazon", "Legalizacao da amazonia", "Legalization of the Amazon",
       "dtobito", "data_obito", "death_date", "Data do obito", "Date of death",
-      "locnasc","local_nascimento", "local_nascimento", "birth_place", "Local de nascimento", "Place of birth",
+      "locnasc","local_nascimento", "birth_place", "Local de nascimento", "Place of birth",
       "estcivmae", "estado_civil_mae", "mother_marital_status", "Estado civil da mae", "Mother's marital status",
       "escmae", "escolaridade_mae", "mother_education", "Escolaridade da mae", "Mother's education level",
       "qtdfilvivo", "qtdfilvivo", "qtdfilvivo", "Filhos nascidos vivos", "Live-born children",
