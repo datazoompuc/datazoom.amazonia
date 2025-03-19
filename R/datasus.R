@@ -73,9 +73,9 @@ load_datasus <- function(dataset,
   var_code <- year <- qt_sus <- causabas <- available_time <- NULL
 
   origem <- locnasc <- estcivmae <- escmae <- semagestac <- gravidez <- parto <- NULL
-    consprenat <- sexo <- racacor <- idanomal <- escmae2010 <- dtnascmae <- NULL
-    racacormae <- dtultmenst <- tpmetestim <- tpapresent <- sttrabpart <- NULL
-    stcesparto <- tpnascassi <- codmunnasc <- NULL
+  consprenat <- sexo <- racacor <- idanomal <- escmae2010 <- dtnascmae <- NULL
+  racacormae <- dtultmenst <- tpmetestim <- tpapresent <- sttrabpart <- NULL
+  stcesparto <- tpnascassi <- codmunnasc <- NULL
 
 
   #############################
