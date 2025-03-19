@@ -1,22 +1,23 @@
 Package: datazoom.amazonia
 Title: Simplify Access to Data from the Amazon Region
-Version: 1.1.2.9000
+Version: 1.1.3.9000
 Authors@R: c(
-    person("Igor", "Rigolon Veiga", email = "igor.rilave@hotmail.com", role = c("aut", "cre")),
-    person("DataZoom (PUC-Rio)", email = "datazoom@econ.puc-rio.br", role = "fnd"),
+    person("Igor", "Rigolon Veiga", , "igor.rilave@hotmail.com", role = c("aut", "cre")),
+    person("DataZoom (PUC-Rio)", , , "datazoom@econ.puc-rio.br", role = "fnd"),
     person("Gustavo", "Gonzaga", email = "gonzaga@econ.puc-rio.br", role = "aut"),
-    person("Guilherme", "Jardim", email = "gnjardim1@gmail.com", role = "aut"),
-    person("Daniel", "AC Barbosa", email = "daniel.adrianocb@gmail.com", role = "aut"),
-    person("Bruno", "Alcantara Duarte", email = "brunoalcanduarte@gmail.com", role = "aut"),
-    person("Fredie", "Didier", email = "fdidier@terra.com.br", role = "aut"),
-    person("Tito", "Bruni", email = "titonico.bruni@gmail.com", role = "aut"),
-    person("Luiz Guilherme", "Lopes Moussatche", email = "luizguilherme.lopesm@gmail.com", role = "aut"),
-    person("Victor", "Aliende da Matta", email = "victor.al.matta@gmail.com", role = "aut"),
-    person("Anna Carolina", "Dutra Saraiva", email = "annadutrasaraiva@gmail.com", role = "aut"),
-    person("Arthur", "Carvalho Brito", email = "arthurcbps@gmail.com", role = "aut"),
-    person("Francisco", "de Lima Cavalcanti", email = "francisco.lima.cavalcanti@gmail.com", role = "aut"),
-    person("Maria", "Mittelbach", email = "mariamittelbach@gmail.com", role = "aut"),
-    person("Felipe", "de Moraes Nunes", , "felipedmoraesn@gmail.com", role = "aut")
+    person("Guilherme", "Jardim", , "gnjardim1@gmail.com", role = "aut"),
+    person("Daniel", "AC Barbosa", , "daniel.adrianocb@gmail.com", role = "aut"),
+    person("Bruno", "Alcantara Duarte", , "brunoalcanduarte@gmail.com", role = "aut"),
+    person("Fredie", "Didier", , "fdidier@terra.com.br", role = "aut"),
+    person("Tito", "Bruni", role = "aut"),
+    person("Luiz Guilherme", "Lopes Moussatche", , "luizguilherme.lopesm@gmail.com", role = "aut"),
+    person("Victor", "Aliende da Matta", , "victor.al.matta@gmail.com", role = "aut"),
+    person("Anna Carolina", "Dutra Saraiva", , "annadutrasaraiva@gmail.com", role = "aut"),
+    person("Arthur", "Carvalho Brito", , "arthurcbps@gmail.com", role = "aut"),
+    person("Francisco", "de Lima Cavalcanti", , "francisco.lima.cavalcanti@gmail.com", role = "aut"),
+    person("Maria", "Mittelbach", , "mariamittelbach@gmail.com", role = "aut"),
+    person("Felipe", "de Moraes Nunes", , "felipedmoraesn@gmail.com", role = "aut"),
+    person("Joao","Santos P. Barbosa",,"joao.31582129@gmail.com", role = "aut")
   )
 Description: Functions to download and treat data regarding the Brazilian
     Amazon region from a variety of official sources.
@@ -40,7 +41,8 @@ Imports:
     tibble,
     tidyr,
     utils,
-    XML
+    XML,
+    lubridate
 Suggests: 
     foreign,
     googledrive,

@@ -2,7 +2,7 @@
 #'
 #' @description Loads DATASUS data on health establishments, mortality, access to health services and several health indicators.
 #'
-#' @param dataset A dataset name, can be one of ("datasus_sim_do", "datasus_sih", "datasus_cnes_lt"), or more. For more details, try \code{vignette("DATASUS")}.
+#' @param dataset A dataset name, can be one of ("datasus_sim_do", "datasus_sih", "datasus_cnes_lt", "datasus_sinasc), or more. For more details, try \code{vignette("DATASUS")}.
 #' @inheritParams load_baci
 #' @param states A \code{string} specifying for which states to download the data. It is "all" by default, but can be a single state such as "AC" or any vector such as c("AC", "AM").
 #' @param keep_all A \code{boolean} choosing whether to aggregate the data by municipality, in turn losing individual-level variables (\code{FALSE}) or to keep all the original variables. Only applies when raw_data is \code{TRUE}.
@@ -72,6 +72,12 @@ load_datasus <- function(dataset,
   legal_amazon <- link <- month <- name_muni <- qt_exist <- qt_nsus <- value <- NULL
   var_code <- year <- qt_sus <- causabas <- available_time <- NULL
 
+  origem <- locnasc <- estcivmae <- escmae <- semagestac <- gravidez <- parto <- NULL
+  consprenat <- sexo <- racacor <- idanomal <- escmae2010 <- dtnascmae <- NULL
+  racacormae <- dtultmenst <- tpmetestim <- tpapresent <- sttrabpart <- NULL
+  stcesparto <- tpnascassi <- codmunnasc <- NULL
+
+
   #############################
   ## Define Basic Parameters ##
   #############################
@@ -125,7 +131,7 @@ load_datasus <- function(dataset,
   file_years <- NULL
   file_years_yy <- NULL
 
-  if (param$dataset == "datasus_sim_do") {
+  if (param$dataset %in% c("datasus_sim_do", "datasus_sinasc")) {
     file_years <- filenames %>%
       substr(5, 8)
   }
@@ -151,7 +157,7 @@ load_datasus <- function(dataset,
 
   file_state <- NULL
 
-  if (param$dataset %in% c("datasus_sim_do", "datasus_sih") | stringr::str_detect(param$dataset, "datasus_cnes")) {
+  if (param$dataset %in% c("datasus_sim_do", "datasus_sih", "datasus_sinasc") | stringr::str_detect(param$dataset, "datasus_cnes")) {
     file_state <- filenames %>%
       substr(3, 4)
   } else if (paste0(param$states, collapse = "") != "all") {
@@ -275,7 +281,40 @@ load_datasus <- function(dataset,
       )
   }
 
-  if (param$dataset != "datasus_sih") {
+  if( param$dataset == "datasus_sinasc" ) {
+
+    dat <- dat %>%
+
+      # Documentando as colunas
+      dplyr::mutate(
+        origem = dplyr::recode(origem, '1' = "oracle", '2' = "ftp", '3' = "sead"),
+        locnasc = dplyr::recode(locnasc, '1' = "hospital", '2' = "outros estabelecimentos de saude", '3' = "domicilio", '4' = "outros", '5' = "aldeia indigena", '9' = "ignorado"),
+        estcivmae = dplyr::recode(estcivmae, '1' = "solteira", '2' = "casada", '3' = "viuva", '4' = "divorciada", '5' = "uniao estavel", '9' = "ignorada"),
+        escmae = dplyr::recode(escmae, '1' = "nenhuma", '2' = "1 a 2 anos", '3' = "4 a 7 anos", '4' = "8 a 11 anos", '5' = "12 e mais", '9' = "ignorado"),
+        semagestac = dplyr::recode(semagestac, '1' = "menos de 22 semanas", '2' = "22 a 27 semanas", '3' = "28 a 31 semanas", '4' = "32 a 36 semanas", '5' = "37 a 41 semanas", '6' = "42 semanas e mais", '9' = "ignorado"),
+        gravidez = dplyr::recode(gravidez, '1' = "unica", '2' = "dupla", '3' = "tripla ou mais", '9' = "ignorado"),
+        parto = dplyr::recode(parto, '1' = "vaginal", '2' = "cesario", '9' = "ignorado"),
+        consprenat = dplyr::recode(consprenat, '1' = "nenhuma", '2' = "de 1 a 3", '3' = "de 4 a 6", '4' = "7 e mais", '9' = "ignorado"),
+        sexo = dplyr::recode(sexo, '0' = "ignorado", '1' = "masculino", '2' = "feminino"),
+        racacor = dplyr::recode(racacor, '1' = "branca", '2' = "preta", '3' = "amarela", '4' = "parda", '5' = "indigena"),
+        idanomal = dplyr::recode(idanomal, '9' = "ignorado", '1' = "sim", '2' = "nao"),
+        escmae2010 = dplyr::recode(escmae2010, '0' = "sem escolaridade", '1' = "fundamental 1", '2' = "fundamental 2", '3' = "medio", '4' = "superior incompleto", '5' = "superior completo", '9' = "ignorado"),
+        dtnascmae = lubridate::dmy(as.character(dtnascmae)),
+        racacormae = dplyr::recode(racacormae, '1' = "branca", '2' = "preta", '3' = "amarela", '4' = "parda", '5' = "indigena"),
+        dtultmenst = lubridate::dmy(as.character(dtultmenst)),
+        tpmetestim = dplyr::recode(tpmetestim, '1' = "exame fisico", '2' = "outro metodo", '9' = "ignorado"),
+        tpapresent = dplyr::recode(tpapresent, '1' = "cefalica", '2' = "pelvica ou podalica", '3' = "transversa", '9' = "ignorado"),
+        sttrabpart = dplyr::recode(sttrabpart, '1' = "sim", '2' = "nao", '9' = "ignorado"),
+        stcesparto = dplyr::recode(stcesparto, '1' = "sim", '2' = "nao", '3' = "nao se aplica", '9' = "ignorado"),
+        tpnascassi = dplyr::recode(tpnascassi, '1' = "medico", '2' = "enfermeira obstetriz", '3' = "parteira", '4' = "outros", '9' = "ignorado")
+      )
+
+    dat <- dat %>%
+      dplyr::mutate(codmunnasc = as.numeric(as.character(codmunnasc))) %>%
+      dplyr::rename("code_muni_6" = "codmunnasc")
+  }
+
+  if (!(param$dataset %in% c("datasus_sih"))) {
     # Adding municipality data
 
     geo <- datazoom.amazonia::municipalities %>%
@@ -360,7 +399,7 @@ load_datasus <- function(dataset,
       dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, legal_amazon, dtobito) %>%
       tibble::as_tibble()
   }
-  if (stringr::str_detect(param$dataset, "datasus_cnes")) {
+  if (stringr::str_detect(param$dataset, "datasus_cnes|datasus_sinasc")) {
     dat_mod <- dat %>%
       dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
       tibble::as_tibble()

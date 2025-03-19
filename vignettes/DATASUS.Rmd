@@ -24,6 +24,7 @@ DATASUS is the IT department of SUS -- the Brazilian Unified Health System. They
       * Possible subsets of SIM-DO are `"datasus_sim_dofet"` (Fetal), `"datasus_sim_doext"` (External causes), `"datasus_sim_doinf"` (Children), `"datasus_sim_domat"` (Maternal)
       * `"datasus_sih"` has SIH hospitalization data.
       * `"datasus_cnes_lt"` has data on the number of hospital beds.
+      * `"datasus_sinasc"` has information about Live Births
       * further subsets of CNES are listed later, but those only allow for the download of raw data.
 
   2. **raw_data**: there are two options:
@@ -118,6 +119,33 @@ data <- load_datasus(
 data <- load_datasus(
   dataset = "datasus_sih",
   time_period = 2010,
+  states = "AM",
+  raw_data = FALSE
+)
+```
+
+##### DATASUS – SINASC (Live Birth Information System)
+Datasus Sinasc is a dataset maintained by the Live Birth Information System (SINASC), which collects and records detailed information about births in Brazil. The data is extracted from Live Birth Certificates (DNVs) and includes information about the newborn, such as sex, weight, gestational age, as well as data about the mother, such as age, number of children and health conditions. SINASC is essential for monitoring maternal and child health and generating relevant indicators for the formulation of public health policies.
+
+The raw data is available through the `raw_data = TRUE` parameter in the `datasus_sinasc` dataset option. If the `raw_data = FALSE` parameter is chosen, the processed data will be provided, with detailed columns, renamed variables and description of the variables in both Portuguese and English, facilitating the analysis and interpretation of the data.
+
+**Examples:**
+
+```{r, eval = FALSE}
+library(datazoom.amazonia)
+
+# download raw data
+data <- load_datasus(
+  dataset = "datasus_sinasc",
+  time_period = 2015,
+  states = "AM",
+  raw_data = TRUE
+)
+
+# download data in a single tibble, with variable labels
+data <- load_datasus(
+  dataset = "datasus_sinasc",
+  time_period = 2015,
   states = "AM",
   raw_data = FALSE
 )
