@@ -791,7 +791,7 @@ load_dictionary <- function(dataset) {
       "seriescmae","serie_escolar_cmae","mother's_schooling_series", "Serie escolar da mae", "Mother's school series",
       "codocupmae","codigo_ocupacao_mae","mother_occupation_code", "Codigo de ocupacao da mae conforme tabela do CBO","Mother's occupation code according to the CBO",
       "idademae", "idade_mae", "mother_age", "Idade da mae", "Mother's age",
-      "naturalmae", "naturalidade_mae", "mother_nationality", "Se a mae for estrangeira, constara o código do país de nascimento", "If the mother is a foreigner, the country of birth code will be included",
+      "naturalmae", "naturalidade_mae", "mother_nationality", "Se a mae for estrangeira, constara o codigo do país de nascimento", "If the mother is a foreigner, the country of birth code will be included",
       "idadepai", "idade_pai", "father_age", "Idade do pai", "Father's age",
       "gestacao", "semanas_gestacao_agrupado", "grouped_gestational_weeks", "Semanas de gestacao agrupado", "Weeks of gestation grouped",
       "gravidez", "tipo_gravidez", "pregnancy_type", "Tipo de gravidez", "Type of pregnancy",

@@ -39,7 +39,6 @@ Imports:
     tidyr,
     utils,
     XML,
-    terra,
     lubridate
 Suggests: 
     foreign,
