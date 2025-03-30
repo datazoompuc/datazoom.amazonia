@@ -1,6 +1,6 @@
 # datazoom.amazonia 1.1.2.9000 (development version)
 
-  * Updated `load_mapbiomas` to download the newest Mapbiomas Collections and to warn about the currently unavailable download URL of the datasets water and irrigation.
+  * Updated `load_mapbiomas` to download the newest Mapbiomas Collections and to warn about the currently unavailable download URL of the datasets water and irrigation. Also added the Indigenous Lands option to the `"mapbiomas_cover"` dataset.
 
 # datazoom.amazonia 1.1.1.9000
 

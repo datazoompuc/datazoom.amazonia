@@ -163,17 +163,17 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
       dat <- dat %>%
         dplyr::rename("state_code" = "code", "state" = "name")
     }
-    if (param$geo_level == "indigenous_land") {
-      dat <- dat %>%
-        tidyr::extract(
-          col = 2,
-          into = c("territory_name", "territory_sub_name", "territory_code"),
-          regex = "^(.*?)\\s*(?:\\(([^()]+)\\))?\\s*\\((\\d+)\\)$"
-        )
-    }
   }
 
 
+  if (param$dataset == "mapbiomas_cover" & param$geo_level == "indigenous_land") {
+    dat <- dat %>%
+      tidyr::extract(
+        col = 2,
+        into = c("territory_name", "territory_sub_name", "territory_code"),
+        regex = "^(.*?)\\s*(?:\\(([^()]+)\\))?\\s*\\((\\d+)\\)$"
+      )
+  }
 
   ################################
   ## Harmonizing Variable Names ##
