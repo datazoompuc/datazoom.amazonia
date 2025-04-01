@@ -157,16 +157,22 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
     }
     if (param$geo_level == "biome") {
       dat <- dat %>%
-        dplyr::rename(
-          "biome_code" = "code", "biome" = "name"
-        )
+        dplyr::rename("biome_code" = "code", "biome" = "name")
     }
     if (param$geo_level == "state") {
       dat <- dat %>%
-        dplyr::rename(
-          "state_code" = "code", "state" = "name"
-        )
+        dplyr::rename("state_code" = "code", "state" = "name")
     }
+  }
+
+
+  if (param$dataset == "mapbiomas_cover" & param$geo_level == "indigenous_land") {
+    dat <- dat %>%
+      tidyr::extract(
+        col = 2,
+        into = c("territory_name", "territory_sub_name", "territory_code"),
+        regex = "^(.*?)\\s*(?:\\(([^()]+)\\))?\\s*\\((\\d+)\\)$"
+      )
   }
 
   ################################
@@ -199,9 +205,11 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
         "il" ~ "terra_indigena",
         "municipality_code" ~ "cod_municipio",
         "biome_code" ~ "cod_bioma",
-        "biome" ~ "bioma",
         "state_code" ~ "cod_uf",
         "state" ~ "uf",
+        "territory_name" ~ "nome_territorio",
+        "territory_subname" ~ "sub_nome_territorio",
+        "territory_code" ~ "cod_territorio",
         .default = .
       )) %>%
       dplyr::rename_with(~ stringr::str_replace(., "to_level", "para_level")) %>%
