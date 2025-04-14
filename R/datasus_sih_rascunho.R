@@ -1,8 +1,10 @@
-# install.packages("devtools")
-library(devtools)
+# Só precisa rodar uma vez:
+# devtools::install_github("datazoompuc/datazoom.amazonia")
 
-devtools::load_all()
+# Carrega o pacote
+library(datazoom.amazonia)
 
+# Baixar e ler dados
 baixar_dbc <- function(url, destino) {
   download.file(url, destfile = destino, mode = "wb")
   if (file.exists(destino)) {
@@ -14,4 +16,4 @@ baixar_dbc <- function(url, destino) {
 }
 
 dados1 <- baixar_dbc("ftp://ftp.datasus.gov.br/dissemin/publicos/SIHSUS/200801_/Dados/RDAC2302.dbc", "RDAC2302.dbc")
-dados2 <- baixar_dbc("ftp://ftp.datasus.gov.br/dissemin/publicos/SIHSUS/200801_/Dados/RDDF2302.dbc", "RDDF2302.dbc")
+View(dados1)
