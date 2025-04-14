@@ -2,7 +2,9 @@
 # devtools::install_github("datazoompuc/datazoom.amazonia")
 
 # Carrega o pacote
-library(datazoom.amazonia)
+# library(datazoom.amazonia)
+
+devtools::load_all()
 
 # Baixar e ler dados
 baixar_dbc <- function(url, destino) {
