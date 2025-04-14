@@ -1,7 +1,6 @@
 # install.packages("devtools")
 library(devtools)
 
-devtools::install_github("datazoompuc/datazoom.amazonia")
 devtools::load_all()
 
 baixar_dbc <- function(url, destino) {
