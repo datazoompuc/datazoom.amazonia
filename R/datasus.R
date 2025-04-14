@@ -145,6 +145,14 @@ load_datasus <- function(dataset,
       substr(5, 6)
   }
 
+  if (param$dataset %in% c("datasus_sih_rd", "datasus_sih_rj", "datasus_sih_sp", "datasus_sih_er")) {
+    file_years_yy <- filenames %>%
+      substr(5, 6)
+
+    file_month <- filenames %>%
+      substr(7,8)
+  }
+
   # Only files whose name's year matches a chosen one are kept
   if (!is.null(file_years)) {
     filenames <- filenames[file_years %in% param$time_period]
@@ -314,6 +322,14 @@ load_datasus <- function(dataset,
       dplyr::rename("code_muni_6" = "codmunnasc")
   }
 
+  if (param$dataset %in% c("datasus_sih_rd", "datasus_sih_rj", "datasus_sih_sp", "datasus_sih_er")) {
+    dat <- dat %>%
+      dplyr::mutate(
+        year = as.numeric(paste0("20", substr(file_name, 5, 6))),
+        month = as.numeric(substr(file_name, 7, 8))
+      )
+  }
+
   if (!(param$dataset %in% c("datasus_sih"))) {
     # Adding municipality data
 
@@ -360,6 +376,18 @@ load_datasus <- function(dataset,
       dplyr::group_by(code_muni_6, code_muni, name_muni, code_state, abbrev_state, legal_amazon, year, month) %>%
       dplyr::summarise(dplyr::across(c(qt_exist, qt_sus, qt_nsus)))
   }
+
+  if (!(param$dataset %in% c("datasus_sih_rd", "datasus_sih_rj", "datasus_sih_sp", "datasus_sih_er"))) {
+    # Adiciona info geográfica
+    geo <- datazoom.amazonia::municipalities %>%
+      dplyr::select(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
+      dplyr::mutate(code_muni_6 = as.integer(code_muni / 10)) %>%
+      dplyr::distinct(code_muni_6, .keep_all = TRUE)
+
+    dat <- dat %>%
+      dplyr::left_join(geo, by = "code_muni_6")
+  }
+
 
   ###############
   ## Labelling ##
