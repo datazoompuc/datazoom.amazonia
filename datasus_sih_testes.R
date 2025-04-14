@@ -1,19 +1,19 @@
-devtools::install_github("datazoompuc/datazoom.amazonia", force = TRUE)
+# Só precisa rodar uma vez:
+# devtools::install_github("datazoompuc/datazoom.amazonia")
 
+# Carrega o pacote
+library(datazoom.amazonia)
 
-# download data in a single tibble, with variable labels
-data_pt <- load_datasus(
-  dataset = "datasus_sih",
-  time_period = 2015,
-  states = "AM",
-  raw_data = TRUE,
-)
+# Baixar e ler dados
+baixar_dbc <- function(url, destino) {
+  download.file(url, destfile = destino, mode = "wb")
+  if (file.exists(destino)) {
+    message(paste("Download concluído:", destino))
+    return(datazoom.amazonia:::read.dbc(destino))
+  } else {
+    stop("Falha no download de ", destino)
+  }
+}
 
-
-url <- "ftp://ftp.datasus.gov.br/dissemin/publicos/SIHSUS/200801_/Dados/ERAC2311.dbc"
-
-destfile <- "ERAC2312.dbc"
-
-download.file(url, destfile, mode = "wb")
-
-df <- datazoom.amazonia:::read.dbc("ERAC2312.dbc")
+dados1 <- baixar_dbc("ftp://ftp.datasus.gov.br/dissemin/publicos/SIHSUS/200801_/Dados/RDAC2302.dbc", "RDAC2302.dbc")
+View(dados1)
