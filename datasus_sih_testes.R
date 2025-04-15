@@ -26,5 +26,8 @@ teste1 <- load_datasus(
   states = "AC"
 )
 
+load_datasus(dataset = "datasus_sih_rd", time_period = 2023, states = "AC")
+
+
 load_datasus("datasus_sih_rd", 2023, "AC")
 
