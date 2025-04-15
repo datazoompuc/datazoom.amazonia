@@ -345,27 +345,27 @@ load_datasus <- function(dataset,
       )
   }
 
-  if (!(param$dataset %in% c("datasus_sih"))) {
-    # Adding municipality data
-
-    geo <- datazoom.amazonia::municipalities %>%
-      dplyr::select(
-        code_muni,
-        name_muni,
-        code_state,
-        abbrev_state,
-        legal_amazon
-      )
-
-    # Original data only has 6 IBGE digits instead of 7
-
-    geo <- geo %>%
-      dplyr::mutate(code_muni_6 = as.integer(code_muni / 10)) %>%
-      dplyr::distinct(code_muni_6, .keep_all = TRUE) # Only keeps municipalities uniquely identified by the 6 digits
-
-    dat <- dat %>%
-      dplyr::left_join(geo, by = "code_muni_6")
-  }
+#  if (!(param$dataset %in% c("datasus_sih"))) {
+#    # Adding municipality data
+#
+#    geo <- datazoom.amazonia::municipalities %>%
+#      dplyr::select(
+#        code_muni,
+#        name_muni,
+#        code_state,
+#        abbrev_state,
+#        legal_amazon
+#      )
+#
+#    # Original data only has 6 IBGE digits instead of 7
+#
+#    geo <- geo %>%
+#      dplyr::mutate(code_muni_6 = as.integer(code_muni / 10)) %>%
+#      dplyr::distinct(code_muni_6, .keep_all = TRUE) # Only keeps municipalities uniquely identified by the 6 digits
+#
+#    dat <- dat %>%
+#      dplyr::left_join(geo, by = "code_muni_6")
+#  }
 
   #################
   ## Aggregating ##
@@ -435,6 +435,12 @@ load_datasus <- function(dataset,
       dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
       tibble::as_tibble()
   }
+
+  if (stringr::str_detect(param$dataset, "datasus_sih_rd|datasus_sih_er|datasus_sih_rj|datasus_sih_sp")) {
+    dat_mod <- dat %>%
+      tibble::as_tibble()
+  }
+
   if (param$dataset == "datasus_sih") {
     dat_mod <- dat %>%
       tibble::as_tibble()

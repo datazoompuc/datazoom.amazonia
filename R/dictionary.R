@@ -816,6 +816,34 @@ load_dictionary <- function(dataset) {
     )
   }
 
+  if (stringr::str_detect(dataset, "datasus_sih_rd")) {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~name_pt, ~name_eng, ~label_pt, ~label_eng,
+
+    )
+  }
+
+  if (stringr::str_detect(dataset, "datasus_sih_er")) {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~name_pt, ~name_eng, ~label_pt, ~label_eng,
+
+    )
+  }
+
+  if (stringr::str_detect(dataset, "datasus_sih_sp")) {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~name_pt, ~name_eng, ~label_pt, ~label_eng,
+
+    )
+  }
+
+  if (stringr::str_detect(dataset, "datasus_sih_rj")) {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~name_pt, ~name_eng, ~label_pt, ~label_eng,
+
+    )
+  }
+
   if (dataset == "datasus_sih") {
     harmonization_dat <- tibble::tribble(
       ~var_code, ~name_pt, ~name_eng, ~label_pt, ~label_eng,
