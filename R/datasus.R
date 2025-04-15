@@ -126,6 +126,20 @@ load_datasus <- function(dataset,
     stringr::str_split("\r*\n") %>%
     unlist()
 
+  # Filtro adicional para garantir que o prefixo corresponda ao dataset
+  dataset_prefix_map <- list(
+    "datasus_sih_rd" = "RD",
+    "datasus_sih_rj" = "RJ",
+    "datasus_sih_sp" = "SP",
+    "datasus_sih_er" = "ER"
+  )
+
+  prefix <- dataset_prefix_map[[param$dataset]]
+
+  if (!is.null(prefix)) {
+    filenames <- filenames[grepl(paste0("^", prefix), filenames)]
+  }
+
   ### Filtering by year
 
   file_years <- NULL
@@ -160,20 +174,6 @@ load_datasus <- function(dataset,
   }
   if (!is.null(file_years_yy)) {
     filenames <- filenames[file_years_yy %in% param$time_period_yy]
-  }
-
-  # Filtro adicional para garantir que o prefixo corresponda ao dataset
-  dataset_prefix_map <- list(
-    "datasus_sih_rd" = "RD",
-    "datasus_sih_rj" = "RJ",
-    "datasus_sih_sp" = "SP",
-    "datasus_sih_er" = "ER"
-  )
-
-  prefix <- dataset_prefix_map[[param$dataset]]
-
-  if (!is.null(prefix)) {
-    filenames <- filenames[grepl(paste0("^", prefix), filenames)]
   }
 
   ### Filtering for chosen states when possible
