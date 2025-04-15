@@ -286,14 +286,6 @@ load_datasus <- function(dataset,
       dplyr::rename("code_muni_6" = "codmunocor")
   }
 
-  if (param$dataset %in% c("datasus_sih_rd", "datasus_sih_rj", "datasus_sih_sp", "datasus_sih_er")) {
-    dat <- dat %>%
-      dplyr::mutate(
-        year = as.numeric(paste0("20", substr(file_name, 5, 6))),
-        month = as.numeric(substr(file_name, 7, 8))
-      )
-  }
-
   if (param$dataset == "datazoom_sih") {
 
   }
