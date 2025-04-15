@@ -820,6 +820,12 @@ load_dictionary <- function(dataset) {
     harmonization_dat <- tibble::tribble(
       ~var_code, ~name_pt, ~name_eng, ~label_pt, ~label_eng,
 
+      "IDADE",      "idade_fake",  "age_fake",    "Idade falsa",     "Fake age",
+      "SEXO",       "sexo_fake",   "sex_fake",    "Sexo falso",      "Fake sex",
+      "MUNIC_RES",  "mun_fake",    "mun_fake",    "Município fake",  "Fake city",
+      "UF_RES",     "uf_fake",     "uf_fake",     "UF fake",         "Fake UF",
+      "RACA_COR",   "raca_fake",   "race_fake",   "Raça fake",       "Fake race"
+
     )
   }
 
