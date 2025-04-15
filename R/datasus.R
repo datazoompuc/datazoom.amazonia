@@ -401,18 +401,6 @@ load_datasus <- function(dataset,
       dplyr::summarise(dplyr::across(c(qt_exist, qt_sus, qt_nsus)))
   }
 
-  if (!(param$dataset %in% c("datasus_sih_rd", "datasus_sih_rj", "datasus_sih_sp", "datasus_sih_er"))) {
-    # Adiciona info geográfica
-    geo <- datazoom.amazonia::municipalities %>%
-      dplyr::select(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
-      dplyr::mutate(code_muni_6 = as.integer(code_muni / 10)) %>%
-      dplyr::distinct(code_muni_6, .keep_all = TRUE)
-
-    dat <- dat %>%
-      dplyr::left_join(geo, by = "code_muni_6")
-  }
-
-
   ###############
   ## Labelling ##
   ###############
