@@ -130,6 +130,7 @@ load_datasus <- function(dataset,
 
   file_years <- NULL
   file_years_yy <- NULL
+  file_month_mm <- NULL
 
   if (param$dataset %in% c("datasus_sim_do", "datasus_sinasc")) {
     file_years <- filenames %>%
@@ -149,7 +150,7 @@ load_datasus <- function(dataset,
     file_years_yy <- filenames %>%
       substr(5, 6)
 
-    file_month <- filenames %>%
+    file_month_mm <- filenames %>%
       substr(7,8)
   }
 
@@ -165,7 +166,7 @@ load_datasus <- function(dataset,
 
   file_state <- NULL
 
-  if (param$dataset %in% c("datasus_sim_do", "datasus_sih", "datasus_sinasc") | stringr::str_detect(param$dataset, "datasus_cnes")) {
+  if (param$dataset %in% c("datasus_sim_do", "datasus_sih", "datasus_sinasc", "datasus_sih_rd", "datasus_sih_rj", "datasus_sih_sp", "datasus_sih_er") | stringr::str_detect(param$dataset, "datasus_cnes")) {
     file_state <- filenames %>%
       substr(3, 4)
   } else if (paste0(param$states, collapse = "") != "all") {
