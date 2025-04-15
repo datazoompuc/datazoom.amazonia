@@ -290,8 +290,7 @@ load_datasus <- function(dataset,
     dat <- dat %>%
       dplyr::mutate(
         year = as.numeric(paste0("20", substr(file_name, 5, 6))),
-        month = as.numeric(substr(file_name, 7, 8)),
-        code_muni_6 = as.integer(as.character(codmunocor))  # <– essa linha cria a coluna que faltava
+        month = as.numeric(substr(file_name, 7, 8))
       )
   }
 
