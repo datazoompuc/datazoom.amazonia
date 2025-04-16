@@ -16,7 +16,7 @@ rj_data <- load_datasus(
   dataset = "datasus_sinasc",
   time_period = 2024,
   states = "AC",
-  raw_data = TRUE)
+  raw_data = FALSE)
 
 
 load_datasus("datasus_sih_rd", 2023, "AC")
