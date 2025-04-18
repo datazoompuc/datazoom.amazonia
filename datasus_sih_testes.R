@@ -9,15 +9,16 @@ devtools::load_all()
 teste1 <- load_datasus(
   dataset = "datasus_sinasc",
   time_period = 2023,
-  raw_data = TRUE,
+  raw_data = FALSE,
   states = "AC"
-)
+  )
 
 testes <- load_datasus(
   dataset = "datasus_sih_rd",
   time_period = 2023,
   raw_data = FALSE,
-  states = "AC")
+  states = "AC"
+  )
 
 
 load_datasus("datasus_sinasc", time_period = 2023, states = "AC", raw_data = FALSE) %>% View()
