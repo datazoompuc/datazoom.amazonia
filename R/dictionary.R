@@ -829,6 +829,7 @@ load_dictionary <- function(dataset) {
     )
   }
 
+
   if (stringr::str_detect(dataset, "datasus_sih_er")) {
     harmonization_dat <- tibble::tribble(
       ~var_code, ~name_pt, ~name_eng, ~label_pt, ~label_eng,
