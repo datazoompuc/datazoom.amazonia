@@ -157,14 +157,6 @@ load_datasus <- function(dataset,
       substr(5, 6)
   }
 
-#  if (param$dataset %in% c("datasus_sih_rd", "datasus_sih_rj", "datasus_sih_sp", "datasus_sih_er")) {
-#    file_years_yy <- filenames %>%
-#      substr(5, 6)
-
-#    file_month_mm <- filenames %>%
-#      substr(7,8)
-#  }
-
   # Only files whose name's year matches a chosen one are kept
   if (!is.null(file_years)) {
     filenames <- filenames[file_years %in% param$time_period]
@@ -338,37 +330,14 @@ load_datasus <- function(dataset,
 
     dat <- dat %>%
       dplyr::mutate(codmunnasc = as.numeric(as.character(codmunnasc))) %>%
-      dplyr::rename("code_muni_6" = "codmunnasc")
+      dplyr::rename(code_muni_6 = codmunnasc)
   }
 
   if (param$dataset %in% c("datasus_sih_rd", "datasus_sih_rj", "datasus_sih_sp", "datasus_sih_er")) {
-    dat <- dat
-#    %>%
-#      dplyr::mutate(
-#        year = as.numeric(paste0("20", substr(file_name, 5, 6))),
-#        month = as.numeric(substr(file_name, 7, 8))
-#      )
-    geo <- datazoom.amazonia::municipalities %>%
-      dplyr::select(
-        code_muni,
-        name_muni,
-        code_state,
-        abbrev_state,
-        legal_amazon
-      )
 
-    # Original data only has 6 IBGE digits instead of 7
-
-    geo <- geo %>%
-      dplyr::mutate(code_muni_6 = as.integer(code_muni / 10)) %>%
-      dplyr::distinct(code_muni_6, .keep_all = TRUE) %>%
-      dplyr::rename_with(~ paste0("geo_", .), -code_muni_6)
-
-    dat <- geo %>%
-      dplyr::inner_join(
-        dat %>% dplyr::mutate(munic_res = as.integer(as.character(munic_res))),
-        by = c("code_muni_6" = "munic_res")
-      )
+    dat <- dat %>%
+      dplyr::mutate(munic_res = as.integer(as.character(munic_res))) %>%
+      dplyr::rename(code_muni_6 = munic_res)
 
   }
 
@@ -465,6 +434,7 @@ load_datasus <- function(dataset,
 
   if (stringr::str_detect(param$dataset, "datasus_sih_rd|datasus_sih_er|datasus_sih_rj|datasus_sih_sp")) {
     dat_mod <- dat %>%
+      dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
       tibble::as_tibble()
   }
 
