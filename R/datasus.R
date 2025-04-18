@@ -126,14 +126,6 @@ load_datasus <- function(dataset,
     stringr::str_split("\r*\n") %>%
     unlist()
 
-  # Filtro adicional para garantir que o prefixo corresponda ao dataset
-  dataset_prefix_map <- list(
-    "datasus_sih_rd" = "RD",
-    "datasus_sih_rj" = "RJ",
-    "datasus_sih_sp" = "SP",
-    "datasus_sih_er" = "ER"
-  )
-
   prefix <- dataset_prefix_map[[param$dataset]]
 
   if (!is.null(prefix)) {
@@ -160,13 +152,18 @@ load_datasus <- function(dataset,
       substr(5, 6)
   }
 
-  if (param$dataset %in% c("datasus_sih_rd", "datasus_sih_rj", "datasus_sih_sp", "datasus_sih_er")) {
+  if (stringr::str_detect(param$dataset, "datasus_sih_rd|datasus_sih_rj|datasus_sih_sp|datasus_sih_er")) {
     file_years_yy <- filenames %>%
       substr(5, 6)
-
-    file_month_mm <- filenames %>%
-      substr(7,8)
   }
+
+#  if (param$dataset %in% c("datasus_sih_rd", "datasus_sih_rj", "datasus_sih_sp", "datasus_sih_er")) {
+#    file_years_yy <- filenames %>%
+#      substr(5, 6)
+
+#    file_month_mm <- filenames %>%
+#      substr(7,8)
+#  }
 
   # Only files whose name's year matches a chosen one are kept
   if (!is.null(file_years)) {
@@ -195,6 +192,13 @@ load_datasus <- function(dataset,
 
   if (param$dataset %in% c("datasus_sim_doext", "datasus_sim_doinf", "datasus_sim_domat", "datasus_sim_dofet")) {
     suffix <- stringr::str_remove(param$dataset, "datasus_sim_") %>%
+      toupper()
+
+    filenames <- filenames[stringr::str_detect(filenames, suffix)]
+  }
+
+  if (param$dataset %in% c("datasus_sih_rd", "datasus_sih_er", "datasus_sih_rj", "datasus_sih_sp")) {
+    suffix <- stringr::str_remove(param$dataset, "datasus_sih_") %>%
       toupper()
 
     filenames <- filenames[stringr::str_detect(filenames, suffix)]
@@ -338,11 +342,34 @@ load_datasus <- function(dataset,
   }
 
   if (param$dataset %in% c("datasus_sih_rd", "datasus_sih_rj", "datasus_sih_sp", "datasus_sih_er")) {
-    dat <- dat %>%
-      dplyr::mutate(
-        year = as.numeric(paste0("20", substr(file_name, 5, 6))),
-        month = as.numeric(substr(file_name, 7, 8))
+    dat <- dat
+#    %>%
+#      dplyr::mutate(
+#        year = as.numeric(paste0("20", substr(file_name, 5, 6))),
+#        month = as.numeric(substr(file_name, 7, 8))
+#      )
+    geo <- datazoom.amazonia::municipalities %>%
+      dplyr::select(
+        code_muni,
+        name_muni,
+        code_state,
+        abbrev_state,
+        legal_amazon
       )
+
+    # Original data only has 6 IBGE digits instead of 7
+
+    geo <- geo %>%
+      dplyr::mutate(code_muni_6 = as.integer(code_muni / 10)) %>%
+      dplyr::distinct(code_muni_6, .keep_all = TRUE) %>%
+      dplyr::rename_with(~ paste0("geo_", .), -code_muni_6)
+
+    dat <- geo %>%
+      dplyr::inner_join(
+        dat %>% mutate(munic_res = as.integer(as.character(munic_res))),
+        by = c("code_muni_6" = "munic_res")
+      )
+
   }
 
   if (!(param$dataset %in% c("datasus_sih"))) {
