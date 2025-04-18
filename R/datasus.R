@@ -75,7 +75,7 @@ load_datasus <- function(dataset,
   origem <- locnasc <- estcivmae <- escmae <- semagestac <- gravidez <- parto <- NULL
   consprenat <- sexo <- racacor <- idanomal <- escmae2010 <- dtnascmae <- NULL
   racacormae <- dtultmenst <- tpmetestim <- tpapresent <- sttrabpart <- NULL
-  stcesparto <- tpnascassi <- codmunnasc <- NULL
+  stcesparto <- tpnascassi <- codmunnasc <- dataset_prefix_map <- NULL
 
 
   #############################
@@ -366,7 +366,7 @@ load_datasus <- function(dataset,
 
     dat <- geo %>%
       dplyr::inner_join(
-        dat %>% mutate(munic_res = as.integer(as.character(munic_res))),
+        dat %>% dplyr::mutate(munic_res = as.integer(as.character(munic_res))),
         by = c("code_muni_6" = "munic_res")
       )
 
