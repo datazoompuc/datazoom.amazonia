@@ -59,6 +59,8 @@ load_datasus("datasus_sinasc", time_period = 2023, states = "AC", raw_data = FAL
 "val_transp", "valor_transporte", "transport_value", "zerado", "zeroed",
 "val_obsang", "valor_obsang", "obsang_value", "zerado", "zeroed",
 "val_ped1ac", "valor_ped1ac", "ped1ac_value", "zerado", "zeroed",
+
+
 "val_tot", "valor_total", "total_value", "valor total da aih", "total value of the aih",
 "val_uti", "valor_uti", "icu_value", "valor de uti", "icu value",
 "us_tot", "valor_total_dolar", "total_value_usd", "valor total, em dolar", "total value in dollars",
@@ -81,14 +83,16 @@ load_datasus("datasus_sinasc", time_period = 2023, states = "AC", raw_data = FAL
 "num_proc", "numero_procedimento", "procedure_number", "zerado", "zeroed",
 "car_int", "carater_internacao", "admission_type", "carater da internacao", "admission type",
 "tot_pt_sp", "total_pt_sp", "total_pt_sp", "zerado", "zeroed",
+
 "cpf_aut", "cpf_autorizador", "authorizer_cpf", "zerado", "zeroed",
 "homonimo", "indicador_homonimo", "homonym_indicator", "indicador se o paciente da aih e homonimo do paciente de outra aih", "indicator if the aih patient is a homonym of another aih patient",
 "num_filhos", "numero_filhos", "number_of_children", "numero de filhos do paciente", "number of patient's children",
-"instru", "grau_instrucao", "education_level", "grau de instrucao", "education_level", "grau de instrucao do paciente", "patient's education level",
+"instru", "grau_instrucao", "education_level", "grau de instrucao do paciente", "patient's education level",
 "cid_notif", "cid_notificacao_obrigatoria", "mandatory_reporting_cid", "cid de doenca de notificacao obrigatoria", "cid of mandatory notifiable disease",
 "complex", "complexidade_procedimento", "procedure_complexity", "complexidade do procedimento", "procedure complexity",
 "financ", "tipo_financiamento", "funding_type", "tipo de financiamento", "type of funding",
 "faec_tp", "faec_tipo", "faec_type", "tipo de procedimento faec", "type of faec procedure",
+
 "regct", "regiao_contratualizacao", "contract_region", "regiao de contratualizacao", "contracting region",
 "munic_pac", "municipio_paciente", "patient_municipality", "municipio de residencia do paciente", "patient's residence municipality",
 "estbl_pac", "estabelecimento_paciente", "patient_establishment", "codigo do estabelecimento do paciente", "patient's establishment code",
