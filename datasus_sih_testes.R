@@ -9,6 +9,7 @@ devtools::load_all()
 teste1 <- load_datasus(
   dataset = "datasus_sinasc",
   time_period = 2023,
+  language = "eng",
   raw_data = FALSE,
   states = "AC"
   )

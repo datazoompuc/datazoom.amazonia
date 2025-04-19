@@ -302,31 +302,64 @@ load_datasus <- function(dataset,
 
   if( param$dataset == "datasus_sinasc" ) {
 
-    dat <- dat %>%
+      if (param$lang == "pt") {
+
+        dat <- dat %>%
+
+          dplyr::mutate(
+            origem = dplyr::recode(origem, '1' = "oracle", '2' = "ftp", '3' = "sead"),
+            locnasc = dplyr::recode(locnasc, '1' = "hospital", '2' = "outros estabelecimentos de saude", '3' = "domicilio", '4' = "outros", '5' = "aldeia indigena", '9' = "ignorado"),
+            estcivmae = dplyr::recode(estcivmae, '1' = "solteira", '2' = "casada", '3' = "viuva", '4' = "divorciada", '5' = "uniao estavel", '9' = "ignorada"),
+            escmae = dplyr::recode(escmae, '1' = "nenhuma", '2' = "1 a 2 anos", '3' = "4 a 7 anos", '4' = "8 a 11 anos", '5' = "12 e mais", '9' = "ignorado"),
+            semagestac = dplyr::recode(semagestac, '1' = "menos de 22 semanas", '2' = "22 a 27 semanas", '3' = "28 a 31 semanas", '4' = "32 a 36 semanas", '5' = "37 a 41 semanas", '6' = "42 semanas e mais", '9' = "ignorado"),
+            gravidez = dplyr::recode(gravidez, '1' = "unica", '2' = "dupla", '3' = "tripla ou mais", '9' = "ignorado"),
+            parto = dplyr::recode(parto, '1' = "vaginal", '2' = "cesario", '9' = "ignorado"),
+            consprenat = dplyr::recode(consprenat, '1' = "nenhuma", '2' = "de 1 a 3", '3' = "de 4 a 6", '4' = "7 e mais", '9' = "ignorado"),
+            sexo = dplyr::recode(sexo, '0' = "ignorado", '1' = "masculino", '2' = "feminino"),
+            racacor = dplyr::recode(racacor, '1' = "branca", '2' = "preta", '3' = "amarela", '4' = "parda", '5' = "indigena"),
+            idanomal = dplyr::recode(idanomal, '9' = "ignorado", '1' = "sim", '2' = "nao"),
+            escmae2010 = dplyr::recode(escmae2010, '0' = "sem escolaridade", '1' = "fundamental 1", '2' = "fundamental 2", '3' = "medio", '4' = "superior incompleto", '5' = "superior completo", '9' = "ignorado"),
+            dtnascmae = lubridate::dmy(as.character(dtnascmae)),
+            racacormae = dplyr::recode(racacormae, '1' = "branca", '2' = "preta", '3' = "amarela", '4' = "parda", '5' = "indigena"),
+            dtultmenst = lubridate::dmy(as.character(dtultmenst)),
+            tpmetestim = dplyr::recode(tpmetestim, '1' = "exame fisico", '2' = "outro metodo", '9' = "ignorado"),
+            tpapresent = dplyr::recode(tpapresent, '1' = "cefalica", '2' = "pelvica ou podalica", '3' = "transversa", '9' = "ignorado"),
+            sttrabpart = dplyr::recode(sttrabpart, '1' = "sim", '2' = "nao", '9' = "ignorado"),
+            stcesparto = dplyr::recode(stcesparto, '1' = "sim", '2' = "nao", '3' = "nao se aplica", '9' = "ignorado"),
+            tpnascassi = dplyr::recode(tpnascassi, '1' = "medico", '2' = "enfermeira obstetriz", '3' = "parteira", '4' = "outros", '9' = "ignorado")
+          )
+
+      } else {
+
+        dat <- dat %>%
+
+          dplyr::mutate(
+            origem = dplyr::case_when(origem == '1' ~ "oracle", origem == '2' ~ "ftp", origem == '3' ~ "sead", TRUE ~ origem),
+            locnasc = dplyr::case_when(locnasc == '1' ~ "hospital", locnasc == '2' ~ "other health facilities", locnasc == '3' ~ "domicile", locnasc == '4' ~ "others", locnasc == '5' ~ "indigenous village", locnasc == '9' ~ "ignored", TRUE ~ locnasc),
+            estcivmae = dplyr::case_when(estcivmae == '1' ~ "single", estcivmae == '2' ~ "married", estcivmae == '3' ~ "widowed", estcivmae == '4' ~ "divorced", estcivmae == '5' ~ "stable union", estcivmae == '9' ~ "ignored", TRUE ~ estcivmae),
+            escmae = dplyr::case_when(escmae == '1' ~ "none", escmae == '2' ~ "1 to 3 years", escmae == '3' ~ "4 to 7 years", escmae == '4' ~ "8 to 11 years", escmae == '5' ~ "12 or more", escmae == '9' ~ "ignored", TRUE ~ escmae),
+            semagestac = dplyr::case_when(semagestac == '1' ~ "less than 22 weeks", semagestac == '2' ~ "22 to 27 weeks", semagestac == '3' ~ "28 to 31 weeks", semagestac == '4' ~ "32 to 36 weeks", semagestac == '5' ~ "37 to 41 weeks", semagestac == '6' ~ "42 weeks or more", semagestac == '9' ~ "ignored", TRUE ~ semagestac),
+            gravidez = dplyr::case_when(gravidez == '1' ~ "single", gravidez == '2' ~ "twin", gravidez == '3' ~ "triplet or more", gravidez == '9' ~ "ignored", TRUE ~ gravidez),
+            parto = dplyr::case_when(parto == '1' ~ "vaginal", parto == '2' ~ "cesarean", parto == '9' ~ "ignored", TRUE ~ parto),
+            consprenat = dplyr::case_when(consprenat == '1' ~ "none", consprenat == '2' ~ "1 to 3", consprenat == '3' ~ "4 to 6", consprenat == '4' ~ "7 or more", consprenat == '9' ~ "ignored", TRUE ~ consprenat),
+            sexo = dplyr::case_when(sexo == '0' ~ "ignored", sexo == '1' ~ "male", sexo == '2' ~ "female", TRUE ~ sexo),
+            racacor = dplyr::case_when(racacor == '1' ~ "white", racacor == '2' ~ "black", racacor == '3' ~ "yellow", racacor == '4' ~ "brown", racacor == '5' ~ "indigenous", TRUE ~ racacor),
+            idanomal = dplyr::case_when(idanomal == '1' ~ "yes", idanomal == '2' ~ "no", idanomal == '9' ~ "ignored", TRUE ~ idanomal),
+            escmae2010 = dplyr::case_when(escmae2010 == '0' ~ "no schooling", escmae2010 == '1' ~ "primary 1", escmae2010 == '2' ~ "primary 2", escmae2010 == '3' ~ "secondary", escmae2010 == '4' ~ "incomplete higher", escmae2010 == '5' ~ "complete higher", escmae2010 == '9' ~ "ignored", TRUE ~ escmae2010),
+            dtnascmae = lubridate::dmy(as.character(dtnascmae)),
+            racacormae = dplyr::case_when(racacormae == '1' ~ "white", racacormae == '2' ~ "black", racacormae == '3' ~ "yellow", racacormae == '4' ~ "brown", racacormae == '5' ~ "indigenous", TRUE ~ racacormae),
+            dtultmenst = lubridate::dmy(as.character(dtultmenst)),
+            tpmetestim = dplyr::case_when(tpmetestim == '1' ~ "physical exam", tpmetestim == '2' ~ "other method", tpmetestim == '9' ~ "ignored", TRUE ~ tpmetestim),
+            tpapresent = dplyr::case_when(tpapresent == '1' ~ "cephalic", tpapresent == '2' ~ "pelvic or podalic", tpapresent == '3' ~ "transverse", tpapresent == '9' ~ "ignored", TRUE ~ tpapresent),
+            sttrabpart = dplyr::case_when(sttrabpart == '1' ~ "yes", sttrabpart == '2' ~ "no", sttrabpart == '9' ~ "ignored", TRUE ~ sttrabpart),
+            stcesparto = dplyr::case_when(stcesparto == '1' ~ "yes", stcesparto == '2' ~ "no", stcesparto == '3' ~ "not applicable", stcesparto == '9' ~ "ignored", TRUE ~ stcesparto),
+            tpnascassi = dplyr::case_when(tpnascassi == '1' ~ "doctor", tpnascassi == '2' ~ "obstetric nurse", tpnascassi == '3' ~ "midwife", tpnascassi == '4' ~ "others", tpnascassi == '9' ~ "ignored", TRUE ~ tpnascassi)
+          )
+
+      }
 
       # Documentando as colunas
-      dplyr::mutate(
-        origem = dplyr::recode(origem, '1' = "oracle", '2' = "ftp", '3' = "sead"),
-        locnasc = dplyr::recode(locnasc, '1' = "hospital", '2' = "outros estabelecimentos de saude", '3' = "domicilio", '4' = "outros", '5' = "aldeia indigena", '9' = "ignorado"),
-        estcivmae = dplyr::recode(estcivmae, '1' = "solteira", '2' = "casada", '3' = "viuva", '4' = "divorciada", '5' = "uniao estavel", '9' = "ignorada"),
-        escmae = dplyr::recode(escmae, '1' = "nenhuma", '2' = "1 a 2 anos", '3' = "4 a 7 anos", '4' = "8 a 11 anos", '5' = "12 e mais", '9' = "ignorado"),
-        semagestac = dplyr::recode(semagestac, '1' = "menos de 22 semanas", '2' = "22 a 27 semanas", '3' = "28 a 31 semanas", '4' = "32 a 36 semanas", '5' = "37 a 41 semanas", '6' = "42 semanas e mais", '9' = "ignorado"),
-        gravidez = dplyr::recode(gravidez, '1' = "unica", '2' = "dupla", '3' = "tripla ou mais", '9' = "ignorado"),
-        parto = dplyr::recode(parto, '1' = "vaginal", '2' = "cesario", '9' = "ignorado"),
-        consprenat = dplyr::recode(consprenat, '1' = "nenhuma", '2' = "de 1 a 3", '3' = "de 4 a 6", '4' = "7 e mais", '9' = "ignorado"),
-        sexo = dplyr::recode(sexo, '0' = "ignorado", '1' = "masculino", '2' = "feminino"),
-        racacor = dplyr::recode(racacor, '1' = "branca", '2' = "preta", '3' = "amarela", '4' = "parda", '5' = "indigena"),
-        idanomal = dplyr::recode(idanomal, '9' = "ignorado", '1' = "sim", '2' = "nao"),
-        escmae2010 = dplyr::recode(escmae2010, '0' = "sem escolaridade", '1' = "fundamental 1", '2' = "fundamental 2", '3' = "medio", '4' = "superior incompleto", '5' = "superior completo", '9' = "ignorado"),
-        dtnascmae = lubridate::dmy(as.character(dtnascmae)),
-        racacormae = dplyr::recode(racacormae, '1' = "branca", '2' = "preta", '3' = "amarela", '4' = "parda", '5' = "indigena"),
-        dtultmenst = lubridate::dmy(as.character(dtultmenst)),
-        tpmetestim = dplyr::recode(tpmetestim, '1' = "exame fisico", '2' = "outro metodo", '9' = "ignorado"),
-        tpapresent = dplyr::recode(tpapresent, '1' = "cefalica", '2' = "pelvica ou podalica", '3' = "transversa", '9' = "ignorado"),
-        sttrabpart = dplyr::recode(sttrabpart, '1' = "sim", '2' = "nao", '9' = "ignorado"),
-        stcesparto = dplyr::recode(stcesparto, '1' = "sim", '2' = "nao", '3' = "nao se aplica", '9' = "ignorado"),
-        tpnascassi = dplyr::recode(tpnascassi, '1' = "medico", '2' = "enfermeira obstetriz", '3' = "parteira", '4' = "outros", '9' = "ignorado")
-      )
+
 
     dat <- dat %>%
       dplyr::mutate(codmunnasc = as.numeric(as.character(codmunnasc))) %>%
@@ -434,6 +467,7 @@ load_datasus <- function(dataset,
 
   if (stringr::str_detect(param$dataset, "datasus_sih_rd|datasus_sih_er|datasus_sih_rj|datasus_sih_sp")) {
     dat_mod <- dat %>%
+      dplyr::select(where(~ !is.numeric(.) || !all(. == 0 | is.na(.)))) %>%   # remove colunas com todos os valores iguais a 0
       dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
       tibble::as_tibble()
   }
