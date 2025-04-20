@@ -386,7 +386,6 @@ load_datasus <- function(dataset,
             natureza = dplyr::case_when(
               natureza == "01" ~ "hospitais gerais",
               natureza == "02" ~ "hospitais especializados",
-              # Adicione os demais códigos conforme arquivo
               TRUE ~ NA_character_
             )
   )
