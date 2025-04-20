@@ -18,7 +18,7 @@ sinasc_eng <- load_datasus(
   dataset = "datasus_sinasc",
   time_period = 2023,
   language = "eng",
-  raw_data = TRUE,
+  raw_data = FALSE,
   states = "AC"
 )
 

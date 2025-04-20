@@ -369,14 +369,27 @@ load_datasus <- function(dataset,
       dplyr::mutate(munic_res = as.integer(as.character(munic_res))) %>%
       dplyr::rename(code_muni_6 = munic_res)
 
-    # Filtrando por dataset para filtragem dos idiomas
+    # Filtrando por dataset do SIH para limpeza por idiomas
 
     # RD
     if(param$dataset == "datasus_sih_rd") {
 
       if(param$language == "pt"){
 
-
+        dat <- dat %>%
+          dplyr::mutate(
+            sexo = dplyr::case_when(
+              sexo == "1" ~ "masculino",
+              sexo == "3" ~ "feminino",
+              TRUE ~ NA_character_
+            ),
+            natureza = dplyr::case_when(
+              natureza == "01" ~ "hospitais gerais",
+              natureza == "02" ~ "hospitais especializados",
+              # Adicione os demais códigos conforme arquivo
+              TRUE ~ NA_character_
+            )
+  )
       }
 
       if(param$language == "eng"){
