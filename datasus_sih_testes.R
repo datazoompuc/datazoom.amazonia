@@ -6,13 +6,21 @@
 
 devtools::load_all()
 
-teste1 <- load_datasus(
+sinasc_pt <- load_datasus(
   dataset = "datasus_sinasc",
   time_period = 2023,
-  language = "eng",
+  language = "pt",
   raw_data = FALSE,
   states = "AC"
   )
+
+sinasc_eng <- load_datasus(
+  dataset = "datasus_sinasc",
+  time_period = 2023,
+  language = "eng",
+  raw_data = TRUE,
+  states = "AC"
+)
 
 testes <- load_datasus(
   dataset = "datasus_sih_rd",
