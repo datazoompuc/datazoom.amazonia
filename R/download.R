@@ -612,17 +612,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     # param$sheet contains the selected sheets
 
     # Making a list with all the sheets
-    dat <- purrr::imap(
-      param$sheet,
-      function(sheets, number) {
-        base::message(
-          paste0("Reading sheet ", number, " out of ", length(param$sheet), " (", sheets, ")")
-        )
-        base::suppressMessages(
-          readxl::read_xls(temp, sheet = sheets)
-        )
-      }
-    )
+
+      dat <- readxl::read_excel(temp, sheet = param$sheet, skip = param$skip_rows)
 
     names(dat) <- param$sheet
   }
@@ -630,15 +621,15 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     if (param$dataset == "energy_enterprises_distributed") {
       dat <- data.table::fread(temp, encoding = "Latin-1")
     } else if (dataset == "energy_generation") {
-      dat <- readxl::read_xlsx(temp, sheet = param$sheet, skip = param$skip_rows, na = c("-", ""))
+      dat <-readxl::read_xlsx(temp,sheet = param$sheet,skip = param$skip_rows,na = c("-", ""))
     }
-  }
-
-  if (param$source == "ips") {
+  } else if (param$source == "ips") {
     dat <- param$sheet %>%
-      purrr::map(
-        ~ readxl::read_xlsx(temp, sheet = .)
-      )
+      purrr::map(~ readxl::read_xlsx(temp, sheet = .))
+  } else if (param$source == "epe") {
+    if (param$dataset == "energy_consumption_per_class") {
+      dat <- readxl::read_excel(temp, sheet = param$sheet)
+    }
   }
 
   ## Now the rest of the functions
@@ -950,7 +941,7 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
     ## EPE
 
-    "epe", "energy_consumption_per_class", NA, "2004-2021", "Region, Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/Documents/CONSUMO%20MENSAL%20DE%20ENERGIA%20EL%c3%89TRICA%20POR%20CLASSE.xls",
+    "epe", "energy_consumption_per_class", NA, "2004-2025", "Region, Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx",
     "epe", "national_energy_balance", NA, "2011-2022", NA, "https://drive.google.com/file/d/1_JTYyAPdbQayR-nrURts6OmbKcm2cLix/view?usp=share_link",
 
     ## Shapefile from github repository
