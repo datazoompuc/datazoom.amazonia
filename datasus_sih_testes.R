@@ -22,7 +22,7 @@ sinasc_eng <- load_datasus(
   states = "AC"
 )
 
-testes <- load_datasus(
+datasus_sih_rd <- load_datasus(
   dataset = "datasus_sih_rd",
   time_period = 2023,
   raw_data = FALSE,
