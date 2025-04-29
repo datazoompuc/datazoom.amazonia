@@ -359,7 +359,7 @@ load_datasus <- function(dataset,
     dat <- dat %>%
       dplyr::mutate(codmunnasc = as.numeric(as.character(codmunnasc)),
                     dtrecebim = lubridate::dmy(as.character(dtrecebim)),
-                    dtcadastro = lubridade::dmy(as.character(dtcadastro))) %>%
+                    dtcadastro = lubridate::dmy(as.character(dtcadastro))) %>%
       dplyr::rename(code_muni_6 = codmunnasc)
   }
 
