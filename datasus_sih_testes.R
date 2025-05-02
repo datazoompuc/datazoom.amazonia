@@ -6,6 +6,8 @@
 
 devtools::load_all()
 
+# SINASC
+
 sinasc_pt <- load_datasus(
   dataset = "datasus_sinasc",
   time_period = 2023,
@@ -22,16 +24,40 @@ sinasc_eng <- load_datasus(
   states = "AC"
 )
 
+# SIHSUS
+
 datasus_sih_rd <- load_datasus(
   dataset = "datasus_sih_rd",
   time_period = 2023,
-  raw_data = TRUE,
+  raw_data = FALSE,
   language = "pt",
   states = "AC"
   )
 
+datasus_sih_er <-load_datasus(
+  dataset = "datasus_sih_er",
+  time_period = 2023,
+  raw_data = FALSE,
+  language = "pt",
+  states = "AC"
+)
 
-load_datasus("datasus_sinasc", time_period = 2023, states = "AC", raw_data = FALSE) %>% View()
+datasus_sih_rj <-load_datasus(
+  dataset = "datasus_sih_rj",
+  time_period = 2023,
+  raw_data = FALSE,
+  language = "pt",
+  states = "AC"
+)
+
+datasus_sih_sp <-load_datasus(
+  dataset = "datasus_sih_sp",
+  time_period = 2023,
+  raw_data = FALSE,
+  language = "pt",
+  states = "AC"
+)
+
 
 "uf_zi", "uf_gestor", "uf_manager", "municipio do gestor", "municipality of the manager",
 "ano_cmpt", "ano_processamento", "processing_year", "ano de processamento da aih", "aih processing year",

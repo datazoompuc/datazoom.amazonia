@@ -365,78 +365,20 @@ load_datasus <- function(dataset,
 
   if (param$dataset %in% c("datasus_sih_rd", "datasus_sih_rj", "datasus_sih_sp", "datasus_sih_er")) {
 
-    dat <- dat %>%
-      dplyr::mutate(munic_res = as.integer(as.character(munic_res))) %>%
-      dplyr::rename(code_muni_6 = munic_res)
-
-    # Filtrando por dataset do SIH para limpeza por idiomas
-
-    # RD
-    if(param$dataset == "datasus_sih_rd") {
-
-      if(param$language == "pt"){
-
-        dat <- dat %>%
-          dplyr::mutate(
-            sexo = dplyr::case_when(
-              sexo == "1" ~ "masculino",
-              sexo == "3" ~ "feminino",
-              TRUE ~ NA_character_
-            ),
-            natureza = dplyr::case_when(
-              natureza == "01" ~ "hospitais gerais",
-              natureza == "02" ~ "hospitais especializados",
-              TRUE ~ NA_character_
-            )
-  )
-      }
-
-      if(param$language == "eng"){
-
-
-      }
+    if(param$dataset %in% c("datasus_sih_er")) {
+      dat <- dat %>%
+        dplyr::mutate(mun_res = as.integer(as.character(mun_res))) %>%
+        dplyr::rename(code_muni_6 = mun_res)
     }
 
-    #ER
-    if(param$dataset == "datasus_sih_er") {
-
-      if(param$language == "pt"){
-
-
-      }
-
-      if(param$language == "eng"){
-
-
-      }
+    if(param$dataset %in% c("datasus_sih_sp")) {
+      dat <- dat
     }
 
-    #RJ
-    if(param$dataset == "datasus_sih_rj") {
-
-      if(param$language == "pt"){
-
-
-      }
-
-      if(param$language == "eng"){
-
-
-      }
-    }
-
-    #SP
-    if(param$dataset == "datasus_sih_sp") {
-
-      if(param$language == "pt"){
-
-
-      }
-
-      if(param$language == "eng"){
-
-
-      }
+    if(param$dataset %in% c("datasus_sih_rd", "datasus_sih_rj")) {
+      dat <- dat %>%
+        dplyr::mutate(munic_res = as.integer(as.character(munic_res))) %>%
+        dplyr::rename(code_muni_6 = munic_res)
     }
 
   }
@@ -455,12 +397,15 @@ load_datasus <- function(dataset,
 
     # Original data only has 6 IBGE digits instead of 7
 
-    geo <- geo %>%
-      dplyr::mutate(code_muni_6 = as.integer(code_muni / 10)) %>%
-      dplyr::distinct(code_muni_6, .keep_all = TRUE) # Only keeps municipalities uniquely identified by the 6 digits
+    if(param$dataset != "datasus_sih_sp") {
 
-    dat <- dat %>%
-      dplyr::left_join(geo, by = "code_muni_6")
+      geo <- geo %>%
+        dplyr::mutate(code_muni_6 = as.integer(code_muni / 10)) %>%
+        dplyr::distinct(code_muni_6, .keep_all = TRUE) # Only keeps municipalities uniquely identified by the 6 digits
+
+      dat <- dat %>%
+        dplyr::left_join(geo, by = "code_muni_6")
+    }
   }
 
   #################
@@ -532,10 +477,16 @@ load_datasus <- function(dataset,
       tibble::as_tibble()
   }
 
-  if (stringr::str_detect(param$dataset, "datasus_sih_rd|datasus_sih_er|datasus_sih_rj|datasus_sih_sp")) {
+  if (stringr::str_detect(param$dataset, "datasus_sih_rd|datasus_sih_er|datasus_sih_rj")) {
     dat_mod <- dat %>%
       dplyr::select(where(~ !is.numeric(.) || !all(. == 0 | is.na(.)))) %>%   # remove colunas com todos os valores iguais a 0
       dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
+      tibble::as_tibble()
+  }
+
+  if (stringr::str_detect(param$dataset, "datasus_sih_sp")) {
+    dat_mod <- dat %>%
+      dplyr::select(where(~ !is.numeric(.) || !all(. == 0 | is.na(.)))) %>%   # remove colunas com todos os valores iguais a 0
       tibble::as_tibble()
   }
 
