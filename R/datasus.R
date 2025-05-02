@@ -2,7 +2,7 @@
 #'
 #' @description Loads DATASUS data on health establishments, mortality, access to health services and several health indicators.
 #'
-#' @param dataset A dataset name, can be one of ("datasus_sim_do", "datasus_sih", "datasus_cnes_lt", "datasus_sinasc), or more. For more details, try \code{vignette("DATASUS")}.
+#' @param dataset A dataset name, can be one of ("datasus_sim_do", "datasus_sih_rd", "datasus_sih_er", "datasus_sih_rj", "datasus_sih_sp", "datasus_cnes_lt", "datasus_sinasc), or more. For more details, try \code{vignette("DATASUS")}.
 #' @inheritParams load_baci
 #' @param states A \code{string} specifying for which states to download the data. It is "all" by default, but can be a single state such as "AC" or any vector such as c("AC", "AM").
 #' @param keep_all A \code{boolean} choosing whether to aggregate the data by municipality, in turn losing individual-level variables (\code{FALSE}) or to keep all the original variables. Only applies when raw_data is \code{TRUE}.
@@ -147,7 +147,7 @@ load_datasus <- function(dataset,
       stringr::str_extract("\\d+")
     # In this case, the position varies
   }
-  if (stringr::str_detect(param$dataset, "datasus_cnes|datasus_sih")) {
+  if (stringr::str_detect(param$dataset, "datasus_cnes")) {
     file_years_yy <- filenames %>%
       substr(5, 6)
   }
@@ -169,7 +169,7 @@ load_datasus <- function(dataset,
 
   file_state <- NULL
 
-  if (param$dataset %in% c("datasus_sim_do", "datasus_sih", "datasus_sinasc", "datasus_sih_rd", "datasus_sih_rj", "datasus_sih_sp", "datasus_sih_er") | stringr::str_detect(param$dataset, "datasus_cnes")) {
+  if (param$dataset %in% c("datasus_sim_do", "datasus_sinasc", "datasus_sih_rd", "datasus_sih_rj", "datasus_sih_sp", "datasus_sih_er") | stringr::str_detect(param$dataset, "datasus_cnes")) {
     file_state <- filenames %>%
       substr(3, 4)
   } else if (paste0(param$states, collapse = "") != "all") {
@@ -383,31 +383,6 @@ load_datasus <- function(dataset,
 
   }
 
-  if (!(param$dataset %in% c("datasus_sih"))) {
-    # Adding municipality data
-
-    geo <- datazoom.amazonia::municipalities %>%
-      dplyr::select(
-        code_muni,
-        name_muni,
-        code_state,
-        abbrev_state,
-        legal_amazon
-      )
-
-    # Original data only has 6 IBGE digits instead of 7
-
-    if(param$dataset != "datasus_sih_sp") {
-
-      geo <- geo %>%
-        dplyr::mutate(code_muni_6 = as.integer(code_muni / 10)) %>%
-        dplyr::distinct(code_muni_6, .keep_all = TRUE) # Only keeps municipalities uniquely identified by the 6 digits
-
-      dat <- dat %>%
-        dplyr::left_join(geo, by = "code_muni_6")
-    }
-  }
-
   #################
   ## Aggregating ##
   #################
@@ -487,11 +462,6 @@ load_datasus <- function(dataset,
   if (stringr::str_detect(param$dataset, "datasus_sih_sp")) {
     dat_mod <- dat %>%
       dplyr::select(where(~ !is.numeric(.) || !all(. == 0 | is.na(.)))) %>%   # remove colunas com todos os valores iguais a 0
-      tibble::as_tibble()
-  }
-
-  if (param$dataset == "datasus_sih") {
-    dat_mod <- dat %>%
       tibble::as_tibble()
   }
 
