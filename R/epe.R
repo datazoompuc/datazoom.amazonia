@@ -18,11 +18,7 @@
 #'
 #' @export
 # Nova versão da função load_epe(), considerando estrutura real do Excel
-
 load_epe <- function(dataset, table = NULL, geo_level = "state", raw_data = FALSE, language = "eng") {
-  # Variáveis globais para o R CMD Check
-  ano <- mes <- uf <- sistema <- tipo_consumidor <- classe_consumo <- atividade <- cnae <- quantidade <- NULL
-
   # Define parâmetros
   param <- list()
   param$source <- "epe"
@@ -39,23 +35,45 @@ load_epe <- function(dataset, table = NULL, geo_level = "state", raw_data = FALS
     stop("Invalid dataset. Choose 'energy_consumption_per_class' or 'national_energy_balance'.")
   }
 
-  # Para "national_energy_balance", download é direto
   if (param$dataset == "national_energy_balance") {
     dat <- external_download(source = param$source, dataset = param$dataset)
-    dat <- dat %>% janitor::clean_names()
-    if (raw_data) return(dat)
-    return(dat)
+    dat <- janitor::clean_names(dat)
+    if (param$raw_data) return(dat)
+    return(dat) # ainda não tratado
   }
 
-  # Definindo sheets para "energy_consumption_per_class"
+  # RAW_DATA = TRUE → retorna todas as sheets em uma lista
+  if (param$raw_data) {
+    raw_sheets <- c(
+      "SETOR INDUSTRIAL POR RG",
+      "SETOR INDUSTRIAL POR UF",
+      "CONSUMO E NUMCONS SAM UF",
+      "CONSUMO E NUMCONS SAM"
+    )
+
+    dat_list <- lapply(raw_sheets, function(sheet_name) {
+      external_download(
+        source = param$source,
+        dataset = param$dataset,
+        sheet = sheet_name
+      )
+    })
+
+    names(dat_list) <- raw_sheets
+    return(dat_list)
+  }
+
+  # Caso não seja raw_data, continua com tratamento normal
+
+  # Definindo sheets mapeadas
   sheets_available <- list(
     consumer_type = list(
       state = "CONSUMO E NUMCONS SAM UF",
-      subsystem = "CONSUMO E NUMCONS SAM SISTEMA/REGIAO"
+      subsystem = "CONSUMO E NUMCONS SAM"
     ),
     industrial_sector = list(
       state = "SETOR INDUSTRIAL POR UF",
-      subsystem = "SETOR INDUSTRIAL POR SISTEMA/REGIAO"
+      subsystem = "SETOR INDUSTRIAL POR RG"
     )
   )
 
@@ -69,71 +87,64 @@ load_epe <- function(dataset, table = NULL, geo_level = "state", raw_data = FALS
 
   sheet_selected <- sheets_available[[param$table]][[param$geo_level]]
 
-  # Download e leitura
+  # Download e leitura do sheet específico
   dat <- external_download(
     source = param$source,
     dataset = param$dataset,
     sheet = sheet_selected
   )
 
-  if (param$raw_data) {
-    return(dat)
+  # Limpeza
+  dat <- dat %>%
+    janitor::clean_names() %>%
+    dplyr::mutate_if(is.character, ~ stringi::stri_trans_general(., "Latin-ASCII"))
+
+  # Tratamento da coluna de data
+  if ("data_excel" %in% names(dat)) {
+    dat <- dat %>%
+      dplyr::mutate(data_excel = as.Date(data_excel)) %>%
+      dplyr::rename(!!ifelse(param$language == "en", "Date", "Data") := data_excel)
   }
 
-  # Limpeza básica
   dat <- dat %>%
-    dplyr::mutate_if(is.character, ~ stringi::stri_trans_general(., "Latin-ASCII")) %>%
-    janitor::clean_names()
+    dplyr::select(-dplyr::any_of(c("data", "data_versao")))
 
-  # Renomeia colunas conforme tipo de tabela
+  # Renomear colunas específicas
   if (param$table == "consumer_type") {
     dat <- dat %>%
       dplyr::rename(
-        year = ano,
-        month = mes,
-        state = uf,
-        system = sistema,
-        consumer_class = classe_consumo,
-        consumer_type = tipo_consumidor,
-        consumption_mwh = quantidade
+        State = uf,
+        Region = regiao,
+        System = sistema,
+        Class = classe,
+        ConsumerType = tipo_consumidor,
+        Consumption = consumo,
+        Consumers = consumidores
       )
   }
 
   if (param$table == "industrial_sector") {
     dat <- dat %>%
       dplyr::rename(
-        year = ano,
-        month = mes,
-        state = uf,
-        system = sistema,
-        cnae_code = cnae,
-        activity = atividade,
-        consumption_mwh = quantidade
+        IndustrialSector = setor_industrial,
+        State = uf,
+        Region = regiao,
+        Consumption = consumo
       )
   }
 
-  # Correção de tipos
-  dat <- dat %>%
-    dplyr::mutate(
-      year = as.integer(year),
-      month = as.integer(month),
-      consumption_mwh = as.numeric(consumption_mwh)
-    )
-
-  # Tradução se language == "pt"
+  # Tradução (apenas se language == "en")
   if (param$language == "en") {
-    dat <- dat %>%
-      dplyr::rename_with(~ dplyr::recode(.,
-                                         "state" = "estado",
-                                         "system" = "sistema",
-                                         "consumer_class" = "classe_consumo",
-                                         "consumer_type" = "tipo_consumidor",
-                                         "cnae_code" = "codigo_cnae",
-                                         "activity" = "atividade",
-                                         "year" = "ano",
-                                         "month" = "mes",
-                                         "consumption_mwh" = "consumo_mwh"
-      ))
+    names(dat) <- dplyr::recode(names(dat),
+                                "uf" = "State",
+                                "regiao" = "Region",
+                                "sistema" = "System",
+                                "classe" = "Class",
+                                "tipo_consumidor" = "ConsumerType",
+                                "consumo" = "Consumption",
+                                "consumidores" = "Consumers",
+                                "setor_industrial" = "IndustrialSector"
+    )
   }
 
   return(dat)
