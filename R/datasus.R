@@ -346,8 +346,7 @@ load_datasus <- function(dataset,
       dplyr::distinct(code_muni_6, .keep_all = TRUE) # Only keeps municipalities uniquely identified by the 6 digits
 
     dat <- dat %>%
-      dplyr::rename("code_muni_6" = "codmunnasc") %>%
-      dplyr::left_join(geo, by = "code_muni_6")
+      dplyr::left_join(geo, c("code_muni_6" = "codmunnasc"))
   }
 
   if (stringr::str_detect(param$dataset, "datasus_sih")) {
