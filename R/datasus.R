@@ -286,6 +286,9 @@ load_datasus <- function(dataset,
 
   if(param$dataset == "datasus_sinasc") {
 
+    dat <- dat %>%
+      dplyr::mutate(across(where(is.factor), as.character)) # os dados vem todos em factor, transformo em character
+
     if(param$language == "pt") {
       dat <- dat %>%
         dplyr::mutate(
@@ -335,11 +338,16 @@ load_datasus <- function(dataset,
             stcesparto = dplyr::case_match(stcesparto, '1' ~ "yes", '2' ~ "no", '3' ~ "not_applicable", '9' ~ "unknown"),
             tpnascassi = dplyr::case_match(tpnascassi, '1' ~ "doctor", '2' ~ "nurse_midwife", '3' ~ "midwife", '4' ~ "others", '9' ~ "unknown")
           )
-      }
+    }
+
+    geo <- datazoom.amazonia::municipalities %>%
+      dplyr::select(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
+      dplyr::mutate(code_muni_6 = as.character(as.integer(code_muni / 10))) %>%
+      dplyr::distinct(code_muni_6, .keep_all = TRUE) # Only keeps municipalities uniquely identified by the 6 digits
 
     dat <- dat %>%
-      dplyr::mutate(codmunnasc = as.numeric(as.character(codmunnasc))) %>%
-      dplyr::rename("code_muni_6" = "codmunnasc")
+      dplyr::rename("code_muni_6" = "codmunnasc") %>%
+      dplyr::left_join(geo, by = "code_muni_6")
   }
 
   if (stringr::str_detect(param$dataset, "datasus_sih")) {
