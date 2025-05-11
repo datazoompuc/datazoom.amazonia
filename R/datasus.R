@@ -179,7 +179,7 @@ load_datasus <- function(dataset,
   }
 
   if(param$dataset %in% c("datasus_sih_rd", "datasus_sih_er", "datasus_sih_rj", "datasus_sih_sp")) {
-    suffix <- stringr::str_remove(param$dataset, "^datasus_sih_") %>%
+    suffix <- stringr::str_remove(param$dataset, "datasus_sih_") %>%
       toupper()
 
     filenames <- filenames[stringr::str_detect(filenames, suffix)]
