@@ -26,13 +26,15 @@ Authors:
   \item Daniel AC Barbosa \email{daniel.adrianocb@gmail.com}
   \item Bruno Alcantara Duarte \email{brunoalcanduarte@gmail.com}
   \item Fredie Didier \email{fdidier@terra.com.br}
-  \item Tito Bruni \email{titonico.bruni@gmail.com}
+  \item Tito Bruni
   \item Luiz Guilherme Lopes Moussatche \email{luizguilherme.lopesm@gmail.com}
   \item Victor Aliende da Matta \email{victor.al.matta@gmail.com}
   \item Anna Carolina Dutra Saraiva \email{annadutrasaraiva@gmail.com}
   \item Arthur Carvalho Brito \email{arthurcbps@gmail.com}
   \item Francisco de Lima Cavalcanti \email{francisco.lima.cavalcanti@gmail.com}
   \item Maria Mittelbach \email{mariamittelbach@gmail.com}
+  \item Felipe de Moraes Nunes \email{felipedmoraesn@gmail.com}
+  \item Joao Santos P. Barbosa \email{joao.31582129@gmail.com}
 }
 
 Other contributors:

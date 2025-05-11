@@ -128,15 +128,10 @@ load_datasus <- function(dataset,
 
   prefix <- dataset_prefix_map[[param$dataset]]
 
-  if (!is.null(prefix)) {
-    filenames <- filenames[grepl(paste0("^", prefix), filenames)]
-  }
-
   ### Filtering by year
 
   file_years <- NULL
   file_years_yy <- NULL
-  file_month_mm <- NULL
 
   if (param$dataset %in% c("datasus_sim_do", "datasus_sinasc")) {
     file_years <- filenames %>%
@@ -147,12 +142,8 @@ load_datasus <- function(dataset,
       stringr::str_extract("\\d+")
     # In this case, the position varies
   }
-  if (stringr::str_detect(param$dataset, "datasus_cnes")) {
-    file_years_yy <- filenames %>%
-      substr(5, 6)
-  }
 
-  if (stringr::str_detect(param$dataset, "datasus_sih_rd|datasus_sih_rj|datasus_sih_sp|datasus_sih_er")) {
+  if (stringr::str_detect(param$dataset, "datasus_cnes|datasus_sih")) {
     file_years_yy <- filenames %>%
       substr(5, 6)
   }
@@ -169,11 +160,13 @@ load_datasus <- function(dataset,
 
   file_state <- NULL
 
-  if (param$dataset %in% c("datasus_sim_do", "datasus_sinasc", "datasus_sih_rd", "datasus_sih_rj", "datasus_sih_sp", "datasus_sih_er") | stringr::str_detect(param$dataset, "datasus_cnes")) {
+  if (param$dataset %in% c("datasus_sim_do", "datasus_sinasc") | stringr::str_detect("param$dataset", "datasus_cnes|datasus_sih")) {
     file_state <- filenames %>%
       substr(3, 4)
+
   } else if (paste0(param$states, collapse = "") != "all") {
     base::message("Filtering by state not supported for all datasets. Data for other states will be included.")
+
   }
 
   if (!is.null(file_state) & paste0(param$states, collapse = "") != "all") {
@@ -189,7 +182,7 @@ load_datasus <- function(dataset,
     filenames <- filenames[stringr::str_detect(filenames, suffix)]
   }
 
-  if (param$dataset %in% c("datasus_sih_rd", "datasus_sih_er", "datasus_sih_rj", "datasus_sih_sp")) {
+  if (param$dataset %in% stringr::str_detect("param$dataset", "datasus_cnes|datasus_sih")) {
     suffix <- stringr::str_remove(param$dataset, "datasus_sih_") %>%
       toupper()
 
