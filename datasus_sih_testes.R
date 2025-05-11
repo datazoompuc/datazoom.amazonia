@@ -38,7 +38,7 @@ datasus_sih_rd <- load_datasus(
 datasus_sih_er <-load_datasus(
   dataset = "datasus_sih_er",
   time_period = 2023,
-  raw_data = TRUE,
+  raw_data = FALSE,
   language = "pt",
   states = "AC"
 )

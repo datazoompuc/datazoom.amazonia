@@ -885,11 +885,11 @@ load_dictionary <- function(dataset) {
     harmonization_dat <- tibble::tribble(
       ~var_code, ~name_pt, ~name_eng, ~label_pt, ~label_eng,
 
-      "IDADE",      "idade_fake",  "age_fake",    "Idade falsa",     "Fake age",
-      "SEXO",       "sexo_fake",   "sex_fake",    "Sexo falso",      "Fake sex",
-      "MUNIC_RES",  "mun_fake",    "mun_fake",    "Município fake",  "Fake city",
-      "UF_RES",     "uf_fake",     "uf_fake",     "UF fake",         "Fake UF",
-      "RACA_COR",   "raca_fake",   "race_fake",   "Raça fake",       "Fake race"
+      "code_muni", "code_muni", "code_muni", "Codigo IBGE do municipio", "IBGE Municipality code",
+      "name_muni", "name_muni", "name_muni", "Nome do municipio", "City name",
+      "code_state", "code_state", "code_state", "Codigo do estado", "State code",
+      "abbrev_state", "abbrev_state", "abbrev_state", "Sigla do estado", "State abbreviation",
+      "legal_amazon", "legal_amazon", "legal_amazon", "Amazonia Legal", "Legal Amazon"
 
     )
   }

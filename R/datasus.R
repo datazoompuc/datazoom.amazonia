@@ -343,7 +343,7 @@ load_datasus <- function(dataset,
 
     } else {
       dat <- dat
-    }
+      }
 
   }
 
@@ -416,10 +416,16 @@ load_datasus <- function(dataset,
       tibble::as_tibble()
   }
   if (stringr::str_detect(param$dataset, "datasus_sih")) {
+
+    if(param$dataset != "datasus_sih_sp") {
     dat_mod <- dat %>%
       dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
       dplyr::select(where(~ !(all(is.na(.)) || all(. == 0, na.rm = TRUE)))) %>% # Remove colunas que só possuem 0 e NA
       tibble::as_tibble()
+
+    } else {
+      dat_mod <- dat # datasus_sih_sp não possui variável de identificação de município
+    }
   }
 
   dic <- load_dictionary(param$dataset)
