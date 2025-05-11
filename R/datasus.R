@@ -317,7 +317,6 @@ load_datasus <- function(dataset,
   }
 
   if (stringr::str_detect(param$dataset, "datasus_sih")) {
-
     # Adding municipality data
     geo <- datazoom.amazonia::municipalities %>%
       dplyr::select(
@@ -327,7 +326,6 @@ load_datasus <- function(dataset,
         abbrev_state,
         legal_amazon
       )
-
     # Original data only has 6 IBGE digits instead of 7
     geo <- geo %>%
       dplyr::mutate(code_muni_6 = as.character(as.integer(code_muni / 10))) %>%
@@ -340,7 +338,7 @@ load_datasus <- function(dataset,
 
     } else if (param$dataset == "datasus_sih_er"){
       dat <- dat %>%
-        dplyr::mutate(munic_res = as.character(munic_res)) %>%
+        dplyr::mutate(mun_res = as.character(mun_res)) %>%
         dplyr::left_join(geo, by = c("mun_res" = "code_muni_6"))
 
     } else {
@@ -422,8 +420,6 @@ load_datasus <- function(dataset,
       dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
       dplyr::select(where(~ !(all(is.na(.)) || all(. == 0, na.rm = TRUE)))) %>% # Remove colunas que só possuem 0 e NA
       tibble::as_tibble()
-
-
   }
 
   dic <- load_dictionary(param$dataset)
