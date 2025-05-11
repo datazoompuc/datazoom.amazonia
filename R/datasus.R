@@ -316,7 +316,7 @@ load_datasus <- function(dataset,
       dplyr::rename("code_muni_6" = "codmunnasc")
   }
 
-  if (!(param$dataset %in% stringr::str_detect(param$dataset, "datasus_sih"))) {
+  if (stringr::str_detect(param$dataset, "datasus_sih")) {
     # Adding municipality data
 
     geo <- datazoom.amazonia::municipalities %>%
@@ -331,11 +331,12 @@ load_datasus <- function(dataset,
     # Original data only has 6 IBGE digits instead of 7
 
     geo <- geo %>%
-      dplyr::mutate(code_muni_6 = as.integer(code_muni / 10)) %>%
+      dplyr::mutate(code_muni_6 = as.character(as.integer(code_muni / 10))) %>%
       dplyr::distinct(code_muni_6, .keep_all = TRUE) # Only keeps municipalities uniquely identified by the 6 digits
 
     dat <- dat %>%
-      dplyr::left_join(geo, by = "code_muni_6")
+      dplyr::mutate(munic_res = as.character(munic_res)) %>%
+      dplyr::left_join(geo, by = c("munic_res" = "code_muni_6"))
   }
 
   #################
