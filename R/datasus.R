@@ -75,7 +75,7 @@ load_datasus <- function(dataset,
   origem <- locnasc <- estcivmae <- escmae <- semagestac <- gravidez <- parto <- NULL
   consprenat <- sexo <- racacor <- idanomal <- escmae2010 <- dtnascmae <- NULL
   racacormae <- dtultmenst <- tpmetestim <- tpapresent <- sttrabpart <- NULL
-  stcesparto <- tpnascassi <- codmunnasc <- NULL
+  stcesparto <- tpnascassi <- codmunnasc <- dataset_prefix_map <- NULL
 
 
   #############################
@@ -157,7 +157,7 @@ load_datasus <- function(dataset,
 
   file_state <- NULL
 
-  if (param$dataset %in% c("datasus_sim_do", "datasus_sih", "datasus_sinasc") | stringr::str_detect(param$dataset, "datasus_cnes")) {
+  if (param$dataset %in% c("datasus_sim_do", "datasus_sinasc") | stringr::str_detect(param$dataset, "datasus_cnes|datasus_sih")) {
     file_state <- filenames %>%
       substr(3, 4)
   } else if (paste0(param$states, collapse = "") != "all") {
