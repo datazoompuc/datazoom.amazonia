@@ -183,7 +183,6 @@ load_datasus <- function(dataset,
       toupper()
 
     filenames <- filenames[stringr::str_detect(filenames, suffix)]
-
   }
 
   param$filenames <- filenames
