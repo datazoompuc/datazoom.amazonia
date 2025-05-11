@@ -410,7 +410,7 @@ load_datasus <- function(dataset,
   if (stringr::str_detect(param$dataset, "datasus_sih")) {
     dat_mod <- dat %>%
       dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
-      dplyr::select(where(~ !all(.x == 0))) %>%
+      dplyr::select(where(~ !(all(is.na(.)) || all(. == 0, na.rm = TRUE)))) %>% # Remove colunas que só possuem 0 e NA
       tibble::as_tibble()
 
 
