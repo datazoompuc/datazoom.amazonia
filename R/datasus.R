@@ -284,8 +284,7 @@ load_datasus <- function(dataset,
       )
   }
 
-  if(param$dataset == "datasus_sinasc" ) {
-
+  if(param$dataset == "datasus_sinasc") {
     dat <- dat %>%
 
       # Documentando as colunas
