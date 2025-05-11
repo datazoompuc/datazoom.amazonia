@@ -362,15 +362,14 @@ load_datasus <- function(dataset,
         dplyr::mutate(munic_res = as.character(munic_res)) %>%
         dplyr::left_join(geo, by = c("munic_res" = "code_muni_6"))
 
-    } else if (param$dataset == "datasus_sih_er"){
+    } else if(param$dataset == "datasus_sih_er"){
       dat <- dat %>%
         dplyr::mutate(mun_res = as.character(mun_res)) %>%
         dplyr::left_join(geo, by = c("mun_res" = "code_muni_6"))
 
-    } else {
+    } else if(param$dataset == "datasus_sih_sp") {
       dat <- dat
-      }
-
+    }
   }
 
   #################
