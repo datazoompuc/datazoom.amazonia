@@ -272,10 +272,6 @@ load_datasus <- function(dataset,
       dplyr::rename("code_muni_6" = "codmunocor")
   }
 
-  if (param$dataset == "datazoom_sih") {
-
-  }
-
   if (stringr::str_detect(param$dataset, "datasus_cnes")) {
     dat <- dat %>%
       dplyr::mutate(codufmun = as.numeric(as.character(codufmun))) %>%
@@ -290,7 +286,7 @@ load_datasus <- function(dataset,
       )
   }
 
-  if( param$dataset == "datasus_sinasc" ) {
+  if(param$dataset == "datasus_sinasc" ) {
 
     dat <- dat %>%
 
@@ -323,7 +319,7 @@ load_datasus <- function(dataset,
       dplyr::rename("code_muni_6" = "codmunnasc")
   }
 
-  if (!(param$dataset %in% c("datasus_sih"))) {
+  if (!(param$dataset %in% stringr::str_detect(param$dataset, "datasus_sih"))) {
     # Adding municipality data
 
     geo <- datazoom.amazonia::municipalities %>%
