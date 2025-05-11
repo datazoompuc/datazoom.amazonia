@@ -423,8 +423,11 @@ load_datasus <- function(dataset,
       dplyr::select(where(~ !(all(is.na(.)) || all(. == 0, na.rm = TRUE)))) %>% # Remove colunas que só possuem 0 e NA
       tibble::as_tibble()
 
+    # datasus_sih_sp não possui variável de identificação de município
     } else {
-      dat_mod <- dat # datasus_sih_sp não possui variável de identificação de município
+      dat_mod <- dat %>%
+        dplyr::select(where(~ !(all(is.na(.)) || all(. == 0, na.rm = TRUE)))) %>% # Remove colunas que só possuem 0 e NA
+        tibble::as_tibble()
     }
   }
 
