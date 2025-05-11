@@ -407,9 +407,13 @@ load_datasus <- function(dataset,
       dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
       tibble::as_tibble()
   }
-  if (param$dataset == "datasus_sih") {
+  if (stringr::str_detect(param$dataset, "datasus_sih")) {
     dat_mod <- dat %>%
+      dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
+      dplyr::select(where(~ !all(.x == 0))) %>%
       tibble::as_tibble()
+
+
   }
 
   dic <- load_dictionary(param$dataset)
