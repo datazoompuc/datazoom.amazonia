@@ -160,7 +160,6 @@ load_datasus <- function(dataset,
   if (param$dataset %in% c("datasus_sim_do", "datasus_sinasc") | stringr::str_detect(param$dataset, "datasus_cnes|datasus_sih")) {
     file_state <- filenames %>%
       substr(3, 4)
-
   } else if (paste0(param$states, collapse = "") != "all") {
     base::message("Filtering by state not supported for all datasets. Data for other states will be included.")
   }
@@ -182,7 +181,7 @@ load_datasus <- function(dataset,
     suffix <- stringr::str_remove(param$dataset, "datasus_sih_") %>%
       toupper()
 
-    filenames <- filenames[stringr::str_detect(filenames, suffix)]
+    filenames <- filenames[stringr::str_starts(filenames, suffix)]
   }
 
   param$filenames <- filenames
