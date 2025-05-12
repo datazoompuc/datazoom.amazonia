@@ -283,35 +283,131 @@ load_datasus <- function(dataset,
 
   if( param$dataset == "datasus_sinasc" ) {
 
-    dat <- dat %>%
+    labels <- tibble::tribble(
+      ~ var_code, ~ value, ~ label_pt, ~ label_eng,
+      "origem", 1, "oracle", "oracle",
+      "origem", 2, "ftp", "ftp",
+      "origem", 3, "sead", "sead",
+      "locnasc", 1, "hospital", "hospital",
+      "locnasc", 2, "outros estabelecimentos de saude", "other health establishments",
+      "locnasc", 3, "domicilio", "home",
+      "locnasc", 4, "outros", "other",
+      "locnasc", 5, "aldeia indigena", "indigenous village",
+      "locnasc", 9, "ignorado", "unknown",
+      "estcivmae", 1, "solteira", "single",
+      "estcivmae", 2, "casada", "married",
+      "estcivmae", 3, "viuva", "widowed",
+      "estcivmae", 4, "divorciada", "divorced",
+      "estcivmae", 5, "uniao estavel", "civil union",
+      "estcivmae", 9, "ignorado", "unknown",
+      "escmae", 1, "nenhuma", "none",
+      "escmae", 2, "1 a 2 anos", "1 to 2 years",
+      "escmae", 3, "4 a 7 anos", "4 to 7 years",
+      "escmae", 4, "8 a 11 anos", "8 to 11 years",
+      "escmae", 5, "12 e mais", "12 or more years",
+      "escmae", 9, "ignorado", "unknown",
+      "semagestac", 1, "menos de 22 semanas", "less than 22 weeks",
+      "semagestac", 2, "22 a 27 semanas", "22 to 27 weeks",
+      "semagestac", 3, "28 a 31 semanas", "28 to 31 weeks",
+      "semagestac", 4, "32 a 36 semanas", "32 to 36 weeks",
+      "semagestac", 5, "37 a 41 semanas", "37 to 41 weeks",
+      "semagestac", 6, "42 semanas e mais", "42 weeks or more",
+      "semagestac", 9, "ignorado", "unknown",
+      "gravidez", 1, "unica", "single",
+      "gravidez", 2, "dupla", "twin",
+      "gravidez", 3, "tripla ou mais", "triplet or more",
+      "gravidez", 9, "ignorado", "unknown",
+      "parto", 1, "vaginal", "vaginal",
+      "parto", 2, "cesario", "cesarean",
+      "parto", 9, "ignorado", "unknown",
+      "consprenat", 1, "nenhuma", "none",
+      "consprenat", 2, "de 1 a 3", "1 to 3",
+      "consprenat", 3, "de 4 a 6", "4 to 6",
+      "consprenat", 4, "7 e mais", "7 or more",
+      "consprenat", 9, "ignorado", "unknown",
+      "sexo", 0, "ignorado", "unknown",
+      "sexo", 1, "masculino", "male",
+      "sexo", 2, "feminino", "female",
+      "racacor", 1, "branca", "white",
+      "racacor", 2, "preta", "black",
+      "racacor", 3, "amarela", "yellow",
+      "racacor", 4, "parda", "brown",
+      "racacor", 5, "indigena", "indigenous",
+      "idanomal", 1, "ignorado", "unknown",
+      "idanomal", 2, "sim", "yes",
+      "idanomal", 9, "nao", "no",
+      "escmae2010", 0, "sem escolaridade", "no education",
+      "escmae2010", 1, "fundamental 1", "elementary 1",
+      "escmae2010", 2, "fundamental 2", "elementary 2",
+      "escmae2010", 3, "medio", "high school",
+      "escmae2010", 4, "superior incompleto", "incomplete higher education",
+      "escmae2010", 5, "superior completo", "complete higher education",
+      "escmae2010", 9, "ignorado", "unknown",
+      "racacormae", 1, "branca", "white",
+      "racacormae", 2, "preta", "black",
+      "racacormae", 3, "amarela", "yellow",
+      "racacormae", 4, "parda", "brown",
+      "racacormae", 5, "indigena", "indigenous",
+      "tpmetestim", 1, "exame fisico", "physical exam",
+      "tpmetestim", 2, "outro metodo", "other method",
+      "tpmetestim", 9, "ignorado", "unknown",
+      "tpapresent", 1, "cefalica", "cephalic",
+      "tpapresent", 2, "pelvica ou podalica", "breech or footling",
+      "tpapresent", 3, "transversa", "transverse",
+      "tpapresent", 9, "ignorado", "unknown",
+      "sttrabpart", 1, "sim", "yes",
+      "sttrabpart", 2, "nao", "no",
+      "sttrabpart", 9, "ignorado", "unknown",
+      "stcesparto", 1, "sim", "yes",
+      "stcesparto", 2, "nao", "no",
+      "stcesparto", 3, "nao se aplica", "not applicable",
+      "stcesparto", 9, "ignorado", "unknown",
+      "tpnascassi", 1, "medico", "doctor",
+      "tpnascassi", 2, "enfermeira obstetriz", "obstetric nurse",
+      "tpnascassi", 3, "parteira", "midwife",
+      "tpnascassi", 4, "outros", "other",
+      "tpnascassi", 9, "ignorado", "unknown"
+    )
 
-      # Documentando as colunas
+    # adicionando factor labels
+
+    dat <- dat %>%
       dplyr::mutate(
-        origem = dplyr::recode(origem, '1' = "oracle", '2' = "ftp", '3' = "sead"),
-        locnasc = dplyr::recode(locnasc, '1' = "hospital", '2' = "outros estabelecimentos de saude", '3' = "domicilio", '4' = "outros", '5' = "aldeia indigena", '9' = "ignorado"),
-        estcivmae = dplyr::recode(estcivmae, '1' = "solteira", '2' = "casada", '3' = "viuva", '4' = "divorciada", '5' = "uniao estavel", '9' = "ignorada"),
-        escmae = dplyr::recode(escmae, '1' = "nenhuma", '2' = "1 a 2 anos", '3' = "4 a 7 anos", '4' = "8 a 11 anos", '5' = "12 e mais", '9' = "ignorado"),
-        semagestac = dplyr::recode(semagestac, '1' = "menos de 22 semanas", '2' = "22 a 27 semanas", '3' = "28 a 31 semanas", '4' = "32 a 36 semanas", '5' = "37 a 41 semanas", '6' = "42 semanas e mais", '9' = "ignorado"),
-        gravidez = dplyr::recode(gravidez, '1' = "unica", '2' = "dupla", '3' = "tripla ou mais", '9' = "ignorado"),
-        parto = dplyr::recode(parto, '1' = "vaginal", '2' = "cesario", '9' = "ignorado"),
-        consprenat = dplyr::recode(consprenat, '1' = "nenhuma", '2' = "de 1 a 3", '3' = "de 4 a 6", '4' = "7 e mais", '9' = "ignorado"),
-        sexo = dplyr::recode(sexo, '0' = "ignorado", '1' = "masculino", '2' = "feminino"),
-        racacor = dplyr::recode(racacor, '1' = "branca", '2' = "preta", '3' = "amarela", '4' = "parda", '5' = "indigena"),
-        idanomal = dplyr::recode(idanomal, '9' = "ignorado", '1' = "sim", '2' = "nao"),
-        escmae2010 = dplyr::recode(escmae2010, '0' = "sem escolaridade", '1' = "fundamental 1", '2' = "fundamental 2", '3' = "medio", '4' = "superior incompleto", '5' = "superior completo", '9' = "ignorado"),
-        dtnascmae = lubridate::dmy(as.character(dtnascmae)),
-        racacormae = dplyr::recode(racacormae, '1' = "branca", '2' = "preta", '3' = "amarela", '4' = "parda", '5' = "indigena"),
-        dtultmenst = lubridate::dmy(as.character(dtultmenst)),
-        tpmetestim = dplyr::recode(tpmetestim, '1' = "exame fisico", '2' = "outro metodo", '9' = "ignorado"),
-        tpapresent = dplyr::recode(tpapresent, '1' = "cefalica", '2' = "pelvica ou podalica", '3' = "transversa", '9' = "ignorado"),
-        sttrabpart = dplyr::recode(sttrabpart, '1' = "sim", '2' = "nao", '9' = "ignorado"),
-        stcesparto = dplyr::recode(stcesparto, '1' = "sim", '2' = "nao", '3' = "nao se aplica", '9' = "ignorado"),
-        tpnascassi = dplyr::recode(tpnascassi, '1' = "medico", '2' = "enfermeira obstetriz", '3' = "parteira", '4' = "outros", '9' = "ignorado")
+        dplyr::across(
+          dplyr::any_of(unique(labels$var_code)),
+          function(x) {
+            # linhas do dict correspondentes a cada variavel
+            dic <- labels %>%
+              dplyr::filter(var_code == dplyr::cur_column())
+
+            # vetor de levels
+            lev <- dic$value
+
+            # vetor de labels
+            if (param$language == "pt") {
+              lab <- dic$label_pt
+            }
+            else {
+              lab <- dic$label_eng
+            }
+
+            # transforma em factor
+
+            factor(x, levels = lev, labels = lab)
+          }
+        )
       )
 
+    # formatando dados
+
     dat <- dat %>%
-      dplyr::mutate(codmunnasc = as.numeric(as.character(codmunnasc))) %>%
+      dplyr::mutate(
+        dtnascmae = lubridate::dmy(as.character(dtnascmae)),
+        dtultmenst = lubridate::dmy(as.character(dtultmenst)),
+        codmunnasc = as.numeric(as.character(codmunnasc))
+      ) %>%
       dplyr::rename("code_muni_6" = "codmunnasc")
+
   }
 
   if (!(param$dataset %in% c("datasus_sih"))) {
