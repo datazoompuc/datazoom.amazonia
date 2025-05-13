@@ -125,3 +125,91 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
 
   return(dat_mod)
 }
+
+
+
+
+### ajuste_desmatamento_prodes (Vanndher) ###
+library(sf)
+library(dplyr)
+library(stringi)
+
+# Caminhos
+path_accumulated <- "C:/Users/usuário/Downloads/accumulated_deforestation_2007.shp"
+path_yearly <- "C:/Users/usuário/Downloads/yearly_deforestation.shp"
+path_municipality <- "C:/Users/usuário/Downloads/BR_Municipios_2023.shp"
+
+# Leitura
+accumulated <- st_read(path_accumulated)
+yearly <- st_read(path_yearly)
+municipality <- st_read(path_municipality)
+
+# Remoção das colunas por índice
+accumulated <- accumulated %>%
+  select(state, main_class, year, area_km, geometry)
+
+yearly <- yearly %>%
+  select(state, main_class, year, area_km, geometry)
+
+municipality <- municipality %>%
+  select(NM_MUN, NM_UF, NM_REGIAO, geometry)
+
+
+teste_prodes <- function(ano = NULL, municipio = NULL, estado = NULL) {
+
+  sf_use_s2(FALSE)
+
+  # Padronizar município e estado buscados
+  muni_std <- tolower(stri_trans_general(municipio, "Latin-ASCII"))
+  estado_std <- tolower(stri_trans_general(estado, "Latin-ASCII"))
+
+  # Padronizar os nomes do shapefile para comparar
+  municipality_std <- municipality %>%
+    mutate(
+      nome_mun_std = tolower(stri_trans_general(NM_MUN, "Latin-ASCII")),
+      nome_uf_std = tolower(stri_trans_general(NM_UF, "Latin-ASCII"))
+    )
+
+  # Filtrar
+  mun <- municipality_std %>%
+    filter(nome_mun_std == muni_std & nome_uf_std == estado_std)
+
+
+  if (nrow(mun) == 0) {
+    stop("Município não encontrado. Verifique o nome e o estado.")
+  }
+
+  # Garantir que os dados estão no mesmo CRS
+  accumulated <- st_transform(accumulated, st_crs(mun))
+  yearly <- st_transform(yearly, st_crs(mun))
+
+  # Reduz a área de interesse para melhorar performance
+  accumulated_crop <- st_crop(accumulated, mun)
+  yearly_crop <- st_crop(yearly, mun)
+
+  # Filtrar e intersectar o desmatamento acumulado de 2007
+  accumulated_mun <- st_intersection(accumulated_crop, mun)
+  accumulated_area <- sum(accumulated_mun$area_km, na.rm = TRUE)
+
+  # Filtrar incrementos entre 2008 e o ano desejado (inclusive)
+  incr_mun <- yearly %>%
+    filter(year <= ano) %>%
+    st_intersection(mun)
+  incr_area <- sum(incr_mun$area_km, na.rm = TRUE)
+
+  # Desmatamento apenas do ano solicitado
+  year_mun <- incr_mun %>%
+    filter(year == ano)
+  year_area <- sum(year_mun$area_km, na.rm = TRUE)
+
+  # Retorno organizado
+  return(list(
+    municipio = municipio,
+    estado = estado,
+    ano = ano,
+    desmatamento_ano = year_area,
+    acumulado_total = accumulated_area + incr_area
+  ))
+}
+
+teste_prodes(ano = 2022, municipio = "Novo Aripuanã", estado = "Amazonas")
