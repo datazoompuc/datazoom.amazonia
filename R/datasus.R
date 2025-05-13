@@ -131,7 +131,7 @@ load_datasus <- function(dataset,
   file_years <- NULL
   file_years_yy <- NULL
 
-  if (param$dataset %in% c("datasus_sim_do", "datasus_sinasc")) {
+  if (param$dataset %in% c("datasus_sim_do", "datasus_sinasc", "datasus_po")) {
     file_years <- filenames %>%
       substr(5, 8)
   }
