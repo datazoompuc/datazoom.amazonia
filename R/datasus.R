@@ -314,6 +314,11 @@ load_datasus <- function(dataset,
       dplyr::rename("code_muni_6" = "codmunnasc")
   }
 
+  if (param$dataset == "datasus_po"){
+
+
+  }
+
   if (!(param$dataset %in% c("datasus_sih"))) {
     # Adding municipality data
 
