@@ -466,11 +466,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source == "imazon") {
     file_extension <- ".rds"
   }
-  if (source == "epe") {
-    if (param$dataset == "national_energy_balance") {
-      file_extension <- ".csv"
-    }
-  }
   if (source == "aneel") {
     if (dataset == "energy_development_budget") {
       file_extension <- ".rds"
@@ -502,11 +497,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     if (dataset == "energy_enterprises_distributed") {
       message("This may take a while.\n")
       options(timeout = 1000) # increase timeout limit
-    }
-  }
-  if (source == "epe") {
-    if (dataset == "national_energy_balance") {
-      download_method <- "googledrive"
     }
   }
   if (source %in% c("deter", "terraclimate", "baci", "sigmine", "mapbiomas")) {
@@ -608,15 +598,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
   }
 
-  if (param$source == "epe" & param$dataset == "energy_consumption_per_class") {
-    # param$sheet contains the selected sheets
-
-    # Making a list with all the sheets
-
-      dat <- readxl::read_excel(temp, sheet = param$sheet, skip = param$skip_rows)
-
-    names(dat) <- param$sheet
-  }
   if (param$source == "aneel") {
     if (param$dataset == "energy_enterprises_distributed") {
       dat <- data.table::fread(temp, encoding = "Latin-1")
@@ -627,9 +608,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     dat <- param$sheet %>%
       purrr::map(~ readxl::read_xlsx(temp, sheet = .))
   } else if (param$source == "epe") {
-    if (param$dataset == "energy_consumption_per_class") {
-      dat <- readxl::read_excel(temp, sheet = param$sheet)
-    }
+    #if (param$dataset == "energy_consumption_per_class") {
+      dat <- readxl::read_excel(temp, sheet = param$sheet, skip = param$skip_rows)
+    #}
   }
 
   ## Now the rest of the functions
@@ -942,7 +923,7 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
     ## EPE
 
     "epe", "energy_consumption_per_class", NA, "2004-2025", "Region, Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx",
-    "epe", "national_energy_balance", NA, "2011-2022", NA, "https://drive.google.com/file/d/1_JTYyAPdbQayR-nrURts6OmbKcm2cLix/view?usp=share_link",
+    "epe", "national_energy_balance", NA, "2003-2023", NA, "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/PublicacoesArquivos/publicacao-819/topico-716/Anexo%20IX%20-%20Balan%C3%A7os%20Consolidados%20(em%20tep)%201970%20a%202023.xlsx",
 
     ## Shapefile from github repository
 

@@ -17,7 +17,6 @@
 #' }
 #'
 #' @export
-# Nova versão da função load_epe(), considerando estrutura real do Excel
 load_epe <- function(dataset, table = NULL, geo_level = "state", raw_data = FALSE, language = "eng") {
   # Define parâmetros
   param <- list()
@@ -35,117 +34,130 @@ load_epe <- function(dataset, table = NULL, geo_level = "state", raw_data = FALS
     stop("Invalid dataset. Choose 'energy_consumption_per_class' or 'national_energy_balance'.")
   }
 
+  # --------------------------------------------------------------
+  # Caso: national_energy_balance
+  # --------------------------------------------------------------
   if (param$dataset == "national_energy_balance") {
-    dat <- external_download(source = param$source, dataset = param$dataset)
-    dat <- janitor::clean_names(dat)
-    if (param$raw_data) return(dat)
-    return(dat) # ainda não tratado
+    if (param$raw_data) {
+      years <- as.character(2003:2023)
+      dat_list <- lapply(years, function(sheet_name) {
+        external_download(
+          source = param$source,
+          dataset = param$dataset,
+          sheet = sheet_name,
+          skip_rows = 2
+        )
+      })
+      names(dat_list) <- years
+      return(dat_list)
+    }
+
+    # (Tratamento estruturado ainda não implementado)
+    return(NULL)
   }
 
-  # RAW_DATA = TRUE → retorna todas as sheets em uma lista
-  if (param$raw_data) {
-    raw_sheets <- c(
-      "SETOR INDUSTRIAL POR RG",
-      "SETOR INDUSTRIAL POR UF",
-      "CONSUMO E NUMCONS SAM UF",
-      "CONSUMO E NUMCONS SAM"
+  # --------------------------------------------------------------
+  # Caso: energy_consumption_per_class
+  # --------------------------------------------------------------
+  if (param$dataset == "energy_consumption_per_class") {
+
+    if (param$raw_data) {
+      raw_sheets <- c(
+        "SETOR INDUSTRIAL POR RG",
+        "SETOR INDUSTRIAL POR UF",
+        "CONSUMO E NUMCONS SAM UF",
+        "CONSUMO E NUMCONS SAM"
+      )
+
+      dat_list <- lapply(raw_sheets, function(sheet_name) {
+        external_download(
+          source = param$source,
+          dataset = param$dataset,
+          sheet = sheet_name
+        )
+      })
+
+      names(dat_list) <- raw_sheets
+      return(dat_list)
+    }
+
+    # Continua com o tratamento normal
+    sheets_available <- list(
+      consumer_type = list(
+        state = "CONSUMO E NUMCONS SAM UF",
+        subsystem = "CONSUMO E NUMCONS SAM"
+      ),
+      industrial_sector = list(
+        state = "SETOR INDUSTRIAL POR UF",
+        subsystem = "SETOR INDUSTRIAL POR RG"
+      )
     )
 
-    dat_list <- lapply(raw_sheets, function(sheet_name) {
-      external_download(
-        source = param$source,
-        dataset = param$dataset,
-        sheet = sheet_name
-      )
-    })
+    if (is.null(param$table) || !param$table %in% names(sheets_available)) {
+      stop("For 'energy_consumption_per_class', specify 'table' as 'consumer_type' or 'industrial_sector'.")
+    }
 
-    names(dat_list) <- raw_sheets
-    return(dat_list)
-  }
+    if (!param$geo_level %in% c("state", "subsystem")) {
+      stop("Invalid geo_level. Choose 'state' or 'subsystem'.")
+    }
 
-  # Caso não seja raw_data, continua com tratamento normal
+    sheet_selected <- sheets_available[[param$table]][[param$geo_level]]
 
-  # Definindo sheets mapeadas
-  sheets_available <- list(
-    consumer_type = list(
-      state = "CONSUMO E NUMCONS SAM UF",
-      subsystem = "CONSUMO E NUMCONS SAM"
-    ),
-    industrial_sector = list(
-      state = "SETOR INDUSTRIAL POR UF",
-      subsystem = "SETOR INDUSTRIAL POR RG"
+    dat <- external_download(
+      source = param$source,
+      dataset = param$dataset,
+      sheet = sheet_selected
     )
-  )
 
-  if (is.null(param$table) || !param$table %in% names(sheets_available)) {
-    stop("For 'energy_consumption_per_class', specify 'table' as 'consumer_type' or 'industrial_sector'.")
-  }
-
-  if (!param$geo_level %in% c("state", "subsystem")) {
-    stop("Invalid geo_level. Choose 'state' or 'subsystem'.")
-  }
-
-  sheet_selected <- sheets_available[[param$table]][[param$geo_level]]
-
-  # Download e leitura do sheet específico
-  dat <- external_download(
-    source = param$source,
-    dataset = param$dataset,
-    sheet = sheet_selected
-  )
-
-  # Limpeza
-  dat <- dat %>%
-    janitor::clean_names() %>%
-    dplyr::mutate_if(is.character, ~ stringi::stri_trans_general(., "Latin-ASCII"))
-
-  # Tratamento da coluna de data
-  if ("data_excel" %in% names(dat)) {
     dat <- dat %>%
-      dplyr::mutate(data_excel = as.Date(data_excel)) %>%
-      dplyr::rename(!!ifelse(param$language == "en", "Date", "Data") := data_excel)
-  }
+      janitor::clean_names() %>%
+      dplyr::mutate_if(is.character, ~ stringi::stri_trans_general(., "Latin-ASCII"))
 
-  dat <- dat %>%
-    dplyr::select(-dplyr::any_of(c("data", "data_versao")))
+    if ("data_excel" %in% names(dat)) {
+      dat <- dat %>%
+        dplyr::mutate(data_excel = as.Date(data_excel)) %>%
+        dplyr::rename(!!ifelse(param$language == "en", "Date", "Data") := data_excel)
+    }
 
-  # Renomear colunas específicas
-  if (param$table == "consumer_type") {
     dat <- dat %>%
-      dplyr::rename(
-        State = uf,
-        Region = regiao,
-        System = sistema,
-        Class = classe,
-        ConsumerType = tipo_consumidor,
-        Consumption = consumo,
-        Consumers = consumidores
+      dplyr::select(-dplyr::any_of(c("data", "data_versao")))
+
+    if (param$table == "consumer_type") {
+      dat <- dat %>%
+        dplyr::rename(
+          State = uf,
+          Region = regiao,
+          System = sistema,
+          Class = classe,
+          ConsumerType = tipo_consumidor,
+          Consumption = consumo,
+          Consumers = consumidores
+        )
+    }
+
+    if (param$table == "industrial_sector") {
+      dat <- dat %>%
+        dplyr::rename(
+          IndustrialSector = setor_industrial,
+          State = uf,
+          Region = regiao,
+          Consumption = consumo
+        )
+    }
+
+    if (param$language == "en") {
+      names(dat) <- dplyr::recode(names(dat),
+                                  "uf" = "State",
+                                  "regiao" = "Region",
+                                  "sistema" = "System",
+                                  "classe" = "Class",
+                                  "tipo_consumidor" = "ConsumerType",
+                                  "consumo" = "Consumption",
+                                  "consumidores" = "Consumers",
+                                  "setor_industrial" = "IndustrialSector"
       )
-  }
+    }
 
-  if (param$table == "industrial_sector") {
-    dat <- dat %>%
-      dplyr::rename(
-        IndustrialSector = setor_industrial,
-        State = uf,
-        Region = regiao,
-        Consumption = consumo
-      )
+    return(dat)
   }
-
-  # Tradução (apenas se language == "en")
-  if (param$language == "en") {
-    names(dat) <- dplyr::recode(names(dat),
-                                "uf" = "State",
-                                "regiao" = "Region",
-                                "sistema" = "System",
-                                "classe" = "Class",
-                                "tipo_consumidor" = "ConsumerType",
-                                "consumo" = "Consumption",
-                                "consumidores" = "Consumers",
-                                "setor_industrial" = "IndustrialSector"
-    )
-  }
-
-  return(dat)
 }
