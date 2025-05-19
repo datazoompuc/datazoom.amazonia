@@ -22,12 +22,11 @@ DATASUS is the IT department of SUS -- the Brazilian Unified Health System. They
   1. **dataset**:
       * `"datasus_sim_do"` has SIM-DO mortality data
       * Possible subsets of SIM-DO are `"datasus_sim_dofet"` (Fetal), `"datasus_sim_doext"` (External causes), `"datasus_sim_doinf"` (Children), `"datasus_sim_domat"` (Maternal)
-      * SIH hospitalization data is split across four datasets:
       * `"datasus_sih_rd"` – Reduced AIHs (summary of hospitalizations)
       * `"datasus_sih_sp"` – Professional Services performed during hospitalization
       * `"datasus_sih_rj"` – Rejected AIHs (general reason)
       * `"datasus_sih_er"` – Rejected AIHs with specific error codes
-      * `"datasus_sih"` has SIH hospitalization data.
+      * SIH hospitalization data is split across four datasets:
       * `"datasus_cnes_lt"` has data on the number of hospital beds.
       * `"datasus_sinasc"` has information about Live Births
       * further subsets of CNES are listed later, but those only allow for the download of raw data.
@@ -119,7 +118,7 @@ Includes consolidated records of AIHs that were rejected, specifying the general
 `"datasus_sih_er"` – Rejected AIHs with Error Codes (AIHs com Erro)
 Contains AIHs that were rejected due to inconsistencies found during processing. Each rejection includes a specific error code indicating the reason (e.g., invalid patient data, procedure incompatibilities).
 
-All SIH datasets are available by state and time period. By using the raw_data = TRUE parameter, the original DATASUS files are downloaded in their segmented form. If raw_data = FALSE is used, the data is returned as a single, processed tibble with renamed variables and bilingual (Portuguese/English) variable descriptions, making analysis easier and more intuitive.
+All SIH datasets are available by state and time period. By using the `raw_data = TRUE` parameter, the original DATASUS files are downloaded in their segmented form. If `raw_data = FALSE` is used, the data is returned as a single, processed tibble with renamed variables and bilingual (Portuguese/English) variable descriptions, making analysis easier and more intuitive.
 
 **Examples:**
 
