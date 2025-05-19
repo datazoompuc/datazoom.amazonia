@@ -443,7 +443,10 @@ load_datasus <- function(dataset,
         dplyr::left_join(geo, by = c("mun_res" = "code_muni_6"))
 
     } else if(param$dataset == "datasus_sih_sp") {
-      dat <- dat
+      dat <- dat %>%
+        dplyr::mutate(sp_m_hosp = as.character(sp_m_hosp)) %>%
+        dplyr::left_join(geo, by = c("sp_m_hosp" = "code_muni_6"))
+
     }
   }
 
@@ -517,18 +520,10 @@ load_datasus <- function(dataset,
   }
   if (stringr::str_detect(param$dataset, "datasus_sih")) {
 
-    if(param$dataset != "datasus_sih_sp") {
     dat_mod <- dat %>%
       dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
       dplyr::select(where(~ !(all(is.na(.)) || all(. == 0, na.rm = TRUE)))) %>% # Remove colunas que só possuem 0 e NA
       tibble::as_tibble()
-
-    # datasus_sih_sp não possui variável de identificação de município
-    } else {
-      dat_mod <- dat %>%
-        dplyr::select(where(~ !(all(is.na(.)) || all(. == 0, na.rm = TRUE)))) %>% # Remove colunas que só possuem 0 e NA
-        tibble::as_tibble()
-    }
   }
 
   dic <- load_dictionary(param$dataset)
