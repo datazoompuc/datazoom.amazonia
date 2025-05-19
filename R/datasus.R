@@ -75,7 +75,8 @@ load_datasus <- function(dataset,
   origem <- locnasc <- estcivmae <- escmae <- semagestac <- gravidez <- parto <- NULL
   consprenat <- sexo <- racacor <- idanomal <- escmae2010 <- dtnascmae <- NULL
   racacormae <- dtultmenst <- tpmetestim <- tpapresent <- sttrabpart <- NULL
-  stcesparto <- tpnascassi <- codmunnasc <- dataset_prefix_map <- NULL
+  stcesparto <- tpnascassi <- codmunnasc <- dataset_prefix_map <- munic_res <- NULL
+  mun_res <- sp_m_hosp <- where <- NULL
 
 
   #############################
@@ -522,7 +523,7 @@ load_datasus <- function(dataset,
 
     dat_mod <- dat %>%
       dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
-      dplyr::select(where(~ !(all(is.na(.)) || all(. == 0, na.rm = TRUE)))) %>% # Remove colunas que só possuem 0 e NA
+      dplyr::select(tidyselect::where(~ !(all(is.na(.)) || all(. == 0, na.rm = TRUE)))) %>% # Remove colunas que só possuem 0 e NA
       tibble::as_tibble()
   }
 
