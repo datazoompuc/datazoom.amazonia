@@ -40,7 +40,7 @@ For all datasets, areas are measured in hectares (ha).
 
   3. **geo_level**: 
   
-      * For dataset `"mapbiomas_cover"`, can only be `"municipality"`
+      * For dataset `"mapbiomas_cover"`, can be `"municipality"` or `"indigenous_land"`
       * For dataset `"mapbiomas_transition"`, can be `"municipality"` or `"biome"` (faster download)
       * For dataset `"mapbiomas_deforestation_regeneration"`, can only be `"municipality"`
       * For dataset `"mapbiomas_mining"`, can be `"indigenous_land"` or `"municipality"`
