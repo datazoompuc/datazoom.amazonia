@@ -76,7 +76,7 @@ load_datasus <- function(dataset,
   consprenat <- sexo <- racacor <- idanomal <- escmae2010 <- dtnascmae <- NULL
   racacormae <- dtultmenst <- tpmetestim <- tpapresent <- sttrabpart <- NULL
   stcesparto <- tpnascassi <- codmunnasc <- dataset_prefix_map <- munic_res <- NULL
-  mun_res <- sp_m_hosp <- where <- NULL
+  mun_res <- sp_m_hosp <- dt_diag <- dt_trat <- dt_nasc <- mun_diag <- NULL
 
 
   #############################
@@ -450,7 +450,6 @@ load_datasus <- function(dataset,
       "diagnostic", "2", "neoplasias in situ", "neoplasms in situ",
       "diagnostic", "3", "neoplasias de comportamento incerto ou desconhecido", "neoplasms of uncertain or unknown behavior",
       "diagnostic", "4", "C44 e C73", "C44 e C73",
-      "idade", "999", "idade ignorada", "age unknown",
       "sexo", "F", "feminino", "female",
       "sexo", "M", "masculino", "masculine",
       "estadiam", "0", "0", "0",
@@ -460,7 +459,6 @@ load_datasus <- function(dataset,
       "estadiam", "4", "IV", "IV",
       "estadiam", "5", "nao se aplica", "not applicable",
       "estadiam", "9", "ignorado", "ignored",
-      "tempo_trat", "99999", "sem informacao de tratamento", "no treatment information"
     )
 
 
