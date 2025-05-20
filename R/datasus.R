@@ -314,11 +314,6 @@ load_datasus <- function(dataset,
       dplyr::rename("code_muni_6" = "codmunnasc")
   }
 
-  if (param$dataset == "datasus_po"){
-
-
-  }
-
   if (!(param$dataset %in% c("datasus_sih"))) {
     # Adding municipality data
 
@@ -339,6 +334,18 @@ load_datasus <- function(dataset,
 
     dat <- dat %>%
       dplyr::left_join(geo, by = "code_muni_6")
+  }
+
+  if (param$dataset == "datasus_po") {
+
+    geo <- datazoom.amazonia::municipalities %>%
+      dplyr::select(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
+      dplyr::mutate(code_muni_6 = as.integer(code_muni / 10)) %>%
+      dplyr::distinct(code_muni_6, .keep_all = TRUE) # Only keeps municipalities uniquely identified by the 6 digits
+
+    dat <- dat %>%
+      dplyr::mutate(mun_diag = as.integer(as.character(mun_diag))) %>%
+      dplyr::left_join(geo, by = c("mun_diag" = "code_muni_6"))
   }
 
   #################
