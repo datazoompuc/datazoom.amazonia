@@ -332,8 +332,8 @@ load_datasus <- function(dataset,
       dplyr::mutate(code_muni_6 = as.integer(code_muni / 10)) %>%
       dplyr::distinct(code_muni_6, .keep_all = TRUE) # Only keeps municipalities uniquely identified by the 6 digits
 
-    dat <- dat %>%
-      dplyr::left_join(geo, by = "code_muni_6")
+    #dat <- dat %>%
+    #  dplyr::left_join(geo, by = "code_muni_6")
   }
 
   if (param$dataset == "datasus_po") {
@@ -411,7 +411,7 @@ load_datasus <- function(dataset,
       dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, legal_amazon, dtobito) %>%
       tibble::as_tibble()
   }
-  if (stringr::str_detect(param$dataset, "datasus_cnes|datasus_sinasc")) {
+  if (stringr::str_detect(param$dataset, "datasus_cnes|datasus_sinasc|datasus_po")) {
     dat_mod <- dat %>%
       dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
       tibble::as_tibble()
