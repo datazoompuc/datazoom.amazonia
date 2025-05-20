@@ -22,7 +22,11 @@ DATASUS is the IT department of SUS -- the Brazilian Unified Health System. They
   1. **dataset**:
       * `"datasus_sim_do"` has SIM-DO mortality data
       * Possible subsets of SIM-DO are `"datasus_sim_dofet"` (Fetal), `"datasus_sim_doext"` (External causes), `"datasus_sim_doinf"` (Children), `"datasus_sim_domat"` (Maternal)
-      * `"datasus_sih"` has SIH hospitalization data.
+      * `"datasus_sih_rd"` – Reduced AIHs (summary of hospitalizations)
+      * `"datasus_sih_sp"` – Professional Services performed during hospitalization
+      * `"datasus_sih_rj"` – Rejected AIHs (general reason)
+      * `"datasus_sih_er"` – Rejected AIHs with specific error codes
+      * SIH hospitalization data is split across four datasets:
       * `"datasus_cnes_lt"` has data on the number of hospital beds.
       * `"datasus_sinasc"` has information about Live Births
       * further subsets of CNES are listed later, but those only allow for the download of raw data.
@@ -99,27 +103,57 @@ data <- load_datasus(
 )
 ```
 
-##### DATASUS - SIH (System of Hospital Information)
-Contains data on hospitalizations. Treated data only gains variable labels, with no extra manipulation. Beware that this is a much heavier dataset.
+##### DATASUS – SIH (Hospital Information System)
+SIH consists of multiple datasets that record detailed information about hospital admissions funded by Brazil's public health system (SUS). Each row corresponds to a Hospital Admission Authorization (AIH), and the files are organized by the type of information they contain. The main available datasets are:
+
+`"datasus_sih_rd"` – Reduced AIH (AIH Reduzida)
+Contains consolidated information about approved and processed AIHs, including the main procedure performed, related diagnoses, and total costs. This is the most commonly used dataset for statistical and epidemiological analyses.
+
+`"datasus_sih_sp" ` – Professional Services (Serviços Profissionais)
+Provides detailed records of the professional services carried out during hospital stays, including procedures performed, professionals involved (CBO/CNS), and amounts paid for medical and hospital services.
+
+`"datasus_sih_rj"` – Rejected AIHs (AIHs Rejeitadas)
+Includes consolidated records of AIHs that were rejected, specifying the general reason for the rejection but without detailed error codes. Useful for analyzing the volume and impact of rejections.
+
+`"datasus_sih_er"` – Rejected AIHs with Error Codes (AIHs com Erro)
+Contains AIHs that were rejected due to inconsistencies found during processing. Each rejection includes a specific error code indicating the reason (e.g., invalid patient data, procedure incompatibilities).
+
+All SIH datasets are available by state and time period. By using the `raw_data = TRUE` parameter, the original DATASUS files are downloaded in their segmented form. If `raw_data = FALSE` is used, the data is returned as a single, processed tibble with renamed variables and bilingual (Portuguese/English) variable descriptions, making analysis easier and more intuitive.
 
 **Examples:**
 
 ```{r, eval = FALSE}
 library(datazoom.amazonia)
 
-# download raw data
-data <- load_datasus(
-  dataset = "datasus_sih",
+# Download of raw data for Reduced AIH (AIH Reduzida) – State of Amazonas, 2010
+data_rd_raw <- load_datasus(
+  dataset = "datasus_sih_rd",
   time_period = 2010,
   states = "AM",
   raw_data = TRUE
 )
 
-# download data in a single tibble, with variable labels
-data <- load_datasus(
-  dataset = "datasus_sih",
+# Download of processed data for Rejected AIHs with Error Codes – State of Amazonas, 2010
+data_er_processed <- load_datasus(
+  dataset = "datasus_sih_er",
   time_period = 2010,
   states = "AM",
+  raw_data = FALSE
+)
+
+# Download of raw data for Professional Services – State of Acre, 2010
+data_sp_raw <- load_datasus(
+  dataset = "datasus_sih_sp",
+  time_period = 2010,
+  states = "AC",
+  raw_data = TRUE
+)
+
+# Download of processed data for Professional Services – Federal District, 2010
+data_sp_processed <- load_datasus(
+  dataset = "datasus_sih_sp",
+  time_period = 2010,
+  states = "DF",
   raw_data = FALSE
 )
 ```
