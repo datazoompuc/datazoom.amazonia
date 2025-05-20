@@ -445,7 +445,7 @@ load_datasus <- function(dataset,
       "tratamento", "2", "quimioterapia", "chemotherapy",
       "tratamento", "3", "radioterapia", "radiotherapy",
       "tratamento", "4", "quimioterapia + radioterapia", "chemotherapy + radiotherapy",
-      "tratamento", "5", "sem informação de tratamento", "no treatment information",
+      "tratamento", "5", "sem informacao de tratamento", "no treatment information",
       "diagnostic", "1", "neoplasias malignas (lei no 12.732/12)", "malignant neoplasms (law no. 12.732/12)",
       "diagnostic", "2", "neoplasias in situ", "neoplasms in situ",
       "diagnostic", "3", "neoplasias de comportamento incerto ou desconhecido", "neoplasms of uncertain or unknown behavior",
@@ -595,7 +595,7 @@ load_datasus <- function(dataset,
 
     dat_mod <- dat %>%
       dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
-      dplyr::select(tidyselect::where(~ !(all(is.na(.)) || all(. == 0, na.rm = TRUE)))) %>% # Remove colunas que só possuem 0 e NA
+      dplyr::select(tidyselect::where(~ !(all(is.na(.)) || all(. == 0, na.rm = TRUE)))) %>% # Remove colunas que so possuem 0 e NA
       tibble::as_tibble()
   }
 
