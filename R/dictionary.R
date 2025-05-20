@@ -978,11 +978,38 @@ load_dictionary <- function(dataset) {
   if (dataset == "datasus_po") {
     harmonization_dat <- tibble::tribble(
       ~var_code, ~name_pt, ~name_eng, ~label_pt, ~label_eng,
-      "code_muni", "code_muni", "code_muni", "Codigo IBGE do municipio", "IBGE Municipality code",
-      "name_muni", "name_muni", "name_muni", "Nome do municipio", "City name",
-      "code_state", "code_state", "code_state", "Codigo do estado", "State code",
-      "abbrev_state", "abbrev_state", "abbrev_state", "Sigla do estado", "State abbreviation",
-      "legal_amazon", "legal_amazon", "legal_amazon", "Amazonia Legal", "Legal Amazon"
+
+      # Painel de Oncologia
+
+      "code_muni",    "code_muni",         "code_muni",          "Codigo IBGE do municipio",                                          "IBGE Municipality code",
+      "name_muni",    "name_muni",         "name_muni",           "Nome do municipio",                                                "City name",
+      "code_state",   "code_state",        "code_state",          "Codigo do estado",                                                 "State code",
+      "abbrev_state", "abbrev_state",      "abbrev_state",        "Sigla do estado",                                                  "State abbreviation",
+      "legal_amazon", "legal_amazon",      "legal_amazon",        "Amazonia Legal",                                                   "Legal Amazon",
+      "ano_diagn",    "ano_diagnostico",   "year_diagnosis",      "Ano de diagnóstico",                                               "Year of diagnosis",
+      "anomes_dia",   "ano_mes_diagnostico", "year_month_diagnosis","Ano e mês do diagnóstico",                                        "Year and month of diagnosis",
+      "ano_tratam",   "ano_tratamento",     "year_treatment",      "Ano do primeiro tratamento registrado",                            "Year of first recorded treatment",
+      "anomes_tra",   "ano_mes_tratamento", "year_month_treatment","Ano e mês do primeiro tratamento registrado",                     "Year and month of first recorded treatment",
+      "uf_resid",     "uf_residencia",      "state_residence",     "UF de residência",                                                 "State of residence",
+      "mun_resid",    "municipio_residencia","mun_residence",      "Município de residência (cód. IBGE)",                              "Municipality of residence (IBGE code)",
+      "uf_tratam",    "uf_tratamento",      "state_treatment",     "UF do estabelecimento de tratamento",                              "State of treatment facility",
+      "mun_tratam",   "municipio_tratamento","mun_treatment",      "Município do estabelecimento de tratamento (cód. IBGE)",           "Municipality of treatment facility (IBGE code)",
+      "uf_diagn",     "uf_diagnostico",     "state_diagnosis",     "UF do estabelecimento de diagnóstico",                             "State of diagnosis facility",
+      "mun_diag",     "municipio_diagnostico","mun_diagnosis",     "Município do estabelecimento de diagnóstico (cód. IBGE)",          "Municipality of diagnosis facility (IBGE code)",
+      "tratamento",   "tipo_tratamento",    "treatment_type",      "Tipo de primeiro tratamento registrado",                           "Type of first recorded treatment",
+      "diagnostic",   "categoria_diagnostico","diagnosis_category","Categoria de diagnóstico",                                         "Diagnosis category",
+      "idade",        "idade_paciente",     "patient_age",         "Idade do paciente no momento do diagnóstico",                      "Age at diagnosis",
+      "sexo",         "sexo_paciente",      "patient_sex",         "Sexo do paciente",                                                 "Patient sex",
+      "estadiam",     "estadiamento",       "staging",             "Estadiamento da doença",                                           "Disease staging",
+      "cnes_diag",    "cnes_diagnostico",   "cnes_diagnosis",      "Código CNES do estabelecimento de diagnOstico",                    "CNES code of diagnosis facility",
+      "cnes_trat",    "cnes_tratamento",    "cnes_treatment",      "Código CNES do estabelecimento de tratamento",                     "CNES code of treatment facility",
+      "tempo_trat",   "intervalo_tratamento","treatment_interval", "Intervalo entre diagnóstico e tratamento (em dias)",               "Interval between diagnosis and treatment (in days)",
+      "cns_pac",      "cns_paciente",       "patient_cns",         "Cartão Nacional de Saúde do paciente",                             "National Health Card number",
+      "diag_deth",    "cid_detalhado",      "detailed_icd",        "Diagnóstico detalhado (CID-10)",                                   "Detailed diagnosis (ICD-10)",
+      "dt_diag",      "data_diagnostico",   "date_diagnosis",      "Data detalhada do diagnóstico",                                    "Full diagnosis date",
+      "dt_trat",      "data_tratamento",    "date_treatment",      "Data detalhada do tratamento",                                     "Full treatment date",
+      "dt_nasc",      "data_nascimento",    "date_birth",          "Data de nascimento do paciente",                                   "Date of birth"
+
     )
     }
 

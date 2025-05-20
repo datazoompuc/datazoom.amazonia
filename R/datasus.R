@@ -338,15 +338,88 @@ load_datasus <- function(dataset,
 
   if (param$dataset == "datasus_po") {
 
+    labels <- tibble::tribble(
+      ~ var_code, ~ value, ~ label_pt, ~ label_eng,
+      "tratamento", "1", "cirurgia", "surgery",
+      "tratamento", "2", "quimioterapia", "chemotherapy",
+      "tratamento", "3", "radioterapia", "radiotherapy",
+      "tratamento", "4", "quimioterapia + radioterapia", "chemotherapy + radiotherapy",
+      "tratamento", "5", "sem informação de tratamento", "no treatment information",
+      "diagnostic", "1", "neoplasias malignas (lei no 12.732/12)", "malignant neoplasms (law no. 12.732/12)",
+      "diagnostic", "2", "neoplasias in situ", "neoplasms in situ",
+      "diagnostic", "3", "neoplasias de comportamento incerto ou desconhecido", "neoplasms of uncertain or unknown behavior",
+      "diagnostic", "4", "C44 e C73", "C44 e C73",
+      "idade", "999", "idade ignorada", "age unknown",
+      "sexo", "F", "femenino", "female",
+      "sexo", "M", "masculino", "masculine",
+      "estadiam", "0", "0", "0",
+      "estadiam", "1", "I", "I",
+      "estadiam", "2", "II", "II",
+      "estadiam", "3", "III", "III",
+      "estadiam", "4", "IV", "IV",
+      "estadiam", "5", "nao se aplica", "not applicable",
+      "estadiam", "9", "ignorado", "ignored",
+      "tempo_trat", "99999", "sem informacao de tratamento", "no treatment information"
+    )
+
+
+    # adicionando factor labels
+
+    dat <- dat %>%
+      dplyr::mutate(
+        dplyr::across(
+          dplyr::any_of(unique(labels$var_code)),
+          function(x) {
+            # linhas do dict correspondentes a cada variavel
+            dic <- labels %>%
+              dplyr::filter(var_code == dplyr::cur_column())
+
+            # vetor de levels
+            lev <- dic$value
+
+            # vetor de labels
+            if (param$language == "pt") {
+              lab <- dic$label_pt
+            }
+            else {
+              lab <- dic$label_eng
+            }
+
+            # transforma em factor
+
+            factor(x, levels = lev, labels = lab)
+          }
+        )
+      )
+
+    # formatando dados
+
     geo <- datazoom.amazonia::municipalities %>%
       dplyr::select(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
       dplyr::mutate(code_muni_6 = as.integer(code_muni / 10)) %>%
       dplyr::distinct(code_muni_6, .keep_all = TRUE) # Only keeps municipalities uniquely identified by the 6 digits
 
     dat <- dat %>%
-      dplyr::mutate(mun_diag = as.integer(as.character(mun_diag))) %>%
+      dplyr::mutate(
+        dt_diag = lubridate::dmy(as.character(dt_diag)),
+        dt_trat = lubridate::dmy(as.character(dt_trat)),
+        dt_nasc = lubridate::dmy(as.character(dt_nasc)),
+        mun_diag = as.integer(as.character(mun_diag))) %>%
       dplyr::left_join(geo, by = c("mun_diag" = "code_muni_6"))
+
   }
+
+#  if (param$dataset == "datasus_po") {
+#
+#    geo <- datazoom.amazonia::municipalities %>%
+#      dplyr::select(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
+#      dplyr::mutate(code_muni_6 = as.integer(code_muni / 10)) %>%
+#      dplyr::distinct(code_muni_6, .keep_all = TRUE) # Only keeps municipalities uniquely identified by the 6 digits
+#
+#    dat <- dat %>%
+#      dplyr::mutate(mun_diag = as.integer(as.character(mun_diag))) %>%
+#      dplyr::left_join(geo, by = c("mun_diag" = "code_muni_6"))
+#  }
 
   #################
   ## Aggregating ##
