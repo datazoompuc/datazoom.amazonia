@@ -624,7 +624,7 @@ load_datasus <- function(dataset,
 
   return(dat_mod)
 }
-
+}
 
 expand_cid_code <- function(cid) {
   # Turns a character "A050-B010" into an expanded vector c("A050", "A051", ..., "B010")
