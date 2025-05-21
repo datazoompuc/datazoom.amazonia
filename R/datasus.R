@@ -461,7 +461,6 @@ load_datasus <- function(dataset,
       "estadiam", "9", "ignorado", "ignored",
     )
 
-
     # adicionando factor labels
 
     dat <- dat %>%
