@@ -505,6 +505,8 @@ load_datasus <- function(dataset,
         mun_diag = as.integer(as.character(mun_diag))) %>%
       dplyr::left_join(geo, by = c("mun_diag" = "code_muni_6"))
 
+  }
+
     if(param$dataset %in% c("datasus_sih_rd", "datasus_sih_rj")){
       dat <- dat %>%
         dplyr::mutate(munic_res = as.character(munic_res)) %>%
@@ -621,7 +623,7 @@ load_datasus <- function(dataset,
 
   return(dat_mod)
 }
-}
+
 
 expand_cid_code <- function(cid) {
   # Turns a character "A050-B010" into an expanded vector c("A050", "A051", ..., "B010")
