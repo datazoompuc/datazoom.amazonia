@@ -21,12 +21,16 @@ DATASUS is the IT department of SUS -- the Brazilian Unified Health System. They
 
   1. **dataset**:
       * `"datasus_sim_do"` has SIM-DO mortality data
-      * Possible subsets of SIM-DO are `"datasus_sim_dofet"` (Fetal), `"datasus_sim_doext"` (External causes), `"datasus_sim_doinf"` (Children), `"datasus_sim_domat"` (Maternal)
-      * `"datasus_sih_rd"` – Reduced AIHs (summary of hospitalizations)
-      * `"datasus_sih_sp"` – Professional Services performed during hospitalization
-      * `"datasus_sih_rj"` – Rejected AIHs (general reason)
-      * `"datasus_sih_er"` – Rejected AIHs with specific error codes
+      * Possible subsets of SIM-DO are:  
+        * `"datasus_sim_dofet"` – Fetal  
+        * `"datasus_sim_doext"` – External causes  
+        * `"datasus_sim_doinf"` – Children  
+        * `"datasus_sim_domat"` – Maternal 
       * SIH hospitalization data is split across four datasets:
+        * `"datasus_sih_rd"` – Reduced AIHs (summary of hospitalizations)  
+        * `"datasus_sih_sp"` – Professional Services performed during hospitalization  
+        * `"datasus_sih_rj"` – Rejected AIHs (general reason)  
+        * `"datasus_sih_er"` – Rejected AIHs with specific error codes 
       * `"datasus_cnes_lt"` has data on the number of hospital beds.
       * `"datasus_sinasc"` has information about Live Births
       * further subsets of CNES are listed later, but those only allow for the download of raw data.
