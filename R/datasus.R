@@ -500,9 +500,9 @@ load_datasus <- function(dataset,
 
     dat <- dat %>%
       dplyr::mutate(
-        dt_diag = lubridate::dmy(as.character(dt_diag)),
-        dt_trat = lubridate::dmy(as.character(dt_trat)),
-        dt_nasc = lubridate::dmy(as.character(dt_nasc)),
+        dt_diag = lubridate::dmy((dt_diag)),
+        dt_trat = lubridate::dmy((dt_trat)),
+        dt_nasc = lubridate::dmy((dt_nasc)),
         mun_diag = as.integer(as.character(mun_diag))) %>%
       dplyr::left_join(geo, by = c("mun_diag" = "code_muni_6"))
 
