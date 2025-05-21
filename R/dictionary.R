@@ -816,9 +816,11 @@ load_dictionary <- function(dataset) {
     )
   }
 
-  if (stringr::str_detect(dataset, "datasus_sih_rd")) {
+  if (stringr::str_detect(dataset, "datasus_sih")) {
     harmonization_dat <- tibble::tribble(
       ~var_code, ~name_pt, ~name_eng, ~label_pt, ~label_eng,
+
+      # DATASUS SIH RD
 
       "code_muni", "code_muni", "code_muni", "Codigo IBGE do municipio", "IBGE Municipality code",
       "name_muni", "name_muni", "name_muni", "Nome do municipio", "City name",
@@ -877,31 +879,8 @@ load_dictionary <- function(dataset) {
       "codibge", "codigo_ibge_municipio_residencia", "ibge_code_residence_municipality", "codigo ibge do municipio de residencia do paciente", "ibge code of patient's residence municipality",
       "dt_inter", "data_internacao",  "date_admission", "data da internacao", "date of admission",
 
-    )
-  }
+      # DATASUS SIH SP
 
-  if (stringr::str_detect(dataset, "datasus_sih_er")) {
-    harmonization_dat <- tibble::tribble(
-      ~var_code, ~name_pt, ~name_eng, ~label_pt, ~label_eng,
-
-      "code_muni", "code_muni", "code_muni", "Codigo IBGE do municipio", "IBGE Municipality code",
-      "name_muni", "name_muni", "name_muni", "Nome do municipio", "City name",
-      "code_state", "code_state", "code_state", "Codigo do estado", "State code",
-      "abbrev_state", "abbrev_state", "abbrev_state", "Sigla do estado", "State abbreviation",
-      "legal_amazon", "legal_amazon", "legal_amazon", "Amazonia Legal", "Legal Amazon"
-
-    )
-  }
-
-  if (stringr::str_detect(dataset, "datasus_sih_sp")) {
-    harmonization_dat <- tibble::tribble(
-      ~var_code,       ~name_pt,                    ~name_eng,                 ~label_pt,                           ~label_eng,
-
-      "code_muni",    "code_muni",                 "code_muni",              "Codigo IBGE do municipio",         "IBGE Municipality code",
-      "name_muni",    "name_muni",                 "name_muni",              "Nome do municipio",                "City name",
-      "code_state",   "code_state",                "code_state",             "Codigo do estado",                 "State code",
-      "abbrev_state", "abbrev_state",              "abbrev_state",           "Sigla do estado",                  "State abbreviation",
-      "legal_amazon", "legal_amazon",              "legal_amazon",           "Amazonia Legal",                   "Legal Amazon",
       "sp_gestor",    "municipio_gestor",          "managing_municipality",  "Municipio gestor",                 "Managing municipality",
       "sp_uf",        "uf",                        "federal_unit",           "Unidade da Federacao",             "Federative unit",
       "sp_aa",        "ano_internacao",            "year_admission",         "Ano da internacao",                "Admission year",
@@ -939,7 +918,7 @@ load_dictionary <- function(dataset) {
       "sp_qt_proc",   "quantidade_procedimentos",  "procedures_quantity",    "Quantidade de procedimentos",      "Number of procedures",
       "sp_u_aih",     "indicador_unico",           "unique_aih",             "Indicador unico da AIH",           "Unique AIH indicator"
 
-      )
+    )
   }
 
   if (dataset == "datasus_po") {
