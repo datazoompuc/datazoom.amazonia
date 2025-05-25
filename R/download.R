@@ -800,8 +800,11 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
     "datasus", "datasus_cnes_ee", NA, "2007-2021", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/EE/$file_name$",
     "datasus", "datasus_cnes_ef", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/EF/$file_name$",
     "datasus", "datasus_cnes_gm", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/GM/$file_name$",
-    "datasus", "datasus_sih", NA, "2008-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIHSUS/200801_/dados/$file_name$",
     "datasus", "datasus_sinasc", NA, "1979-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SINASC/1996_/Dados/DNRES/$file_name$",
+    "datasus", "datasus_sih_rd", NA, "1979-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIHSUS/200801_/Dados/$file_name$",
+    "datasus", "datasus_sih_rj", NA, "1979-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIHSUS/200801_/Dados/$file_name$",
+    "datasus", "datasus_sih_sp", NA, "1979-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIHSUS/200801_/Dados/$file_name$",
+    "datasus", "datasus_sih_er", NA, "1979-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIHSUS/200801_/Dados/$file_name$",
 
 
     ## IEMA

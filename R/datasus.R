@@ -75,7 +75,8 @@ load_datasus <- function(dataset,
   origem <- locnasc <- estcivmae <- escmae <- semagestac <- gravidez <- parto <- NULL
   consprenat <- sexo <- racacor <- idanomal <- escmae2010 <- dtnascmae <- NULL
   racacormae <- dtultmenst <- tpmetestim <- tpapresent <- sttrabpart <- NULL
-  stcesparto <- tpnascassi <- codmunnasc <- NULL
+  stcesparto <- tpnascassi <- codmunnasc <- dataset_prefix_map <- munic_res <- NULL
+  mun_res <- sp_m_hosp <- where <- NULL
 
 
   #############################
@@ -157,7 +158,7 @@ load_datasus <- function(dataset,
 
   file_state <- NULL
 
-  if (param$dataset %in% c("datasus_sim_do", "datasus_sih", "datasus_sinasc") | stringr::str_detect(param$dataset, "datasus_cnes")) {
+  if (param$dataset %in% c("datasus_sim_do", "datasus_sinasc") | stringr::str_detect(param$dataset, "datasus_cnes|datasus_sih")) {
     file_state <- filenames %>%
       substr(3, 4)
   } else if (paste0(param$states, collapse = "") != "all") {
@@ -175,6 +176,13 @@ load_datasus <- function(dataset,
       toupper()
 
     filenames <- filenames[stringr::str_detect(filenames, suffix)]
+  }
+
+  if(stringr::str_detect(param$dataset, "datasus_sih")) {
+    suffix <- stringr::str_remove(param$dataset, "datasus_sih_") %>%
+      toupper()
+
+    filenames <- filenames[stringr::str_starts(filenames, suffix)]
   }
 
   param$filenames <- filenames
@@ -263,10 +271,6 @@ load_datasus <- function(dataset,
       dplyr::rename("code_muni_6" = "codmunocor")
   }
 
-  if (param$dataset == "datazoom_sih") {
-
-  }
-
   if (stringr::str_detect(param$dataset, "datasus_cnes")) {
     dat <- dat %>%
       dplyr::mutate(codufmun = as.numeric(as.character(codufmun))) %>%
@@ -281,7 +285,12 @@ load_datasus <- function(dataset,
       )
   }
 
-  if( param$dataset == "datasus_sinasc" ) {
+  if(param$dataset == "datasus_sinasc") {
+
+    geo <- datazoom.amazonia::municipalities %>%
+      dplyr::select(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
+      dplyr::mutate(code_muni_6 = as.character(as.integer(code_muni / 10))) %>%
+      dplyr::distinct(code_muni_6, .keep_all = TRUE) # Only keeps municipalities uniquely identified by the 6 digits
 
     labels <- tibble::tribble(
       ~ var_code, ~ value, ~ label_pt, ~ label_eng,
@@ -407,12 +416,10 @@ load_datasus <- function(dataset,
         codmunnasc = as.numeric(as.character(codmunnasc))
       ) %>%
       dplyr::rename("code_muni_6" = "codmunnasc")
-
   }
 
-  if (!(param$dataset %in% c("datasus_sih"))) {
+  if (stringr::str_detect(param$dataset, "datasus_sih")) {
     # Adding municipality data
-
     geo <- datazoom.amazonia::municipalities %>%
       dplyr::select(
         code_muni,
@@ -421,15 +428,27 @@ load_datasus <- function(dataset,
         abbrev_state,
         legal_amazon
       )
-
     # Original data only has 6 IBGE digits instead of 7
-
     geo <- geo %>%
-      dplyr::mutate(code_muni_6 = as.integer(code_muni / 10)) %>%
+      dplyr::mutate(code_muni_6 = as.character(as.integer(code_muni / 10))) %>%
       dplyr::distinct(code_muni_6, .keep_all = TRUE) # Only keeps municipalities uniquely identified by the 6 digits
 
-    dat <- dat %>%
-      dplyr::left_join(geo, by = "code_muni_6")
+    if(param$dataset %in% c("datasus_sih_rd", "datasus_sih_rj")){
+      dat <- dat %>%
+        dplyr::mutate(munic_res = as.character(munic_res)) %>%
+        dplyr::left_join(geo, by = c("munic_res" = "code_muni_6"))
+
+    } else if(param$dataset == "datasus_sih_er"){
+      dat <- dat %>%
+        dplyr::mutate(mun_res = as.character(mun_res)) %>%
+        dplyr::left_join(geo, by = c("mun_res" = "code_muni_6"))
+
+    } else if(param$dataset == "datasus_sih_sp") {
+      dat <- dat %>%
+        dplyr::mutate(sp_m_hosp = as.character(sp_m_hosp)) %>%
+        dplyr::left_join(geo, by = c("sp_m_hosp" = "code_muni_6"))
+
+    }
   }
 
   #################
@@ -500,8 +519,11 @@ load_datasus <- function(dataset,
       dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
       tibble::as_tibble()
   }
-  if (param$dataset == "datasus_sih") {
+  if (stringr::str_detect(param$dataset, "datasus_sih")) {
+
     dat_mod <- dat %>%
+      dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
+      dplyr::select(tidyselect::where(~ !(all(is.na(.)) || all(. == 0, na.rm = TRUE)))) %>% # Remove colunas que só possuem 0 e NA
       tibble::as_tibble()
   }
 
