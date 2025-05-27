@@ -1,37 +1,36 @@
 #' @title EPE
 #'
-#' @description Electrical Energy Monthly Consumption per Class
+#' @description Electrical Energy Monthly Consumption per Class or Industrial Sector
 #'
-#' @param dataset A dataset name, ("consumer_energy_consumption"), ("industrial_energy_consumption") or ("national_energy_balance")
-#' @param geo_level A geographical level, ("state") or ("subsystem"), only available for consumer or industrial datasets
-#' @inheritParams load_baci
-#'
-#' @examples
-#' \dontrun{
-#' clean_epe <- load_epe(
-#'   dataset = "consumer_energy_consumption",
-#'   geo_level = "state",
-#'   raw_data = FALSE
-#' )
-#' }
+#' @param dataset Dataset name: "consumer_energy_consumption", "industrial_energy_consumption", or "national_energy_balance"
+#' @param geo_level Geographical level: "state" or "subsystem". Only applies to consumer or industrial datasets.
+#' @param raw_data If TRUE, returns raw sheets.
+#' @param language "pt" or "en". Applies to processed outputs.
 #'
 #' @export
 load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = "eng") {
-  # Set parameters
-  param <- list()
-  param$source <- "epe"
-  param$dataset <- dataset
-  param$geo_level <- geo_level
-  param$raw_data <- raw_data
-  param$language <- language
 
-  # Check inputs
+  ##############################
+  ## Binding Global Variables ##
+  ##############################
+  uf <- regiao <- sistema <- classe <- tipo_consumidor <- consumo <- consumidores <- setor_industrial <- data_excel <- NULL
+
+  #############################
+  ## Define Basic Parameters ##
+  #############################
+  param <- list(
+    source = "epe",
+    dataset = dataset,
+    geo_level = geo_level,
+    raw_data = raw_data,
+    language = language
+  )
+
   check_params(param)
 
-  if (!param$dataset %in% c("consumer_energy_consumption", "industrial_energy_consumption", "national_energy_balance")) {
-    stop("Invalid dataset. Choose 'consumer_energy_consumption', 'industrial_energy_consumption' or 'national_energy_balance'.")
-  }
-
+  ######################
+  ## Downloading Data ##
+  ######################
   if (param$dataset == "national_energy_balance") {
     if (param$raw_data) {
       years <- as.character(2003:2023)
@@ -45,6 +44,8 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
       names(dat_list) <- years
       return(dat_list)
     }
+
+    message("Processed data for 'national_energy_balance' is not yet available.")
     return(NULL)
   }
 
@@ -68,6 +69,9 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
       return(dat_list)
     }
 
+    ##############################
+    ## Harmonizing Sheet Names ##
+    ##############################
     sheets_available <- list(
       consumer_energy_consumption = list(
         state = "CONSUMO E NUMCONS SAM UF",
@@ -85,12 +89,18 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
 
     sheet_selected <- sheets_available[[param$dataset]][[param$geo_level]]
 
+    ######################
+    ## Downloading Data ##
+    ######################
     dat <- external_download(
       source = param$source,
       dataset = param$dataset,
       sheet = sheet_selected
     )
 
+    ######################
+    ## Data Engineering ##
+    ######################
     dat <- dat %>%
       janitor::clean_names() %>%
       dplyr::mutate_if(is.character, ~ stringi::stri_trans_general(., "Latin-ASCII"))
@@ -104,6 +114,9 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
     dat <- dat %>%
       dplyr::select(-dplyr::any_of(c("data", "data_versao")))
 
+    ################################
+    ## Harmonizing Variable Names ##
+    ################################
     if (param$dataset == "consumer_energy_consumption") {
       dat <- dat %>%
         dplyr::rename(
@@ -120,26 +133,29 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
     if (param$dataset == "industrial_energy_consumption") {
       dat <- dat %>%
         dplyr::rename(
-          IndustrialSector = setor_industrial,
           State = uf,
           Region = regiao,
+          IndustrialSector = setor_industrial,
           Consumption = consumo
         )
     }
 
     if (param$language == "en") {
-      names(dat) <- dplyr::recode(names(dat),
-                                  "uf" = "State",
-                                  "regiao" = "Region",
-                                  "sistema" = "System",
-                                  "classe" = "Class",
-                                  "tipo_consumidor" = "ConsumerType",
-                                  "consumo" = "Consumption",
-                                  "consumidores" = "Consumers",
-                                  "setor_industrial" = "IndustrialSector"
-      )
+      dat <- dat %>%
+        dplyr::rename_with(~ dplyr::recode(.x,
+                                           "uf" = "State",
+                                           "regiao" = "Region",
+                                           "sistema" = "System",
+                                           "classe" = "Class",
+                                           "tipo_consumidor" = "ConsumerType",
+                                           "consumo" = "Consumption",
+                                           "consumidores" = "Consumers",
+                                           "setor_industrial" = "IndustrialSector"))
     }
 
+    ####################
+    ## Returning Data ##
+    ####################
     return(dat)
   }
 }
