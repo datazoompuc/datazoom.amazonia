@@ -2,41 +2,36 @@
 #'
 #' @description Electrical Energy Monthly Consumption per Class
 #'
-#' @param dataset A dataset name, ("energy_consumption_per_class") or ("national_energy_balance")
-#' @param geo_level A geographical level, ("state") or ("subsystem"), only available for "energy_consumption_per_class"
+#' @param dataset A dataset name, ("consumer_energy_consumption"), ("industrial_energy_consumption") or ("national_energy_balance")
+#' @param geo_level A geographical level, ("state") or ("subsystem"), only available for consumer or industrial datasets
 #' @inheritParams load_baci
 #'
 #' @examples
 #' \dontrun{
-#' # download treated data about energy consumption at the state level
 #' clean_epe <- load_epe(
-#'   dataset = "energy_consumption_per_class",
+#'   dataset = "consumer_energy_consumption",
 #'   geo_level = "state",
 #'   raw_data = FALSE
 #' )
 #' }
 #'
 #' @export
-load_epe <- function(dataset, table = NULL, geo_level = "state", raw_data = FALSE, language = "eng") {
-  # Define parâmetros
+load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = "eng") {
+  # Set parameters
   param <- list()
   param$source <- "epe"
   param$dataset <- dataset
-  param$table <- table
   param$geo_level <- geo_level
   param$raw_data <- raw_data
   param$language <- language
 
-  # Validação de inputs
+  # Check inputs
   check_params(param)
 
-  if (!param$dataset %in% c("energy_consumption_per_class", "national_energy_balance")) {
-    stop("Invalid dataset. Choose 'energy_consumption_per_class' or 'national_energy_balance'.")
+  if (!param$dataset %in% c("consumer_energy_consumption", "industrial_energy_consumption", "national_energy_balance")) {
+    stop("Invalid dataset. Choose 'consumer_energy_consumption', 'industrial_energy_consumption' or 'national_energy_balance'.")
   }
 
-  # --------------------------------------------------------------
-  # Caso: national_energy_balance
-  # --------------------------------------------------------------
   if (param$dataset == "national_energy_balance") {
     if (param$raw_data) {
       years <- as.character(2003:2023)
@@ -44,30 +39,22 @@ load_epe <- function(dataset, table = NULL, geo_level = "state", raw_data = FALS
         external_download(
           source = param$source,
           dataset = param$dataset,
-          sheet = sheet_name,
-          skip_rows = 2
+          sheet = sheet_name
         )
       })
       names(dat_list) <- years
       return(dat_list)
     }
-
-    # (Tratamento estruturado ainda não implementado)
     return(NULL)
   }
 
-  # --------------------------------------------------------------
-  # Caso: energy_consumption_per_class
-  # --------------------------------------------------------------
-  if (param$dataset == "energy_consumption_per_class") {
-
+  if (param$dataset %in% c("consumer_energy_consumption", "industrial_energy_consumption")) {
     if (param$raw_data) {
-      raw_sheets <- c(
-        "SETOR INDUSTRIAL POR RG",
-        "SETOR INDUSTRIAL POR UF",
-        "CONSUMO E NUMCONS SAM UF",
-        "CONSUMO E NUMCONS SAM"
-      )
+      raw_sheets <- if (param$dataset == "consumer_energy_consumption") {
+        c("CONSUMO E NUMCONS SAM UF", "CONSUMO E NUMCONS SAM")
+      } else {
+        c("SETOR INDUSTRIAL POR UF", "SETOR INDUSTRIAL POR RG")
+      }
 
       dat_list <- lapply(raw_sheets, function(sheet_name) {
         external_download(
@@ -81,27 +68,22 @@ load_epe <- function(dataset, table = NULL, geo_level = "state", raw_data = FALS
       return(dat_list)
     }
 
-    # Continua com o tratamento normal
     sheets_available <- list(
-      consumer_type = list(
+      consumer_energy_consumption = list(
         state = "CONSUMO E NUMCONS SAM UF",
         subsystem = "CONSUMO E NUMCONS SAM"
       ),
-      industrial_sector = list(
+      industrial_energy_consumption = list(
         state = "SETOR INDUSTRIAL POR UF",
         subsystem = "SETOR INDUSTRIAL POR RG"
       )
     )
 
-    if (is.null(param$table) || !param$table %in% names(sheets_available)) {
-      stop("For 'energy_consumption_per_class', specify 'table' as 'consumer_type' or 'industrial_sector'.")
-    }
-
     if (!param$geo_level %in% c("state", "subsystem")) {
       stop("Invalid geo_level. Choose 'state' or 'subsystem'.")
     }
 
-    sheet_selected <- sheets_available[[param$table]][[param$geo_level]]
+    sheet_selected <- sheets_available[[param$dataset]][[param$geo_level]]
 
     dat <- external_download(
       source = param$source,
@@ -122,7 +104,7 @@ load_epe <- function(dataset, table = NULL, geo_level = "state", raw_data = FALS
     dat <- dat %>%
       dplyr::select(-dplyr::any_of(c("data", "data_versao")))
 
-    if (param$table == "consumer_type") {
+    if (param$dataset == "consumer_energy_consumption") {
       dat <- dat %>%
         dplyr::rename(
           State = uf,
@@ -135,7 +117,7 @@ load_epe <- function(dataset, table = NULL, geo_level = "state", raw_data = FALS
         )
     }
 
-    if (param$table == "industrial_sector") {
+    if (param$dataset == "industrial_energy_consumption") {
       dat <- dat %>%
         dplyr::rename(
           IndustrialSector = setor_industrial,
@@ -161,3 +143,4 @@ load_epe <- function(dataset, table = NULL, geo_level = "state", raw_data = FALS
     return(dat)
   }
 }
+
