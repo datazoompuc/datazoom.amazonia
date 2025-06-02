@@ -141,7 +141,7 @@ load_datasus <- function(dataset,
       stringr::str_extract("\\d+")
     # In this case, the position varies
   }
-  if (stringr::str_detect(param$dataset, "datasus_cnes|datasus_sih")) {
+  if (stringr::str_detect(param$dataset, "datasus_cnes|datasus_sih|datasus_siasus")) {
     file_years_yy <- filenames %>%
       substr(5, 6)
   }
@@ -158,7 +158,7 @@ load_datasus <- function(dataset,
 
   file_state <- NULL
 
-  if (param$dataset %in% c("datasus_sim_do", "datasus_sinasc") | stringr::str_detect(param$dataset, "datasus_cnes|datasus_sih")) {
+  if (param$dataset %in% c("datasus_sim_do", "datasus_sinasc") | stringr::str_detect(param$dataset, "datasus_cnes|datasus_sih|datasus_siasus")) {
     file_state <- filenames %>%
       substr(3, 4)
   } else if (paste0(param$states, collapse = "") != "all") {
@@ -180,6 +180,13 @@ load_datasus <- function(dataset,
 
   if(stringr::str_detect(param$dataset, "datasus_sih")) {
     suffix <- stringr::str_remove(param$dataset, "datasus_sih_") %>%
+      toupper()
+
+    filenames <- filenames[stringr::str_starts(filenames, suffix)]
+  }
+
+  if(stringr::str_detect(param$dataset, "datasus_siasus")) {
+    suffix <- stringr::str_remove(param$dataset, "datasus_siasus_") %>%
       toupper()
 
     filenames <- filenames[stringr::str_starts(filenames, suffix)]
