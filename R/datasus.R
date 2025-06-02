@@ -185,11 +185,11 @@ load_datasus <- function(dataset,
     filenames <- filenames[stringr::str_starts(filenames, suffix)]
   }
 
-  if(stringr::str_detect(param$dataset, "datasus_siasus")) {
+  if (stringr::str_detect(param$dataset, "datasus_siasus")) {
     suffix <- stringr::str_remove(param$dataset, "datasus_siasus_") %>%
       toupper()
 
-    filenames <- filenames[stringr::str_starts(filenames, suffix)]
+    filenames <- filenames[stringr::str_detect(filenames, paste0("^", suffix))]
   }
 
   param$filenames <- filenames
