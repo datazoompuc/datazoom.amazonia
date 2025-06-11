@@ -95,6 +95,44 @@ load_datasus <- function(dataset,
 
   param$states <- ifelse(states == "all", "all", toupper(states))
 
+  # Mapping of readable aliases
+  dataset_aliases <- list(
+    # SIM
+    "mortality"                    = "datasus_sim_do",
+    "mortality_fetal"              = "datasus_sim_dofet",
+    "mortality_maternal"           = "datasus_sim_domat",
+    "mortality_infant"             = "datasus_sim_doinf",
+
+    # SINASC
+    "live_births"                  = "datasus_sinasc",
+
+    # SIH
+    "hospitalizations_approved"    = "datasus_sih_rd",
+    "hospitalizations_rejected"    = "datasus_sih_rj",
+    "hospitalizations_errors"      = "datasus_sih_er",
+    "hospitalizations_procedures"  = "datasus_sih_sp",
+
+    # CNES
+    "hospital_beds"                = "datasus_cnes_lt",
+    "health_establishments"        = "datasus_cnes_st",
+    "complementary_data"           = "datasus_cnes_ct",
+    "equipment"                    = "datasus_cnes_eq",
+    "specialized_services"         = "datasus_cnes_sr",
+    "license"                      = "datasus_cnes_hb",
+    "practitioner"                 = "datasus_cnes_pf",
+    "teams"                        = "datasus_cnes_ep",
+    "contractual_rules"            = "datasus_cnes_rc",
+    "incentives"                   = "datasus_cnes_in",
+    "teaching_establishments"      = "datasus_cnes_ee",
+    "philanthropic_establishments" = "datasus_cnes_ef",
+    "management_and_goals"         = "datasus_cnes_gm"
+  )
+
+  # If the user used a readable name, convert it to the internal one
+  if (dataset %in% names(dataset_aliases)) {
+    dataset <- dataset_aliases[[dataset]]
+  }
+
   # Auxiliary parameters to be passed to external_download
 
   param$skip_rows <- NULL
