@@ -1,3 +1,9 @@
+# datazoom.amazonia 1.1.3.9000
+
+  * Updated `download.R` to read the data now avaiable at the EPE website.
+  
+  * Updated `load_epe` which has now 3 parameters following the split of `energy_consumption_per_class` in `industrial_energy_consumption` and `consumer_energy_consumption`.  
+
 # datazoom.amazonia 1.1.2.9000 (development version)
 
   * Updated `load_mapbiomas` to download the newest Mapbiomas Collections and to warn about the currently unavailable download URL of the datasets water and irrigation. Also added the Indigenous Lands option to the `"mapbiomas_cover"` dataset.
