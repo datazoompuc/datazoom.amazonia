@@ -1658,54 +1658,90 @@ clean_aneel <- load_aneel(
 
 ## EPE
 
-Loads data from the Energy Research Company (EPE), a Brazilian public company that works closely with the Brazilian Ministry of Mines and Energy (MME) and other agencies to ensure the sustainable development of Brazil’s energy infrastructure. EPE’s duty on that mission is to support MME with quality research and studies in order to aid Brazil’s energy infrastructure planning.
+Loads data from the Energy Research Company (EPE), a Brazilian public
+company that works closely with the Brazilian Ministry of Mines and
+Energy (MME) and other agencies to ensure the sustainable development of
+Brazil’s energy infrastructure. EPE’s duty on that mission is to support
+MME with quality research and studies in order to aid Brazil’s energy
+infrastructure planning.
 
-As for now, there are three different datasets available for download: Consumer Energy Consumption, Industrial Energy Consumption, and the National Energy Balance. All of them were obtained from the [EPE website](https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/).
+As for now, there are three different datasets available for download:
+Consumer Energy Consumption, Industrial Energy Consumption, and the
+National Energy Balance. All of them were obtained from the [EPE
+website](https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/).
 
 #### Consumer Energy Consumption
 
-The Consumer Energy Consumption dataset provides monthly data from 2004 to 2025 about energy consumption and number of consumers. The data is organized by State, Region, or Electric Subsystem, and is broken down by class of service and type of consumer.
+The Consumer Energy Consumption dataset provides monthly data from 2004
+to 2025 about energy consumption and number of consumers. The data is
+organized by State, Region, or Electric Subsystem, and is broken down by
+class of service and type of consumer.
 
-The available classes are: Residential, Commercial, Industrial, Rural, and Others. For each observation, the dataset reports the type of consumer (Captive or Free), total consumption in megawatt-hours (MWh), and the number of consumers.
+The available classes are: Residential, Commercial, Industrial, Rural,
+and Others. For each observation, the dataset reports the type of
+consumer (Captive or Free), total consumption in megawatt-hours (MWh),
+and the number of consumers.
 
-When using the Subsystem or Region level, consumer totals are provided but are not disaggregated for all classes and consumer types.
+When using the Subsystem or Region level, consumer totals are provided
+but are not disaggregated for all classes and consumer types.
 
 #### Industrial Energy Consumption
 
-The Industrial Energy Consumption dataset provides monthly data from 2004 to 2025 on energy consumption by industrial sector. Data is available at the State or Subsystem level. Each observation identifies the industrial sector responsible for the consumption and the amount consumed in megawatt-hours (MWh).
+The Industrial Energy Consumption dataset provides monthly data from
+2004 to 2025 on energy consumption by industrial sector. Data is
+available at the State or Subsystem level. Each observation identifies
+the industrial sector responsible for the consumption and the amount
+consumed in megawatt-hours (MWh).
 
 #### National Energy Balance
 
-The National Energy Balance is a thorough and extensive research developed and published by EPE that contains useful data about energy production, consumption, imports, exports, transformation, and final use.
+The National Energy Balance is a thorough and extensive research
+developed and published by EPE that contains useful data about energy
+production, consumption, imports, exports, transformation, and final
+use.
 
-The processed dataset provides yearly data from 2003 to 2023. It covers all Brazilian energy sources (such as petróleo, gás natural, carvão, eletricidade, lenha, solar and others) and distinguishes between different types of energy flow: production, transformation, final consumption, losses, and adjustments.
+The processed dataset provides yearly data from 2003 to 2023. It covers
+all Brazilian energy sources (such as petróleo, gás natural, carvão,
+eletricidade, lenha, solar and others) and distinguishes between
+different types of energy flow: production, transformation, final
+consumption, losses, and adjustments.
 
-Each energy source appears as a separate column in the original spreadsheets. The cleaned data is returned in long format, with one row per combination of year, energy source, and account type. The account type is labeled to indicate whether it refers to production, transformation (for example, “TRANSFORMAÇÃO – REFINARIAS DE PETRÓLEO”), or consumption (for example, “CONSUMO – RESIDENCIAL”).
+Each energy source appears as a separate column in the original
+spreadsheets. The cleaned data is returned in long format, with one row
+per combination of year, energy source, and account type. The account
+type is labeled to indicate whether it refers to production,
+transformation (for example, “TRANSFORMAÇÃO – REFINARIAS DE PETRÓLEO”),
+or consumption (for example, “CONSUMO – RESIDENCIAL”).
 
 ------------------------------------------------------------------------
 
 **Options:**
 
 1.  **dataset**: there are three choices:  
-    `"consumer_energy_consumption"`: monthly energy consumption and consumers by State, Region or Electric Subsystem  
-    `"industrial_energy_consumption"`: monthly industrial energy consumption by State or Subsystem  
-    `"national_energy_balance"`: yearly energy flow by account and energy source
+    `"consumer_energy_consumption"`: monthly energy consumption and
+    consumers by State, Region or Electric Subsystem  
+    `"industrial_energy_consumption"`: monthly industrial energy
+    consumption by State or Subsystem  
+    `"national_energy_balance"`: yearly energy flow by account and
+    energy source
 
 2.  **raw_data**: there are two options:  
     `TRUE`: if you want the data as it is originally.  
     `FALSE`: if you want the treated version of the data.
 
-3.  **geo_level**: only applies to `"consumer_energy_consumption"` and `"industrial_energy_consumption"` datasets.  
+3.  **geo_level**: only applies to `"consumer_energy_consumption"` and
+    `"industrial_energy_consumption"` datasets.  
     `"state"`  
     `"subsystem"`
 
-4.  **language**: you can choose between Portuguese `("pt")` and English `("eng")`
+4.  **language**: you can choose between Portuguese `("pt")` and English
+    `("eng")`
 
 ------------------------------------------------------------------------
 
 **Examples:**
 
-```r
+``` r
 # download treated data about consumer energy consumption at the state level
 clean_epe <- load_epe(
   dataset = "consumer_energy_consumption",
@@ -1718,8 +1754,7 @@ balance <- load_epe(
   dataset = "national_energy_balance",
   raw_data = FALSE
 )
-
----
+```
 
 # Other tools
 

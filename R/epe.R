@@ -18,7 +18,7 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
 
   uf <- regiao <- sistema <- classe <- tipo_consumidor <- consumo <- consumidores <- setor_industrial <- data_excel <- NULL
 
-  utils::globalVariables(c("Conta", "Fonte", "Valor", "Ano", "bloco", "account", "source", "year", "value", ":="))
+  Conta <- bloco <-Fonte <- Valor <- Ano <- account <- year <- value <- NULL
 
   #############################
   ## Define Basic Parameters ##

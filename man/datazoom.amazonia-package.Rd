@@ -35,6 +35,7 @@ Authors:
   \item Maria Mittelbach \email{mariamittelbach@gmail.com}
   \item Felipe de Moraes Nunes \email{felipedmoraesn@gmail.com}
   \item Joao Santos P. Barbosa \email{joao.31582129@gmail.com}
+  \item Bernardo Furlanetto Sieira \email{bernardo.sieira@gmail.com}
 }
 
 Other contributors:
