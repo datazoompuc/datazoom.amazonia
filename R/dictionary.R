@@ -959,6 +959,22 @@ load_dictionary <- function(dataset) {
     )
   }
 
+  if (stringr::str_detect(param$dataset, "datasus_siasus"))
+    {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~name_pt, ~name_eng, ~label_pt, ~label_eng,
+
+      # Painel de Oncologia
+
+      "code_muni",    "code_muni",         "code_muni",            "Codigo IBGE do municipio",                                          "IBGE Municipality code",
+      "name_muni",    "name_muni",         "name_muni",            "Nome do municipio",                                                "City name",
+      "code_state",   "code_state",        "code_state",           "Codigo do estado",                                                 "State code",
+      "abbrev_state", "abbrev_state",      "abbrev_state",         "Sigla do estado",                                                  "State abbreviation",
+      "legal_amazon", "legal_amazon",      "legal_amazon",         "Amazonia Legal",                                                   "Legal Amazon",
+
+    )
+  }
+
   if (dataset == "baci_countries") {
     harmonization_dat <- tibble::tribble(
       ~country_code, ~country_pt, ~country_eng,
