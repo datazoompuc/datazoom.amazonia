@@ -525,7 +525,6 @@ load_datasus <- function(dataset,
   if(stringr::str_detect(param$dataset,"datasus_siasus")){
 
     dat <- dat %>% dplyr::rename_with(~ toupper(.x)) %>%
-      #dplyr::select(-FILE_NAME) %>%
       dplyr::mutate_if(is.factor, as.character)
 
     suffix <- stringr::str_remove(param$dataset, "datasus_siasus_") %>%
@@ -607,8 +606,8 @@ load_datasus <- function(dataset,
   if (stringr::str_detect(param$dataset, "datasus_siasus")) {
     dat_mod <- dat %>%
       dplyr::select(-matches("^as\\.factor\\(")) %>%
-      dplyr::select(where(~ !(all(is.na(.)) || all(. == 0, na.rm = TRUE)))) %>%
-      dplyr::select(where(~ length(unique(.)) > 1)) %>%
+      dplyr::select(where(~ !(all(is.na(.)) || all(. == 0, na.rm = TRUE)))) %>% # Remove colunas vazias ou constantes (etapa original)
+      dplyr::select(where(~ length(unique(.)) > 1)) %>% # Converte character para factor (se necessário)
       dplyr::mutate_if(is.character, as.factor) %>%
       tibble::as_tibble()
   }
