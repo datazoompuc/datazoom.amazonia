@@ -141,7 +141,12 @@ load_datasus <- function(dataset,
       stringr::str_extract("\\d+")
     # In this case, the position varies
   }
-  if (stringr::str_detect(param$dataset, "datasus_cnes|datasus_sih|datasus_siasus")) {
+  if (stringr::str_detect(param$dataset, "datasus_cnes|datasus_sih")) {
+    file_years_yy <- filenames %>%
+      substr(5, 6)
+  }
+
+  if (stringr::str_detect(param$dataset, "datasus_siasus")) {
     file_years_yy <- filenames %>%
       substr(5, 6)
   }
