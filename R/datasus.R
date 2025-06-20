@@ -113,19 +113,19 @@ load_datasus <- function(dataset,
 
   # Get dataset source URL
 
-  dat_url <- datasets_link()
+    dat_url <- datasets_link()
 
-  url <- dat_url %>%
-    dplyr::filter(dataset == param$dataset) %>%
-    dplyr::select(link) %>%
-    base::unlist() %>%
-    as.character()
+    url <- dat_url %>%
+      dplyr::filter(dataset == param$dataset) %>%
+      dplyr::select(link) %>%
+      base::unlist() %>%
+      as.character()
 
-  # Use RCurl to extract the names of all files stored in the server
+    # Use RCurl to extract the names of all files stored in the server
 
-  filenames <- RCurl::getURL(url, ftp.use.epsv = TRUE, dirlistonly = TRUE) %>%
-    stringr::str_split("\r*\n") %>%
-    unlist()
+    filenames <- RCurl::getURL(url, ftp.use.epsv = TRUE, dirlistonly = TRUE) %>%
+      stringr::str_split("\r*\n") %>%
+      unlist()
 
   ### Filtering by year
 
@@ -141,12 +141,7 @@ load_datasus <- function(dataset,
       stringr::str_extract("\\d+")
     # In this case, the position varies
   }
-  if (stringr::str_detect(param$dataset, "datasus_cnes|datasus_sih")) {
-    file_years_yy <- filenames %>%
-      substr(5, 6)
-  }
-
-  if (stringr::str_detect(param$dataset, "datasus_siasus")) {
+  if (stringr::str_detect(param$dataset, "datasus_cnes|datasus_sih|datasus_siasus")) {
     file_years_yy <- filenames %>%
       substr(5, 6)
   }
@@ -183,18 +178,11 @@ load_datasus <- function(dataset,
     filenames <- filenames[stringr::str_detect(filenames, suffix)]
   }
 
-  if(stringr::str_detect(param$dataset, "datasus_sih")) {
-    suffix <- stringr::str_remove(param$dataset, "datasus_sih_") %>%
+  if(stringr::str_detect(param$dataset, "datasus_sih|datasus_siasus_")) {
+    suffix <- stringr::str_remove(param$dataset, "datasus_sih_|datasus_siasus_") %>%
       toupper()
 
     filenames <- filenames[stringr::str_starts(filenames, suffix)]
-  }
-
-  if (stringr::str_detect(param$dataset, "datasus_siasus")) {
-    suffix <- stringr::str_remove(param$dataset, "datasus_siasus_") %>%
-      toupper()
-
-    filenames <- filenames[stringr::str_detect(filenames, paste0("^", suffix))]
   }
 
   param$filenames <- filenames
@@ -216,6 +204,7 @@ load_datasus <- function(dataset,
     )
 
   names(dat) <- filenames
+
 
   ## Return Raw Data
 
@@ -594,9 +583,6 @@ load_datasus <- function(dataset,
   ## Harmonizing Variable Names ##
   ################################
 
-  if (stringr::str_detect(param$dataset, "datasus_siasus")){
-    dat_mod <- dat
-  }
 
   if (stringr::str_detect(param$dataset, "datasus_sim")) {
     dat_mod <- dat %>%
