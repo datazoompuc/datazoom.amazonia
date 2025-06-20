@@ -522,12 +522,27 @@ load_datasus <- function(dataset,
 
   }
 
-  if(stringr::str_detect("datasus_siasus")){
+  if(stringr::str_detect(param$dataset,"datasus_siasus")){
 
-    geo <- datazoom.amazonia::municipalities %>%
-      dplyr::select(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
-      dplyr::mutate(code_muni_6 = as.character(as.integer(code_muni / 10))) %>%
-      dplyr::distinct(code_muni_6, .keep_all = TRUE) # Only keeps municipalities uniquely identified by the 6 digits
+    dat <- dat %>% dplyr::rename_with(~ toupper(.x)) %>%
+      #dplyr::select(-FILE_NAME) %>%
+      dplyr::mutate_if(is.factor, as.character)
+
+    suffix <- stringr::str_remove(param$dataset, "datasus_siasus_") %>%
+      toupper()
+
+    if (!requireNamespace("read.dbc", quietly = TRUE)) {
+      install.packages("read.dbc", repos = "https://packagemanager.posit.co/cran/2024-07-05")
+    }
+
+    if (!requireNamespace("remotes", quietly = TRUE)) {
+      install.packages("remotes")
+    }
+    remotes::install_github("rfsaldanha/microdatasus")
+
+
+    dat <- microdatasus::process_sia(dat, paste0("SIA-", suffix)) %>%
+      janitor::clean_names()
 
   }
 
@@ -589,6 +604,14 @@ load_datasus <- function(dataset,
   ## Harmonizing Variable Names ##
   ################################
 
+  if (stringr::str_detect(param$dataset, "datasus_siasus")) {
+    dat_mod <- dat %>%
+      dplyr::select(-matches("^as\\.factor\\(")) %>%
+      dplyr::select(where(~ !(all(is.na(.)) || all(. == 0, na.rm = TRUE)))) %>%
+      dplyr::select(where(~ length(unique(.)) > 1)) %>%
+      dplyr::mutate_if(is.character, as.factor) %>%
+      tibble::as_tibble()
+  }
 
   if (stringr::str_detect(param$dataset, "datasus_sim")) {
     dat_mod <- dat %>%
