@@ -594,6 +594,10 @@ load_datasus <- function(dataset,
   ## Harmonizing Variable Names ##
   ################################
 
+  if (stringr::str_detect(param$dataset, "datasus_siasus")){
+    dat_mod <- dat
+  }
+
   if (stringr::str_detect(param$dataset, "datasus_sim")) {
     dat_mod <- dat %>%
       dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, legal_amazon, dtobito) %>%

@@ -959,7 +959,7 @@ load_dictionary <- function(dataset) {
     )
   }
 
-  if (stringr::str_detect(param$dataset, "datasus_siasus"))
+  if (stringr::str_detect(dataset, "datasus_siasus"))
     {
     harmonization_dat <- tibble::tribble(
       ~var_code, ~name_pt, ~name_eng, ~label_pt, ~label_eng,
