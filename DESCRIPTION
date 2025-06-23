@@ -17,7 +17,7 @@ Authors@R: c(
     person("Francisco", "de Lima Cavalcanti", , "francisco.lima.cavalcanti@gmail.com", role = "aut"),
     person("Maria", "Mittelbach", , "mariamittelbach@gmail.com", role = "aut"),
     person("Felipe", "de Moraes Nunes", , "felipedmoraesn@gmail.com", role = "aut"),
-    person("Joao","Santos P. Barbosa",,"joao.31582129@gmail.com", role = "aut"),
+    person("Joao Paulo","Santos P. Barbosa",,"joao.31582129@gmail.com", role = "aut"),
     person("Bernardo","Furlanetto Sieira",,"bernardo.sieira@gmail.com", role = "aut")
   )
 Description: Functions to download and treat data regarding the Brazilian
@@ -43,7 +43,8 @@ Imports:
     tidyr,
     utils,
     XML,
-    lubridate
+    lubridate,
+    tidyselect
 Suggests: 
     foreign,
     googledrive,

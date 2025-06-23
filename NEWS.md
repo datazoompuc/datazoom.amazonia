@@ -1,9 +1,15 @@
-# datazoom.amazonia 1.1.3.9000
+# datazoom.amazonia 1.1.3.9000 (development version)
 
   * Updated `download.R` to read the data now avaiable at the EPE website.
   
-  * Updated `load_epe` which has now 3 parameters following the split of `energy_consumption_per_class` in `industrial_energy_consumption` and `consumer_energy_consumption`.  
-
+  * Updated `load_epe` which has now 3 parameters following the split of `energy_consumption_per_class` in `industrial_energy_consumption` and `consumer_energy_consumption`. 
+  
+  * Added support for four new SIH datasets in the load_datasus() function:
+    * "datasus_sih_rd" – Reduced AIHs (summary of hospitalizations)
+    * "datasus_sih_sp" – Professional Services performed during hospitalizations
+    * "datasus_sih_rj" – Rejected AIHs with general rejection reasons
+    * "datasus_sih_er" – Rejected AIHs with specific error codes
+    
 # datazoom.amazonia 1.1.2.9000 (development version)
 
   * Updated `load_mapbiomas` to download the newest Mapbiomas Collections and to warn about the currently unavailable download URL of the datasets water and irrigation. Also added the Indigenous Lands option to the `"mapbiomas_cover"` dataset.

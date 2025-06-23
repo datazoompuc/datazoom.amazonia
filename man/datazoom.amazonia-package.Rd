@@ -34,7 +34,7 @@ Authors:
   \item Francisco de Lima Cavalcanti \email{francisco.lima.cavalcanti@gmail.com}
   \item Maria Mittelbach \email{mariamittelbach@gmail.com}
   \item Felipe de Moraes Nunes \email{felipedmoraesn@gmail.com}
-  \item Joao Santos P. Barbosa \email{joao.31582129@gmail.com}
+  \item Joao Paulo Santos P. Barbosa \email{joao.31582129@gmail.com}
   \item Bernardo Furlanetto Sieira \email{bernardo.sieira@gmail.com}
 }
 
