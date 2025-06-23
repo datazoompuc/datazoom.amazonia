@@ -602,15 +602,18 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     if (param$dataset == "energy_enterprises_distributed") {
       dat <- data.table::fread(temp, encoding = "Latin-1")
     } else if (dataset == "energy_generation") {
-      dat <-readxl::read_xlsx(temp,sheet = param$sheet,skip = param$skip_rows,na = c("-", ""))
+      dat <- readxl::read_xlsx(temp, sheet = param$sheet,skip = param$skip_rows,na = c("-", ""))
     }
   } else if (param$source == "ips") {
     dat <- param$sheet %>%
-      purrr::map(~ readxl::read_xlsx(temp, sheet = .))
+      purrr::map(
+        ~ readxl::read_xlsx(temp, sheet = .)
+      )
   } else if (param$source == "epe") {
-    #if (param$dataset == "energy_consumption_per_class") {
-      dat <- readxl::read_excel(temp, sheet = param$sheet, skip = param$skip_rows)
-    #}
+    dat <- param$sheet %>%
+      purrr::map(
+        ~ base::suppressMessages(readxl::read_xlsx(temp, sheet = .))
+      )
   }
 
   ## Now the rest of the functions
