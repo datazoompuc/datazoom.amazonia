@@ -447,9 +447,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source %in% c("seeg", "iema", "ips")) {
     file_extension <- ".xlsx"
   }
-  if (source == "prodes") {
-    file_extension <- ".txt"
-  }
   if (source == "terraclimate") {
     file_extension <- ".nc"
   }
@@ -653,7 +650,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   # Folder is kept
 
-  if (file_extension != ".nc") {
+  if (!file_extension %in% c(".nc")) {
     unlink(temp)
   }
 

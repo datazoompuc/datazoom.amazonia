@@ -12,13 +12,13 @@ load_prodes(
 )
 }
 \arguments{
-\item{dataset}{A dataset name ("deforestation").}
+\item{dataset}{A dataset name. Can be one of "deforestation", "residual_deforestation", "native_vegetation", "hydrography", "non_forest", or "clouds".}
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
 \item{time_period}{A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.
 \itemize{
-\item Between 2007 - 2023 for dataset "deforestation". Deforestation for 2007 includes all cumulative deforestation up to 2007.
+\item Between 2007 - 2023 for dataset "deforestation". Deforestation for 2007 includes all cumulative deforestation up to 2007. For other years, deforestation is incremental
 \item Between 2010 - 2023 for dataset "residual_deforestation"
 \item Only 2023 for all other datasets
 }}
@@ -36,7 +36,9 @@ Loads data on deforestation in the Legal Amazon region.
 # Download treated data (raw_data = FALSE)
 # in portuguese (language = 'pt').
 data <- load_prodes(
+  dataset = "deforestation",
   raw_data = FALSE,
+  time_period = 2020:2023,
   language = "pt"
 )
 }

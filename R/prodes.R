@@ -2,9 +2,9 @@
 #'
 #' @description Loads data on deforestation in the Legal Amazon region.
 #'
-#' @param dataset A dataset name ("deforestation").
+#' @param dataset A dataset name. Can be one of "deforestation", "residual_deforestation", "native_vegetation", "hydrography", "non_forest", or "clouds".
 #' @param time_period A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.
-#'    * Between 2007 - 2023 for dataset "deforestation". Deforestation for 2007 includes all cumulative deforestation up to 2007.
+#'    * Between 2007 - 2023 for dataset "deforestation". Deforestation for 2007 includes all cumulative deforestation up to 2007. For other years, deforestation is incremental
 #'    * Between 2010 - 2023 for dataset "residual_deforestation"
 #'    * Only 2023 for all other datasets
 #' @inheritParams load_baci
@@ -16,7 +16,9 @@
 #' # Download treated data (raw_data = FALSE)
 #' # in portuguese (language = 'pt').
 #' data <- load_prodes(
+#'   dataset = "deforestation",
 #'   raw_data = FALSE,
+#'   time_period = 2020:2023,
 #'   language = "pt"
 #' )
 #' }
@@ -27,7 +29,6 @@
 
 load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
                         time_period = 2023, language = "eng") {
-
   if (!requireNamespace("terra", quietly = TRUE)) {
     stop(
       "Package \"terra\" must be installed to use this function.",
@@ -40,26 +41,24 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
       call. = FALSE
     )
   }
-  if (!requireNamespace("rlang", quietly = TRUE)) {
-    stop(
-      "Package \"rlang\" must be installed to use this function.",
-      call. = FALSE
-    )
-  }
 
   ###########################
   ## Bind Global Variables ##
   ###########################
 
+  . <- area_km2 <- km <- ID <- prodes_amazonia_legal_2023 <- NULL
+
   #############################
   ## Define Basic Parameters ##
   #############################
 
-  param <- list()
-  param$source <- "prodes"
-  param$dataset <- dataset
-  param$raw_data <- raw_data
-  param$language <- language
+  param <- list(
+    source = "prodes",
+    dataset = dataset,
+    raw_data = raw_data,
+    time_period = time_period,
+    language = language
+  )
 
   # check if dataset and time_period are supported
 
@@ -97,7 +96,7 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
 
   message("Downloading map of Brazilian municipalities")
 
-  munic <- datazoom.amazonia:::external_download(
+  munic <- external_download(
     source = "internal",
     dataset = "geo_municipalities"
   )
@@ -117,7 +116,6 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
     purrr::map2(
       param$time_period,
       function(code, year) {
-
         message(paste("Reading data for", year, "\n"))
 
         # filtering raster to only the deforestation in that year
@@ -135,7 +133,7 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
 
         pixel_areas <- terra::cellSize(df, unit = "km")
 
-        message("Extracting pixel values")
+        message("Extracting pixel values\n")
 
         counts <- terra::extract(
           df * pixel_areas, # adds the number of marked pixels * the area
@@ -158,30 +156,33 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
         # add km2 units
 
         counts <- counts %>%
-          dplyr::mutate(across(prodes_amazonia_legal_2023, ~ units::set_units(., "km^2")))
-
-        # rename variable to match the dataset
-
-        counts <- counts %>%
-          rename(!!paste(param$dataset, "km2", sep = "_") := prodes_amazonia_legal_2023)
+          dplyr::mutate(dplyr::across(prodes_amazonia_legal_2023, ~ units::set_units(., "km^2")))
 
         # drop cities with no pixels
 
         counts <- counts %>%
-          tidyr::drop_na(deforestation_km2)
+          tidyr::drop_na(prodes_amazonia_legal_2023)
+
+        # rename variable to match the dataset
+
+        counts <- counts %>%
+          dplyr::rename(!!paste(param$dataset, "km2", sep = "_") := prodes_amazonia_legal_2023)
 
         # return data frame
         counts
       }
     )
 
+  # combining data frames
+
+  dat <- dat %>%
+    dplyr::bind_rows()
 
   ################################
   ## Harmonizing Variable Names ##
   ################################
 
   if (param$language == "pt") {
-
     col_names <- c(
       cod_ibge = "code_muni",
       municipio = "name_muni",
