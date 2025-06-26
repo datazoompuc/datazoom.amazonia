@@ -140,29 +140,41 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 The PRODES project uses satellites to monitor deforestation in Brazil’s
 Legal Amazon. The raw data reports total and incremental (year-by-year)
 low-cut deforested area at the municipality level, going back to the
-year 2000.
-
-Data is collected based on the PRODES-year, which starts at August 1st
-and ends on July 31st. Accordingly, 2018 deforestation data covers the
-period from 01/08/2017 to 31/07/2018.
+year 2007.
 
 INPE’s most recent data is now published at
-[TerraBrasilis](http://terrabrasilis.dpi.inpe.br/downloads/). We have
-refrained from updating to this new source, as it only contains detailed
-spatial data, rather than agregated, municipality-level data.
+[TerraBrasilis](http://terrabrasilis.dpi.inpe.br/downloads/). We read
+their full [raster
+data](https://terrabrasilis.dpi.inpe.br/geonetwork/srv/eng/catalog.search#/metadata/507294db-a789-42dd-9158-9dea77d9293f)
+for the Legal Amazon region and extract values onto the map of Brazilian
+municipalities.
 
 ------------------------------------------------------------------------
 
 **Options:**
 
-1.  **dataset**: `"deforestation"`
+1.  **dataset**: `"deforestation"`, `"residual_deforestation"`,
+    `"native_vegetation"`, `"hydrography"`, `"non_forest"`, or
+    `"clouds"`
 
 2.  **raw_data**: there are two options:
 
-    - `TRUE`: if you want the data as it is originally.
-    - `FALSE`: if you want the treated version of the data.
+    - `TRUE`: if you want the data as it is originally, read as a
+      SpatRaster.
+    - `FALSE`: if you want the treated version of the data, measuring
+      affected areas per municipality.
 
-3.  **language**: you can choose between Portuguese `("pt")` and English
+3.  **time_period**: picks the years for which the data will be
+    downloaded, under the following constraints:
+
+    - For dataset `"deforestation"`, it can be between 2007 and 2023.
+      Deforestation for 2007 includes all cumulative deforestation up
+      to 2007. For other years, deforestation is incremental;
+    - For dataset `"residual_deforestation"`, it can be between 2010 and
+      2023;
+    - For all other datasets, only the year 2023 is available.
+
+4.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`
 
 ------------------------------------------------------------------------
@@ -173,7 +185,9 @@ spatial data, rather than agregated, municipality-level data.
 # Download treated data (raw_data = FALSE)
 # in portuguese (language = 'pt').
 data <- load_prodes(
+  dataset = "deforestation",
   raw_data = FALSE,
+  time_period = 2020:2023,
   language = "pt"
 )
 ```

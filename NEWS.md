@@ -1,3 +1,7 @@
+# datazoom.amazonia 1.1.4.9000 (development version)
+
+  * `load_prodes` now reads the full raster data from PRODES
+
 # datazoom.amazonia 1.1.3.9000 (development version)
 
   * Updated `download.R` to read the data now avaiable at the EPE website.
