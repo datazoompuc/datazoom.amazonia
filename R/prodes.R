@@ -60,6 +60,12 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
     language = language
   )
 
+  # forcing years
+
+  if (!param$dataset %in% c("deforestation", "residual_deforestation")) {
+    param$time_period <- 2023
+  }
+
   # check if dataset and time_period are supported
 
   check_params(param)

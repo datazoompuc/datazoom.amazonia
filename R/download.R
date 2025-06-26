@@ -595,6 +595,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
     if (param$source == "prodes") {
 
+      # clearing rasters to avoid overlap
+
+      terra::tmpFiles(remove = TRUE)
+
       file <- list.files(dir, pattern = "*.tif", full.names = TRUE)
 
       dat <- terra::rast(file)
