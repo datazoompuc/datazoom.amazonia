@@ -3,9 +3,13 @@
 #' @description Loads data on deforestation in the Legal Amazon region.
 #'
 #' @param dataset A dataset name ("deforestation").
+#' @param time_period A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.
+#'    * Between 2007 - 2023 for dataset "deforestation". Deforestation for 2007 includes all cumulative deforestation up to 2007.
+#'    * Between 2010 - 2023 for dataset "residual_deforestation"
+#'    * Only 2023 for all other datasets
 #' @inheritParams load_baci
 #'
-#' @return A \code{tibble} with the selected data.
+#' @return A \code{tibble} with the selected data if raw_data is \code{FALSE}, and a \code{SpatRaster} is \code{TRUE}.
 #'
 #' @examples
 #' \dontrun{
@@ -27,6 +31,18 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
   if (!requireNamespace("terra", quietly = TRUE)) {
     stop(
       "Package \"terra\" must be installed to use this function.",
+      call. = FALSE
+    )
+  }
+  if (!requireNamespace("units", quietly = TRUE)) {
+    stop(
+      "Package \"units\" must be installed to use this function.",
+      call. = FALSE
+    )
+  }
+  if (!requireNamespace("rlang", quietly = TRUE)) {
+    stop(
+      "Package \"rlang\" must be installed to use this function.",
       call. = FALSE
     )
   }
@@ -89,7 +105,7 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
   # calculate area to join later
 
   munic_areas <- munic %>%
-    mutate(
+    dplyr::mutate(
       area_km2 = sf::st_area(.),
       area_km2 = units::set_units(area_km2, km^2)
     ) %>%
@@ -187,7 +203,7 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
       dplyr::rename(dplyr::any_of(col_names))
   }
 
-  if (param$language == "en") dat_mod <- dat
+  if (param$language == "eng") dat_mod <- dat
 
   #################
   ## Return data ##

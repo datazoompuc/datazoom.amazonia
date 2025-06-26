@@ -598,7 +598,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
     if (param$source == "prodes") {
 
-      file <- list.files(dir, pattern = "*.tif", full_names = TRUE)
+      file <- list.files(dir, pattern = "*.tif", full.names = TRUE)
 
       dat <- terra::rast(file)
     }

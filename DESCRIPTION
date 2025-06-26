@@ -51,7 +51,9 @@ Suggests:
     knitr,
     RCurl,
     rmarkdown,
-    terra
+    terra,
+    units,
+    rlang
 LinkingTo: 
     Rcpp
 VignetteBuilder: 
