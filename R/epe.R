@@ -4,8 +4,7 @@
 #'
 #' @param dataset Dataset name: "consumer_energy_consumption", "industrial_energy_consumption", or "national_energy_balance"
 #' @param geo_level Geographical level: "state" or "subsystem". Only applies to consumer or industrial datasets.
-#' @param raw_data If TRUE, returns raw sheets.
-#' @param language "pt" or "en". Applies to processed outputs.
+#' @inheritParams load_baci
 #'
 #' @export
 load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = "eng") {
@@ -148,7 +147,7 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
   ################################
 
   if (param$dataset == "national_energy_balance") {
-    if (param$language == "en") {
+    if (param$language == "eng") {
       dat_mod <- dat %>%
         dplyr::rename(
           "account" = conta,
@@ -165,7 +164,7 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
         "data" = data_excel
       )
 
-    if (param$language == "en") {
+    if (param$language == "eng") {
       dat_mod <- dat_mod %>%
         dplyr::rename(
           state = uf,
@@ -186,7 +185,7 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
         "data" = data_excel
       )
 
-    if (param$language == "en") {
+    if (param$language == "eng") {
       dat_mod <- dat_mod %>%
         dplyr::rename(
           state = uf,

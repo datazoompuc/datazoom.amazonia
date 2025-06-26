@@ -11,9 +11,9 @@ load_epe(dataset, geo_level = "state", raw_data = FALSE, language = "eng")
 
 \item{geo_level}{Geographical level: "state" or "subsystem". Only applies to consumer or industrial datasets.}
 
-\item{raw_data}{If TRUE, returns raw sheets.}
+\item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
-\item{language}{"pt" or "en". Applies to processed outputs.}
+\item{language}{A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.}
 }
 \description{
 Electrical Energy Monthly Consumption per Class or Industrial Sector
