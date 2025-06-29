@@ -1,5 +1,5 @@
 
-<a href="https://github.com/datazoompuc/datazoom.amazonia"><img src="https://raw.githubusercontent.com/datazoompuc/datazoom.amazonia/master/logo.png?token=AU72KNQCGY4ZR6XLARTNSXLBXCPNG" align="left" width="100" hspace="10" vspace="6"></a>
+<a href="https://github.com/datazoompuc/datazoom.amazonia"><img src="https://raw.githubusercontent.com/datazoompuc/datazoom.amazonia/master/logo.png" align="left" width="100" hspace="10" vspace="6"></a>
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
