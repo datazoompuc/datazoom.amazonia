@@ -447,9 +447,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source %in% c("seeg", "iema", "ips")) {
     file_extension <- ".xlsx"
   }
-  if (source == "prodes") {
-    file_extension <- ".txt"
-  }
   if (source == "terraclimate") {
     file_extension <- ".nc"
   }
@@ -596,6 +593,16 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       # each data frame in the list is named after the corresponding year
       names(dat) <- param$year
     }
+    if (param$source == "prodes") {
+
+      # clearing rasters to avoid overlap
+
+      terra::tmpFiles(remove = TRUE)
+
+      file <- list.files(dir, pattern = "*.tif", full.names = TRUE)
+
+      dat <- terra::rast(file)
+    }
   }
 
   if (param$source == "aneel") {
@@ -647,7 +654,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   # Folder is kept
 
-  if (file_extension != ".nc") {
+  if (!file_extension %in% c(".nc")) {
     unlink(temp)
   }
 
@@ -670,7 +677,12 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
     ## PRODES
 
-    "prodes", "deforestation", NA, "2000-2023", "Municipality", "http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2023&estado=&ordem=MUNICIPIO&type=tabela&output=txt&",
+    "prodes", "deforestation", NA, "2007-2023", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2023.zip",
+    "prodes", "residual_deforestation", NA, "2010-2023", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2023.zip",
+    "prodes", "native_vegetation", NA, "2023", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2023.zip",
+    "prodes", "non_forest", NA, "2023", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2023.zip",
+    "prodes", "hydrography", NA, "2023", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2023.zip",
+    "prodes", "clouds", NA, "2023", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2023.zip",
 
     ## DETER
 
