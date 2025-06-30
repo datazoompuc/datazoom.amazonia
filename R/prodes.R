@@ -122,7 +122,7 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
     purrr::map2(
       param$time_period,
       function(code, year) {
-        message(paste("Reading data for", year, "\n"))
+        message(paste("Reading data for", year, "\n", "Processing this large raster may take a while\n"))
 
         # filtering raster to only the deforestation in that year
 
