@@ -533,7 +533,6 @@ load_datasus <- function(dataset,
     if (!requireNamespace("read.dbc", quietly = TRUE)) {
       install.packages("read.dbc", repos = "https://packagemanager.posit.co/cran/2024-07-05")
     }
-
     if (!requireNamespace("remotes", quietly = TRUE)) {
       install.packages("remotes")
     }
@@ -541,9 +540,50 @@ load_datasus <- function(dataset,
 
 
     dat <- microdatasus::process_sia(dat, paste0("SIA-", suffix)) %>%
-      janitor::clean_names()
+      janitor::clean_names() %>%
+      dplyr::mutate(across(where(is.character), tolower))  # Converte todas colunas de texto para minúscula
 
-  }
+
+    if (param$language == "eng") {
+
+      # Verifica e instala o pacote 'deeplr' se necessário
+      if (!requireNamespace("deeplr", quietly = TRUE)) {
+        tryCatch({
+          if (!requireNamespace("remotes", quietly = TRUE)) {
+            install.packages("remotes", repos = "https://cloud.r-project.org")
+          }
+          remotes::install_github("zumbov2/deeplr")
+        }, error = function(e) {
+          stop("Falha na instalação do deeplr. Erro: ", e$message)
+        })
+      }
+
+      # Define a chave da API do DeepL, se ainda não estiver definida
+      if (Sys.getenv("DEEPL_API_KEY") == "") {
+        Sys.setenv(DEEPL_API_KEY = "198QHVUqVLM366Wgm")
+      }
+
+      # Função simples para traduzir texto
+      traduzir_texto <- function(texto) {
+        if (is.na(texto) || texto == "") return(texto)
+        tryCatch(
+          deeplr::translate2(texto, target_lang = "EN", auth_key = Sys.getenv("DEEPL_API_KEY")),
+          error = function(e) texto
+        )
+      }
+
+      # Aplica a tradução apenas nas colunas de texto
+
+      dat <- dat %>%
+        dplyr::mutate(
+          dplyr::across(
+            dplyr::where(is.character),
+            ~ sapply(.x, traduzir_texto)
+          )
+        )
+    }
+    }
+
 
   #################
   ## Aggregating ##
