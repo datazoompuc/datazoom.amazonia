@@ -524,26 +524,36 @@ load_datasus <- function(dataset,
 
   if(stringr::str_detect(param$dataset,"datasus_siasus")){
 
+    # 1. Converte tudo que for fator para texto (preserva zero à esquerda)
+    dat <- dat %>%
+      dplyr::mutate(
+        dplyr::across(where(is.factor), as.character)
+      )
+
+    # 2. Função auxiliar para checar se algum valor começa com zero
     tem_zero_a_esquerda <- function(x) {
       any(grepl("^0", x))
     }
 
+    # 3. Função para checar se a coluna tem *apenas* números (possui dígitos apenas, ignorando espaços)
+    coluna_numerica_valida <- function(x) {
+      all(grepl("^\\d+$", x))  # Só números inteiros
+    }
+
+    # 3. Converte colunas character em numeric só se não tiver zero à esquerda
     dat <- dat %>%
       dplyr::mutate(
         dplyr::across(
-          everything(),
+          where(is.character),
           ~ {
-            if (is.character(.x) && !tem_zero_a_esquerda(.x)) {
-              # Se não tem zero à esquerda, converte para numérico
-              as.numeric(.x)
+            if (!tem_zero_a_esquerda(.x) && coluna_numerica_valida(.x)) {
+              suppressWarnings(as.numeric(.x))
             } else {
-              # Mantém como character (preserva zero à esquerda)
               .x
             }
           }
         )
       )
-
     }
 
 
