@@ -554,6 +554,22 @@ load_datasus <- function(dataset,
           }
         )
       )
+
+    geo <- datazoom.amazonia::municipalities %>%
+      dplyr::select(
+        code_muni,
+        name_muni,
+        code_state,
+        abbrev_state,
+        legal_amazon
+      )
+    # Original data only has 6 IBGE digits instead of 7
+    geo <- geo %>%
+      dplyr::mutate(code_muni_6 = as.integer(code_muni / 10))
+
+    dat <- dat %>%
+            dplyr::left_join(geo, by = c("pa_ufmun" = "code_muni_6"))
+
     }
 
 
@@ -617,8 +633,7 @@ load_datasus <- function(dataset,
 
   if (stringr::str_detect(param$dataset, "datasus_siasus")) {
     dat_mod <- dat %>%
-
-      dplyr::select(where(~ !(all(is.na(.)) || all(. == 0, na.rm = TRUE)))) %>% # Remove colunas vazias ou constantes (etapa original)
+      dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
       tibble::as_tibble()
   }
 
