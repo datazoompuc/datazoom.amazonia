@@ -572,6 +572,8 @@ load_datasus <- function(dataset,
 
     suffix <- if (param$dataset == "datasus_siasus_pa") {
       "pa_ufmun"
+    } else if(param$dataset == "datasus_siasus_ps"){
+      "ufmun"
     } else {
       "ap_ufmun"
     }
