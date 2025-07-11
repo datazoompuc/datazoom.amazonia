@@ -566,6 +566,7 @@ load_datasus <- function(dataset,
         abbrev_state,
         legal_amazon
       )
+
     # Original data only has 6 IBGE digits instead of 7
     geo <- geo %>%
       dplyr::mutate(code_muni_6 = as.integer(code_muni / 10))
