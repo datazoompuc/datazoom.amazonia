@@ -524,24 +524,7 @@ load_datasus <- function(dataset,
 
   if(stringr::str_detect(param$dataset,"datasus_siasus")){
 
-    dat <- dat %>% dplyr::rename_with(~ toupper(.x)) %>%
-      dplyr::mutate_if(is.factor, as.character)
-
-    suffix <- stringr::str_remove(param$dataset, "datasus_siasus_") %>%
-      toupper()
-
-    if (!requireNamespace("read.dbc", quietly = TRUE)) {
-      install.packages("read.dbc", repos = "https://packagemanager.posit.co/cran/2024-07-05")
-    }
-    if (!requireNamespace("remotes", quietly = TRUE)) {
-      install.packages("remotes")
-    }
-    remotes::install_github("rfsaldanha/microdatasus")
-
-
-    dat <- microdatasus::process_sia(dat, paste0("SIA-", suffix)) %>%
-      janitor::clean_names() %>%
-      dplyr::mutate(across(where(is.character), tolower))  # Converte todas colunas de texto para minúscula
+    dat <- dat
 
     }
 
