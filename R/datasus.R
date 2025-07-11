@@ -532,12 +532,15 @@ load_datasus <- function(dataset,
 
     # 2. Função auxiliar para checar se algum valor começa com zero
     tem_zero_a_esquerda <- function(x) {
+      # Força o encoding como latin1 → UTF-8 para evitar warnings
+      x <- enc2utf8(iconv(x, from = "latin1", to = "UTF-8"))
       any(grepl("^0", x))
     }
 
     # 3. Função para checar se a coluna tem *apenas* números (possui dígitos apenas, ignorando espaços)
     coluna_numerica_valida <- function(x) {
-      all(grepl("^\\d+$", x))  # Só números inteiros
+      x <- enc2utf8(iconv(x, from = "latin1", to = "UTF-8"))
+      all(grepl("^\\d+$", x))
     }
 
     # 3. Converte colunas character em numeric só se não tiver zero à esquerda
@@ -567,8 +570,14 @@ load_datasus <- function(dataset,
     geo <- geo %>%
       dplyr::mutate(code_muni_6 = as.integer(code_muni / 10))
 
+    suffix <- if (param$dataset == "datasus_siasus_pa") {
+      "pa_ufmun"
+    } else {
+      "ap_ufmun"
+    }
+
     dat <- dat %>%
-            dplyr::left_join(geo, by = c("pa_ufmun" = "code_muni_6"))
+      dplyr::left_join(geo, by = setNames("code_muni_6", suffix))
 
     }
 
