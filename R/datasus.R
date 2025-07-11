@@ -524,7 +524,25 @@ load_datasus <- function(dataset,
 
   if(stringr::str_detect(param$dataset,"datasus_siasus")){
 
-    dat <- dat
+    tem_zero_a_esquerda <- function(x) {
+      any(grepl("^0", x))
+    }
+
+    dat <- dat %>%
+      dplyr::mutate(
+        dplyr::across(
+          everything(),
+          ~ {
+            if (is.character(.x) && !tem_zero_a_esquerda(.x)) {
+              # Se não tem zero à esquerda, converte para numérico
+              as.numeric(.x)
+            } else {
+              # Mantém como character (preserva zero à esquerda)
+              .x
+            }
+          }
+        )
+      )
 
     }
 
