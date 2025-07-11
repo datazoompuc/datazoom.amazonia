@@ -617,10 +617,8 @@ load_datasus <- function(dataset,
 
   if (stringr::str_detect(param$dataset, "datasus_siasus")) {
     dat_mod <- dat %>%
-      dplyr::select(-matches("^as\\.factor\\(")) %>%
+
       dplyr::select(where(~ !(all(is.na(.)) || all(. == 0, na.rm = TRUE)))) %>% # Remove colunas vazias ou constantes (etapa original)
-      dplyr::select(where(~ length(unique(.)) > 1)) %>% # Converte character para factor (se necessário)
-      dplyr::mutate_if(is.character, as.factor) %>%
       tibble::as_tibble()
   }
 
