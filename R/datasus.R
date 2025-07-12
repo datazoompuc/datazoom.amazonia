@@ -2,7 +2,7 @@
 #'
 #' @description Loads DATASUS data on health establishments, mortality, access to health services and several health indicators.
 #'
-#' @param dataset A dataset name, can be one of ("datasus_sim_do", "datasus_sih", "datasus_cnes_lt", "datasus_sinasc), or more. For more details, try \code{vignette("DATASUS")}.
+#' @param dataset A dataset name, can be one of ("datasus_sim_do", "datasus_sih", "datasus_cnes_lt", "datasus_sinasc","datasus_siasus"), or more. For more details, try \code{vignette("DATASUS")}.
 #' @inheritParams load_baci
 #' @param states A \code{string} specifying for which states to download the data. It is "all" by default, but can be a single state such as "AC" or any vector such as c("AC", "AM").
 #' @param keep_all A \code{boolean} choosing whether to aggregate the data by municipality, in turn losing individual-level variables (\code{FALSE}) or to keep all the original variables. Only applies when raw_data is \code{TRUE}.
