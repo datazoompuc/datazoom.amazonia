@@ -742,17 +742,57 @@ each avaliable dataset.
 1.  **dataset**:
 
     - `"datasus_sim_do"` has SIM-DO mortality data
+
     - Possible subsets of SIM-DO are `"datasus_sim_dofet"` (Fetal),
       `"datasus_sim_doext"` (External causes), `"datasus_sim_doinf"`
       (Children), `"datasus_sim_domat"` (Maternal)
+
+    - SIH hospitalization data is split across four datasets:
+
     - `"datasus_sih_rd"` – Reduced AIHs (summary of hospitalizations)
+
     - `"datasus_sih_sp"` – Professional Services performed during
       hospitalization
+
     - `"datasus_sih_rj"` – Rejected AIHs (general reason)
+
     - `"datasus_sih_er"` – Rejected AIHs with specific error codes
-    - SIH hospitalization data is split across four datasets:
+
+    - SIASUS Ambulatory Care Datasets:
+
+    - `"datasus_siasus_pa"` - Procedimentos Ambulatoriais (consolidated
+      outpatient procedures)
+
+    - `"datasus_siasus_abo"` - Acompanhamento pós-cirurgia bariátrica
+      (Post-bariatric surgery follow-up)
+
+    - `"datasus_siasus_ab"` - Cirurgia Bariátrica (bariatric surgery
+      follow-up)
+
+    - `"datasus_siasus_acf"` - Fístula Arteriovenosa (vascular access
+      for dialysis)
+
+    - `"datasus_siasus_ad"` - Laudos Diversos (miscellaneous specialized
+      procedures)
+
+    - `"datasus_siasus_am"` - Medicamentos (high-cost medications)
+
+    - `"datasus_siasus_an"` - Nefrologia (nephrology/dialysis)
+
+    - `"datasus_siasus_aq"` - Quimioterapia (chemotherapy)
+
+    - `"datasus_siasus_ar"` - Radioterapia (radiotherapy)
+
+    - `"datasus_siasus_atd"` - Tratamento Dialítico (dialysis treatment)
+
+    - `"datasus_siasus_ps"` - RAAS Psicossocial (psychosocial care)
+
+    - `"datasus_siasus_sad"` - RAAS Atenção Domiciliar (home care)
+
     - `"datasus_cnes_lt"` has data on the number of hospital beds.
+
     - `"datasus_sinasc"` has information about Live Births
+
     - further subsets of CNES are listed later, but those only allow for
       the download of raw data.
 
@@ -939,6 +979,187 @@ data_sp_processed <- load_datasus(
   time_period = 2010,
   states = "DF",
   raw_data = FALSE
+)
+```
+
+##### DATASUS – SIASUS (Ambulatory Information System)
+
+The SIASUS (Sistema de Informações Ambulatoriais do SUS) is Brazil’s
+official system for recording outpatient services funded by the public
+health system (SUS). Each row in the datasets corresponds to a procedure
+performed at an outpatient level, including clinical, administrative,
+and financial details. The data is organized by type of service or
+procedure group.
+
+All SIASUS datasets are available by state and time period. By setting
+the parameter `raw_data = TRUE`, users can download the original
+segmented DATASUS files. If `raw_data = FALSE` is used, the data is
+returned as a single, cleaned tibble with renamed variables and
+bilingual (Portuguese/English) variable descriptions, facilitating
+easier analysis and interpretation
+
+`"datasus_siasus_pa"` – Consolidated Outpatient Procedures
+(Procedimentos Ambulatoriais) Contains records of approved outpatient
+procedures across all specialties. This is the most comprehensive SIASUS
+dataset and is often used for general outpatient service analysis.
+
+`"datasus_siasus_ab"` – Bariatric Surgery (Cirurgia Bariátrica) Records
+related to bariatric surgery procedures performed in outpatient
+settings.
+
+`"datasus_siasus_abo"` – Post-Bariatric Surgery Follow-Up
+(Acompanhamento Bariátrico) Includes follow-up care for patients who
+have undergone bariatric surgery, focusing on long-term monitoring and
+outcomes.
+
+`"datasus_siasus_acf"` – Vascular Access for Dialysis (Fístula
+Arteriovenosa) Documents procedures involving the creation or
+maintenance of arteriovenous fistulas, essential for hemodialysis
+treatment.
+
+`"datasus_siasus_ad"` – Miscellaneous Specialized Procedures (Laudos
+Diversos) Covers less frequent or highly specialized outpatient
+procedures not classified in other datasets.
+
+`"datasus_siasus_am"` – High-Cost Medications (Medicamentos) Tracks the
+distribution and usage of outpatient medications that are high-cost and
+part of specific therapeutic programs.
+
+`"datasus_siasus_an"` – Nephrology / Dialysis (Nefrologia) Contains
+outpatient nephrology procedures, particularly related to the care and
+monitoring of patients with chronic kidney disease.
+
+`"datasus_siasus_aq"` – Chemotherapy (Quimioterapia) Records of
+chemotherapy treatments administered in outpatient settings.
+
+`"datasus_siasus_ar"` – Radiotherapy (Radioterapia) Covers radiotherapy
+procedures provided to patients in ambulatory care.
+
+`"datasus_siasus_atd"` – Dialysis Treatment (Tratamento Dialítico)
+Includes outpatient dialysis treatment sessions for patients with kidney
+failure.
+
+`"datasus_siasus_ps"` – RAAS Psychosocial Care (RAAS Psicossocial) Part
+of the Specialized Outpatient Mental Health Services. Records care
+provided through Psychosocial Care Centers (CAPS), including treatments
+for severe mental disorders and substance use.
+
+`"datasus_siasus_sad"` – RAAS Home Care (RAAS Atenção Domiciliar)
+Focuses on outpatient care provided at patients’ homes, often involving
+chronic condition management, palliative care, and multi-professional
+follow-ups.
+
+**Examples:**
+
+``` r
+library(datazoom.amazonia)
+
+# ABO – Post-Bariatric Surgery Follow-Up
+teste_abo <- load_datasus(
+  dataset = "datasus_siasus_abo",
+  time_period = 2012,
+  raw_data = FALSE,
+  language = "eng",
+  states = "AC"
+)
+
+# AB – Bariatric Surgery
+teste_ab <- load_datasus(
+  dataset = "datasus_siasus_ab",
+  time_period = 2014,
+  raw_data = FALSE,
+  language = "eng",
+  states = "AC"
+)
+
+# ACF – Vascular Access for Dialysis
+teste_acf <- load_datasus(
+  dataset = "datasus_siasus_acf",
+  time_period = 2018,
+  raw_data = FALSE,
+  language = "eng",
+  states = "PE"
+)
+
+# AD – Miscellaneous Specialized Procedures
+teste_ad <- load_datasus(
+  dataset = "datasus_siasus_ad",
+  time_period = 2022,
+  raw_data = FALSE,
+  language = "eng",
+  states = "AC"
+)
+
+# AM – High-Cost Medications
+teste_am <- load_datasus(
+  dataset = "datasus_siasus_am",
+  time_period = 2022,
+  raw_data = FALSE,
+  language = "eng",
+  states = "AC"
+)
+
+# AN – Nephrology / Dialysis
+teste_an <- load_datasus(
+  dataset = "datasus_siasus_an",
+  time_period = 2014,  # final year available
+  raw_data = FALSE,
+  language = "eng",
+  states = "AC"
+)
+
+# AQ – Chemotherapy
+teste_aq <- load_datasus(
+  dataset = "datasus_siasus_aq",
+  time_period = 2022,
+  raw_data = FALSE,
+  language = "eng",
+  states = "AC"
+)
+
+# AR – Radiotherapy
+teste_ar <- load_datasus(
+  dataset = "datasus_siasus_ar",
+  time_period = 2022,
+  raw_data = FALSE,
+  language = "eng",
+  states = "AC"
+)
+
+# ATD – Dialysis Treatment
+teste_atd <- load_datasus(
+  dataset = "datasus_siasus_atd",
+  time_period = 2024,
+  raw_data = FALSE,
+  language = "eng",
+  states = "AC"
+)
+
+# PA – Consolidated Outpatient Procedures
+teste_pa <- load_datasus(
+  dataset = "datasus_siasus_pa",
+  time_period = 2022,
+  raw_data = FALSE,
+  language = "eng",
+  states = "AC"
+)
+
+# PS – RAAS Psychosocial Care
+teste_ps <- load_datasus(
+  dataset = "datasus_siasus_ps",
+  time_period = 2022,
+  raw_data = FALSE,
+  language = "eng",
+  states = "AC"
+)
+
+# SAD – RAAS Home Care
+teste_sad <- load_datasus(
+  dataset = "datasus_siasus_sad",
+  time_period = 2015,
+  raw_data = FALSE,
+  language = "eng",
+  states = "AC"
 )
 ```
 
