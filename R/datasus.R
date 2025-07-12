@@ -141,10 +141,38 @@ load_datasus <- function(dataset,
       stringr::str_extract("\\d+")
     # In this case, the position varies
   }
-  if (stringr::str_detect(param$dataset, "datasus_cnes|datasus_sih|datasus_siasus")) {
+  if (stringr::str_detect(param$dataset, "datasus_cnes|datasus_sih")) {
     file_years_yy <- filenames %>%
       substr(5, 6)
   }
+
+  if (stringr::str_detect(param$dataset, "datasus_siasus")) {
+
+    siasus_two_digits <- c(
+      "datasus_siasus_ab",
+      "datasus_siasus_ad",
+      "datasus_siasus_am",
+      "datasus_siasus_an",
+      "datasus_siasus_aq",
+      "datasus_siasus_ar",
+      "datasus_siasus_pa",
+      "datasus_siasus_ps"
+    )
+
+    siasus_two_digits_alt <- c(
+      "datasus_siasus_abo",
+      "datasus_siasus_acf",
+      "datasus_siasus_atd",
+      "datasus_siasus_sad"
+    )
+
+    if (param$dataset %in% siasus_two_digits) {
+      file_years_yy <- substr(filenames, 5, 6)
+    } else if (param$dataset %in% siasus_two_digits_alt) {
+      file_years_yy <- substr(filenames, 6, 7)
+    }
+  }
+
 
   # Only files whose name's year matches a chosen one are kept
   if (!is.null(file_years)) {
