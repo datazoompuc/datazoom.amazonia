@@ -564,7 +564,7 @@ load_datasus <- function(dataset,
 
     dat <- dat %>%
       dplyr::mutate(
-        dplyr::across(where(is.factor), as.character)
+        dplyr::across(tidyselect::where(is.factor), as.character)
       )
 
     tem_zero_a_esquerda <- function(x) {
@@ -581,7 +581,7 @@ load_datasus <- function(dataset,
     dat <- dat %>%
       dplyr::mutate(
         dplyr::across(
-          where(is.character),
+          tidyselect::where(is.character),
           ~ {
             if (!tem_zero_a_esquerda(.x) && coluna_numerica_valida(.x)) {
               suppressWarnings(as.numeric(.x))
@@ -613,7 +613,7 @@ load_datasus <- function(dataset,
     }
 
     dat <- dat %>%
-      dplyr::left_join(geo, by = setNames("code_muni_6", suffix))
+      dplyr::left_join(geo, by = stats::setNames("code_muni_6", suffix))
     }
 
 
