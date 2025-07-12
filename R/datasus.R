@@ -611,7 +611,7 @@ load_datasus <- function(dataset,
 
     suffix <- if (param$dataset == "datasus_siasus_pa") {
       "pa_ufmun"
-    } else if(param$dataset == "datasus_siasus_ps"){
+    } else if(param$dataset %in% c("datasus_siasus_ps","datasus_siasus_sad")) {
       "ufmun"
     } else {
       "ap_ufmun"
