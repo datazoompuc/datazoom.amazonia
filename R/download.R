@@ -814,6 +814,11 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
     "datasus", "datasus_siasus_ar", NA, "2008-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
     "datasus", "datasus_siasus_pa", NA, "1994-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
     "datasus", "datasus_siasus_ps", NA, "2013-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
+    "datasus", "datasus_siasus_abo", NA, "2008-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
+    "datasus", "datasus_siasus_acf", NA, "1994-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
+    "datasus", "datasus_siasus_atd", NA, "2014-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
+    "datasus", "datasus_siasus_sad", NA, "2012-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
+
 
 
     ## IEMA

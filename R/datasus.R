@@ -193,6 +193,16 @@ load_datasus <- function(dataset,
     base::message("Filtering by state not supported for all datasets. Data for other states will be included.")
   }
 
+  if (stringr::str_detect(param$dataset, "datasus_cnes|datasus_sih|datasus_siasus")) {
+    if (param$dataset %in% siasus_two_digits) {
+      file_state <- filenames %>%
+        substr(3, 4)
+    } else if (param$dataset %in% siasus_two_digits_alt) {
+      file_state <- filenames %>%
+        substr(4, 5)
+    }
+  }
+
   if (!is.null(file_state) & paste0(param$states, collapse = "") != "all") {
     filenames <- filenames[file_state %in% param$states]
   }
