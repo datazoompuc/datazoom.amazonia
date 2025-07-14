@@ -816,12 +816,10 @@ load_dictionary <- function(dataset) {
     )
   }
 
-  if (stringr::str_detect(dataset, "datasus_sih")) {
+
+  if (stringr::str_detect(dataset, "datasus_sih_rd")) {
     harmonization_dat <- tibble::tribble(
       ~var_code, ~name_pt, ~name_eng, ~label_pt, ~label_eng,
-
-      # DATASUS SIH RD
-
       "code_muni", "code_muni", "code_muni", "Codigo IBGE do municipio", "IBGE Municipality code",
       "name_muni", "name_muni", "name_muni", "Nome do municipio", "City name",
       "code_state", "code_state", "code_state", "Codigo do estado", "State code",
@@ -955,6 +953,16 @@ load_dictionary <- function(dataset) {
       "dt_diag",      "data_diagnostico",   "date_diagnosis",      "Data detalhada do diagnostico",                                    "Full diagnosis date",
       "dt_trat",      "data_tratamento",    "date_treatment",      "Data detalhada do tratamento",                                     "Full treatment date",
       "dt_nasc",      "data_nascimento",    "date_birth",          "Data de nascimento do paciente",                                   "Date of birth"
+
+  if (stringr::str_detect(dataset, "datasus_sih_er")) {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~name_pt, ~name_eng, ~label_pt, ~label_eng,
+
+      "code_muni", "code_muni", "code_muni", "Codigo IBGE do municipio", "IBGE Municipality code",
+      "name_muni", "name_muni", "name_muni", "Nome do municipio", "City name",
+      "code_state", "code_state", "code_state", "Codigo do estado", "State code",
+      "abbrev_state", "abbrev_state", "abbrev_state", "Sigla do estado", "State abbreviation",
+      "legal_amazon", "legal_amazon", "legal_amazon", "Amazonia Legal", "Legal Amazon"
 
     )
   }
@@ -1255,6 +1263,55 @@ load_dictionary <- function(dataset) {
     }
   }
 
+
+  if (stringr::str_detect(dataset, "datasus_sih_sp")) {
+    harmonization_dat <- tibble::tribble(
+      ~var_code,       ~name_pt,                    ~name_eng,                 ~label_pt,                           ~label_eng,
+
+      "code_muni",    "code_muni",                 "code_muni",              "Codigo IBGE do municipio",         "IBGE Municipality code",
+      "name_muni",    "name_muni",                 "name_muni",              "Nome do municipio",                "City name",
+      "code_state",   "code_state",                "code_state",             "Codigo do estado",                 "State code",
+      "abbrev_state", "abbrev_state",              "abbrev_state",           "Sigla do estado",                  "State abbreviation",
+      "legal_amazon", "legal_amazon",              "legal_amazon",           "Amazonia Legal",                   "Legal Amazon",
+      "sp_gestor",    "municipio_gestor",          "managing_municipality",  "Municipio gestor",                 "Managing municipality",
+      "sp_uf",        "uf",                        "federal_unit",           "Unidade da Federacao",             "Federative unit",
+      "sp_aa",        "ano_internacao",            "year_admission",         "Ano da internacao",                "Admission year",
+      "sp_mm",        "mes_internacao",            "month_admission",        "Mes da internacao",                "Admission month",
+      "sp_cnes",      "cnes_estabelecimento",      "facility_cnes",          "CNES do estabelecimento",          "Facility CNES",
+      "sp_naih",      "numero_aih",                "aih_number",             "Numero da AIH",                    "AIH number",
+      "sp_procrea",   "procedimento_realizado",    "procedure_performed",    "Procedimento realizado",           "Procedure performed",
+      "sp_dtinter",   "data_internacao",           "admission_date",         "Data da internacao",               "Admission date",
+      "sp_dtsaida",   "data_saida",                "discharge_date",         "Data de saida",                    "Discharge date",
+      "sp_num_pr",    "zerado_1",                  "zeroed_1",               "Campo zerado",                     "Zeroed field",
+      "sp_tipo",      "zerado_2",                  "zeroed_2",               "Campo zerado",                     "Zeroed field",
+      "sp_cpfcgc",    "cpf_cnpj_prestador",        "provider_id",            "CPF/CNPJ do prestador",            "Provider CPF/CNPJ",
+      "sp_atoprof",   "procedimento_profissional", "professional_procedure", "Procedimento do ato profissional", "Professional procedure",
+      "sp_tp_ato",    "zerado_3",                  "zeroed_3",               "Campo zerado",                     "Zeroed field",
+      "sp_qtd_ato",   "quantidade_ato",            "procedure_quantity",     "Quantidade de atos profissionais", "Quantity of professional procedures",
+      "sp_ptsp",      "pontos_ato",                "procedure_points",       "Quantidade de pontos",             "Procedure points",
+      "sp_nf",        "nota_fiscal",               "invoice_or_date",        "Nota fiscal ou data do ato",       "Invoice or act date",
+      "sp_valato",    "valor_ato",                 "procedure_value",        "Valor do ato profissional",        "Professional procedure value",
+      "sp_m_hosp",    "municipio_estabelecimento", "facility_municipality",  "Municipio do estabelecimento",     "Facility municipality",
+      "sp_m_pac",     "municipio_paciente",        "patient_municipality",   "MunicIpio do paciente",            "Patient municipality",
+      "sp_des_hos",   "uf_diferente_estab",        "out_of_state_facility",  "UF diferente do estabelecimento",  "Different state from facility",
+      "sp_des_pac",   "uf_diferente_paciente",     "out_of_state_patient",   "UF diferente do paciente",         "Different state from patient",
+      "sp_complex",   "complexidade",              "complexity",             "Complexidade do ato",              "Procedure complexity",
+      "sp_financ",    "tipo_financiamento",        "financing_type",         "Tipo de financiamento",            "Financing type",
+      "sp_co_faec",   "subtipo_faec",              "faec_subtype",           "Subtipo de financiamento FAEC",    "FAEC financing subtype",
+      "sp_pf_cbo",    "cbo_profissional",          "professional_cbo",       "CBO do profissional",              "Professional CBO",
+      "sp_pf_doc",    "doc_profissional",          "professional_doc",       "Documento do profissional",        "Professional document",
+      "sp_pj_doc",    "doc_pj",                    "pj_doc",                 "Documento da pessoa juridica",     "Legal entity document",
+      "in_tp_val",    "tipo_valor",                "value_type",             "Tipo de valor",                    "Value type",
+      "sequencia",    "codigo_sequencial",         "sequential_code",        "Codigo sequencial",                "Sequential code",
+      "remessa",      "nome_remessa",              "batch_name",             "Nome da remessa",                  "Remittance name",
+      "serv_cla",     "servico_classificacao",     "service_classification", "ServiCo ou Classificacao",         "Service or Classification",
+      "sp_cidpri",    "cid_principal",             "main_cid",               "CID principal",                    "Main ICD",
+      "sp_cidsec",    "cid_secundario",            "secondary_cid",          "CID secundario",                   "Secondary ICD",
+      "sp_qt_proc",   "quantidade_procedimentos",  "procedures_quantity",    "Quantidade de procedimentos",      "Number of procedures",
+      "sp_u_aih",     "indicador_unico",           "unique_aih",             "Indicador unico da AIH",           "Unique AIH indicator"
+
+      )
+  }
 
   if (dataset == "baci_countries") {
     harmonization_dat <- tibble::tribble(

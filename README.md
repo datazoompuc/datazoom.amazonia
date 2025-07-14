@@ -1,5 +1,5 @@
 
-<a href="https://github.com/datazoompuc/datazoom.amazonia"><img src="https://raw.githubusercontent.com/datazoompuc/datazoom.amazonia/master/logo.png?token=AU72KNQCGY4ZR6XLARTNSXLBXCPNG" align="left" width="100" hspace="10" vspace="6"></a>
+<a href="https://github.com/datazoompuc/datazoom.amazonia"><img src="https://raw.githubusercontent.com/datazoompuc/datazoom.amazonia/master/logo.png" align="left" width="100" hspace="10" vspace="6"></a>
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -80,12 +80,12 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 <tr>
 <td>
 
-|  |  |
-|----|----|
-| **[IPS](#ips)** | *Amazon Social Progress Index* |
-| **[DATASUS](#datasus)** | *Causes of mortality and availability of hospital beds* |
-| **[IEMA](#iema)** | *Access to electricity in the Amazon region* |
-| **[Population](#population)** | *Population* |
+|                               |                                                         |
+|-------------------------------|---------------------------------------------------------|
+| **[IPS](#ips)**               | *Amazon Social Progress Index*                          |
+| **[DATASUS](#datasus)**       | *Causes of mortality and availability of hospital beds* |
+| **[IEMA](#iema)**             | *Access to electricity in the Amazon region*            |
+| **[Population](#population)** | *Population*                                            |
 
 </td>
 </tr>
@@ -126,10 +126,10 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 <tr>
 <td>
 
-|  |  |
-|----|----|
+|                                                                 |                                                                             |
+|-----------------------------------------------------------------|-----------------------------------------------------------------------------|
 | **[Legal Amazon Municipalities](#legal-amazon-municipalities)** | *Dataset with brazilian cities and whether they belong to the Legal Amazon* |
-| **[The ‘googledrive’ package](#googledrive)** | *Troubleshooting and information for downloads from Google Drive* |
+| **[The ‘googledrive’ package](#googledrive)**                   | *Troubleshooting and information for downloads from Google Drive*           |
 
 </table>
 
@@ -140,29 +140,41 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 The PRODES project uses satellites to monitor deforestation in Brazil’s
 Legal Amazon. The raw data reports total and incremental (year-by-year)
 low-cut deforested area at the municipality level, going back to the
-year 2000.
-
-Data is collected based on the PRODES-year, which starts at August 1st
-and ends on July 31st. Accordingly, 2018 deforestation data covers the
-period from 01/08/2017 to 31/07/2018.
+year 2007.
 
 INPE’s most recent data is now published at
-[TerraBrasilis](http://terrabrasilis.dpi.inpe.br/downloads/). We have
-refrained from updating to this new source, as it only contains detailed
-spatial data, rather than agregated, municipality-level data.
+[TerraBrasilis](http://terrabrasilis.dpi.inpe.br/downloads/). We read
+their full [raster
+data](https://terrabrasilis.dpi.inpe.br/geonetwork/srv/eng/catalog.search#/metadata/507294db-a789-42dd-9158-9dea77d9293f)
+for the Legal Amazon region and extract values onto the map of Brazilian
+municipalities.
 
 ------------------------------------------------------------------------
 
 **Options:**
 
-1.  **dataset**: `"deforestation"`
+1.  **dataset**: `"deforestation"`, `"residual_deforestation"`,
+    `"native_vegetation"`, `"hydrography"`, `"non_forest"`, or
+    `"clouds"`
 
 2.  **raw_data**: there are two options:
 
-    - `TRUE`: if you want the data as it is originally.
-    - `FALSE`: if you want the treated version of the data.
+    - `TRUE`: if you want the data as it is originally, read as a
+      SpatRaster.
+    - `FALSE`: if you want the treated version of the data, measuring
+      affected areas per municipality.
 
-3.  **language**: you can choose between Portuguese `("pt")` and English
+3.  **time_period**: picks the years for which the data will be
+    downloaded, under the following constraints:
+
+    - For dataset `"deforestation"`, it can be between 2007 and 2023.
+      Deforestation for 2007 includes all cumulative deforestation up
+      to 2007. For other years, deforestation is incremental;
+    - For dataset `"residual_deforestation"`, it can be between 2010 and
+      2023;
+    - For all other datasets, only the year 2023 is available.
+
+4.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`
 
 ------------------------------------------------------------------------
@@ -173,7 +185,9 @@ spatial data, rather than agregated, municipality-level data.
 # Download treated data (raw_data = FALSE)
 # in portuguese (language = 'pt').
 data <- load_prodes(
+  dataset = "deforestation",
   raw_data = FALSE,
+  time_period = 2020:2023,
   language = "pt"
 )
 ```
@@ -456,22 +470,22 @@ web server, as recommended for rectangular subsets of the global data.
 Click to see all dataset options
 </summary>
 
-| Dataset | Code | Description | Units |
-|:---|:--:|:---|:--:|
-| max_temperature | tmax | Maximum 2-m Temperature | degC |
-| min_temperature | tmin | Minimum 2-m Temperature | degC |
-| wind_speed | ws | Wind Speed at 10-m | m/s |
-| vapor_pressure_deficit | vpd | Vapor Pressure Deficit | kPa |
-| vapor_pressure | vap | 2-m Vapor Pressure | kPa |
-| snow_water_equivalent | swe | Snow Water Equivalent at End of Month | mm |
-| shortwave_radiation_flux | srad | Downward Shortwave Radiation Flux at the Surface | W/m^2 |
-| soil_moisture | soil | Soil Moisture at End of Month | mm |
-| runoff | q | Runoff | mm |
-| precipitation | ppt | Accumulated Precipitation | mm |
-| potential_evaporation | pet | Reference Evapotranspiration | mm |
-| climatic_water_deficit | def | Climatic Water Deficit | mm |
-| water_evaporation | aet | Actual Evapotranspiration | mm |
-| palmer_drought_severity_index | PDSI | Palmer Drought Severity Index | unitless |
+| Dataset                       | Code | Description                                      |  Units   |
+|:------------------------------|:----:|:-------------------------------------------------|:--------:|
+| max_temperature               | tmax | Maximum 2-m Temperature                          |   degC   |
+| min_temperature               | tmin | Minimum 2-m Temperature                          |   degC   |
+| wind_speed                    |  ws  | Wind Speed at 10-m                               |   m/s    |
+| vapor_pressure_deficit        | vpd  | Vapor Pressure Deficit                           |   kPa    |
+| vapor_pressure                | vap  | 2-m Vapor Pressure                               |   kPa    |
+| snow_water_equivalent         | swe  | Snow Water Equivalent at End of Month            |    mm    |
+| shortwave_radiation_flux      | srad | Downward Shortwave Radiation Flux at the Surface |  W/m^2   |
+| soil_moisture                 | soil | Soil Moisture at End of Month                    |    mm    |
+| runoff                        |  q   | Runoff                                           |    mm    |
+| precipitation                 | ppt  | Accumulated Precipitation                        |    mm    |
+| potential_evaporation         | pet  | Reference Evapotranspiration                     |    mm    |
+| climatic_water_deficit        | def  | Climatic Water Deficit                           |    mm    |
+| water_evaporation             | aet  | Actual Evapotranspiration                        |    mm    |
+| palmer_drought_severity_index | PDSI | Palmer Drought Severity Index                    | unitless |
 
 </details>
 
@@ -742,57 +756,20 @@ each avaliable dataset.
 1.  **dataset**:
 
     - `"datasus_sim_do"` has SIM-DO mortality data
-
-    - Possible subsets of SIM-DO are `"datasus_sim_dofet"` (Fetal),
-      `"datasus_sim_doext"` (External causes), `"datasus_sim_doinf"`
-      (Children), `"datasus_sim_domat"` (Maternal)
-
+    - Possible subsets of SIM-DO are:
+      - `"datasus_sim_dofet"` – Fetal  
+      - `"datasus_sim_doext"` – External causes  
+      - `"datasus_sim_doinf"` – Children  
+      - `"datasus_sim_domat"` – Maternal
     - SIH hospitalization data is split across four datasets:
-
-    - `"datasus_sih_rd"` – Reduced AIHs (summary of hospitalizations)
-
-    - `"datasus_sih_sp"` – Professional Services performed during
-      hospitalization
-
-    - `"datasus_sih_rj"` – Rejected AIHs (general reason)
-
-    - `"datasus_sih_er"` – Rejected AIHs with specific error codes
-
-    - SIASUS Ambulatory Care Datasets:
-
-    - `"datasus_siasus_pa"` - Procedimentos Ambulatoriais (consolidated
-      outpatient procedures)
-
-    - `"datasus_siasus_abo"` - Acompanhamento pós-cirurgia bariátrica
-      (Post-bariatric surgery follow-up)
-
-    - `"datasus_siasus_ab"` - Cirurgia Bariátrica (bariatric surgery
-      follow-up)
-
-    - `"datasus_siasus_acf"` - Fístula Arteriovenosa (vascular access
-      for dialysis)
-
-    - `"datasus_siasus_ad"` - Laudos Diversos (miscellaneous specialized
-      procedures)
-
-    - `"datasus_siasus_am"` - Medicamentos (high-cost medications)
-
-    - `"datasus_siasus_an"` - Nefrologia (nephrology/dialysis)
-
-    - `"datasus_siasus_aq"` - Quimioterapia (chemotherapy)
-
-    - `"datasus_siasus_ar"` - Radioterapia (radiotherapy)
-
-    - `"datasus_siasus_atd"` - Tratamento Dialítico (dialysis treatment)
-
-    - `"datasus_siasus_ps"` - RAAS Psicossocial (psychosocial care)
-
-    - `"datasus_siasus_sad"` - RAAS Atenção Domiciliar (home care)
-
+      - `"datasus_sih_rd"` – Reduced AIHs (summary of
+        hospitalizations)  
+      - `"datasus_sih_sp"` – Professional Services performed during
+        hospitalization  
+      - `"datasus_sih_rj"` – Rejected AIHs (general reason)  
+      - `"datasus_sih_er"` – Rejected AIHs with specific error codes
     - `"datasus_cnes_lt"` has data on the number of hospital beds.
-
     - `"datasus_sinasc"` has information about Live Births
-
     - further subsets of CNES are listed later, but those only allow for
       the download of raw data.
 
@@ -979,187 +956,6 @@ data_sp_processed <- load_datasus(
   time_period = 2010,
   states = "DF",
   raw_data = FALSE
-)
-```
-
-##### DATASUS – SIASUS (Ambulatory Information System)
-
-The SIASUS (Sistema de Informações Ambulatoriais do SUS) is Brazil’s
-official system for recording outpatient services funded by the public
-health system (SUS). Each row in the datasets corresponds to a procedure
-performed at an outpatient level, including clinical, administrative,
-and financial details. The data is organized by type of service or
-procedure group.
-
-All SIASUS datasets are available by state and time period. By setting
-the parameter `raw_data = TRUE`, users can download the original
-segmented DATASUS files. If `raw_data = FALSE` is used, the data is
-returned as a single, cleaned tibble with renamed variables and
-bilingual (Portuguese/English) variable descriptions, facilitating
-easier analysis and interpretation
-
-`"datasus_siasus_pa"` – Consolidated Outpatient Procedures
-(Procedimentos Ambulatoriais) Contains records of approved outpatient
-procedures across all specialties. This is the most comprehensive SIASUS
-dataset and is often used for general outpatient service analysis.
-
-`"datasus_siasus_ab"` – Bariatric Surgery (Cirurgia Bariátrica) Records
-related to bariatric surgery procedures performed in outpatient
-settings.
-
-`"datasus_siasus_abo"` – Post-Bariatric Surgery Follow-Up
-(Acompanhamento Bariátrico) Includes follow-up care for patients who
-have undergone bariatric surgery, focusing on long-term monitoring and
-outcomes.
-
-`"datasus_siasus_acf"` – Vascular Access for Dialysis (Fístula
-Arteriovenosa) Documents procedures involving the creation or
-maintenance of arteriovenous fistulas, essential for hemodialysis
-treatment.
-
-`"datasus_siasus_ad"` – Miscellaneous Specialized Procedures (Laudos
-Diversos) Covers less frequent or highly specialized outpatient
-procedures not classified in other datasets.
-
-`"datasus_siasus_am"` – High-Cost Medications (Medicamentos) Tracks the
-distribution and usage of outpatient medications that are high-cost and
-part of specific therapeutic programs.
-
-`"datasus_siasus_an"` – Nephrology / Dialysis (Nefrologia) Contains
-outpatient nephrology procedures, particularly related to the care and
-monitoring of patients with chronic kidney disease.
-
-`"datasus_siasus_aq"` – Chemotherapy (Quimioterapia) Records of
-chemotherapy treatments administered in outpatient settings.
-
-`"datasus_siasus_ar"` – Radiotherapy (Radioterapia) Covers radiotherapy
-procedures provided to patients in ambulatory care.
-
-`"datasus_siasus_atd"` – Dialysis Treatment (Tratamento Dialítico)
-Includes outpatient dialysis treatment sessions for patients with kidney
-failure.
-
-`"datasus_siasus_ps"` – RAAS Psychosocial Care (RAAS Psicossocial) Part
-of the Specialized Outpatient Mental Health Services. Records care
-provided through Psychosocial Care Centers (CAPS), including treatments
-for severe mental disorders and substance use.
-
-`"datasus_siasus_sad"` – RAAS Home Care (RAAS Atenção Domiciliar)
-Focuses on outpatient care provided at patients’ homes, often involving
-chronic condition management, palliative care, and multi-professional
-follow-ups.
-
-**Examples:**
-
-``` r
-library(datazoom.amazonia)
-
-# ABO – Post-Bariatric Surgery Follow-Up
-teste_abo <- load_datasus(
-  dataset = "datasus_siasus_abo",
-  time_period = 2012,
-  raw_data = FALSE,
-  language = "eng",
-  states = "AC"
-)
-
-# AB – Bariatric Surgery
-teste_ab <- load_datasus(
-  dataset = "datasus_siasus_ab",
-  time_period = 2014,
-  raw_data = FALSE,
-  language = "eng",
-  states = "AC"
-)
-
-# ACF – Vascular Access for Dialysis
-teste_acf <- load_datasus(
-  dataset = "datasus_siasus_acf",
-  time_period = 2018,
-  raw_data = FALSE,
-  language = "eng",
-  states = "PE"
-)
-
-# AD – Miscellaneous Specialized Procedures
-teste_ad <- load_datasus(
-  dataset = "datasus_siasus_ad",
-  time_period = 2022,
-  raw_data = FALSE,
-  language = "eng",
-  states = "AC"
-)
-
-# AM – High-Cost Medications
-teste_am <- load_datasus(
-  dataset = "datasus_siasus_am",
-  time_period = 2022,
-  raw_data = FALSE,
-  language = "eng",
-  states = "AC"
-)
-
-# AN – Nephrology / Dialysis
-teste_an <- load_datasus(
-  dataset = "datasus_siasus_an",
-  time_period = 2014,  # final year available
-  raw_data = FALSE,
-  language = "eng",
-  states = "AC"
-)
-
-# AQ – Chemotherapy
-teste_aq <- load_datasus(
-  dataset = "datasus_siasus_aq",
-  time_period = 2022,
-  raw_data = FALSE,
-  language = "eng",
-  states = "AC"
-)
-
-# AR – Radiotherapy
-teste_ar <- load_datasus(
-  dataset = "datasus_siasus_ar",
-  time_period = 2022,
-  raw_data = FALSE,
-  language = "eng",
-  states = "AC"
-)
-
-# ATD – Dialysis Treatment
-teste_atd <- load_datasus(
-  dataset = "datasus_siasus_atd",
-  time_period = 2024,
-  raw_data = FALSE,
-  language = "eng",
-  states = "AC"
-)
-
-# PA – Consolidated Outpatient Procedures
-teste_pa <- load_datasus(
-  dataset = "datasus_siasus_pa",
-  time_period = 2022,
-  raw_data = FALSE,
-  language = "eng",
-  states = "AC"
-)
-
-# PS – RAAS Psychosocial Care
-teste_ps <- load_datasus(
-  dataset = "datasus_siasus_ps",
-  time_period = 2022,
-  raw_data = FALSE,
-  language = "eng",
-  states = "AC"
-)
-
-# SAD – RAAS Home Care
-teste_sad <- load_datasus(
-  dataset = "datasus_siasus_sad",
-  time_period = 2015,
-  raw_data = FALSE,
-  language = "eng",
-  states = "AC"
 )
 ```
 
@@ -1555,42 +1351,42 @@ Full datasets provided by IBGE:
 Datasets generated from Temporary Crops:
 </summary>
 
-| dataset | Name (pt) | Name (eng) |
-|:---|:--:|:--:|
-| pineapple | Abacaxi | Pineapple |
-| alfafa | Alfafa Fenada | Alfafa Fenada |
+| dataset           |          Name (pt)           |          Name (eng)           |
+|:------------------|:----------------------------:|:-----------------------------:|
+| pineapple         |           Abacaxi            |           Pineapple           |
+| alfafa            |        Alfafa Fenada         |         Alfafa Fenada         |
 | cotton_herbaceous | Algodao Herbaceo (em Caroco) | Herbaceous Cotton (in Caroco) |
-| garlic | Alho | Garlic |
-| peanut_temporary | Amendoim (em Casca) | Peanuts (in Shell) |
-| rice | Arroz (em Casca) | Rice (in husk) |
-| oats | Aveia (em Grao) | Oats (in grain) |
-| sweet_potato | Batata Doce | Sweet potato |
-| potato_temporary | Batata Inglesa | English potato |
-| sugar_cane | Cana de Acucar | Sugar cane |
-| forage_cane | Cana para Forragem | Forage cane |
-| onion | Cebola | Onion |
-| rye | Centeio (em Grao) | Rye (in grain) |
-| barley | Cevada (em Grao) | Barley (in Grain) |
-| pea | Ervilha (em Grao) | Pea (in Grain) |
-| broad_bean | Fava (em Grao) | Broad Bean (in Grain) |
-| beans_temporary | Feijao (em Grao) | Beans (in Grain) |
-| tobacco | Fumo (em Folha) | Smoke (in Sheet) |
-| sunflower_seeds | Girassol (em Grao) | Sunflower (in Grain) |
-| jute_fiber | Juta (Fibra) | Jute (Fiber) |
-| linen_seeds | Linho (Semente) | Linen (Seed) |
-| malva_fiber | Malva (Fibra) | Malva (Fiber) |
-| castor_bean | Mamona (Baga) | Castor bean (Berry) |
-| cassava | Mandioca | Cassava |
-| watermelon | Melancia | watermelon |
-| melon | Melao | Melon |
-| corn_temporary | Milho (em Grao) | corn (in grain) |
-| ramie_fiber | Rami (Fibra) | Ramie (Fiber) |
-| soybean | Soja (em Grao) | Soybean (in grain) |
-| sorghum | Sorgo (em Grao) | Sorghum (in Grain) |
-| tomato | Tomate | Tomato |
-| wheat | Trigo (em Grao) | Wheat in grain) |
-| triticale | Triticale (em Grao) | Triticale (in grain) |
-| temporary_total | Total | Total |
+| garlic            |             Alho             |            Garlic             |
+| peanut_temporary  |     Amendoim (em Casca)      |      Peanuts (in Shell)       |
+| rice              |       Arroz (em Casca)       |        Rice (in husk)         |
+| oats              |       Aveia (em Grao)        |        Oats (in grain)        |
+| sweet_potato      |         Batata Doce          |         Sweet potato          |
+| potato_temporary  |        Batata Inglesa        |        English potato         |
+| sugar_cane        |        Cana de Acucar        |          Sugar cane           |
+| forage_cane       |      Cana para Forragem      |          Forage cane          |
+| onion             |            Cebola            |             Onion             |
+| rye               |      Centeio (em Grao)       |        Rye (in grain)         |
+| barley            |       Cevada (em Grao)       |       Barley (in Grain)       |
+| pea               |      Ervilha (em Grao)       |        Pea (in Grain)         |
+| broad_bean        |        Fava (em Grao)        |     Broad Bean (in Grain)     |
+| beans_temporary   |       Feijao (em Grao)       |       Beans (in Grain)        |
+| tobacco           |       Fumo (em Folha)        |       Smoke (in Sheet)        |
+| sunflower_seeds   |      Girassol (em Grao)      |     Sunflower (in Grain)      |
+| jute_fiber        |         Juta (Fibra)         |         Jute (Fiber)          |
+| linen_seeds       |       Linho (Semente)        |         Linen (Seed)          |
+| malva_fiber       |        Malva (Fibra)         |         Malva (Fiber)         |
+| castor_bean       |        Mamona (Baga)         |      Castor bean (Berry)      |
+| cassava           |           Mandioca           |            Cassava            |
+| watermelon        |           Melancia           |          watermelon           |
+| melon             |            Melao             |             Melon             |
+| corn_temporary    |       Milho (em Grao)        |        corn (in grain)        |
+| ramie_fiber       |         Rami (Fibra)         |         Ramie (Fiber)         |
+| soybean           |        Soja (em Grao)        |      Soybean (in grain)       |
+| sorghum           |       Sorgo (em Grao)        |      Sorghum (in Grain)       |
+| tomato            |            Tomate            |            Tomato             |
+| wheat             |       Trigo (em Grao)        |        Wheat in grain)        |
+| triticale         |     Triticale (em Grao)      |     Triticale (in grain)      |
+| temporary_total   |            Total             |             Total             |
 
 </details>
 <details>
@@ -1598,47 +1394,47 @@ Datasets generated from Temporary Crops:
 Datasets generated from Permanent Crops:
 </summary>
 
-| dataset | Name (pt) | Name (eng) |
-|:---|:--:|:--:|
-| avocado | Abacate | Avocado |
-| cotton_arboreo | Algodao Arboreo (em Caroco) | Arboreo cotton (in Caroco) |
-| acai | Acai | Acai |
-| olive | Azeitona | Olive |
-| banana | Banana (Cacho) | Banana (Bunch) |
-| rubber_coagulated_latex | Borracha (Latex Coagulado) | Rubber (Coagulated Latex) |
-| rubber_liquid_latex | Borracha (Latex Liquido) | Rubber (Liquid Latex) |
-| cocoa_beans | Cacau (em Amendoa) | Cocoa (in Almonds) |
-| coffee_total | Cafe (em Grao) Total | Coffee (in Grain) Total |
-| coffee_arabica | Cafe (em Grao) Arabica | Cafe (in Grao) Arabica |
-| coffee_canephora | Cafe (em Grao) Canephora | Cafe (in Grain) Canephora |
-| cashew | Caju | Cashew |
-| khaki | Caqui | Khaki |
-| cashew_nut | Castanha de Caju | Cashew Nuts |
-| india_tea | Cha da India (Folha Verde) | India Tea (Leaf) |
-| coconut | Coco da Baia | Coconut |
-| coconut_bunch | Dende (Cacho de Coco) | Coconut Bunch |
-| yerba_mate | Erva Mate (Folha Verde) | Mate Herb (Leaf) |
-| fig | Figo | Fig |
-| guava | Goiaba | Guava |
-| guarana_seeds | Guarana (Semente) | Guarana (Seed) |
-| orange | Laranja | Orange |
-| lemon | Limao | Lemon |
-| apple | Maca | Apple |
-| papaya | Mamao | Papaya |
-| mango | Manga | Mango |
-| passion_fruit | Maracuja | Passion fruit |
-| quince | Marmelo | Quince |
-| walnut | Noz (Fruto Seco) | Walnut (Dry Fruit) |
-| heart_of_palm | Palmito | Palm heart |
-| pear | Pera | Pear |
-| peach | Pessego | Peach |
-| black_pepper | Pimenta do Reino | Black pepper |
-| sisal_or_agave | Sisal ou Agave (Fibra) | Sisal or Agave (Fiber) |
-| tangerine | Tangerina | Tangerine |
-| tung | Tungue (Fruto Seco) | Tung (Dry Fruit) |
-| annatto_seeds | Urucum (Semente) | Annatto (Seed) |
-| grape | Uva | Grape |
-| permanent_total | Total | Total |
+| dataset                 |          Name (pt)          |         Name (eng)         |
+|:------------------------|:---------------------------:|:--------------------------:|
+| avocado                 |           Abacate           |          Avocado           |
+| cotton_arboreo          | Algodao Arboreo (em Caroco) | Arboreo cotton (in Caroco) |
+| acai                    |            Acai             |            Acai            |
+| olive                   |          Azeitona           |           Olive            |
+| banana                  |       Banana (Cacho)        |       Banana (Bunch)       |
+| rubber_coagulated_latex | Borracha (Latex Coagulado)  | Rubber (Coagulated Latex)  |
+| rubber_liquid_latex     |  Borracha (Latex Liquido)   |   Rubber (Liquid Latex)    |
+| cocoa_beans             |     Cacau (em Amendoa)      |     Cocoa (in Almonds)     |
+| coffee_total            |    Cafe (em Grao) Total     |  Coffee (in Grain) Total   |
+| coffee_arabica          |   Cafe (em Grao) Arabica    |   Cafe (in Grao) Arabica   |
+| coffee_canephora        |  Cafe (em Grao) Canephora   | Cafe (in Grain) Canephora  |
+| cashew                  |            Caju             |           Cashew           |
+| khaki                   |            Caqui            |           Khaki            |
+| cashew_nut              |      Castanha de Caju       |        Cashew Nuts         |
+| india_tea               | Cha da India (Folha Verde)  |      India Tea (Leaf)      |
+| coconut                 |        Coco da Baia         |          Coconut           |
+| coconut_bunch           |    Dende (Cacho de Coco)    |       Coconut Bunch        |
+| yerba_mate              |   Erva Mate (Folha Verde)   |      Mate Herb (Leaf)      |
+| fig                     |            Figo             |            Fig             |
+| guava                   |           Goiaba            |           Guava            |
+| guarana_seeds           |      Guarana (Semente)      |       Guarana (Seed)       |
+| orange                  |           Laranja           |           Orange           |
+| lemon                   |            Limao            |           Lemon            |
+| apple                   |            Maca             |           Apple            |
+| papaya                  |            Mamao            |           Papaya           |
+| mango                   |            Manga            |           Mango            |
+| passion_fruit           |          Maracuja           |       Passion fruit        |
+| quince                  |           Marmelo           |           Quince           |
+| walnut                  |      Noz (Fruto Seco)       |     Walnut (Dry Fruit)     |
+| heart_of_palm           |           Palmito           |         Palm heart         |
+| pear                    |            Pera             |            Pear            |
+| peach                   |           Pessego           |           Peach            |
+| black_pepper            |      Pimenta do Reino       |        Black pepper        |
+| sisal_or_agave          |   Sisal ou Agave (Fibra)    |   Sisal or Agave (Fiber)   |
+| tangerine               |          Tangerina          |         Tangerine          |
+| tung                    |     Tungue (Fruto Seco)     |      Tung (Dry Fruit)      |
+| annatto_seeds           |      Urucum (Semente)       |       Annatto (Seed)       |
+| grape                   |             Uva             |           Grape            |
+| permanent_total         |            Total            |           Total            |
 
 </details>
 
@@ -1936,67 +1732,75 @@ Brazil’s energy infrastructure. EPE’s duty on that mission is to support
 MME with quality research and studies in order to aid Brazil’s energy
 infrastructure planning.
 
-As for now, there are two different datasets available for download: the
-Energy Consumption Per Class and the National Energy Balance. Both of
-them were obtained from the [EPE
+As for now, there are three different datasets available for download:
+Consumer Energy Consumption, Industrial Energy Consumption, and the
+National Energy Balance. All of them were obtained from the [EPE
 website](https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/).
 
-#### Energy Consumption Per Class
+#### Consumer Energy Consumption
 
-The Energy Consumption Per Class dataset provides monthly data about
-energy consumption and consumers from 2004 to 2022, for each class of
-energy consumption.
+The Consumer Energy Consumption dataset provides monthly data from 2004
+to 2025 about energy consumption and number of consumers. The data is
+organized by State, Region, or Electric Subsystem, and is broken down by
+class of service and type of consumer.
 
-The different classes are Total consumption (and consumers), Industrial
-consumption (and consumers), Residential consumption (and consumers),
-Commercial consumption (and consumers), Captive consumption\* and Other
-consumption (and consumers).\*\*
+The available classes are: Residential, Commercial, Industrial, Rural,
+and Others. For each observation, the dataset reports the type of
+consumer (Captive or Free), total consumption in megawatt-hours (MWh),
+and the number of consumers.
 
-\*Note that there is no consumer data for ‘Captive’ class at all.
+When using the Subsystem or Region level, consumer totals are provided
+but are not disaggregated for all classes and consumer types.
 
-\*\*There is also no consumer data for ‘Industrial’, ‘Commercial’ and
-‘Other’ classes when the geographical level is ‘Subsystem’ or ‘Region’.
+#### Industrial Energy Consumption
 
-There are three different aggregation levels: The Region level
-encompasses the five Brazilian geographical regions (North, Northeast,
-Midwest, Southeast and South). The Subsystem level encompasses the five
-Brazilian Electric Subsystems (North, Northeast, Southeast/Midwest,
-South, Isolated Systems). The State level encompasses the 26 Brazilian
-States and the Federal District.
+The Industrial Energy Consumption dataset provides monthly data from
+2004 to 2025 on energy consumption by industrial sector. Data is
+available at the State or Subsystem level. Each observation identifies
+the industrial sector responsible for the consumption and the amount
+consumed in megawatt-hours (MWh).
 
 #### National Energy Balance
 
 The National Energy Balance is a thorough and extensive research
 developed and published by EPE that contains useful data about energy
-consumption, generation, exportation and many more subjects.
+production, consumption, imports, exports, transformation, and final
+use.
 
-As for now, the National Energy Balance dataset provides yearly data
-about energy generation per source of production. The sources can be
-divided into two groups: the renewable sources (hydro, wind, solar,
-nuclear, thermal, sugar_cane_bagasse, firewood, black_liquor) and the
-non-renewable sources (steam_coal, natural_gas, coke_oven_gas, fuel_oil,
-diesel).
+The processed dataset provides yearly data from 2003 to 2023. It covers
+all Brazilian energy sources (such as petróleo, gás natural, carvão,
+eletricidade, lenha, solar and others) and distinguishes between
+different types of energy flow: production, transformation, final
+consumption, losses, and adjustments.
 
-The dataset has information at the Brazilian state level, including the
-Federal District, from 2011 to 2021 and also indicates whether the state
-is in the Legal Amazon or not.
+Each energy source appears as a separate column in the original
+spreadsheets. The cleaned data is returned in long format, with one row
+per combination of year, energy source, and account type. The account
+type is labeled to indicate whether it refers to production,
+transformation (for example, “TRANSFORMAÇÃO – REFINARIAS DE PETRÓLEO”),
+or consumption (for example, “CONSUMO – RESIDENCIAL”).
 
 ------------------------------------------------------------------------
 
 **Options:**
 
-1.  **dataset**: there are two choices:
-    - `"energy_consumption_per_class"`: monthly energy consumption and
-      consumers by State, Region or Electric Subsystem
-    - `"national_energy_balance"`: yearly energy generation per source,
-      by State
-2.  **raw_data**: there are two options:
-    - `TRUE`: if you want the data as it is originally.
-    - `FALSE`: if you want the treated version of the data.
-3.  **geo_level**: only applies to the `"energy_consumption_per_class"`
-    dataset.
-    - `"state"`
-    - `"subsystem"`
+1.  **dataset**: there are three choices:  
+    `"consumer_energy_consumption"`: monthly energy consumption and
+    consumers by State, Region or Electric Subsystem  
+    `"industrial_energy_consumption"`: monthly industrial energy
+    consumption by State or Subsystem  
+    `"national_energy_balance"`: yearly energy flow by account and
+    energy source
+
+2.  **raw_data**: there are two options:  
+    `TRUE`: if you want the data as it is originally.  
+    `FALSE`: if you want the treated version of the data.
+
+3.  **geo_level**: only applies to `"consumer_energy_consumption"` and
+    `"industrial_energy_consumption"` datasets.  
+    `"state"`  
+    `"subsystem"`
+
 4.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`
 
@@ -2005,10 +1809,16 @@ is in the Legal Amazon or not.
 **Examples:**
 
 ``` r
-# download treated data about energy consumption at the state level
+# download treated data about consumer energy consumption at the state level
 clean_epe <- load_epe(
-  dataset = "energy_consumption_per_class",
+  dataset = "consumer_energy_consumption",
   geo_level = "state",
+  raw_data = FALSE
+)
+
+# download treated data from the National Energy Balance
+balance <- load_epe(
+  dataset = "national_energy_balance",
   raw_data = FALSE
 )
 ```

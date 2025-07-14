@@ -76,8 +76,7 @@ load_datasus <- function(dataset,
   consprenat <- sexo <- racacor <- idanomal <- escmae2010 <- dtnascmae <- NULL
   racacormae <- dtultmenst <- tpmetestim <- tpapresent <- sttrabpart <- NULL
   stcesparto <- tpnascassi <- codmunnasc <- dataset_prefix_map <- munic_res <- NULL
-  mun_res <- sp_m_hosp <- dt_diag <- dt_trat <- dt_nasc <- mun_diag <- NULL
-
+  mun_res <- sp_m_hosp <- dt_diag <- dt_trat <- dt_nasc <- mun_diag <- where <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -560,63 +559,6 @@ load_datasus <- function(dataset,
 
   }
 
-  if(stringr::str_detect(param$dataset,"datasus_siasus")){
-
-    dat <- dat %>%
-      dplyr::mutate(
-        dplyr::across(tidyselect::where(is.factor), as.character)
-      )
-
-    tem_zero_a_esquerda <- function(x) {
-      # Força o encoding como latin1 → UTF-8 para evitar warnings
-      x <- enc2utf8(iconv(x, from = "latin1", to = "UTF-8"))
-      any(grepl("^0", x))
-    }
-
-    coluna_numerica_valida <- function(x) {
-      x <- enc2utf8(iconv(x, from = "latin1", to = "UTF-8"))
-      all(grepl("^\\d+$", x))
-    }
-
-    dat <- dat %>%
-      dplyr::mutate(
-        dplyr::across(
-          tidyselect::where(is.character),
-          ~ {
-            if (!tem_zero_a_esquerda(.x) && coluna_numerica_valida(.x)) {
-              suppressWarnings(as.numeric(.x))
-            } else {
-              .x
-            }
-          }
-        )
-      )
-
-    geo <- datazoom.amazonia::municipalities %>%
-      dplyr::select(
-        code_muni,
-        name_muni,
-        code_state,
-        abbrev_state,
-        legal_amazon
-      )
-
-    geo <- geo %>%
-      dplyr::mutate(code_muni_6 = as.integer(code_muni / 10))
-
-    suffix <- if (param$dataset == "datasus_siasus_pa") {
-      "pa_ufmun"
-    } else if(param$dataset %in% c("datasus_siasus_ps","datasus_siasus_sad")) {
-      "ufmun"
-    } else {
-      "ap_ufmun"
-    }
-
-    dat <- dat %>%
-      dplyr::left_join(geo, by = stats::setNames("code_muni_6", suffix))
-    }
-
-
   #################
   ## Aggregating ##
   #################
@@ -695,7 +637,7 @@ load_datasus <- function(dataset,
 
     dat_mod <- dat %>%
       dplyr::relocate(code_muni, name_muni, code_state, abbrev_state, legal_amazon) %>%
-      dplyr::select(tidyselect::where(~ !(all(is.na(.)) || all(. == 0, na.rm = TRUE)))) %>% # Remove colunas que so possuem 0 e NA
+      dplyr::select(tidyselect::where(~ !(all(is.na(.)) || all(. == 0, na.rm = TRUE)))) %>% # Remove colunas que só possuem 0 e NA
       tibble::as_tibble()
   }
 

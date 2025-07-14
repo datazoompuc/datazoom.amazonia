@@ -4,28 +4,17 @@
 \alias{load_epe}
 \title{EPE}
 \usage{
-load_epe(dataset, raw_data = FALSE, geo_level = "state", language = "eng")
+load_epe(dataset, geo_level = "state", raw_data = FALSE, language = "eng")
 }
 \arguments{
-\item{dataset}{A dataset name, ("energy_consumption_per_class") or ("national_energy_balance")}
+\item{dataset}{Dataset name: "consumer_energy_consumption", "industrial_energy_consumption", or "national_energy_balance"}
+
+\item{geo_level}{Geographical level: "state" or "subsystem". Only applies to consumer or industrial datasets.}
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
-
-\item{geo_level}{A geographical level, ("state") or ("subsystem"), only available for "energy_consumption_per_class"}
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.}
 }
 \description{
-Electrical Energy Monthly Consumption per Class
-}
-\examples{
-\dontrun{
-# download treated data about energy consumption at the state level
-clean_epe <- load_epe(
-  dataset = "energy_consumption_per_class",
-  geo_level = "state",
-  raw_data = FALSE
-)
-}
-
+Electrical Energy Monthly Consumption per Class or Industrial Sector
 }

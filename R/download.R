@@ -447,9 +447,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source %in% c("seeg", "iema", "ips")) {
     file_extension <- ".xlsx"
   }
-  if (source == "prodes") {
-    file_extension <- ".txt"
-  }
   if (source == "terraclimate") {
     file_extension <- ".nc"
   }
@@ -465,11 +462,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   }
   if (source == "imazon") {
     file_extension <- ".rds"
-  }
-  if (source == "epe") {
-    if (param$dataset == "national_energy_balance") {
-      file_extension <- ".csv"
-    }
   }
   if (source == "aneel") {
     if (dataset == "energy_development_budget") {
@@ -502,11 +494,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     if (dataset == "energy_enterprises_distributed") {
       message("This may take a while.\n")
       options(timeout = 1000) # increase timeout limit
-    }
-  }
-  if (source == "epe") {
-    if (dataset == "national_energy_balance") {
-      download_method <- "googledrive"
     }
   }
   if (source %in% c("deter", "terraclimate", "baci", "sigmine", "mapbiomas")) {
@@ -606,38 +593,33 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       # each data frame in the list is named after the corresponding year
       names(dat) <- param$year
     }
+    if (param$source == "prodes") {
+
+      # clearing rasters to avoid overlap
+
+      terra::tmpFiles(remove = TRUE)
+
+      file <- list.files(dir, pattern = "*.tif", full.names = TRUE)
+
+      dat <- terra::rast(file)
+    }
   }
 
-  if (param$source == "epe" & param$dataset == "energy_consumption_per_class") {
-    # param$sheet contains the selected sheets
-
-    # Making a list with all the sheets
-    dat <- purrr::imap(
-      param$sheet,
-      function(sheets, number) {
-        base::message(
-          paste0("Reading sheet ", number, " out of ", length(param$sheet), " (", sheets, ")")
-        )
-        base::suppressMessages(
-          readxl::read_xls(temp, sheet = sheets)
-        )
-      }
-    )
-
-    names(dat) <- param$sheet
-  }
   if (param$source == "aneel") {
     if (param$dataset == "energy_enterprises_distributed") {
       dat <- data.table::fread(temp, encoding = "Latin-1")
     } else if (dataset == "energy_generation") {
-      dat <- readxl::read_xlsx(temp, sheet = param$sheet, skip = param$skip_rows, na = c("-", ""))
+      dat <- readxl::read_xlsx(temp, sheet = param$sheet,skip = param$skip_rows,na = c("-", ""))
     }
-  }
-
-  if (param$source == "ips") {
+  } else if (param$source == "ips") {
     dat <- param$sheet %>%
       purrr::map(
         ~ readxl::read_xlsx(temp, sheet = .)
+      )
+  } else if (param$source == "epe") {
+    dat <- param$sheet %>%
+      purrr::map(
+        ~ base::suppressMessages(readxl::read_xlsx(temp, sheet = .))
       )
   }
 
@@ -672,7 +654,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   # Folder is kept
 
-  if (file_extension != ".nc") {
+  if (!file_extension %in% c(".nc")) {
     unlink(temp)
   }
 
@@ -695,7 +677,12 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
     ## PRODES
 
-    "prodes", "deforestation", NA, "2000-2023", "Municipality", "http://www.dpi.inpe.br/prodesdigital/tabelatxt.php?ano=2023&estado=&ordem=MUNICIPIO&type=tabela&output=txt&",
+    "prodes", "deforestation", NA, "2007-2023", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2023.zip",
+    "prodes", "residual_deforestation", NA, "2010-2023", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2023.zip",
+    "prodes", "native_vegetation", NA, "2023", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2023.zip",
+    "prodes", "non_forest", NA, "2023", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2023.zip",
+    "prodes", "hydrography", NA, "2023", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2023.zip",
+    "prodes", "clouds", NA, "2023", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2023.zip",
 
     ## DETER
 
@@ -818,8 +805,6 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
     "datasus", "datasus_siasus_acf", NA, "1994-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
     "datasus", "datasus_siasus_atd", NA, "2014-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
     "datasus", "datasus_siasus_sad", NA, "2012-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
-
-
 
     ## IEMA
 
@@ -967,8 +952,9 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
     ## EPE
 
-    "epe", "energy_consumption_per_class", NA, "2004-2021", "Region, Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/Documents/CONSUMO%20MENSAL%20DE%20ENERGIA%20EL%c3%89TRICA%20POR%20CLASSE.xls",
-    "epe", "national_energy_balance", NA, "2011-2022", NA, "https://drive.google.com/file/d/1_JTYyAPdbQayR-nrURts6OmbKcm2cLix/view?usp=share_link",
+    "epe", "industrial_energy_consumption", NA, "2004-2025", "Region, Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx",
+    "epe", "consumer_energy_consumption", NA, "2004-2025", "Region, Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx",
+    "epe", "national_energy_balance", NA, "2003-2023", NA, "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/PublicacoesArquivos/publicacao-819/topico-716/Anexo%20IX%20-%20Balan%C3%A7os%20Consolidados%20(em%20tep)%201970%20a%202023.xlsx",
 
     ## Shapefile from github repository
 
