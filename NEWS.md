@@ -1,3 +1,11 @@
+# datazoom.amazonia 1.1.5.9000 (development version)
+
+  * Added support for four new SIH datasets in the load_datasus() function:
+  "datasus_sih_rd" – Reduced AIHs (summary of hospitalizations)
+  "datasus_sih_sp" – Professional Services performed during hospitalizations
+  "datasus_sih_rj" – Rejected AIHs with general rejection reasons
+  "datasus_sih_er" – Rejected AIHs with specific error codes
+  
 # datazoom.amazonia 1.1.4.9000 (development version)
 
   * `load_prodes` now reads the full raster data from PRODES

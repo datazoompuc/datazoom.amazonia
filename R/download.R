@@ -788,11 +788,23 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
     "datasus", "datasus_cnes_ef", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/EF/$file_name$",
     "datasus", "datasus_cnes_gm", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/GM/$file_name$",
     "datasus", "datasus_sinasc", NA, "1979-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SINASC/1996_/Dados/DNRES/$file_name$",
+    "datasus", "datasus_po", NA, "1979-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/PAINEL_ONCOLOGIA/DADOS/$file_name$",
     "datasus", "datasus_sih_rd", NA, "1979-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIHSUS/200801_/Dados/$file_name$",
     "datasus", "datasus_sih_rj", NA, "1979-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIHSUS/200801_/Dados/$file_name$",
     "datasus", "datasus_sih_sp", NA, "1979-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIHSUS/200801_/Dados/$file_name$",
     "datasus", "datasus_sih_er", NA, "1979-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIHSUS/200801_/Dados/$file_name$",
-
+    "datasus", "datasus_siasus_ab", NA, "2008-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
+    "datasus", "datasus_siasus_ad", NA, "2008-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
+    "datasus", "datasus_siasus_am", NA, "2008-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
+    "datasus", "datasus_siasus_an", NA, "2008-2014", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
+    "datasus", "datasus_siasus_aq", NA, "2008-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
+    "datasus", "datasus_siasus_ar", NA, "2008-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
+    "datasus", "datasus_siasus_pa", NA, "1994-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
+    "datasus", "datasus_siasus_ps", NA, "2013-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
+    "datasus", "datasus_siasus_abo", NA, "2008-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
+    "datasus", "datasus_siasus_acf", NA, "1994-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
+    "datasus", "datasus_siasus_atd", NA, "2014-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
+    "datasus", "datasus_siasus_sad", NA, "2012-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
 
     ## IEMA
 
