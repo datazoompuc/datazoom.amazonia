@@ -952,9 +952,11 @@ load_dictionary <- function(dataset) {
       "diag_deth",    "cid_detalhado",      "detailed_icd",        "Diagnostico detalhado (CID-10)",                                   "Detailed diagnosis (ICD-10)",
       "dt_diag",      "data_diagnostico",   "date_diagnosis",      "Data detalhada do diagnostico",                                    "Full diagnosis date",
       "dt_trat",      "data_tratamento",    "date_treatment",      "Data detalhada do tratamento",                                     "Full treatment date",
-      "dt_nasc",      "data_nascimento",    "date_birth",          "Data de nascimento do paciente",                                   "Date of birth"
+      "dt_nasc",      "data_nascimento",    "date_birth",          "Data de nascimento do paciente","Date of birth"
+    )
+}
 
-  if (stringr::str_detect(dataset, "datasus_sih_er")) {
+      if (stringr::str_detect(dataset, "datasus_sih_er")) {
     harmonization_dat <- tibble::tribble(
       ~var_code, ~name_pt, ~name_eng, ~label_pt, ~label_eng,
 
@@ -1191,6 +1193,7 @@ load_dictionary <- function(dataset) {
       "atd_seperi",   "peritonite_mes",          "peritonitis_this_month",    "peritonite na dialise peritoneal",      "peritonitis in peritoneal dialysis",
       "ap_natjur",    "natureza_juridica",       "legal_nature_code",         "codigo da natureza juridica",           "legal nature code"
     )
+  }
 
     if(dataset %in% c("datasus_siasus_sad","datasus_siasus_ps")) {
       harmonization_dat <- tibble::tribble(
@@ -1261,7 +1264,6 @@ load_dictionary <- function(dataset) {
 
       )
     }
-  }
 
 
   if (stringr::str_detect(dataset, "datasus_sih_sp")) {
