@@ -249,6 +249,91 @@ load_datasus <- function(dataset,
     return(dat)
   }
 
+  # Adding preventable causes`
+
+  causas_evitaveis <- tibble::tribble(
+    ~categoria, ~grupo, ~cid10, ~tipo,
+
+    # 1.1 Imunopreveníveis
+    "Tuberculose do sistema nervoso", "1.1 Imunopreveníveis", "A17", "evitavel_imunoprevenivel",
+    "Tuberculose miliar", "1.1 Imunopreveníveis", "A19", "evitavel_imunoprevenivel",
+    "Tétano neonatal", "1.1 Imunopreveníveis", "A33", "evitavel_imunoprevenivel",
+    "Tétano obstétrico", "1.1 Imunopreveníveis", "A34", "evitavel_imunoprevenivel",
+    "Tétano", "1.1 Imunopreveníveis", "A35", "evitavel_imunoprevenivel",
+    "Difteria", "1.1 Imunopreveníveis", "A36", "evitavel_imunoprevenivel",
+    "Coqueluche", "1.1 Imunopreveníveis", "A37", "evitavel_imunoprevenivel",
+    "Poliomielite aguda", "1.1 Imunopreveníveis", "A80", "evitavel_imunoprevenivel",
+    "Sarampo", "1.1 Imunopreveníveis", "B05", "evitavel_imunoprevenivel",
+    "Rubéola", "1.1 Imunopreveníveis", "B06", "evitavel_imunoprevenivel",
+    "Hepatite viral aguda B", "1.1 Imunopreveníveis", "B16", "evitavel_imunoprevenivel",
+    "Hepatite viral aguda A", "1.1 Imunopreveníveis", "B15", "evitavel_imunoprevenivel",
+    "Meningite por Haemophilus", "1.1 Imunopreveníveis", "G00.0", "evitavel_imunoprevenivel",
+
+    # 1.2 Infecciosas
+    "Tuberculose respiratória com confirmação", "1.2 Infecciosas", "A15", "evitavel_infecciosa",
+    "Tuberculose respiratória sem confirmação", "1.2 Infecciosas", "A16", "evitavel_infecciosa",
+    "Tuberculose de outros órgãos", "1.2 Infecciosas", "A18", "evitavel_infecciosa",
+    "Sequelas de tuberculose", "1.2 Infecciosas", "B90", "evitavel_infecciosa",
+    "Doenças infecciosas intestinais", "1.2 Infecciosas", "A00-A09", "evitavel_infecciosa",
+    "HIV/AIDS", "1.2 Infecciosas", "B20-B24", "evitavel_infecciosa",
+    "Outras hepatites virais", "1.2 Infecciosas", "B15-B19", "evitavel_infecciosa",
+    "DSTs bacterianas", "1.2 Infecciosas", "A50-A59,A63-A64", "evitavel_infecciosa",
+    "Doenças inflamatórias pélvicas femininas", "1.2 Infecciosas", "N70-N76", "evitavel_infecciosa",
+    "Febre reumática e doenças reumáticas do coração", "1.2 Infecciosas", "I00-I09", "evitavel_infecciosa",
+    "Infecções respiratórias agudas", "1.2 Infecciosas", "J00-J01,J02.8-J02.9,J03.8-J03.9,J04-J06,J10-J22", "evitavel_infecciosa",
+    "Infecções de pele e tecidos subcutâneos", "1.2 Infecciosas", "L02-L08", "evitavel_infecciosa",
+    "Infecção urinária não especificada", "1.2 Infecciosas", "N39.0", "evitavel_infecciosa",
+    "Outras doenças notificáveis (ex: dengue, leptospirose etc.)", "1.2 Infecciosas", "A20-A22,A27,A30,A77,A82,A90-A91,A92.3,A95,A98.5,B03,B55,B57.0-B57.2,B65", "evitavel_infecciosa",
+    "Infecções do SNC", "1.2 Infecciosas", "G00.1-G00.9,G01", "evitavel_infecciosa",
+
+    # 1.3 Não transmissíveis
+    "Neoplasia de mama", "1.3 Não transmissíveis", "C50", "evitavel_ntransmissivel",
+    "Neoplasia do colo do útero", "1.3 Não transmissíveis", "C53", "evitavel_ntransmissivel",
+    "Neoplasias do fígado e vias biliares", "1.3 Não transmissíveis", "C22", "evitavel_ntransmissivel",
+    "Neoplasia do estômago", "1.3 Não transmissíveis", "C16", "evitavel_ntransmissivel",
+    "Neoplasia do cólon e reto", "1.3 Não transmissíveis", "C18-C21", "evitavel_ntransmissivel",
+    "Neoplasia de boca e faringe", "1.3 Não transmissíveis", "C01-C06,C09-C10,C12-C14", "evitavel_ntransmissivel",
+    "Neoplasia do esôfago", "1.3 Não transmissíveis", "C15", "evitavel_ntransmissivel",
+    "Neoplasia da laringe", "1.3 Não transmissíveis", "C32", "evitavel_ntransmissivel",
+    "Neoplasia dos pulmões", "1.3 Não transmissíveis", "C33-C34", "evitavel_ntransmissivel",
+    "Diabetes mellitus", "1.3 Não transmissíveis", "E10-E14", "evitavel_ntransmissivel",
+    "Obesidade", "1.3 Não transmissíveis", "E66", "evitavel_ntransmissivel",
+    "Alcoolismo e doenças associadas", "1.3 Não transmissíveis", "F10,I42.6,K29.2,K70,K86.0", "evitavel_ntransmissivel",
+    "Epilepsia", "1.3 Não transmissíveis", "G40-G41", "evitavel_ntransmissivel",
+    "Hipertensão arterial", "1.3 Não transmissíveis", "I10-I13", "evitavel_ntransmissivel",
+    "Doença isquêmica do coração", "1.3 Não transmissíveis", "I20-I25", "evitavel_ntransmissivel",
+    "Aterosclerose", "1.3 Não transmissíveis", "I70", "evitavel_ntransmissivel",
+    "Insuficiência cardíaca", "1.3 Não transmissíveis", "I50", "evitavel_ntransmissivel",
+    "Doença cerebrovascular", "1.3 Não transmissíveis", "I60-I69", "evitavel_ntransmissivel",
+    "Doenças respiratórias crônicas", "1.3 Não transmissíveis", "J40-J47,J81", "evitavel_ntransmissivel",
+    "Úlceras do sistema digestivo", "1.3 Não transmissíveis", "K25-K28", "evitavel_ntransmissivel",
+    "Apendicite aguda", "1.3 Não transmissíveis", "K35", "evitavel_ntransmissivel",
+    "Hérnias e íleo paralítico", "1.3 Não transmissíveis", "K40-K46,K56", "evitavel_ntransmissivel",
+    "Doenças da vesícula biliar", "1.3 Não transmissíveis", "K80-K83", "evitavel_ntransmissivel",
+    "Insuficiência renal crônica", "1.3 Não transmissíveis", "N18", "evitavel_ntransmissivel",
+
+    # 1.4 Maternas
+    "Todas as causas maternas", "1.4 Maternas", "O00-O99", "evitavel_materna",
+
+    # 1.5 Externas
+    "Acidentes de transporte", "1.5 Causas externas", "V01-V99", "evitavel_externa",
+    "Quedas", "1.5 Causas externas", "W00-W19", "evitavel_externa",
+    "Afogamento", "1.5 Causas externas", "W65-W74", "evitavel_externa",
+    "Exposição ao fogo", "1.5 Causas externas", "X00-X09", "evitavel_externa",
+    "Intoxicações acidentais", "1.5 Causas externas", "X40-X49", "evitavel_externa",
+    "Suicídios", "1.5 Causas externas", "X60-X84", "evitavel_externa",
+    "Homicídios", "1.5 Causas externas", "X85-Y09", "evitavel_externa",
+    "Eventos médicos adversos", "1.5 Causas externas", "Y60-Y84", "evitavel_externa",
+    "Eventos com intenção indeterminada", "1.5 Causas externas", "Y10-Y34", "evitavel_externa",
+    "Eventos legais e operações de guerra", "1.5 Causas externas", "Y35-Y36", "evitavel_externa",
+    "Forças mecânicas", "1.5 Causas externas", "W20-W64", "evitavel_externa",
+    "Animais venenosos", "1.5 Causas externas", "X20-X29", "evitavel_externa",
+    "Corrente elétrica, calor, forças da natureza", "1.5 Causas externas", "W85-W99,X10-X39", "evitavel_externa",
+    "Efeitos adversos de medicamentos", "1.5 Causas externas", "Y40-Y59", "evitavel_externa"
+  ) %>%
+    dplyr::mutate(cid_expandido = purrr::map(cid10, expand_cid_code)) %>%
+    tidyr::unnest(cid_expandido)
+
   ######################
   ## Data Engineering ##
   ######################
@@ -661,6 +746,20 @@ load_datasus <- function(dataset,
   ####################
   ## Returning Data ##
   ####################
+
+  if ("causabas" %in% names(dat_mod)) {
+    dat_mod <- dat_mod %>%
+      dplyr::mutate(causabas = stringr::str_to_upper(causabas)) %>%
+      dplyr::left_join(
+        causas_evitaveis %>% dplyr::select(cid_expandido, tipo),
+        by = c("causabas" = "cid_expandido")
+      ) %>%
+      dplyr::rename(causa_evitavel = tipo) %>%
+      dplyr::mutate(is_evitavel = !is.na(causa_evitavel))
+
+    Hmisc::label(dat_mod$causa_evitavel) <- "Classificação da causa evitável (agrupamento do MS)"
+    Hmisc::label(dat_mod$is_evitavel) <- "Indicador binário se a causa básica é evitável"
+  }
 
   return(dat_mod)
 }
