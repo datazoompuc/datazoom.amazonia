@@ -2,7 +2,7 @@
 #'
 #' @description Loads data on all products imported to or exported from Brazil.
 #'
-#' @param dataset A dataset name ("comex_export_mun", "comex_import_mun", "comex_export_prod" or "comex_import_prod").
+#' @param dataset A dataset name ("export_mun", "import_mun", "export_prod" or "import_prod").
 #' @inheritParams load_baci
 #'
 #' @return A \code{tibble}.
@@ -12,14 +12,14 @@
 #' # download treated (raw_data = FALSE) exports data by municipality (dataset = "comex_export_mun")
 #' # from 2020 to 2021 (time_period = 2020:2021)
 #' data <- load_br_trade(
-#'   dataset = "comex_export_mun",
+#'   dataset = "export_mun",
 #'   raw_data = FALSE,
 #'   time_period = 2020:2021
 #' )
 #' # download treated(raw_data = FALSE) imports data by municipality (dataset = "comex_import_mun")
 #' # from 2020 to 2021 (time_period = 2020:2021)
 #' data <- load_br_trade(
-#'   dataset = "comex_import_mun",
+#'   dataset = "import_mun",
 #'   raw_data = FALSE,
 #'   time_period = 2020:2021
 #' )
@@ -119,7 +119,7 @@ load_br_trade <- function(dataset, raw_data = FALSE,
   # HS (2,4,6) - https://balanca.economia.gov.br/balanca/bd/tabelas/NCM_SH.csv
   # NCM - https://balanca.economia.gov.br/balanca/bd/tabelas/NCM.csv
 
-  if (param$dataset == "comex_export_mun" | param$dataset == "comex_import_mun") {
+  if (param$dataset == "export_mun" | param$dataset == "import_mun") {
     dic <- suppressMessages(load_trade_dic(type = "hs"))
 
     if (param$language == "pt") {
@@ -173,7 +173,7 @@ load_br_trade <- function(dataset, raw_data = FALSE,
     }
   }
 
-  if (param$dataset == "comex_export_prod" | param$dataset == "comex_import_prod") {
+  if (param$dataset == "export_prod" | param$dataset == "import_prod") {
     dic <- suppressMessages(load_trade_dic(type = "ncm"))
 
     if (param$language == "pt") {
