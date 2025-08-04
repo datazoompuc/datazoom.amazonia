@@ -500,10 +500,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     download_method <- "curl"
     quiet <- FALSE
   }
-  if (source == "datasus") {
-    download_method <- "curl"
-    quiet <- TRUE
-  }
   if (source == "ibama") {
     download_method <- "curl"
     options(download.file.method = "curl", download.file.extra = "-k -L") # https://stackoverflow.com/questions/69716835/turning-ssl-verification-off-inside-download-file
@@ -766,45 +762,6 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
     "ips", "communic", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
     "ips", "mortality", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
     "ips", "deforest", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
-
-    ## DATASUS
-
-    "datasus", "datasus_sim_do", NA, "1996-2021", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DORES/$file_name$",
-    "datasus", "datasus_sim_dofet", NA, "1996-2021", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DOFET/$file_name$",
-    "datasus", "datasus_sim_doext", NA, "1996-2021", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DOFET/$file_name$",
-    "datasus", "datasus_sim_doinf", NA, "1996-2021", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DOFET/$file_name$",
-    "datasus", "datasus_sim_domat", NA, "1996-2021", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIM/CID10/DOFET/$file_name$",
-    "datasus", "datasus_cnes_lt", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/LT/$file_name$",
-    "datasus", "datasus_cnes_st", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/ST/$file_name$",
-    "datasus", "datasus_cnes_dc", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/DC/$file_name$",
-    "datasus", "datasus_cnes_eq", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/EQ/$file_name$",
-    "datasus", "datasus_cnes_sr", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/SR/$file_name$",
-    "datasus", "datasus_cnes_hb", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/HB/$file_name$",
-    "datasus", "datasus_cnes_pf", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/PF/$file_name$",
-    "datasus", "datasus_cnes_ep", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/EP/$file_name$",
-    "datasus", "datasus_cnes_rc", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/RC/$file_name$",
-    "datasus", "datasus_cnes_in", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/IN/$file_name$",
-    "datasus", "datasus_cnes_ee", NA, "2007-2021", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/EE/$file_name$",
-    "datasus", "datasus_cnes_ef", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/EF/$file_name$",
-    "datasus", "datasus_cnes_gm", NA, "2005-2023", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/CNES/200508_/Dados/GM/$file_name$",
-    "datasus", "datasus_sinasc", NA, "1979-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SINASC/1996_/Dados/DNRES/$file_name$",
-    "datasus", "datasus_po", NA, "1979-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/PAINEL_ONCOLOGIA/DADOS/$file_name$",
-    "datasus", "datasus_sih_rd", NA, "1979-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIHSUS/200801_/Dados/$file_name$",
-    "datasus", "datasus_sih_rj", NA, "1979-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIHSUS/200801_/Dados/$file_name$",
-    "datasus", "datasus_sih_sp", NA, "1979-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIHSUS/200801_/Dados/$file_name$",
-    "datasus", "datasus_sih_er", NA, "1979-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIHSUS/200801_/Dados/$file_name$",
-    "datasus", "datasus_siasus_ab", NA, "2008-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
-    "datasus", "datasus_siasus_ad", NA, "2008-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
-    "datasus", "datasus_siasus_am", NA, "2008-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
-    "datasus", "datasus_siasus_an", NA, "2008-2014", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
-    "datasus", "datasus_siasus_aq", NA, "2008-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
-    "datasus", "datasus_siasus_ar", NA, "2008-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
-    "datasus", "datasus_siasus_pa", NA, "1994-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
-    "datasus", "datasus_siasus_ps", NA, "2013-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
-    "datasus", "datasus_siasus_abo", NA, "2008-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
-    "datasus", "datasus_siasus_acf", NA, "1994-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
-    "datasus", "datasus_siasus_atd", NA, "2014-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
-    "datasus", "datasus_siasus_sad", NA, "2012-2025", "State", "ftp://ftp.datasus.gov.br/dissemin/publicos/SIASUS/200801_/Dados/$file_name$",
 
     ## IEMA
 
