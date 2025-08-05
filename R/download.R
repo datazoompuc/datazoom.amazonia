@@ -637,10 +637,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       dat <- readr::read_rds(temp)
     }
     if (file_extension == ".xlsx") {
-      dat <- readxl::read_xlsx(temp, sheet = param$sheet, skip = param$skip_rows)
-    }
-    if (file_extension == ".dbc") {
-      dat <- read.dbc(temp)
+      dat <-
+        readxl::read_xlsx(temp, sheet = param$sheet, skip = param$skip_rows)
     }
   }
 

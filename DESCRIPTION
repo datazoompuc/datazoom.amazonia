@@ -1,6 +1,6 @@
 Package: datazoom.amazonia
 Title: Simplify Access to Data from the Amazon Region
-Version: 1.1.5.9000
+Version: 1.1.6.9000
 Authors@R: c(
     person("Igor", "Rigolon Veiga", , "igor.rilave@hotmail.com", role = c("aut", "cre")),
     person("DataZoom (PUC-Rio)", , , "datazoom@econ.puc-rio.br", role = "fnd"),
@@ -43,8 +43,6 @@ Imports:
     tidyr,
     utils,
     XML,
-    lubridate,
-    tidyselect,
     rlang
 Suggests: 
     foreign,
@@ -54,8 +52,6 @@ Suggests:
     rmarkdown,
     terra,
     units
-LinkingTo: 
-    Rcpp
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
