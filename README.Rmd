@@ -87,7 +87,6 @@ devtools::load_all()
 |||
 |---|---|
 | **[IPS](#ips)** | _Amazon Social Progress Index_ |
-| **[DATASUS](#datasus)** | _Causes of mortality and availability of hospital beds_ |
 | **[IEMA](#iema)** | _Access to electricity in the Amazon region_ |
 | **[Population](#population)** | _Population_ |
 
@@ -188,11 +187,6 @@ devtools::load_all()
 ## IPS
 
 ```{r child = "vignettes/IPS.Rmd"}
-```
-
-## DATASUS
-
-```{r child = "vignettes/DATASUS.Rmd"}
 ```
 
 ## IEMA

@@ -1,5 +1,5 @@
 #' @description Functions to download and treat data regarding the Brazilian Amazon region from a variety of official sources.
-#' @useDynLib datazoom.amazonia, .registration = TRUE
+# #' @useDynLib datazoom.amazonia, .registration = TRUE
 #'
 #' @keywords internal
 #' @encoding UTF-8
