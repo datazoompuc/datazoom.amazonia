@@ -7,7 +7,7 @@
 load_br_trade(dataset, raw_data = FALSE, time_period, language = "eng")
 }
 \arguments{
-\item{dataset}{A dataset name ("comex_export_mun", "comex_import_mun", "comex_export_prod" or "comex_import_prod").}
+\item{dataset}{A dataset name ("export_mun", "import_mun", "export_prod" or "import_prod").}
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
@@ -26,14 +26,14 @@ Loads data on all products imported to or exported from Brazil.
 # download treated (raw_data = FALSE) exports data by municipality (dataset = "comex_export_mun")
 # from 2020 to 2021 (time_period = 2020:2021)
 data <- load_br_trade(
-  dataset = "comex_export_mun",
+  dataset = "export_mun",
   raw_data = FALSE,
   time_period = 2020:2021
 )
 # download treated(raw_data = FALSE) imports data by municipality (dataset = "comex_import_mun")
 # from 2020 to 2021 (time_period = 2020:2021)
 data <- load_br_trade(
-  dataset = "comex_import_mun",
+  dataset = "import_mun",
   raw_data = FALSE,
   time_period = 2020:2021
 )

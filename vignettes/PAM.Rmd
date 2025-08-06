@@ -59,40 +59,40 @@ The datasets supported are shown in the tables below, made up of both the origin
 
 | dataset | Name (pt) | Name (eng) |
 |:--------|:---------:|:----------:|
+| total_temporary | Total | Total |
+| abacaxi | Abacaxi | Pineapple |
 | alfafa | Alfafa Fenada | Alfafa Fenada |
-| garlic | Alho | Garlic |
-| pineapple | Abacaxi | Pineapple |
-| peanut_temporary | Amendoim (em Casca) | Peanuts (in Shell) |
-| rice | Arroz (em Casca) | Rice (in husk) |
-| oats | Aveia (em Grao) | Oats (in grain) |
-| barley | Cevada (em Grao) | Barley (in Grain) |
-| broad_bean | Fava (em Grao) | Broad Bean (in Grain) |
-| beans_temporary | Feijao (em Grao) | Beans (in Grain) |
-| tobacco | Fumo (em Folha) | Smoke (in Sheet) |
-| sunflower_seeds | Girassol (em Grao) | Sunflower (in Grain) |
-| jute_fiber | Juta (Fibra) | Jute (Fiber) |
-| linen_seeds | Linho (Semente) | Linen (Seed) |
-| malva_fiber | Malva (Fibra) | Malva (Fiber) |
+| alho | Alho | Garlic |
+| algodao_herbaceo | Algodao Herbaceo (em Caroco) | Herbaceous Cotton (in Caroco) |
+| amendoim_temporary | Amendoim (em Casca) | Peanuts (in Shell) |
+| arroz | Arroz (em Casca) | Rice (in husk) |
+| aveia | Aveia (em Grao) | Oats (in grain) |
+| batata_doce | Batata Doce | Sweet potato |
+| batata_inglesa | Batata Inglesa | English potato |
+| cana_de_acucar | Cana de Acucar | Sugar cane |
+| cana_para_forragem | Cana para Forragem | Forage cane |
 | castor_bean | Mamona (Baga) | Castor bean (Berry) |
-| cassava | Mandioca | Cassava |
-| watermelon | Melancia | watermelon |
-| melon | Melao | Melon |
-| corn_temporary | Milho (em Grao) | corn (in grain) |
-| onion | Cebola | Onion |
-| potato_temporary | Batata Inglesa | English potato |
-| sweet_potato | Batata Doce | Sweet potato |
-| cotton_herbaceous | Algodao Herbaceo (em Caroco) | Herbaceous Cotton (in Caroco) |
-| forage_cane | Cana para Forragem | Forage cane |
-| sugar_cane | Cana de Acucar | Sugar cane |
+| cebola | Cebola | Onion |
+| cevada | Cevada (em Grao) | Barley (in Grain) |
+| ervilha | Ervilha (em Grao) | Pea (in Grain) |
+| fava | Fava (em Grao) | Broad Bean (in Grain) |
+| feijao_temporary | Feijao (em Grao) | Beans (in Grain) |
+| fumo | Fumo (em Folha) | Smoke (in Sheet) |
+| girassol_sementes | Girassol (em Grao) | Sunflower (in Grain) |
+| juta_fibra | Juta (Fibra) | Jute (Fiber) |
+| linho_sementes | Linho (Semente) | Linen (Seed) |
+| malva_fibra | Malva (Fibra) | Malva (Fiber) |
+| mandioca | Mandioca | Cassava |
+| melancia | Melancia | watermelon |
+| melao | Melao | Melon |
+| milho_temporary | Milho (em Grao) | corn (in grain) |
+| rami_fibra | Rami (Fibra) | Ramie (Fiber) |
 | rye | Centeio (em Grao) | Rye (in grain) |
-| ramie_fiber | Rami (Fibra) | Ramie (Fiber) |
-| sorghum | Sorgo (em Grao) | Sorghum (in Grain) |
-| soybean | Soja (em Grao) | Soybean (in grain) |
-| tomato | Tomate | Tomato |
-| temporary_total | Total | Total |
+| soja | Soja (em Grao) | Soybean (in grain) |
+| sorgo | Sorgo (em Grao) | Sorghum (in Grain) |
+| tomate | Tomate | Tomato |
+| trigo | Trigo (em Grao) | Wheat in grain) |
 | triticale | Triticale (em Grao) | Triticale (in grain) |
-| wheat | Trigo (em Grao) | Wheat in grain) |
-| pea | Ervilha (em Grao) | Pea (in Grain) |
 </details>
 
 <details>
