@@ -22,10 +22,10 @@ The data has a monthly frequency and is available starting from the year 1989. F
 **Options:**
 
   1. **dataset**: there are four choices:
-      * `"comex_export_mun"`: selects exports data by municipality
-      * `"comex_import_mun"`: selects imports data by municipality
-      * `"comex_export_prod"`: selects exports data by producer
-      * `"comex_import_prod"`: selects imports data by producer
+      * `"export_mun"`: selects exports data by municipality
+      * `"import_mun"`: selects imports data by municipality
+      * `"export_prod"`: selects exports data by producer
+      * `"import_prod"`: selects imports data by producer
 
   2. **raw_data**: there are two options:
       * `TRUE`: if you want the data as it is originally.
@@ -40,17 +40,17 @@ The data has a monthly frequency and is available starting from the year 1989. F
 **Examples:**
 
 ```{r, eval = FALSE}
-# download treated (raw_data = FALSE) exports data by municipality (dataset = "comex_export_mun")
+# download treated (raw_data = FALSE) exports data by municipality (dataset = "export_mun")
 # from 2020 to 2021 (time_period = 2020:2021)
 data <- load_br_trade(
-  dataset = "comex_export_mun",
+  dataset = "export_mun",
   raw_data = FALSE,
   time_period = 2020:2021
 )
-# download treated(raw_data = FALSE) imports data by municipality (dataset = "comex_import_mun")
+# download treated(raw_data = FALSE) imports data by municipality (dataset = "import_mun")
 # from 2020 to 2021 (time_period = 2020:2021)
 data <- load_br_trade(
-  dataset = "comex_import_mun",
+  dataset = "import_mun",
   raw_data = FALSE,
   time_period = 2020:2021
 )
