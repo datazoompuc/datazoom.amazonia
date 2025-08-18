@@ -229,6 +229,14 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
       ))
   }
 
+  dat_mod <- dat_mod %>%
+    dplyr::mutate(
+      dplyr::across(
+        tidyselect::matches("^class_level_\\d+$"),
+        ~ sub("^\\s*\\d+(?:\\.\\d+)*\\.?\\s*", "", as.character(.))
+      )
+    )
+
   ####################
   ## Returning Data ##
   ####################
