@@ -44,8 +44,6 @@ Imports:
     tidyr,
     utils,
     XML,
-    lubridate,
-    tidyselect,
     rlang
 Suggests: 
     foreign,
@@ -55,8 +53,6 @@ Suggests:
     rmarkdown,
     terra,
     units
-LinkingTo: 
-    Rcpp
 VignetteBuilder: 
     knitr
 Encoding: UTF-8

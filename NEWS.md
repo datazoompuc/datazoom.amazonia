@@ -1,3 +1,7 @@
+# datazoom.amazonia 1.1.6.9000 (development version)
+
+  * Removed all of datasus-related functions from this package, as they are being moved to a new health-focused package currently under development.
+
 # datazoom.amazonia 1.1.5.9000 (development version)
 
   * Added support for four new SIH datasets in the load_datasus() function:
