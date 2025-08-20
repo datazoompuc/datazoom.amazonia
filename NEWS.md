@@ -1,3 +1,8 @@
+# datazoom.amazonia 1.2.0.0000
+
+  * Implemented minor styling updates
+  * Internal code clean-upto prepare for CRAN release.
+
 # datazoom.amazonia 1.1.6.9000 (development version)
 
   * Removed all of datasus-related functions from this package, as they are being moved to a new health-focused package currently under development.

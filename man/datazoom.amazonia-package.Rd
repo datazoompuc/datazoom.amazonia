@@ -17,11 +17,12 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Igor Rigolon Veiga \email{igor.rilave@hotmail.com}
+\strong{Maintainer}: Laura Tavares Regadas \email{lauratregadas@gmail.com}
 
 Authors:
 \itemize{
   \item Gustavo Gonzaga \email{gonzaga@econ.puc-rio.br}
+  \item Igor Rigolon Veiga \email{igor.rilave@hotmail.com}
   \item Guilherme Jardim \email{gnjardim1@gmail.com}
   \item Daniel AC Barbosa \email{daniel.adrianocb@gmail.com}
   \item Bruno Alcantara Duarte \email{brunoalcanduarte@gmail.com}
