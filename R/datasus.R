@@ -15,10 +15,10 @@
 load_datasus <- function(dataset = NULL, raw_data = NULL, time_period = NULL,
                          language = "eng") {
   if (language == "pt") {
-    warning("A fun\u00e7\u00e3o `load_datasus` n\u00e3o faz mais parte do pacote e n\u00e3o est\u00e1 mais dispon\u00edvel. Novidades em breve.",
+    warning("A fun\u00e7\u00e3o `load_datasus` n\u00e3o faz mais parte do pacote e n\u00e3o est\u00e1 mais dispon\u00vel. Instale o novo pacote datazoom.saude para carregar esses dados.",
             call. = FALSE)
   } else {
-    warning("The `load_datasus` function is no longer part of the package and is no longer available. Updates on the matter coming soon.",
+    warning("The `load_datasus` function is no longer part of the package and is no longer available. Updates on the matter coming soon. To load this data, install the new datazoom.saude package.",
             call. = FALSE)
   }
   return(invisible(NULL))
