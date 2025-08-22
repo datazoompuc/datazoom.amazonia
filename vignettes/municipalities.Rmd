@@ -16,6 +16,8 @@ knitr::opts_chunk$set(
 
 Many of our functions use a dataset with Brazilian municipalities, their municipality codes, whether they belong to the Legal Amazon, their state, and some more variables. It was constructed from the [IBGE spreadsheet](https://www.ibge.gov.br/geociencias/cartas-e-mapas/mapas-regionais/15819-amazonia-legal.html?=&t=acesso-ao-produto) with Legal Amazon municipalities, along with a data frame from the 'geobr' package. For more information on the columns, run `??datazoom.amazonia::municipalities`.
 
+Regarding the statistics in this package reported at the **municipality level**, for municipalities that are only partially included in the Legal Amazon (according to IBGE's latest release), the data refer to the entire municipality, not just to the portion that lies within the Legal Amazon.
+
 ```{r, eval = FALSE}
 # load Brazilian municipalities dataset
 data <- datazoom.amazonia::municipalities
