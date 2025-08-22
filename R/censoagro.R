@@ -25,7 +25,7 @@
 #'   dataset = "vegetable_production_temporary",
 #'   raw_data = FALSE,
 #'   geo_level = "state",
-#'   time_period = 1996,
+#'   time_period = 1995,
 #'   language = "pt"
 #' )
 #' }
