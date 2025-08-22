@@ -1,10 +1,11 @@
 Package: datazoom.amazonia
 Title: Simplify Access to Data from the Amazon Region
-Version: 1.1.6.9000
+Version: 1.2.0
 Authors@R: c(
-    person("Igor", "Rigolon Veiga", , "igor.rilave@hotmail.com", role = c("aut", "cre")),
+    person("Laura", "Tavares Regadas", , "lauratregadas@gmail.com", role = c("aut", "cre")),
     person("DataZoom (PUC-Rio)", , , "datazoom@econ.puc-rio.br", role = "fnd"),
     person("Gustavo", "Gonzaga", email = "gonzaga@econ.puc-rio.br", role = "aut"),
+    person("Igor", "Rigolon Veiga", , "igor.rilave@hotmail.com", role = "aut"),
     person("Guilherme", "Jardim", , "gnjardim1@gmail.com", role = "aut"),
     person("Daniel", "AC Barbosa", , "daniel.adrianocb@gmail.com", role = "aut"),
     person("Bruno", "Alcantara Duarte", , "brunoalcanduarte@gmail.com", role = "aut"),
@@ -17,8 +18,8 @@ Authors@R: c(
     person("Francisco", "de Lima Cavalcanti", , "francisco.lima.cavalcanti@gmail.com", role = "aut"),
     person("Maria", "Mittelbach", , "mariamittelbach@gmail.com", role = "aut"),
     person("Felipe", "de Moraes Nunes", , "felipedmoraesn@gmail.com", role = "aut"),
-    person("Joao Paulo","Santos P. Barbosa",,"joao.31582129@gmail.com", role = "aut"),
-    person("Bernardo","Furlanetto Sieira",,"bernardo.sieira@gmail.com", role = "aut")
+    person("Joao Paulo", "Santos P. Barbosa",,"joao.31582129@gmail.com", role = "aut"),
+    person("Bernardo", "Furlanetto Sieira", ,"bernardo.sieira@gmail.com", role = "aut")
   )
 Description: Functions to download and treat data regarding the Brazilian
     Amazon region from a variety of official sources.

@@ -1,6 +1,10 @@
-# datazoom.amazonia 1.1.6.9000 (development version)
+# datazoom.amazonia 1.2.0
 
-  * Removed all of datasus-related functions from this package, as they are being moved to a new health-focused package currently under development.
+  * Deprecated `load_datasus()`. All its datasets were moved to a new package: datazoom.saude. Beta version available soon.
+  
+  * Updated `load_mapbiomas` to the Collection 9 data, with both new and reformed datasets
+  
+  * Many small bug fixes
 
 # datazoom.amazonia 1.1.5.9000 (development version)
 
@@ -16,21 +20,17 @@
 
 # datazoom.amazonia 1.1.3.9000 (development version)
 
-  * Updated `download.R` to read the data now avaiable at the EPE website.
+  * Updated `download.R` to read the data now available at the EPE website.
   
   * Updated `load_epe` which has now 3 parameters following the split of `energy_consumption_per_class` in `industrial_energy_consumption` and `consumer_energy_consumption`. 
   
-  * Added support for four new SIH datasets in the load_datasus() function:
-    * "datasus_sih_rd" – Reduced AIHs (summary of hospitalizations)
-    * "datasus_sih_sp" – Professional Services performed during hospitalizations
-    * "datasus_sih_rj" – Rejected AIHs with general rejection reasons
-    * "datasus_sih_er" – Rejected AIHs with specific error codes
+  * Added support for four new SIH datasets in the `load_datasus()` function
     
 # datazoom.amazonia 1.1.2.9000 (development version)
 
   * Updated `load_mapbiomas` to download the newest Mapbiomas Collections and to warn about the currently unavailable download URL of the datasets water and irrigation. Also added the Indigenous Lands option to the `"mapbiomas_cover"` dataset.
 
-# datazoom.amazonia 1.1.1.9000
+# datazoom.amazonia 1.1.1.9000 (development version)
 
   * Updated `load_baci` to support the newest version of the data, fixing the previous broken download URL. (Thanks to @OlivazShai)
 
