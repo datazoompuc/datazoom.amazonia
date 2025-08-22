@@ -2041,6 +2041,12 @@ with Legal Amazon municipalities, along with a data frame from the
 ‘geobr’ package. For more information on the columns, run
 `??datazoom.amazonia::municipalities`.
 
+Regarding the statistics in this package reported at the
+**municipality level**, for municipalities that are only partially 
+included in the Legal Amazon (according to IBGE's latest release), 
+the data refer to the entire municipality, not just to the portion that 
+lies within the Legal Amazon.
+
 ``` r
 # load Brazilian municipalities dataset
 data <- datazoom.amazonia::municipalities
