@@ -93,25 +93,16 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
     return(dat)
   }
 
-  # Join all tables
-  temp <- tibble::tribble(
-    ~linkcolumn, ~scene_id, ~class_name, ~pathrow, ~uf,
-    ~area, ~geometry, ~year, ~con_ai_id, ~julday,
-    ~ano, ~objet_id_3, ~cell_oid, ~view_date,
-    ~codigouf, ~nome, ~inter_oid, ~areametros, ~areameters
-  )
+  # Join all tables while preserving sf objects
+  dat <- do.call(rbind, dat)
 
-  dat <- c(dat, list(temp)) %>%
-    dplyr::bind_rows() %>%
-    tibble::as_tibble()
-
-  # Remove useless columns
+  # Remove useless column
   dat <- dat %>%
-    dplyr::select(-ano, -nome)
+    dplyr::select(-nome)
 
   # Add sigla UF
   ufs <- tibble::tribble(
-    ~sigla, ~codigouf,
+    ~uf, ~codigouf,
     "AC", 12,
     "AL", 27,
     "AP", 16,
@@ -145,9 +136,7 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
   dat <- dat %>%
     dplyr::mutate(codigouf = as.numeric(codigouf)) %>%
     dplyr::left_join(ufs, by = "codigouf") %>%
-    dplyr::mutate(uf = ifelse(is.na(uf), sigla, uf)) %>%
-    dplyr::select(-codigouf, -sigla) %>%
-    dplyr::select(-area, -areametros, -areameters)
+    dplyr::select(-codigouf, -area)
 
 
   # Clean geometry
