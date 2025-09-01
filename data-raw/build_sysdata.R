@@ -19,11 +19,11 @@ dir <- tempdir()
 temp <- tempfile(tmpdir = dir)
 options(download.file.method = "curl", download.file.extra = "-k -L")
 
-url <- "https://geoftp.ibge.gov.br/organizacao_do_territorio/estrutura_territorial/amazonia_legal/2020/lista_de_municipios_Amazonia_Legal_2020.xls"
+url <- "https://geoftp.ibge.gov.br/organizacao_do_territorio/estrutura_territorial/amazonia_legal/2024/Municipios_da_Amazonia_Legal_2024.xls"
 
 utils::download.file(url, destfile = temp, method = "curl")
 
-legal_amazon <- readxl::read_xls(temp, range = "A1:L773")
+legal_amazon <- readxl::read_xls(temp, range = "A1:P774")
 
 legal_amazon_list <- legal_amazon$CD_MUN %>%
   as.numeric()
@@ -62,7 +62,7 @@ municipalities <- municipalities %>%
 municipalities_biomes <- biome_munic_mapbiomas %>%
   dplyr::mutate(
     dplyr::across(
-      is.character,
+      where(is.character),
       ~ stringi::stri_trans_general(., id = "Latin-ASCII")
     )
   ) %>%
