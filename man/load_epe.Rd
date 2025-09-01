@@ -18,3 +18,22 @@ load_epe(dataset, geo_level = "state", raw_data = FALSE, language = "eng")
 \description{
 Electrical Energy Monthly Consumption per Class or Industrial Sector
 }
+\examples{
+\dontrun{
+# download treated (raw_data = FALSE) data about
+# consumer energy consumption (dataset = "consumer_energy_consumption")
+# at the state level (geo_level = "state")
+data <- load_epe(
+  dataset = "consumer_energy_consumption",
+  geo_level = "state",
+  raw_data = FALSE
+)
+# download treated (raw_data = FALSE) data
+# from the National Energy Balance (dataset = "national_energy_balance")
+balance <- load_epe(
+  dataset = "national_energy_balance",
+  raw_data = FALSE
+)
+}
+
+}

@@ -6,6 +6,24 @@
 #' @param geo_level Geographical level: "state" or "subsystem". Only applies to consumer or industrial datasets.
 #' @inheritParams load_baci
 #'
+#' @examples
+#' \dontrun{
+#' # download treated (raw_data = FALSE) data about
+#' # consumer energy consumption (dataset = "consumer_energy_consumption")
+#' # at the state level (geo_level = "state")
+#' data <- load_epe(
+#'   dataset = "consumer_energy_consumption",
+#'   geo_level = "state",
+#'   raw_data = FALSE
+#' )
+#' # download treated (raw_data = FALSE) data
+#' # from the National Energy Balance (dataset = "national_energy_balance")
+#' balance <- load_epe(
+#'   dataset = "national_energy_balance",
+#'   raw_data = FALSE
+#' )
+#' }
+#'
 #' @export
 load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = "eng") {
   ##############################
