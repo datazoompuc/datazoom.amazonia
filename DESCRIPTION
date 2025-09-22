@@ -44,7 +44,6 @@ Imports:
     tidyr,
     tidyselect,
     utils,
-    XML,
     rlang
 Suggests: 
     foreign,
