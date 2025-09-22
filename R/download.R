@@ -871,9 +871,9 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
     ## PEVS
 
-    "pevs", "pevs_forest_crops", "289", "1986-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
-    "pevs", "pevs_silviculture", "291", "1986-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
-    "pevs", "pevs_silviculture_area", "5930", "2013-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
+    "pevs", "pevs_forest_crops", "289", "1986-2023", "Country, State, Municipality, Region", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
+    "pevs", "pevs_silviculture", "291", "1986-2023", "Country, State, Municipality, Region", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
+    "pevs", "pevs_silviculture_area", "5930", "2013-2023", "Country, State, Municipality, Region", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
 
     ## PPM
 
