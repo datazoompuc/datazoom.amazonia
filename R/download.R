@@ -556,21 +556,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
 
     if (param$source == "ibama") {
-      # get latest downloaded file (the name changes daily)
-      file <- file.info(list.files(dir, pattern = "rel_areas_embargadas_.*.xls"))
-      file <- file[with(file, order(as.POSIXct(mtime))), ]
-      file <- rownames(file)
-
-      doc <- XML::htmlParse(file.path(dir, file), encoding = "UTF-8")
-
-      tableNode <- XML::getNodeSet(doc, "//table")
-
-      dataset <- XML::readHTMLTable(tableNode[[1]])
-
-
-      colnames(dataset) <- dataset[5, ]
-
-      dat <- dataset[-c(1:5), ]
+      shp <- list.files(dir, pattern = "\\.shp$", full.names = TRUE, recursive = TRUE)
+      dat_sf <- sf::read_sf(shp[1], quiet = TRUE)
+      dat <- tibble::as_tibble(dat_sf)
     }
 
     if (param$source == "baci") {
@@ -693,7 +681,7 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
     ## IBAMA
 
-    "ibama", "embargoed_areas", NA, NA, "Municipality", "https://servicos.ibama.gov.br/ctf/publico/areasembargadas/downloadListaAreasEmbargadas.php",
+    "ibama", "embargoed_areas", NA, NA, "Municipality", "https://pamgia.ibama.gov.br/geoservicos/arquivos/adm_embargo_ibama_a.shp.zip",
     "ibama", "distributed_fines", NA, NA, "Municipality", "https://dadosabertos.ibama.gov.br/dados/SICAFI/$state$/Quantidade/multasDistribuidasBensTutelados.csv",
     "ibama", "collected_fines", NA, NA, "Municipality", "https://dadosabertos.ibama.gov.br/dados/SICAFI/$state$/Arrecadacao/arrecadacaobenstutelados.csv",
 

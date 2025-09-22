@@ -36,18 +36,24 @@ load_ibama <- function(dataset,
 
   survey <- link <- legal_amazon <- codigo_ibge_municipio_embargo <- NULL
   municipio_embargo <- uf_embargo <- julgamento <- infracao <- data_de_insercao_na_lista <- NULL
-  cpf_ou_cnpj <- cod_municipio <- ano <- mes <- NULL
-  month <- year <- municipality_code <- n_infracoes <- n_ja_julgado <- NULL
-  n_cpf_cnpj_unicos <- NULL
+  cpf_ou_cnpj <- cod_municipio <- ano <- mes <- month <- year <- municipality_code <- NULL
+  n_infracoes <- n_ja_julgado <- n_cpf_cnpj_unicos <- NULL
   municipio_infracao <- uf_infracao <- uf <- NULL
   municipio <- name_muni <- code_muni <- municipality <- NULL
   data_auto <- abbrev_state <- ultima_atualizacao_relatorio <- tipo_auto <- valor_do_auto <- NULL
   acao_fiscalizatoria <- amazonia_legal <- cod_tipo_bioma <- cod_uf_tad <- cpf_cnpj_embargado <- NULL
   dat_embargo <- dat_impressao <- dat_ult_alter_geom <- data_embargo <- data_impressao <- NULL
-  data_ult_alter_geom <- des_infracao <- des_localizacao <- des_tad <- hora_embargo <- NULL
-  hora_impressao <- hora_ult_alter_geom <- nome_pessoa_embargada <- num_auto_infracao <- num_processo <- NULL
-  num_tad <- ordem_fiscalizacao <- qtd_area_desmatada <- qtd_area_embargada <- ser_auto_infracao <- NULL
-  ser_tad <- sit_desmatamento <- state <- NULL
+  data_ult_alter_geom <- des_infracao <- des_localizacao <- des_locali <- des_tad <- hora_embargo <- NULL
+  hora_impressao <- hora_ult_alter_geom <- nome_pessoa_embargada <- nome_embar <- cpf_cnpj_e <- NULL
+  num_auto_infracao <- num_auto_i <- serie_auto <- ser_auto_infracao <- ser_tad <- NULL
+  num_processo <- num_proces <- ordem_fiscalizacao <- ordem_fisc <- cd_acao_fi <- NULL
+  qtd_area_desmatada <- qtd_area_d <- qtd_area_embargada <- qtd_area_e <- NULL
+  sit_desmatamento <- sit_desmat <- state <- location_description <- NULL
+  tad_description <- embargo_date <- embargo_time <- print_date <- print_time <- NULL
+  last_geom_update_date <- last_geom_update_time <- infringement_number <- infringement_series <- NULL
+  deforested_area_amount <- embargoed_area_amount <- biome_type_code <- fiscal_action <- fiscal_order <- NULL
+  infringement_description <- longitude <- latitude <- NULL
+  dat_embarg <- dat_impres <- dat_ult_al <- cod_tipo_b <- des_infrac <- num_longit <- num_latitu <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -201,14 +207,14 @@ load_ibama <- function(dataset,
   if (dataset == "embargoed_areas") {
     ## Minor corrections
     dat <- dat %>%
-      tidyr::separate(col = dat_embargo, into = c("data_embargo", "hora_embargo"), sep = " ") %>%
-      tidyr::separate(col = dat_impressao, into = c("data_impressao", "hora_impressao"), sep = " ") %>%
-      tidyr::separate(col = dat_ult_alter_geom, into = c("data_ult_alter_geom", "hora_ult_alter_geom"), sep = " ") %>%
+      tidyr::separate(col = dat_embarg, into = c("data_embargo", "hora_embargo"), sep = " ") %>%
+      tidyr::separate(col = dat_impres, into = c("data_impressao", "hora_impressao"), sep = " ") %>%
+      tidyr::separate(col = dat_ult_al, into = c("data_ult_alter_geom", "hora_ult_alter_geom"), sep = " ") %>%
       suppressWarnings() %>%
       dplyr::mutate(dplyr::across(dplyr::where(is.character), ~ dplyr::na_if(.x, "")),
-        data_embargo = as.Date(data_embargo, "%d/%m/%Y"),
-        data_impressao = as.Date(data_impressao, "%d/%m/%Y"),
-        data_ult_alter_geom = as.Date(data_ult_alter_geom, "%d/%m/%Y"),
+        data_embargo = as.Date(data_embargo, "%d/%m/%y"),
+        data_impressao = as.Date(data_impressao, "%d/%m/%y"),
+        data_ult_alter_geom = as.Date(data_ult_alter_geom, "%d/%m/%y"),
         dplyr::across(dplyr::starts_with("qtd"), ~ gsub("[,]", ".", .x) %>% as.numeric())
       )
   }
@@ -223,11 +229,10 @@ load_ibama <- function(dataset,
   if (dataset == "embargoed_areas") {
     if (param$language == "pt") {
       dat_mod <- dat %>%
-        dplyr::select(-municipio) %>%
-        dplyr::select(-cod_uf_tad) %>%
+        dplyr::select(-municipio, -dplyr::any_of("cod_uf_tad")) %>%
         dplyr::rename(
-          municipio = name_muni,
-          cod_municipio = code_muni,
+          municipio      = name_muni,
+          cod_municipio  = code_muni,
           amazonia_legal = legal_amazon
         ) %>%
         dplyr::relocate(c(municipio, cod_municipio, amazonia_legal), .before = uf)
@@ -235,34 +240,32 @@ load_ibama <- function(dataset,
 
     if (param$language == "eng") {
       dat_mod <- dat %>%
-        dplyr::select(-municipio) %>%
-        dplyr::select(-cod_uf_tad) %>%
+        dplyr::select(-municipio, -dplyr::any_of("cod_uf_tad")) %>%
         dplyr::rename(
-          municipality = name_muni,
-          municipality_code = code_muni,
-          num_tad = num_tad,
-          ser_tad = ser_tad,
-          embargo_date = data_embargo,
-          embargo_time = hora_embargo,
-          embargoed_person_name = nome_pessoa_embargada,
-          embargoed_cpf_cnpj = cpf_cnpj_embargado,
-          process_number = num_processo,
-          tad_description = des_tad,
-          state = uf,
-          location_description = des_localizacao,
-          embargoed_area_amount = qtd_area_embargada,
-          deforestation_status = sit_desmatamento,
-          last_geom_update_date = data_ult_alter_geom,
-          last_geom_update_time = hora_ult_alter_geom,
-          infringement_number = num_auto_infracao,
-          infringement_series = ser_auto_infracao,
-          deforested_area_amount = qtd_area_desmatada,
-          biome_type_code = cod_tipo_bioma,
-          fiscal_action = acao_fiscalizatoria,
-          fiscal_order = ordem_fiscalizacao,
-          infringement_description = des_infracao,
-          print_date = data_impressao,
-          print_time = hora_impressao
+          municipality              = name_muni,
+          municipality_code         = code_muni,
+          state                     = uf,
+          location_description      = des_locali,
+          embargoed_person_name     = nome_embar,
+          embargoed_cpf_cnpj        = cpf_cnpj_e,
+          process_number            = num_proces,
+          tad_description           = des_tad,
+          embargo_date              = data_embargo,
+          embargo_time              = hora_embargo,
+          print_date                = data_impressao,
+          print_time                = hora_impressao,
+          last_geom_update_date     = data_ult_alter_geom,
+          last_geom_update_time     = hora_ult_alter_geom,
+          infringement_number       = num_auto_i,
+          infringement_series       = serie_auto,
+          deforested_area_amount    = qtd_area_d,
+          embargoed_area_amount     = qtd_area_e,
+          biome_type_code           = cod_tipo_b,
+          fiscal_action             = cd_acao_fi,
+          fiscal_order              = ordem_fisc,
+          infringement_description  = des_infrac,
+          longitude                 = num_longit,
+          latitude                  = num_latitu
         ) %>%
         dplyr::relocate(c(municipality, municipality_code, legal_amazon), .before = state)
     }
