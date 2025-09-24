@@ -552,7 +552,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       }
     }
     if (param$source == "sigmine") {
-      dat <- sf::read_sf(file.path(dir, "BRASIL.shp"))
+      dat <- purrr::quietly(sf::read_sf)(file.path(dir, "BRASIL.shp"))$result
     }
 
     if (param$source == "ibama") {
