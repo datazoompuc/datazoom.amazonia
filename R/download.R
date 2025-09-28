@@ -366,7 +366,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   if (source == "mapbiomas") {
     if (dataset == "mapbiomas_cover") {
-      if(param$geo_level == "indigenous_land") {
+      if (param$geo_level == "indigenous_land") {
         path <- "https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2024/08/MAPBIOMAS_BRAZIL-COL.9-INDIGENOUS_LANDS-1.xlsx"
       }
     }
@@ -521,7 +521,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   }
   if (download_method == "googledrive") {
     message("Please follow the steps from `googledrive` package to download the data. This may take a while.\nIn case of authentication errors, run vignette(\"GOOGLEDRIVE\").")
-    if (source == "seeg") {googledrive::drive_deauth()}
+    if (source == "seeg") {
+      googledrive::drive_deauth()
+    }
     googledrive::drive_download(path, path = temp, overwrite = TRUE)
   }
 
@@ -578,7 +580,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       names(dat) <- param$year
     }
     if (param$source == "prodes") {
-
       # clearing rasters to avoid overlap
 
       terra::tmpFiles(remove = TRUE)
@@ -593,7 +594,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     if (param$dataset == "energy_enterprises_distributed") {
       dat <- data.table::fread(temp, encoding = "Latin-1")
     } else if (dataset == "energy_generation") {
-      dat <- readxl::read_xlsx(temp, sheet = param$sheet,skip = param$skip_rows,na = c("-", ""))
+      dat <- readxl::read_xlsx(temp, sheet = param$sheet, skip = param$skip_rows, na = c("-", ""))
     }
   } else if (param$source == "ips") {
     dat <- param$sheet %>%
