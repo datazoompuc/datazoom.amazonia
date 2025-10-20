@@ -497,7 +497,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
   }
   if (source %in% c("deter", "terraclimate", "baci", "sigmine", "mapbiomas")) {
-    download_method <- "curl"
+    download_method <- "libcurl"
     quiet <- FALSE
   }
   if (source == "ibama") {
@@ -515,6 +515,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   if (download_method == "standard") {
     utils::download.file(url = path, destfile = temp, mode = "wb")
+  }
+  if (download_method == "libcurl") {
+    utils::download.file(url = path, destfile = temp, method = "libcurl", mode = "wb", quiet = TRUE)
   }
   if (download_method == "curl") {
     utils::download.file(url = path, destfile = temp, method = "curl", quiet = quiet)
