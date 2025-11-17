@@ -134,7 +134,7 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
 
 
   dat <- dat %>%
-    dplyr::mutate(codigouf = as.numeric(dplyr::coalesce(codigouf, 0))) %>%
+    dplyr::mutate(codigouf = as.numeric(dplyr::coalesce(as.numeric(codigouf), 0))) %>%
     dplyr::left_join(ufs, by = "codigouf", multiple = "first") %>%
     dplyr::select(-codigouf, -area)
 
