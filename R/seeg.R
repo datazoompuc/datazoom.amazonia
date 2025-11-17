@@ -51,7 +51,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
   sector <- emitters_production <- emitters <- economic_activity <- product <- NULL
   value <- emissions_category <- activity <- generating_processes_categories <- NULL
   biome <- biome_area <- transition_type <- emission_removal_bunker <- NULL
-  emissions_sources <- emissions_type <- emissions_generating_processes <- NULL
+  emissions_sources <- emissions_type <- emissions_generating_processes <- emission_bunker <- NULL
 
   #############################
   ## Define Basic Parameters ##
