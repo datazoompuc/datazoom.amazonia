@@ -94,7 +94,7 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
   }
 
   # Join all tables while preserving sf objects
-  dat <- do.call(rbind, dat)
+  dat <- dplyr::bind_rows(dat)
 
   # Remove useless column
   dat <- dat %>%
@@ -134,8 +134,8 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
 
 
   dat <- dat %>%
-    dplyr::mutate(codigouf = as.numeric(codigouf)) %>%
-    dplyr::left_join(ufs, by = "codigouf") %>%
+    dplyr::mutate(codigouf = as.numeric(dplyr::coalesce(as.numeric(codigouf), 0))) %>%
+    dplyr::left_join(ufs, by = "codigouf", multiple = "first") %>%
     dplyr::select(-codigouf, -area)
 
 
