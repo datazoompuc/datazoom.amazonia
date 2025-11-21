@@ -496,6 +496,11 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       options(timeout = 1000) # increase timeout limit
     }
   }
+  if (source == "prodes") {
+    message("This may take a while.\n")
+    a <- TRUE
+    options(timeout = max(1000, getOption("timeout")))
+  }
   if (source %in% c("deter", "terraclimate", "baci", "sigmine", "mapbiomas")) {
     download_method <- "curl"
     quiet <- FALSE
