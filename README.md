@@ -49,7 +49,9 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 **[1 - Environmental data](#environmental-data)**
 
 <table>
+
 <tr>
+
 <td>
 
 |                       |                                        |
@@ -60,6 +62,7 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 | **[Imazon](#imazon)** | *Deforestation pressure in the Amazon* |
 
 </td>
+
 <td>
 
 |                                   |                                     |
@@ -71,30 +74,37 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 | **[CENSOAGRO](#censoagro)**       | *Agriculture activities*            |
 
 </td>
+
 </tr>
+
 </table>
 
 **[2 - Social data](#social-data)**
 
 <table>
+
 <tr>
+
 <td>
 
-|                               |                                                         |
-|-------------------------------|---------------------------------------------------------|
-| **[IPS](#ips)**               | *Amazon Social Progress Index*                          |
-| **[DATASUS](#datasus)**       | *Causes of mortality and availability of hospital beds* |
-| **[IEMA](#iema)**             | *Access to electricity in the Amazon region*            |
-| **[Population](#population)** | *Population*                                            |
+|  |  |
+|----|----|
+| **[IPS](#ips)** | *Amazon Social Progress Index* |
+| **[IEMA](#iema)** | *Access to electricity in the Amazon region* |
+| **[Population](#population)** | *Population* |
 
 </td>
+
 </tr>
+
 </table>
 
 **[3 - Economic data](#economic-data)**
 
 <table>
+
 <tr>
+
 <td>
 
 |                             |                                 |
@@ -106,6 +116,7 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 | **[PAM](#pam)**             | *Agricultural production*       |
 
 </td>
+
 <td>
 
 |                         |                           |
@@ -117,19 +128,23 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 | **[EPE](#epe)**         | *Energy consumption*      |
 
 </td>
+
 </tr>
+
 </table>
 
 **[4 - Other tools](#other-tools)**
 
 <table>
+
 <tr>
+
 <td>
 
-|                                                                 |                                                                             |
-|-----------------------------------------------------------------|-----------------------------------------------------------------------------|
+|  |  |
+|----|----|
 | **[Legal Amazon Municipalities](#legal-amazon-municipalities)** | *Dataset with brazilian cities and whether they belong to the Legal Amazon* |
-| **[The ‘googledrive’ package](#googledrive)**                   | *Troubleshooting and information for downloads from Google Drive*           |
+| **[The ‘googledrive’ package](#googledrive)** | *Troubleshooting and information for downloads from Google Drive* |
 
 </table>
 
@@ -466,26 +481,28 @@ Netcdf files are downloaded from the
 web server, as recommended for rectangular subsets of the global data.
 
 <details>
+
 <summary>
+
 Click to see all dataset options
 </summary>
 
-| Dataset                       | Code | Description                                      |  Units   |
-|:------------------------------|:----:|:-------------------------------------------------|:--------:|
-| max_temperature               | tmax | Maximum 2-m Temperature                          |   degC   |
-| min_temperature               | tmin | Minimum 2-m Temperature                          |   degC   |
-| wind_speed                    |  ws  | Wind Speed at 10-m                               |   m/s    |
-| vapor_pressure_deficit        | vpd  | Vapor Pressure Deficit                           |   kPa    |
-| vapor_pressure                | vap  | 2-m Vapor Pressure                               |   kPa    |
-| snow_water_equivalent         | swe  | Snow Water Equivalent at End of Month            |    mm    |
-| shortwave_radiation_flux      | srad | Downward Shortwave Radiation Flux at the Surface |  W/m^2   |
-| soil_moisture                 | soil | Soil Moisture at End of Month                    |    mm    |
-| runoff                        |  q   | Runoff                                           |    mm    |
-| precipitation                 | ppt  | Accumulated Precipitation                        |    mm    |
-| potential_evaporation         | pet  | Reference Evapotranspiration                     |    mm    |
-| climatic_water_deficit        | def  | Climatic Water Deficit                           |    mm    |
-| water_evaporation             | aet  | Actual Evapotranspiration                        |    mm    |
-| palmer_drought_severity_index | PDSI | Palmer Drought Severity Index                    | unitless |
+| Dataset | Code | Description | Units |
+|:---|:--:|:---|:--:|
+| max_temperature | tmax | Maximum 2-m Temperature | degC |
+| min_temperature | tmin | Minimum 2-m Temperature | degC |
+| wind_speed | ws | Wind Speed at 10-m | m/s |
+| vapor_pressure_deficit | vpd | Vapor Pressure Deficit | kPa |
+| vapor_pressure | vap | 2-m Vapor Pressure | kPa |
+| snow_water_equivalent | swe | Snow Water Equivalent at End of Month | mm |
+| shortwave_radiation_flux | srad | Downward Shortwave Radiation Flux at the Surface | W/m^2 |
+| soil_moisture | soil | Soil Moisture at End of Month | mm |
+| runoff | q | Runoff | mm |
+| precipitation | ppt | Accumulated Precipitation | mm |
+| potential_evaporation | pet | Reference Evapotranspiration | mm |
+| climatic_water_deficit | def | Climatic Water Deficit | mm |
+| water_evaporation | aet | Actual Evapotranspiration | mm |
+| palmer_drought_severity_index | PDSI | Palmer Drought Severity Index | unitless |
 
 </details>
 
@@ -537,8 +554,7 @@ do Clima, a network of institutions focused on climate change research
 in Brazil.
 
 The data provided in SEEG’s Collection 9 is a series covering the period
-from 1970 to 2020, except for the Land Use Change Sector that has the
-series from 1990 to 2020.
+from 2000 to 2018.
 
 Using data collected from government entities, institutes, research
 centers, NGOs and other institutions, the estimates are created using
@@ -687,7 +703,7 @@ data <- load_censoagro(
   dataset = "vegetable_production_temporary",
   raw_data = FALSE,
   geo_level = "state",
-  time_period = 1996,
+  time_period = 1995,
   language = "pt"
 )
 ```
@@ -737,470 +753,6 @@ data <- load_ips(dataset = "all", raw_data = TRUE, time_period = 2014)
 data <- load_ips(
   dataset = "deforest", raw_data = FALSE,
   time_period = 2018, language = "pt"
-)
-```
-
-## DATASUS
-
-DATASUS is the IT department of SUS – the Brazilian Unified Health
-System. They provide data on health establishments, mortality, access to
-health services and several health indicators nationwide. This function
-allows for an easy download of several DATASUS raw datasets, and also
-cleans the data in a couple of datasets. The sections below explains
-each avaliable dataset.
-
-------------------------------------------------------------------------
-
-**Options:**
-
-1.  **dataset**:
-
-    - SIH hospitalization data is split across four datasets:
-      - `"datasus_sih_rd"` – Reduced AIHs (summary of hospitalizations)
-      - `"datasus_sih_sp"` – Professional Services performed during
-        hospitalization
-      - `"datasus_sih_rj"` – Rejected AIHs (general reason)
-      - `"datasus_sih_er"` – Rejected AIHs with specific error codes
-    - SIASUS Ambulatory Care Datasets:
-      - `"datasus_siasus_pa"` - Procedimentos Ambulatoriais
-        (consolidated outpatient procedures)
-      - `"datasus_siasus_abo"` - Acompanhamento pós-cirurgia bariátrica
-        (Post-bariatric surgery follow-up)
-      - `"datasus_siasus_ab"` - Cirurgia Bariátrica (bariatric surgery
-        follow-up)
-      - `"datasus_siasus_acf"` - Fístula Arteriovenosa (vascular access
-        for dialysis)
-      - `"datasus_siasus_ad"` - Laudos Diversos (miscellaneous
-        specialized procedures)
-      - `"datasus_siasus_am"` - Medicamentos (high-cost medications)
-      - `"datasus_siasus_an"` - Nefrologia (nephrology/dialysis)
-      - `"datasus_siasus_aq"` - Quimioterapia (chemotherapy)
-      - `"datasus_siasus_ar"` - Radioterapia (radiotherapy)
-      - `"datasus_siasus_atd"` - Tratamento Dialítico (dialysis
-        treatment)
-      - `"datasus_siasus_ps"` - RAAS Psicossocial (psychosocial care)
-      - `"datasus_siasus_sad"` - RAAS Atenção Domiciliar (home care)
-    - `"datasus_sim_do"` has SIM-DO mortality data. Possible subsets of
-      SIM-DO are:
-      - `"datasus_sim_dofet"` – Fetal  
-      - `"datasus_sim_doext"` – External causes  
-      - `"datasus_sim_doinf"` – Children  
-      - `"datasus_sim_domat"` – Maternal
-    - SIH hospitalization data is split across four datasets:
-      - `"datasus_sih_rd"` – Reduced AIHs (summary of
-        hospitalizations)  
-      - `"datasus_sih_sp"` – Professional Services performed during
-        hospitalization  
-      - `"datasus_sih_rj"` – Rejected AIHs (general reason)  
-      - `"datasus_sih_er"` – Rejected AIHs with specific error codes
-    - `"datasus_cnes_lt"` has data on the number of hospital beds.
-    - `"datasus_sinasc"` has information about Live Births
-    - further subsets of CNES are listed later, but those only allow for
-      the download of raw data.
-
-2.  **raw_data**: there are two options:
-
-    - `TRUE`: if you want the data as it is originally.
-    - `FALSE`: if you want the treated version of the data. Only
-      effective for SIM-DO and subsets, SIH, and CNES-LT.
-
-3.  **keep_all**: only applies when raw_data is FALSE. There are two
-    options:
-
-    - `TRUE`: keeps all original variables, adding variable labels and
-      possibly constructing extra variables.
-    - `FALSE`: aggregates data at the municipality, thereby losing
-      individual-level data, and only keeping aggregate measures.
-
-4.  **time_period**: picks the years for which the data will be
-    downloaded
-
-5.  **states**: a vector of states by which to filter the data. Only
-    works for datasets whose data is provided in separate files by
-    state.
-
-6.  **language**: you can choose between Portuguese `("pt")` and English
-    `("eng")`
-
-------------------------------------------------------------------------
-
-##### DATASUS - SIM (System of Mortality Information)
-
-Each original SIM data file contains rows corresponding to a declaration
-of death (DO), and columns with several characteristics of the person,
-the place of death, and the cause of death. The data comes from the main
-SIM-DO (Declarations of Death) dataset, which goes by the option
-`"datasus_sim_do"`. There are also 4 subsets of SIM-DO, namely SIM-DOFET
-(Fetal), SIM-DOMAT (Maternal), SIM-DOINF (Children), and SIM-DOEXT
-(External Causes), with corresponding dataset options
-`"datasus_sim_dofet", "datasus_sim_domat", "datasus_sim_doinf", "datasus_sim_doext"`.
-Note that only SIM-DO provides separate files for each state, so all
-other dataset options always contain data from the whole country.
-
-Below is an example of downloading the raw data, and also using the
-`raw_data = FALSE` option to obtain treated data. When this option is
-selected, we create several variables for deaths from each cause, which
-are encoded by their CID-10 codes. The function then returns, by
-default, the aggregated data of mortality sources at the municipality
-level. In this process, all the individual information such as age, sex,
-race, and schooling are lost, so we also offer the option of
-`keep_all = TRUE`, which creates all the indicator variables for cause
-of death, adds variable labels, and does not aggregate, thereby keeping
-all individual-level variables.
-
-**Examples:**
-
-``` r
-library(datazoom.amazonia)
-
-# download raw data for the year 2010 in the state of AM.
-data <- load_datasus(
-  dataset = "datasus_sim_do",
-  time_period = 2010,
-  states = "AM",
-  raw_data = TRUE
-)
-
-# download treated data with the number of deaths by cause in AM and PA.
-data <- load_datasus(
-  dataset = "datasus_sim_do",
-  time_period = 2010,
-  states = c("AM", "PA"),
-  raw_data = FALSE
-)
-
-# download treated data with the number of deaths by cause in AM and PA
-# keeping all individual variables.
-data <- load_datasus(
-  dataset = "datasus_sim_do",
-  time_period = 2010,
-  states = c("AM", "PA"),
-  raw_data = FALSE,
-  keep_all = TRUE
-)
-```
-
-##### DATASUS - CNES (National Register of Health Establishments)
-
-Provides information on health establishments, avaliable hospital beds,
-and active physicians. The data is split into 13 datasets: LT (Beds), ST
-(Establishments), DC (Complimentary data), EQ (Equipment), SR
-(Specialized services), HB (License), PF (Practitioner), EP (Teams), RC
-(Contractual Rules), IN (Incentives), EE (Teaching establishments), EF
-(Philanthropic establishments), and GM (Management and goals).
-
-Raw data is avaliable for all of them using the dataset option
-`datasus_cnes_lt, datasus_cnes_st`, and so on, and treated data is only
-avaliable for CNES - LT. When `raw_data = FALSE` is chosen, we return
-data on the number of total hospital beds and the ones avaliable through
-SUS, which can be aggregated by municipality (with option
-`keep_all = FALSE`) or keeping all original variables
-(`keep_all = TRUE`).
-
-**Examples:**
-
-``` r
-library(datazoom.amazonia)
-
-# download treated data with the number of avaliable beds in AM and PA.
-data <- load_datasus(
-  dataset = "datasus_cnes_lt",
-  time_period = 2010,
-  states = c("AM", "PA"),
-  raw_data = FALSE
-)
-```
-
-##### DATASUS – SIH (Hospital Information System)
-
-SIH consists of multiple datasets that record detailed information about
-hospital admissions funded by Brazil’s public health system (SUS). Each
-row corresponds to a Hospital Admission Authorization (AIH), and the
-files are organized by the type of information they contain. The main
-available datasets are:
-
-`"datasus_sih_rd"` – Reduced AIH (AIH Reduzida) Contains consolidated
-information about approved and processed AIHs, including the main
-procedure performed, related diagnoses, and total costs. This is the
-most commonly used dataset for statistical and epidemiological analyses.
-
-`"datasus_sih_sp"` – Professional Services (Serviços Profissionais)
-Provides detailed records of the professional services carried out
-during hospital stays, including procedures performed, professionals
-involved (CBO/CNS), and amounts paid for medical and hospital services.
-
-`"datasus_sih_rj"` – Rejected AIHs (AIHs Rejeitadas) Includes
-consolidated records of AIHs that were rejected, specifying the general
-reason for the rejection but without detailed error codes. Useful for
-analyzing the volume and impact of rejections.
-
-`"datasus_sih_er"` – Rejected AIHs with Error Codes (AIHs com Erro)
-Contains AIHs that were rejected due to inconsistencies found during
-processing. Each rejection includes a specific error code indicating the
-reason (e.g., invalid patient data, procedure incompatibilities).
-
-All SIH datasets are available by state and time period. By using the
-`raw_data = TRUE` parameter, the original DATASUS files are downloaded
-in their segmented form. If `raw_data = FALSE` is used, the data is
-returned as a single, processed tibble with renamed variables and
-bilingual (Portuguese/English) variable descriptions, making analysis
-easier and more intuitive.
-
-**Examples:**
-
-``` r
-library(datazoom.amazonia)
-
-# Download of raw data for Reduced AIH (AIH Reduzida) – State of Amazonas, 2010
-data_rd_raw <- load_datasus(
-  dataset = "datasus_sih_rd",
-  time_period = 2010,
-  states = "AM",
-  raw_data = TRUE
-)
-
-# Download of processed data for Rejected AIHs with Error Codes – State of Amazonas, 2010
-data_er_processed <- load_datasus(
-  dataset = "datasus_sih_er",
-  time_period = 2010,
-  states = "AM",
-  raw_data = FALSE
-)
-
-# Download of raw data for Professional Services – State of Acre, 2010
-data_sp_raw <- load_datasus(
-  dataset = "datasus_sih_sp",
-  time_period = 2010,
-  states = "AC",
-  raw_data = TRUE
-)
-
-# Download of processed data for Professional Services – Federal District, 2010
-data_sp_processed <- load_datasus(
-  dataset = "datasus_sih_sp",
-  time_period = 2010,
-  states = "DF",
-  raw_data = FALSE
-)
-```
-
-##### DATASUS – SIASUS (Ambulatory Information System)
-
-The SIASUS (Sistema de Informações Ambulatoriais do SUS) is Brazil’s
-official system for recording outpatient services funded by the public
-health system (SUS). Each row in the datasets corresponds to a procedure
-performed at an outpatient level, including clinical, administrative,
-and financial details. The data is organized by type of service or
-procedure group.
-
-All SIASUS datasets are available by state and time period. By setting
-the parameter `raw_data = TRUE`, users can download the original
-segmented DATASUS files. If `raw_data = FALSE` is used, the data is
-returned as a single, cleaned tibble with renamed variables and
-bilingual (Portuguese/English) variable descriptions, facilitating
-easier analysis and interpretation
-
-`"datasus_siasus_pa"` – Consolidated Outpatient Procedures
-(Procedimentos Ambulatoriais) Contains records of approved outpatient
-procedures across all specialties. This is the most comprehensive SIASUS
-dataset and is often used for general outpatient service analysis.
-
-`"datasus_siasus_ab"` – Bariatric Surgery (Cirurgia Bariátrica) Records
-related to bariatric surgery procedures performed in outpatient
-settings.
-
-`"datasus_siasus_abo"` – Post-Bariatric Surgery Follow-Up
-(Acompanhamento Bariátrico) Includes follow-up care for patients who
-have undergone bariatric surgery, focusing on long-term monitoring and
-outcomes.
-
-`"datasus_siasus_acf"` – Vascular Access for Dialysis (Fístula
-Arteriovenosa) Documents procedures involving the creation or
-maintenance of arteriovenous fistulas, essential for hemodialysis
-treatment.
-
-`"datasus_siasus_ad"` – Miscellaneous Specialized Procedures (Laudos
-Diversos) Covers less frequent or highly specialized outpatient
-procedures not classified in other datasets.
-
-`"datasus_siasus_am"` – High-Cost Medications (Medicamentos) Tracks the
-distribution and usage of outpatient medications that are high-cost and
-part of specific therapeutic programs.
-
-`"datasus_siasus_an"` – Nephrology / Dialysis (Nefrologia) Contains
-outpatient nephrology procedures, particularly related to the care and
-monitoring of patients with chronic kidney disease.
-
-`"datasus_siasus_aq"` – Chemotherapy (Quimioterapia) Records of
-chemotherapy treatments administered in outpatient settings.
-
-`"datasus_siasus_ar"` – Radiotherapy (Radioterapia) Covers radiotherapy
-procedures provided to patients in ambulatory care.
-
-`"datasus_siasus_atd"` – Dialysis Treatment (Tratamento Dialítico)
-Includes outpatient dialysis treatment sessions for patients with kidney
-failure.
-
-`"datasus_siasus_ps"` – RAAS Psychosocial Care (RAAS Psicossocial) Part
-of the Specialized Outpatient Mental Health Services. Records care
-provided through Psychosocial Care Centers (CAPS), including treatments
-for severe mental disorders and substance use.
-
-`"datasus_siasus_sad"` – RAAS Home Care (RAAS Atenção Domiciliar)
-Focuses on outpatient care provided at patients’ homes, often involving
-chronic condition management, palliative care, and multi-professional
-follow-ups.
-
-**Examples:**
-
-``` r
-library(datazoom.amazonia)
-
-# ABO – Post-Bariatric Surgery Follow-Up
-teste_abo <- load_datasus(
-  dataset = "datasus_siasus_abo",
-  time_period = 2012,
-  raw_data = FALSE,
-  language = "eng",
-  states = "AC"
-)
-
-# AB – Bariatric Surgery
-teste_ab <- load_datasus(
-  dataset = "datasus_siasus_ab",
-  time_period = 2014,
-  raw_data = FALSE,
-  language = "eng",
-  states = "AC"
-)
-
-# ACF – Vascular Access for Dialysis
-teste_acf <- load_datasus(
-  dataset = "datasus_siasus_acf",
-  time_period = 2018,
-  raw_data = FALSE,
-  language = "eng",
-  states = "PE"
-)
-
-# AD – Miscellaneous Specialized Procedures
-teste_ad <- load_datasus(
-  dataset = "datasus_siasus_ad",
-  time_period = 2022,
-  raw_data = FALSE,
-  language = "eng",
-  states = "AC"
-)
-
-# AM – High-Cost Medications
-teste_am <- load_datasus(
-  dataset = "datasus_siasus_am",
-  time_period = 2022,
-  raw_data = FALSE,
-  language = "eng",
-  states = "AC"
-)
-
-# AN – Nephrology / Dialysis
-teste_an <- load_datasus(
-  dataset = "datasus_siasus_an",
-  time_period = 2014,  # final year available
-  raw_data = FALSE,
-  language = "eng",
-  states = "AC"
-)
-
-# AQ – Chemotherapy
-teste_aq <- load_datasus(
-  dataset = "datasus_siasus_aq",
-  time_period = 2022,
-  raw_data = FALSE,
-  language = "eng",
-  states = "AC"
-)
-
-# AR – Radiotherapy
-teste_ar <- load_datasus(
-  dataset = "datasus_siasus_ar",
-  time_period = 2022,
-  raw_data = FALSE,
-  language = "eng",
-  states = "AC"
-)
-
-# ATD – Dialysis Treatment
-teste_atd <- load_datasus(
-  dataset = "datasus_siasus_atd",
-  time_period = 2024,
-  raw_data = FALSE,
-  language = "eng",
-  states = "AC"
-)
-
-# PA – Consolidated Outpatient Procedures
-teste_pa <- load_datasus(
-  dataset = "datasus_siasus_pa",
-  time_period = 2022,
-  raw_data = FALSE,
-  language = "eng",
-  states = "AC"
-)
-
-# PS – RAAS Psychosocial Care
-teste_ps <- load_datasus(
-  dataset = "datasus_siasus_ps",
-  time_period = 2022,
-  raw_data = FALSE,
-  language = "eng",
-  states = "AC"
-)
-
-# SAD – RAAS Home Care
-teste_sad <- load_datasus(
-  dataset = "datasus_siasus_sad",
-  time_period = 2015,
-  raw_data = FALSE,
-  language = "eng",
-  states = "AC"
-)
-```
-
-##### DATASUS – SINASC (Live Birth Information System)
-
-Datasus Sinasc is a dataset maintained by the Live Birth Information
-System (SINASC), which collects and records detailed information about
-births in Brazil. The data is extracted from Live Birth Certificates
-(DNVs) and includes information about the newborn, such as sex, weight,
-gestational age, as well as data about the mother, such as age, number
-of children and health conditions. SINASC is essential for monitoring
-maternal and child health and generating relevant indicators for the
-formulation of public health policies.
-
-The raw data is available through the `raw_data = TRUE` parameter in the
-`datasus_sinasc` dataset option. If the `raw_data = FALSE` parameter is
-chosen, the processed data will be provided, with detailed columns,
-renamed variables and description of the variables in both Portuguese
-and English, facilitating the analysis and interpretation of the data.
-
-**Examples:**
-
-``` r
-library(datazoom.amazonia)
-
-# download raw data
-data <- load_datasus(
-  dataset = "datasus_sinasc",
-  time_period = 2015,
-  states = "AM",
-  raw_data = TRUE
-)
-
-# download data in a single tibble, with variable labels
-data <- load_datasus(
-  dataset = "datasus_sinasc",
-  time_period = 2015,
-  states = "AM",
-  raw_data = FALSE
 )
 ```
 
@@ -1537,7 +1089,9 @@ the original databases and their narrower subsets. Note that downloading
 only specific crops is considerably faster.
 
 <details>
+
 <summary>
+
 Full datasets provided by IBGE:
 </summary>
 
@@ -1552,95 +1106,99 @@ Full datasets provided by IBGE:
 | beans           |
 
 </details>
+
 <details>
+
 <summary>
+
 Datasets generated from Temporary Crops:
 </summary>
 
-| dataset           |          Name (pt)           |          Name (eng)           |
-|:------------------|:----------------------------:|:-----------------------------:|
-| pineapple         |           Abacaxi            |           Pineapple           |
-| alfafa            |        Alfafa Fenada         |         Alfafa Fenada         |
-| cotton_herbaceous | Algodao Herbaceo (em Caroco) | Herbaceous Cotton (in Caroco) |
-| garlic            |             Alho             |            Garlic             |
-| peanut_temporary  |     Amendoim (em Casca)      |      Peanuts (in Shell)       |
-| rice              |       Arroz (em Casca)       |        Rice (in husk)         |
-| oats              |       Aveia (em Grao)        |        Oats (in grain)        |
-| sweet_potato      |         Batata Doce          |         Sweet potato          |
-| potato_temporary  |        Batata Inglesa        |        English potato         |
-| sugar_cane        |        Cana de Acucar        |          Sugar cane           |
-| forage_cane       |      Cana para Forragem      |          Forage cane          |
-| onion             |            Cebola            |             Onion             |
-| rye               |      Centeio (em Grao)       |        Rye (in grain)         |
-| barley            |       Cevada (em Grao)       |       Barley (in Grain)       |
-| pea               |      Ervilha (em Grao)       |        Pea (in Grain)         |
-| broad_bean        |        Fava (em Grao)        |     Broad Bean (in Grain)     |
-| beans_temporary   |       Feijao (em Grao)       |       Beans (in Grain)        |
-| tobacco           |       Fumo (em Folha)        |       Smoke (in Sheet)        |
-| sunflower_seeds   |      Girassol (em Grao)      |     Sunflower (in Grain)      |
-| jute_fiber        |         Juta (Fibra)         |         Jute (Fiber)          |
-| linen_seeds       |       Linho (Semente)        |         Linen (Seed)          |
-| malva_fiber       |        Malva (Fibra)         |         Malva (Fiber)         |
-| castor_bean       |        Mamona (Baga)         |      Castor bean (Berry)      |
-| cassava           |           Mandioca           |            Cassava            |
-| watermelon        |           Melancia           |          watermelon           |
-| melon             |            Melao             |             Melon             |
-| corn_temporary    |       Milho (em Grao)        |        corn (in grain)        |
-| ramie_fiber       |         Rami (Fibra)         |         Ramie (Fiber)         |
-| soybean           |        Soja (em Grao)        |      Soybean (in grain)       |
-| sorghum           |       Sorgo (em Grao)        |      Sorghum (in Grain)       |
-| tomato            |            Tomate            |            Tomato             |
-| wheat             |       Trigo (em Grao)        |        Wheat in grain)        |
-| triticale         |     Triticale (em Grao)      |     Triticale (in grain)      |
-| temporary_total   |            Total             |             Total             |
+| dataset | Name (pt) | Name (eng) |
+|:---|:--:|:--:|
+| total_temporary | Total | Total |
+| abacaxi | Abacaxi | Pineapple |
+| alfafa | Alfafa Fenada | Alfafa Fenada |
+| alho | Alho | Garlic |
+| algodao_herbaceo | Algodao Herbaceo (em Caroco) | Herbaceous Cotton (in Caroco) |
+| amendoim_temporary | Amendoim (em Casca) | Peanuts (in Shell) |
+| arroz | Arroz (em Casca) | Rice (in husk) |
+| aveia | Aveia (em Grao) | Oats (in grain) |
+| batata_doce | Batata Doce | Sweet potato |
+| batata_inglesa | Batata Inglesa | English potato |
+| cana_de_acucar | Cana de Acucar | Sugar cane |
+| cana_para_forragem | Cana para Forragem | Forage cane |
+| castor_bean | Mamona (Baga) | Castor bean (Berry) |
+| cebola | Cebola | Onion |
+| cevada | Cevada (em Grao) | Barley (in Grain) |
+| ervilha | Ervilha (em Grao) | Pea (in Grain) |
+| fava | Fava (em Grao) | Broad Bean (in Grain) |
+| feijao_temporary | Feijao (em Grao) | Beans (in Grain) |
+| fumo | Fumo (em Folha) | Smoke (in Sheet) |
+| girassol_sementes | Girassol (em Grao) | Sunflower (in Grain) |
+| juta_fibra | Juta (Fibra) | Jute (Fiber) |
+| linho_sementes | Linho (Semente) | Linen (Seed) |
+| malva_fibra | Malva (Fibra) | Malva (Fiber) |
+| mandioca | Mandioca | Cassava |
+| melancia | Melancia | watermelon |
+| melao | Melao | Melon |
+| milho_temporary | Milho (em Grao) | corn (in grain) |
+| rami_fibra | Rami (Fibra) | Ramie (Fiber) |
+| rye | Centeio (em Grao) | Rye (in grain) |
+| soja | Soja (em Grao) | Soybean (in grain) |
+| sorgo | Sorgo (em Grao) | Sorghum (in Grain) |
+| tomate | Tomate | Tomato |
+| trigo | Trigo (em Grao) | Wheat in grain) |
+| triticale | Triticale (em Grao) | Triticale (in grain) |
 
 </details>
+
 <details>
+
 <summary>
+
 Datasets generated from Permanent Crops:
 </summary>
 
-| dataset                 |          Name (pt)          |         Name (eng)         |
-|:------------------------|:---------------------------:|:--------------------------:|
-| avocado                 |           Abacate           |          Avocado           |
-| cotton_arboreo          | Algodao Arboreo (em Caroco) | Arboreo cotton (in Caroco) |
-| acai                    |            Acai             |            Acai            |
-| olive                   |          Azeitona           |           Olive            |
-| banana                  |       Banana (Cacho)        |       Banana (Bunch)       |
-| rubber_coagulated_latex | Borracha (Latex Coagulado)  | Rubber (Coagulated Latex)  |
-| rubber_liquid_latex     |  Borracha (Latex Liquido)   |   Rubber (Liquid Latex)    |
-| cocoa_beans             |     Cacau (em Amendoa)      |     Cocoa (in Almonds)     |
-| coffee_total            |    Cafe (em Grao) Total     |  Coffee (in Grain) Total   |
-| coffee_arabica          |   Cafe (em Grao) Arabica    |   Cafe (in Grao) Arabica   |
-| coffee_canephora        |  Cafe (em Grao) Canephora   | Cafe (in Grain) Canephora  |
-| cashew                  |            Caju             |           Cashew           |
-| khaki                   |            Caqui            |           Khaki            |
-| cashew_nut              |      Castanha de Caju       |        Cashew Nuts         |
-| india_tea               | Cha da India (Folha Verde)  |      India Tea (Leaf)      |
-| coconut                 |        Coco da Baia         |          Coconut           |
-| coconut_bunch           |    Dende (Cacho de Coco)    |       Coconut Bunch        |
-| yerba_mate              |   Erva Mate (Folha Verde)   |      Mate Herb (Leaf)      |
-| fig                     |            Figo             |            Fig             |
-| guava                   |           Goiaba            |           Guava            |
-| guarana_seeds           |      Guarana (Semente)      |       Guarana (Seed)       |
-| orange                  |           Laranja           |           Orange           |
-| lemon                   |            Limao            |           Lemon            |
-| apple                   |            Maca             |           Apple            |
-| papaya                  |            Mamao            |           Papaya           |
-| mango                   |            Manga            |           Mango            |
-| passion_fruit           |          Maracuja           |       Passion fruit        |
-| quince                  |           Marmelo           |           Quince           |
-| walnut                  |      Noz (Fruto Seco)       |     Walnut (Dry Fruit)     |
-| heart_of_palm           |           Palmito           |         Palm heart         |
-| pear                    |            Pera             |            Pear            |
-| peach                   |           Pessego           |           Peach            |
-| black_pepper            |      Pimenta do Reino       |        Black pepper        |
-| sisal_or_agave          |   Sisal ou Agave (Fibra)    |   Sisal or Agave (Fiber)   |
-| tangerine               |          Tangerina          |         Tangerine          |
-| tung                    |     Tungue (Fruto Seco)     |      Tung (Dry Fruit)      |
-| annatto_seeds           |      Urucum (Semente)       |       Annatto (Seed)       |
-| grape                   |             Uva             |           Grape            |
-| permanent_total         |            Total            |           Total            |
+| dataset | Name (pt) | Name (eng) |
+|:---|:--:|:--:|
+| acai | Acai | Acai |
+| annatto_seeds | Urucum (Semente) | Annatto (Seed) |
+| apple | Maca | Apple |
+| avocado | Abacate | Avocado |
+| banana | Banana (Cacho) | Banana (Bunch) |
+| black_pepper | Pimenta do Reino | Black pepper |
+| cashew | Caju | Cashew |
+| cashew_nut | Castanha de Caju | Cashew Nuts |
+| cocoa_beans | Cacau (em Amendoa) | Cocoa (in Almonds) |
+| coffee_arabica | Cafe (em Grao) Arabica | Cafe (in Grao) Arabica |
+| coffee_canephora | Cafe (em Grao) Canephora | Cafe (in Grain) Canephora |
+| coffee_total | Cafe (em Grao) Total | Coffee (in Grain) Total |
+| coconut | Coco da Baia | Coconut |
+| coconut_bunch | Dende (Cacho de Coco) | Coconut Bunch |
+| cotton_arboreo | Algodao Arboreo (em Caroco) | Arboreo cotton (in Caroco) |
+| fig | Figo | Fig |
+| grape | Uva | Grape |
+| guarana_seeds | Guarana (Semente) | Guarana (Seed) |
+| guava | Goiaba | Guava |
+| heart_of_palm | Palmito | Palm heart |
+| india_tea | Cha da India (Folha Verde) | India Tea (Leaf) |
+| khaki | Caqui | Khaki |
+| lemon | Limao | Lemon |
+| mango | Manga | Mango |
+| papaya | Mamao | Papaya |
+| passion_fruit | Maracuja | Passion fruit |
+| peach | Pessego | Peach |
+| pear | Pera | Pear |
+| permanent_total | Total | Total |
+| quince | Marmelo | Quince |
+| rubber_coagulated_latex | Borracha (Latex Coagulado) | Rubber (Coagulated Latex) |
+| rubber_liquid_latex | Borracha (Latex Liquido) | Rubber (Liquid Latex) |
+| sisal_or_agave | Sisal ou Agave (Fibra) | Sisal or Agave (Fiber) |
+| tangerine | Tangerina | Tangerine |
+| tung | Tungue (Fruto Seco) | Tung (Dry Fruit) |
+| walnut | Noz (Fruto Seco) | Walnut (Dry Fruit) |
+| yerba_mate | Erva Mate (Folha Verde) | Mate Herb (Leaf) |
 
 </details>
 
@@ -2041,11 +1599,11 @@ with Legal Amazon municipalities, along with a data frame from the
 ‘geobr’ package. For more information on the columns, run
 `??datazoom.amazonia::municipalities`.
 
-Regarding the statistics in this package reported at the
-**municipality level**, for municipalities that are only partially 
-included in the Legal Amazon (according to IBGE's latest release), 
-the data refer to the entire municipality, not just to the portion that 
-lies within the Legal Amazon.
+Regarding the statistics in this package reported at the **municipality
+level**, for municipalities that are only partially included in the
+Legal Amazon (according to IBGE’s latest release), the data refer to the
+entire municipality, not just to the portion that lies within the Legal
+Amazon.
 
 ``` r
 # load Brazilian municipalities dataset

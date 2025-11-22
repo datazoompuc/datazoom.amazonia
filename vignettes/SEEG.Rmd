@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 Loads estimates of emission of greenhouse gases of Brazilian cities and states from SEEG. SEEG is the System of Estimates of Emissions and Removals of Greenhouse Gases (SEEG), an initiative of the Observatório do Clima, a network of institutions focused on climate change research in Brazil. 
 
-The data provided in SEEG's Collection 9 is a series covering the period from 1970 to 2020, except for the Land Use Change Sector that has the series from 1990 to 2020.
+The data provided in SEEG's Collection 9 is a series covering the period from 2000 to 2018.
 
 Using data collected from government entities, institutes, research centers, NGOs and other institutions, the estimates are created using the methodology of the Brazilian Inventory of Anthropic Emissions and Removals of Greenhouse Gases, assembled by the Ministry of Science, Technology and Innovation (MCTI), and the directives of Intergovernmental Panel on Climate Change (IPCC)
 
