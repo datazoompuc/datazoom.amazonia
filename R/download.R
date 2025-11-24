@@ -511,9 +511,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     quiet <- TRUE
   }
   if (source == "seeg") {
-    if (geo_level == "municipality") {
       download_method <- "googledrive"
-    }
   }
 
   ## Downloading file by the selected method
@@ -720,12 +718,12 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
     ## SEEG
 
-    "seeg", "seeg", NA, "1970-2021", "Country, State, Municipality", "https://seeg-br.s3.amazonaws.com/Estat%C3%ADsticas/SEEG10/1-SEEG10_GERAL-BR_UF_2022.10.27-FINAL-SITE.xlsx",
-    "seeg", "seeg_farming", NA, "1970-2021", "Country, State, Municipality", "https://seeg-br.s3.amazonaws.com/Estat%C3%ADsticas/SEEG10/1-SEEG10_GERAL-BR_UF_2022.10.27-FINAL-SITE.xlsx",
-    "seeg", "seeg_industry", NA, "1970-2021", "Country, State, Municipality", "https://seeg-br.s3.amazonaws.com/Estat%C3%ADsticas/SEEG10/1-SEEG10_GERAL-BR_UF_2022.10.27-FINAL-SITE.xlsx",
-    "seeg", "seeg_energy", NA, "1970-2021", "Country, State, Municipality", "https://seeg-br.s3.amazonaws.com/Estat%C3%ADsticas/SEEG10/1-SEEG10_GERAL-BR_UF_2022.10.27-FINAL-SITE.xlsx",
-    "seeg", "seeg_land", NA, "1970-2021", "Country, State, Municipality", "https://seeg-br.s3.amazonaws.com/Estat%C3%ADsticas/SEEG10/1-SEEG10_GERAL-BR_UF_2022.10.27-FINAL-SITE.xlsx",
-    "seeg", "seeg_residuals", NA, "1970-2021", "Country, State, Municipality", "https://seeg-br.s3.amazonaws.com/Estat%C3%ADsticas/SEEG10/1-SEEG10_GERAL-BR_UF_2022.10.27-FINAL-SITE.xlsx",
+    "seeg", "seeg", NA, "2000-2018", "Country, State, Municipality", "https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd",
+    "seeg", "seeg_farming", NA, "2000-2018", "Country, State, Municipality", "https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd",
+    "seeg", "seeg_industry", NA, "2000-2018", "Country, State, Municipality", "https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd",
+    "seeg", "seeg_energy", NA, "2000-2018", "Country, State, Municipality", "https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd",
+    "seeg", "seeg_land", NA, "2000-2018", "Country, State, Municipality", "https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd",
+    "seeg", "seeg_residuals", NA, "2000-2018", "Country, State, Municipality", "https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd",
 
     ## Censo Agro
 
