@@ -184,6 +184,11 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
   dat <- dat %>%
     dplyr::bind_rows()
 
+  # removing exceding municipality
+
+  dat <- dat %>%
+    dplyr::filter(name_muni != "Passagem Franca")
+
   ################################
   ## Harmonizing Variable Names ##
   ################################
