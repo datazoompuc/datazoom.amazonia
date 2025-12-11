@@ -1,0 +1,32 @@
+{
+  "lockfile_version": 1,
+  "os": "Windows 11 x64 (build 26200)",
+  "r_version": "R version 4.4.1 (2024-06-14 ucrt)",
+  "platform": "x86_64-w64-mingw32",
+  "packages": [
+    {
+      "ref": "deps::.",
+      "package": "localprojectautoscan-deps",
+      "version": "1.0.0",
+      "type": "deps",
+      "direct": true,
+      "binary": false,
+      "dependencies": [],
+      "vignettes": false,
+      "metadata": {
+        "RemotePkgRef": "deps::.",
+        "RemoteType": "deps"
+      },
+      "sources": [],
+      "target": "src/contrib/localprojectautoscan-deps_1.0.0.tar.gz",
+      "platform": "source",
+      "rversion": "*",
+      "directpkg": true,
+      "license": "Unknown",
+      "dep_types": ["Depends", "Imports", "LinkingTo"],
+      "params": [],
+      "install_args": "--no-multiarch",
+      "sysreqs": ""
+    }
+  ]
+}
