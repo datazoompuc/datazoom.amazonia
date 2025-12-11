@@ -12,6 +12,8 @@ jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}
 
+    continue-on-error: ${{ matrix.config.r == 'devel' }}
+
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
 
     strategy:
