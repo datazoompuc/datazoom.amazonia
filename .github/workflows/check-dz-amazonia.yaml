@@ -20,12 +20,24 @@ jobs:
           r-version: 'release'
           use-public-rspm: true
 
+      - name: Instalar dependências do sistema (sf/units)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgdal-dev \
+            libgeos-dev \
+            libproj-dev \
+            libudunits2-dev \
+            gdal-bin \
+            proj-bin \
+            libcurl4-openssl-dev \
+            libssl-dev \
+            libxml2-dev
+
       - name: Instalar dependências do pacote
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: |
-            any::devtools
-            any::rlang
             local::.
           needs: check
 
@@ -37,5 +49,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: check-results
-          path: check_results_*.csv 
+          path: check_results_*.csv
 
