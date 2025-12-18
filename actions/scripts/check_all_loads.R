@@ -1,5 +1,12 @@
 # actions/scripts/check_all_loads.R
 
+args_cli <- commandArgs(trailingOnly = TRUE)
+target_fn <- NULL
+
+ if (length(args_cli) >= 2 && args_cli[1] == "--fn") target_fn <- args_cli[2]
+
+
+
 library(datazoom.amazonia)
 
 # Config
@@ -138,6 +145,13 @@ call_with_geo <- function(fn, args, geo_level = "state") {
 fns <- ls("package:datazoom.amazonia")
 get_fns <- fns[startsWith(fns, "load_") & !endsWith(fns, "datasus")]
 
+if (!is.null(target_fn)) {
+  if (!target_fn %in% get_fns){
+    stop("Função especificada em --fn não encontrada: ", target_fn)
+  }
+  get_fns <- intersect(get_fns, target_fn)
+}
+
 results <- data.frame(
   function_name = character(),
   dataset       = character(),
@@ -213,7 +227,15 @@ for (fn_name in get_fns) {
 print(results)
 
 # salva resultados
-write.csv(results, sprintf("check_results_%s.csv", Sys.Date()), row.names = FALSE)
+out_name <- if (!is.na(target_fn)) {
+  sprintf("check_results_%s_%s.csv", target_fn, Sys.Date())
+} else {
+  sprintf("check_results_all_%s_.csv", Sys.Date())
+}
+
+write.csv(results, out_name, row.names = FALSE)
+
+cat("Resultados salvos em:", out_name, "\n")
 
 # Falha só se tiver FAIL (não WARN/WEIRD)
 if (any(results$status == "FAIL")) {
