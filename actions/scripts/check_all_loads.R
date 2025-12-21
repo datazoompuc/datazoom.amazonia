@@ -6,7 +6,9 @@ target_fn <- NULL
  if (length(args_cli) >= 2 && args_cli[1] == "--fn") target_fn <- args_cli[2]
 
 
-
+if (!requireNamespace("datazoom.amazonia", quietly = TRUE)) {
+  stop("Pacote datazoom.amazonia não está instalado. Verifique o step setup-r-dependencies.")
+}
 library(datazoom.amazonia)
 
 # Config
@@ -156,6 +158,8 @@ results <- data.frame(
   function_name = character(),
   dataset       = character(),
   status        = character(),
+  n_rows        = integer(),
+  n_cols        = integer(),
   message       = character(),
   stringsAsFactors = FALSE
 )
@@ -173,6 +177,8 @@ for (fn_name in get_fns) {
       function_name = fn_name,
       dataset       = NA_character_,
       status        = "SKIP",
+      n_rows        = NA_integer_,
+      n_cols        = NA_integer_,
       message       = "Sem datasets_by_fn definido para esta função",
       stringsAsFactors = FALSE
     ))
@@ -187,6 +193,8 @@ for (fn_name in get_fns) {
     if ("time_period" %in% arg_names) args$time_period <- TIME_PERIOD
     if ("raw_data"    %in% arg_names) args$raw_data    <- RAW_DATA
     if ("language"    %in% arg_names) args$language    <- LANGUAGE
+
+    out <- NULL
 
     res <- tryCatch(
       {
@@ -212,13 +220,32 @@ for (fn_name in get_fns) {
       "FAIL"
     }
 
-    msg <- if (status %in% c("WARN", "FAIL", "WEIRD")) res else ""
+    # dimensões (só faz sentido se out for data.frame/tibble)
+    n_rows <- NA_integer_
+    n_cols <- NA_integer_
+    if (!is.null(out) && (is.data.frame(out) || inherits(out, "tbl_df"))) {
+      n_rows <- nrow(out)
+      n_cols <- ncol(out)
+    }
+
+    # se rodou "OK" (ou até "WARN") mas retornou vazio, marque como EMPTY
+    # (ajuste a regra se quiser: ex. considerar vazio só quando n_rows == 0)
+    if (status %in% c("OK", "WARN") && !is.na(n_rows) && n_rows == 0) {
+      status <- "EMPTY"
+      if (!startsWith(res, "WARN:")) {
+        res <- "EMPTY: data.frame retornado com 0 linhas"
+      }
+    }
+
+    msg <- if (status %in% c("WARN", "FAIL", "WEIRD", "EMPTY")) res else ""
 
     results <- rbind(results, data.frame(
       function_name = fn_name,
       dataset       = ds,
       status        = status,
-      message       = if (status %in% c("WARN","FAIL","WEIRD")) res else "",
+      n_rows        = n_rows,
+      n_cols        = n_cols,
+      message       = msg,
       stringsAsFactors = FALSE
     ))
   }
@@ -227,17 +254,17 @@ for (fn_name in get_fns) {
 print(results)
 
 # salva resultados
-out_name <- if (!is.na(target_fn)) {
+out_name <- if (!is.null(target_fn)) {
   sprintf("check_results_%s_%s.csv", target_fn, Sys.Date())
 } else {
-  sprintf("check_results_all_%s_.csv", Sys.Date())
+  sprintf("check_results_all_%s.csv", Sys.Date())
 }
 
 write.csv(results, out_name, row.names = FALSE)
 
 cat("Resultados salvos em:", out_name, "\n")
 
-# Falha só se tiver FAIL (não WARN/WEIRD)
-if (any(results$status == "FAIL")) {
-  stop("Uma ou mais funções load_ falharam. Veja o log acima.")
+
+if (any(results$status %in% c("FAIL", "EMPTY"))) {
+  stop("Uma ou mais funções load_ falharam (FAIL/EMPTY). Veja o log/CSV.")
 }
