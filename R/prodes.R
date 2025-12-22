@@ -46,7 +46,7 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
   ## Bind Global Variables ##
   ###########################
 
-  . <- area_km2 <- km <- ID <- prodes_amazonia_legal_2023 <- NULL
+  . <- area_km2 <- km <- ID <- prodes_amazonia_legal_2023 <- name_muni <- NULL
 
   #############################
   ## Define Basic Parameters ##
