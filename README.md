@@ -158,7 +158,7 @@ low-cut deforested area at the municipality level, going back to the
 year 2007.
 
 INPE’s most recent data is now published at
-[TerraBrasilis](http://terrabrasilis.dpi.inpe.br/downloads/). We read
+[TerraBrasilis](https://terrabrasilis.dpi.inpe.br/downloads/). We read
 their full [raster
 data](https://terrabrasilis.dpi.inpe.br/geonetwork/srv/eng/catalog.search#/metadata/507294db-a789-42dd-9158-9dea77d9293f)
 for the Legal Amazon region and extract values onto the map of Brazilian
