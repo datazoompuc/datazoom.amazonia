@@ -366,7 +366,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   if (source == "mapbiomas") {
     if (dataset == "mapbiomas_cover") {
-      if(param$geo_level == "indigenous_land") {
+      if (param$geo_level == "indigenous_land") {
         path <- "https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2024/08/MAPBIOMAS_BRAZIL-COL.9-INDIGENOUS_LANDS-1.xlsx"
       }
     }
@@ -496,6 +496,11 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       options(timeout = 1000) # increase timeout limit
     }
   }
+  if (source == "prodes") {
+    message("This may take a while.\n")
+    a <- TRUE
+    options(timeout = max(1000, getOption("timeout")))
+  }
   if (source %in% c("deter", "terraclimate", "baci", "sigmine", "mapbiomas")) {
     download_method <- "curl"
     quiet <- FALSE
@@ -506,9 +511,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     quiet <- TRUE
   }
   if (source == "seeg") {
-    if (geo_level == "municipality") {
       download_method <- "googledrive"
-    }
   }
 
   ## Downloading file by the selected method
@@ -521,7 +524,9 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   }
   if (download_method == "googledrive") {
     message("Please follow the steps from `googledrive` package to download the data. This may take a while.\nIn case of authentication errors, run vignette(\"GOOGLEDRIVE\").")
-    if (source == "seeg") {googledrive::drive_deauth()}
+    if (source == "seeg") {
+      googledrive::drive_deauth()
+    }
     googledrive::drive_download(path, path = temp, overwrite = TRUE)
   }
 
@@ -552,7 +557,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       }
     }
     if (param$source == "sigmine") {
-      dat <- sf::read_sf(file.path(dir, "BRASIL.shp"))
+      dat <- purrr::quietly(sf::read_sf)(file.path(dir, "BRASIL.shp"))$result
     }
 
     if (param$source == "ibama") {
@@ -578,7 +583,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       names(dat) <- param$year
     }
     if (param$source == "prodes") {
-
       # clearing rasters to avoid overlap
 
       terra::tmpFiles(remove = TRUE)
@@ -593,7 +597,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     if (param$dataset == "energy_enterprises_distributed") {
       dat <- data.table::fread(temp, encoding = "Latin-1")
     } else if (dataset == "energy_generation") {
-      dat <- readxl::read_xlsx(temp, sheet = param$sheet,skip = param$skip_rows,na = c("-", ""))
+      dat <- readxl::read_xlsx(temp, sheet = param$sheet, skip = param$skip_rows, na = c("-", ""))
     }
   } else if (param$source == "ips") {
     dat <- param$sheet %>%
@@ -714,12 +718,12 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
     ## SEEG
 
-    "seeg", "seeg", NA, "1970-2021", "Country, State, Municipality", "https://seeg-br.s3.amazonaws.com/Estat%C3%ADsticas/SEEG10/1-SEEG10_GERAL-BR_UF_2022.10.27-FINAL-SITE.xlsx",
-    "seeg", "seeg_farming", NA, "1970-2021", "Country, State, Municipality", "https://seeg-br.s3.amazonaws.com/Estat%C3%ADsticas/SEEG10/1-SEEG10_GERAL-BR_UF_2022.10.27-FINAL-SITE.xlsx",
-    "seeg", "seeg_industry", NA, "1970-2021", "Country, State, Municipality", "https://seeg-br.s3.amazonaws.com/Estat%C3%ADsticas/SEEG10/1-SEEG10_GERAL-BR_UF_2022.10.27-FINAL-SITE.xlsx",
-    "seeg", "seeg_energy", NA, "1970-2021", "Country, State, Municipality", "https://seeg-br.s3.amazonaws.com/Estat%C3%ADsticas/SEEG10/1-SEEG10_GERAL-BR_UF_2022.10.27-FINAL-SITE.xlsx",
-    "seeg", "seeg_land", NA, "1970-2021", "Country, State, Municipality", "https://seeg-br.s3.amazonaws.com/Estat%C3%ADsticas/SEEG10/1-SEEG10_GERAL-BR_UF_2022.10.27-FINAL-SITE.xlsx",
-    "seeg", "seeg_residuals", NA, "1970-2021", "Country, State, Municipality", "https://seeg-br.s3.amazonaws.com/Estat%C3%ADsticas/SEEG10/1-SEEG10_GERAL-BR_UF_2022.10.27-FINAL-SITE.xlsx",
+    "seeg", "seeg", NA, "2000-2018", "Country, State, Municipality", "https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd",
+    "seeg", "seeg_farming", NA, "2000-2018", "Country, State, Municipality", "https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd",
+    "seeg", "seeg_industry", NA, "2000-2018", "Country, State, Municipality", "https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd",
+    "seeg", "seeg_energy", NA, "2000-2018", "Country, State, Municipality", "https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd",
+    "seeg", "seeg_land", NA, "2000-2018", "Country, State, Municipality", "https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd",
+    "seeg", "seeg_residuals", NA, "2000-2018", "Country, State, Municipality", "https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd",
 
     ## Censo Agro
 

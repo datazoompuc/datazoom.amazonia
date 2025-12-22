@@ -1,35 +1,28 @@
 ## Test environments
-- R-hub windows-x86_64-devel (r-devel)
-- R-hub ubuntu-gcc-release (r-release)
-- R-hub fedora-clang-devel (r-devel)
+- R-CMD-check macos-latest (release)
+- R-CMD-check windows-latest (release)
+- R-CMD-check ubuntu-latest (devel)
+- R-CMD-check ubuntu-latest (release)
+- R-CMD-check ubuntu-latest (oldrel-1)
 
 ## R CMD check results
 
-0 errors ✔ | 0 warnings ✔ | 6 notes ✖
+0 errors ✔ | 0 warnings ✔ | 3 notes ✖
 
-There are four distinct notes across the platforms:
+There are two distinct notes across the platforms:
 
-  * Our maintainer has changed
+  * Our maintainer has changed.
   
-  * checking for non-standard things in the check directory ... NOTE  
-  Found the following files/directories:  
-  ''NULL''
-    
-  * checking for detritus in the temp directory ... NOTE  
-  Found the following files/directories:  
-  'lastMiKTeXException'
-  
-  * checking HTML version of manual ... NOTE  
-  Skipping checking HTML validation: no command 'tidy' found
-  
-Seem to be common and harmless, not sure of the cause.
-  
-  * Found the following (possibly) invalid URLs:  
-    URL: https://dadosabertos.aneel.gov.br/dataset/relacao-de-empreendimentos-de-geracao-distribuida  
-      From: inst/doc/ANEEL.html  
-            README.md  
-      Status: 403  
-      Message: Forbidden
+  * Found the following (possibly) invalid URLs:
+    URL: http://terrabrasilis.dpi.inpe.br/downloads/ (moved to https://terrabrasilis.dpi.inpe.br/downloads/)
+      From: inst/doc/PRODES.html
+            README.md
+      Status: 200
+      Message: OK
+    URL: http://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37 (moved to https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37&id=37)
+      From: inst/doc/BACI.html
+            README.md
+      Status: 200
+      Message: OK
       
-The URL works for us.  
-
+Both URL work for us.  
