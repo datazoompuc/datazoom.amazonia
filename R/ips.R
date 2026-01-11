@@ -122,12 +122,11 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
   )
 
   if (param$raw_data) {
+    # converting into a dataframe
 
-    #converting into a dataframe
-
-    colnames = dat[[1]] %>% colnames()
-    dat = dat %>% as.data.frame()
-    colnames(dat) = colnames
+    colnames <- dat[[1]] %>% colnames()
+    dat <- dat %>% as.data.frame()
+    colnames(dat) <- colnames
 
     return(dat)
   }

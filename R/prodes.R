@@ -184,6 +184,11 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
   dat <- dat %>%
     dplyr::bind_rows()
 
+  # remove exceding municipality
+  ## Passagem Franca (MA) is at 43.95o west, thus mistakenly included through the 44o west rule
+  dat <- dat %>%
+    dplyr::filter(name_muni != "Passagem Franca")
+
   ################################
   ## Harmonizing Variable Names ##
   ################################

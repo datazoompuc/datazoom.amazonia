@@ -3,7 +3,7 @@
 args_cli <- commandArgs(trailingOnly = TRUE)
 target_fn <- NULL
 
-if (length(args_cli) >= 2 && args_cli[1] == "--fn") target_fn <- args_cli[2]
+ if (length(args_cli) >= 2 && args_cli[1] == "--fn") target_fn <- args_cli[2]
 
 
 if (!requireNamespace("datazoom.amazonia", quietly = TRUE)) {
