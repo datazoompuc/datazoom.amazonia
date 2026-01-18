@@ -12,7 +12,9 @@ Functions to download and treat data regarding the Brazilian Amazon region from 
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://www.econ.puc-rio.br/datazoom/}
+  \item \url{https://datazoom.com.br/amazonia/en/}
+  \item \url{https://github.com/datazoompuc/datazoom.amazonia}
+  \item Report bugs at \url{https://github.com/datazoompuc/datazoom.amazonia/issues}
 }
 
 }
