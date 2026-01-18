@@ -778,7 +778,7 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
     ## PIB-Munic
 
-    "pibmunic", "pibmunic", "5938", "2002-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pib-munic/tabelas",
+    "pibmunic", "pibmunic", "5938", "2002-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pib-munic/tabelas",
 
     ## CEMPRE
 
