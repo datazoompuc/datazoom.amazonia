@@ -24,7 +24,7 @@ Authors@R: c(
 Description: Functions to download and treat data regarding the Brazilian
     Amazon region from a variety of official sources.
 License: MIT + file LICENSE
-URL: https://www.econ.puc-rio.br/datazoom/
+URL: https://datazoom.com.br/amazonia/en/, https://github.com/datazoompuc/datazoom.amazonia
 Depends: 
     R (>= 4.0)
 Imports:
@@ -59,3 +59,4 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+BugReports: https://github.com/datazoompuc/datazoom.amazonia/issues

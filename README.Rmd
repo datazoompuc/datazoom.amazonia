@@ -268,12 +268,12 @@ devtools::load_all()
 
 ## Credits
 
-DataZoom is developed by a team at Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio), Department of Economics. Our official website is at: <https://www.econ.puc-rio.br/datazoom/>.
+DataZoom is developed by a team at Pontifícia Universidade Católica do Rio de Janeiro (PUC-Rio), Department of Economics. Our official website is at: <https://datazoom.com.br/pt/>.
 
 To cite package `datazoom.amazonia` in publications use:
 
 > Data Zoom (2023). Data Zoom: Simplifying Access To Brazilian Microdata.  
-> https://www.econ.puc-rio.br/datazoom/english/index.html
+> https://datazoom.com.br/en/
 
 A BibTeX entry for LaTeX users is:
 
@@ -281,7 +281,7 @@ A BibTeX entry for LaTeX users is:
 @Unpublished{DataZoom2023,
 	author = {Data Zoom},
 	title = {Data Zoom: Simplifying Access To Brazilian Microdata},
-	url = {https://www.econ.puc-rio.br/datazoom/english/index.html},
+	url = {https://datazoom.com.br/en/},
 	year = {2023},
 }
 
