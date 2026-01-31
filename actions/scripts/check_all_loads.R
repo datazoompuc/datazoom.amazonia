@@ -11,6 +11,12 @@ if (!requireNamespace("datazoom.amazonia", quietly = TRUE)) {
 }
 library(datazoom.amazonia)
 
+# Avoid iterative authentication in CI (googledrive)
+if (requireNamespace("googledrive", quietly = TRUE)) {
+  options(gargle_oauth_cache = FALSE)
+  googledrive::drive_deauth()
+}
+
 # Config
 TIME_PERIOD <- 2020
 LANGUAGE    <- "pt"
@@ -195,49 +201,60 @@ for (fn_name in get_fns) {
     if ("language"    %in% arg_names) args$language    <- LANGUAGE
 
     out <- NULL
+    warn_msgs <- character(0)
 
     res <- tryCatch(
-      {
-        out <- call_with_geo(fn, args, geo_level = GEO_LEVEL)
-
-        if (!is.null(out) && (is.data.frame(out) || inherits(out, "tbl_df"))) {
+      withCallingHandlers(
+        {
+          out <- call_with_geo(fn, args, geo_level = GEO_LEVEL)
           "OK"
-        } else {
-          "WEIRD"
+        },
+        warning = function(w) {
+          warn_msgs <<- c(warn_msgs, conditionMessage(w))
+          invokeRestart("muffleWarning")
         }
-      },
-      warning = function(w) paste("WARN:", conditionMessage(w)),
-      error   = function(e) paste("ERROR:", conditionMessage(e))
+      ),
+      error = function(e) paste("ERROR:", conditionMessage(e))
     )
 
-    status <- if (identical(res, "OK")) {
-      "OK"
-    } else if (identical(res, "WEIRD")) {
-      "WEIRD"
-    } else if (startsWith(res, "WARN:")) {
+    # decide status
+    status <- if (startsWith(res, "ERROR:")) {
+      "FAIL"
+    } else if (length(warn_msgs) > 0) {
       "WARN"
     } else {
-      "FAIL"
+      "OK"
     }
 
-    # dimensões (só faz sentido se out for data.frame/tibble)
+    # dims
     n_rows <- NA_integer_
     n_cols <- NA_integer_
     if (!is.null(out) && (is.data.frame(out) || inherits(out, "tbl_df"))) {
       n_rows <- nrow(out)
       n_cols <- ncol(out)
+    } else if (status != "FAIL") {
+      status <- "WEIRD"
     }
 
-    # se rodou "OK" (ou até "WARN") mas retornou vazio, marque como EMPTY
-    # (ajuste a regra se quiser: ex. considerar vazio só quando n_rows == 0)
+    # empty
     if (status %in% c("OK", "WARN") && !is.na(n_rows) && n_rows == 0) {
       status <- "EMPTY"
-      if (!startsWith(res, "WARN:")) {
-        res <- "EMPTY: data.frame retornado com 0 linhas"
-      }
     }
 
-    msg <- if (status %in% c("WARN", "FAIL", "WEIRD", "EMPTY")) res else ""
+    # mensagem
+    msg <- ""
+    if (status == "FAIL") {
+      msg <- res
+    } else if (status %in% c("WARN","WEIRD","EMPTY")) {
+      msg <- paste(c(warn_msgs, if (status=="EMPTY") "EMPTY: data.frame retornado com 0 linhas" else NULL), collapse = " | ")
+    }
+
+    # opcional: classificar falta de disco como FAIL (mesmo vindo como warning)
+    if (grepl("Estimated disk space needed", msg, fixed = TRUE)) {
+      status <- "FAIL"
+      msg <- paste("DISK:", msg)
+    }
+
 
     results <- rbind(results, data.frame(
       function_name = fn_name,
