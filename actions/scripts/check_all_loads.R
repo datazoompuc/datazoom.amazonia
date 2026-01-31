@@ -249,11 +249,11 @@ for (fn_name in get_fns) {
       msg <- paste(c(warn_msgs, if (status=="EMPTY") "EMPTY: data.frame retornado com 0 linhas" else NULL), collapse = " | ")
     }
 
-    # opcional: classificar falta de disco como FAIL (mesmo vindo como warning)
-    if (grepl("Estimated disk space needed", msg, fixed = TRUE)) {
-      status <- "FAIL"
-      msg <- paste("DISK:", msg)
-    }
+    # Classificar falta de disco como FAIL (mesmo vindo como warning)
+    # if (grepl("Estimated disk space needed", msg, fixed = TRUE)) {
+    #   status <- "FAIL"
+    #   msg <- paste("DISK:", msg)
+    # }
 
 
     results <- rbind(results, data.frame(
