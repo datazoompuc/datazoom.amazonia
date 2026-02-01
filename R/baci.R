@@ -1,4 +1,4 @@
-#' @title BACI - Global international trade
+#' @title BACI - Global foreign trade
 #'
 #' @description Loads disaggregated data on bilateral trade flows for more than 5000 products and 200 countries.
 #'
