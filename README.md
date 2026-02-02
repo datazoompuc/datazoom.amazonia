@@ -98,8 +98,8 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 
 |                             |                                 |
 |-----------------------------|---------------------------------|
-| **[COMEX](#comex)**         | *Brazilian international trade* |
-| **[BACI](#baci)**           | *Global international trade*    |
+| **[COMEX](#comex)**         | *Brazilian foreign trade*       |
+| **[BACI](#baci)**           | *Global foreign trade*          |
 | **[PIB-Munic](#pib-munic)** | *Municipal GDP*                 |
 | **[CEMPRE](#cempre)**       | *Central register of companies* |
 | **[PAM](#pam)**             | *Agricultural production*       |
@@ -127,7 +127,7 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 
 |                                                                 |                                                                             |
 |-----------------------------------------------------------------|-----------------------------------------------------------------------------|
-| **[Legal Amazon Municipalities](#legal-amazon-municipalities)** | *Dataset with brazilian cities and whether they belong to the Legal Amazon* |
+| **[Legal Amazon Municipalities](#legal-amazon-municipalities)** | *Dataset with Brazilian cities and whether they belong to the Legal Amazon* |
 | **[The ‘googledrive’ package](#googledrive)**                   | *Troubleshooting and information for downloads from Google Drive*           |
 
 </table>
