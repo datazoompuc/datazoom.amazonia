@@ -1,4 +1,4 @@
-#' @title Comex - Brazilian external trade
+#' @title Comex - Brazilian foreign trade
 #'
 #' @description Loads data on all products imported to or exported from Brazil.
 #'

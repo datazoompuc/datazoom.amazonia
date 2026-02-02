@@ -100,8 +100,8 @@ devtools::load_all()
 
 |||
 |---|---|
-| **[COMEX](#comex)** | _Brazilian international trade_ |
-| **[BACI](#baci)** | _Global international trade_ |
+| **[COMEX](#comex)** | _Brazilian foreign trade_ |
+| **[BACI](#baci)** | _Global foreign trade_ |
 | **[PIB-Munic](#pib-munic)** | _Municipal GDP_ |
 | **[CEMPRE](#cempre)** | _Central register of companies_ |
 | **[PAM](#pam)** | _Agricultural production_ |
@@ -126,7 +126,7 @@ devtools::load_all()
 
 |||
 |---|---|
-| **[Legal Amazon Municipalities](#legal-amazon-municipalities)** | _Dataset with brazilian cities and whether they belong to the Legal Amazon_ |
+| **[Legal Amazon Municipalities](#legal-amazon-municipalities)** | _Dataset with Brazilian cities and whether they belong to the Legal Amazon_ |
 | **[The 'googledrive' package](#googledrive)** | _Troubleshooting and information for downloads from Google Drive_ |
 
 </table>

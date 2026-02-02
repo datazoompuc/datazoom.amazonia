@@ -2,7 +2,7 @@
 % Please edit documentation in R/comex.R
 \name{load_br_trade}
 \alias{load_br_trade}
-\title{Comex - Brazilian external trade}
+\title{Comex - Brazilian foreign trade}
 \usage{
 load_br_trade(dataset, raw_data = FALSE, time_period, language = "eng")
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/baci.R
 \name{load_baci}
 \alias{load_baci}
-\title{BACI - Global international trade}
+\title{BACI - Global foreign trade}
 \usage{
 load_baci(dataset = "HS92", raw_data = FALSE, time_period, language = "eng")
 }
