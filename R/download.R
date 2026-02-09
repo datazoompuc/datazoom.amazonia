@@ -520,6 +520,12 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     utils::download.file(url = path, destfile = temp, mode = "wb")
   }
   if (download_method == "curl") {
+    if (source == "deter") {
+      options(download.file.method = "curl", download.file.extra = "-L")
+    }
+    if (source == "deter") {
+      options(download.file.method = "curl", download.file.extra = "-L")
+    }
     utils::download.file(url = path, destfile = temp, method = "curl", quiet = quiet)
   }
   if (download_method == "googledrive") {
