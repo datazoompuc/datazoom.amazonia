@@ -344,8 +344,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
         stringr::str_replace("\\$year\\$", as.character(param$year))
     }
     if (!is.null(param$state)) {
-      path <- path %>%
-        stringr::str_replace("\\$state\\$", param$state)
+      path <- sub("$state$", param$state, path, fixed = TRUE)
     }
     if (!is.null(param$file_name)) {
       path <- path %>%
