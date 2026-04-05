@@ -23,6 +23,10 @@ LANGUAGE    <- "pt"
 RAW_DATA    <- FALSE
 GEO_LEVEL   <- "state"
 
+time_period_by_fn <- list(
+  load_ips = 2023
+)
+
 
 
 datasets_by_fn <- list(
@@ -133,18 +137,9 @@ call_with_geo <- function(fn, args, geo_level = "state") {
   }
 
   # tenta com geo_level = "state"
-  res <- tryCatch(
-    do.call(fn, c(args, list(geo_level = geo_level))),
-    error = function(e) e
-  )
+  res <- do.call(fn, c(args, list(geo_level = geo_level)))
 
-  # se funcionou, retorna
-  if (!inherits(res, "error")) {
-    return(res)
-  }
-
-  # fallback: tenta sem geo_level
-  do.call(fn, args)
+  return(res)
 }
 
 
@@ -196,7 +191,11 @@ for (fn_name in get_fns) {
 
     args <- list()
     if ("dataset"     %in% arg_names) args$dataset     <- ds
-    if ("time_period" %in% arg_names) args$time_period <- TIME_PERIOD
+    if ("time_period" %in% arg_names) {
+        args$time_period <- if (!is.null(time_period_by_fn[[fn_name]])) {
+          time_period_by_fn[[fn_name]]
+          } else {TIME_PERIOD}
+    }
     if ("raw_data"    %in% arg_names) args$raw_data    <- RAW_DATA
     if ("language"    %in% arg_names) args$language    <- LANGUAGE
 
