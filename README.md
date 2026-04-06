@@ -1456,7 +1456,7 @@ and select “Dicionário de dados”.
 ``` r
 # download treated data about energy generation
 clean_aneel <- load_aneel(
-  dataset = "energy generation",
+  dataset = "energy_generation",
   raw_data = FALSE
 )
 ```
