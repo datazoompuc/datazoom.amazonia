@@ -16,7 +16,10 @@
 #'
 #' @export
 
-load_aneel <- function(dataset, raw_data = FALSE, language = "eng") {
+load_aneel <- function(dataset,
+                       raw_data = FALSE,
+                       language = "eng",
+                       year = NULL) {
   ###########################
   ## Bind Global Variables ##
   ###########################
@@ -32,9 +35,14 @@ load_aneel <- function(dataset, raw_data = FALSE, language = "eng") {
   param$dataset <- dataset
   param$raw_data <- raw_data
   param$language <- language
+  param$year <- year
 
   skip <- NULL
 
+  if (param$dataset == "energy_development_budget" && is.null(param$year)) {
+    stop("For 'energy_development_budget', you must provide 'year'.")
+  }
+  
   if (param$dataset == "energy_generation") {
     skip <- 1
     # skips first row of excel sheet for this dataset
@@ -51,6 +59,7 @@ load_aneel <- function(dataset, raw_data = FALSE, language = "eng") {
   dat <- external_download(
     source = param$source,
     dataset = param$dataset,
+    year = param$year,
     skip_rows = skip
   )
 

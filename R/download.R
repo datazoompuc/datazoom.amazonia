@@ -333,6 +333,28 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   path <- param$url
 
+  
+  if (identical(path, "aneel_cde_$year$")) {
+    cde_urls <- c(
+      "2017" = "URL_DO_2017",
+      "2018" = "URL_DO_2018",
+      "2019" = "URL_DO_2019",
+      "2020" = "URL_DO_2020",
+      "2021" = "URL_DO_2021",
+      "2022" = "URL_DO_2022"
+    )
+    
+    if (is.null(param$year)) {
+      stop("For 'energy_development_budget', please provide 'year'.")
+    }
+    
+    if (!as.character(param$year) %in% names(cde_urls)) {
+      stop("Year not available for 'energy_development_budget'.")
+    }
+    
+    path <- unname(cde_urls[as.character(param$year)])
+  }
+  
   ## Filling in URLs
 
   # Some URLs are in the form www.data/$year$_$dataset$.csv, where expression
@@ -464,7 +486,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   }
   if (source == "aneel") {
     if (dataset == "energy_development_budget") {
-      file_extension <- ".rds"
+      file_extension <- ".csv"
     }
     if (dataset == "energy_generation") {
       file_extension <- ".xlsx"
@@ -487,9 +509,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     download_method <- "googledrive"
   }
   if (source == "aneel") {
-    if (dataset == "energy_development_budget") {
-      download_method <- "googledrive"
-    }
     if (dataset == "energy_enterprises_distributed") {
       message("This may take a while.\n")
       options(timeout = 1000) # increase timeout limit
@@ -599,9 +618,17 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   }
 
   if (param$source == "aneel") {
-    if (param$dataset == "energy_enterprises_distributed") {
+    if (param$dataset %in% c("energy_enterprises_distributed", "energy_development_budget")) {
       dat <- data.table::fread(temp, encoding = "Latin-1")
-    } else if (dataset == "energy_generation") {
+    } else if (param$dataset == "energy_generation") {
+      dat <- readxl::read_xlsx(
+        temp,
+        sheet = param$sheet,
+        skip = param$skip_rows,
+        na = c("-", "")
+      )
+    }
+  } else if (dataset == "energy_generation") {
       dat <- readxl::read_xlsx(temp, sheet = param$sheet, skip = param$skip_rows, na = c("-", ""))
     }
   } else if (param$source == "ips") {
@@ -898,7 +925,7 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
     ## ANEEL
 
-    "aneel", "energy_development_budget", NA, "2013-2022", NA, "https://drive.google.com/file/d/1h7mu-9qbKfISk1-k4JSrBhXKBMQHTOH9/view?usp=share_link",
+    "aneel", "energy_development_budget", NA, "2013-2022", NA, "aneel_cde_$year$",
     "aneel", "energy_generation", NA, "1908-2021", "Municipality", "https://git.aneel.gov.br/publico/centralconteudo/-/raw/main/relatorioseindicadores/geracao/BD_SIGA.xlsx?inline=false",
     "aneel", "energy_enterprises_distributed", NA, NA, NA, "https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/b1bd71e7-d0ad-4214-9053-cbd58e9564a7/download/empreendimento-geracao-distribuida.csv",
 
