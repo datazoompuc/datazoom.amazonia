@@ -56,16 +56,34 @@ load_aneel <- function(dataset,
   ## Downloading ##
   #################
 
-  dat <- external_download(
-    source = param$source,
-    dataset = param$dataset,
-    year = param$year,
-    skip_rows = skip
-  )
-
+  if (param$dataset == "energy_development_budget" && length(param$year) > 1) {
+    dat <- purrr::map_dfr(param$year, function(y) {
+      df_y <- external_download(
+        source = param$source,
+        dataset = param$dataset,
+        year = y,
+        skip_rows = skip
+      )
+      
+      if (!"year" %in% names(df_y)) {
+        df_y$year <- y
+      }
+      
+      df_y
+    })
+  } else {
+    dat <- external_download(
+      source = param$source,
+      dataset = param$dataset,
+      year = param$year,
+      skip_rows = skip
+    )
+  }
+  
   if (param$raw_data) {
     return(dat)
   }
+  
 
   ######################
   ## Data Engineering ##
