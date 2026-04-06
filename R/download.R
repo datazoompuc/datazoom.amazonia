@@ -617,18 +617,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
   }
 
-  if (param$source == "aneel") {
-    if (param$dataset %in% c("energy_enterprises_distributed", "energy_development_budget")) {
-      dat <- data.table::fread(temp, encoding = "Latin-1")
-    } else if (param$dataset == "energy_generation") {
-      dat <- readxl::read_xlsx(
-        temp,
-        sheet = param$sheet,
-        skip = param$skip_rows,
-        na = c("-", "")
-      )
-    }
-  } else if (dataset == "energy_generation") {
+if (param$source == "aneel") {
+  if (param$dataset %in% c("energy_enterprises_distributed", "energy_development_budget")) {
+    dat <- data.table::fread(temp, encoding = "Latin-1")
+  } } else if (dataset == "energy_generation") {
       dat <- readxl::read_xlsx(temp, sheet = param$sheet, skip = param$skip_rows, na = c("-", ""))
     }
   } else if (param$source == "ips") {
