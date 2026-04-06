@@ -1448,7 +1448,17 @@ and select “Dicionário de dados”.
     - `FALSE`: if you want the treated version of the data.
 3.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`
-
+4.  **year**: this parameter is specifically applicable to the dataset
+      `"energy_development_budget"`. It allows the user to select a 
+      particular year, enabling a defined temporal subset of the data.
+      For the remaining datasets, this parameter should be set to `"NULL"`.
+      The available year options are:
+      - `2017`
+      - `2018`
+      - `2019`
+      - `2020`
+      - `2021`
+      - `2022`
 ------------------------------------------------------------------------
 
 **Examples:**
@@ -1459,6 +1469,16 @@ clean_aneel <- load_aneel(
   dataset = "energy_generation",
   raw_data = FALSE
 )
+```
+
+```r
+
+development_budget_aneel = load_aneel(
+  dataset = "energy_development_budget",
+  raw_data = TRUE,
+  year = c(2020,2021)
+)
+
 ```
 
 ## EPE
