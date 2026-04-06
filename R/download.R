@@ -336,12 +336,12 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   
   if (identical(path, "aneel_cde_$year$")) {
     cde_urls <- c(
-      "2017" = "URL_DO_2017",
-      "2018" = "URL_DO_2018",
-      "2019" = "URL_DO_2019",
-      "2020" = "URL_DO_2020",
-      "2021" = "URL_DO_2021",
-      "2022" = "URL_DO_2022"
+      "2017" = "https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/684a68fd-4278-4af1-bcf2-c02810dd7c0c/download/cde-beneficiarios-rede-basica-2017.csv",
+      "2018" = "https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/237f3f67-4795-4bd7-a4d2-5f6071ef39af/download/cde-beneficiarios-rede-basica-2018.csv",
+      "2019" = "https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/0bd1f129-39c5-4edc-b272-3f1d11181cca/download/cde-beneficiarios-rede-basica-2019.csv",
+      "2020" = "https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/f77bb713-cc06-406a-baa8-246acc357ff5/download/cde-beneficiarios-rede-basica-2020.csv",
+      "2021" = "https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/cdf1b068-7c76-462a-ab57-d6619ad290fa/download/cde-beneficiarios-rede-basica-2021.csv",
+      "2022" = "https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/e390baae-5304-4a94-854f-0905094b3357/download/cde-beneficiarios-rede-basica-2022.csv"
     )
     
     if (is.null(param$year)) {
