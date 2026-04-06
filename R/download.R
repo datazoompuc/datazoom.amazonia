@@ -583,63 +583,64 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     if (param$source == "sigmine") {
       dat <- purrr::quietly(sf::read_sf)(file.path(dir, "BRASIL.shp"))$result
     }
-
     if (param$source == "ibama") {
       shp <- list.files(dir, pattern = "\\.shp$", full.names = TRUE, recursive = TRUE)
       dat_sf <- sf::read_sf(shp[1], quiet = TRUE)
       dat <- tibble::as_tibble(dat_sf)
     }
-
     if (param$source == "baci") {
       # as year can be a vector, sets up expressions of the form "*YYYY_V202401b.csv" for each year to match file names
       file_expression <- paste0("*", param$year, "_V202401b.csv")
-
       # now turning into *XXXX_V202401b.csv|YYYY_V202401b.csv|ZZZZ_V202401b.csv" to match as regex
       file_expression <- paste0(file_expression, collapse = "|")
-
+      
       file <- list.files(dir, pattern = file_expression, full.names = TRUE) %>%
         as.list()
-
+      
       # now reads each file
+      
       dat <- lapply(file, data.table::fread, header = TRUE, sep = ",")
-
+      
       # each data frame in the list is named after the corresponding year
       names(dat) <- param$year
     }
     if (param$source == "prodes") {
       # clearing rasters to avoid overlap
-
+      
       terra::tmpFiles(remove = TRUE)
-
       file <- list.files(dir, pattern = "*.tif", full.names = TRUE)
-
       dat <- terra::rast(file)
     }
-  }
-
-if (param$source == "aneel") {
-  if (param$dataset %in% c("energy_enterprises_distributed", "energy_development_budget")) {
-    dat <- data.table::fread(temp, encoding = "Latin-1")
-  } } else if (dataset == "energy_generation") {
-      dat <- readxl::read_xlsx(temp, sheet = param$sheet, skip = param$skip_rows, na = c("-", ""))
+    
+  } else if (param$source == "aneel") {
+    if (param$dataset %in% c("energy_enterprises_distributed", "energy_development_budget")) {
+      dat <- data.table::fread(temp, encoding = "Latin-1")
+    } else if (param$dataset == "energy_generation") {
+      dat <- readxl::read_xlsx(
+        temp,
+        sheet = param$sheet,
+        skip = param$skip_rows,
+        na = c("-", "")
+      )
     }
+    
   } else if (param$source == "ips") {
     dat <- param$sheet %>%
       purrr::map(
         ~ readxl::read_xlsx(temp, sheet = .)
       )
+    
   } else if (param$source == "epe") {
     dat <- param$sheet %>%
       purrr::map(
         ~ base::suppressMessages(readxl::read_xlsx(temp, sheet = .))
       )
-  }
-
-  ## Now the rest of the functions
-
-  # This Depends on Data Type (.csv, .shp, ...) and on the data source
-
-  else {
+    
+    ## Now the rest of the functions
+    
+    # This Depends on Data Type (.csv, .shp, ...) and on the data source
+    
+  } else {
     if (file_extension == ".csv") {
       dat <- data.table::fread(temp)
     }
@@ -653,10 +654,12 @@ if (param$source == "aneel") {
       dat <- readr::read_rds(temp)
     }
     if (file_extension == ".xlsx") {
-      dat <-
-        readxl::read_xlsx(temp, sheet = param$sheet, skip = param$skip_rows)
+      dat <- readxl::read_xlsx(temp, sheet = param$sheet, skip = param$skip_rows)
     }
   }
+  
+
+
 
   ##############################
   ## Excluding Temporary File ##
