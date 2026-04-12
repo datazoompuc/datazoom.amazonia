@@ -3,6 +3,9 @@
 #' @description National Electric Energy Agency - ANEEL
 #'
 #' @param dataset A dataset name ("energy_development_budget", "energy_generation" or "energy_enterprises_distributed")
+#' @param year A numeric value or vector of years (2017-2022).
+#'   Required for the "energy_development_budget" dataset.
+#'   Ignored for the other datasets.
 #' @inheritParams load_baci
 #'
 #' @examples
@@ -11,6 +14,13 @@
 #' clean_aneel <- load_aneel(
 #'   dataset = "energy_generation",
 #'   raw_data = FALSE
+#' )
+#'
+#' # download raw annual CDE budget data
+#' raw_cde <- load_aneel(
+#'   dataset = "energy_development_budget",
+#'   year = 2021,
+#'   raw_data = TRUE
 #' )
 #' }
 #'
@@ -42,7 +52,7 @@ load_aneel <- function(dataset,
   if (param$dataset == "energy_development_budget" && is.null(param$year)) {
     stop("For 'energy_development_budget', you must provide 'year'.")
   }
-  
+
   if (param$dataset == "energy_generation") {
     skip <- 1
     # skips first row of excel sheet for this dataset
@@ -64,11 +74,11 @@ load_aneel <- function(dataset,
         year = y,
         skip_rows = skip
       )
-      
+
       if (!"year" %in% names(df_y)) {
         df_y$year <- y
       }
-      
+
       df_y
     })
   } else {
@@ -79,11 +89,11 @@ load_aneel <- function(dataset,
       skip_rows = skip
     )
   }
-  
+
   if (param$raw_data) {
     return(dat)
   }
-  
+
 
   ######################
   ## Data Engineering ##
