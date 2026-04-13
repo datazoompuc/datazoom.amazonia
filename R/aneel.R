@@ -49,9 +49,21 @@ load_aneel <- function(dataset,
 
   skip <- NULL
 
-  if (param$dataset == "energy_development_budget" && is.null(param$year)) {
+if (param$dataset == "energy_development_budget") {
+  if (is.null(param$year) || length(param$year) == 0) {
     stop("For 'energy_development_budget', you must provide 'year'.")
   }
+
+  invalid_years <- setdiff(as.integer(param$year), 2017:2022)
+
+  if (length(invalid_years) > 0) {
+    stop(
+      "Year(s) not available for 'energy_development_budget': ",
+      paste(invalid_years, collapse = ", "),
+      ". Valid years: 2017-2022."
+    )
+  }
+}
 
   if (param$dataset == "energy_generation") {
     skip <- 1
