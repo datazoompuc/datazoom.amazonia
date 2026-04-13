@@ -88,6 +88,12 @@ load_aneel <- function(dataset,
       year = param$year,
       skip_rows = skip
     )
+
+    if (param$dataset == "energy_development_budget" &&
+        !"year" %in% names(dat) &&
+        !"ano" %in% names(dat)) {
+      dat$year <- param$year
+    }
   }
 
   if (param$raw_data) {
