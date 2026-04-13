@@ -1380,18 +1380,21 @@ Electrical Energy Market to develop with balance and for the benefit of
 society.
 
 As for now, there are three different datasets available for download:
-the Energy Development Budget and the Energy Generation.
+Energy Development Budget, Energy Generation, and Energy Enterprises
+Distributed.
 
 #### Energy Development Budget
 
 The Energy Development Budget dataset showcases the Energy Development
-Account’s (CDE) anual budget expenses. The CDE is designed to promote
+Account’s (CDE) annual budget expenses. The CDE is designed to promote
 the Brazilian energy development and is managed by the Electrical Energy
 Commercialization Chamber (CCEE).
 
-The dataset makes available the year of the observation – from 2013 to
-2022 –, the type of expense, its value in R\$ (Reais) and its share over
-the total amount of CDE budget expenses on the year\*.
+In the current implementation, data is available from 2017 to 2022 and
+must be downloaded by year. The year argument can be a single year or a
+vector of years. The dataset includes the type of expense, its value in
+R\$ (Reais), and its share over the total amount of CDE budget expenses
+in each year.\*.
 
 \*Note that ‘share_of_total’ values sum to 1 for each year available.
 
@@ -1448,17 +1451,11 @@ and select “Dicionário de dados”.
     - `FALSE`: if you want the treated version of the data.
 3.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`
-4.  **year**: this parameter is specifically applicable to the dataset
-      `"energy_development_budget"`. It allows the user to select a 
-      particular year, enabling a defined temporal subset of the data.
-      For the remaining datasets, this parameter should be set to `"NULL"`.
-      The available year options are:
-      - `2017`
-      - `2018`
-      - `2019`
-      - `2020`
-      - `2021`
-      - `2022`
+4.  **year**: only used for “energy_development_budget”. It can be a
+    single year or a vector of years from 2017:2022. This argument is
+    required for “energy_development_budget” and can be omitted for the
+    other datasets.
+
 ------------------------------------------------------------------------
 
 **Examples:**
@@ -1469,16 +1466,21 @@ clean_aneel <- load_aneel(
   dataset = "energy_generation",
   raw_data = FALSE
 )
-```
 
-```r
 
-development_budget_aneel = load_aneel(
+# download raw CDE data for one year
+budget_aneel_2019 <- load_aneel(
   dataset = "energy_development_budget",
   raw_data = TRUE,
-  year = c(2020,2021)
+  year = 2019
 )
 
+# download raw CDE data for multiple years
+budget_aneel_multi <- load_aneel(
+  dataset = "energy_development_budget",
+  raw_data = TRUE,
+  year = c(2020, 2021)
+)
 ```
 
 ## EPE
