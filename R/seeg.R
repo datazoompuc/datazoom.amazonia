@@ -10,7 +10,8 @@
 #'
 #' @export
 #'
-#' @examples \dontrun{
+#' @examplesIf interactive()
+#' ### DO NOT RUN ###
 #' # Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg")
 #' # by state (geo_level = "state")
 #' data <- load_seeg(
@@ -25,7 +26,6 @@
 #'   raw_data = FALSE,
 #'   geo_level = "state"
 #' )
-#' }
 load_seeg <- function(dataset, raw_data = FALSE,
                       geo_level, language = "eng") {
   # Checking for googledrive package (in Suggests)

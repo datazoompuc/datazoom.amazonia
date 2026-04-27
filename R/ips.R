@@ -8,7 +8,8 @@
 #'
 #' @return A \code{tibble}.
 #'
-#' @examples \dontrun{
+#' @examplesIf interactive()
+#' ### DO NOT RUN ###
 #' # Download raw data from 2014
 #' data <- load_ips(dataset = "all", raw_data = TRUE, time_period = 2014)
 #'
@@ -17,7 +18,6 @@
 #'   dataset = "deforest", raw_data = FALSE,
 #'   time_period = 2018, language = "pt"
 #' )
-#' }
 #'
 #' @export
 
