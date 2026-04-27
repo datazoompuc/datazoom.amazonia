@@ -36,7 +36,8 @@ A \code{tibble}.
 Loads information about land cover and use
 }
 \examples{
-\dontrun{
+\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+### DO NOT RUN ###
 # download treated Mapbiomas Cover data in English
 data <- load_mapbiomas(
   dataset = "mapbiomas_cover",
@@ -50,6 +51,5 @@ data <- load_mapbiomas("mapbiomas_mining",
   raw_data = FALSE,
   geo_level = "indigenous_land"
 )
-}
-
+\dontshow{\}) # examplesIf}
 }

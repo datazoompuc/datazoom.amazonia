@@ -24,7 +24,8 @@ A \code{tibble} consisting of geographic units that present positive values for 
 Loads information on animal farming inventories and livestock products (IBGE).
 }
 \examples{
-\dontrun{
+\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+### DO NOT RUN ###
 # Download treated data (raw_data = FALSE) about aquaculture (dataset = "ppm_aquaculture")
 # from 2013 to 2015 (time_period = 2013:2015) in english
 # with the level of aggregation being the country (geo_level = "country").
@@ -43,5 +44,5 @@ data <- load_ppm(
   time_period = 1980:1995,
   language = "pt"
 )
-}
+\dontshow{\}) # examplesIf}
 }

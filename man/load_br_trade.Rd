@@ -22,7 +22,8 @@ A \code{tibble}.
 Loads data on all products imported to or exported from Brazil.
 }
 \examples{
-\dontrun{
+\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+### DO NOT RUN ###
 # download treated (raw_data = FALSE) exports data by municipality (dataset = "comex_export_mun")
 # from 2020 to 2021 (time_period = 2020:2021)
 data <- load_br_trade(
@@ -37,6 +38,5 @@ data <- load_br_trade(
   raw_data = FALSE,
   time_period = 2020:2021
 )
-}
-
+\dontshow{\}) # examplesIf}
 }
