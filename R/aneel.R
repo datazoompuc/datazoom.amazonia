@@ -5,14 +5,13 @@
 #' @param dataset A dataset name ("energy_development_budget", "energy_generation" or "energy_enterprises_distributed")
 #' @inheritParams load_baci
 #'
-#' @examples
-#' \dontrun{
+#' @examplesIf interactive()
+#' ### DO NOT RUN ###
 #' # download treated data about energy generation
 #' clean_aneel <- load_aneel(
 #'   dataset = "energy_generation",
 #'   raw_data = FALSE
 #' )
-#' }
 #'
 #' @export
 

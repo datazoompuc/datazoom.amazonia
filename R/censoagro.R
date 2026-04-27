@@ -9,8 +9,8 @@
 #'
 #' @return A \code{tibble}.
 #'
-#' @examples
-#' \dontrun{
+#' @examplesIf interactive()
+#' ### DO NOT RUN ###
 #' # Download total land area data at the country level in year 2006
 #' data <- load_censoagro(
 #'   dataset = "agricultural_land_area",
@@ -28,7 +28,6 @@
 #'   time_period = 1995,
 #'   language = "pt"
 #' )
-#' }
 #'
 #' @export
 

@@ -9,8 +9,8 @@
 #'
 #' @return A \code{tibble}.
 #'
-#' @examples
-#' \dontrun{
+#' @examplesIf interactive()
+#' ### DO NOT RUN ###
 #' # Download raw data (raw_data = TRUE) at the country level
 #' # from 2008 to 2010 (time_period = 2008:2010).
 #' data <- load_cempre(
@@ -29,7 +29,6 @@
 #'   language = "pt",
 #'   sectors = TRUE
 #' )
-#' }
 #'
 #' @export
 
