@@ -4,7 +4,7 @@
 \alias{load_aneel}
 \title{ANEEL}
 \usage{
-load_aneel(dataset, raw_data = FALSE, language = "eng")
+load_aneel(dataset, raw_data = FALSE, language = "eng", year = NULL)
 }
 \arguments{
 \item{dataset}{A dataset name ("energy_development_budget", "energy_generation" or "energy_enterprises_distributed")}
@@ -12,6 +12,10 @@ load_aneel(dataset, raw_data = FALSE, language = "eng")
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.}
+
+\item{year}{A numeric value or vector of years (2017-2022).
+Required for the "energy_development_budget" dataset.
+Ignored for the other datasets.}
 }
 \description{
 National Electric Energy Agency - ANEEL
@@ -24,5 +28,13 @@ clean_aneel <- load_aneel(
   dataset = "energy_generation",
   raw_data = FALSE
 )
-\dontshow{\}) # examplesIf}
+
+# download raw annual CDE budget data
+raw_cde <- load_aneel(
+  dataset = "energy_development_budget",
+  year = 2021,
+  raw_data = TRUE
+)
+}
+
 }

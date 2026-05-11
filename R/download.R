@@ -333,6 +333,28 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   path <- param$url
 
+
+  if (identical(path, "aneel_cde_$year$")) {
+    cde_urls <- c(
+      "2017" = "https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/684a68fd-4278-4af1-bcf2-c02810dd7c0c/download/cde-beneficiarios-rede-basica-2017.csv",
+      "2018" = "https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/237f3f67-4795-4bd7-a4d2-5f6071ef39af/download/cde-beneficiarios-rede-basica-2018.csv",
+      "2019" = "https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/0bd1f129-39c5-4edc-b272-3f1d11181cca/download/cde-beneficiarios-rede-basica-2019.csv",
+      "2020" = "https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/f77bb713-cc06-406a-baa8-246acc357ff5/download/cde-beneficiarios-rede-basica-2020.csv",
+      "2021" = "https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/cdf1b068-7c76-462a-ab57-d6619ad290fa/download/cde-beneficiarios-rede-basica-2021.csv",
+      "2022" = "https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/e390baae-5304-4a94-854f-0905094b3357/download/cde-beneficiarios-rede-basica-2022.csv"
+    )
+
+    if (is.null(param$year)) {
+      stop("For 'energy_development_budget', please provide 'year'.")
+    }
+
+    if (!as.character(param$year) %in% names(cde_urls)) {
+      stop("Year not available for 'energy_development_budget'.")
+    }
+
+    path <- unname(cde_urls[as.character(param$year)])
+  }
+
   ## Filling in URLs
 
   # Some URLs are in the form www.data/$year$_$dataset$.csv, where expression
@@ -464,7 +486,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   }
   if (source == "aneel") {
     if (dataset == "energy_development_budget") {
-      file_extension <- ".rds"
+      file_extension <- ".csv"
     }
     if (dataset == "energy_generation") {
       file_extension <- ".xlsx"
@@ -487,9 +509,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     download_method <- "googledrive"
   }
   if (source == "aneel") {
-    if (dataset == "energy_development_budget") {
-      download_method <- "googledrive"
-    }
     if (dataset == "energy_enterprises_distributed") {
       message("This may take a while.\n")
       options(timeout = 1000) # increase timeout limit
@@ -564,17 +583,14 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     if (param$source == "sigmine") {
       dat <- purrr::quietly(sf::read_sf)(file.path(dir, "BRASIL.shp"))$result
     }
-
     if (param$source == "ibama") {
       shp <- list.files(dir, pattern = "\\.shp$", full.names = TRUE, recursive = TRUE)
       dat_sf <- sf::read_sf(shp[1], quiet = TRUE)
       dat <- tibble::as_tibble(dat_sf)
     }
-
     if (param$source == "baci") {
       # as year can be a vector, sets up expressions of the form "*YYYY_V202401b.csv" for each year to match file names
       file_expression <- paste0("*", param$year, "_V202401b.csv")
-
       # now turning into *XXXX_V202401b.csv|YYYY_V202401b.csv|ZZZZ_V202401b.csv" to match as regex
       file_expression <- paste0(file_expression, collapse = "|")
 
@@ -582,6 +598,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
         as.list()
 
       # now reads each file
+
       dat <- lapply(file, data.table::fread, header = TRUE, sep = ",")
 
       # each data frame in the list is named after the corresponding year
@@ -591,36 +608,39 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       # clearing rasters to avoid overlap
 
       terra::tmpFiles(remove = TRUE)
-
       file <- list.files(dir, pattern = "*.tif", full.names = TRUE)
-
       dat <- terra::rast(file)
     }
-  }
 
-  if (param$source == "aneel") {
-    if (param$dataset == "energy_enterprises_distributed") {
+  } else if (param$source == "aneel") {
+    if (param$dataset %in% c("energy_enterprises_distributed", "energy_development_budget")) {
       dat <- data.table::fread(temp, encoding = "Latin-1")
-    } else if (dataset == "energy_generation") {
-      dat <- readxl::read_xlsx(temp, sheet = param$sheet, skip = param$skip_rows, na = c("-", ""))
+    } else if (param$dataset == "energy_generation") {
+      dat <- readxl::read_xlsx(
+        temp,
+        sheet = param$sheet,
+        skip = param$skip_rows,
+        na = c("-", "")
+      )
     }
+
   } else if (param$source == "ips") {
     dat <- param$sheet %>%
       purrr::map(
         ~ readxl::read_xlsx(temp, sheet = .)
       )
+
   } else if (param$source == "epe") {
     dat <- param$sheet %>%
       purrr::map(
         ~ base::suppressMessages(readxl::read_xlsx(temp, sheet = .))
       )
-  }
 
-  ## Now the rest of the functions
+    ## Now the rest of the functions
 
-  # This Depends on Data Type (.csv, .shp, ...) and on the data source
+    # This Depends on Data Type (.csv, .shp, ...) and on the data source
 
-  else {
+  } else {
     if (file_extension == ".csv") {
       dat <- data.table::fread(temp)
     }
@@ -634,10 +654,12 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       dat <- readr::read_rds(temp)
     }
     if (file_extension == ".xlsx") {
-      dat <-
-        readxl::read_xlsx(temp, sheet = param$sheet, skip = param$skip_rows)
+      dat <- readxl::read_xlsx(temp, sheet = param$sheet, skip = param$skip_rows)
     }
   }
+
+
+
 
   ##############################
   ## Excluding Temporary File ##
@@ -898,7 +920,7 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
     ## ANEEL
 
-    "aneel", "energy_development_budget", NA, "2013-2022", NA, "https://drive.google.com/file/d/1h7mu-9qbKfISk1-k4JSrBhXKBMQHTOH9/view?usp=share_link",
+    "aneel", "energy_development_budget", NA, "2017-2022", NA, "aneel_cde_$year$",
     "aneel", "energy_generation", NA, "1908-2021", "Municipality", "https://git.aneel.gov.br/publico/centralconteudo/-/raw/main/relatorioseindicadores/geracao/BD_SIGA.xlsx?inline=false",
     "aneel", "energy_enterprises_distributed", NA, NA, NA, "https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/b1bd71e7-d0ad-4214-9053-cbd58e9564a7/download/empreendimento-geracao-distribuida.csv",
 

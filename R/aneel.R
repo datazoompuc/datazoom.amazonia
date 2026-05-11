@@ -3,6 +3,9 @@
 #' @description National Electric Energy Agency - ANEEL
 #'
 #' @param dataset A dataset name ("energy_development_budget", "energy_generation" or "energy_enterprises_distributed")
+#' @param year A numeric value or vector of years (2017-2022).
+#'   Required for the "energy_development_budget" dataset.
+#'   Ignored for the other datasets.
 #' @inheritParams load_baci
 #'
 #' @examplesIf interactive()
@@ -13,9 +16,20 @@
 #'   raw_data = FALSE
 #' )
 #'
+#' # download raw annual CDE budget data
+#' raw_cde <- load_aneel(
+#'   dataset = "energy_development_budget",
+#'   year = 2021,
+#'   raw_data = TRUE
+#' )
+#' }
+#'
 #' @export
 
-load_aneel <- function(dataset, raw_data = FALSE, language = "eng") {
+load_aneel <- function(dataset,
+                       raw_data = FALSE,
+                       language = "eng",
+                       year = NULL) {
   ###########################
   ## Bind Global Variables ##
   ###########################
@@ -31,8 +45,25 @@ load_aneel <- function(dataset, raw_data = FALSE, language = "eng") {
   param$dataset <- dataset
   param$raw_data <- raw_data
   param$language <- language
+  param$year <- year
 
   skip <- NULL
+
+if (param$dataset == "energy_development_budget") {
+  if (is.null(param$year) || length(param$year) == 0) {
+    stop("For 'energy_development_budget', you must provide 'year'.")
+  }
+
+  invalid_years <- setdiff(as.integer(param$year), 2017:2022)
+
+  if (length(invalid_years) > 0) {
+    stop(
+      "Year(s) not available for 'energy_development_budget': ",
+      paste(invalid_years, collapse = ", "),
+      ". Valid years: 2017-2022."
+    )
+  }
+}
 
   if (param$dataset == "energy_generation") {
     skip <- 1
@@ -47,15 +78,40 @@ load_aneel <- function(dataset, raw_data = FALSE, language = "eng") {
   ## Downloading ##
   #################
 
-  dat <- external_download(
-    source = param$source,
-    dataset = param$dataset,
-    skip_rows = skip
-  )
+  if (param$dataset == "energy_development_budget" && length(param$year) > 1) {
+    dat <- purrr::map_dfr(param$year, function(y) {
+      df_y <- external_download(
+        source = param$source,
+        dataset = param$dataset,
+        year = y,
+        skip_rows = skip
+      )
+
+      if (!"year" %in% names(df_y)) {
+        df_y$year <- y
+      }
+
+      df_y
+    })
+  } else {
+    dat <- external_download(
+      source = param$source,
+      dataset = param$dataset,
+      year = param$year,
+      skip_rows = skip
+    )
+
+    if (param$dataset == "energy_development_budget" &&
+        !"year" %in% names(dat) &&
+        !"ano" %in% names(dat)) {
+      dat$year <- param$year
+    }
+  }
 
   if (param$raw_data) {
     return(dat)
   }
+
 
   ######################
   ## Data Engineering ##
