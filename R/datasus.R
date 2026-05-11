@@ -14,15 +14,7 @@
 #' @export
 load_datasus <- function(dataset = NULL, raw_data = NULL, time_period = NULL,
                          language = "eng") {
-  if (language == "pt") {
-    warning(
-      "A fun\u00e7\u00e3o `load_datasus` n\u00e3o faz mais parte do pacote e n\u00e3o est\u00e1 mais dispon\u00edvel. As funcionalidades ser\u00e3o integradas no novo pacote chamado Datazoom Sa\u00fade, atualmente em desenvolvimento.",
-      call. = FALSE
-    )
-  } else {
-    warning("The `load_datasus` function is no longer part of the package and is no longer available. The functionalities will be explored in a new package called Datazoom Saude, currently under development.",
-      call. = FALSE
-    )
-  }
-  return(invisible(NULL))
+  .Defunct(
+    msg = "The `load_datasus` function is no longer part of the package and is no longer available. The functionalities are already available in the beta version of the new package Datazoom Saude, currently under development. You can access it and download it via GitHub: https://github.com/datazoompuc/datazoom.saude ."
+  )
 }

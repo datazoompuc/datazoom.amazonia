@@ -26,7 +26,7 @@
 #'
 #' A dataset containing each municipality-biome's IBGE code, state, biome, name and MAPBIOMAS ID. Mostly for our functions' internal use.
 #'
-#' @format A data frame with 6537 rows and 4 variables:
+#' @format A data frame with 6537 rows and 5 variables:
 #' \describe{
 #'   \item{feature_id}{MAPBIOMAS biome-municipality ID}
 #'   \item{code_muni}{IBGE 7-digit municipality code}

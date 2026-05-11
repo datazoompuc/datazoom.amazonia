@@ -30,7 +30,7 @@ Depends:
 Imports:
     data.table,
     dplyr,
-    Hmisc,
+    googledrive,
     janitor,
     magrittr,
     purrr,
@@ -46,10 +46,7 @@ Imports:
     utils,
     rlang
 Suggests: 
-    foreign,
-    googledrive,
     knitr,
-    RCurl,
     rmarkdown,
     terra,
     units

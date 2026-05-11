@@ -373,7 +373,7 @@ load_cempre <- function(dataset = "cempre", raw_data = FALSE,
     janitor::clean_names()
 
   labelled <- function(x, label) {
-    Hmisc::label(x) <- label
+    attr(x, "label") <- label
     x
   }
 
