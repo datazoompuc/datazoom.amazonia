@@ -244,7 +244,7 @@ load_pevs <- function(dataset, raw_data = FALSE,
   ###############
 
   labelled <- function(x, label) {
-    Hmisc::label(x) <- label
+    attr(x, "label") <- label
     x
   }
 
