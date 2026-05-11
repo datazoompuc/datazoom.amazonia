@@ -31,7 +31,6 @@ Imports:
     data.table,
     dplyr,
     googledrive,
-    Hmisc,
     janitor,
     magrittr,
     purrr,

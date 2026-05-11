@@ -5,7 +5,7 @@
 \alias{municipalities_biomes}
 \title{IBGE codes and MAPBIOMAS id of Brazilian municipalities and biomes}
 \format{
-A data frame with 6537 rows and 4 variables:
+A data frame with 6537 rows and 5 variables:
 \describe{
 \item{feature_id}{MAPBIOMAS biome-municipality ID}
 \item{code_muni}{IBGE 7-digit municipality code}
