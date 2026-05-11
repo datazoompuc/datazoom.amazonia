@@ -6,8 +6,8 @@
 #' @inheritParams load_baci
 #' @param legal_amazon_only A \code{boolean} setting the return of Legal Amazon Data (\code{TRUE}) or Country's Data (\code{FALSE}). Defaults to \code{FALSE}
 #'
-#' @examples
-#' \dontrun{
+#' @examplesIf interactive()
+#' ### DO NOT RUN ###
 #' # Downloading maximum temperature data from 2000 to 2001
 #' max_temp <- load_climate(dataset = "max_temperature", time_period = 2000:2001)
 #'
@@ -17,7 +17,6 @@
 #'   time_period = 2010,
 #'   legal_amazon_only = TRUE
 #' )
-#' }
 #'
 #' @return A \code{tibble}.
 #' @export

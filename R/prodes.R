@@ -11,8 +11,8 @@
 #'
 #' @return A \code{tibble} with the selected data if raw_data is \code{FALSE}, and a \code{SpatRaster} is \code{TRUE}.
 #'
-#' @examples
-#' \dontrun{
+#' @examplesIf interactive()
+#' ### DO NOT RUN ###
 #' # Download treated data (raw_data = FALSE)
 #' # in portuguese (language = 'pt').
 #' data <- load_prodes(
@@ -21,7 +21,6 @@
 #'   time_period = 2020:2023,
 #'   language = "pt"
 #' )
-#' }
 #'
 #' @importFrom rlang :=
 #'

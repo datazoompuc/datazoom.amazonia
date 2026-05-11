@@ -20,12 +20,12 @@ A \code{sf} object.
 Loads data on changes in forest cover in the Legal Amazon and the Cerrado biome.
 }
 \examples{
-\dontrun{
+\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+### DO NOT RUN ###
 # Download treated data (raw_data = FALSE) from Amazonia (dataset = "deter_amz")
 deter_amz <- load_deter(
   dataset = "deter_amz",
   raw_data = FALSE
 )
-}
-
+\dontshow{\}) # examplesIf}
 }

@@ -19,7 +19,8 @@ load_epe(dataset, geo_level = "state", raw_data = FALSE, language = "eng")
 Electrical Energy Monthly Consumption per Class or Industrial Sector
 }
 \examples{
-\dontrun{
+\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+### DO NOT RUN ###
 # download treated (raw_data = FALSE) data about
 # consumer energy consumption (dataset = "consumer_energy_consumption")
 # at the state level (geo_level = "state")
@@ -34,6 +35,5 @@ balance <- load_epe(
   dataset = "national_energy_balance",
   raw_data = FALSE
 )
-}
-
+\dontshow{\}) # examplesIf}
 }

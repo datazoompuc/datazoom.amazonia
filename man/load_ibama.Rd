@@ -22,7 +22,8 @@ A \code{tibble}.
 Loads information on environmental fines in the Amazon region
 }
 \examples{
-\dontrun{
+\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+### DO NOT RUN ###
 # Download treated embargoes data (raw_data = FALSE) in english (language = "eng")
 data <- load_ibama(
   dataset = "embargoed_areas", raw_data = FALSE,
@@ -34,6 +35,5 @@ data <- load_ibama(
   dataset = "collected_fines", raw_data = FALSE,
   states = "BA", language = "pt"
 )
-}
-
+\dontshow{\}) # examplesIf}
 }

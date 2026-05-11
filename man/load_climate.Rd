@@ -30,7 +30,8 @@ A \code{tibble}.
 Spatial data on climate variables, extracted from Climatology Lab's TerraClimate.
 }
 \examples{
-\dontrun{
+\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+### DO NOT RUN ###
 # Downloading maximum temperature data from 2000 to 2001
 max_temp <- load_climate(dataset = "max_temperature", time_period = 2000:2001)
 
@@ -40,6 +41,5 @@ amz_precipitation <- load_climate(
   time_period = 2010,
   legal_amazon_only = TRUE
 )
-}
-
+\dontshow{\}) # examplesIf}
 }

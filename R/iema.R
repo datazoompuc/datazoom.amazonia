@@ -7,11 +7,10 @@
 #'
 #' @return A \code{tibble}.
 #'
-#' @examples
-#' \dontrun{
+#' @examplesIf interactive()
+#' ### DO NOT RUN ###
 #' # Download treated data
 #' data <- load_iema(raw_data = FALSE)
-#' }
 #'
 #' @export
 

@@ -30,12 +30,13 @@ A \code{tibble}.
 Loads information on gross domestic product at current prices, taxes, net of subsidies, on products at current prices and gross value added at current prices, total and by economic activity, and respective shares.
 }
 \examples{
-\dontrun{
+\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+### DO NOT RUN ###
 # download treated municipal GDP data at the state level for 2010 to 2012
 data <- load_pibmunic(
   raw_data = FALSE,
   geo_level = "state",
   time_period = 2010:2012
 )
-}
+\dontshow{\}) # examplesIf}
 }

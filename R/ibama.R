@@ -9,8 +9,8 @@
 #'
 #' @return A \code{tibble}.
 #'
-#' @examples
-#' \dontrun{
+#' @examplesIf interactive()
+#' ### DO NOT RUN ###
 #' # Download treated embargoes data (raw_data = FALSE) in english (language = "eng")
 #' data <- load_ibama(
 #'   dataset = "embargoed_areas", raw_data = FALSE,
@@ -22,7 +22,6 @@
 #'   dataset = "collected_fines", raw_data = FALSE,
 #'   states = "BA", language = "pt"
 #' )
-#' }
 #'
 #' @export
 

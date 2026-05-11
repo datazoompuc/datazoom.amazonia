@@ -21,7 +21,8 @@ Ignored for the other datasets.}
 National Electric Energy Agency - ANEEL
 }
 \examples{
-\dontrun{
+\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+### DO NOT RUN ###
 # download treated data about energy generation
 clean_aneel <- load_aneel(
   dataset = "energy_generation",

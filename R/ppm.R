@@ -10,7 +10,8 @@
 #'
 #' @export
 #'
-#' @examples \dontrun{
+#' @examplesIf interactive()
+#' ### DO NOT RUN ###
 #' # Download treated data (raw_data = FALSE) about aquaculture (dataset = "ppm_aquaculture")
 #' # from 2013 to 2015 (time_period = 2013:2015) in english
 #' # with the level of aggregation being the country (geo_level = "country").
@@ -29,7 +30,6 @@
 #'   time_period = 1980:1995,
 #'   language = "pt"
 #' )
-#' }
 load_ppm <- function(dataset, raw_data = FALSE,
                      geo_level, time_period,
                      language = "eng") {

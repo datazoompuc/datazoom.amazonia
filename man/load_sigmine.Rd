@@ -20,12 +20,13 @@ A \code{tibble}.
 Loads information the mines being explored legally in Brazil, including their location, status, product being mined and area in square meters.
 }
 \examples{
-\dontrun{
+\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+### DO NOT RUN ###
 # Download treated data (raw_data = FALSE) in portuguese (language = "pt").
 data <- load_sigmine(
   dataset = "sigmine_active",
   raw_data = FALSE,
   language = "pt"
 )
-}
+\dontshow{\}) # examplesIf}
 }

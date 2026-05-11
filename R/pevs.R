@@ -8,7 +8,8 @@
 #'
 #' @return A \code{tibble} consisting of geographic units that present positive values for any of the variables in the dataset.
 #'
-#' @examples \dontrun{
+#' @examplesIf interactive()
+#' ### DO NOT RUN ###
 #' # Download treated (raw_data = FALSE) silviculture data (dataset = 'pevs_silviculture')
 #' # by state (geo_level = 'state') from 2012 (time_period =  2012)
 #' # in portuguese (language = "pt")
@@ -27,7 +28,6 @@
 #'   geo_level = "region",
 #'   time_period = 2012:2013
 #' )
-#' }
 #'
 #' @export
 

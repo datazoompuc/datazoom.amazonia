@@ -22,7 +22,8 @@ A \code{tibble}.
 Loads data of estimates of emission of greenhouse gases
 }
 \examples{
-\dontrun{
+\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+### DO NOT RUN ###
 # Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg")
 # by state (geo_level = "state")
 data <- load_seeg(
@@ -37,5 +38,5 @@ data <- load_seeg(
   raw_data = FALSE,
   geo_level = "state"
 )
-}
+\dontshow{\}) # examplesIf}
 }

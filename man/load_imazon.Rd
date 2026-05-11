@@ -20,9 +20,9 @@ A \code{tibble}.
 Loads data categorizing each municipality by the level of deforestation pressure it faces
 }
 \examples{
-\dontrun{
+\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+### DO NOT RUN ###
 # Download treated data
 data <- load_imazon(raw_data = FALSE)
-}
-
+\dontshow{\}) # examplesIf}
 }

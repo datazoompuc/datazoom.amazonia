@@ -15,8 +15,8 @@
 #'
 #' @return A \code{tibble}.
 #'
-#' @examples
-#' \dontrun{
+#' @examplesIf interactive()
+#' ### DO NOT RUN ###
 #' # download treated Mapbiomas Cover data in English
 #' data <- load_mapbiomas(
 #'   dataset = "mapbiomas_cover",
@@ -30,7 +30,6 @@
 #'   raw_data = FALSE,
 #'   geo_level = "indigenous_land"
 #' )
-#' }
 #'
 #' @export
 

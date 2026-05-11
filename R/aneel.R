@@ -8,8 +8,8 @@
 #'   Ignored for the other datasets.
 #' @inheritParams load_baci
 #'
-#' @examples
-#' \dontrun{
+#' @examplesIf interactive()
+#' ### DO NOT RUN ###
 #' # download treated data about energy generation
 #' clean_aneel <- load_aneel(
 #'   dataset = "energy_generation",
