@@ -298,6 +298,15 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   link <- NULL
 
+  ## Restore global options on exit (CRAN compliance)
+
+  old_options <- list(
+    timeout = getOption("timeout"),
+    download.file.method = getOption("download.file.method"),
+    download.file.extra = getOption("download.file.extra")
+  )
+  on.exit(options(old_options), add = TRUE)
+
   ## Define Basic Parameters
 
   param <- list()
@@ -525,11 +534,11 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   }
   if (source == "ibama") {
     download_method <- "curl"
-    options(download.file.method = "curl", download.file.extra = "-k -L") # https://stackoverflow.com/questions/69716835/turning-ssl-verification-off-inside-download-file
+    options(download.file.method = "curl", download.file.extra = "-L") # https://stackoverflow.com/questions/69716835/turning-ssl-verification-off-inside-download-file
     quiet <- TRUE
   }
   if (source == "seeg") {
-      download_method <- "googledrive"
+    download_method <- "googledrive"
   }
 
   ## Downloading file by the selected method
@@ -538,9 +547,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     utils::download.file(url = path, destfile = temp, mode = "wb")
   }
   if (download_method == "curl") {
-    if (source == "deter") {
-      options(download.file.method = "curl", download.file.extra = "-L")
-    }
     if (source == "deter") {
       options(download.file.method = "curl", download.file.extra = "-L")
     }
