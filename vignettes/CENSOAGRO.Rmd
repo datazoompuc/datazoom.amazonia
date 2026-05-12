@@ -15,65 +15,322 @@ knitr::opts_chunk$set(
 ```
 
 
-The census of agriculture collects information about agricultural establishments
-and the agricultural activities carried out there, covering characteristics of the
-producer and establishment, economy and employment in rural areas, livestock, 
-farming and agroindustry. 
+## Overview
 
-Data is collected by IBGE and is available at
-country, state and municipality level.
+The Census of Agriculture (Censo Agropecuário) is Brazil's comprehensive survey of agricultural establishments and activities, conducted by IBGE (Instituto Brasileiro de Geografia e Estatística). This census collects detailed information about:
 
-***
-**Options:**
+- **Agricultural establishments**: characteristics, size, and management
+- **Agricultural producers**: demographics, education, and land ownership conditions
+- **Production activities**: crops, livestock, and agroindustry operations
+- **Rural employment and labor**: workforce characteristics and wages
+- **Agricultural inputs**: machinery, equipment, and technology adoption
 
-  1.  **dataset**:there are 10 possible choices:
-      * `"agricultural_land_area"`: area and number of agricultural properties
-      * `"agricultural_area_use"`: area of agricultural properties by use
-      * `"agricultural_employees_tractors"`: number of employees and tractors in agricultural properties
-      * `"agricultural_producer_condition"`: condition of agricultural producer, whether they own the land
-      * `"animal_production"`: number of animals farmed, by species
-      * `"animal_products"`: amount of animal products, by product type
-      * `"vegetable_production_area"`: area and amount produced, by vegetable product
-      * `"vegetable_production_temporary"`: amount produced, by temporary crop
-      * `"vegetable_production_permanent"`: amount produced, by permanent crop
-      * `"livestock_production"`: amount of bovine cattle, and number of agricultural properties
+The census provides critical data for agricultural policy, market research, and understanding the structure of Brazilian agriculture across regional and temporal dimensions.
 
-  2.  **raw_data**: there are two options:
+### Data Coverage
 
-      * `TRUE`: if you want the data as it is originally.
-      * `FALSE`: if you want the treated version of the data.
+Data is collected at multiple geographic levels:
+- **Country level**: aggregate national statistics
+- **State level**: disaggregated by Brazilian states
+- **Municipality level**: available for select datasets (currently `"livestock_production"`)
 
-  3. **geo_level**: `"country"` or `"state"`. For dataset `"livestock_production"`, it can also be `"municipality"`   
-  
-  4.  **time_period**: picks the years for which the data will be
-    downloaded:
-      * For datasets `"agricultural_land_area"`, `"agricultural_producer_condition"`, `"animal_products"`, and `"vegetable_production_area"`, it can be one of 1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, or 2006.
-      * For datasets `"vegetable_production_permanent"` and `"vegetable_production_permanent"`, it can only be from 1940 onwards
-      * For datasets `"agricultural_area_use"`, `"agricultural_employees_tractors"`, `"animal_production"`, it can only be from 1970 onwards
-      * For dataset `"livestock_production"`, it can only be 2017
+Historical data spans from 1920 onwards, with different time series available for different datasets based on IBGE's survey methodology evolution.
 
-  5.  **language**: you can choose between Portuguese `("pt")` and English
-    `("eng")`
-    
-***
+---
 
-**Examples:**
+## Available Datasets
+
+### 1. **agricultural_land_area**
+Provides comprehensive data on total agricultural land area and the number of agricultural properties.
+
+- **Key metrics**: Total land area (hectares), number of properties
+- **Time period**: 1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017
+- **Geographic levels**: Country, State
+- **Use case**: Track long-term trends in farm consolidation and total agricultural land expansion
+
+### 2. **agricultural_area_use**
+Details how agricultural properties use their land (crop farming, pasture, forests, etc.).
+
+- **Key metrics**: Area by use category (temporary crops, permanent crops, natural pastures, planted pastures, forest for forest production, protected natural vegetation, other areas)
+- **Time period**: 1970 onwards (1970, 1975, 1980, 1985, 1995, 2006, 2017)
+- **Geographic levels**: Country, State
+- **Use case**: Analyze land use transitions, deforestation patterns, and agricultural intensification
+
+### 3. **agricultural_employees_tractors**
+Captures information about the agricultural workforce and mechanization levels.
+
+- **Key metrics**: Number of employees, number of tractors, employed persons
+- **Time period**: 1970 onwards (1970, 1975, 1980, 1985, 1995, 2006, 2017)
+- **Geographic levels**: Country, State
+- **Use case**: Study agricultural mechanization trends and rural employment dynamics
+
+### 4. **agricultural_producer_condition**
+Describes the tenure status of agricultural land (ownership, rental, partnership, etc.).
+
+- **Key metrics**: Number of properties by producer condition (owner, tenant, partner, occupant)
+- **Time period**: 1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017
+- **Geographic levels**: Country, State
+- **Use case**: Understand land tenure structures and changes in property ownership patterns
+
+### 5. **animal_production**
+Details the number of livestock animals farmed by species and type.
+
+- **Key metrics**: Number of animals by species (cattle, pigs, poultry, sheep, horses, goats, water buffalo, etc.), number of establishments
+- **Time period**: 1970 onwards (1970, 1975, 1980, 1985, 1995, 2006, 2017)
+- **Geographic levels**: Country, State
+- **Use case**: Monitor livestock herd sizes and sectoral changes in animal agriculture
+
+### 6. **animal_products**
+Quantifies production volumes of animal-based products.
+
+- **Key metrics**: Production quantities (eggs, milk, honey, wool, hide, etc.)
+- **Time period**: 1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017
+- **Geographic levels**: Country, State
+- **Use case**: Track historical trends in dairy, poultry, and other animal product sectors
+
+### 7. **vegetable_production_area**
+Provides detailed crop production data including area planted and volume produced.
+
+- **Key metrics**: Area planted (hectares), quantity produced (kilograms), number of establishments by crop type
+- **Time period**: 1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017
+- **Geographic levels**: Country, State
+- **Use case**: Comprehensive analysis of crop production patterns and agricultural productivity
+
+### 8. **vegetable_production_temporary**
+Focuses specifically on temporary crops (annual crops that must be replanted each season).
+
+- **Key metrics**: Area planted, quantity produced for crops like soybeans, corn, beans, cassava
+- **Time period**: 1970 onwards (1970, 1975, 1980, 1985, 1995, 2006, 2017)
+- **Geographic levels**: Country, State
+- **Use case**: Study annual crop production cycles and seasonal variations
+
+### 9. **vegetable_production_permanent**
+Focuses on permanent crops (perennial crops that produce for multiple years).
+
+- **Key metrics**: Area planted, quantity produced for crops like coffee, sugarcane, cocoa, oranges
+- **Time period**: 1940 onwards (1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017)
+- **Geographic levels**: Country, State
+- **Use case**: Analyze long-cycle crop production and regional specialization
+
+### 10. **livestock_production**
+Specialized dataset on bovine cattle production and related establishments.
+
+- **Key metrics**: Number of cattle establishments, herd size, number of properties
+- **Time period**: 2017 (most recent census year)
+- **Geographic levels**: Country, State, **Municipality** (unique to this dataset)
+- **Use case**: Detailed regional analysis of cattle ranching, including municipality-level data
+
+---
+
+## Function Parameters
+
+### 1. **dataset**
+Selects which dataset to download. See dataset descriptions above.
+
+```r
+dataset = "agricultural_land_area"  # character string
+```
+
+### 2. **raw_data**
+Controls whether to download the original data or the processed/cleaned version.
+
+- `TRUE`: Returns raw data exactly as published by IBGE
+- `FALSE`: Returns treated data with standardized formatting, variable names in English, and consistent units
+
+**Default behavior**: Raw data typically requires more cleaning and interpretation, while treated data is ready for immediate analysis.
+
+```r
+raw_data = FALSE  # logical
+```
+
+### 3. **geo_level**
+Specifies the geographic aggregation level.
+
+- `"country"`: National aggregate
+- `"state"`: Disaggregated by Brazilian state
+- `"municipality"`: Available only for `"livestock_production"` dataset
+
+```r
+geo_level = "state"  # character string
+```
+
+### 4. **time_period**
+Defines which year(s) to download. Availability varies by dataset:
+
+| Dataset | Available Years |
+|---------|-----------------|
+| `agricultural_land_area` | 1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017 |
+| `agricultural_area_use` | 1970, 1975, 1980, 1985, 1995, 2006, 2017 |
+| `agricultural_employees_tractors` | 1970, 1975, 1980, 1985, 1995, 2006, 2017 |
+| `agricultural_producer_condition` | 1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017 |
+| `animal_production` | 1970, 1975, 1980, 1985, 1995, 2006, 2017 |
+| `animal_products` | 1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017 |
+| `vegetable_production_area` | 1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017 |
+| `vegetable_production_temporary` | 1970, 1975, 1980, 1985, 1995, 2006, 2017 |
+| `vegetable_production_permanent` | 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017 |
+| `livestock_production` | 2017 |
+
+You can request a single year or a range of years:
+
+```r
+time_period = 2006           # single year
+time_period = c(1995, 2006)  # multiple specific years
+time_period = 1995:2006      # will select years within this range that are available
+```
+
+### 5. **language**
+Output language for variable names and labels.
+
+- `"pt"`: Portuguese
+- `"eng"`: English
+
+```r
+language = "eng"  # character string
+```
+
+---
+
+## Examples
+
+### Example 1: Basic Land Area Analysis
+
+Download total agricultural land area data at the country level for recent years:
+
 ```{r eval=FALSE}
-# Download total land area data at the country level in year 2006
-data <- load_censoagro(
+# Download treated land area data for Brazil (country level) in 2017
+land_data <- load_censoagro(
   dataset = "agricultural_land_area",
-  raw_data = TRUE,
+  raw_data = FALSE,
   geo_level = "country",
-  time_period = 2006
+  time_period = 2017,
+  language = "eng"
 )
 
-# Download temporary production crops data by state (geo_level = "state") in year 2006
-# in portuguese (language = "pt")
-data <- load_censoagro(
+head(land_data)
+summary(land_data)
+```
+
+### Example 2: Temporary Crops Analysis by State
+
+Analyze temporary crop production trends across Brazilian states:
+
+```{r eval=FALSE}
+# Download treated temporary crop data by state for multiple years
+temp_crops <- load_censoagro(
   dataset = "vegetable_production_temporary",
   raw_data = FALSE,
   geo_level = "state",
-  time_period = 1995,
+  time_period = c(1995, 2006, 2017),
+  language = "eng"
+)
+
+# Explore the data
+head(temp_crops)
+unique(temp_crops$state)
+
+# Simple visualization of soybean production over time
+library(dplyr)
+soybeans <- temp_crops %>%
+  filter(product == "Soybeans") %>%
+  group_by(year) %>%
+  summarize(total_production = sum(quantity, na.rm = TRUE))
+```
+
+### Example 3: Cattle Production by Municipality
+
+Get detailed municipality-level cattle data (only available for livestock_production):
+
+```{r eval=FALSE}
+# Download municipality-level cattle data
+cattle_data <- load_censoagro(
+  dataset = "livestock_production",
+  raw_data = FALSE,
+  geo_level = "municipality",
+  time_period = 2017,
+  language = "eng"
+)
+
+# Identify top cattle-producing municipalities
+top_cattle <- cattle_data %>%
+  arrange(desc(cattle_count)) %>%
+  head(20)
+```
+
+### Example 4: Land Use Transitions Over Time
+
+Track changes in land use patterns across decades:
+
+```{r eval=FALSE}
+# Download land use data for multiple years
+land_use <- load_censoagro(
+  dataset = "agricultural_area_use",
+  raw_data = FALSE,
+  geo_level = "state",
+  time_period = c(1980, 1995, 2006, 2017),
   language = "pt"
 )
+
+# Compare pastureland across states
+pasture_data <- land_use %>%
+  filter(use_category == "Pastos plantados" | use_category == "Pastos naturais")
+```
+
+### Example 5: Agricultural Mechanization Trends
+
+Study the adoption of tractors in agriculture:
+
+```{r eval=FALSE}
+# Download mechanization data
+mechanization <- load_censoagro(
+  dataset = "agricultural_employees_tractors",
+  raw_data = FALSE,
+  geo_level = "state",
+  time_period = 1970:2017,
+  language = "eng"
+)
+
+# Calculate tractors per 1000 hectares as a mechanization index
+summary_stats <- mechanization %>%
+  group_by(year, state) %>%
+  summarize(
+    total_tractors = sum(tractors, na.rm = TRUE),
+    total_employees = sum(employees, na.rm = TRUE),
+    .groups = 'drop'
+  )
+```
+
+---
+
+## Data Notes
+
+### Raw vs. Treated Data
+
+- **Raw data** (`raw_data = TRUE`): Exactly as published by IBGE, with original formatting and Portuguese variable names
+- **Treated data** (`raw_data = FALSE`): Cleaned and standardized with English variable names, consistent units (hectares for area, kilograms for production quantities), and NA values properly handled
+
+### Data Organization
+
+When using treated data, the output is typically in long format with one row per observation unit, containing:
+- Geographic identifiers (state, municipality if applicable)
+- Year of the census
+- Product/category names (crop type, animal species, etc.)
+- Quantitative measurements (area, quantity, count)
+- Number of establishments/properties
+
+### Important Considerations
+
+1. **Time gaps**: Census data is not collected every year. Years with no data simply won't be available.
+2. **Geographic changes**: Brazil's state boundaries have changed historically; use caution when comparing very old data
+3. **Definition changes**: IBGE's classification of crops and agricultural activities has evolved. Variables may not be directly comparable across all decades.
+4. **Municipality data**: Currently only available for `livestock_production` in 2017
+5. **Download size**: Historical data requests with multiple years may be large; plan accordingly
+
+### Citing the Data
+
+When using this data in research or publications, cite:
+
+> IBGE - Instituto Brasileiro de Geografia e Estatística. Censo Agropecuário. Available at: https://sidra.ibge.gov.br/pesquisa/censo-agropecuario
+
+---
+
 ```
