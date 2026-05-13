@@ -13,31 +13,257 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+## Overview
 
-Loads information the mines being explored legally in Brazil, including their location, status, product being mined and area in square meters etc. Survey is done at municipal and state level. The National Mining Agency (ANM) is responsible for this survey.
- 
-***
-**Options:**
+SIGMINE (Sistema de Informações Geográficas da Mineração - Mining Geographic Information System) is Brazil's official mining registry maintained by the [National Department of Mineral Production (DNPM)](https://www.gov.br/dnpm/) (now part of the Geological Service of Brazil - SGB-CPRM).
 
-  1. **dataset**: `"sigmine_active"`
+This dataset provides:
 
-  2. **raw_data**: there are two options:
-      * `TRUE`: if you want the data as it is originally.
-      * `FALSE`: if you want the treated version of the data.
+- **Active mining operations**: All legally authorized mining projects across Brazil
+- **Mine locations**: Geographic coordinates and spatial extent
+- **Product information**: What minerals/resources are being mined
+- **Operational status**: Whether mines are active, suspended, or recovering
+- **Area data**: Size of mining concessions and operating areas
+- **Company information**: Operator and ownership details
+- **Environmental permits**: Status of environmental authorization
+- **Geographic coverage**: National coverage including Legal Amazon region
 
-  3. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
-  
-***
+SIGMINE data is critical for understanding Brazil's mining sector impact on the environment, economy, and land use, particularly in sensitive regions like the Amazon.
 
-**Examples:** 
- 
-```{r eval=FALSE}
-# Download treated data (raw_data = FALSE) in portuguese (language = "pt").
-data <- load_sigmine(
-  dataset = "sigmine_active",
-  raw_data = FALSE,
-  language = "pt"
-)
+### Data Source and Information
+
+SIGMINE data comes from:
+- Brazilian mining authorization and regulatory system
+- Geological Service of Brazil (SGB-CPRM)
+- Environmental licensing agencies
+- Updated continuously as mining permits are issued/revoked
+- Publicly accessible through government databases
+
+For more information, visit [SGB-CPRM](https://www.gov.br/cprm/) and mining databases.
+
+---
+
+## Available Dataset
+
+### **sigmine_active (Active Mining Operations)**
+
+Comprehensive registry of legally operating mining projects in Brazil.
+
+- **Coverage**: All active, legally authorized mining operations
+- **Status**: Currently operating, suspended, or in recovery phases
+- **Geographic levels**: National coverage with state and municipality identification
+- **Key variables**: Mine name, operator, location, mineral type, area, authorization status
+- **Mineral types**: Precious metals, industrial minerals, energy minerals (coal, uranium), others
+- **Environmental data**: Environmental license status, compliance information
+- **Spatial data**: Polygon boundaries of mining concessions/operations
+- **Use cases**:
+  - Assess mining impacts in regions of interest
+  - Identify mining activity in conservation areas
+  - Analyze relationships between mining and deforestation
+  - Economic analysis of mining sector
+  - Environmental impact assessment
+  - Conflict identification (mining vs. indigenous lands, protected areas)
+
+---
+
+## Function Parameters
+
+### 1. **dataset**
+
+Only one dataset is available:
+
+```r
+dataset = "sigmine_active"  # Active mining operations
 ```
 
+### 2. **raw_data**
+
+Controls whether to download original or processed data.
+
+- `TRUE`: Returns raw SIGMINE/DNPM data format with original coding
+- `FALSE`: Returns treated data with English variable names and standardized formatting
+
+```r
+raw_data = FALSE  # logical
+```
+
+### 3. **language**
+
+Output language for variable names and documentation.
+
+- `"pt"`: Portuguese
+- `"eng"`: English
+
+```r
+language = "eng"  # character string
+```
+
+---
+
+## Data Structure
+
+SIGMINE data typically includes:
+
+- **Mine identification**: Name, registration number, operator
+- **Location**: State, municipality, geographic coordinates
+- **Resource**: Mineral type being mined
+- **Area**: Size of mining concession (square meters)
+- **Status**: Active, suspended, recovery, or other operational status
+- **Authorization**: Mining and environmental permits
+- **Geometry**: Spatial polygon of mining area (when available)
+
+---
+
+## Examples
+
+### Example 1: Active Mining in Amazon Region
+
+Identify mining operations in the Legal Amazon:
+
+```{r eval=FALSE}
+library(dplyr)
+
+# Load SIGMINE data
+mining <- load_sigmine(
+  dataset = "sigmine_active",
+  raw_data = FALSE,
+  language = "eng"
+)
+
+# Filter for Amazon region
+amazon_states <- c("AC", "AM", "AP", "MA", "MT", "MS", "PA", "RO", "RR", "TO")
+
+amazon_mining <- mining %>%
+  filter(state %in% amazon_states) %>%
+  select(mine_name, state, municipality, mineral_type, area_m2, status)
+
+print("Active mining operations in the Amazon:")
+print(amazon_mining)
+
+print(paste("Total mining operations in Amazon:", nrow(amazon_mining)))
+```
+
+### Example 2: Mineral Types and Distribution
+
+Analyze which minerals are mined and where:
+
+```{r eval=FALSE}
+library(dplyr)
+
+mining <- load_sigmine(
+  dataset = "sigmine_active",
+  raw_data = FALSE,
+  language = "eng"
+)
+
+# Mineral types by frequency
+mineral_distribution <- mining %>%
+  group_by(mineral_type) %>%
+  summarize(
+    num_operations = n(),
+    total_area_hectares = sum(area_m2, na.rm = TRUE) / 10000,
+    num_states = n_distinct(state),
+    .groups = 'drop'
+  ) %>%
+  arrange(desc(num_operations))
+
+print("Mining operations by mineral type:")
+print(mineral_distribution)
+
+# Where are precious metals mined?
+precious_metals <- mining %>%
+  filter(grepl("gold|silver|diamond", mineral_type, ignore.case = TRUE)) %>%
+  group_by(state) %>%
+  summarize(
+    num_operations = n(),
+    total_area = sum(area_m2, na.rm = TRUE) / 10000,
+    .groups = 'drop'
+  ) %>%
+  arrange(desc(num_operations))
+
+print("Precious metal mining by state:")
+print(precious_metals)
+```
+
+### Example 3: Largest Mining Operations
+
+Identify the largest mining concessions by area:
+
+```{r eval=FALSE}
+library(dplyr)
+
+mining <- load_sigmine(
+  dataset = "sigmine_active",
+  raw_data = FALSE,
+  language = "eng"
+)
+
+# Largest mining operations
+largest_mines <- mining %>%
+  mutate(area_hectares = area_m2 / 10000) %>%
+  arrange(desc(area_hectares)) %>%
+  select(mine_name, state, municipality, mineral_type, area_hectares, status) %>%
+  head(30)
+
+print("Largest mining operations in Brazil:")
+print(largest_mines)
+
+# Total mining area by state
+state_mining_area <- mining %>%
+  mutate(area_hectares = area_m2 / 10000) %>%
+  group_by(state) %>%
+  summarize(
+    total_mining_area = sum(area_hectares, na.rm = TRUE),
+    num_operations = n(),
+    avg_operation_size = mean(area_hectares, na.rm = TRUE),
+    .groups = 'drop'
+  ) %>%
+  arrange(desc(total_mining_area))
+
+print("Mining footprint by state:")
+print(state_mining_area)
+```
+
+---
+
+## Data Notes
+
+### Mining Authorization Status
+
+SIGMINE tracks mines at various stages:
+- **Active**: Currently operating, producing minerals
+- **Suspended**: Temporarily halted operations
+- **Recovery**: Reclamation and environmental restoration phase
+- **Other**: Various other regulatory statuses
+
+### Minerals Covered
+
+SIGMINE includes:
+- **Precious metals**: Gold, silver, platinum
+- **Industrial minerals**: Iron, copper, aluminum, tin, others
+- **Energy minerals**: Coal, uranium
+- **Gemstones**: Diamonds, emeralds, others
+- **Construction minerals**: Sand, gravel, granite
+
+### Data Updates
+
+- SIGMINE is continuously updated as new permits are issued/revoked
+- The dataset you access reflects the most current government registry
+- Historical changes available from government archives
+
+### Geographic Information
+
+- **Coordinates**: GPS coordinates of mine locations
+- **Polygons**: Spatial boundaries of mining concessions (when available)
+- **Accuracy**: Depends on government survey quality
+
+### Important Limitations
+
+1. **Only legal operations**: Artisanal/informal mining not included
+2. **Status lags**: Official status may lag actual operational status
+3. **Environmental permits**: May not reflect real-time compliance
+4. **Spatial accuracy**: Boundaries may have uncertain precision
+5. **Definition changes**: Mining classification/categories may evolve
+
+---
 
