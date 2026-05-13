@@ -13,53 +13,316 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+## Overview
 
-Loads information on the amount and value of the production of the exploitation of native plant resources and planted forest massifs, as well as existing total and harvested areas of forest crops.
+PEVS (Produção da Silvicultura e da Extração Vegetal - Silviculture and Forestry Extraction Production) is a comprehensive annual survey conducted by [IBGE](https://www.ibge.gov.br/) that collects data on forestry and related activities in Brazil.
 
-Data is from the Silviculture and Forestry Extraction Production (PEVS, in Portuguese), a nationwide annual survey conducted by IBGE (Brazilian Institute of Geography and Statistics). The data also has multiple aggregation levels, such as nationwide, by region, mesoregion and microregion, as well as state and municipality. 
+This dataset provides:
 
-The data available has a yearly frequency and is available from 1986 to the present, with the exception of the data on total area for production, which are only available from 2013 onwards. More information can be found in [this link](https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry-and-fishing/18374-forestry-activities.html?=&t=o-que-e).
+- **Native forest extraction**: Data on harvesting of native plant resources from natural forests
+- **Planted forest production**: Information on timber and other products from managed forest plantations
+- **Silviculture activities**: Forest management, afforestation, and reforestation data
+- **Production volumes and values**: Both physical quantities and economic values
+- **Harvested areas**: Land area from which extraction or harvest occurred
+- **Forest crop areas**: Total existing areas of forest crops (silviculture)
+- **Multi-level geographic data**: Available at country, regional, state, and municipality levels
+- **Long historical coverage**: Annual data from 1986 onwards
 
-***
-**Options:**
+PEVS is Brazil's primary source for forestry production statistics, important for understanding the timber industry, forest management practices, and sustainable use of forest resources.
 
-  1. **dataset**: there are three choices:
-      * `"pevs_forest_crops"`: provides data related to both quantity and value of the forestry activities. The data goes from 1986 to 2019 and it is divided by type of product.
-      * `"pevs_silviculture"`: provides data related to both quantity and value of the silviculture. The data goes from 1986 to 2019 and it is divided by type of product.
-      * `"pevs_silviculture_area"`: total existing area used for silviculture in 12/31.The data goes from 2013 to 2019 and it is divided by forestry species.  
+### Data Source and Coverage
 
-  2. **raw_data**: there are two options:
-      * `TRUE`: if you want the data as it is originally.
-      * `FALSE`: if you want the treated version of the data. 
-      
-  3. **geo_level**: `"country"`, `"region"`, `"state"`, or `"municipality"`  
-  
-  4. **time_period**: picks the years for which the data will be downloaded
+PEVS data comes from:
+- Direct surveys of forestry companies and producers
+- Administrative records from forestry operations
+- Compiled and validated by IBGE's agriculture statistics division
+- Annual release with data for previous year
+- Covers both industrial and subsistence-level forestry activities
 
-  5. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
-  
-***
+For more information, visit [IBGE Agriculture Statistics](https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry/).
 
-**Examples:**
+---
+
+## Available Datasets
+
+### **1. pevs_forest_crops**
+
+Production data from forest crop plantations (timber and non-timber products).
+
+- **Coverage**: All Brazilian forest crops and related products
+- **Time period**: 1986 to 2019
+- **Geographic levels**: Country, Region, State, Municipality
+- **Key variables**: Quantity produced, value of production, by product type
+- **Products included**: Eucalyptus, pine, other timber species, charcoal, resins, turpentine, cork
+- **Use cases**:
+  - Analyze timber production by region and species
+  - Track forest product market values
+  - Identify regional forestry specialization
+  - Assess economic contribution of forest crops
+  - Monitor charcoal and other non-timber forest products
+
+### **2. pevs_silviculture**
+
+Data on silviculture activities including afforestation, reforestation, and forest management.
+
+- **Coverage**: All silviculture operations across Brazil
+- **Time period**: 1986 to 2019
+- **Geographic levels**: Country, Region, State, Municipality
+- **Key variables**: Quantity and value of silviculture products, area under management
+- **Activities tracked**: Timber production, forest management, conservation activities
+- **Use cases**:
+  - Track silviculture expansion and development
+  - Analyze productivity of managed forests
+  - Regional specialization in forest management
+  - Economic analysis of forest-based industries
+  - Environmental and conservation-oriented forestry
+
+### **3. pevs_silviculture_area**
+
+Total existing area used for silviculture operations, disaggregated by forest species.
+
+- **Coverage**: All silviculture land areas in Brazil
+- **Time period**: 2013 to 2019 (limited historical coverage)
+- **Geographic levels**: Country, Region, State, Municipality
+- **Key variables**: Total area by species (hectares), area by type of forest operation
+- **Species tracked**: Eucalyptus, pine, acacia, other species
+- **Measurement**: Area as of December 31st of each year
+- **Use cases**:
+  - Monitor forest plantation expansion
+  - Track species-specific area trends
+  - Land use change analysis
+  - Assessment of silviculture infrastructure
+  - Regional forest resource assessment
+  - Support for long-term forest management planning
+
+---
+
+## Function Parameters
+
+### 1. **dataset**
+
+Selects which forestry dataset to download.
+
+```r
+dataset = "pevs_forest_crops"       # Forest crop production (1986-2019)
+dataset = "pevs_silviculture"       # Silviculture production (1986-2019)
+dataset = "pevs_silviculture_area"  # Silviculture land area (2013-2019)
+```
+
+### 2. **raw_data**
+
+Controls whether to download original or processed data.
+
+- `TRUE`: Returns raw IBGE data with original Portuguese variable names
+- `FALSE`: Returns treated data with English variable names, standardized units, and cleaned formatting
+
+```r
+raw_data = FALSE  # logical
+```
+
+### 3. **geo_level**
+
+Specifies the geographic aggregation level.
+
+- `"country"`: National aggregate
+- `"region"`: Brazilian geographic regions (North, Northeast, Center-West, Southeast, South)
+- `"state"`: State-level data (27 units)
+- `"municipality"`: Most granular level with 5,570+ municipalities
+
+```r
+geo_level = "state"  # character string
+```
+
+### 4. **time_period**
+
+Defines which year(s) to download.
+
+**Important: Dataset-specific availability:**
+
+| Dataset | Available Years |
+|---------|-----------------|
+| `pevs_forest_crops` | 1986-2019 |
+| `pevs_silviculture` | 1986-2019 |
+| `pevs_silviculture_area` | 2013-2019 |
+
+```r
+time_period = 2019              # single year
+time_period = c(2010, 2015)     # specific years
+time_period = 2010:2019         # range of years
+```
+
+### 5. **language**
+
+Output language for variable names.
+
+- `"pt"`: Portuguese
+- `"eng"`: English
+
+```r
+language = "eng"  # character string
+```
+
+---
+
+## Examples
+
+### Example 1: Forest Crop Production by State
+
+Analyze timber and forest product production across states:
 
 ```{r eval=FALSE}
-# Download treated (raw_data = FALSE) silviculture data (dataset = 'pevs_silviculture')
-# by state (geo_level = 'state') from 2012 (time_period =  2012)
-# in portuguese (language = "pt")
-data <- load_pevs(
-  dataset = "pevs_silviculture",
+library(dplyr)
+
+# Download forest crops data at state level
+forest_crops <- load_pevs(
+  dataset = "pevs_forest_crops",
   raw_data = FALSE,
   geo_level = "state",
-  time_period = 2012,
-  language = "pt"
+  time_period = 2019,
+  language = "eng"
 )
 
-# Download raw (raw_data = TRUE) forest crops data by region
-# from 2012 to 2013 in english
-data <- load_pevs(
-  dataset = "pevs_forest_crops",
-  raw_data = TRUE,
-  geo_level = "region",
-  time_period = 2012:2013
-)
+# Top states by forest product production value
+top_producers <- forest_crops %>%
+  group_by(state) %>%
+  summarize(
+    total_production_value = sum(production_value, na.rm = TRUE),
+    total_quantity = sum(quantity_produced, na.rm = TRUE),
+    num_products = n_distinct(product_type),
+    .groups = 'drop'
+  ) %>%
+  arrange(desc(total_production_value)) %>%
+  head(15)
+
+print(top_producers)
 ```
+### Example 2: Silviculture Area Expansion
+
+Track the growth of forest plantations over time:
+
+```{r eval=FALSE}
+library(dplyr)
+library(ggplot2)
+
+# Load silviculture area data for multiple years
+silvi_area <- load_pevs(
+  dataset = "pevs_silviculture_area",
+  raw_data = FALSE,
+  geo_level = "state",
+  time_period = 2013:2019,
+  language = "eng"
+)
+
+# National silviculture area trends
+national_area <- silvi_area %>%
+  group_by(year) %>%
+  summarize(
+    total_area = sum(area_hectares, na.rm = TRUE),
+    num_states = n_distinct(state),
+    .groups = 'drop'
+  )
+
+# Visualize expansion
+ggplot(national_area, aes(x = year, y = total_area)) +
+  geom_line(size = 1) +
+  geom_point(size = 3) +
+  labs(title = "Total Silviculture Area in Brazil (2013-2019)",
+       x = "Year",
+       y = "Area (hectares)") +
+  theme_minimal()
+
+# States with largest plantations in 2019
+largest_states <- silvi_area %>%
+  filter(year == 2019) %>%
+  group_by(state) %>%
+  summarize(total_area = sum(area_hectares, na.rm = TRUE)) %>%
+  arrange(desc(total_area)) %>%
+  head(10)
+```
+
+### Example 3: Regional Silviculture Production
+
+Compare silviculture production across regions:
+
+```{r eval=FALSE}
+library(dplyr)
+
+# Regional silviculture data
+silvi_prod <- load_pevs(
+  dataset = "pevs_silviculture",
+  raw_data = FALSE,
+  geo_level = "region",
+  time_period = 2019,
+  language = "eng"
+)
+
+# Production by region
+regional_production <- silvi_prod %>%
+  group_by(region) %>%
+  summarize(
+    total_production_value = sum(production_value, na.rm = TRUE),
+    total_quantity = sum(quantity_produced, na.rm = TRUE),
+    num_products = n_distinct(product_type),
+    .groups = 'drop'
+  ) %>%
+  arrange(desc(total_production_value))
+
+print(regional_production)
+
+# Product specialization by region
+region_products <- silvi_prod %>%
+  group_by(region, product_type) %>%
+  summarize(
+    value = sum(production_value, na.rm = TRUE),
+    .groups = 'drop'
+  ) %>%
+  pivot_wider(
+    names_from = product_type,
+    values_from = value,
+    values_fill = 0
+  )
+```
+
+
+## Data Notes
+
+### Data Structure
+
+Each row typically represents:
+- A geographic unit (country, region, state, or municipality)
+- A specific year
+- A product type or forest species
+- Quantity produced (in appropriate units: cubic meters, tons, etc.)
+- Value of production (in currency units)
+
+### Product Categories
+
+Forest crops include:
+- **Timber species**: Eucalyptus, pine, other timber
+- **Non-timber products**: Charcoal, resins, turpentine, cork, bark
+- **Other forest products**: Tannin, rosin, pulpwood
+
+Exact categories vary by dataset and year.
+
+### Raw vs. Treated Data
+
+- **Raw data** (`raw_data = TRUE`): IBGE original format, Portuguese variable names
+- **Treated data** (`raw_data = FALSE`): English names, standardized units, cleaned formatting
+
+### Important Limitations
+
+1. **Data collection changes**: Survey methodology may evolve over time
+2. **Area vs. production**: Area data only available from 2013; earlier years have production data only
+3. **Municipality data sparse**: Many small municipalities may have zero or no reported data
+4. **Seasonal nature**: Some products are seasonal; annual aggregates smooth out variation
+5. **Informal forestry**: May undercount small-scale or informal forestry operations
+
+### Units of Measurement
+
+- **Area**: Hectares (ha)
+- **Quantity**: Varies by product (cubic meters for timber, tons for charcoal, etc.)
+- **Value**: Brazilian Real (R$) at current prices
+
+---
+
+
