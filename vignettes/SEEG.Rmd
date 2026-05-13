@@ -13,53 +13,508 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+## Overview
 
-Loads estimates of emission of greenhouse gases of Brazilian cities and states from SEEG. SEEG is the System of Estimates of Emissions and Removals of Greenhouse Gases (SEEG), an initiative of the Observatório do Clima, a network of institutions focused on climate change research in Brazil. 
+SEEG (Sistema de Estimativa de Emissões e Remoções de Gases de Efeito Estufa - System of Estimates of Emissions and Removals of Greenhouse Gases) is Brazil's most comprehensive greenhouse gas emissions database developed by [Observatório do Clima](https://www.observatoriodoclima.org.br/) (Climate Observatory).
 
-The data provided in SEEG's Collection 9 is a series covering the period from 2000 to 2018.
+This dataset provides:
 
-Using data collected from government entities, institutes, research centers, NGOs and other institutions, the estimates are created using the methodology of the Brazilian Inventory of Anthropic Emissions and Removals of Greenhouse Gases, assembled by the Ministry of Science, Technology and Innovation (MCTI), and the directives of Intergovernmental Panel on Climate Change (IPCC)
+- **Greenhouse gas emissions**: Complete estimates of all major climate-relevant gases
+- **Multi-sector coverage**: Agriculture, energy, land use, industry, waste
+- **Sub-sectoral detail**: Detailed breakdowns within each sector
+- **Municipality and state levels**: Geographic disaggregation for regional analysis
+- **Time series**: Historical data from 2000 onwards
+- **Removal accounting**: Also includes carbon sequestration and removals
+- **Comprehensive methodology**: Based on Brazilian national inventory standards
+- **Transparent assumptions**: Well-documented methodology and data sources
 
-Emissions are divided in five main sources: Agricultural and Cattle Raising, Energy, Changes in Use of Land, Industrial Processes and Residues. All greenhouse gases contained in the national inventory are considered, encompassing CO2, CH4, N2O and the HFCs, with the conversion to carbon equivalence (CO2e) also included, both in the metric of GWP (Global Warming Potential) and GTP (Global Temperature Potential).
+SEEG is the primary tool for understanding Brazil's greenhouse gas emissions profile, tracking progress toward climate goals, identifying emission hotspots, and supporting climate policy.
 
-The data is downloaded from the SEEG website in the form of one single file, so the option to select a certain range of years is not available. Also, due to the size of the file, a stable internet connection is necessary, and the function may take time to run. 
+### Data Source and Methodology
 
-***
-**Options:**
+SEEG emissions estimates are compiled using:
+- Government data from multiple agencies (MAPA, IBGE, ANP, etc.)
+- Satellite monitoring of deforestation and land use
+- International IPCC methodology standards
+- Peer-reviewed scientific research
+- Regular updates as new government data becomes available
 
-  1. **dataset**: there are six choices:
-      * `"seeg"`: provides all sectors in a same dataframe. Only works with `raw_data = TRUE`
-      * `"seeg_farming"`
-      * `"seeg_industry"`
-      * `"seeg_energy"`
-      * `"seeg_land"`
-      * `"seeg_residuals"`
+For more information, visit [SEEG Project](https://seeg.org.br/) and [Observatório do Clima](https://www.observatoriodoclima.org.br/).
 
-  2. **raw_data**: there are two options:
-      * `TRUE`: if you want the data as it is originally.
-      * `FALSE`: if you want the treated version of the data. 
-      
-  3. **geo_level**: `"country"`, `"state"`, or `"municipality"`
+---
 
-  4. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
-  
-***
+## Available Datasets
 
-**Examples:**  
-  
+### **1. seeg (All Sectors Combined)**
+
+Complete greenhouse gas emissions across all sectors in one dataset.
+
+- **Coverage**: All emission sources in Brazil
+- **Sectors included**: All five (agriculture, energy, land use, industry, waste)
+- **Time period**: 2000-2018
+- **Geographic levels**: Country, State, Municipality
+- **Key variables**: Total emissions (CO₂e), by sector and sub-sector
+- **Format**: Comprehensive view of Brazil's total emissions profile
+- **Note**: Only available with `raw_data = TRUE`
+- **Use cases**:
+  - Understand overall emissions landscape
+  - Identify dominant emission sources
+  - Track total emissions trends over time
+
+### **2. seeg_farming (Agricultural and Livestock Emissions)**
+
+Greenhouse gas emissions from agriculture and livestock activities.
+
+- **Coverage**: All agricultural and livestock production
+- **Time period**: 2000-2018
+- **Geographic levels**: Country, State, Municipality
+- **Key variables**: Emissions from cattle, crop production, soil management, manure
+- **Dominant source**: Usually the largest single emissions sector in Brazil
+- **Components**: 
+  - Livestock (enteric fermentation, manure)
+  - Crop production and soil management
+  - Agricultural land preparation
+- **Use cases**:
+  - Assess agricultural emission contributions
+  - Identify highest-emission municipalities
+  - Evaluate livestock and farming intensity
+  - Policy targets for agricultural emissions reduction
+
+### **3. seeg_energy (Energy Sector Emissions)**
+
+Emissions from energy production and consumption.
+
+- **Coverage**: All energy-related emissions
+- **Time period**: 2000-2018
+- **Geographic levels**: Country, State, Municipality
+- **Key variables**: Emissions from electricity, transport, heating, fuel production
+- **Components**:
+  - Energy generation and distribution
+  - Transportation fuels
+  - Energy consumption
+  - Industrial energy use
+- **Use cases**:
+  - Understand energy sector contribution to climate change
+  - Track renewable vs. fossil fuel impacts
+  - Identify regional energy emission patterns
+
+### **4. seeg_land (Land Use Change Emissions)**
+
+Emissions and removals from changes in forest cover and land use.
+
+- **Coverage**: Deforestation, forest degradation, reforestation effects
+- **Time period**: 2000-2018
+- **Geographic levels**: Country, State, Municipality
+- **Key variables**: Net emissions/removals from land use change
+- **Components**:
+  - Deforestation and forest loss
+  - Forest degradation
+  - Reforestation and afforestation
+  - Vegetation conversion
+- **Importance**: Often largest single contributor to Brazil's emissions
+- **Use cases**:
+  - Analyze deforestation climate impact
+  - Identify reforestation opportunities
+  - Assess forest conservation value
+  - Link with PRODES and DETER deforestation data
+
+### **5. seeg_industry (Industrial Process Emissions)**
+
+Emissions from manufacturing and industrial processes.
+
+- **Coverage**: All industrial sectors
+- **Time period**: 2000-2018
+- **Geographic levels**: Country, State, Municipality
+- **Key variables**: Emissions from cement, chemicals, metals, minerals, other manufacturing
+- **Components**:
+  - Chemical production (ammonia, soda ash, etc.)
+  - Metal production (iron, aluminum, others)
+  - Mineral processing (cement, lime, glass)
+  - Other industrial processes
+- **Use cases**:
+  - Identify industrial emission hotspots
+  - Regional manufacturing impacts
+  - Process-specific emission reduction opportunities
+
+### **6. seeg_residuals (Waste and Residuals Emissions)**
+
+Emissions from waste management, landfills, and waste treatment.
+
+- **Coverage**: All waste-related emissions
+- **Time period**: 2000-2018
+- **Geographic levels**: Country, State, Municipality
+- **Key variables**: Emissions from solid waste, wastewater treatment, waste treatment
+- **Components**:
+  - Landfill methane emissions
+  - Wastewater treatment
+  - Waste disposal and treatment
+  - Municipal solid waste management
+- **Use cases**:
+  - Assess waste sector contributions
+  - Identify waste management improvement opportunities
+  - Evaluate circular economy potential
+
+---
+
+## Important Data Characteristics
+
+### Collection 9 Data
+
+The data provided is from SEEG's Collection 9:
+- **Time period**: 2000-2018
+- **Methodology**: Latest available when data was compiled
+- **Quality**: Peer-reviewed and validated
+- **Revisions**: May be updated in future SEEG collections as better data becomes available
+
+### Emissions Units
+
+- **Standard unit**: Gigatonnes CO₂ equivalent (Gt CO₂e)
+- **CO₂e equivalence**: Uses global warming potentials (GWP) to convert CH₄ and N₂O to CO₂ equivalent
+- **Consistency**: Allows comparison across different gases and sectors
+
+### Download Considerations
+
+ **Important**: The complete SEEG dataset is quite large. When downloading:
+- Entire datasets are downloaded as single files; year selection is limited
+- A stable, high-speed internet connection is recommended
+- Downloads may take time depending on connection speed
+- Ensure sufficient disk space for storage
+
+---
+
+## Function Parameters
+
+### 1. **dataset**
+
+Selects which emission sector(s) to download.
+
+```r
+dataset = "seeg"              # All sectors (raw_data = TRUE only)
+dataset = "seeg_farming"      # Agriculture and livestock
+dataset = "seeg_energy"       # Energy sector
+dataset = "seeg_land"         # Land use changes
+dataset = "seeg_industry"     # Industrial processes
+dataset = "seeg_residuals"    # Waste and residuals
+```
+
+### 2. **raw_data**
+
+Controls whether to download original or processed data.
+
+- `TRUE`: Returns raw SEEG data format (more detailed)
+- `FALSE`: Returns treated data with English variable names and standardized format
+
+```r
+raw_data = FALSE  # logical
+```
+
+### 3. **geo_level**
+
+Specifies geographic aggregation level.
+
+- `"country"`: National total
+- `"state"`: State-level emissions (27 units)
+- `"municipality"`: All 5,570+ municipalities
+
+```r
+geo_level = "state"  # character string
+```
+
+### 4. **language**
+
+Output language for variable names and labels.
+
+- `"pt"`: Portuguese
+- `"eng"`: English
+
+```r
+language = "eng"  # character string
+```
+
+**Note on timing**: Downloads may take considerable time due to file size.
+
+---
+## Examples
+
+### Example 1: Total National Emissions by Sector
+
+Understand Brazil's overall emissions profile:
+
 ```{r eval=FALSE}
-# Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg")
-# by state (geo_level = "state")
-data <- load_seeg(
+library(dplyr)
+library(ggplot2)
+
+# Load all sectors (raw data format)
+all_emissions <- load_seeg(
   dataset = "seeg",
   raw_data = TRUE,
-  geo_level = "state"
+  geo_level = "country",
+  language = "eng"
 )
 
-# Download treated data (raw_data = FALSE) of industry greenhouse gases (dataset = "seeg_industry")
-data <- load_seeg(
-  dataset = "seeg_industry",
-  raw_data = FALSE,
-  geo_level = "state"
-)
+# Total emissions by sector for latest available year
+sector_breakdown <- all_emissions %>%
+  group_by(sector) %>%
+  summarize(
+    total_emissions = sum(emissions_co2e, na.rm = TRUE),
+    pct_of_total = (total_emissions / sum(all_emissions$emissions_co2e, na.rm = TRUE)) * 100,
+    .groups = 'drop'
+  ) %>%
+  arrange(desc(total_emissions))
+
+print("Brazil's emissions by sector:")
+print(sector_breakdown)
+
+# Visualize sector contributions
+ggplot(sector_breakdown, aes(x = reorder(sector, total_emissions), y = total_emissions)) +
+  geom_col(fill = "darkred") +
+  coord_flip() +
+  labs(title = "Brazil's Greenhouse Gas Emissions by Sector",
+       x = "Sector",
+       y = "Emissions (CO₂e)") +
+  theme_minimal()
 ```
+
+### Example 2: Agricultural Emissions Analysis
+
+Analyze the largest emissions sector for Brazil:
+
+```{r eval=FALSE}
+library(dplyr)
+
+# Load agricultural emissions by state
+farming <- load_seeg(
+  dataset = "seeg_farming",
+  raw_data = FALSE,
+  geo_level = "state",
+  language = "eng"
+)
+
+# States with highest agricultural emissions
+top_farm_states <- farming %>%
+  group_by(state) %>%
+  summarize(
+    total_ag_emissions = sum(emissions_co2e, na.rm = TRUE),
+    num_sources = n_distinct(source),
+    .groups = 'drop'
+  ) %>%
+  arrange(desc(total_ag_emissions)) %>%
+  head(15)
+
+print("Top agricultural emission states:")
+print(top_farm_states)
+
+# Breakdown of agricultural sources (livestock vs crop)
+ag_sources <- farming %>%
+  group_by(source) %>%
+  summarize(
+    emissions = sum(emissions_co2e, na.rm = TRUE),
+    .groups = 'drop'
+  ) %>%
+  arrange(desc(emissions))
+
+print("Agricultural emission sources:")
+print(ag_sources)
+```
+
+### Example 3: Land Use Change Emissions
+
+Understand the climate impact of deforestation:
+
+```{r eval=FALSE}
+library(dplyr)
+
+# Load land use change emissions
+land_use <- load_seeg(
+  dataset = "seeg_land",
+  raw_data = FALSE,
+  geo_level = "state",
+  language = "eng"
+)
+
+# Net emissions/removals by state
+state_net_emissions <- land_use %>%
+  group_by(state) %>%
+  summarize(
+    net_emissions = sum(emissions_co2e, na.rm = TRUE),
+    .groups = 'drop'
+  ) %>%
+  arrange(desc(net_emissions))
+
+print("Land use change emissions by state (positive = emissions from deforestation):")
+print(state_net_emissions)
+
+# States with highest deforestation impact
+high_emission_states <- state_net_emissions %>%
+  filter(net_emissions > 0) %>%
+  top_n(10, net_emissions)
+
+print("States with highest deforestation emissions:")
+print(high_emission_states)
+```
+
+### Example 4: Emissions Trends Over Time
+
+Track how emissions have changed from 2000 to 2018:
+
+```{r eval=FALSE}
+library(dplyr)
+library(ggplot2)
+
+# Load all sectors for country level
+all_sectors <- load_seeg(
+  dataset = "seeg",
+  raw_data = TRUE,
+  geo_level = "country",
+  language = "eng"
+)
+
+# Annual emissions trends
+annual_emissions <- all_sectors %>%
+  group_by(year) %>%
+  summarize(
+    total_emissions = sum(emissions_co2e, na.rm = TRUE),
+    .groups = 'drop'
+  ) %>%
+  arrange(year)
+
+print(annual_emissions)
+
+# Visualize trends
+ggplot(annual_emissions, aes(x = year, y = total_emissions)) +
+  geom_line(size = 1, color = "darkred") +
+  geom_point(size = 2) +
+  labs(title = "Brazil's Total Greenhouse Gas Emissions (2000-2018)",
+       x = "Year",
+       y = "Total Emissions (CO₂e)") +
+  theme_minimal()
+
+# Calculate trend
+first_year <- annual_emissions$total_emissions[1]
+last_year <- annual_emissions$total_emissions[nrow(annual_emissions)]
+change_pct <- ((last_year - first_year) / first_year) * 100
+
+print(paste("Total change 2000-2018:", round(change_pct, 1), "%"))
+```
+
+### Example 5: Municipal Emission Hotspots
+
+Identify highest-emitting municipalities:
+
+```{r eval=FALSE}
+library(dplyr)
+
+# Load municipality-level data
+all_sectors_munic <- load_seeg(
+  dataset = "seeg",
+  raw_data = TRUE,
+  geo_level = "municipality",
+  language = "eng"
+)
+
+# Highest-emitting municipalities
+top_municipalities <- all_sectors_munic %>%
+  group_by(municipality, state) %>%
+  summarize(
+    total_emissions = sum(emissions_co2e, na.rm = TRUE),
+    .groups = 'drop'
+  ) %>%
+  arrange(desc(total_emissions)) %>%
+  head(30)
+
+print("Highest-emitting municipalities in Brazil:")
+print(top_municipalities)
+
+# Emission concentration: top municipalities account for what %?
+total_emissions <- sum(all_sectors_munic$emissions_co2e, na.rm = TRUE)
+top100 <- top_municipalities %>%
+  head(100) %>%
+  summarize(top100_total = sum(total_emissions))
+
+top100_pct <- (top100$top100_total / total_emissions) * 100
+print(paste("Top 100 municipalities account for", round(top100_pct, 1), "% of emissions"))
+```
+
+### Example 6: Sector Comparison by State
+
+Compare sectoral composition across states:
+
+```{r eval=FALSE}
+library(dplyr)
+library(tidyr)
+
+# Load individual sector datasets
+farming <- load_seeg(dataset = "seeg_farming", raw_data = FALSE, 
+                     geo_level = "state", language = "eng") %>%
+  mutate(sector = "Agriculture") %>%
+  group_by(state, sector) %>%
+  summarize(emissions = sum(emissions_co2e, na.rm = TRUE), .groups = 'drop')
+
+energy <- load_seeg(dataset = "seeg_energy", raw_data = FALSE,
+                    geo_level = "state", language = "eng") %>%
+  mutate(sector = "Energy") %>%
+  group_by(state, sector) %>%
+  summarize(emissions = sum(emissions_co2e, na.rm = TRUE), .groups = 'drop')
+
+land_use <- load_seeg(dataset = "seeg_land", raw_data = FALSE,
+                      geo_level = "state", language = "eng") %>%
+  mutate(sector = "Land Use") %>%
+  group_by(state, sector) %>%
+  summarize(emissions = sum(emissions_co2e, na.rm = TRUE), .groups = 'drop')
+
+# Combine
+combined <- bind_rows(farming, energy, land_use)
+
+# State profiles
+state_profile <- combined %>%
+  pivot_wider(
+    names_from = sector,
+    values_from = emissions,
+    values_fill = 0
+  ) %>%
+  mutate(
+    total = Agriculture + Energy + `Land Use`,
+    ag_share = (Agriculture / total) * 100,
+    energy_share = (Energy / total) * 100,
+    land_share = (`Land Use` / total) * 100
+  )
+
+print(state_profile)
+```
+---
+
+## Data Notes
+
+### Emission Sources Included
+
+SEEG includes all major anthropogenic emission sources:
+- Agriculture (livestock, crops, soil)
+- Energy (electricity, transport, heating)
+- Land use change (deforestation, afforestation)
+- Industrial processes (cement, chemicals, metals)
+- Waste (landfills, wastewater)
+
+### Methodology
+
+Estimates follow:
+- IPCC guidelines for national greenhouse gas inventories
+- Brazilian national inventory standards
+- International best practices
+- Transparent, documented assumptions
+
+### Data Quality
+
+- Peer-reviewed methodology
+- Validated against government data
+- Uncertainty ranges available in detailed products
+- Regular methodology updates
+
+### Limitations
+
+1. **Fixed time period**: Collection 9 covers 2000-2018 only
+2. **File size**: Large downloads; requires good internet
+3. **Year aggregation**: Cannot select individual years; entire dataset downloaded
+4. **Revisions**: Methodology may change in future SEEG releases
+5. **Sub-national uncertainty**: Municipal and state estimates have higher uncertainty than national
+
+---
