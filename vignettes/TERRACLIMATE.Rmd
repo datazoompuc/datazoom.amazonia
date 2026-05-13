@@ -14,62 +14,377 @@ knitr::opts_chunk$set(
 )
 ```
 
-Spatial data on several climate variables, extracted from Climatology Lab's [TerraClimate](https://www.climatologylab.org/terraclimate.html). The table below shows all possible variables to be extracted, which are chosen through the "dataset" parameter. Data ranges from 1958 to 2020.
+## Overview
 
-Netcdf files are downloaded from the [THREDDS](http://thredds.northwestknowledge.net:8080/thredds/terraclimate_catalog.html) web server, as recommended for rectangular subsets of the global data.
+TerraClimate is a global climate and climatic water balance dataset developed by the [Climatology Lab](https://www.climatologylab.org/) at University of California, Merced. This package provides access to TerraClimate data for Brazil and the Amazon region.
 
-<details>
-<summary>
-Click to see all dataset options
-</summary>
+This dataset provides:
+
+- **High-resolution climate data**: Monthly climate variables at ~4km resolution globally
+- **Comprehensive variables**: Temperature, precipitation, wind, radiation, soil moisture, drought indices
+- **Water balance data**: Evapotranspiration, runoff, water deficit calculations
+- **Temporal coverage**: Monthly data from 1958 to present (continuously updated)
+- **Global coverage**: Available worldwide, subset here for Brazil
+- **Satellite-derived data**: Combines satellite observations with ground station networks
+- **Research quality**: Peer-reviewed, widely used in climate and ecological research
+
+TerraClimate is essential for understanding climate variability, water availability, drought risk, agricultural potential, and climate change impacts across Brazil and the Amazon.
+
+### Data Source and Methodology
+
+TerraClimate data is compiled by:
+- University of California Climatology Lab
+- Integration of satellite and ground-based observations
+- Validated against station networks
+- Downscaled to ~4km global resolution
+- Monthly temporal resolution with daily and subdaily estimates available
+
+For more information, visit [TerraClimate Project](https://www.climatologylab.org/terraclimate.html).
+
+---
+
+## Available Climate Variables
+
+TerraClimate provides 13 main climate and water balance variables:
+
 | Dataset | Code | Description | Units |
-|:--------|:----:|:------------|:-----:|
-| max_temperature | tmax | Maximum 2-m Temperature | degC |
-| min_temperature | tmin | Minimum 2-m Temperature | degC |
-| wind_speed | ws   | Wind Speed at 10-m | m/s |
-| vapor_pressure_deficit | vpd  | Vapor Pressure Deficit | kPa |
+|---------|------|-------------|-------|
+| max_temperature | tmax | Maximum 2-m Temperature | °C |
+| min_temperature | tmin | Minimum 2-m Temperature | °C |
+| wind_speed | ws | Wind Speed at 10-m | m/s |
+| vapor_pressure_deficit | vpd | Vapor Pressure Deficit | kPa |
 | vapor_pressure | vap | 2-m Vapor Pressure | kPa |
-| snow_water_equivalent | swe  | Snow Water Equivalent at End of Month | mm |
-| shortwave_radiation_flux | srad | Downward Shortwave Radiation Flux at the Surface | W/m^2 |
-| soil_moisture | soil | Soil Moisture at End of Month | mm
-| runoff | q    | Runoff | mm |
-| precipitation | ppt  | Accumulated Precipitation | mm |
-| potential_evaporation | pet  | Reference Evapotranspiration | mm |
-| climatic_water_deficit | def  | Climatic Water Deficit | mm |
-| water_evaporation | aet  | Actual Evapotranspiration | mm |
+| snow_water_equivalent | swe | Snow Water Equivalent at End of Month | mm |
+| shortwave_radiation_flux | srad | Downward Shortwave Radiation Flux | W/m² |
+| soil_moisture | soil | Soil Moisture at End of Month | mm |
+| runoff | q | Runoff | mm |
+| precipitation | ppt | Accumulated Precipitation | mm |
+| potential_evaporation | pet | Reference Evapotranspiration | mm |
+| climatic_water_deficit | def | Climatic Water Deficit | mm |
+| water_evaporation | aet | Actual Evapotranspiration | mm |
 | palmer_drought_severity_index | PDSI | Palmer Drought Severity Index | unitless |
-</details>
 
-***
+---
 
-**Options:**
+## Data Format and Coverage
 
-  1. **dataset**: picks the variable to be read. Possible options are shown in the table above.
+### Spatial Resolution
 
-  2. **raw_data**: there are two options:
-      * `TRUE`: if you want the data as it is originally.
-      * `FALSE`: if you want the treated version of the data. 
-  
-  3. **time_period**: picks the years for which the data will be downloaded
+- **Resolution**: Approximately 4 km (0.04° at equator)
+- **Coverage**: Global; subset available for Brazil and Legal Amazon
+- **Coordinates**: WGS84 latitude/longitude
 
-  4. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
-  
-  5. **legal_amazon_only**: if set to `TRUE`, only downloads data from the Legal Amazon region
-  
-  OBS: A good internet connection is needed, because the data is heavy.
-  
-***
+### Temporal Resolution
 
-**Examples:**
+- **Frequency**: Monthly
+- **Time span**: 1958 to present (continuously updated)
+- **Data lag**: Recent months added as they become available (typically 2-3 months delay)
 
-```{r, eval=FALSE}
-# Downloading maximum temperature data from 2000 to 2001
-max_temp <- load_climate(dataset = "max_temperature", time_period = 2000:2001)
+### Data Type
 
-# Downloading precipitation data only for the legal Amazon in 2010
-amz_precipitation <- load_climate(
-  dataset = "precipitation",
-  time_period = 2010,
-  legal_amazon_only = TRUE
-)
+- **Format**: NetCDF files (raster/grid data)
+- **Size**: Large for multi-year, multi-variable downloads
+- **Access**: Downloaded from THREDDS server
+
+---
+
+## Function Parameters
+
+### 1. **dataset**
+
+Selects which climate variable to download.
+
+```r
+# Temperature and radiation
+dataset = "max_temperature"         # tmax
+dataset = "min_temperature"         # tmin
+dataset = "shortwave_radiation_flux" # srad
+
+# Water and moisture
+dataset = "precipitation"           # ppt
+dataset = "potential_evaporation"   # pet
+dataset = "water_evaporation"       # aet (actual evapotranspiration)
+dataset = "soil_moisture"           # soil
+dataset = "runoff"                  # q
+
+# Atmospheric variables
+dataset = "wind_speed"              # ws
+dataset = "vapor_pressure"          # vap
+dataset = "vapor_pressure_deficit"  # vpd
+
+# Drought and composite indices
+dataset = "climatic_water_deficit"  # def
+dataset = "palmer_drought_severity_index" # PDSI
+dataset = "snow_water_equivalent"   # swe
 ```
+
+### 2. **raw_data**
+
+Controls data format returned.
+
+- `TRUE`: Returns raw raster data (NetCDF, SpatRaster format)
+- `FALSE`: Returns aggregated data (specific format depends on configuration)
+
+```r
+raw_data = FALSE  # logical
+```
+
+### 3. **time_period**
+
+Specifies which year(s) to download.
+
+**Available range**: 1958 to present (most recent months have 2-3 month lag)
+
+```r
+time_period = 2020              # single year
+time_period = c(2010, 2020)     # specific years
+time_period = 2010:2020         # range of years
+```
+
+### 4. **legal_amazon_only**
+
+Restricts geographic coverage to Legal Amazon region.
+
+- `TRUE`: Downloads only data for Legal Amazon region (much smaller files)
+- `FALSE`: Downloads data for all Brazil (larger files)
+
+```r
+legal_amazon_only = TRUE  # logical
+```
+
+**Recommendation**: Use `TRUE` to significantly reduce download size for Amazon-focused research.
+
+### 5. **language**
+
+Output language for variable names and documentation.
+
+- `"pt"`: Portuguese
+- `"eng"`: English
+
+```r
+language = "eng"  # character string
+```
+
+---
+
+## Important Download Considerations
+
+ **Data Size**: TerraClimate raster data is substantial. Consider:
+
+- **File size**: Multi-year downloads can be very large (hundreds of MB to GBs)
+- **Internet**: High-speed connection recommended; THREDDS downloads can be slow
+- **Storage**: Ensure sufficient disk space (multiple years of global data is large)
+- **Time**: Downloads may take considerable time
+- **Memory**: Raster processing requires sufficient RAM
+
+**Recommendations**:
+- Use `legal_amazon_only = TRUE` to reduce size by ~95%
+- Download single or 2-3 year periods rather than decades at once
+- Use high-speed internet connection
+- Have at least 10-50 GB free disk space for multi-year downloads
+
+---
+
+## Examples
+
+### Example 1: Precipitation Patterns
+
+Analyze rainfall across the Amazon:
+
+```{r eval=FALSE}
+library(raster)
+library(dplyr)
+
+# Download precipitation for one year in Amazon
+precip <- load_climate(
+  dataset = "precipitation",
+  time_period = 2020,
+  legal_amazon_only = TRUE,
+  language = "eng"
+)
+
+# Basic statistics
+summary(precip)
+
+# Plot precipitation
+plot(precip, main = "Amazon Precipitation (2020)")
+
+# Annual total (sum of months)
+annual_precip <- sum(precip, na.rm = TRUE)
+plot(annual_precip, main = "Annual Precipitation in Amazon")
+```
+
+### Example 2: Temperature Trends
+
+Track temperature changes over time:
+
+```{r eval=FALSE}
+library(raster)
+
+# Download max temperature for recent decade
+max_temp <- load_climate(
+  dataset = "max_temperature",
+  time_period = 2010:2020,
+  legal_amazon_only = TRUE,
+  language = "eng"
+)
+
+# Average temperature over period
+avg_temp <- mean(max_temp, na.rm = TRUE)
+plot(avg_temp, main = "Average Maximum Temperature (2010-2020)")
+
+# Temperature range: compare first and last year
+temp_2010 <- max_temp[[1:12]]  # First year
+temp_2020 <- max_temp[[(nlayers(max_temp)-11):nlayers(max_temp)]]  # Last year
+
+avg_2010 <- mean(temp_2010, na.rm = TRUE)
+avg_2020 <- mean(temp_2020, na.rm = TRUE)
+
+# Simple warming calculation
+temp_change <- avg_2020 - avg_2010
+plot(temp_change, main = "Temperature Change 2010-2020")
+```
+
+### Example 3: Drought Assessment
+
+Analyze drought conditions using water deficit data:
+
+```{r eval=FALSE}
+library(raster)
+
+# Download climatic water deficit
+water_def <- load_climate(
+  dataset = "climatic_water_deficit",
+  time_period = 2020,
+  legal_amazon_only = TRUE,
+  language = "eng"
+)
+
+# Water deficit (high values = dry conditions)
+# Average deficit over year
+avg_water_def <- mean(water_def, na.rm = TRUE)
+plot(avg_water_def, main = "Average Climatic Water Deficit (2020)")
+
+# Identify dry areas (high deficit)
+drought_areas <- avg_water_def > quantile(avg_water_def, 0.75, na.rm = TRUE)
+plot(drought_areas, main = "High Drought Risk Areas")
+
+# Palmer Drought Severity Index for additional drought context
+pdsi <- load_climate(
+  dataset = "palmer_drought_severity_index",
+  time_period = 2020,
+  legal_amazon_only = TRUE,
+  language = "eng"
+)
+
+# PDSI: negative = drought, positive = wet
+plot(pdsi, main = "Palmer Drought Severity Index (2020)")
+```
+### Example 4: Radiation and Growing Season
+
+Analyze solar radiation and its relationship to temperature:
+
+```{r eval=FALSE}
+library(raster)
+
+# Download radiation and temperature
+radiation <- load_climate(
+  dataset = "shortwave_radiation_flux",
+  time_period = 2020,
+  legal_amazon_only = TRUE,
+  language = "eng"
+)
+
+temp <- load_climate(
+  dataset = "max_temperature",
+  time_period = 2020,
+  legal_amazon_only = TRUE,
+  language = "eng"
+)
+
+# Annual radiation total
+annual_radiation <- sum(radiation, na.rm = TRUE)
+plot(annual_radiation, main = "Annual Solar Radiation")
+
+# Average temperature
+avg_temp <- mean(temp, na.rm = TRUE)
+plot(avg_temp, main = "Average Maximum Temperature")
+
+# Correlation between radiation and temperature
+# (Simplified: stack and calculate)
+radiation_temp <- stack(annual_radiation, avg_temp)
+names(radiation_temp) <- c("Radiation", "Temperature")
+```
+
+### Example 5: Soil Moisture Dynamics
+
+Track seasonal soil moisture patterns:
+
+```{r eval=FALSE}
+library(raster)
+
+# Download soil moisture
+soil_moisture <- load_climate(
+  dataset = "soil_moisture",
+  time_period = 2020,
+  legal_amazon_only = TRUE,
+  language = "eng"
+)
+
+# Monthly stack (12 months if 1 year)
+plot(soil_moisture, main = "Monthly Soil Moisture (2020)")
+
+# Identify wet vs. dry months
+avg_soil <- mean(soil_moisture, na.rm = TRUE)
+
+# High vs. low moisture areas
+high_moisture <- soil_moisture > quantile(soil_moisture, 0.75, na.rm = TRUE)
+low_moisture <- soil_moisture < quantile(soil_moisture, 0.25, na.rm = TRUE)
+
+plot(high_moisture, main = "High Soil Moisture Areas")
+plot(low_moisture, main = "Low Soil Moisture Areas")
+```
+---
+
+## Data Notes
+
+### Variable Definitions
+
+- **Tmax/Tmin**: Monthly average maximum and minimum 2-meter air temperatures
+- **Precipitation**: Accumulated monthly precipitation
+- **Evapotranspiration (AET)**: Actual water loss from soil + plants through evaporation/transpiration
+- **Potential Evaporation (PET)**: Theoretical maximum evapotranspiration if unlimited water
+- **Runoff**: Water flowing overland/through soil to streams
+- **Soil Moisture**: Water stored in root zone at month end
+- **Vapor Pressure Deficit (VPD)**: Difference between saturated and actual vapor pressure (indicator of atmospheric dryness)
+- **Water Deficit (DEF)**: Accumulated water stress (PET - AET)
+- **PDSI**: Standardized drought index (-4 to +4 scale)
+
+### Data Quality
+
+- **Validation**: Validated against independent station networks
+- **Uncertainty**: Varies by region; higher in data-sparse areas
+- **Interpolation**: Satellite and station data combined and downscaled to 4km
+
+- **Reliability**: Generally excellent for temperature and precipitation; water balance variables have higher uncertainty
+
+### Important Limitations
+
+1. **Raster data large**: Multi-year downloads can be hundreds of MB to GBs
+2. **4km resolution**: Suitable for regional analysis; may miss local variation
+3. **Monthly aggregation**: Daily and sub-daily variation not captured
+4. **Recent data lag**: Most recent 2-3 months not yet available
+5. **Interpolation uncertainty**: Some regions have lower data density
+6. **Snow/ice areas**: Less accurate in high mountains or glaciated regions (not major issue for Amazon)
+
+### Recommended Processing
+
+Due to large file size:
+- **Aggregate early**: Summarize by month/year quickly to reduce memory use
+- **Legal Amazon only**: Massive size reduction if working in Amazon region
+- **Subset years**: Download only years of interest rather than decades
+- **Extract points**: If doing point-based analysis, extract specific coordinates to simplify data
+- **Use cloud computing**: Consider cloud platforms (Google Earth Engine) for very large analyses
+
+---
+
