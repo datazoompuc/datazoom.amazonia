@@ -219,3 +219,47 @@ priority_education <- education_data %>%
 
 print(priority_education)
 ```
+---
+
+## Data Notes
+
+### Index Scales
+
+- **0-100 scale**: All indices standardized to 0-100 for comparison
+- **Higher is better**: Across all dimensions except deforestation (where higher forest index = better)
+- **Comparable across dimensions**: Standardized scale allows cross-dimension comparison
+
+### Dimensions and Indicators
+
+Each dimension contains multiple indicators:
+- **Life quality**: 4-6 indicators
+- **Sanitation/habitat**: 3-5 indicators  
+- **Violence**: 3-4 indicators
+- **Education**: 3-4 indicators
+- **Communication**: 2-3 indicators
+- **Mortality**: 3-4 indicators
+- **Deforestation**: 2-3 indicators
+
+(Exact number varies by year and methodology)
+
+### Temporal Comparisons
+
+When comparing across years (2014, 2018, 2021, 2023):
+- Methodology may have evolved between assessments
+- New indicators may have been added
+- Some municipalities may not have data in all years
+- Use caution comparing very old (2014) with recent (2023) data
+
+### Missing Data
+
+- Some municipalities may lack data for specific indicators
+- Remote or less accessible areas may have less complete data
+- Use `na.rm = TRUE` in aggregations to handle missing values
+
+### Geographic Coverage
+
+- Covers 570+ municipalities in the Legal Amazon
+- Includes all states with Amazon territory
+- Some frontier/protected areas may lack complete data
+
+---

@@ -182,3 +182,38 @@ state_risk <- imazon_data %>%
 print(state_risk)
 ```
 
+---
+
+## Data Notes
+
+### Data Format
+
+- **Shapefile format**: Returned as Simple Features (SF) spatial objects
+- **Geometric representation**: Municipality polygons with pressure classification
+- **Attributes**: Municipality name, state, pressure category
+
+### Pressure Categories
+
+The 0-3 scale represents Imazon's assessment of deforestation risk:
+- Based on historical deforestation trends
+- Current forest cover
+- Accessibility and economic drivers
+- Human pressure factors
+
+### Important Limitations
+
+1. **Static classification**: This is a classification/index, not time-series deforestation data
+2. **Methodology may change**: Imazon's methodology for calculating pressure may be updated
+3. **Subjective risk assessment**: Classification involves judgment in addition to objective metrics
+4. **Not current alerts**: This is not real-time detection like DETER; it's a classification product
+5. **Municipal-level only**: Finer spatial resolution not available
+
+### Using with Other Datasets
+
+This dataset works well in combination with:
+- **DETER**: Compare pressure classification with actual recent deforestation
+- **DEGRAD**: Correlate pressure with degradation patterns
+- **CEMPRE**: Analyze relationship between employment and deforestation pressure
+- **COMEX**: Examine trade patterns in high-pressure vs low-pressure areas
+
+---

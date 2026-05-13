@@ -175,3 +175,38 @@ ggplot(global_trade, aes(x = year, y = total_trade)) +
        y = "Trade Value (USD)") +
   theme_minimal()
 ```
+---
+
+## Data Notes
+
+### Raw vs. Treated Data
+
+- **Raw data** (`raw_data = TRUE`): CEPII's original format with variable codes and potentially non-standard naming
+- **Treated data** (`raw_data = FALSE`): Standardized with English variable names, consistent column formatting, and ready for immediate analysis
+
+### Data Structure
+
+Each row typically represents a trade flow with:
+- **Exporter**: Country code (ISO 3-letter code)
+- **Importer**: Country code (ISO 3-letter code)
+- **Year**: Calendar year of the trade flow
+- **Product code**: HS 6-digit classification
+- **Product name**: Description of the product
+- **Value**: Trade value in USD
+- **Quantity**: Physical quantity (where available)
+
+### Country and Product Coverage
+
+- Most countries covered from 2000 onwards
+- Coverage varies by country; some countries have earlier data available
+- HS 6-digit codes ensure consistency with international standards
+- Product classifications may change over time as the HS is updated
+
+### Quality Notes
+
+- BACI reconciles mirror flows to improve data quality
+- Missing values may occur for certain country-product-year combinations
+- Some countries report data more frequently/accurately than others
+- Small trade flows may have been imputed or estimated
+
+---
