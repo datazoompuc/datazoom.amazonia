@@ -133,6 +133,15 @@ if (param$dataset == "energy_development_budget") {
       dplyr::mutate(
         dplyr::across(dplyr::starts_with("mda"), ~ gsub("[,]", ".", .x) %>% as.numeric()),
         dplyr::across(dplyr::starts_with("num_coord"), ~ gsub("[,]", ".", .x) %>% as.numeric())
+      ) %>%
+      dplyr::mutate(
+        sig_modalidade_empreendimento = dplyr::case_when(
+          dsc_modalidade_habilitado == "Geracao na propria UC" ~ "Microgera\u00e7\u00e3o ou Minigera\u00e7\u00e3o distribu\u00edda",
+          dsc_modalidade_habilitado == "Auto consumo remoto"   ~ "Autoconsumo remoto",
+          dsc_modalidade_habilitado == "Compartilhada"         ~ "Gera\u00e7\u00e3o compartilhada",
+          dsc_modalidade_habilitado == "Condom\u00ednio"      ~ "Condom\u00ednio",
+          TRUE                                                 ~ "Indefinido"
+        )
       )
   } else {
     dat <- dat %>%
