@@ -20,3 +20,20 @@ Ignored for the other datasets.}
 \description{
 National Electric Energy Agency - ANEEL
 }
+\examples{
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
+### DO NOT RUN ###
+# download treated data about energy generation
+clean_aneel <- load_aneel(
+  dataset = "energy_generation",
+  raw_data = FALSE
+)
+
+# download raw annual CDE budget data
+raw_cde <- load_aneel(
+  dataset = "energy_development_budget",
+  year = 2021,
+  raw_data = TRUE
+)
+\dontshow{\}) # examplesIf}
+}
