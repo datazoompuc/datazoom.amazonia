@@ -32,7 +32,7 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
 
   uf <- regiao <- sistema <- classe <- tipo_consumidor <- consumo <- consumidores <- setor_industrial <- data_excel <- NULL
 
-  conta <- bloco <- fonte <- valor <- ano <- account <- year <- value <- data <- total_produzido <- hidro <- eolica <- solar <- nuclear <- termo <- cana <- lenha <- lixivia <- outras_fontes_renovaveis <- carvao_vapor <- gas_natural <- gas_de_coqueira <- combustivel <- diesel <- outras_fontes_nao_renovaveis <- amz_legal <- state <- legal_amazon <- total_produced <- hydro <- wind <- other_renewable_sources <- steam_coal <- natural_gas <- coke_oven_gas <- fuel_oil <- diesel_oil <- other_non_renewable_sources <- NULL
+  . <- ano_tag <- conta <- bloco <- fonte <- valor <- ano <- account <- year <- value <- data <- total_produzido <- hidro <- eolica <- solar <- nuclear <- termo <- cana <- lenha <- lixivia <- outras_fontes_renovaveis <- carvao_vapor <- gas_natural <- gas_de_coqueira <- combustivel <- diesel <- outras_fontes_nao_renovaveis <- amz_legal <- state <- legal_amazon <- total_produced <- hydro <- wind <- other_renewable_sources <- steam_coal <- natural_gas <- coke_oven_gas <- fuel_oil <- diesel_oil <- other_non_renewable_sources <- NULL
 
   #############################
   ## Define Basic Parameters ##
