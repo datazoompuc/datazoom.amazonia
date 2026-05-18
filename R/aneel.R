@@ -180,7 +180,7 @@ if (param$dataset == "energy_development_budget") {
           names(var_labels) <- var_codes
 
           df <- df %>%
-            dplyr::mutate(dplyr::across(var, dplyr::recode, !!!var_labels))
+            dplyr::mutate(dplyr::across(dplyr::all_of(var), \(x) dplyr::recode(x, !!!var_labels)))
         }
 
         return(df)
@@ -191,11 +191,7 @@ if (param$dataset == "energy_development_budget") {
 
   dat <- dat %>%
     dplyr::mutate(
-      dplyr::across(
-        operation_start,
-        as.Date,
-        format = "%d/%m/%Y", origin = "1970-01-01"
-      )
+      dplyr::across(operation_start, \(x) as.Date(x, format = "%d/%m/%Y", origin = "1970-01-01"))
     )
 
   ################################
@@ -260,7 +256,7 @@ if (param$dataset == "energy_development_budget") {
         "cod_cep" = "zip_code",
         "sig_tipo_consumidor" = "consumer_type",
         "num_cpfcnpj" = "cpf_cnpj_number",
-        "nome_titular_empreendimento" = "business_owner_name",
+        "nom_titular_empreendimento" = "business_owner_name",
         "cod_empreendimento" = "business_code",
         "dth_atualiza_cadastral_empreend" = "update_date",
         "sig_modalidade_empreendimento" = "business_type",
