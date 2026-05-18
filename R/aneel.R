@@ -22,7 +22,6 @@
 #'   year = 2021,
 #'   raw_data = TRUE
 #' )
-#' }
 #'
 #' @export
 

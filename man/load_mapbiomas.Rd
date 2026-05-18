@@ -36,7 +36,7 @@ A \code{tibble}.
 Loads information about land cover and use
 }
 \examples{
-\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
 # download treated Mapbiomas Cover data in English
 data <- load_mapbiomas(

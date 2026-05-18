@@ -27,7 +27,7 @@ A \code{tibble}.
 Loads information on the social and environmental performance of the Legal Amazon.
 }
 \examples{
-\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
 # Download raw data from 2014
 data <- load_ips(dataset = "all", raw_data = TRUE, time_period = 2014)

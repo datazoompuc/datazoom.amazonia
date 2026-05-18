@@ -24,7 +24,7 @@ A \code{tibble} consisting of geographic units that present positive values for 
 Loads information on the amount and value of the production of the exploitation of native plant resources and planted forest massifs, as well as existing total and harvested areas of forest crops.
 }
 \examples{
-\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
 # Download treated (raw_data = FALSE) silviculture data (dataset = 'pevs_silviculture')
 # by state (geo_level = 'state') from 2012 (time_period =  2012)

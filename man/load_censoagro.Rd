@@ -33,7 +33,7 @@ A \code{tibble}.
 Loads information on agricultural establishments and activities
 }
 \examples{
-\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
 # Download total land area data at the country level in year 2006
 data <- load_censoagro(
