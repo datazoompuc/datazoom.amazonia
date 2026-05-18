@@ -32,7 +32,7 @@ A \code{tibble} with the selected data if raw_data is \code{FALSE}, and a \code{
 Loads data on deforestation in the Legal Amazon region.
 }
 \examples{
-\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
 # Download treated data (raw_data = FALSE)
 # in portuguese (language = 'pt').

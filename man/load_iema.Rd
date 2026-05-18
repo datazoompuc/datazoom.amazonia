@@ -20,7 +20,7 @@ A \code{tibble}.
 Loads information on electric energy access at the municipality level in the Amazon region
 }
 \examples{
-\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
 # Download treated data
 data <- load_iema(raw_data = FALSE)

@@ -24,7 +24,7 @@ A \code{tibble} consisting of geographic units that present positive values for 
 Loads information on the quantity, value and area of temporary and permanent crops cultivated.
 }
 \examples{
-\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
 # download treated data at the state level from 2010 to 2011 for all crops
 data <- load_pam(

@@ -22,7 +22,7 @@ A \code{tibble}.
 Loads data of estimates of emission of greenhouse gases
 }
 \examples{
-\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
 # Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg")
 # by state (geo_level = "state")

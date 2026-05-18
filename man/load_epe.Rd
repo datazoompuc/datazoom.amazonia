@@ -7,7 +7,7 @@
 load_epe(dataset, geo_level = "state", raw_data = FALSE, language = "eng")
 }
 \arguments{
-\item{dataset}{Dataset name: "consumer_energy_consumption", "industrial_energy_consumption", or "national_energy_balance"}
+\item{dataset}{Dataset name: "consumer_energy_consumption", "industrial_energy_consumption", "national_energy_balance", or "energy_state_panel"}
 
 \item{geo_level}{Geographical level: "state" or "subsystem". Only applies to consumer or industrial datasets.}
 
@@ -19,7 +19,7 @@ load_epe(dataset, geo_level = "state", raw_data = FALSE, language = "eng")
 Electrical Energy Monthly Consumption per Class or Industrial Sector
 }
 \examples{
-\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
 # download treated (raw_data = FALSE) data about
 # consumer energy consumption (dataset = "consumer_energy_consumption")

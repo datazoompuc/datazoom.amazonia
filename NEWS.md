@@ -1,6 +1,8 @@
 # datazoom.amazonia 1.2.0
 
-  * Deprecated `load_datasus()`. All its datasets were moved to a new package: datazoom.saude. Beta version available soon.
+  * Added `"energy_state_panel"` dataset to `load_epe`: yearly energy production by source and state (2011-2024), from EPE's BEN Chapter 8 (Dados Estaduais). 
+
+  * Deprecated `load_datasus()`. All its datasets were moved to a new package: datazoom.saude. Beta version available.
   
   * Updated `load_mapbiomas` to the Collection 9 data, with both new and reformed datasets
   

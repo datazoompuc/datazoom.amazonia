@@ -33,7 +33,7 @@ A \code{tibble}.
 Loads information on companies and other organizations and their respective formally constituted local units, registered with the CNPJ - National Register of Legal Entities.
 }
 \examples{
-\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
 # Download raw data (raw_data = TRUE) at the country level
 # from 2008 to 2010 (time_period = 2008:2010).

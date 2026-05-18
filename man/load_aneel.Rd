@@ -21,7 +21,7 @@ Ignored for the other datasets.}
 National Electric Energy Agency - ANEEL
 }
 \examples{
-\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
 # download treated data about energy generation
 clean_aneel <- load_aneel(
@@ -35,6 +35,5 @@ raw_cde <- load_aneel(
   year = 2021,
   raw_data = TRUE
 )
-}
-
+\dontshow{\}) # examplesIf}
 }
