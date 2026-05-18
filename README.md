@@ -1518,9 +1518,10 @@ Brazil’s energy infrastructure. EPE’s duty on that mission is to support
 MME with quality research and studies in order to aid Brazil’s energy
 infrastructure planning.
 
-As for now, there are three different datasets available for download:
-Consumer Energy Consumption, Industrial Energy Consumption, and the
-National Energy Balance. All of them were obtained from the [EPE
+As for now, there are four different datasets available for download:
+Consumer Energy Consumption, Industrial Energy Consumption, the National
+Energy Balance, and the State Energy Production Panel. All of them were
+obtained from the [EPE
 website](https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/).
 
 #### Consumer Energy Consumption
@@ -1566,6 +1567,19 @@ type is labeled to indicate whether it refers to production,
 transformation (for example, “TRANSFORMAÇÃO – REFINARIAS DE PETRÓLEO”),
 or consumption (for example, “CONSUMO – RESIDENCIAL”).
 
+#### State Energy Production Panel
+
+The State Energy Production Panel provides yearly data from 2011 to 2024
+on electricity generation by energy source and Brazilian state. The data
+is sourced from EPE’s BEN Chapter 8 (Dados Estaduais) and covers all 27
+states, including the Federal District.
+
+Each row corresponds to one state-year combination. The dataset includes
+production by source (hydro, wind, solar, nuclear, thermal, sugar cane,
+firewood, black liquor, other renewables, steam coal, natural gas, coke
+oven gas, fuel oil, diesel, and other non-renewables), total production,
+and an indicator of whether the state belongs to the Legal Amazon.
+
 ------------------------------------------------------------------------
 
 **Options:**
@@ -1576,7 +1590,8 @@ or consumption (for example, “CONSUMO – RESIDENCIAL”).
     `"industrial_energy_consumption"`: monthly industrial energy
     consumption by State or Subsystem  
     `"national_energy_balance"`: yearly energy flow by account and
-    energy source
+    energy source  
+    `"energy_state_panel"`: yearly energy production by source and state
 
 2.  **raw_data**: there are two options:  
     `TRUE`: if you want the data as it is originally.  
@@ -1606,6 +1621,13 @@ clean_epe <- load_epe(
 balance <- load_epe(
   dataset = "national_energy_balance",
   raw_data = FALSE
+)
+
+# download treated data on state energy production panel
+state_panel <- load_epe(
+  dataset = "energy_state_panel",
+  raw_data = FALSE,
+  language = "eng"
 )
 ```
 

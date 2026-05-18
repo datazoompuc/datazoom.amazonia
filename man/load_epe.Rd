@@ -7,7 +7,7 @@
 load_epe(dataset, geo_level = "state", raw_data = FALSE, language = "eng")
 }
 \arguments{
-\item{dataset}{Dataset name: "consumer_energy_consumption", "industrial_energy_consumption", or "national_energy_balance"}
+\item{dataset}{Dataset name: "consumer_energy_consumption", "industrial_energy_consumption", "national_energy_balance", or "energy_state_panel"}
 
 \item{geo_level}{Geographical level: "state" or "subsystem". Only applies to consumer or industrial datasets.}
 

@@ -935,6 +935,7 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
     "epe", "industrial_energy_consumption", NA, "2004-2025", "Region, Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx",
     "epe", "consumer_energy_consumption", NA, "2004-2025", "Region, Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx",
     "epe", "national_energy_balance", NA, "2003-2023", NA, "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/PublicacoesArquivos/publicacao-819/topico-716/Anexo%20IX%20-%20Balan%C3%A7os%20Consolidados%20(em%20tep)%201970%20a%202023.xlsx",
+    "epe", "energy_state_panel", NA, "2011-2024", "State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/PublicacoesArquivos/publicacao-145/topico-515/Cap%C3%ADtulo%208%20(Dados%20Estaduais).xlsx",
 
     ## Shapefile from github repository
 
