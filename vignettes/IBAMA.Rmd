@@ -13,43 +13,187 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+## Overview
 
-The dataset is originally from the Brazilian Institute of Environment and Renewable  Natural Resources (Ibama), documenting environmental embargoes and fines at the individual level from 2005 to the present day. In addition, it is possible to download distributed and collected fines from 1994 until the present day.
+The Brazilian Institute of Environment and Renewable Natural Resources (Instituto Brasileiro do Meio Ambiente e dos Recursos Naturais Renováveis - IBAMA) dataset documents environmental enforcement actions, including embargoes of productive assets and fines issued for environmental violations. This dataset provides individual-level records of environmental infractions from 2005 onwards, representing the enforcement activity of Brazil's primary federal environmental agency.
 
-The function returns either the raw data or a data frame with aggregates considering, for each time-location period, counts for total the number of infractions, infractions that already went to trial, and number of unique perpetrators of infractions. There are also two data frames regarding distributed and collected fines across municipalities
+The data covers environmental violations across multiple sectors including deforestation, illegal mining, wildlife trafficking, illegal fishing, and other environmental crimes.
 
-***
+## Data Coverage
+
+The IBAMA dataset includes:
+
+- **Time Period**: Individual enforcement records from 2005 to present
+- **Geographic Coverage**: All Brazilian states and the Legal Amazon region
+- **Infraction Types**: Environmental violations across forestry, biodiversity, and natural resource management
+- **Actions**: Embargoed areas, distributed fines, and collected fines
+- **Individual-Level Detail**: Each record represents a specific infraction event
+
+## Dataset Description
+
+### Available Datasets
+
+The function provides access to three distinct datasets tracking different stages of environmental enforcement:
+
+1. **Embargoed Areas** (`"embargoed_areas"`)
+   - Areas of land subject to federal environmental embargo
+   - Productively assets frozen due to illegal activities (typically deforestation)
+   - Includes area size, location, and embargo date
+   - Useful for measuring enforcement scope and geographic patterns
+
+2. **Distributed Fines** (`"distributed_fines"`)
+   - Environmental fines issued by IBAMA for violations
+   - Fines not yet paid by individuals or corporations
+   - Include violation type, fine amount, and entity responsible
+   - Track enforcement intensity and violation frequency
+
+3. **Collected Fines** (`"collected_fines"`)
+   - Environmental fines that have been paid
+   - Represents actual revenue recovery from environmental violations
+   - Subset of distributed fines with payment confirmation
+   - Indicates compliance and enforcement effectiveness
+
+### Key Variables
+
+1. **Infraction Information**: Type of violation, legal basis, date of infraction
+2. **Location**: State, municipality, coordinates (when available)
+3. **Enforcement Action**: Type of action (embargo, fine), date of action
+4. **Financial Data**: Fine amount, payment status, payment date
+5. **Entity Information**: Individual or corporate identifier, sector
+6. **Embargo Details**: Embargoed area size, land type, geographic descriptors
+
+---
+
+## Data Aggregation
+
+The function returns either:
+- **Raw Data**: Individual infraction records (original format)
+- **Aggregated Data**: Summary statistics for each time-location period, including:
+  - Total number of infractions
+  - Infractions sent to prosecution
+  - Infractions with ongoing legal proceedings
+  - Embargoed area totals
+  - Fine totals and collection rates
+
+---
+
+## Function Parameters
+
 **Options:**
 
-  1. **dataset**: there are three possible choices.
-      * `"embargoed_areas"`: embargoed areas
-      * `"distributed_fines"`: fines that have not been paid by individuals or corporations
-      * `"collected_fines"`: fines that have been paid by individuals or corporations
+1. **dataset**: Three possible choices
+   - `"embargoed_areas"`: Embargoed productive areas
+   - `"distributed_fines"`: Issued fines (paid or unpaid)
+   - `"collected_fines"`: Fines that have been paid
 
-  2. **raw_data**: there are two options:
-      * `TRUE`: if you want the data as it is originally.
-      * `FALSE`: if you want the treated version of the data. 
-  
-  3. **states**: specifies for which states to download the data. It is "all" by default, but can be a single state such as `"AC"` or any vector such as `c("AC", "AM")`. Does not apply to the `"embargoed_areas"` dataset.
+2. **raw_data**: 
+   - `TRUE`: Individual-level records as originally recorded
+   - `FALSE`: Treated/aggregated version of the data
 
-  4. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
-  
-***
+3. **states**: 
+   - Specifies which states to download (default: `"all"`)
+   - Single state example: `"AC"` (Acre)
+   - Multiple states example: `c("AC", "AM", "AP")` (Acre, Amazonas, Amapá)
+   - Does not apply to embargoed_areas dataset
 
-**Examples:**
+4. **language**: 
+   - `"pt"`: Portuguese language labels and names
+   - `"eng"`: English language
 
-```{r, eval = FALSE}
+---
+
+---
+
+## Practical Examples
+
+### Example 1: Environmental Enforcement in Amazon States
+
+```{r eval=FALSE}
 library(datazoom.amazonia)
 
-# Download treated embargoes data (raw_data = FALSE) in english (language = "eng")
-data <- load_ibama(
-  dataset = "embargoed_areas", raw_data = FALSE,
+# Download embargoed areas across Amazon states
+amazon_embargoes <- load_ibama(
+  dataset = "embargoed_areas",
+  raw_data = FALSE,
   language = "eng"
 )
 
-# Download treated collected fines data from "BA"
-data <- load_ibama(
-  dataset = "collected_fines", raw_data = FALSE,
-  states = "BA", language = "pt"
-)
+# View recent embargoes
+head(amazon_embargoes)
+
+# Summary statistics
+summary(amazon_embargoes$embargoed_area_hectares)
 ```
+
+### Example 2: Environmental Fine Collections
+
+```{r eval=FALSE}
+# Download fines data for specific Amazon state
+state_fines <- load_ibama(
+  dataset = "collected_fines",
+  raw_data = FALSE,
+  states = "AM",
+  language = "pt"
+)
+
+# Calculate total enforcement revenue by year
+revenue_by_year <- state_fines %>%
+  group_by(year) %>%
+  summarise(
+    total_collected = sum(fine_amount, na.rm = TRUE),
+    num_fines = n()
+  )
+```
+
+### Example 3: Comparative Regional Analysis
+
+```{r eval=FALSE}
+# Compare enforcement across multiple states
+amazon_states <- c("AC", "AM", "AP", "MA", "MT", "RO", "RR", "TO", "PA")
+
+regional_enforcement <- load_ibama(
+  dataset = "distributed_fines",
+  raw_data = FALSE,
+  states = amazon_states,
+  language = "eng"
+)
+
+# Compare enforcement intensity by state
+enforcement_summary <- regional_enforcement %>%
+  group_by(state) %>%
+  summarise(
+    total_fines = n(),
+    total_amount = sum(fine_amount, na.rm = TRUE),
+    avg_fine = mean(fine_amount, na.rm = TRUE)
+  ) %>%
+  arrange(desc(total_amount))
+```
+
+### Example 4: Individual-Level Infraction Data
+
+```{r eval=FALSE}
+# Download raw individual infraction records
+raw_infractions <- load_ibama(
+  dataset = "embargoed_areas",
+  raw_data = TRUE,
+  language = "eng"
+)
+
+# Examine original data structure
+str(raw_infractions)
+```
+
+---
+
+## Use Cases
+
+- **Environmental Compliance**: Track enforcement patterns and violations by sector
+- **Deforestation Analysis**: Monitor embargoed areas and link to land use changes
+- **Policy Effectiveness**: Evaluate deterrent effect of fines and embargoes
+- **Regional Development**: Assess environmental regulation intensity across states
+- **Business Impact**: Understand regulatory environment by sector and state
+- **Law Enforcement**: Analyze IBAMA effectiveness and resource allocation
+
+---
+
+
