@@ -120,40 +120,44 @@ language = "eng"  # character string
 
 ## Examples
 
-### Example 1: Richest and Poorest Municipalities
-
-Identify municipalities by economic size:
+### Example 1: Municipal GDP for a single year
 
 ```{r eval=FALSE}
-library(dplyr)
-
-# Load municipal GDP data
+# download treated municipal GDP data for 2020
 pib_munic <- load_pibmunic(
+  dataset = "pibmunic",
   raw_data = FALSE,
   geo_level = "municipality",
   time_period = 2020,
   language = "eng"
 )
-
-# Richest municipalities (highest GDP)
-richest <- pib_munic %>%
-  arrange(desc(gdp)) %>%
-  select(municipality, state, gdp) %>%
-  head(20)
-
-print("Richest municipalities:")
-print(richest)
-
-# Poorest municipalities
-poorest <- pib_munic %>%
-  arrange(gdp) %>%
-  select(municipality, state, gdp) %>%
-  head(20)
-
-print("Poorest municipalities:")
-print(poorest)
 ```
----
+
+### Example 2: State-level GDP over time
+
+```{r eval=FALSE}
+# download treated state-level GDP data for 2015 to 2020
+pib_state <- load_pibmunic(
+  dataset = "pibmunic",
+  raw_data = FALSE,
+  geo_level = "state",
+  time_period = 2015:2020,
+  language = "eng"
+)
+```
+
+### Example 3: Country-level GDP in Portuguese
+
+```{r eval=FALSE}
+# download treated country-level GDP data for 2010 to 2020 in Portuguese
+pib_br <- load_pibmunic(
+  dataset = "pibmunic",
+  raw_data = FALSE,
+  geo_level = "country",
+  time_period = 2010:2020,
+  language = "pt"
+)
+```
 
 ## Data Notes
 
