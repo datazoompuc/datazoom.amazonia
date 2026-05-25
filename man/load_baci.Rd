@@ -22,12 +22,14 @@ A \code{tibble}.
 Loads disaggregated data on bilateral trade flows for more than 5000 products and 200 countries.
 }
 \examples{
-\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
-# download treated data for 2016 (takes a long time to download)
-clean_baci <- load_baci(
+# download treated trade data for 2016 (HS92 classification)
+trade_2016 <- load_baci(
+  dataset = "HS92",
   raw_data = FALSE,
-  time_period = 2016
+  time_period = 2016,
+  language = "eng"
 )
 \dontshow{\}) # examplesIf}
 }

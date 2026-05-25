@@ -28,14 +28,14 @@ A \code{list} of tibbles (if \code{raw_data} = \code{TRUE}) or a tibble (if \cod
 Loads information on forest degradation in the Brazilian Amazon, replaced by DETER-B in December 2016.
 }
 \examples{
-\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
-# download treated data (raw_data = TRUE) related to forest degradation
-# from 2010 to 2012 (time_period = 2010:2012).
+# download treated forest degradation data from 2010 to 2012
 data <- load_degrad(
   dataset = "degrad",
   raw_data = FALSE,
-  time_period = 2010:2012
+  time_period = 2010:2012,
+  language = "eng"
 )
 \dontshow{\}) # examplesIf}
 }

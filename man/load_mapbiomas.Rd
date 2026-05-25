@@ -36,9 +36,9 @@ A \code{tibble}.
 Loads information about land cover and use
 }
 \examples{
-\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
-# download treated Mapbiomas Cover data in English
+# download treated MapBiomas land cover data by municipality
 data <- load_mapbiomas(
   dataset = "mapbiomas_cover",
   raw_data = FALSE,
@@ -47,9 +47,11 @@ data <- load_mapbiomas(
 )
 
 # download treated data on mining on indigenous lands
-data <- load_mapbiomas("mapbiomas_mining",
+data <- load_mapbiomas(
+  dataset = "mapbiomas_mining",
   raw_data = FALSE,
-  geo_level = "indigenous_land"
+  geo_level = "indigenous_land",
+  language = "eng"
 )
 \dontshow{\}) # examplesIf}
 }

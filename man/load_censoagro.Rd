@@ -33,18 +33,18 @@ A \code{tibble}.
 Loads information on agricultural establishments and activities
 }
 \examples{
-\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
-# Download total land area data at the country level in year 2006
+# download treated land area data at the country level in 2017
 data <- load_censoagro(
   dataset = "agricultural_land_area",
-  raw_data = TRUE,
+  raw_data = FALSE,
   geo_level = "country",
-  time_period = 2006
+  time_period = 2017,
+  language = "eng"
 )
 
-# Download temporary production crops data by state (geo_level = "state") in year 2006
-# in portuguese (language = "pt")
+# download treated temporary crop data by state in 1995
 data <- load_censoagro(
   dataset = "vegetable_production_temporary",
   raw_data = FALSE,
