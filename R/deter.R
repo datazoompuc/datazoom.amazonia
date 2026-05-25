@@ -9,11 +9,72 @@
 #'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
-#' # Download treated data (raw_data = FALSE) from Amazonia (dataset = "deter_amz")
+#' ### Example 1: Recent Deforestation Hotspots
+#'
+#' Identify municipalities with recent deforestation activity:
+#'
+#' library(dplyr)
+#'
+#' # Download treated DETER Amazon data
 #' deter_amz <- load_deter(
 #'   dataset = "deter_amz",
-#'   raw_data = FALSE
+#'   raw_data = FALSE,
+#'   language = "eng"
 #' )
+#'
+#' # Deforestation by municipality (most recent data)
+#' # Note: DETER alerts are cumulative; use most recent date period
+#' recent_period <- deter_amz %>%
+#'   filter(detection_date >= "2023-01-01") %>%
+#'   group_by(municipality, state) %>%
+#'   summarize(
+#'     total_area_hectares = sum(area_hectares, na.rm = TRUE),
+#'     num_alerts = n(),
+#'     alert_types = paste(unique(alert_type), collapse = ", "),
+#'     .groups = 'drop'
+#'   ) %>%
+#'   arrange(desc(total_area_hectares)) %>%
+#'   head(20)
+#'
+#' print(recent_period)
+#'
+#' ### Example 2: Cerrado vs Amazon Comparison
+#'
+#' Compare forest loss patterns between biomes:
+#'
+#' library(dplyr)
+#'
+#' # Load both datasets
+#' amazon_data <- load_deter(
+#'   dataset = "deter_amz",
+#'   raw_data = FALSE,
+#'   language = "eng"
+#' ) %>%
+#'   mutate(biome = "Amazon")
+#'
+#' cerrado_data <- load_deter(
+#'   dataset = "deter_cerrado",
+#'   raw_data = FALSE,
+#'   language = "eng"
+#' ) %>%
+#'   mutate(biome = "Cerrado")
+#'
+#' # Combine and compare
+#' combined <- bind_rows(amazon_data, cerrado_data)
+#'
+#' # Biome comparison
+#' biome_comparison <- combined %>%
+#'   group_by(biome) %>%
+#'   summarize(
+#'     total_area_loss = sum(area_hectares, na.rm = TRUE),
+#'     num_alerts = n(),
+#'     avg_alert_size = mean(area_hectares, na.rm = TRUE),
+#'     recent_alerts = sum(year(detection_date) == 2023)
+#'   )
+#'
+#' print(biome_comparison)
+#'
+#' @export
 #'
 #' @export
 

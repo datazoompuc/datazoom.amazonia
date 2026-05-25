@@ -80,7 +80,7 @@ Data can be retrieved with sector disaggregation or aggregate form:
 
 --
 
-## Practical Examples
+## Examples
 
 ### Example 1: National Employment Trends
 
