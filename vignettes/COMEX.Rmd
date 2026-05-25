@@ -153,146 +153,53 @@ language = "eng"  # character string
 ---
 ## Examples
 
-### Example 1: Top Exporting Municipalities
-
-Identify Brazil's leading export hubs:
+### Example 1: Export data by municipality
 
 ```{r eval=FALSE}
-library(dplyr)
-
-# Download municipality-level export data for 2020
+# download treated export data by municipality for 2020
 export_data <- load_br_trade(
   dataset = "export_mun",
   raw_data = FALSE,
   time_period = 2020,
   language = "eng"
 )
-
-# Top 20 exporting municipalities by total value
-top_exporters <- export_data %>%
-  group_by(municipality, state) %>%
-  summarize(
-    total_exports = sum(value_usd, na.rm = TRUE),
-    num_products = n_distinct(product_code),
-    .groups = 'drop'
-  ) %>%
-  arrange(desc(total_exports)) %>%
-  head(20)
-
-print(top_exporters)
 ```
 
-### Example 2: Export Product Composition
-
-Analyze what Brazil exports by sector:
+### Example 2: Export product composition
 
 ```{r eval=FALSE}
-library(dplyr)
-
-# Download producer-level export data
+# download treated export data by producer for 2020
 export_prod <- load_br_trade(
   dataset = "export_prod",
   raw_data = FALSE,
   time_period = 2020,
   language = "eng"
 )
-
-# Top products exported by value
-top_products <- export_prod %>%
-  group_by(product_code, product_name) %>%
-  summarize(
-    total_value = sum(value_usd, na.rm = TRUE),
-    num_exporters = n_distinct(exporter_code),
-    .groups = 'drop'
-  ) %>%
-  arrange(desc(total_value)) %>%
-  head(20)
-
-# Calculate product concentration (HHI-type analysis)
-product_shares <- export_prod %>%
-  group_by(product_code) %>%
-  summarize(export_value = sum(value_usd, na.rm = TRUE)) %>%
-  mutate(
-    total_exports = sum(export_value),
-    share = export_value / total_exports,
-    share_squared = share^2
-  ) %>%
-  summarize(concentration = sum(share_squared))
-
-print(paste("Export concentration index:", round(concentration, 4)))
 ```
 
-### Example 3: Imports by Geographic Region
-
-Analyze import patterns across regions:
+### Example 3: Import data by municipality
 
 ```{r eval=FALSE}
-library(dplyr)
-
-# Download municipality-level import data
+# download treated import data by municipality for 2020
 import_data <- load_br_trade(
   dataset = "import_mun",
   raw_data = FALSE,
   time_period = 2020,
   language = "eng"
 )
-
-# Imports by state
-state_imports <- import_data %>%
-  group_by(state) %>%
-  summarize(
-    total_imports = sum(value_usd, na.rm = TRUE),
-    num_municipalities = n_distinct(municipality),
-    avg_import_per_mun = mean(value_usd, na.rm = TRUE),
-    .groups = 'drop'
-  ) %>%
-  arrange(desc(total_imports))
-
-# Which regions import specific products?
-# Example: chemical imports by state
-chemical_imports <- import_data %>%
-  filter(grepl("chemical", product_name, ignore.case = TRUE)) %>%
-  group_by(state) %>%
-  summarize(chemical_imports = sum(value_usd, na.rm = TRUE)) %>%
-  arrange(desc(chemical_imports))
 ```
 
-### Example 4: Trade Trends Over Time
-
-Analyze export and import dynamics across years:
+### Example 4: Trade trends over time
 
 ```{r eval=FALSE}
-library(dplyr)
-library(ggplot2)
-
-# Download data for multiple years
+# download treated export data by municipality for multiple years
 trade_series <- load_br_trade(
   dataset = "export_mun",
   raw_data = FALSE,
   time_period = 2015:2020,
   language = "eng"
 )
-
-# Annual trade trends
-annual_trends <- trade_series %>%
-  group_by(year) %>%
-  summarize(
-    total_exports = sum(value_usd, na.rm = TRUE),
-    num_exporters = n_distinct(exporter_code),
-    num_products = n_distinct(product_code),
-    .groups = 'drop'
-  )
-
-# Visualize trends
-ggplot(annual_trends, aes(x = year, y = total_exports)) +
-  geom_line(size = 1) +
-  geom_point(size = 3) +
-  labs(title = "Brazilian Total Exports Over Time",
-       x = "Year",
-       y = "Total Exports (USD)") +
-  theme_minimal()
 ```
----
 
 ## Data Notes
 
