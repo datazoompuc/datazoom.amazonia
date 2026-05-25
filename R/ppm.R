@@ -10,49 +10,23 @@
 #'
 #'
 #' @examplesIf interactive()
-#' # download treated livestock inventory data at the state level for 2020
-#' livestock <- load_ppm(
-#'   dataset = "ppm_livestock_inventory",
-#'   raw_data = FALSE,
-#'   geo_level = "state",
-#'   time_period = 2020,
-#'   language = "eng"
-#' )
-#'
-#' # download treated dairy cow data at the state level for 2020
-#' dairy <- load_ppm(
-#'   dataset = "ppm_cow_farming",
-#'   raw_data = FALSE,
-#'   geo_level = "state",
-#'   time_period = 2020,
-#'   language = "eng"
-#' )
-#'
-#' # download treated animal origin production data at the country level for 2020
-#' animal_products <- load_ppm(
-#'   dataset = "ppm_animal_origin_production",
-#'   raw_data = FALSE,
-#'   geo_level = "country",
-#'   time_period = 2020,
-#'   language = "eng"
-#' )
-#'
-#' # download treated sheep farming data at the state level for 2020
-#' sheep <- load_ppm(
-#'   dataset = "ppm_sheep_farming",
-#'   raw_data = FALSE,
-#'   geo_level = "state",
-#'   time_period = 2020,
-#'   language = "eng"
-#' )
-#'
-#' # download treated aquaculture data at the state level for 2015 to 2020
-#' aquaculture <- load_ppm(
+#' ### DO NOT RUN ###
+#' # download treated aquaculture data at the country level from 2013 to 2015
+#' data <- load_ppm(
 #'   dataset = "ppm_aquaculture",
 #'   raw_data = FALSE,
-#'   geo_level = "state",
-#'   time_period = 2015:2020,
+#'   geo_level = "country",
+#'   time_period = 2013:2015,
 #'   language = "eng"
+#' )
+#'
+#' # download raw sheep farming data by state from 1980 to 1995 in portuguese
+#' data <- load_ppm(
+#'   dataset = "ppm_sheep_farming",
+#'   raw_data = TRUE,
+#'   geo_level = "state",
+#'   time_period = 1980:1995,
+#'   language = "pt"
 #' )
 #'
 #' @export

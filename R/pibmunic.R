@@ -10,21 +10,12 @@
 #'
 #'
 #' @examplesIf interactive()
-#' # download treated municipal GDP data for 2020
-#' pib_munic <- load_pibmunic(
-#'   dataset = "pibmunic",
-#'   raw_data = FALSE,
-#'   geo_level = "municipality",
-#'   time_period = 2020,
-#'   language = "eng"
-#' )
-#'
-#' # download treated state-level GDP data for 2015 to 2020
-#' pib_state <- load_pibmunic(
-#'   dataset = "pibmunic",
+#' ### DO NOT RUN ###
+#' # download treated municipal GDP data at the state level for 2010 to 2012
+#' data <- load_pibmunic(
 #'   raw_data = FALSE,
 #'   geo_level = "state",
-#'   time_period = 2015:2020,
+#'   time_period = 2010:2012,
 #'   language = "eng"
 #' )
 #'

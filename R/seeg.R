@@ -10,6 +10,7 @@
 #'
 #'
 #' @examplesIf interactive()
+#' ### DO NOT RUN ###
 #' # download raw SEEG data (all sectors) at the country level
 #' all_emissions <- load_seeg(
 #'   dataset = "seeg",

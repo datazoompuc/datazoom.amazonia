@@ -8,6 +8,7 @@
 #' @return A \code{sf} object.
 #'
 #' @examplesIf interactive()
+#' ### DO NOT RUN ###
 #' # download treated DETER Amazon data
 #' deter_amz <- load_deter(
 #'   dataset = "deter_amz",

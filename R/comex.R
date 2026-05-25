@@ -8,27 +8,20 @@
 #' @return A \code{tibble}.
 #'
 #' @examplesIf interactive()
-#' # download treated export data by municipality for 2020
-#' export_data <- load_br_trade(
+#' ### DO NOT RUN ###
+#' # download treated exports data by municipality from 2020 to 2021
+#' data <- load_br_trade(
 #'   dataset = "export_mun",
 #'   raw_data = FALSE,
-#'   time_period = 2020,
+#'   time_period = 2020:2021,
 #'   language = "eng"
 #' )
 #'
-#' # download treated import data by municipality for 2020
-#' import_data <- load_br_trade(
+#' # download treated imports data by municipality from 2020 to 2021
+#' data <- load_br_trade(
 #'   dataset = "import_mun",
 #'   raw_data = FALSE,
-#'   time_period = 2020,
-#'   language = "eng"
-#' )
-#'
-#' # download treated export data by producer for 2015 to 2020
-#' trade_series <- load_br_trade(
-#'   dataset = "export_prod",
-#'   raw_data = FALSE,
-#'   time_period = 2015:2020,
+#'   time_period = 2020:2021,
 #'   language = "eng"
 #' )
 #'

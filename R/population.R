@@ -9,31 +9,21 @@
 #' @return A \code{tibble}.
 #'
 #' @examplesIf interactive()
-#' # download treated population data at the state level for 2021
-#' pop_2021 <- load_population(
-#'   dataset = "population",
-#'   raw_data = FALSE,
-#'   geo_level = "state",
-#'   time_period = 2021,
+#' ### DO NOT RUN ###
+#' # download raw population data at the country level from 2008 to 2010
+#' data <- load_population(
+#'   raw_data = TRUE,
+#'   geo_level = "country",
+#'   time_period = 2008:2010,
 #'   language = "eng"
 #' )
 #'
-#' # download treated population data at the state level for 2010 to 2021
-#' pop_series <- load_population(
-#'   dataset = "population",
+#' # download treated population data by state from 2008 to 2010 in portuguese
+#' data <- load_population(
 #'   raw_data = FALSE,
 #'   geo_level = "state",
-#'   time_period = 2010:2021,
-#'   language = "eng"
-#' )
-#'
-#' # download treated population data at the municipality level for 2020
-#' pop_munic <- load_population(
-#'   dataset = "population",
-#'   raw_data = FALSE,
-#'   geo_level = "municipality",
-#'   time_period = 2020,
-#'   language = "eng"
+#'   time_period = 2008:2010,
+#'   language = "pt"
 #' )
 #'
 #' @export

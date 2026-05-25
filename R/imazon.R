@@ -8,18 +8,11 @@
 #' @return A \code{tibble}.
 #'
 #' @examplesIf interactive()
+#' ### DO NOT RUN ###
 #' # download treated Imazon deforestation pressure data
-#' imazon_data <- load_imazon(
-#'   dataset = "imazon_shp",
+#' data <- load_imazon(
 #'   raw_data = FALSE,
 #'   language = "eng"
-#' )
-#'
-#' # download raw Imazon data in Portuguese
-#' imazon_raw <- load_imazon(
-#'   dataset = "imazon_shp",
-#'   raw_data = TRUE,
-#'   language = "pt"
 #' )
 #'
 #' @export

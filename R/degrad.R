@@ -10,19 +10,12 @@
 #'
 #'
 #' @examplesIf interactive()
-#' # download treated DEGRAD data for 2015
-#' degrad_data <- load_degrad(
+#' ### DO NOT RUN ###
+#' # download treated forest degradation data from 2010 to 2012
+#' data <- load_degrad(
 #'   dataset = "degrad",
 #'   raw_data = FALSE,
-#'   time_period = 2015,
-#'   language = "eng"
-#' )
-#'
-#' # download treated DEGRAD data for multiple years
-#' degrad_series <- load_degrad(
-#'   dataset = "degrad",
-#'   raw_data = FALSE,
-#'   time_period = 2010:2015,
+#'   time_period = 2010:2012,
 #'   language = "eng"
 #' )
 #'

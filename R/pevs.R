@@ -9,30 +9,22 @@
 #' @return A \code{tibble} consisting of geographic units that present positive values for any of the variables in the dataset.
 #'
 #' @examplesIf interactive()
-#' # download treated forest crops data at the state level for 2019
-#' forest_crops <- load_pevs(
-#'   dataset = "pevs_forest_crops",
-#'   raw_data = FALSE,
-#'   geo_level = "state",
-#'   time_period = 2019,
-#'   language = "eng"
-#' )
-#'
-#' # download treated silviculture area data at the state level for 2013 to 2019
-#' silvi_area <- load_pevs(
-#'   dataset = "pevs_silviculture_area",
-#'   raw_data = FALSE,
-#'   geo_level = "state",
-#'   time_period = 2013:2019,
-#'   language = "eng"
-#' )
-#'
-#' # download treated silviculture production data at the region level for 2019
-#' silvi_prod <- load_pevs(
+#' ### DO NOT RUN ###
+#' # download treated silviculture data by state from 2012 in portuguese
+#' data <- load_pevs(
 #'   dataset = "pevs_silviculture",
 #'   raw_data = FALSE,
+#'   geo_level = "state",
+#'   time_period = 2012,
+#'   language = "pt"
+#' )
+#'
+#' # download raw forest crops data by region from 2012 to 2013
+#' data <- load_pevs(
+#'   dataset = "pevs_forest_crops",
+#'   raw_data = TRUE,
 #'   geo_level = "region",
-#'   time_period = 2019,
+#'   time_period = 2012:2013,
 #'   language = "eng"
 #' )
 #'

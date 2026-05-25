@@ -8,16 +8,11 @@
 #' @return A \code{tibble}.
 #'
 #' @examplesIf interactive()
-#' # download treated IEMA energy access data in English
-#' amazon_energy <- load_iema(
+#' ### DO NOT RUN ###
+#' # download treated IEMA energy access data
+#' data <- load_iema(
 #'   raw_data = FALSE,
 #'   language = "eng"
-#' )
-#'
-#' # download raw IEMA data in Portuguese
-#' amazon_energy_raw <- load_iema(
-#'   raw_data = TRUE,
-#'   language = "pt"
 #' )
 #'
 #' @export

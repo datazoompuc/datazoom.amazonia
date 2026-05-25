@@ -9,6 +9,7 @@
 #'
 #'
 #' @examplesIf interactive()
+#' ### DO NOT RUN ###
 #' # download treated active mining data in portuguese
 #' mining_active <- load_sigmine(
 #'   dataset = "sigmine_active",

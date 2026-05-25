@@ -16,52 +16,21 @@
 #' @return A \code{tibble}.
 #'
 #' @examplesIf interactive()
-#' # download treated land cover data at the municipality level
-#' land_cover <- load_mapbiomas(
+#' ### DO NOT RUN ###
+#' # download treated MapBiomas land cover data by municipality
+#' data <- load_mapbiomas(
 #'   dataset = "mapbiomas_cover",
 #'   raw_data = FALSE,
 #'   geo_level = "municipality",
 #'   language = "eng"
 #' )
 #'
-#' # download treated land cover transitions at the municipality level
-#' transitions <- load_mapbiomas(
-#'   dataset = "mapbiomas_transition",
-#'   raw_data = FALSE,
-#'   geo_level = "municipality",
-#'   language = "eng"
-#' )
-#'
-#' # download treated deforestation and regeneration data at the municipality level
-#' deforestation <- load_mapbiomas(
-#'   dataset = "mapbiomas_deforestation_regeneration",
-#'   raw_data = FALSE,
-#'   geo_level = "municipality",
-#'   language = "eng"
-#' )
-#'
-#' # download treated mining data by indigenous land
-#' mining_indigenous <- load_mapbiomas(
+#' # download treated data on mining on indigenous lands
+#' data <- load_mapbiomas(
 #'   dataset = "mapbiomas_mining",
 #'   raw_data = FALSE,
 #'   geo_level = "indigenous_land",
 #'   language = "eng"
-#' )
-#'
-#' # download treated fire data by state
-#' fire_data <- load_mapbiomas(
-#'   dataset = "mapbiomas_fire",
-#'   raw_data = FALSE,
-#'   geo_level = "state",
-#'   language = "eng"
-#' )
-#'
-#' # download treated land cover transitions at the biome level (faster download)
-#' biome_transitions <- load_mapbiomas(
-#'   dataset = "mapbiomas_transition",
-#'   raw_data = FALSE,
-#'   geo_level = "biome",
-#'   language = "pt"
 #' )
 #'
 #' @export

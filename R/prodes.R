@@ -12,6 +12,7 @@
 #' @return A \code{tibble} with the selected data if raw_data is \code{FALSE}, and a \code{SpatRaster} is \code{TRUE}.
 #'
 #' @examplesIf interactive()
+#' ### DO NOT RUN ###
 #' # download treated deforestation data for 2023
 #' deforestation <- load_prodes(
 #'   dataset = "deforestation",

@@ -10,34 +10,20 @@
 #' @return A \code{tibble}.
 #'
 #' @examplesIf interactive()
-#' # download treated embargoed areas data
-#' amazon_embargoes <- load_ibama(
+#' ### DO NOT RUN ###
+#' # download treated embargoed areas data in english
+#' data <- load_ibama(
 #'   dataset = "embargoed_areas",
 #'   raw_data = FALSE,
 #'   language = "eng"
 #' )
 #'
-#' # download treated collected fines data for Amazonas state
-#' state_fines <- load_ibama(
+#' # download treated collected fines data from Bahia
+#' data <- load_ibama(
 #'   dataset = "collected_fines",
 #'   raw_data = FALSE,
-#'   states = "AM",
+#'   states = "BA",
 #'   language = "pt"
-#' )
-#'
-#' # download treated distributed fines data for multiple Amazon states
-#' regional_enforcement <- load_ibama(
-#'   dataset = "distributed_fines",
-#'   raw_data = FALSE,
-#'   states = c("AC", "AM", "AP", "MA", "MT", "RO", "RR", "TO", "PA"),
-#'   language = "eng"
-#' )
-#'
-#' # download raw embargoed areas data
-#' raw_infractions <- load_ibama(
-#'   dataset = "embargoed_areas",
-#'   raw_data = TRUE,
-#'   language = "eng"
 #' )
 #'
 #' @export

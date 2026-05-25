@@ -10,8 +10,8 @@
 #' @return A \code{tibble}.
 #'
 #' @examplesIf interactive()
-#' # DO NOT RUN
-#' # download treated HS92 trade data for 2016 (takes a long time to download)
+#' ### DO NOT RUN ###
+#' # download treated trade data for 2016 (HS92 classification)
 #' trade_2016 <- load_baci(
 #'   dataset = "HS92",
 #'   raw_data = FALSE,

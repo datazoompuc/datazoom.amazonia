@@ -9,35 +9,20 @@
 #' @return A \code{tibble}.
 #'
 #' @examplesIf interactive()
-#' # download complete IPS data for the most recent year
-#' ips_data <- load_ips(
+#' ### DO NOT RUN ###
+#' # download raw IPS data from 2014
+#' data <- load_ips(
 #'   dataset = "all",
-#'   raw_data = FALSE,
-#'   time_period = 2023,
+#'   raw_data = TRUE,
+#'   time_period = 2014,
 #'   language = "eng"
 #' )
 #'
-#' # download education indicators for multiple years
-#' education_data <- load_ips(
-#'   dataset = "educ",
-#'   raw_data = FALSE,
-#'   time_period = c(2018, 2021, 2023),
-#'   language = "eng"
-#' )
-#'
-#' # download deforestation indicators for all available years
-#' deforest_data <- load_ips(
+#' # download treated deforestation IPS data from 2018 in portuguese
+#' data <- load_ips(
 #'   dataset = "deforest",
 #'   raw_data = FALSE,
-#'   time_period = c(2014, 2018, 2021, 2023),
-#'   language = "eng"
-#' )
-#'
-#' # download violence indicators in Portuguese
-#' violence_data <- load_ips(
-#'   dataset = "violence",
-#'   raw_data = FALSE,
-#'   time_period = 2023,
+#'   time_period = 2018,
 #'   language = "pt"
 #' )
 #'

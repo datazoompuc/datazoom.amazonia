@@ -10,13 +10,22 @@
 #' @return A \code{tibble}.
 #'
 #' @examplesIf interactive()
-#' # download treated CEMPRE data at the state level for 2010 to 2012
+#' ### DO NOT RUN ###
+#' # download treated national-level data from 2008 to 2010
 #' data <- load_cempre(
-#'   dataset = "cempre",
+#'   raw_data = FALSE,
+#'   geo_level = "country",
+#'   time_period = 2008:2010,
+#'   language = "eng"
+#' )
+#'
+#' # download treated state-level data split by sector
+#' data <- load_cempre(
 #'   raw_data = FALSE,
 #'   geo_level = "state",
-#'   time_period = 2010:2012,
-#'   language = "eng"
+#'   time_period = 2008:2010,
+#'   language = "pt",
+#'   sectors = TRUE
 #' )
 #'
 #' @export

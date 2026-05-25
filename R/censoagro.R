@@ -10,22 +10,23 @@
 #' @return A \code{tibble}.
 #'
 #' @examplesIf interactive()
-#' # download treated agricultural land area data at the state level for 2006 and 2017
+#' ### DO NOT RUN ###
+#' # download treated land area data at the country level in 2017
 #' data <- load_censoagro(
 #'   dataset = "agricultural_land_area",
 #'   raw_data = FALSE,
-#'   geo_level = "state",
-#'   time_period = c(2006, 2017),
+#'   geo_level = "country",
+#'   time_period = 2017,
 #'   language = "eng"
 #' )
 #'
-#' # download treated livestock production data at the municipality level for 2017
+#' # download treated temporary crop data by state in 1995
 #' data <- load_censoagro(
-#'   dataset = "livestock_production",
+#'   dataset = "vegetable_production_temporary",
 #'   raw_data = FALSE,
-#'   geo_level = "municipality",
-#'   time_period = 2017,
-#'   language = "eng"
+#'   geo_level = "state",
+#'   time_period = 1995,
+#'   language = "pt"
 #' )
 #'
 #' @export
