@@ -9,67 +9,15 @@
 #'
 #'
 #' @examplesIf interactive()
-#' ### DO NOT RUN ###
-#' @examples
-#' # Example 1: Active Mining in Amazon Region
-#' \dontrun{
-#' library(dplyr)
-#' mining <- load_sigmine(dataset = "sigmine_active", raw_data = FALSE, language = "eng")
-#' amazon_states <- c("AC", "AM", "AP", "MA", "MT", "MS", "PA", "RO", "RR", "TO")
-#' amazon_mining <- mining %>%
-#'   filter(state %in% amazon_states) %>%
-#'   select(mine_name, state, municipality, mineral_type, area_m2, status)
-#' print("Active mining operations in the Amazon:")
-#' print(amazon_mining)
-#' print(paste("Total mining operations in Amazon:", nrow(amazon_mining)))
-#' }
+#' # download treated active mining data in portuguese
+#' mining_active <- load_sigmine(
+#'   dataset = "sigmine_active",
+#'   raw_data = FALSE,
+#'   language = "pt"
+#' )
 #'
-#' # Example 2: Mineral Types and Distribution
-#' \dontrun{
-#' library(dplyr)
-#' mining <- load_sigmine(dataset = "sigmine_active", raw_data = FALSE, language = "eng")
-#' mineral_distribution <- mining %>%
-#'   group_by(mineral_type) %>%
-#'   summarize(num_operations = n(),
-#'             total_area_hectares = sum(area_m2, na.rm = TRUE) / 10000,
-#'             num_states = n_distinct(state), .groups = 'drop') %>%
-#'   arrange(desc(num_operations))
-#' print("Mining operations by mineral type:")
-#' print(mineral_distribution)
-#' precious_metals <- mining %>%
-#'   filter(grepl("gold|silver|diamond", mineral_type, ignore.case = TRUE)) %>%
-#'   group_by(state) %>%
-#'   summarize(num_operations = n(),
-#'             total_area = sum(area_m2, na.rm = TRUE) / 10000, .groups = 'drop') %>%
-#'   arrange(desc(num_operations))
-#' print("Precious metal mining by state:")
-#' print(precious_metals)
-#' }
-#'
-#' # Example 3: Largest Mining Operations
-#' \dontrun{
-#' library(dplyr)
-#' mining <- load_sigmine(dataset = "sigmine_active", raw_data = FALSE, language = "eng")
-#' largest_mines <- mining %>%
-#'   mutate(area_hectares = area_m2 / 10000) %>%
-#'   arrange(desc(area_hectares)) %>%
-#'   select(mine_name, state, municipality, mineral_type, area_hectares, status) %>%
-#'   head(30)
-#' print("Largest mining operations in Brazil:")
-#' print(largest_mines)
-#' state_mining_area <- mining %>%
-#'   mutate(area_hectares = area_m2 / 10000) %>%
-#'   group_by(state) %>%
-#'   summarize(total_mining_area = sum(area_hectares, na.rm = TRUE),
-#'             num_operations = n(),
-#'             avg_operation_size = mean(area_hectares, na.rm = TRUE), .groups = 'drop') %>%
-#'   arrange(desc(total_mining_area))
-#' print("Mining footprint by state:")
-#' print(state_mining_area)
-#' }
-#'
-#' #' @export
-#'
+#' @export
+
 load_sigmine <- function(dataset = "sigmine_active",
                          raw_data = FALSE,
                          language = "eng") {
