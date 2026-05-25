@@ -10,14 +10,7 @@
 #'
 #'
 #' @examplesIf interactive()
-#' ### DO NOT RUN ###
-#' ### Example 1: Forest Degradation Hotspots
-#'
-#' Identify municipalities with highest degradation:
-#'
-#' library(dplyr)
-#'
-#' # Load degradation data
+#' # download treated DEGRAD data for 2015
 #' degrad_data <- load_degrad(
 #'   dataset = "degrad",
 #'   raw_data = FALSE,
@@ -25,22 +18,14 @@
 #'   language = "eng"
 #' )
 #'
-#' # Most affected municipalities
-#' top_degradation <- degrad_data %>%
-#'   as.data.frame() %>%  # Convert SF to data frame for analysis
-#'   group_by(municipality, state) %>%
-#'   summarize(
-#'     total_degraded_area = sum(area_hectares, na.rm = TRUE),
-#'     num_events = n(),
-#'     avg_event_size = mean(area_hectares, na.rm = TRUE),
-#'     .groups = 'drop'
-#'   ) %>%
-#'   arrange(desc(total_degraded_area)) %>%
-#'   head(20)
+#' # download treated DEGRAD data for multiple years
+#' degrad_series <- load_degrad(
+#'   dataset = "degrad",
+#'   raw_data = FALSE,
+#'   time_period = 2010:2015,
+#'   language = "eng"
+#' )
 #'
-#' print(top_degradation)
-#'
-#' @export
 #' @export
 
 load_degrad <- function(dataset = "degrad", raw_data = FALSE,
