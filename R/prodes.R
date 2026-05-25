@@ -13,14 +13,67 @@
 #'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
-#' # Download treated data (raw_data = FALSE)
-#' # in portuguese (language = 'pt').
-#' data <- load_prodes(
-#'   dataset = "deforestation",
-#'   raw_data = FALSE,
-#'   time_period = 2020:2023,
-#'   language = "pt"
-#' )
+#' @examples
+#' # Example 1: Deforestation Hotspots
+#' \dontrun{
+#' library(dplyr)
+#' deforestation <- load_prodes(dataset = "deforestation", raw_data = FALSE,
+#'   time_period = 2023, language = "eng")
+#' hotspots <- deforestation %>%
+#'   arrange(desc(deforested_area_hectares)) %>%
+#'   select(municipality, state, year, deforested_area_hectares) %>%
+#'   head(30)
+#' print("Deforestation hotspots (2023):")
+#' print(hotspots)
+#' deforestation_series <- load_prodes(dataset = "deforestation", raw_data = FALSE,
+#'   time_period = 2008:2023, language = "eng")
+#' total_by_municipality <- deforestation_series %>%
+#'   group_by(municipality, state) %>%
+#'   summarize(cumulative_deforestation = sum(deforested_area_hectares, na.rm = TRUE),
+#'             years_with_activity = n_distinct(year), .groups = 'drop') %>%
+#'   arrange(desc(cumulative_deforestation)) %>%
+#'   head(30)
+#' print("Municipalities with most cumulative deforestation (2008-2023):")
+#' print(total_by_municipality)
+#' }
+#'
+#' # Example 2: Regional Deforestation Patterns
+#' \dontrun{
+#' library(dplyr)
+#' deforestation <- load_prodes(dataset = "deforestation", raw_data = FALSE,
+#'   time_period = 2023, language = "eng")
+#' state_deforest <- deforestation %>%
+#'   group_by(state) %>%
+#'   summarize(total_deforestation = sum(deforested_area_hectares, na.rm = TRUE),
+#'             num_municipalities_affected = n_distinct(municipality),
+#'             avg_per_municipality = mean(deforested_area_hectares, na.rm = TRUE),
+#'             .groups = 'drop') %>%
+#'   arrange(desc(total_deforestation))
+#' print(state_deforest)
+#' state_deforest <- state_deforest %>%
+#'   mutate(pct_of_total = (total_deforestation / sum(total_deforestation)) * 100)
+#' top5 <- state_deforest %>%
+#'   head(5) %>%
+#'   summarize(top5_pct = sum(pct_of_total))
+#' print(paste("Top 5 states account for", round(top5$top5_pct, 1), "% of 2023 deforestation"))
+#' }
+#'
+#' # Example 3: Cumulative Forest Loss
+#' \dontrun{
+#' library(dplyr)
+#' all_deforestation <- load_prodes(dataset = "deforestation", raw_data = FALSE,
+#'   time_period = c(2007, 2008:2023), language = "eng")
+#' cumulative_2023 <- all_deforestation %>%
+#'   group_by(municipality, state) %>%
+#'   summarize(total_deforestation_to_2023 = sum(deforested_area_hectares, na.rm = TRUE),
+#'             .groups = 'drop') %>%
+#'   arrange(desc(total_deforestation_to_2023))
+#' print("Municipalities with most cumulative deforestation (1988-2023):")
+#' print(head(cumulative_2023, 20))
+#' total_amazon_loss <- sum(cumulative_2023$total_deforestation_to_2023, na.rm = TRUE)
+#' print(paste("Total Amazon deforestation through 2023:",
+#'             round(total_amazon_loss / 1000000, 1), "million hectares"))
+#' }
 #'
 #' @importFrom rlang :=
 #'

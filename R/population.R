@@ -10,23 +10,43 @@
 #'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
-#' # Download raw data (raw_data = TRUE) at the country level
-#' # from 2008 to 2010 (time_period = 2008:2010).
-#' data <- load_population(
-#'   raw_data = TRUE,
-#'   geo_level = "country",
-#'   time_period = 2008:2010
-#' )
+#' #' @examples
+#' # Example 1: Population by State
+#' \dontrun{
+#' library(dplyr)
+#' pop_2021 <- load_population(raw_data = FALSE, geo_level = "state",
+#'   time_period = 2021, language = "eng")
+#' state_ranking <- pop_2021 %>%
+#'   arrange(desc(population)) %>%
+#'   select(state, population) %>%
+#'   mutate(rank = row_number(), pct_of_total = (population / sum(population)) * 100)
+#' print(state_ranking)
+#' top5_pct <- state_ranking %>%
+#'   head(5) %>%
+#'   summarize(total_pct = sum(pct_of_total))
+#' }
 #'
-#' # Download treted data (raw_data = FALSE) by state (geo_level = "state")
-#' # from 2008 to 2010 (time_period = 2008:2010) in portuguese (language = "pt").
-#' data <- load_population(
-#'   raw_data = FALSE,
-#'   geo_level = "state",
-#'   time_period = 2008:2010,
-#'   language = "pt"
-#' )
-#'
+#' # Example 2: Population Growth Rates
+#' \dontrun{
+#' library(dplyr)
+#' pop_series <- load_population(raw_data = FALSE, geo_level = "state",
+#'   time_period = 2010:2021, language = "eng")
+#' growth_analysis <- pop_series %>%
+#'   group_by(state) %>%
+#'   arrange(year) %>%
+#'   mutate(lag_pop = lag(population),
+#'          annual_growth = ((population - lag_pop) / lag_pop) * 100) %>%
+#'   filter(!is.na(annual_growth))
+#' avg_growth <- growth_analysis %>%
+#'   group_by(state) %>%
+#'   summarize(avg_annual_growth = mean(annual_growth, na.rm = TRUE),
+#'             decade_growth = ((last(population) - first(population)) / first(population)) * 100,
+#'             .groups = 'drop') %>%
+#'   arrange(desc(decade_growth))
+#' print(avg_growth)
+#' fastest <- avg_growth %>% top_n(10, avg_annual_growth)
+#' print(fastest)
+#' }
 #' @export
 
 load_population <- function(dataset = "population", raw_data = FALSE,

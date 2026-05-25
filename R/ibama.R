@@ -11,17 +11,44 @@
 #'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
-#' # Download treated embargoes data (raw_data = FALSE) in english (language = "eng")
-#' data <- load_ibama(
-#'   dataset = "embargoed_areas", raw_data = FALSE,
-#'   language = "eng"
-#' )
+#' #' @examples
+#' # Example 1: Environmental Enforcement in Amazon States
+#' \dontrun{
+#' library(datazoom.amazonia)
+#' amazon_embargoes <- load_ibama(dataset = "embargoed_areas", raw_data = FALSE,
+#'   language = "eng")
+#' head(amazon_embargoes)
+#' summary(amazon_embargoes$embargoed_area_hectares)
+#' }
 #'
-#' # Download treated collected fines data from "BA"
-#' data <- load_ibama(
-#'   dataset = "collected_fines", raw_data = FALSE,
-#'   states = "BA", language = "pt"
-#' )
+#' # Example 2: Environmental Fine Collections
+#' \dontrun{
+#' state_fines <- load_ibama(dataset = "collected_fines", raw_data = FALSE,
+#'   states = "AM", language = "pt")
+#' revenue_by_year <- state_fines %>%
+#'   group_by(year) %>%
+#'   summarise(total_collected = sum(fine_amount, na.rm = TRUE), num_fines = n())
+#' }
+#'
+#' # Example 3: Comparative Regional Analysis
+#' \dontrun{
+#' amazon_states <- c("AC", "AM", "AP", "MA", "MT", "RO", "RR", "TO", "PA")
+#' regional_enforcement <- load_ibama(dataset = "distributed_fines", raw_data = FALSE,
+#'   states = amazon_states, language = "eng")
+#' enforcement_summary <- regional_enforcement %>%
+#'   group_by(state) %>%
+#'   summarise(total_fines = n(),
+#'             total_amount = sum(fine_amount, na.rm = TRUE),
+#'             avg_fine = mean(fine_amount, na.rm = TRUE)) %>%
+#'   arrange(desc(total_amount))
+#' }
+#'
+#' # Example 4: Individual-Level Infraction Data
+#' \dontrun{
+#' raw_infractions <- load_ibama(dataset = "embargoed_areas", raw_data = TRUE,
+#'   language = "eng")
+#' str(raw_infractions)
+#' }
 #'
 #' @export
 

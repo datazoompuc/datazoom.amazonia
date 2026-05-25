@@ -9,9 +9,23 @@
 #'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
-#' # Download treated data
-#' data <- load_iema(raw_data = FALSE)
+#' @examples
+#' # Example 1: Basic Data Download
+#' \dontrun{
+#' library(datazoom.amazonia)
+#' amazon_energy <- load_iema(raw_data = FALSE, language = "eng")
+#' head(amazon_energy)
+#' dim(amazon_energy)
+#' }
 #'
+#' # Example 2: Identifying Energy-Poor Municipalities
+#' \dontrun{
+#' amazon_energy <- load_iema(raw_data = FALSE)
+#' worst_access <- amazon_energy %>%
+#'   arrange(desc(population_without_energy)) %>%
+#'   head(20)
+#' print(worst_access[, c("municipality", "state", "population_without_energy")])
+#' }
 #' @export
 
 load_iema <- function(dataset = "iema", raw_data = FALSE, language = "eng") {
