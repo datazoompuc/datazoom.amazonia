@@ -104,86 +104,53 @@ The function returns either:
 
 ---
 
-## Practical Examples
+## Examples
 
-### Example 1: Environmental Enforcement in Amazon States
+### Example 1: Embargoed areas
 
 ```{r eval=FALSE}
-library(datazoom.amazonia)
-
-# Download embargoed areas across Amazon states
+# download treated embargoed areas data
 amazon_embargoes <- load_ibama(
   dataset = "embargoed_areas",
   raw_data = FALSE,
   language = "eng"
 )
-
-# View recent embargoes
-head(amazon_embargoes)
-
-# Summary statistics
-summary(amazon_embargoes$embargoed_area_hectares)
 ```
 
-### Example 2: Environmental Fine Collections
+### Example 2: Collected fines for a specific state
 
 ```{r eval=FALSE}
-# Download fines data for specific Amazon state
+# download treated collected fines data for Amazonas state
 state_fines <- load_ibama(
   dataset = "collected_fines",
   raw_data = FALSE,
   states = "AM",
   language = "pt"
 )
-
-# Calculate total enforcement revenue by year
-revenue_by_year <- state_fines %>%
-  group_by(year) %>%
-  summarise(
-    total_collected = sum(fine_amount, na.rm = TRUE),
-    num_fines = n()
-  )
 ```
 
-### Example 3: Comparative Regional Analysis
+### Example 3: Distributed fines across multiple Amazon states
 
 ```{r eval=FALSE}
-# Compare enforcement across multiple states
-amazon_states <- c("AC", "AM", "AP", "MA", "MT", "RO", "RR", "TO", "PA")
-
+# download treated distributed fines data for multiple Amazon states
 regional_enforcement <- load_ibama(
   dataset = "distributed_fines",
   raw_data = FALSE,
-  states = amazon_states,
+  states = c("AC", "AM", "AP", "MA", "MT", "RO", "RR", "TO", "PA"),
   language = "eng"
 )
-
-# Compare enforcement intensity by state
-enforcement_summary <- regional_enforcement %>%
-  group_by(state) %>%
-  summarise(
-    total_fines = n(),
-    total_amount = sum(fine_amount, na.rm = TRUE),
-    avg_fine = mean(fine_amount, na.rm = TRUE)
-  ) %>%
-  arrange(desc(total_amount))
 ```
 
-### Example 4: Individual-Level Infraction Data
+### Example 4: Raw individual infraction records
 
 ```{r eval=FALSE}
-# Download raw individual infraction records
+# download raw embargoed areas data
 raw_infractions <- load_ibama(
   dataset = "embargoed_areas",
   raw_data = TRUE,
   language = "eng"
 )
-
-# Examine original data structure
-str(raw_infractions)
 ```
-
----
 
 ## Use Cases
 

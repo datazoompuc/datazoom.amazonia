@@ -10,45 +10,35 @@
 #' @return A \code{tibble}.
 #'
 #' @examplesIf interactive()
-#' ### DO NOT RUN ###
-#' #' @examples
-#' # Example 1: Environmental Enforcement in Amazon States
-#' \dontrun{
-#' library(datazoom.amazonia)
-#' amazon_embargoes <- load_ibama(dataset = "embargoed_areas", raw_data = FALSE,
-#'   language = "eng")
-#' head(amazon_embargoes)
-#' summary(amazon_embargoes$embargoed_area_hectares)
-#' }
+#' # download treated embargoed areas data
+#' amazon_embargoes <- load_ibama(
+#'   dataset = "embargoed_areas",
+#'   raw_data = FALSE,
+#'   language = "eng"
+#' )
 #'
-#' # Example 2: Environmental Fine Collections
-#' \dontrun{
-#' state_fines <- load_ibama(dataset = "collected_fines", raw_data = FALSE,
-#'   states = "AM", language = "pt")
-#' revenue_by_year <- state_fines %>%
-#'   group_by(year) %>%
-#'   summarise(total_collected = sum(fine_amount, na.rm = TRUE), num_fines = n())
-#' }
+#' # download treated collected fines data for Amazonas state
+#' state_fines <- load_ibama(
+#'   dataset = "collected_fines",
+#'   raw_data = FALSE,
+#'   states = "AM",
+#'   language = "pt"
+#' )
 #'
-#' # Example 3: Comparative Regional Analysis
-#' \dontrun{
-#' amazon_states <- c("AC", "AM", "AP", "MA", "MT", "RO", "RR", "TO", "PA")
-#' regional_enforcement <- load_ibama(dataset = "distributed_fines", raw_data = FALSE,
-#'   states = amazon_states, language = "eng")
-#' enforcement_summary <- regional_enforcement %>%
-#'   group_by(state) %>%
-#'   summarise(total_fines = n(),
-#'             total_amount = sum(fine_amount, na.rm = TRUE),
-#'             avg_fine = mean(fine_amount, na.rm = TRUE)) %>%
-#'   arrange(desc(total_amount))
-#' }
+#' # download treated distributed fines data for multiple Amazon states
+#' regional_enforcement <- load_ibama(
+#'   dataset = "distributed_fines",
+#'   raw_data = FALSE,
+#'   states = c("AC", "AM", "AP", "MA", "MT", "RO", "RR", "TO", "PA"),
+#'   language = "eng"
+#' )
 #'
-#' # Example 4: Individual-Level Infraction Data
-#' \dontrun{
-#' raw_infractions <- load_ibama(dataset = "embargoed_areas", raw_data = TRUE,
-#'   language = "eng")
-#' str(raw_infractions)
-#' }
+#' # download raw embargoed areas data
+#' raw_infractions <- load_ibama(
+#'   dataset = "embargoed_areas",
+#'   raw_data = TRUE,
+#'   language = "eng"
+#' )
 #'
 #' @export
 
