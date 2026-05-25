@@ -219,127 +219,53 @@ language = "eng"  # character string
 
 ## Examples
 
-
-### Example 1: Deforestation Hotspots
-
-Identify municipalities with highest deforestation:
+### Example 1: Deforestation data for a single year
 
 ```{r eval=FALSE}
-library(dplyr)
-
-# Load recent deforestation data
+# download treated deforestation data for 2023
 deforestation <- load_prodes(
   dataset = "deforestation",
   raw_data = FALSE,
   time_period = 2023,
   language = "eng"
 )
+```
 
-# Municipalities with most recent deforestation
-hotspots <- deforestation %>%
-  arrange(desc(deforested_area_hectares)) %>%
-  select(municipality, state, year, deforested_area_hectares) %>%
-  head(30)
+### Example 2: Deforestation data over multiple years
 
-print("Deforestation hotspots (2023):")
-print(hotspots)
-
-# Cumulative deforestation from 2008-2023
+```{r eval=FALSE}
+# download treated deforestation data for 2008 to 2023
 deforestation_series <- load_prodes(
   dataset = "deforestation",
   raw_data = FALSE,
   time_period = 2008:2023,
   language = "eng"
 )
-
-total_by_municipality <- deforestation_series %>%
-  group_by(municipality, state) %>%
-  summarize(
-    cumulative_deforestation = sum(deforested_area_hectares, na.rm = TRUE),
-    years_with_activity = n_distinct(year),
-    .groups = 'drop'
-  ) %>%
-  arrange(desc(cumulative_deforestation)) %>%
-  head(30)
-
-print("Municipalities with most cumulative deforestation (2008-2023):")
-print(total_by_municipality)
 ```
 
-### Example 2: Regional Deforestation Patterns
-
-Compare deforestation across states and regions:
+### Example 3: Cumulative forest loss since 1988
 
 ```{r eval=FALSE}
-library(dplyr)
-
-deforestation <- load_prodes(
-  dataset = "deforestation",
-  raw_data = FALSE,
-  time_period = 2023,
-  language = "eng"
-)
-
-# State-level deforestation
-state_deforest <- deforestation %>%
-  group_by(state) %>%
-  summarize(
-    total_deforestation = sum(deforested_area_hectares, na.rm = TRUE),
-    num_municipalities_affected = n_distinct(municipality),
-    avg_per_municipality = mean(deforested_area_hectares, na.rm = TRUE),
-    .groups = 'drop'
-  ) %>%
-  arrange(desc(total_deforestation))
-
-print(state_deforest)
-
-# Share of total deforestation
-state_deforest <- state_deforest %>%
-  mutate(
-    pct_of_total = (total_deforestation / sum(total_deforestation)) * 100
-  )
-
-# Top states account for what %?
-top5 <- state_deforest %>%
-  head(5) %>%
-  summarize(top5_pct = sum(pct_of_total))
-
-print(paste("Top 5 states account for", round(top5$top5_pct, 1), "% of 2023 deforestation"))
-```
-
-### Example 3: Cumulative Forest Loss
-
-Analyze total deforestation since 2007:
-
-```{r eval=FALSE}
-library(dplyr)
-
-# Load 2007 (cumulative from 1988-2007) plus all years 2008-2023
+# download 2007 (cumulative 1988-2007) plus all years up to 2023
 all_deforestation <- load_prodes(
   dataset = "deforestation",
   raw_data = FALSE,
   time_period = c(2007, 2008:2023),
   language = "eng"
 )
-
-# Cumulative loss by 2023
-cumulative_2023 <- all_deforestation %>%
-  group_by(municipality, state) %>%
-  summarize(
-    total_deforestation_to_2023 = sum(deforested_area_hectares, na.rm = TRUE),
-    .groups = 'drop'
-  ) %>%
-  arrange(desc(total_deforestation_to_2023))
-
-print("Municipalities with most cumulative deforestation (1988-2023):")
-print(head(cumulative_2023, 20))
-
-# Total Amazon deforestation
-total_amazon_loss <- sum(cumulative_2023$total_deforestation_to_2023, na.rm = TRUE)
-print(paste("Total Amazon deforestation through 2023:", 
-            round(total_amazon_loss / 1000000, 1), "million hectares"))
 ```
----
+
+### Example 4: Residual deforestation
+
+```{r eval=FALSE}
+# download treated residual deforestation data for 2020
+residual <- load_prodes(
+  dataset = "residual_deforestation",
+  raw_data = FALSE,
+  time_period = 2020,
+  language = "eng"
+)
+```
 
 ## Data Notes
 
