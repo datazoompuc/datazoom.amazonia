@@ -11,27 +11,16 @@
 #'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
-#' @examples
-#' # Example 1: Richest and Poorest Municipalities
-#' \dontrun{
-#' library(dplyr)
-#' pib_munic <- load_pibmunic(raw_data = FALSE, geo_level = "municipality",
-#'   time_period = 2020, language = "eng")
-#' richest <- pib_munic %>%
-#'   arrange(desc(gdp)) %>%
-#'   select(municipality, state, gdp) %>%
-#'   head(20)
-#' print("Richest municipalities:")
-#' print(richest)
-#' poorest <- pib_munic %>%
-#'   arrange(gdp) %>%
-#'   select(municipality, state, gdp) %>%
-#'   head(20)
-#' print("Poorest municipalities:")
-#' print(poorest)
-#' }
-
+#' # download treated municipal GDP data at the state level for 2010 to 2012
+#' data <- load_pibmunic(
+#'   raw_data = FALSE,
+#'   geo_level = "state",
+#'   time_period = 2010:2012,
+#'   language = "eng"
+#' )
+#'
 #' @export
+
 load_pibmunic <- function(dataset = "pibmunic", raw_data = FALSE,
                           geo_level, time_period,
                           language = "eng") {

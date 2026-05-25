@@ -22,21 +22,22 @@ A \code{tibble}.
 Loads data on all products imported to or exported from Brazil.
 }
 \examples{
-\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
-# download treated (raw_data = FALSE) exports data by municipality (dataset = "comex_export_mun")
-# from 2020 to 2021 (time_period = 2020:2021)
+# download treated exports data by municipality from 2020 to 2021
 data <- load_br_trade(
   dataset = "export_mun",
   raw_data = FALSE,
-  time_period = 2020:2021
+  time_period = 2020:2021,
+  language = "eng"
 )
-# download treated(raw_data = FALSE) imports data by municipality (dataset = "comex_import_mun")
-# from 2020 to 2021 (time_period = 2020:2021)
+
+# download treated imports data by municipality from 2020 to 2021
 data <- load_br_trade(
   dataset = "import_mun",
   raw_data = FALSE,
-  time_period = 2020:2021
+  time_period = 2020:2021,
+  language = "eng"
 )
 \dontshow{\}) # examplesIf}
 }

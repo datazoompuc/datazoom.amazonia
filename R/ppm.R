@@ -11,129 +11,26 @@
 #'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
-#' #' @examples
-#' # Example 1: Livestock Specialization by State
-#' \dontrun{
-#' library(dplyr)
-#' livestock <- load_ppm(dataset = "ppm_livestock_inventory", raw_data = FALSE,
-#'   geo_level = "state", time_period = 2020, language = "eng")
-#' livestock_composition <- livestock %>%
-#'   group_by(state) %>%
-#'   mutate(total_animals = sum(number_of_animals, na.rm = TRUE)) %>%
-#'   group_by(state, animal_species) %>%
-#'   summarize(num_animals = sum(number_of_animals, na.rm = TRUE),
-#'             pct_of_state = (num_animals / first(total_animals)) * 100,
-#'             .groups = 'drop') %>%
-#'   pivot_wider(names_from = animal_species, values_from = num_animals, values_fill = 0)
-#' cattle_states <- livestock %>%
-#'   filter(animal_species == "Cattle") %>%
-#'   group_by(state) %>%
-#'   summarize(cattle_herd = sum(number_of_animals, na.rm = TRUE), .groups = 'drop') %>%
-#'   arrange(desc(cattle_herd)) %>%
-#'   head(15)
-#' print(cattle_states)
-#' }
+#' # download treated aquaculture data at the country level from 2013 to 2015
+#' data <- load_ppm(
+#'   dataset = "ppm_aquaculture",
+#'   raw_data = FALSE,
+#'   geo_level = "country",
+#'   time_period = 2013:2015,
+#'   language = "eng"
+#' )
 #'
-#' # Example 2: Dairy Productivity Analysis
-#' \dontrun{
-#' library(dplyr)
-#' dairy <- load_ppm(dataset = "ppm_cow_farming", raw_data = FALSE,
-#'   geo_level = "state", time_period = 2020, language = "eng")
-#' dairy_analysis <- dairy %>%
-#'   mutate(productivity_liter_per_cow = milk_production_liters / milked_cows) %>%
-#'   group_by(state) %>%
-#'   summarize(total_milked_cows = sum(milked_cows, na.rm = TRUE),
-#'             total_milk_production = sum(milk_production_liters, na.rm = TRUE),
-#'             avg_productivity = mean(productivity_liter_per_cow, na.rm = TRUE),
-#'             .groups = 'drop') %>%
-#'   arrange(desc(total_milk_production))
-#' print("Milk production by state:")
-#' print(dairy_analysis)
-#' most_productive <- dairy_analysis %>% arrange(desc(avg_productivity)) %>% head(10)
-#' print("Most productive dairy states:")
-#' print(most_productive)
-#' }
-#'
-#' # Example 3: Animal Product Economics
-#' \dontrun{
-#' library(dplyr)
-#' animal_products <- load_ppm(dataset = "ppm_animal_origin_production", raw_data = FALSE,
-#'   geo_level = "country", time_period = 2020, language = "eng")
-#' product_value <- animal_products %>%
-#'   group_by(product_type) %>%
-#'   summarize(total_production = sum(quantity_produced, na.rm = TRUE),
-#'             total_value = sum(production_value, na.rm = TRUE),
-#'             .groups = 'drop') %>%
-#'   mutate(value_per_unit = total_value / total_production) %>%
-#'   arrange(desc(total_value))
-#' print(product_value)
-#' product_value %>%
-#'   mutate(pct_of_total = (total_value / sum(total_value)) * 100) %>%
-#'   arrange(desc(pct_of_total))
-#' }
-#'
-#' # Example 4: Regional Livestock Structure
-#' \dontrun{
-#' library(dplyr)
-#' livestock <- load_ppm(dataset = "ppm_livestock_inventory", raw_data = FALSE,
-#'   geo_level = "region", time_period = 2020, language = "eng")
-#' regional_livestock <- livestock %>%
-#'   group_by(region, animal_species) %>%
-#'   summarize(num_animals = sum(number_of_animals, na.rm = TRUE), .groups = 'drop') %>%
-#'   pivot_wider(names_from = animal_species, values_from = num_animals, values_fill = 0)
-#' print(regional_livestock)
-#' specialization <- livestock %>%
-#'   group_by(animal_species) %>%
-#'   mutate(national_total = sum(number_of_animals, na.rm = TRUE)) %>%
-#'   group_by(region, animal_species) %>%
-#'   summarize(regional_share = sum(number_of_animals, na.rm = TRUE) / first(national_total) * 100,
-#'             .groups = 'drop')
-#' print(specialization)
-#' }
-#'
-#' # Example 5: Wool Production Analysis
-#' \dontrun{
-#' library(dplyr)
-#' sheep <- load_ppm(dataset = "ppm_sheep_farming", raw_data = FALSE,
-#'   geo_level = "state", time_period = 2020, language = "eng")
-#' wool_production <- sheep %>%
-#'   group_by(state) %>%
-#'   summarize(total_sheep = sum(total_sheep, na.rm = TRUE),
-#'             sheared_sheep = sum(sheared_sheep, na.rm = TRUE),
-#'             total_fleece_weight = sum(fleece_weight_kg, na.rm = TRUE),
-#'             avg_fleece_per_sheep = mean(fleece_weight_kg / sheared_sheep, na.rm = TRUE),
-#'             .groups = 'drop') %>%
-#'   arrange(desc(total_fleece_weight))
-#' print(wool_production)
-#' wool_production %>%
-#'   mutate(shearing_percentage = (sheared_sheep / total_sheep) * 100) %>%
-#'   select(state, total_sheep, shearing_percentage)
-#' }
-#'
-#' # Example 6: Aquaculture Growth
-#' \dontrun{
-#' library(dplyr)
-#' aquaculture <- load_ppm(dataset = "ppm_aquaculture", raw_data = FALSE,
-#'   geo_level = "state", time_period = 2015:2020, language = "eng")
-#' aquaculture_by_type <- aquaculture %>%
-#'   group_by(year, aquaculture_type) %>%
-#'   summarize(production = sum(quantity_produced, na.rm = TRUE),
-#'             value = sum(production_value, na.rm = TRUE),
-#'             .groups = 'drop')
-#' leading_aquaculture <- aquaculture %>%
-#'   filter(year == 2020) %>%
-#'   group_by(state) %>%
-#'   summarize(total_production = sum(quantity_produced, na.rm = TRUE),
-#'             total_value = sum(production_value, na.rm = TRUE),
-#'             .groups = 'drop') %>%
-#'   arrange(desc(total_value)) %>%
-#'   head(15)
-#' print("Top aquaculture states:")
-#' print(leading_aquaculture)
-#' }
+#' # download raw sheep farming data by state from 1980 to 1995 in portuguese
+#' data <- load_ppm(
+#'   dataset = "ppm_sheep_farming",
+#'   raw_data = TRUE,
+#'   geo_level = "state",
+#'   time_period = 1980:1995,
+#'   language = "pt"
+#' )
 #'
 #' @export
-#'
+
 load_ppm <- function(dataset, raw_data = FALSE,
                      geo_level, time_period,
                      language = "eng") {

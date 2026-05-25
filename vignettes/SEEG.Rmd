@@ -236,252 +236,78 @@ language = "eng"  # character string
 ---
 ## Examples
 
-### Example 1: Total National Emissions by Sector
-
-Understand Brazil's overall emissions profile:
+### Example 1: All sectors combined (raw data) at the country level
 
 ```{r eval=FALSE}
-library(dplyr)
-library(ggplot2)
-
-# Load all sectors (raw data format)
+# download raw SEEG data (all sectors) at the country level
+# note: dataset = "seeg" only works with raw_data = TRUE
 all_emissions <- load_seeg(
   dataset = "seeg",
   raw_data = TRUE,
   geo_level = "country",
   language = "eng"
 )
-
-# Total emissions by sector for latest available year
-sector_breakdown <- all_emissions %>%
-  group_by(sector) %>%
-  summarize(
-    total_emissions = sum(emissions_co2e, na.rm = TRUE),
-    pct_of_total = (total_emissions / sum(all_emissions$emissions_co2e, na.rm = TRUE)) * 100,
-    .groups = 'drop'
-  ) %>%
-  arrange(desc(total_emissions))
-
-print("Brazil's emissions by sector:")
-print(sector_breakdown)
-
-# Visualize sector contributions
-ggplot(sector_breakdown, aes(x = reorder(sector, total_emissions), y = total_emissions)) +
-  geom_col(fill = "darkred") +
-  coord_flip() +
-  labs(title = "Brazil's Greenhouse Gas Emissions by Sector",
-       x = "Sector",
-       y = "Emissions (CO₂e)") +
-  theme_minimal()
 ```
 
-### Example 2: Agricultural Emissions Analysis
-
-Analyze the largest emissions sector for Brazil:
+### Example 2: Agricultural emissions by state
 
 ```{r eval=FALSE}
-library(dplyr)
-
-# Load agricultural emissions by state
+# download treated agricultural emissions at the state level
 farming <- load_seeg(
   dataset = "seeg_farming",
   raw_data = FALSE,
   geo_level = "state",
   language = "eng"
 )
-
-# States with highest agricultural emissions
-top_farm_states <- farming %>%
-  group_by(state) %>%
-  summarize(
-    total_ag_emissions = sum(emissions_co2e, na.rm = TRUE),
-    num_sources = n_distinct(source),
-    .groups = 'drop'
-  ) %>%
-  arrange(desc(total_ag_emissions)) %>%
-  head(15)
-
-print("Top agricultural emission states:")
-print(top_farm_states)
-
-# Breakdown of agricultural sources (livestock vs crop)
-ag_sources <- farming %>%
-  group_by(source) %>%
-  summarize(
-    emissions = sum(emissions_co2e, na.rm = TRUE),
-    .groups = 'drop'
-  ) %>%
-  arrange(desc(emissions))
-
-print("Agricultural emission sources:")
-print(ag_sources)
 ```
 
-### Example 3: Land Use Change Emissions
-
-Understand the climate impact of deforestation:
+### Example 3: Land use change emissions by state
 
 ```{r eval=FALSE}
-library(dplyr)
-
-# Load land use change emissions
+# download treated land use change emissions at the state level
 land_use <- load_seeg(
   dataset = "seeg_land",
   raw_data = FALSE,
   geo_level = "state",
   language = "eng"
 )
-
-# Net emissions/removals by state
-state_net_emissions <- land_use %>%
-  group_by(state) %>%
-  summarize(
-    net_emissions = sum(emissions_co2e, na.rm = TRUE),
-    .groups = 'drop'
-  ) %>%
-  arrange(desc(net_emissions))
-
-print("Land use change emissions by state (positive = emissions from deforestation):")
-print(state_net_emissions)
-
-# States with highest deforestation impact
-high_emission_states <- state_net_emissions %>%
-  filter(net_emissions > 0) %>%
-  top_n(10, net_emissions)
-
-print("States with highest deforestation emissions:")
-print(high_emission_states)
 ```
 
-### Example 4: Emissions Trends Over Time
-
-Track how emissions have changed from 2000 to 2018:
+### Example 4: Energy emissions by municipality
 
 ```{r eval=FALSE}
-library(dplyr)
-library(ggplot2)
-
-# Load all sectors for country level
-all_sectors <- load_seeg(
-  dataset = "seeg",
-  raw_data = TRUE,
-  geo_level = "country",
-  language = "eng"
-)
-
-# Annual emissions trends
-annual_emissions <- all_sectors %>%
-  group_by(year) %>%
-  summarize(
-    total_emissions = sum(emissions_co2e, na.rm = TRUE),
-    .groups = 'drop'
-  ) %>%
-  arrange(year)
-
-print(annual_emissions)
-
-# Visualize trends
-ggplot(annual_emissions, aes(x = year, y = total_emissions)) +
-  geom_line(size = 1, color = "darkred") +
-  geom_point(size = 2) +
-  labs(title = "Brazil's Total Greenhouse Gas Emissions (2000-2018)",
-       x = "Year",
-       y = "Total Emissions (CO₂e)") +
-  theme_minimal()
-
-# Calculate trend
-first_year <- annual_emissions$total_emissions[1]
-last_year <- annual_emissions$total_emissions[nrow(annual_emissions)]
-change_pct <- ((last_year - first_year) / first_year) * 100
-
-print(paste("Total change 2000-2018:", round(change_pct, 1), "%"))
-```
-
-### Example 5: Municipal Emission Hotspots
-
-Identify highest-emitting municipalities:
-
-```{r eval=FALSE}
-library(dplyr)
-
-# Load municipality-level data
-all_sectors_munic <- load_seeg(
-  dataset = "seeg",
-  raw_data = TRUE,
+# download treated energy emissions at the municipality level
+energy <- load_seeg(
+  dataset = "seeg_energy",
+  raw_data = FALSE,
   geo_level = "municipality",
   language = "eng"
 )
-
-# Highest-emitting municipalities
-top_municipalities <- all_sectors_munic %>%
-  group_by(municipality, state) %>%
-  summarize(
-    total_emissions = sum(emissions_co2e, na.rm = TRUE),
-    .groups = 'drop'
-  ) %>%
-  arrange(desc(total_emissions)) %>%
-  head(30)
-
-print("Highest-emitting municipalities in Brazil:")
-print(top_municipalities)
-
-# Emission concentration: top municipalities account for what %?
-total_emissions <- sum(all_sectors_munic$emissions_co2e, na.rm = TRUE)
-top100 <- top_municipalities %>%
-  head(100) %>%
-  summarize(top100_total = sum(total_emissions))
-
-top100_pct <- (top100$top100_total / total_emissions) * 100
-print(paste("Top 100 municipalities account for", round(top100_pct, 1), "% of emissions"))
 ```
 
-### Example 6: Sector Comparison by State
-
-Compare sectoral composition across states:
+### Example 5: Industrial process emissions by state
 
 ```{r eval=FALSE}
-library(dplyr)
-library(tidyr)
-
-# Load individual sector datasets
-farming <- load_seeg(dataset = "seeg_farming", raw_data = FALSE, 
-                     geo_level = "state", language = "eng") %>%
-  mutate(sector = "Agriculture") %>%
-  group_by(state, sector) %>%
-  summarize(emissions = sum(emissions_co2e, na.rm = TRUE), .groups = 'drop')
-
-energy <- load_seeg(dataset = "seeg_energy", raw_data = FALSE,
-                    geo_level = "state", language = "eng") %>%
-  mutate(sector = "Energy") %>%
-  group_by(state, sector) %>%
-  summarize(emissions = sum(emissions_co2e, na.rm = TRUE), .groups = 'drop')
-
-land_use <- load_seeg(dataset = "seeg_land", raw_data = FALSE,
-                      geo_level = "state", language = "eng") %>%
-  mutate(sector = "Land Use") %>%
-  group_by(state, sector) %>%
-  summarize(emissions = sum(emissions_co2e, na.rm = TRUE), .groups = 'drop')
-
-# Combine
-combined <- bind_rows(farming, energy, land_use)
-
-# State profiles
-state_profile <- combined %>%
-  pivot_wider(
-    names_from = sector,
-    values_from = emissions,
-    values_fill = 0
-  ) %>%
-  mutate(
-    total = Agriculture + Energy + `Land Use`,
-    ag_share = (Agriculture / total) * 100,
-    energy_share = (Energy / total) * 100,
-    land_share = (`Land Use` / total) * 100
-  )
-
-print(state_profile)
+# download treated industrial process emissions at the state level
+industry <- load_seeg(
+  dataset = "seeg_industry",
+  raw_data = FALSE,
+  geo_level = "state",
+  language = "eng"
+)
 ```
----
+
+### Example 6: Waste emissions by state
+
+```{r eval=FALSE}
+# download treated waste emissions at the state level
+residuals <- load_seeg(
+  dataset = "seeg_residuals",
+  raw_data = FALSE,
+  geo_level = "state",
+  language = "eng"
+)
+```
 
 ## Data Notes
 

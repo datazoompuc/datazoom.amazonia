@@ -24,19 +24,18 @@ A \code{tibble} consisting of geographic units that present positive values for 
 Loads information on animal farming inventories and livestock products (IBGE).
 }
 \examples{
-\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
-# Download treated data (raw_data = FALSE) about aquaculture (dataset = "ppm_aquaculture")
-# from 2013 to 2015 (time_period = 2013:2015) in english
-# with the level of aggregation being the country (geo_level = "country").
+# download treated aquaculture data at the country level from 2013 to 2015
 data <- load_ppm(
   dataset = "ppm_aquaculture",
   raw_data = FALSE,
   geo_level = "country",
-  time_period = 2013:2015
+  time_period = 2013:2015,
+  language = "eng"
 )
 
-# Download raw data about sheep farming by state from 1980 to 1995 in portuguese (language = "pt")
+# download raw sheep farming data by state from 1980 to 1995 in portuguese
 data <- load_ppm(
   dataset = "ppm_sheep_farming",
   raw_data = TRUE,

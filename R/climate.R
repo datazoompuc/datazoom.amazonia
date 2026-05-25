@@ -8,78 +8,20 @@
 #'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
-#' @examples
-#' # Example 1: Precipitation Patterns
-#' \dontrun{
-#' library(raster)
-#' library(dplyr)
-#' precip <- load_climate(dataset = "precipitation", time_period = 2020,
-#'   legal_amazon_only = TRUE, language = "eng")
-#' summary(precip)
-#' plot(precip, main = "Amazon Precipitation (2020)")
-#' annual_precip <- sum(precip, na.rm = TRUE)
-#' plot(annual_precip, main = "Annual Precipitation in Amazon")
-#' }
+#' # download maximum temperature data from 2000 to 2001
+#' max_temp <- load_climate(
+#'   dataset = "max_temperature",
+#'   time_period = 2000:2001,
+#'   language = "eng"
+#' )
 #'
-#' # Example 2: Temperature Trends
-#' \dontrun{
-#' library(raster)
-#' max_temp <- load_climate(dataset = "max_temperature", time_period = 2010:2020,
-#'   legal_amazon_only = TRUE, language = "eng")
-#' avg_temp <- mean(max_temp, na.rm = TRUE)
-#' plot(avg_temp, main = "Average Maximum Temperature (2010-2020)")
-#' temp_2010 <- max_temp[[1:12]]
-#' temp_2020 <- max_temp[[(nlayers(max_temp) - 11):nlayers(max_temp)]]
-#' avg_2010 <- mean(temp_2010, na.rm = TRUE)
-#' avg_2020 <- mean(temp_2020, na.rm = TRUE)
-#' temp_change <- avg_2020 - avg_2010
-#' plot(temp_change, main = "Temperature Change 2010-2020")
-#' }
-#'
-#' # Example 3: Drought Assessment
-#' \dontrun{
-#' library(raster)
-#' water_def <- load_climate(dataset = "climatic_water_deficit", time_period = 2020,
-#'   legal_amazon_only = TRUE, language = "eng")
-#' avg_water_def <- mean(water_def, na.rm = TRUE)
-#' plot(avg_water_def, main = "Average Climatic Water Deficit (2020)")
-#' drought_areas <- avg_water_def > quantile(avg_water_def, 0.75, na.rm = TRUE)
-#' plot(drought_areas, main = "High Drought Risk Areas")
-#' pdsi <- load_climate(dataset = "palmer_drought_severity_index", time_period = 2020,
-#'   legal_amazon_only = TRUE, language = "eng")
-#' plot(pdsi, main = "Palmer Drought Severity Index (2020)")
-#' }
-#'
-#' # Example 4: Radiation and Growing Season
-#' \dontrun{
-#' library(raster)
-#' radiation <- load_climate(dataset = "shortwave_radiation_flux", time_period = 2020,
-#'   legal_amazon_only = TRUE, language = "eng")
-#' temp <- load_climate(dataset = "max_temperature", time_period = 2020,
-#'   legal_amazon_only = TRUE, language = "eng")
-#' annual_radiation <- sum(radiation, na.rm = TRUE)
-#' plot(annual_radiation, main = "Annual Solar Radiation")
-#' avg_temp <- mean(temp, na.rm = TRUE)
-#' plot(avg_temp, main = "Average Maximum Temperature")
-#' radiation_temp <- stack(annual_radiation, avg_temp)
-#' names(radiation_temp) <- c("Radiation", "Temperature")
-#' }
-#'
-#' # Example 5: Soil Moisture Dynamics
-#' \dontrun{
-#' library(raster)
-#' soil_moisture <- load_climate(dataset = "soil_moisture", time_period = 2020,
-#'   legal_amazon_only = TRUE, language = "eng")
-#' plot(soil_moisture, main = "Monthly Soil Moisture (2020)")
-#' avg_soil <- mean(soil_moisture, na.rm = TRUE)
-#' high_moisture <- soil_moisture > quantile(soil_moisture, 0.75, na.rm = TRUE)
-#' low_moisture <- soil_moisture < quantile(soil_moisture, 0.25, na.rm = TRUE)
-#' plot(high_moisture, main = "High Soil Moisture Areas")
-#' plot(low_moisture, main = "Low Soil Moisture Areas")
-#' }
-#'
-#' @return A \code{tibble}.
-#' @export
+#' # download precipitation data only for the legal Amazon in 2010
+#' amz_precip <- load_climate(
+#'   dataset = "precipitation",
+#'   time_period = 2010,
+#'   legal_amazon_only = TRUE,
+#'   language = "eng"
+#' )
 
 load_climate <- function(dataset, raw_data = FALSE,
                          time_period,

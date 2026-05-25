@@ -82,56 +82,22 @@ Data can be retrieved with sector disaggregation or aggregate form:
 
 ## Examples
 
-### Example 1: National Employment Trends
-
 ```{r eval=FALSE}
-library(datazoom.amazonia)
-
-# Download treated national-level data for recent years
-national_firms <- load_cempre(
-  raw_data = FALSE,
+# download raw data at the country level from 2008 to 2010
+data <- load_cempre(
+  raw_data = TRUE,
   geo_level = "country",
-  time_period = 2015:2022,
+  time_period = 2008:2010,
   language = "eng"
 )
 
-# View structure
-head(national_firms)
-```
-
-### Example 2: State-Level Analysis
-
-```{r eval=FALSE}
-# Download state-level employment data
-state_data <- load_cempre(
+# download treated state-level data split by sector in portuguese
+data <- load_cempre(
   raw_data = FALSE,
   geo_level = "state",
-  time_period = 2010:2022,
-  language = "pt"
+  time_period = 2008:2010,
+  language = "pt",
+  sectors = TRUE
 )
-
-# Calculate average employment by state
-state_summary <- state_data %>%
-  group_by(state) %>%
-  summarise(
-    avg_employees = mean(employment, na.rm = TRUE),
-    total_establishments = sum(establishments, na.rm = TRUE)
-  )
 ```
----
-
-## Use Cases
-
-- **Economic Impact Analysis**: Measure employment creation and firm growth by sector and region
-- **Industrial Policy Evaluation**: Assess effectiveness of development programs using firm-level data
-- **Labor Market Studies**: Analyze wage trends and employment dynamics across sectors
-- **Regional Development**: Compare economic structures across municipalities
-- **Business Environment**: Monitor formal business registration and formalization trends
-
-```
-```
-
----
-
-
 

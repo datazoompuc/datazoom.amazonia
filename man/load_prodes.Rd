@@ -32,15 +32,30 @@ A \code{tibble} with the selected data if raw_data is \code{FALSE}, and a \code{
 Loads data on deforestation in the Legal Amazon region.
 }
 \examples{
-\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
-# Download treated data (raw_data = FALSE)
-# in portuguese (language = 'pt').
-data <- load_prodes(
+# download treated deforestation data for 2023
+deforestation <- load_prodes(
   dataset = "deforestation",
   raw_data = FALSE,
-  time_period = 2020:2023,
-  language = "pt"
+  time_period = 2023,
+  language = "eng"
+)
+
+# download treated deforestation data for 2008 to 2023
+deforestation_series <- load_prodes(
+  dataset = "deforestation",
+  raw_data = FALSE,
+  time_period = 2008:2023,
+  language = "eng"
+)
+
+# download treated residual deforestation data for 2020
+residual <- load_prodes(
+  dataset = "residual_deforestation",
+  raw_data = FALSE,
+  time_period = 2020,
+  language = "eng"
 )
 \dontshow{\}) # examplesIf}
 }

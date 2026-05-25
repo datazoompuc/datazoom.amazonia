@@ -30,18 +30,17 @@ A \code{tibble}.
 Loads information on (estimated) population
 }
 \examples{
-\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
-# Download raw data (raw_data = TRUE) at the country level
-# from 2008 to 2010 (time_period = 2008:2010).
+# download raw population data at the country level from 2008 to 2010
 data <- load_population(
   raw_data = TRUE,
   geo_level = "country",
-  time_period = 2008:2010
+  time_period = 2008:2010,
+  language = "eng"
 )
 
-# Download treted data (raw_data = FALSE) by state (geo_level = "state")
-# from 2008 to 2010 (time_period = 2008:2010) in portuguese (language = "pt").
+# download treated population data by state from 2008 to 2010 in portuguese
 data <- load_population(
   raw_data = FALSE,
   geo_level = "state",

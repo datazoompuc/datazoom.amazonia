@@ -17,114 +17,21 @@
 #'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
-#' @examples
-#' # Example 1: Amazon Deforestation Trends
-#' \dontrun{
-#' library(datazoom.amazonia)
-#' deforestation <- load_mapbiomas(dataset = "mapbiomas_deforestation_regeneration",
-#'   raw_data = FALSE, geo_level = "municipality", language = "eng")
-#' top_deforested <- deforestation %>%
-#'   group_by(municipality, state) %>%
-#'   summarise(cumulative_deforestation = sum(deforestation_area, na.rm = TRUE),
-#'             .groups = 'drop') %>%
-#'   arrange(desc(cumulative_deforestation)) %>%
-#'   head(10)
-#' print(top_deforested)
-#' }
+#' # download treated MapBiomas land cover data by municipality
+#' data <- load_mapbiomas(
+#'   dataset = "mapbiomas_cover",
+#'   raw_data = FALSE,
+#'   geo_level = "municipality",
+#'   language = "eng"
+#' )
 #'
-#' # Example 2: Land Cover Composition Analysis
-#' \dontrun{
-#' land_cover <- load_mapbiomas(dataset = "mapbiomas_cover", raw_data = FALSE,
-#'   geo_level = "municipality", language = "eng")
-#' forest_cover <- land_cover %>%
-#'   filter(year == max(year)) %>%
-#'   filter(land_cover_type %in% c("Forest", "Forest Formation")) %>%
-#'   group_by(municipality, state) %>%
-#'   summarise(forest_area_ha = sum(area_hectares, na.rm = TRUE), .groups = 'drop') %>%
-#'   arrange(desc(forest_area_ha))
-#' head(forest_cover, 15)
-#' }
-#'
-#' # Example 3: Agricultural Expansion Tracking
-#' \dontrun{
-#' transitions <- load_mapbiomas(dataset = "mapbiomas_transition", raw_data = FALSE,
-#'   geo_level = "municipality", language = "eng")
-#' forest_to_ag <- transitions %>%
-#'   filter(land_use_from %in% c("Forest", "Forest Formation"),
-#'          land_use_to %in% c("Temporary Crops", "Sugarcane", "Pasture")) %>%
-#'   group_by(year, land_use_to) %>%
-#'   summarise(conversion_area = sum(transition_area, na.rm = TRUE), .groups = 'drop')
-#' plot(forest_to_ag$year, forest_to_ag$conversion_area,
-#'      main = "Conversion from Forest to Agriculture",
-#'      xlab = "Year", ylab = "Area (hectares)")
-#' }
-#'
-#' # Example 4: Biome-Level Analysis
-#' \dontrun{
-#' biome_transitions <- load_mapbiomas(dataset = "mapbiomas_transition", raw_data = FALSE,
-#'   geo_level = "biome", language = "pt")
-#' deforestation_by_biome <- biome_transitions %>%
-#'   filter(land_use_from == "Forest") %>%
-#'   group_by(biome, year) %>%
-#'   summarise(annual_deforestation = sum(transition_area, na.rm = TRUE), .groups = 'drop') %>%
-#'   arrange(biome, year)
-#' print(deforestation_by_biome)
-#' }
-#'
-#' # Example 5: Mining Impact Assessment
-#' \dontrun{
-#' mining_indigenous <- load_mapbiomas(dataset = "mapbiomas_mining", raw_data = FALSE,
-#'   geo_level = "indigenous_land", language = "eng")
-#' impacted_territories <- mining_indigenous %>%
-#'   filter(mining_area > 0) %>%
-#'   arrange(desc(mining_area)) %>%
-#'   head(15)
-#' print(impacted_territories)
-#' }
-#'
-#' # Example 6: Fire Monitoring by State
-#' \dontrun{
-#' fire_data <- load_mapbiomas(dataset = "mapbiomas_fire", raw_data = FALSE,
-#'   geo_level = "state", language = "eng")
-#' fire_trends <- fire_data %>%
-#'   group_by(state) %>%
-#'   summarise(total_burned_area = sum(burned_area, na.rm = TRUE),
-#'             recent_fires = sum(burned_area[year >= 2020], na.rm = TRUE),
-#'             .groups = 'drop') %>%
-#'   arrange(desc(recent_fires))
-#' head(fire_trends, 10)
-#' }
-#'
-#' # Example 7: Forest Regeneration Monitoring
-#' \dontrun{
-#' forest_dynamics <- load_mapbiomas(dataset = "mapbiomas_deforestation_regeneration",
-#'   raw_data = FALSE, geo_level = "municipality", language = "eng")
-#' forest_summary <- forest_dynamics %>%
-#'   group_by(municipality, state) %>%
-#'   summarise(total_deforestation = sum(deforestation_area, na.rm = TRUE),
-#'             total_regeneration = sum(regeneration_area, na.rm = TRUE),
-#'             net_change = total_regeneration - total_deforestation,
-#'             .groups = 'drop') %>%
-#'   filter(net_change > 0) %>%
-#'   arrange(desc(net_change))
-#' print(head(forest_summary, 10))
-#' }
-#'
-#' # Example 8: Temporal Trend Analysis
-#' \dontrun{
-#' library(ggplot2)
-#' long_series <- load_mapbiomas(dataset = "mapbiomas_cover", raw_data = FALSE,
-#'   geo_level = "municipality", language = "eng")
-#' specific_municipality <- long_series %>%
-#'   filter(municipality == "Altamira" & state == "PA") %>%
-#'   group_by(year, land_cover_type) %>%
-#'   summarise(area = sum(area_hectares, na.rm = TRUE), .groups = 'drop')
-#' ggplot(specific_municipality, aes(x = year, y = area, fill = land_cover_type)) +
-#'   geom_area() +
-#'   theme_minimal() +
-#'   labs(title = "Land Cover Changes in Altamira (PA)",
-#'        x = "Year", y = "Area (hectares)")
-#' }
+#' # download treated data on mining on indigenous lands
+#' data <- load_mapbiomas(
+#'   dataset = "mapbiomas_mining",
+#'   raw_data = FALSE,
+#'   geo_level = "indigenous_land",
+#'   language = "eng"
+#' )
 #'
 #' @export
 

@@ -11,55 +11,13 @@
 #'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
-#' ### Example 1: Basic Trade Flow Analysis
-#'
-#' Download and explore bilateral trade data for a single year:
-#'
-#' # Download treated HS92 trade data for 2016
-#' # Warning: This will take a long time to download!
+#' # download treated trade data for 2016 (HS92 classification)
 #' trade_2016 <- load_baci(
 #'   dataset = "HS92",
 #'   raw_data = FALSE,
 #'   time_period = 2016,
 #'   language = "eng"
 #' )
-#'
-#' # Explore the structure
-#' head(trade_2016)
-#' dim(trade_2016)
-#' names(trade_2016)
-#'
-#' ### Example 2: Time Series Analysis (Multiple Years)
-#'
-#' Analyze trade trends over time:
-#'
-#' # Download data for multiple years
-#' # Note: This is a VERY large download - plan accordingly!
-#' trade_series <- load_baci(
-#'   raw_data = FALSE,
-#'   time_period = 2010:2020,
-#'   language = "eng"
-#' )
-#'
-#' # Global trade volume trends
-#' global_trade <- trade_series %>%
-#'   group_by(year) %>%
-#'   summarize(
-#'     total_trade = sum(value, na.rm = TRUE),
-#'     num_country_pairs = n_distinct(paste(exporter, importer)),
-#'     .groups = 'drop'
-#'   )
-#'
-#' # Plot global trade trends
-#' library(ggplot2)
-#' ggplot(global_trade, aes(x = year, y = total_trade)) +
-#'   geom_line() +
-#'   labs(title = "Global Trade Volume Over Time",
-#'        x = "Year",
-#'        y = "Trade Value (USD)") +
-#'   theme_minimal()
-#'
-#' @export
 #'
 #' @export
 
