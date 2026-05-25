@@ -151,26 +151,12 @@ The returned data is a Simple Features (SF) spatial object with:
 
 ## Examples
 
-### Example 1: Load degradation data for a single year
-
 ```{r eval=FALSE}
-# download treated DEGRAD data for 2015
-degrad_data <- load_degrad(
+# download treated forest degradation data from 2010 to 2012
+data <- load_degrad(
   dataset = "degrad",
   raw_data = FALSE,
-  time_period = 2015,
-  language = "eng"
-)
-```
-
-### Example 2: Load degradation data for multiple years
-
-```{r eval=FALSE}
-# download treated DEGRAD data for 2010 to 2015
-degrad_series <- load_degrad(
-  dataset = "degrad",
-  raw_data = FALSE,
-  time_period = 2010:2015,
+  time_period = 2010:2012,
   language = "eng"
 )
 ```

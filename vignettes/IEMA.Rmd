@@ -86,42 +86,11 @@ Since this dataset captures a single year (2018), it represents a snapshot rathe
 
 ## Examples
 
-### Example 1: Basic data download
-
 ```{r eval=FALSE}
 # download treated IEMA energy access data
-amazon_energy <- load_iema(
+data <- load_iema(
   raw_data = FALSE,
   language = "eng"
 )
-
-head(amazon_energy)
-dim(amazon_energy)
 ```
-
-### Example 2: Identifying energy-poor municipalities
-
-```{r eval=FALSE}
-# download treated IEMA data and find municipalities with highest energy poverty
-amazon_energy <- load_iema(
-  raw_data = FALSE,
-  language = "eng"
-)
-
-worst_access <- amazon_energy[order(-amazon_energy$population_without_electricity), ]
-head(worst_access[, c("municipality", "state", "population_without_electricity")], 20)
-```
-
-## Use Cases
-
-- **Energy Access Policy**: Evaluate energy poverty levels and infrastructure gaps
-- **Development Programs**: Identify priority areas for electrification programs
-- **Indigenous Rights**: Understand energy access barriers in indigenous territories
-- **Infrastructure Planning**: Plan grid expansion or off-grid solutions
-- **Development Finance**: Support applications for energy access funding
-- **Environmental Impact**: Link energy access to deforestation and conservation
-- **Social Equity**: Analyze disparities in energy access across populations
-
----
-
 

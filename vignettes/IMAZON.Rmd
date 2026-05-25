@@ -107,50 +107,12 @@ language = "eng"  # character string
 
 ## Examples
 
-### Example 1: Load deforestation pressure data
-
 ```{r eval=FALSE}
 # download treated Imazon deforestation pressure data
-imazon_data <- load_imazon(
-  dataset = "imazon_shp",
+data <- load_imazon(
   raw_data = FALSE,
   language = "eng"
 )
-```
-
-### Example 2: High-pressure municipalities
-
-```{r eval=FALSE}
-# download treated data and filter for high and very high pressure municipalities
-imazon_data <- load_imazon(
-  dataset = "imazon_shp",
-  raw_data = FALSE,
-  language = "eng"
-)
-
-high_pressure <- imazon_data[imazon_data$deforestation_pressure >= 2, ]
-high_pressure <- high_pressure[order(-high_pressure$deforestation_pressure), ]
-head(high_pressure[, c("municipality", "state", "deforestation_pressure")])
-```
-
-### Example 3: State-level pressure distribution
-
-```{r eval=FALSE}
-# download treated data and summarise deforestation pressure by state
-imazon_data <- load_imazon(
-  dataset = "imazon_shp",
-  raw_data = FALSE,
-  language = "eng"
-)
-
-state_risk <- aggregate(
-  deforestation_pressure ~ state,
-  data = imazon_data,
-  FUN = mean,
-  na.rm = TRUE
-)
-state_risk <- state_risk[order(-state_risk$deforestation_pressure), ]
-print(state_risk)
 ```
 
 ## Data Notes

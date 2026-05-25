@@ -131,8 +131,6 @@ language = "eng"  # character string
 
 ## Examples
 
-### Example 1: Download DETER Amazon data
-
 ```{r eval=FALSE}
 # download treated DETER Amazon data
 deter_amz <- load_deter(
@@ -140,38 +138,12 @@ deter_amz <- load_deter(
   raw_data = FALSE,
   language = "eng"
 )
-```
 
-### Example 2: Download DETER Cerrado data
-
-```{r eval=FALSE}
 # download treated DETER Cerrado data
 deter_cerrado <- load_deter(
   dataset = "deter_cerrado",
   raw_data = FALSE,
   language = "eng"
-)
-```
-
-### Example 3: Load both biomes and combine
-
-```{r eval=FALSE}
-# load Amazon and Cerrado data and combine into a single data frame
-amazon_data <- load_deter(
-  dataset = "deter_amz",
-  raw_data = FALSE,
-  language = "eng"
-)
-
-cerrado_data <- load_deter(
-  dataset = "deter_cerrado",
-  raw_data = FALSE,
-  language = "eng"
-)
-
-combined <- dplyr::bind_rows(
-  dplyr::mutate(amazon_data, biome = "Amazon"),
-  dplyr::mutate(cerrado_data, biome = "Cerrado")
 )
 ```
 

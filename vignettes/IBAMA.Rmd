@@ -106,61 +106,20 @@ The function returns either:
 
 ## Examples
 
-### Example 1: Embargoed areas
-
 ```{r eval=FALSE}
-# download treated embargoed areas data
-amazon_embargoes <- load_ibama(
+# download treated embargoed areas data in english
+data <- load_ibama(
   dataset = "embargoed_areas",
   raw_data = FALSE,
   language = "eng"
 )
-```
 
-### Example 2: Collected fines for a specific state
-
-```{r eval=FALSE}
-# download treated collected fines data for Amazonas state
-state_fines <- load_ibama(
+# download treated collected fines data from Bahia
+data <- load_ibama(
   dataset = "collected_fines",
   raw_data = FALSE,
-  states = "AM",
+  states = "BA",
   language = "pt"
 )
 ```
-
-### Example 3: Distributed fines across multiple Amazon states
-
-```{r eval=FALSE}
-# download treated distributed fines data for multiple Amazon states
-regional_enforcement <- load_ibama(
-  dataset = "distributed_fines",
-  raw_data = FALSE,
-  states = c("AC", "AM", "AP", "MA", "MT", "RO", "RR", "TO", "PA"),
-  language = "eng"
-)
-```
-
-### Example 4: Raw individual infraction records
-
-```{r eval=FALSE}
-# download raw embargoed areas data
-raw_infractions <- load_ibama(
-  dataset = "embargoed_areas",
-  raw_data = TRUE,
-  language = "eng"
-)
-```
-
-## Use Cases
-
-- **Environmental Compliance**: Track enforcement patterns and violations by sector
-- **Deforestation Analysis**: Monitor embargoed areas and link to land use changes
-- **Policy Effectiveness**: Evaluate deterrent effect of fines and embargoes
-- **Regional Development**: Assess environmental regulation intensity across states
-- **Business Impact**: Understand regulatory environment by sector and state
-- **Law Enforcement**: Analyze IBAMA effectiveness and resource allocation
-
----
-
 

@@ -124,29 +124,13 @@ language = "eng"  # character string
 
 ## Examples
 
-### Example 1: Basic Trade Flow Analysis
-
-Download and explore bilateral trade data for a single year:
-
 ```{r eval=FALSE}
-# download treated HS92 trade data for 2016 (takes a long time to download)
+# download treated trade data for 2016 (HS92 classification)
+# Warning: large download, may take a long time
 trade_2016 <- load_baci(
   dataset = "HS92",
   raw_data = FALSE,
   time_period = 2016,
-  language = "eng"
-)
-```
-
-### Example 2: Multiple Years
-
-Download data for a range of years:
-
-```{r eval=FALSE}
-# Note: This is a VERY large download - plan accordingly!
-trade_series <- load_baci(
-  raw_data = FALSE,
-  time_period = 2010:2020,
   language = "eng"
 )
 ```

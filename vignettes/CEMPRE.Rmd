@@ -82,43 +82,22 @@ Data can be retrieved with sector disaggregation or aggregate form:
 
 ## Examples
 
-### Example 1: National-level data
-
 ```{r eval=FALSE}
-# download treated CEMPRE data at the country level for 2015 to 2022
+# download raw data at the country level from 2008 to 2010
 data <- load_cempre(
-  raw_data = FALSE,
+  raw_data = TRUE,
   geo_level = "country",
-  time_period = 2015:2022,
+  time_period = 2008:2010,
   language = "eng"
 )
-```
 
-### Example 2: State-level data with sector disaggregation
-
-```{r eval=FALSE}
-# download treated CEMPRE data by state and sector for 2010
+# download treated state-level data split by sector in portuguese
 data <- load_cempre(
   raw_data = FALSE,
   geo_level = "state",
-  time_period = 2010,
-  language = "eng",
+  time_period = 2008:2010,
+  language = "pt",
   sectors = TRUE
 )
 ```
-
-## Use Cases
-
-- **Economic Impact Analysis**: Measure employment creation and firm growth by sector and region
-- **Industrial Policy Evaluation**: Assess effectiveness of development programs using firm-level data
-- **Labor Market Studies**: Analyze wage trends and employment dynamics across sectors
-- **Regional Development**: Compare economic structures across municipalities
-- **Business Environment**: Monitor formal business registration and formalization trends
-
-```
-```
-
----
-
-
 

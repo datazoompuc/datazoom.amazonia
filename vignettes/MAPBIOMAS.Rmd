@@ -151,71 +151,25 @@ Areas affected by wildfires:
 
 ## Examples
 
-### Example 1: Deforestation and regeneration by municipality
-
 ```{r eval=FALSE}
-# download treated deforestation and regeneration data at the municipality level
-deforestation <- load_mapbiomas(
-  dataset = "mapbiomas_deforestation_regeneration",
-  raw_data = FALSE,
-  geo_level = "municipality",
-  language = "eng"
-)
-```
-
-### Example 2: Land cover by municipality
-
-```{r eval=FALSE}
-# download treated land cover data at the municipality level
-land_cover <- load_mapbiomas(
+# download treated MapBiomas land cover data by municipality
+data <- load_mapbiomas(
   dataset = "mapbiomas_cover",
   raw_data = FALSE,
   geo_level = "municipality",
   language = "eng"
 )
-```
 
-### Example 3: Land cover transitions by municipality
-
-```{r eval=FALSE}
-# download treated land cover transitions at the municipality level
-transitions <- load_mapbiomas(
-  dataset = "mapbiomas_transition",
-  raw_data = FALSE,
-  geo_level = "municipality",
-  language = "eng"
-)
-```
-
-### Example 4: Land cover transitions at the biome level (faster download)
-
-```{r eval=FALSE}
-# download treated land cover transitions at the biome level
-biome_transitions <- load_mapbiomas(
-  dataset = "mapbiomas_transition",
-  raw_data = FALSE,
-  geo_level = "biome",
-  language = "pt"
-)
-```
-
-### Example 5: Mining impact on indigenous lands
-
-```{r eval=FALSE}
-# download treated mining data by indigenous land
-mining_indigenous <- load_mapbiomas(
+# download treated data on mining on indigenous lands
+data <- load_mapbiomas(
   dataset = "mapbiomas_mining",
   raw_data = FALSE,
   geo_level = "indigenous_land",
   language = "eng"
 )
-```
 
-### Example 6: Fire monitoring by state
-
-```{r eval=FALSE}
-# download treated fire data by state
-fire_data <- load_mapbiomas(
+# download treated wildfire burn scar data by state
+data <- load_mapbiomas(
   dataset = "mapbiomas_fire",
   raw_data = FALSE,
   geo_level = "state",
@@ -223,15 +177,3 @@ fire_data <- load_mapbiomas(
 )
 ```
 
-## Use Cases
-
-- **Deforestation Monitoring**: Track Amazon forest loss and environmental policies effectiveness
-- **Agricultural Planning**: Monitor crop expansion and land use intensity
-- **Environmental Compliance**: Verify land use against environmental regulations
-- **Conservation Assessment**: Evaluate protected area effectiveness and forest regeneration
-- **Climate Impact**: Estimate carbon implications of land use changes
-- **Restoration Planning**: Identify areas suitable for reforestation or regeneration
-- **Mining Impact**: Assess environmental damage from mining operations
-- **Fire Management**: Monitor fire patterns and ecosystem vulnerability
-
----
