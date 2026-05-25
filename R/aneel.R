@@ -22,7 +22,6 @@
 #'   year = 2021,
 #'   raw_data = TRUE
 #' )
-#' }
 #'
 #' @export
 
@@ -134,6 +133,15 @@ if (param$dataset == "energy_development_budget") {
       dplyr::mutate(
         dplyr::across(dplyr::starts_with("mda"), ~ gsub("[,]", ".", .x) %>% as.numeric()),
         dplyr::across(dplyr::starts_with("num_coord"), ~ gsub("[,]", ".", .x) %>% as.numeric())
+      ) %>%
+      dplyr::mutate(
+        sig_modalidade_empreendimento = dplyr::case_when(
+          dsc_modalidade_habilitado == "Geracao na propria UC" ~ "Microgera\u00e7\u00e3o ou Minigera\u00e7\u00e3o distribu\u00edda",
+          dsc_modalidade_habilitado == "Auto consumo remoto"   ~ "Autoconsumo remoto",
+          dsc_modalidade_habilitado == "Compartilhada"         ~ "Gera\u00e7\u00e3o compartilhada",
+          dsc_modalidade_habilitado == "Condom\u00ednio"      ~ "Condom\u00ednio",
+          TRUE                                                 ~ "Indefinido"
+        )
       )
   } else {
     dat <- dat %>%
@@ -181,7 +189,7 @@ if (param$dataset == "energy_development_budget") {
           names(var_labels) <- var_codes
 
           df <- df %>%
-            dplyr::mutate(dplyr::across(var, dplyr::recode, !!!var_labels))
+            dplyr::mutate(dplyr::across(dplyr::all_of(var), \(x) dplyr::recode(x, !!!var_labels)))
         }
 
         return(df)
@@ -192,11 +200,7 @@ if (param$dataset == "energy_development_budget") {
 
   dat <- dat %>%
     dplyr::mutate(
-      dplyr::across(
-        operation_start,
-        as.Date,
-        format = "%d/%m/%Y", origin = "1970-01-01"
-      )
+      dplyr::across(operation_start, \(x) as.Date(x, format = "%d/%m/%Y", origin = "1970-01-01"))
     )
 
   ################################
@@ -261,7 +265,7 @@ if (param$dataset == "energy_development_budget") {
         "cod_cep" = "zip_code",
         "sig_tipo_consumidor" = "consumer_type",
         "num_cpfcnpj" = "cpf_cnpj_number",
-        "nome_titular_empreendimento" = "business_owner_name",
+        "nom_titular_empreendimento" = "business_owner_name",
         "cod_empreendimento" = "business_code",
         "dth_atualiza_cadastral_empreend" = "update_date",
         "sig_modalidade_empreendimento" = "business_type",
