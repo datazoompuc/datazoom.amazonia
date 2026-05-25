@@ -7,7 +7,11 @@ on:
       - '!master'
     paths:
       - '**.Rmd'
-  workflow_dispatch: # Allows manual triggering from the GitHub Actions tab
+  workflow_dispatch:
+
+env:
+  # Resolves the Node.js 20 deprecation warning by forcing Node 24
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   render:
@@ -17,6 +21,12 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+
+      # Install system dependencies required by the 'sf' package on Linux
+      - name: Install Spatial System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgdal-dev libgeos-dev libproj-dev libudunits2-dev
 
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
@@ -28,7 +38,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          Rscript -e 'install.packages(c("rmarkdown", "knitr", "devtools", "remotes"))'
+          Rscript -e 'install.packages(c("rmarkdown", "knitr", "devtools", "remotes", "sf"))'
           Rscript -e 'remotes::install_deps(dependencies = TRUE)'
           Rscript -e 'devtools::install_local(".", dependencies = TRUE, upgrade = "never")'
 
