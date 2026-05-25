@@ -9,84 +9,38 @@
 #' @return A \code{tibble}.
 #'
 #' @examplesIf interactive()
-#' ### DO NOT RUN ###
-#' ### Example 1: High-Pressure Municipalities
-#'
-#' Identify municipalities facing highest deforestation pressure:
-#'
-#' library(dplyr)
-#'
-#' # Load Imazon pressure data
-#' imazon_data <- load_imazon(
+#' # download complete IPS data for the most recent year
+#' ips_data <- load_ips(
+#'   dataset = "all",
 #'   raw_data = FALSE,
+#'   time_period = 2023,
 #'   language = "eng"
 #' )
 #'
-#' # High and very high pressure municipalities
-#' high_pressure <- imazon_data %>%
-#'   as.data.frame() %>%
-#'   filter(pressure_category >= 2) %>%
-#'   select(municipality, state, pressure_category) %>%
-#'   arrange(desc(pressure_category), municipality)
-#'
-#' print(high_pressure)
-#'
-#' # Count by pressure level
-#' pressure_summary <- imazon_data %>%
-#'   as.data.frame() %>%
-#'   group_by(pressure_category) %>%
-#'   summarize(
-#'     num_municipalities = n(),
-#'     percentage = (n() / nrow(imazon_data)) * 100,
-#'     .groups = 'drop'
-#'   ) %>%
-#'   arrange(desc(pressure_category))
-#'
-#' print(pressure_summary)
-#'
-#' ### Example 2: State-Level Pressure Distribution
-#'
-#' Analyze deforestation pressure across states:
-#'
-#' library(dplyr)
-#'
-#' imazon_data <- load_imazon(
+#' # download education indicators for multiple years
+#' education_data <- load_ips(
+#'   dataset = "educ",
 #'   raw_data = FALSE,
+#'   time_period = c(2018, 2021, 2023),
 #'   language = "eng"
 #' )
 #'
-#' # State-level pressure distribution
-#' state_pressure <- imazon_data %>%
-#'   as.data.frame() %>%
-#'   group_by(state, pressure_category) %>%
-#'   summarize(num_municipalities = n(), .groups = 'drop') %>%
-#'   pivot_wider(
-#'     names_from = pressure_category,
-#'     values_from = num_municipalities,
-#'     values_fill = 0,
-#'     names_prefix = "category_"
-#'   )
+#' # download deforestation indicators for all available years
+#' deforest_data <- load_ips(
+#'   dataset = "deforest",
+#'   raw_data = FALSE,
+#'   time_period = c(2014, 2018, 2021, 2023),
+#'   language = "eng"
+#' )
 #'
-#' # Overall state risk score
-#' state_risk <- imazon_data %>%
-#'   as.data.frame() %>%
-#'   group_by(state) %>%
-#'   summarize(
-#'     total_municipalities = n(),
-#'     avg_pressure = mean(pressure_category, na.rm = TRUE),
-#'     high_risk_count = sum(pressure_category >= 2, na.rm = TRUE),
-#'     pct_high_risk = (high_risk_count / total_municipalities) * 100,
-#'     .groups = 'drop'
-#'   ) %>%
-#'   arrange(desc(pct_high_risk))
+#' # download violence indicators in Portuguese
+#' violence_data <- load_ips(
+#'   dataset = "violence",
+#'   raw_data = FALSE,
+#'   time_period = 2023,
+#'   language = "pt"
+#' )
 #'
-#' print(state_risk)
-#'
-#' @export
-
-
-
-
 #' @export
 
 load_ips <- function(dataset = "all", raw_data = FALSE,

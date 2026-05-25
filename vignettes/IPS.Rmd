@@ -155,71 +155,53 @@ language = "eng"  # character string
 ---
 ## Examples
 
-### Example 1: Overall Social Progress Assessment
-
-Get a comprehensive view of development progress:
+### Example 1: Overall social progress for the most recent year
 
 ```{r eval=FALSE}
-library(dplyr)
-
-# Load complete IPS data for most recent year
-ips_complete <- load_ips(
+# download complete IPS data for 2023
+ips_data <- load_ips(
   dataset = "all",
   raw_data = FALSE,
   time_period = 2023,
   language = "eng"
 )
-
-# Top municipalities by overall progress
-top_performers <- ips_complete %>%
-  arrange(desc(overall_index)) %>%
-  select(municipality, state, overall_index) %>%
-  head(20)
-
-print(top_performers)
-
-# Summary statistics
-summary(ips_complete$overall_index)
 ```
 
-### Example 2: Education Access and Quality
-
-Analyze educational indicators across the Amazon:
+### Example 2: Education indicators across multiple years
 
 ```{r eval=FALSE}
-library(dplyr)
-
-# Load education dimension
+# download education indicators for 2018, 2021 and 2023
 education_data <- load_ips(
   dataset = "educ",
   raw_data = FALSE,
-  time_period = 2023,
+  time_period = c(2018, 2021, 2023),
   language = "eng"
 )
-
-# States with highest education index
-state_education <- education_data %>%
-  group_by(state) %>%
-  summarize(
-    avg_education_index = mean(education_index, na.rm = TRUE),
-    num_municipalities = n(),
-    min_index = min(education_index, na.rm = TRUE),
-    max_index = max(education_index, na.rm = TRUE),
-    .groups = 'drop'
-  ) %>%
-  arrange(desc(avg_education_index))
-
-print(state_education)
-
-# Municipalities with lowest education access (priority areas)
-priority_education <- education_data %>%
-  arrange(education_index) %>%
-  select(municipality, state, education_index) %>%
-  head(30)
-
-print(priority_education)
 ```
----
+
+### Example 3: Deforestation indicators for all available years
+
+```{r eval=FALSE}
+# download deforestation indicators for all available years
+deforest_data <- load_ips(
+  dataset = "deforest",
+  raw_data = FALSE,
+  time_period = c(2014, 2018, 2021, 2023),
+  language = "eng"
+)
+```
+
+### Example 4: Violence indicators in Portuguese
+
+```{r eval=FALSE}
+# download violence indicators for 2023 in Portuguese
+violence_data <- load_ips(
+  dataset = "violence",
+  raw_data = FALSE,
+  time_period = 2023,
+  language = "pt"
+)
+```
 
 ## Data Notes
 
