@@ -1,0 +1,48 @@
+name: Render README
+
+on:
+  push:
+    branches:
+      - '**'
+      - '!master'
+    paths:
+      - '**.Rmd'
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - name: Install Pandoc
+        uses: r-lib/actions/setup-pandoc@v2
+
+      - name: Install Dependencies
+        run: |
+          Rscript -e 'install.packages(c("rmarkdown", "knitr", "devtools", "remotes"))'
+          Rscript -e 'remotes::install_deps(dependencies = TRUE)'
+          Rscript -e 'devtools::install_local(".", dependencies = TRUE, upgrade = "never")'
+
+      - name: Render README.Rmd
+        run: |
+          Rscript -e 'rmarkdown::render("README.Rmd", output_format = "github_document")'
+
+      - name: Commit and Push changes
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          if ! git diff --cached --quiet; then
+            git commit -m "Auto-render README.Rmd [skip ci]"
+            git push
+          else
+            echo "No changes to README.md to commit."
+          fi
