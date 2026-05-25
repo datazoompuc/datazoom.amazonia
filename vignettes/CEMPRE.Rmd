@@ -82,43 +82,30 @@ Data can be retrieved with sector disaggregation or aggregate form:
 
 ## Examples
 
-### Example 1: National Employment Trends
+### Example 1: National-level data
 
 ```{r eval=FALSE}
-library(datazoom.amazonia)
-
-# Download treated national-level data for recent years
-national_firms <- load_cempre(
+# download treated CEMPRE data at the country level for 2015 to 2022
+data <- load_cempre(
   raw_data = FALSE,
   geo_level = "country",
   time_period = 2015:2022,
   language = "eng"
 )
-
-# View structure
-head(national_firms)
 ```
 
-### Example 2: State-Level Analysis
+### Example 2: State-level data with sector disaggregation
 
 ```{r eval=FALSE}
-# Download state-level employment data
-state_data <- load_cempre(
+# download treated CEMPRE data by state and sector for 2010
+data <- load_cempre(
   raw_data = FALSE,
   geo_level = "state",
-  time_period = 2010:2022,
-  language = "pt"
+  time_period = 2010,
+  language = "eng",
+  sectors = TRUE
 )
-
-# Calculate average employment by state
-state_summary <- state_data %>%
-  group_by(state) %>%
-  summarise(
-    avg_employees = mean(employment, na.rm = TRUE),
-    total_establishments = sum(establishments, na.rm = TRUE)
-  )
 ```
----
 
 ## Use Cases
 
