@@ -10,144 +10,56 @@
 #'
 #'
 #' @examplesIf interactive()
-#' ### DO NOT RUN ###
-#' @examples
-#' # Example 1: Total National Emissions by Sector
-#' \dontrun{
-#' library(dplyr)
-#' library(ggplot2)
-#' all_emissions <- load_seeg(dataset = "seeg", raw_data = TRUE,
-#'   geo_level = "country", language = "eng")
-#' sector_breakdown <- all_emissions %>%
-#'   group_by(sector) %>%
-#'   summarize(total_emissions = sum(emissions_co2e, na.rm = TRUE),
-#'             pct_of_total = (total_emissions / sum(all_emissions$emissions_co2e, na.rm = TRUE)) * 100,
-#'             .groups = 'drop') %>%
-#'   arrange(desc(total_emissions))
-#' print("Brazil's emissions by sector:")
-#' print(sector_breakdown)
-#' ggplot(sector_breakdown, aes(x = reorder(sector, total_emissions), y = total_emissions)) +
-#'   geom_col(fill = "darkred") +
-#'   coord_flip() +
-#'   labs(title = "Brazil's Greenhouse Gas Emissions by Sector",
-#'        x = "Sector", y = "Emissions (CO2e)") +
-#'   theme_minimal()
-#' }
+#' # download raw SEEG data (all sectors) at the country level
+#' all_emissions <- load_seeg(
+#'   dataset = "seeg",
+#'   raw_data = TRUE,
+#'   geo_level = "country",
+#'   language = "eng"
+#' )
 #'
-#' # Example 2: Agricultural Emissions Analysis
-#' \dontrun{
-#' library(dplyr)
-#' farming <- load_seeg(dataset = "seeg_farming", raw_data = FALSE,
-#'   geo_level = "state", language = "eng")
-#' top_farm_states <- farming %>%
-#'   group_by(state) %>%
-#'   summarize(total_ag_emissions = sum(emissions_co2e, na.rm = TRUE),
-#'             num_sources = n_distinct(source), .groups = 'drop') %>%
-#'   arrange(desc(total_ag_emissions)) %>%
-#'   head(15)
-#' print("Top agricultural emission states:")
-#' print(top_farm_states)
-#' ag_sources <- farming %>%
-#'   group_by(source) %>%
-#'   summarize(emissions = sum(emissions_co2e, na.rm = TRUE), .groups = 'drop') %>%
-#'   arrange(desc(emissions))
-#' print("Agricultural emission sources:")
-#' print(ag_sources)
-#' }
+#' # download treated agricultural emissions at the state level
+#' farming <- load_seeg(
+#'   dataset = "seeg_farming",
+#'   raw_data = FALSE,
+#'   geo_level = "state",
+#'   language = "eng"
+#' )
 #'
-#' # Example 3: Land Use Change Emissions
-#' \dontrun{
-#' library(dplyr)
-#' land_use <- load_seeg(dataset = "seeg_land", raw_data = FALSE,
-#'   geo_level = "state", language = "eng")
-#' state_net_emissions <- land_use %>%
-#'   group_by(state) %>%
-#'   summarize(net_emissions = sum(emissions_co2e, na.rm = TRUE), .groups = 'drop') %>%
-#'   arrange(desc(net_emissions))
-#' print("Land use change emissions by state (positive = emissions from deforestation):")
-#' print(state_net_emissions)
-#' high_emission_states <- state_net_emissions %>%
-#'   filter(net_emissions > 0) %>%
-#'   top_n(10, net_emissions)
-#' print("States with highest deforestation emissions:")
-#' print(high_emission_states)
-#' }
+#' # download treated land use change emissions at the state level
+#' land_use <- load_seeg(
+#'   dataset = "seeg_land",
+#'   raw_data = FALSE,
+#'   geo_level = "state",
+#'   language = "eng"
+#' )
 #'
-#' # Example 4: Emissions Trends Over Time
-#' \dontrun{
-#' library(dplyr)
-#' library(ggplot2)
-#' all_sectors <- load_seeg(dataset = "seeg", raw_data = TRUE,
-#'   geo_level = "country", language = "eng")
-#' annual_emissions <- all_sectors %>%
-#'   group_by(year) %>%
-#'   summarize(total_emissions = sum(emissions_co2e, na.rm = TRUE), .groups = 'drop') %>%
-#'   arrange(year)
-#' print(annual_emissions)
-#' ggplot(annual_emissions, aes(x = year, y = total_emissions)) +
-#'   geom_line(linewidth = 1, color = "darkred") +
-#'   geom_point(size = 2) +
-#'   labs(title = "Brazil's Total Greenhouse Gas Emissions (2000-2018)",
-#'        x = "Year", y = "Total Emissions (CO2e)") +
-#'   theme_minimal()
-#' first_year <- annual_emissions$total_emissions[1]
-#' last_year <- annual_emissions$total_emissions[nrow(annual_emissions)]
-#' change_pct <- ((last_year - first_year) / first_year) * 100
-#' print(paste("Total change 2000-2018:", round(change_pct, 1), "%"))
-#' }
+#' # download treated energy emissions at the municipality level
+#' energy <- load_seeg(
+#'   dataset = "seeg_energy",
+#'   raw_data = FALSE,
+#'   geo_level = "municipality",
+#'   language = "eng"
+#' )
 #'
-#' # Example 5: Municipal Emission Hotspots
-#' \dontrun{
-#' library(dplyr)
-#' all_sectors_munic <- load_seeg(dataset = "seeg", raw_data = TRUE,
-#'   geo_level = "municipality", language = "eng")
-#' top_municipalities <- all_sectors_munic %>%
-#'   group_by(municipality, state) %>%
-#'   summarize(total_emissions = sum(emissions_co2e, na.rm = TRUE), .groups = 'drop') %>%
-#'   arrange(desc(total_emissions)) %>%
-#'   head(30)
-#' print("Highest-emitting municipalities in Brazil:")
-#' print(top_municipalities)
-#' total_emissions <- sum(all_sectors_munic$emissions_co2e, na.rm = TRUE)
-#' top100 <- top_municipalities %>%
-#'   head(100) %>%
-#'   summarize(top100_total = sum(total_emissions))
-#' top100_pct <- (top100$top100_total / total_emissions) * 100
-#' print(paste("Top 100 municipalities account for", round(top100_pct, 1), "% of emissions"))
-#' }
+#' # download treated industrial process emissions at the state level
+#' industry <- load_seeg(
+#'   dataset = "seeg_industry",
+#'   raw_data = FALSE,
+#'   geo_level = "state",
+#'   language = "eng"
+#' )
 #'
-#' # Example 6: Sector Comparison by State
-#' \dontrun{
-#' library(dplyr)
-#' library(tidyr)
-#' farming <- load_seeg(dataset = "seeg_farming", raw_data = FALSE,
-#'   geo_level = "state", language = "eng") %>%
-#'   mutate(sector = "Agriculture") %>%
-#'   group_by(state, sector) %>%
-#'   summarize(emissions = sum(emissions_co2e, na.rm = TRUE), .groups = 'drop')
-#' energy <- load_seeg(dataset = "seeg_energy", raw_data = FALSE,
-#'   geo_level = "state", language = "eng") %>%
-#'   mutate(sector = "Energy") %>%
-#'   group_by(state, sector) %>%
-#'   summarize(emissions = sum(emissions_co2e, na.rm = TRUE), .groups = 'drop')
-#' land_use <- load_seeg(dataset = "seeg_land", raw_data = FALSE,
-#'   geo_level = "state", language = "eng") %>%
-#'   mutate(sector = "Land Use") %>%
-#'   group_by(state, sector) %>%
-#'   summarize(emissions = sum(emissions_co2e, na.rm = TRUE), .groups = 'drop')
-#' combined <- bind_rows(farming, energy, land_use)
-#' state_profile <- combined %>%
-#'   pivot_wider(names_from = sector, values_from = emissions, values_fill = 0) %>%
-#'   mutate(total = Agriculture + Energy + `Land Use`,
-#'          ag_share = (Agriculture / total) * 100,
-#'          energy_share = (Energy / total) * 100,
-#'          land_share = (`Land Use` / total) * 100)
-#' print(state_profile)
-#' }
-#'
+#' # download treated waste emissions at the state level
+#' residuals <- load_seeg(
+#'   dataset = "seeg_residuals",
+#'   raw_data = FALSE,
+#'   geo_level = "state",
+#'   language = "eng"
+#' )
 #'
 #' @export
-#'
+
 load_seeg <- function(dataset, raw_data = FALSE,
                       geo_level, language = "eng") {
   # Checking for googledrive package (in Suggests)
