@@ -8,24 +8,18 @@
 #' @return A \code{tibble}.
 #'
 #' @examplesIf interactive()
-#' ### DO NOT RUN ###
-#' @examples
-#' # Example 1: Basic Data Download
-#' \dontrun{
-#' library(datazoom.amazonia)
-#' amazon_energy <- load_iema(raw_data = FALSE, language = "eng")
-#' head(amazon_energy)
-#' dim(amazon_energy)
-#' }
+#' # download treated IEMA energy access data in English
+#' amazon_energy <- load_iema(
+#'   raw_data = FALSE,
+#'   language = "eng"
+#' )
 #'
-#' # Example 2: Identifying Energy-Poor Municipalities
-#' \dontrun{
-#' amazon_energy <- load_iema(raw_data = FALSE)
-#' worst_access <- amazon_energy %>%
-#'   arrange(desc(population_without_energy)) %>%
-#'   head(20)
-#' print(worst_access[, c("municipality", "state", "population_without_energy")])
-#' }
+#' # download raw IEMA data in Portuguese
+#' amazon_energy_raw <- load_iema(
+#'   raw_data = TRUE,
+#'   language = "pt"
+#' )
+#'
 #' @export
 
 load_iema <- function(dataset = "iema", raw_data = FALSE, language = "eng") {

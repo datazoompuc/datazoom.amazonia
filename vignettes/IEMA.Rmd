@@ -84,40 +84,33 @@ Since this dataset captures a single year (2018), it represents a snapshot rathe
 ---
 
 
-## Practical Examples
+## Examples
 
-### Example 1: Basic Data Download
+### Example 1: Basic data download
 
 ```{r eval=FALSE}
-library(datazoom.amazonia)
-
-# Download treated energy access data
+# download treated IEMA energy access data
 amazon_energy <- load_iema(
   raw_data = FALSE,
   language = "eng"
 )
 
-# View data structure
 head(amazon_energy)
 dim(amazon_energy)
 ```
 
-### Example 2: Identifying Energy-Poor Municipalities
+### Example 2: Identifying energy-poor municipalities
 
 ```{r eval=FALSE}
-# Load IEMA data
-amazon_energy <- load_iema(raw_data = FALSE)
+# download treated IEMA data and find municipalities with highest energy poverty
+amazon_energy <- load_iema(
+  raw_data = FALSE,
+  language = "eng"
+)
 
-# Identify municipalities with highest energy poverty
-worst_access <- amazon_energy %>%
-  arrange(desc(population_without_energy)) %>%
-  head(20)
-
-# Display municipalities
-print(worst_access[, c("municipality", "state", "population_without_energy")])
+worst_access <- amazon_energy[order(-amazon_energy$population_without_electricity), ]
+head(worst_access[, c("municipality", "state", "population_without_electricity")], 20)
 ```
-
----
 
 ## Use Cases
 
