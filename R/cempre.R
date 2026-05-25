@@ -11,24 +11,42 @@
 #'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
-#' # Download raw data (raw_data = TRUE) at the country level
-#' # from 2008 to 2010 (time_period = 2008:2010).
-#' data <- load_cempre(
-#'   raw_data = TRUE,
+#'#' @examplesIf interactive()
+#' ### Example 1: National Employment Trends
+#'
+#' library(datazoom.amazonia)
+#'
+#' # Download treated national-level data for recent years
+#' national_firms <- load_cempre(
+#'   raw_data = FALSE,
 #'   geo_level = "country",
-#'   time_period = 2008:2010
+#'   time_period = 2015:2022,
+#'   language = "eng"
 #' )
 #'
-#' # Download treted data (raw_data = FALSE) by state (geo_level = "state")
-#' # from 2008 to 2010 (time_period = 2008:2010) in portuguese (language = "pt").
-#' # In this example, data is split by sector (sectors = TRUE)
-#' data <- load_cempre(
+#' # View structure
+#' head(national_firms)
+#'
+#' ### Example 2: State-Level Analysis
+#'
+#' # Download state-level employment data
+#' state_data <- load_cempre(
 #'   raw_data = FALSE,
 #'   geo_level = "state",
-#'   time_period = 2008:2010,
-#'   language = "pt",
-#'   sectors = TRUE
+#'   time_period = 2010:2022,
+#'   language = "pt"
 #' )
+#'
+#' # Calculate average employment by state
+#' state_summary <- state_data %>%
+#'   group_by(state) %>%
+#'   summarise(
+#'     avg_employees = mean(employment, na.rm = TRUE),
+#'     total_establishments = sum(establishments, na.rm = TRUE)
+#'   )
+#'
+#' @export
+
 #'
 #' @export
 

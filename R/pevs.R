@@ -9,26 +9,119 @@
 #' @return A \code{tibble} consisting of geographic units that present positive values for any of the variables in the dataset.
 #'
 #' @examplesIf interactive()
-#' ### DO NOT RUN ###
-#' # Download treated (raw_data = FALSE) silviculture data (dataset = 'pevs_silviculture')
-#' # by state (geo_level = 'state') from 2012 (time_period =  2012)
-#' # in portuguese (language = "pt")
-#' data <- load_pevs(
-#'   dataset = "pevs_silviculture",
+#' ### Example 1: Forest Crop Production by State
+#'
+#' Analyze timber and forest product production across states:
+#'
+#' library(dplyr)
+#'
+#' # Download forest crops data at state level
+#' forest_crops <- load_pevs(
+#'   dataset = "pevs_forest_crops",
 #'   raw_data = FALSE,
 #'   geo_level = "state",
-#'   time_period = 2012,
-#'   language = "pt"
+#'   time_period = 2019,
+#'   language = "eng"
 #' )
 #'
-#' # Download raw (raw_data = TRUE) forest crops data by region from 2012 to 2013 in english
-#' data <- load_pevs(
-#'   dataset = "pevs_forest_crops",
-#'   raw_data = TRUE,
+#' # Top states by forest product production value
+#' top_producers <- forest_crops %>%
+#'   group_by(state) %>%
+#'   summarize(
+#'     total_production_value = sum(production_value, na.rm = TRUE),
+#'     total_quantity = sum(quantity_produced, na.rm = TRUE),
+#'     num_products = n_distinct(product_type),
+#'     .groups = 'drop'
+#'   ) %>%
+#'   arrange(desc(total_production_value)) %>%
+#'   head(15)
+#'
+#' print(top_producers)
+#'
+#' ### Example 2: Silviculture Area Expansion
+#'
+#' Track the growth of forest plantations over time:
+#'
+#' library(dplyr)
+#' library(ggplot2)
+#'
+#' # Load silviculture area data for multiple years
+#' silvi_area <- load_pevs(
+#'   dataset = "pevs_silviculture_area",
+#'   raw_data = FALSE,
+#'   geo_level = "state",
+#'   time_period = 2013:2019,
+#'   language = "eng"
+#' )
+#'
+#' # National silviculture area trends
+#' national_area <- silvi_area %>%
+#'   group_by(year) %>%
+#'   summarize(
+#'     total_area = sum(area_hectares, na.rm = TRUE),
+#'     num_states = n_distinct(state),
+#'     .groups = 'drop'
+#'   )
+#'
+#' # Visualize expansion
+#' ggplot(national_area, aes(x = year, y = total_area)) +
+#'   geom_line(size = 1) +
+#'   geom_point(size = 3) +
+#'   labs(title = "Total Silviculture Area in Brazil (2013-2019)",
+#'        x = "Year",
+#'        y = "Area (hectares)") +
+#'   theme_minimal()
+#'
+#' # States with largest plantations in 2019
+#' largest_states <- silvi_area %>%
+#'   filter(year == 2019) %>%
+#'   group_by(state) %>%
+#'   summarize(total_area = sum(area_hectares, na.rm = TRUE)) %>%
+#'   arrange(desc(total_area)) %>%
+#'   head(10)
+#'
+#' ### Example 3: Regional Silviculture Production
+#'
+#' Compare silviculture production across regions:
+#'
+#' library(dplyr)
+#'
+#' # Regional silviculture data
+#' silvi_prod <- load_pevs(
+#'   dataset = "pevs_silviculture",
+#'   raw_data = FALSE,
 #'   geo_level = "region",
-#'   time_period = 2012:2013
+#'   time_period = 2019,
+#'   language = "eng"
 #' )
 #'
+#' # Production by region
+#' regional_production <- silvi_prod %>%
+#'   group_by(region) %>%
+#'   summarize(
+#'     total_production_value = sum(production_value, na.rm = TRUE),
+#'     total_quantity = sum(quantity_produced, na.rm = TRUE),
+#'     num_products = n_distinct(product_type),
+#'     .groups = 'drop'
+#'   ) %>%
+#'   arrange(desc(total_production_value))
+#'
+#' print(regional_production)
+#'
+#' # Product specialization by region
+#' region_products <- silvi_prod %>%
+#'   group_by(region, product_type) %>%
+#'   summarize(
+#'     value = sum(production_value, na.rm = TRUE),
+#'     .groups = 'drop'
+#'   ) %>%
+#'   pivot_wider(
+#'     names_from = product_type,
+#'     values_from = value,
+#'     values_fill = 0
+#'   )
+#'
+#' @export
 #' @export
 
 load_pevs <- function(dataset, raw_data = FALSE,

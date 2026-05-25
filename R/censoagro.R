@@ -11,24 +11,106 @@
 #'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
-#' # Download total land area data at the country level in year 2006
-#' data <- load_censoagro(
+#'
+## Examples
+#' ### Example 1: Basic Land Area Analysis
+#'
+#' Download total agricultural land area data at the country level for recent years:
+#'
+#' # Download treated land area data for Brazil (country level) in 2017
+#' land_data <- load_censoagro(
 #'   dataset = "agricultural_land_area",
-#'   raw_data = TRUE,
+#'   raw_data = FALSE,
 #'   geo_level = "country",
-#'   time_period = 2006
+#'   time_period = 2017,
+#'   language = "eng"
 #' )
 #'
-#' # Download temporary production crops data by state (geo_level = "state") in year 2006
-#' # in portuguese (language = "pt")
-#' data <- load_censoagro(
+#' head(land_data)
+#' summary(land_data)
+#'
+#' ### Example 2: Temporary Crops Analysis by State
+#'
+#' Analyze temporary crop production trends across Brazilian states:
+#'
+#' # Download treated temporary crop data by state for multiple years
+#' temp_crops <- load_censoagro(
 #'   dataset = "vegetable_production_temporary",
 #'   raw_data = FALSE,
 #'   geo_level = "state",
-#'   time_period = 1995,
+#'   time_period = c(1995, 2006, 2017),
+#'   language = "eng"
+#' )
+#'
+#' # Explore the data
+#' head(temp_crops)
+#' unique(temp_crops$state)
+#'
+#' # Simple visualization of soybean production over time
+#' library(dplyr)
+#' soybeans <- temp_crops %>%
+#'   filter(product == "Soybeans") %>%
+#'   group_by(year) %>%
+#'   summarize(total_production = sum(quantity, na.rm = TRUE))
+#'
+#' ### Example 3: Cattle Production by Municipality
+#'
+#' Get detailed municipality-level cattle data (only available for livestock_production):
+#'
+#' # Download municipality-level cattle data
+#' cattle_data <- load_censoagro(
+#'   dataset = "livestock_production",
+#'   raw_data = FALSE,
+#'   geo_level = "municipality",
+#'   time_period = 2017,
+#'   language = "eng"
+#' )
+#'
+#' # Identify top cattle-producing municipalities
+#' top_cattle <- cattle_data %>%
+#'   arrange(desc(cattle_count)) %>%
+#'   head(20)
+#'
+#' ### Example 4: Land Use Transitions Over Time
+#'
+#' Track changes in land use patterns across decades:
+#'
+#' # Download land use data for multiple years
+#' land_use <- load_censoagro(
+#'   dataset = "agricultural_area_use",
+#'   raw_data = FALSE,
+#'   geo_level = "state",
+#'   time_period = c(1980, 1995, 2006, 2017),
 #'   language = "pt"
 #' )
 #'
+#' # Compare pastureland across states
+#' pasture_data <- land_use %>%
+#'   filter(use_category == "Pastos plantados" | use_category == "Pastos naturais")
+#'
+#' ### Example 5: Agricultural Mechanization Trends
+#'
+#' Study the adoption of tractors in agriculture:
+#'
+#' # Download mechanization data
+#' mechanization <- load_censoagro(
+#'   dataset = "agricultural_employees_tractors",
+#'   raw_data = FALSE,
+#'   geo_level = "state",
+#'   time_period = 1970:2017,
+#'   language = "eng"
+#' )
+#'
+#' # Calculate tractors per 1000 hectares as a mechanization index
+#' summary_stats <- mechanization %>%
+#'   group_by(year, state) %>%
+#'   summarize(
+#'     total_tractors = sum(tractors, na.rm = TRUE),
+#'     total_employees = sum(employees, na.rm = TRUE),
+#'     .groups = 'drop'
+#'   )
+#'
+#' @export
 #' @export
 
 load_censoagro <- function(dataset, raw_data = FALSE,
