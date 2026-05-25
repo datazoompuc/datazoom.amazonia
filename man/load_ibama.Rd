@@ -24,16 +24,19 @@ Loads information on environmental fines in the Amazon region
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
-# Download treated embargoes data (raw_data = FALSE) in english (language = "eng")
+# download treated embargoed areas data in english
 data <- load_ibama(
-  dataset = "embargoed_areas", raw_data = FALSE,
+  dataset = "embargoed_areas",
+  raw_data = FALSE,
   language = "eng"
 )
 
-# Download treated collected fines data from "BA"
+# download treated collected fines data from Bahia
 data <- load_ibama(
-  dataset = "collected_fines", raw_data = FALSE,
-  states = "BA", language = "pt"
+  dataset = "collected_fines",
+  raw_data = FALSE,
+  states = "BA",
+  language = "pt"
 )
 \dontshow{\}) # examplesIf}
 }

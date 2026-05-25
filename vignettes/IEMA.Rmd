@@ -13,25 +13,84 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+## Overview
 
-Data from the Institute of Environment and Water Resources (IEMA), documenting the number of people without access to eletric energy throughout the Amazon region in the year 2018.
+Data from the Institute of Environment and Water Resources (Instituto de Energia e Meio Ambiente - IEMA), documenting electric energy access across the Amazon region. This dataset provides comprehensive information on populations without access to electric energy throughout the Legal Amazon in 2018, offering critical insights into energy poverty and infrastructure gaps in the region.
 
-***
+The IEMA dataset is particularly valuable for understanding energy access disparities in the Amazon, including remote communities, indigenous territories, and areas with limited infrastructure development.
+
+## Data Coverage
+
+The IEMA dataset includes:
+
+- **Time Period**: Cross-sectional data from 2018
+- **Geographic Coverage**: Legal Amazon region (9 states and partial coverage of others)
+- **Unit of Analysis**: Municipalities and/or census areas within the Amazon
+- **Population Focus**: Population without access to electric energy (energy-poor populations)
+- **Variables**: Energy access indicators, population counts, and geographic identifiers
+
+## Dataset Description
+
+### Key Variables
+
+1. **Population Without Energy Access**: Number of individuals lacking access to electric energy
+2. **Geographic Identifiers**: Municipality, state, and biome information
+3. **Settlement Type**: Rural vs. urban classification where available
+4. **Indigenous Territory Data**: Energy access in indigenous lands (where applicable)
+5. **Infrastructure Indicators**: Distance to grid, cost of connection, barriers to access
+
+### Geographic Coverage
+
+The Legal Amazon encompasses:
+- **9 Full States**: Amazonas, Roraima, Acre, Amazonas, Rondônia, Mato Grosso, Amapá, Pará, Maranhão
+- **Partial Coverage**: Parts of Maranhão and other states
+- **Total Area**: Approximately 5.5 million square kilometers
+- **Population Focus**: Amazon-dwelling populations with particular attention to vulnerable groups
+
+### Energy Access Dimensions
+
+The dataset addresses multiple aspects of energy poverty:
+- **Access Type**: Grid connection vs. off-grid solutions
+- **Reliability**: Service quality and availability
+- **Affordability**: Connection costs and monthly tariffs
+- **Geographic Barriers**: Remote location and access challenges
+- **Population Characteristics**: Indigenous communities, rural settlements, urban poor
+
+---
+
+## Function Parameters
+
 **Options:**
 
-  1. **dataset**: `"iema"`
+1. **dataset**: `"iema"`
 
-  2. **raw_data**: there are two options:
-      * `TRUE`: if you want the data as it is originally.
-      * `FALSE`: if you want the treated version of the data.
+2. **raw_data**: 
+   - `TRUE`: Data in original format from IEMA
+   - `FALSE`: Cleaned and standardized version
 
-  3. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
-  
-***
+3. **language**: 
+   - `"pt"`: Portuguese language
+   - `"eng"`: English language
 
-**Examples:**  
-  
+---
+
+## Data Limitations
+
+Since this dataset captures a single year (2018), it represents a snapshot rather than a time series. The cross-sectional nature means:
+- **No Trend Analysis**: Cannot track changes over time without merging with other sources
+- **Temporal Stability**: Conditions may have changed since 2018
+- **Recent Updates**: Users may need to contact IEMA for more recent data
+
+---
+
+
+## Examples
+
 ```{r eval=FALSE}
-# Download treated data
-data <- load_iema(raw_data = FALSE)
+# download treated IEMA energy access data
+data <- load_iema(
+  raw_data = FALSE,
+  language = "eng"
+)
 ```
+

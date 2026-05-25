@@ -8,21 +8,19 @@
 #'
 #' @return A \code{tibble} consisting of geographic units that present positive values for any of the variables in the dataset.
 #'
-#' @export
 #'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
-#' # Download treated data (raw_data = FALSE) about aquaculture (dataset = "ppm_aquaculture")
-#' # from 2013 to 2015 (time_period = 2013:2015) in english
-#' # with the level of aggregation being the country (geo_level = "country").
+#' # download treated aquaculture data at the country level from 2013 to 2015
 #' data <- load_ppm(
 #'   dataset = "ppm_aquaculture",
 #'   raw_data = FALSE,
 #'   geo_level = "country",
-#'   time_period = 2013:2015
+#'   time_period = 2013:2015,
+#'   language = "eng"
 #' )
 #'
-#' # Download raw data about sheep farming by state from 1980 to 1995 in portuguese (language = "pt")
+#' # download raw sheep farming data by state from 1980 to 1995 in portuguese
 #' data <- load_ppm(
 #'   dataset = "ppm_sheep_farming",
 #'   raw_data = TRUE,
@@ -30,6 +28,9 @@
 #'   time_period = 1980:1995,
 #'   language = "pt"
 #' )
+#'
+#' @export
+
 load_ppm <- function(dataset, raw_data = FALSE,
                      geo_level, time_period,
                      language = "eng") {

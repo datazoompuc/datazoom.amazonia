@@ -13,41 +13,85 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+## Overview
 
-Employment, salary and firm data from IBGE's [Cadastro Central de Empresas (CEMPRE)](https://sidra.ibge.gov.br/pesquisa/cempre/tabelas). Loads information on companies and other organizations and their respective formally constituted local units, registered with the CNPJ - National Register of Legal Entities. Data is available between 2006 and 2019.
+Employment, salary and firm data from IBGE's [Cadastro Central de Empresas (CEMPRE)](https://sidra.ibge.gov.br/pesquisa/cempre/tabelas). This comprehensive dataset provides information on companies and other organizations registered with Brazil's tax authority (Receita Federal), including employment levels, wage information, and business establishment data across Brazilian municipalities and sectors.
 
-***
+The CEMPRE dataset is one of the most detailed sources of firm-level data in Brazil, covering virtually all formal enterprises and organizations operating in the country.
+
+## Data Coverage
+
+The CEMPRE dataset includes:
+
+- **Time Period**: Annual data from 1985 to the most recent available year
+- **Geographic Coverage**: All Brazilian states, regions, and municipalities
+- **Sectoral Detail**: Economic activities classified by CNAE (Classificação Nacional de Atividades Econômicas)
+- **Variables**: Number of establishments, total employment, average salary, payroll totals, and other firm characteristics
+
+## Dataset Description
+
+### Key Variables
+
+1. **Establishment Count**: Number of registered establishments
+2. **Employment**: Total number of employees and average employees per establishment
+3. **Wages**: Average salary, total payroll, and wage bill information
+4. **Economic Classification**: CNAE codes for sector identification
+5. **Location**: State, region, and municipality identifiers
+
+### Geographic Aggregation Levels
+
+The data is available at three different aggregation levels:
+- **Country Level**: Aggregate statistics for all of Brazil
+- **State Level**: Data aggregated by state (27 units)
+- **Municipality Level**: Data disaggregated to municipality level (5,570+ municipalities)
+
+### Sectoral Detail
+
+Data can be retrieved with sector disaggregation or aggregate form:
+- **Sectoral Disaggregation**: Detailed breakdown by CNAE 2.0 (main divisions and subdivisions)
+- **Aggregate**: Total across all sectors
+
+---
+
+## Function Parameters
+
 **Options:**
 
-  1. **dataset**: `"cempre"`
+1. **dataset**: `"cempre"`
 
-  2. **raw_data**: there are two options:
-      * `TRUE`: if you want the data as it is originally.
-      * `FALSE`: if you want the treated version of the data. 
-      
-  3. **geo_level**: `"country"`, `"state"` or `"municipality"`    
-  
-  4. **time_period**: picks the years for which the data will be downloaded
+2. **raw_data**: 
+   - `TRUE`: Returns the data in its original format from IBGE
+   - `FALSE`: Returns cleaned and standardized data
 
-  5. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
-  
-  6. **sectors**: defines if the data will be return separated by sectors (`sectors = TRUE`) or not (`sectors = FALSE`)
-  
-***
+3. **geo_level**: 
+   - `"country"`: National aggregate
+   - `"state"`: Aggregated by state
+   - `"municipality"`: Disaggregated to municipality level (detailed results)
 
-**Examples:**
+4. **time_period**: Specifies the years for which data will be downloaded (e.g., `2010:2020` for 2010 through 2020)
 
-```{r, eval = FALSE}
-# Download raw data (raw_data = TRUE) at the country level
-# from 2008 to 2010 (time_period = 2008:2010).
+5. **language**: 
+   - `"pt"`: Portuguese language (variable names and labels)
+   - `"eng"`: English language
+
+6. **sectors**: 
+   - `TRUE`: Data is returned separated and disaggregated by economic sector (CNAE)
+   - `FALSE`: Data is aggregated across all sectors
+
+--
+
+## Examples
+
+```{r eval=FALSE}
+# download raw data at the country level from 2008 to 2010
 data <- load_cempre(
   raw_data = TRUE,
   geo_level = "country",
-  time_period = 2008:2010
+  time_period = 2008:2010,
+  language = "eng"
 )
-# Download treted data (raw_data = FALSE) by state (geo_level = "state")
-# from 2008 to 2010 (time_period = 2008:2010) in portuguese (language = "pt").
-# In this example, data is split by sector (sectors = TRUE)
+
+# download treated state-level data split by sector in portuguese
 data <- load_cempre(
   raw_data = FALSE,
   geo_level = "state",
@@ -56,3 +100,4 @@ data <- load_cempre(
   sectors = TRUE
 )
 ```
+

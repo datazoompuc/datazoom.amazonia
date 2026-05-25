@@ -11,10 +11,12 @@
 #'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
-#' # download treated data for 2016 (takes a long time to download)
-#' clean_baci <- load_baci(
+#' # download treated trade data for 2016 (HS92 classification)
+#' trade_2016 <- load_baci(
+#'   dataset = "HS92",
 #'   raw_data = FALSE,
-#'   time_period = 2016
+#'   time_period = 2016,
+#'   language = "eng"
 #' )
 #'
 #' @export

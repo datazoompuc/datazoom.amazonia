@@ -35,17 +35,15 @@ Loads information on companies and other organizations and their respective form
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
-# Download raw data (raw_data = TRUE) at the country level
-# from 2008 to 2010 (time_period = 2008:2010).
+# download treated national-level data from 2008 to 2010
 data <- load_cempre(
-  raw_data = TRUE,
+  raw_data = FALSE,
   geo_level = "country",
-  time_period = 2008:2010
+  time_period = 2008:2010,
+  language = "eng"
 )
 
-# Download treted data (raw_data = FALSE) by state (geo_level = "state")
-# from 2008 to 2010 (time_period = 2008:2010) in portuguese (language = "pt").
-# In this example, data is split by sector (sectors = TRUE)
+# download treated state-level data split by sector
 data <- load_cempre(
   raw_data = FALSE,
   geo_level = "state",

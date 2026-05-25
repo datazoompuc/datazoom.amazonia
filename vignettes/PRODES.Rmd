@@ -14,38 +14,290 @@ knitr::opts_chunk$set(
 )
 ```
 
-The PRODES project uses satellites to monitor deforestation in Brazil's Legal Amazon. The raw data reports total and incremental (year-by-year) low-cut deforested area at the municipality level, going back to the year 2007.
+## Overview
 
-INPE's most recent data is now published at [TerraBrasilis](https://terrabrasilis.dpi.inpe.br/downloads/). We read their full [raster data](https://terrabrasilis.dpi.inpe.br/geonetwork/srv/eng/catalog.search#/metadata/507294db-a789-42dd-9158-9dea77d9293f) for the Legal Amazon region and extract values onto the map of Brazilian municipalities.
+[PRODES](https://www.gov.br/inpe/) (Projeto de Monitoramento da Floresta Amazônica Brasileira - Project for Monitoring the Brazilian Amazon Forest) is Brazil's primary satellite-based deforestation monitoring system operated by [INPE](https://www.inpe.br/) (National Institute for Space Research).
 
-***
-**Options:**
+This dataset provides:
 
-  1. **dataset**: `"deforestation"`, `"residual_deforestation"`, `"native_vegetation"`, `"hydrography"`, `"non_forest"`, or `"clouds"`
+- **Amazon deforestation monitoring**: Official deforestation data using satellite imagery
+- **Multiple landscape classes**: Deforestation, residual deforestation, native vegetation, hydrography, non-forest areas, clouds
+- **Raster data**: High-resolution spatial data covering entire Legal Amazon
+- **Municipality aggregates**: Affected areas per municipality for non-spatial analysis
+- **Cumulative and incremental data**: Total deforestation since 1988 and year-by-year changes
+- **Long time series**: Available from 2007 onwards (cumulative) and incrementally by year
+- **Official baseline**: Used by Brazilian government for forest policy and enforcement
 
-  2. **raw_data**: there are two options:
-      * `TRUE`: if you want the data as it is originally, read as a SpatRaster.
-      * `FALSE`: if you want the treated version of the data, measuring affected areas per municipality.
-  
-  3. **time_period**: picks the years for which the data will be downloaded, under the following constraints:
-      * For dataset `"deforestation"`, it can be between 2007 and 2023. Deforestation for 2007 includes all cumulative deforestation up to 2007. For other years, deforestation is incremental;
-      * For dataset `"residual_deforestation"`, it can be between 2010 and 2023;
-      * For all other datasets, only the year 2023 is available.
-  
-  4. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
-  
-***
+PRODES is the authoritative source for Amazon deforestation statistics, used for environmental monitoring, policy evaluation, and international reporting on Brazilian forest protection.
 
-**Examples:**
+### Data Source and Methodology
 
-```{r,eval=FALSE}
-# Download treated data (raw_data = FALSE)
-# in portuguese (language = 'pt').
-data <- load_prodes(
+PRODES monitoring:
+- Uses satellite imagery from multiple sources (Landsat, CBERS, others)
+- Automated and manual analysis to detect clear-cut deforestation
+- Annual assessment of forest loss
+- Recently (2020+) raster data published through [TerraBrasilis](https://terrabrasilis.dpi.inpe.br/)
+- Data available as both raster files and aggregated by municipality
+
+For more information, visit [INPE PRODES Project](https://www.gov.br/inpe/) and [TerraBrasilis](https://terrabrasilis.dpi.inpe.br/).
+
+---
+
+## Available Datasets
+
+### **1. deforestation**
+
+Clear-cut deforestation areas (complete forest loss).
+
+- **Coverage**: Entire Legal Amazon region
+- **Time period**: 
+  - 2007: Cumulative deforestation from 1988 to 2007
+  - 2008-2023: Annual incremental deforestation (year-specific)
+- **Data types**: 
+  - Raw: Raster/grid data (SpatRaster format)
+  - Treated: Municipality-level area aggregates
+- **Variables**: Deforested area (hectares) by municipality
+- **Use cases**:
+  - Track annual deforestation trends
+  - Identify deforestation hotspots
+  - Cumulative forest loss assessment
+  - Municipality-level deforestation analysis
+
+### **2. residual_deforestation**
+
+Deforestation that was not captured in previous surveys (detected through improved methodology).
+
+- **Coverage**: Legal Amazon
+- **Time period**: 2010-2023
+- **Data types**: Raster or municipality aggregates
+- **Variables**: Additional detected deforestation (hectares)
+- **Use cases**:
+  - More comprehensive deforestation assessment
+  - Correct for historical detection gaps
+  - Full accounting of forest loss
+
+### **3. native_vegetation**
+
+Remaining native forest and natural vegetation areas.
+
+- **Coverage**: All vegetation in Legal Amazon
+- **Time period**: 2023 (snapshot of current state)
+- **Data types**: Raster only
+- **Variables**: Forest and vegetation extent
+- **Use cases**:
+  - Assess remaining forest cover
+  - Identify conservation priority areas
+  - Vegetation extent mapping
+
+### **4. hydrography**
+
+Water bodies and hydrographic features.
+
+- **Coverage**: All water features in Amazon
+- **Time period**: 2023
+- **Data types**: Raster only
+- **Variables**: Water body extent
+- **Use cases**:
+  - Environmental impact assessment
+  - Hydrology and water resource mapping
+
+### **5. non_forest**
+
+Non-forest areas including savanna, grasslands, and other vegetation types.
+
+- **Coverage**: Legal Amazon region
+- **Time period**: 2023
+- **Data types**: Raster only
+- **Variables**: Non-forest vegetation extent
+- **Use cases**:
+  - Distinguish non-forest from forest areas
+  - Natural vegetation assessment
+  - Land-use classification
+
+### **6. clouds**
+
+Cloud cover in satellite imagery (data quality indicator).
+
+- **Coverage**: Legal Amazon
+- **Time period**: 2023
+- **Data types**: Raster only
+- **Variables**: Cloud-covered areas where analysis is uncertain
+- **Use cases**:
+  - Assess data quality and coverage
+  - Identify areas needing re-analysis
+  - Quantify monitoring gaps
+
+---
+
+## Important Data Characteristics
+
+### Raw vs. Treated Data
+
+- **Raw data** (`raw_data = TRUE`): Returns SpatRaster objects (raster grids) from TerraBrasilis
+- **Treated data** (`raw_data = FALSE`): Aggregated to municipality level showing total affected area
+- **Raster resolution**: Typically ~30-meter pixels
+- **Large size**: Raster data is high-resolution and may be large
+
+### Cumulative vs. Incremental Data
+
+| Year | Type | Definition |
+|------|------|-----------|
+| 2007 | Cumulative | All deforestation from 1988-2007 |
+| 2008-2023 | Incremental | Deforestation detected in that specific year |
+
+When analyzing time trends, be aware that 2007 includes 19 years of accumulated loss.
+
+### Data Organization
+
+- **Raster format**: High-resolution grid with classified pixels (deforestation, forest, etc.)
+- **Municipality level**: Treated data aggregates raster to municipality boundaries
+- **Non-spatial**: Municipality aggregates don't retain spatial location (summarized only)
+
+---
+
+## Function Parameters
+
+### 1. **dataset**
+
+Selects which landscape classification to download.
+
+```r
+dataset = "deforestation"             # Clear-cut deforestation (main product)
+dataset = "residual_deforestation"    # Previously undetected deforestation
+dataset = "native_vegetation"         # Remaining forests and vegetation (2023 only)
+dataset = "hydrography"               # Water bodies (2023 only)
+dataset = "non_forest"                # Savanna and other non-forest (2023 only)
+dataset = "clouds"                    # Cloud cover (2023 only)
+```
+
+### 2. **raw_data**
+
+Controls data format: raster or municipality aggregates.
+
+- `TRUE`: Returns raw raster data (SpatRaster objects)
+- `FALSE`: Returns municipality-level aggregated area data
+
+```r
+raw_data = FALSE  # logical
+```
+
+**Important**: Raster data is large; ensure sufficient storage and memory.
+
+### 3. **time_period**
+
+Specifies which year(s) to download.
+
+**Available by dataset:**
+
+| Dataset | Available Years |
+|---------|---|
+| `deforestation` | 2007 (cumulative), 2008-2023 (incremental) |
+| `residual_deforestation` | 2010-2023 |
+| `native_vegetation` | 2023 only |
+| `hydrography` | 2023 only |
+| `non_forest` | 2023 only |
+| `clouds` | 2023 only |
+
+```r
+time_period = 2020              # single year
+time_period = c(2015, 2020)     # multiple years
+time_period = 2015:2020         # range of years (for deforestation only)
+```
+
+### 4. **language**
+
+Output language.
+
+- `"pt"`: Portuguese
+- `"eng"`: English
+
+```r
+language = "eng"  # character string
+```
+
+---
+
+## Examples
+
+### Example 1: Deforestation data for a single year
+
+```{r eval=FALSE}
+# download treated deforestation data for 2023
+deforestation <- load_prodes(
   dataset = "deforestation",
   raw_data = FALSE,
-  time_period = 2020:2023,
-  language = "pt"
+  time_period = 2023,
+  language = "eng"
 )
 ```
+
+### Example 2: Deforestation data over multiple years
+
+```{r eval=FALSE}
+# download treated deforestation data for 2008 to 2023
+deforestation_series <- load_prodes(
+  dataset = "deforestation",
+  raw_data = FALSE,
+  time_period = 2008:2023,
+  language = "eng"
+)
+```
+
+### Example 3: Cumulative forest loss since 1988
+
+```{r eval=FALSE}
+# download 2007 (cumulative 1988-2007) plus all years up to 2023
+all_deforestation <- load_prodes(
+  dataset = "deforestation",
+  raw_data = FALSE,
+  time_period = c(2007, 2008:2023),
+  language = "eng"
+)
+```
+
+### Example 4: Residual deforestation
+
+```{r eval=FALSE}
+# download treated residual deforestation data for 2020
+residual <- load_prodes(
+  dataset = "residual_deforestation",
+  raw_data = FALSE,
+  time_period = 2020,
+  language = "eng"
+)
+```
+
+## Data Notes
+
+### Raw Raster Data Characteristics
+
+- **Format**: SpatRaster (from terra package)
+- **Resolution**: ~30 meter pixels
+- **Coverage**: Complete Legal Amazon region
+- **Size**: Very large files; may require significant storage/memory
+- **Classification**: Pixel values indicate land cover class (deforestation, forest, etc.)
+- **CRS**: UTM zones or standard projection; verify after loading
+
+### Municipality Aggregates
+
+- **Simplified for analysis**: Loses spatial detail but much smaller files
+- **Aggregation**: Total deforested area per municipality per year
+- **Ideal for**: Time series, trend analysis, comparative studies
+
+### Data Quality and Accuracy
+
+1. **Detection accuracy**: ~95% for clear-cut deforestation
+2. **Minimum mapping unit**: Small forest clearances may not be detected
+3. **Cloud contamination**: Clouds may prevent detection in some areas (see clouds dataset)
+4. **Seasonal effects**: Deforestation easier to detect in dry season
+
+### Limitations
+
+1. **Clear-cut only**: Degradation and partial logging not captured (see DEGRAD for that)
+2. **Legal Amazon only**: Data limited to Legal Amazon definition; doesn't cover all forest regions
+3. **Raster data very large**: May require specialized tools and significant computing resources
+4. **Historical changes**: INPE occasionally revises historical estimates as methodology improves
+5. **Recent data provisional**: 2023 data may be subject to revision as final processing completes
+
+---
 

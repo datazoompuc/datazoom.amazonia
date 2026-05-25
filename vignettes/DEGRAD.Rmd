@@ -14,37 +14,190 @@ knitr::opts_chunk$set(
 )
 ```
 
-The [DEGRAD project](http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad) uses satellites to monitor degradation of forest areas. Raw data is available as simple features (sf) objects, read from shapefiles. The project was substituted in 2016 by DETER-B. Accordingly, data is available from 2007 up to 2016.
+## Overview
 
-Original documentation for this data is very scarce, users beware. Some things to keep in mind are:
+The [DEGRAD project](http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad) is a research initiative that uses satellite imagery to monitor forest degradation in the Amazon. Unlike DETER's near real-time alerts, DEGRAD provides a more detailed annual analysis of forest degradation patterns.
 
-Event data is organized through yearly editions (DEGRAD 2007-2016). Inside a given edition however, there may be data from different years (events that happened in 2015 inside DEGRAD 2016 for example). 
+This dataset captures:
 
-This package provides degradation data with municipality identification. It does this by intersecting DEGRAD geometries with IBGE's municipality geometries from the year 2019. CRS metadata however is missing from the original data source. A best effort approach is used and a CRS is assumed `(proj4string: "+proj=longlat +ellps=aust_SA +towgs84=-66.8700,4.3700,-38.5200,0.0,0.0,0.0,0.0 +no_defs")`.
+- **Forest degradation monitoring**: Tracks areas where forests are being damaged without complete clearing
+- **Annual editions**: Data released as yearly reports with accumulated observations
+- **Spatial polygons**: Detailed geographic boundaries of degradation events
+- **Municipality linkage**: Enhanced version links degradation areas to affected municipalities
+- **Historical coverage**: Multiple years of degradation monitoring from 2007 onwards
 
-***
-**Options:**
+DEGRAD data is valuable for understanding forest degradation as a distinct phenomenon from clear-cut deforestation, important for carbon accounting, biodiversity protection, and understanding transition stages toward complete forest loss.
 
-  1. **dataset**: `"degrad"`
+### Data Source and Methodology
 
-  2. **raw_data**: there are two options:
-      * `TRUE`: if you want the data as it is originally.
-      * `FALSE`: if you want the treated version of the data. 
-  
-  3. **time_period**: picks the years for which the data will be downloaded
+DEGRAD monitoring:
+- Conducted by INPE's forest monitoring programs
+- Uses satellite imagery interpretation to identify forest degradation signs
+- Focuses on selective logging, small-scale agriculture, forest fires, and other degrading activities
+- Released as annual editions with comprehensive analysis
+- Limited documentation available (original INPE documentation is sparse)
 
-  4. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
-  
-***
+For information, visit [INPE Forest Monitoring](http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad).
 
-**Examples:**
+---
 
-```{r, eval = FALSE}
-# download treated data (raw_data = TRUE) related to forest degradation
-# from 2010 to 2012 (time_period = 2010:2012).
+## Important Data Characteristics
+
+### Data Organization
+
+ **Important**: DEGRAD data is organized differently than real-time systems. Key points:
+
+1. **Yearly editions**: Data is organized by publication year (e.g., "DEGRAD 2016"), not event year
+2. **Mixed event years**: A DEGRAD edition may contain degradation events from different years
+   - Example: DEGRAD 2016 edition may include events detected in 2015 or even earlier
+3. **Documentation limited**: Original INPE documentation is minimal; users should be aware of potential inconsistencies
+
+### Spatial Integration
+
+This package enhances the raw DEGRAD data by:
+- Intersecting DEGRAD spatial polygons with IBGE municipality boundaries (2019 version)
+- Providing municipality identification for each degradation event
+- Converting to Simple Features (SF) objects for spatial analysis
+
+**Note on CRS**: Coordinate system metadata should be verified after loading, as original INPE data sometimes has unclear CRS information.
+
+---
+
+## Available Dataset
+
+### **degrad (Forest Degradation)**
+Detailed monitoring of forest degradation across the Legal Amazon.
+
+- **Coverage**: Legal Amazon region with focus on degradation detection
+- **Time period**: 2007 onwards (but events within editions may vary)
+- **Spatial unit**: Polygons/spatial geometries with municipality identification
+- **Variables**: Event date/year, degradation type/cause, area, municipality, state, edition
+- **Data format**: Simple Features (SF) spatial objects with geographic boundaries
+- **Use cases**:
+  - Distinguish degradation from complete deforestation
+  - Analyze forest degradation hotspots
+  - Understand selective logging extent
+  - Carbon stock assessment
+  - Forest fire impacts
+  - Long-term degradation trends
+
+---
+
+## Function Parameters
+
+### 1. **dataset**
+
+Only one dataset is available:
+
+```r
+dataset = "degrad"  # Forest degradation monitoring
+```
+
+### 2. **raw_data**
+
+Controls whether to download the original data or the processed/enhanced version.
+
+- `TRUE`: Returns raw INPE data with minimal processing
+- `FALSE`: Returns treated data with English variable names, municipality identification from spatial intersection, and standardized formatting
+
+```r
+raw_data = FALSE  # logical
+```
+
+**Recommendation**: Use `raw_data = FALSE` for most applications to get municipality-level information.
+### 3. **time_period**
+
+Specifies which year(s) of degradation events to download.
+
+- **Available range**: Generally 2007-2016 (check current availability)
+- **Format**: Single year, vector of years, or range
+
+**Important**: When you request a year, you get events from that year regardless of which DEGRAD edition they appear in.
+
+```r
+time_period = 2015              # single year
+time_period = c(2010, 2015)     # multiple specific years
+time_period = 2010:2015         # range of years
+```
+
+### 4. **language**
+
+Output language for variable names and documentation.
+
+- `"pt"`: Portuguese
+- `"eng"`: English
+
+```r
+language = "eng"  # character string
+```
+
+---
+
+## Data Structure
+
+The returned data is a Simple Features (SF) spatial object with:
+
+- **Spatial column**: Geometric polygons representing degradation areas
+- **year**: Year when degradation was detected/event occurred
+- **degradation_type**: Type of degradation (logging, fire, agriculture, etc.)
+- **area_hectares**: Size of degradation event
+- **municipality**: Name of affected municipality
+- **state**: Brazilian state
+- **edition**: Which DEGRAD edition this event appears in
+- **Additional attributes**: Quality metrics, confidence levels (vary by edition)
+
+---
+
+
+## Examples
+
+```{r eval=FALSE}
+# download treated forest degradation data from 2010 to 2012
 data <- load_degrad(
   dataset = "degrad",
   raw_data = FALSE,
-  time_period = 2010:2012
+  time_period = 2010:2012,
+  language = "eng"
 )
 ```
+
+## Data Notes
+
+### Data Organization Complexity
+
+The annual edition structure (e.g., "DEGRAD 2016") mixed with variable event years within those editions means:
+- When you request year 2015, you get all detected 2015 events regardless of edition
+- Some 2015 events may appear in both DEGRAD 2015 and DEGRAD 2016 editions
+- Duplication is handled in the data loading process
+
+### Degradation Types
+
+Common degradation types include:
+- **Selective logging**: Commercial timber extraction
+- **Forest fires**: Fire damage to forest areas
+- **Agricultural clearing**: Small-scale farming expansion
+- **Mining**: Degradation from mining activities
+- **Other**: Mixed or unclassified degradation causes
+
+(Exact categories vary by edition; verify with your loaded data)
+
+### Spatial Considerations
+
+1. **Polygons not points**: Each event is a geometric polygon, not a single location point
+2. **Municipality intersection**: Treated data identifies all municipalities polygon overlaps
+3. **CRS verification**: Check coordinate system after loading
+4. **Geometry validity**: Some polygons may have validity issues; use `st_is_valid()` to check
+
+### Data Limitations
+
+1. **Limited documentation**: INPE's original documentation for DEGRAD is sparse
+2. **Mixed time periods**: Events from different years appear in same edition
+3. **Possible inconsistencies**: Classification and methodology may vary across editions
+4. **Detection limits**: Minimum detectable degradation size varies by methodology/edition
+5. **Not real-time**: This is annual analysis, not near-real-time detection like DETER
+
+---
+
+```
+
+

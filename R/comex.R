@@ -9,19 +9,20 @@
 #'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
-#' # download treated (raw_data = FALSE) exports data by municipality (dataset = "comex_export_mun")
-#' # from 2020 to 2021 (time_period = 2020:2021)
+#' # download treated exports data by municipality from 2020 to 2021
 #' data <- load_br_trade(
 #'   dataset = "export_mun",
 #'   raw_data = FALSE,
-#'   time_period = 2020:2021
+#'   time_period = 2020:2021,
+#'   language = "eng"
 #' )
-#' # download treated(raw_data = FALSE) imports data by municipality (dataset = "comex_import_mun")
-#' # from 2020 to 2021 (time_period = 2020:2021)
+#'
+#' # download treated imports data by municipality from 2020 to 2021
 #' data <- load_br_trade(
 #'   dataset = "import_mun",
 #'   raw_data = FALSE,
-#'   time_period = 2020:2021
+#'   time_period = 2020:2021,
+#'   language = "eng"
 #' )
 #'
 #' @export

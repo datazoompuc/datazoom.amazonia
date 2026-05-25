@@ -22,7 +22,10 @@ Loads information on electric energy access at the municipality level in the Ama
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
-# Download treated data
-data <- load_iema(raw_data = FALSE)
+# download treated IEMA energy access data
+data <- load_iema(
+  raw_data = FALSE,
+  language = "eng"
+)
 \dontshow{\}) # examplesIf}
 }

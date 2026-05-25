@@ -14,33 +14,183 @@ knitr::opts_chunk$set(
 )
 ```
 
-Loads IBGE information on gross domestic product at current prices, taxes, net of subsidies, on products at current prices and gross value added at current prices, total and by economic activity, and respective shares. Data is available at country, state and municipality level and from 2002 to 2018.
+## Overview
 
-***
-**Options:**
+PIBMUNIC (Produto Interno Bruto por Município - Gross Domestic Product by Municipality) is Brazil's official municipal-level GDP data produced by [IBGE](https://www.ibge.gov.br/). This dataset provides:
 
-  1. **dataset**: `"pibmunic"`
+- **Gross Domestic Product (GDP)**: Total economic output at current market prices
+- **Value Added**: Gross value added by economic activity
+- **Taxes and Subsidies**: Net taxes on products
+- **Sectoral breakdown**: GDP disaggregated by economic sectors (agriculture, industry, services)
+- **Municipal coverage**: All Brazilian municipalities
+- **Long time series**: Historical data spanning multiple decades
+- **Multi-level aggregation**: Available at country, state, and municipality levels
 
-  2. **raw_data**: there are two options:
-      * `TRUE`: if you want the data as it is originally.
-      * `FALSE`: if you want the treated version of the data. 
-      
-  3. **geo_level**: `"country"`, `"state"`, or `"municipality"`    
-  
-  4. **time_period**: picks the years for which the data will be downloaded
+PIBMUNIC is essential for understanding Brazil's regional economic structure, identifying economic disparities, analyzing sectoral specialization, and assessing economic development across municipalities.
 
-  5. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
-  
-***
+### Data Source and Methodology
 
-**Examples:**
+PIBMUNIC data is compiled by IBGE using:
+- Data from CEMPRE (firm registry) for employment and output
+- Production and consumption surveys
+- Tax and financial records
+- Trade and services data
+- National accounts framework aligned with international standards
 
-```{r, eval = FALSE}
-# download treated municipal GDP data at the state level for 2010 to 2012
-data <- load_pibmunic(
+For more information, visit [IBGE National Accounts](https://www.ibge.gov.br/en/statistics/economic/national-accounts/).
+
+---
+
+## Available Dataset
+
+### **pibmunic**
+
+Complete municipal GDP statistics with sectoral detail.
+
+- **Coverage**: All 5,570+ Brazilian municipalities
+- **Variables**: GDP at current prices, value added by sector, taxes, subsidies
+- **Sectors included**: Agriculture, industry, services, public administration
+- **Measurement**: Brazilian Real (R$) at current prices
+- **Time period**: Varies by year; typically 2002 onwards
+- **Use cases**:
+  - Identify richest and poorest municipalities
+  - Analyze regional economic disparities
+  - Assess sectoral specialization (agriculture vs. industry vs. services)
+  - Economic growth analysis by municipality
+  - Development planning and policy evaluation
+  - Correlate with social/environmental indicators
+
+---
+
+## Function Parameters
+
+### 1. **dataset**
+
+Only one dataset is available:
+
+```r
+dataset = "pibmunic"  # Municipal GDP data
+```
+
+### 2. **raw_data**
+
+Controls whether to download original or processed data.
+
+- `TRUE`: Returns raw IBGE format
+- `FALSE`: Returns treated data with English variable names and standardized formatting
+
+```r
+raw_data = FALSE  # logical
+```
+
+### 3. **geo_level**
+
+Specifies geographic aggregation level.
+
+- `"country"`: National aggregate
+- `"state"`: State-level aggregation
+- `"municipality"`: Most detailed level with all municipalities
+
+```r
+geo_level = "municipality"  # character string
+```
+
+### 4. **time_period**
+
+Specifies which year(s) to download.
+
+```r
+time_period = 2020              # single year
+time_period = c(2015, 2020)     # specific years
+time_period = 2015:2020         # range of years
+```
+
+### 5. **language**
+
+Output language for variable names.
+
+- `"pt"`: Portuguese
+- `"eng"`: English
+
+```r
+language = "eng"  # character string
+```
+
+---
+
+## Examples
+
+### Example 1: Municipal GDP for a single year
+
+```{r eval=FALSE}
+# download treated municipal GDP data for 2020
+pib_munic <- load_pibmunic(
+  dataset = "pibmunic",
   raw_data = FALSE,
-  geo_level = "state",
-  time_period = 2010:2012
+  geo_level = "municipality",
+  time_period = 2020,
+  language = "eng"
 )
 ```
+
+### Example 2: State-level GDP over time
+
+```{r eval=FALSE}
+# download treated state-level GDP data for 2015 to 2020
+pib_state <- load_pibmunic(
+  dataset = "pibmunic",
+  raw_data = FALSE,
+  geo_level = "state",
+  time_period = 2015:2020,
+  language = "eng"
+)
+```
+
+### Example 3: Country-level GDP in Portuguese
+
+```{r eval=FALSE}
+# download treated country-level GDP data for 2010 to 2020 in Portuguese
+pib_br <- load_pibmunic(
+  dataset = "pibmunic",
+  raw_data = FALSE,
+  geo_level = "country",
+  time_period = 2010:2020,
+  language = "pt"
+)
+```
+
+## Data Notes
+
+### Variables Structure
+
+Typical variables include:
+- **gdp**: Gross Domestic Product at current prices (R$)
+- **value_added_agriculture**: Farming and forestry sector
+- **value_added_industry**: Manufacturing and construction
+- **value_added_services**: Commerce, finance, transport, etc.
+- **value_added_public_admin**: Government services
+- **net_taxes**: Taxes minus subsidies
+- Additional detail depends on specific IBGE release
+
+### Current Prices
+
+- All values are in "current prices" (nominal values, not deflated)
+- For real (inflation-adjusted) comparisons, you need to apply price deflators
+- Comparisons across years should account for inflation
+
+### Data Coverage
+
+- **All municipalities**: Includes all 5,570+ Brazilian municipalities
+- **Time lag**: Data typically released 2+ years after reference year
+- **Revisions**: IBGE periodically revises historical data
+
+### Important Limitations
+
+1. **Current prices**: Values not adjusted for inflation
+2. **Time lag**: Recent years may not be available
+3. **Confidentiality**: Some small municipalities may have aggregated data
+4. **Methodological changes**: IBGE occasionally updates national accounts methodology
+5. **Municipal boundaries**: Changed in 2021; affects historical comparisons
+
+---
 

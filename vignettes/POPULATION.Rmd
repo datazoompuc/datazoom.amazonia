@@ -13,34 +13,196 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+## Overview
 
-Loads IBGE information on estimated population (2001-2006, 2008-2009, 2011-2021) or population (2007 and 2010) data. Data is available at country, state and municipality level and from 2001 to 2021.
+Population dataset provides Brazil's official population statistics from [IBGE](https://www.ibge.gov.br/) (Brazilian Institute of Geography and Statistics). This dataset includes:
 
-***
-**Options:**
+- **Population estimates**: Official projections and estimates for non-census years
+- **Census data**: Actual population counts from census years (2007, 2010)
+- **Time coverage**: Data from 2001 to 2021 (with some gaps)
+- **Geographic detail**: Available at country, state, and municipality levels
+- **Regular updates**: Annual estimates published by IBGE
+- **Demographic foundation**: Base data for per capita calculations and demographic analysis
 
-  1. **dataset**: `"population"`
+Population data is fundamental to many analyses, providing denominators for per capita metrics, understanding urbanization patterns, tracking demographic trends, and supporting policy and development planning.
 
-  2. **raw_data**: there are two options:
-      * `TRUE`: if you want the data as it is originally.
-      * `FALSE`: if you want the treated version of the data. 
-      
-  3. **geo_level**: `"country"`, `"state"`, or `"municipality"`    
-  
-  4. **time_period**: picks the years for which the data will be downloaded
+### Data Source and Methodology
 
-  5. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
-  
-***
+Population data comes from:
+- **Census years (2007, 2010)**: Actual population enumeration
+- **Estimation years (2001-2006, 2008-2009, 2011-2021)**: IBGE official population projections based on census data and vital statistics
+- **Methodology**: Cohort-component methodology considering births, deaths, migration
+- **Updates**: Revised annually as new vital statistics data becomes available
 
-**Examples:**
+For more information, visit [IBGE Population Estimates](https://www.ibge.gov.br/en/statistics/social/population/).
 
-```{r, eval = FALSE}
-# download treated population data at the state level for 2010 to 2012
-data <- load_population(
+---
+
+## Available Dataset
+
+### **population**
+
+Official Brazilian population statistics and estimates.
+
+- **Coverage**: All Brazilian municipalities, states, and national level
+- **Time period**: 2001 to 2021
+- **Data types**: Census counts (2007, 2010) and official estimates (other years)
+- **Geographic levels**: Country, State, Municipality
+- **Use cases**:
+  - Calculate per capita indicators for all metrics
+  - Track demographic changes and urbanization
+  - Assess population concentration
+  - Population-weighted aggregations
+  - Demographic planning and projections
+  - Support for epidemiological and social statistics
+
+---
+
+## Important Data Characteristics
+
+### Census Years vs. Estimate Years
+
+| Year Type | Years | Nature |
+|-----------|-------|--------|
+| Census | 2007, 2010 | Actual population count |
+| Estimates | 2001-2006, 2008-2009, 2011-2021 | Official IBGE projections |
+
+Census years provide actual counts; other years are official projections.
+
+### Population Definition
+
+- **Resident population**: People living in a given area as of the reference date
+- **Includes**: Brazilian citizens and legal residents
+- **Reference date**: July 1 for most estimate years, September 1 for 2010 census
+
+---
+## Function Parameters
+
+### 1. **dataset**
+
+Only one dataset is available:
+
+```r
+dataset = "population"  # Population statistics
+```
+
+### 2. **raw_data**
+
+Controls whether to download original or processed data.
+
+- `TRUE`: Returns raw IBGE data format
+- `FALSE`: Returns treated data with English variable names and standardized format
+
+```r
+raw_data = FALSE  # logical
+```
+
+### 3. **geo_level**
+
+Specifies geographic aggregation level.
+
+- `"country"`: National total
+- `"state"`: State-level population (27 units)
+- `"municipality"`: All 5,570+ municipalities
+
+```r
+geo_level = "municipality"  # character string
+```
+
+### 4. **time_period**
+
+Specifies which year(s) to download.
+
+**Available years**: 2001-2006, 2007 (census), 2008-2009, 2010 (census), 2011-2021
+
+```r
+time_period = 2020              # single year
+time_period = c(2010, 2020)     # specific years (includes 2010 census)
+time_period = 2010:2020         # range of years
+```
+
+### 5. **language**
+
+Output language for variable names.
+
+- `"pt"`: Portuguese
+- `"eng"`: English
+
+```r
+language = "eng"  # character string
+```
+
+---
+## Examples
+
+### Example 1: Population by state for a single year
+
+```{r eval=FALSE}
+# download treated population data at the state level for 2021
+pop_2021 <- load_population(
+  dataset = "population",
   raw_data = FALSE,
   geo_level = "state",
-  time_period = 2010:2012
+  time_period = 2021,
+  language = "eng"
 )
 ```
+
+### Example 2: Population by state over time
+
+```{r eval=FALSE}
+# download treated population data at the state level for 2010 to 2021
+pop_series <- load_population(
+  dataset = "population",
+  raw_data = FALSE,
+  geo_level = "state",
+  time_period = 2010:2021,
+  language = "eng"
+)
+```
+
+### Example 3: Population by municipality
+
+```{r eval=FALSE}
+# download treated population data at the municipality level for 2020
+pop_munic <- load_population(
+  dataset = "population",
+  raw_data = FALSE,
+  geo_level = "municipality",
+  time_period = 2020,
+  language = "eng"
+)
+```
+
+## Data Notes
+
+### Data Structure
+
+Each record contains:
+- Geographic identifier (state or municipality name/code)
+- Year
+- Population count
+
+Simple and straightforward structure, useful as base for other calculations.
+
+### Census vs. Estimate Quality
+
+- **Census years (2007, 2010)**: High quality, actual counts
+- **Estimate years**: Official IBGE projections based on demographic models
+- **Estimates are less certain**: Especially for small geographic areas
+
+### Municipal Variations
+
+- **Not all municipalities equally reliable**: Very small municipalities may have estimation uncertainty
+- **Boundary changes**: Municipalities occasionally merged or divided; affects time comparisons
+- **Code consistency**: Use IBGE municipal codes (rather than names) for accurate merging with other datasets
+
+### Important Limitations
+1. **Estimate years**: Non-census years are projections, not actual counts
+2. **Lag in release**: May take time for latest estimates to be published
+3. **Revisions**: Estimates revised annually as better vital statistics data becomes available
+4. **Boundary changes**: Municipal boundaries changed; affects historical comparisons
+5. **Definition**: Includes registered residents; may not match actual lived population
+
+---
 

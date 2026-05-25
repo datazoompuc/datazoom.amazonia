@@ -24,19 +24,52 @@ Loads data of estimates of emission of greenhouse gases
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
-# Download raw data (raw_data = TRUE) of greenhouse gases (dataset = "seeg")
-# by state (geo_level = "state")
-data <- load_seeg(
+# download raw SEEG data (all sectors) at the country level
+all_emissions <- load_seeg(
   dataset = "seeg",
   raw_data = TRUE,
-  geo_level = "state"
+  geo_level = "country",
+  language = "eng"
 )
 
-# Download treated data (raw_data = FALSE) of industry greenhouse gases (dataset = "seeg_industry")
-data <- load_seeg(
+# download treated agricultural emissions at the state level
+farming <- load_seeg(
+  dataset = "seeg_farming",
+  raw_data = FALSE,
+  geo_level = "state",
+  language = "eng"
+)
+
+# download treated land use change emissions at the state level
+land_use <- load_seeg(
+  dataset = "seeg_land",
+  raw_data = FALSE,
+  geo_level = "state",
+  language = "eng"
+)
+
+# download treated energy emissions at the municipality level
+energy <- load_seeg(
+  dataset = "seeg_energy",
+  raw_data = FALSE,
+  geo_level = "municipality",
+  language = "eng"
+)
+
+# download treated industrial process emissions at the state level
+industry <- load_seeg(
   dataset = "seeg_industry",
   raw_data = FALSE,
-  geo_level = "state"
+  geo_level = "state",
+  language = "eng"
+)
+
+# download treated waste emissions at the state level
+residuals <- load_seeg(
+  dataset = "seeg_residuals",
+  raw_data = FALSE,
+  geo_level = "state",
+  language = "eng"
 )
 \dontshow{\}) # examplesIf}
 }

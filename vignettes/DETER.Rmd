@@ -14,31 +14,169 @@ knitr::opts_chunk$set(
 )
 ```
 
-[DETER](http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter) uses satellite surveillance to detect and report changes in forest cover across the Legal Amazon and the Cerrado biome. Each data point consists of a warning, describing which type of change has affected a certain area of forest at a given date. Broadly speaking, it makes a distinction between events of deforestation, degradation and logging. The data extracted here spans from 2016 onward in the Amazon, and from 2018 onward in the Cerrado.
+## Overview
 
-The raw DETER data shows one warning per row, with each row also containing a municipality. However, many warnings actually overlap with 2 or up to 4 municipalities, which are not shown in the original data. Therefore, when the option `raw_data = FALSE` is selected, the original spatial information is intersected with a municipalities map of Brazil, and each warning can be split into more than one row, with each row corresponding to a municipality.
+[DETER](http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter) (Real-Time Detection System) is a satellite-based monitoring system operated by [INPE](https://www.inpe.br/) (National Institute of Space Research) that detects and reports changes in forest cover with near real-time frequency.
+This system provides:
 
-***
-**Options:**
+- **Forest cover change detection**: Identifies deforestation and forest degradation events
+- **Near real-time monitoring**: Updates frequently (typically daily or weekly)
+- **Spatial precision**: Geolocated detection of disturbances with geographic coordinates
+- **Biome coverage**: Monitors Legal Amazon and Cerrado biome regions
+- **Event-based data**: Each detection is a separate record with location and date
+- **Historical records**: Accumulated database of past detection events
 
-  1. **dataset**: there are two options:
-      * `"deter_amz"` for data from the Amazon
-      * `"deter_cerrado"` for data from the Cerrado
+DETER is the primary early-warning system for deforestation in the Amazon, used by Brazilian environmental agencies for enforcement, research institutions for analysis, and internationally for monitoring compliance with forest conservation goals.
 
-  2. **raw_data**: there are two options:
-      * `TRUE`: if you want the data as it is originally.
-      * `FALSE`: if you want the treated version of the data.
+### Data Source and Methodology
 
-  3. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
-  
-***
+DETER monitoring:
+- Uses satellite imagery from multiple sources (MODIS, Landsat, Sentinel)
+- Automated and manual analysis to detect recent disturbances
+- Generates "alerts" - polyons representing areas of detected change
+- Updates available regularly (frequency varies by satellite availability)
+- Operated by INPE's Remote Sensing Division
 
-**Examples:**
+For technical details, visit [INPE DETER System](http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter).
 
-```{r,eval=FALSE}
-# Download treated data (raw_data = FALSE) from Amazonia (dataset = "deter_amz")
+---
+
+## Available Datasets
+
+### **1. deter_amz (DETER Amazon)**
+
+DETER monitoring data for the Legal Amazon biome.
+
+- **Geographic coverage**: Legal Amazon region (approximately 5 million km²)
+- **Biome**: Tropical forest
+- **Time period**: Historical data spanning multiple years with continuing updates
+- **Spatial unit**: Polyons/spatial geometries with municipality identification
+- **Variables**: Detection date, deforestation/degradation type, area, municipality, state
+- **Update frequency**: Regular updates (typically daily or weekly)
+- **Use cases**:
+  - Monitor recent deforestation hotspots
+  - Analyze deforestation trends in specific regions
+  - Track enforcement impact on forest cover
+  - Early-warning system for forest loss
+  - Academic research on deforestation drivers
+
+### **2. deter_cerrado (DETER Cerrado)**
+
+DETER monitoring data for the Cerrado biome.
+
+- **Geographic coverage**: Cerrado region (Brazilian tropical savanna)
+- **Biome**: Tropical savanna/grassland
+- **Time period**: Historical data with continuing updates
+- **Spatial unit**: Polygons/spatial geometries with municipality identification
+- **Variables**: Detection date, vegetation loss type, area, municipality, state
+- **Update frequency**: Regular updates
+- **Use cases**:
+  - Monitor Cerrado vegetation loss (increasingly threatened biome)
+  - Analyze agricultural expansion in Cerrado region
+  - Compare forest and savanna degradation patterns
+  - Track conservation effectiveness
+
+---
+
+## Important Data Characteristics
+
+### Raw Data Structure
+
+The raw DETER data from INPE reports one alert/detection per row, with each row typically associated with a single municipality in the raw data. However, **many alerts actually overlap multiple municipalities** (typically 2-4 municipalities) that are not all shown in the original records.
+### Data Processing
+
+This package provides an important enhancement: **spatial intersection with IBGE municipality geometries** (2019 version) to identify ALL municipalities that each DETER alert overlaps with. This creates a more complete and accurate geographic picture than the original raw data.
+
+**Important note on CRS metadata**: The CRS (Coordinate Reference System) information may need verification after loading, as coordinate system metadata can sometimes be unclear in the original INPE data.
+
+---
+
+## Function Parameters
+
+### 1. **dataset**
+
+Selects which biome's DETER data to download.
+
+```r
+dataset = "deter_amz"      # Legal Amazon monitoring
+dataset = "deter_cerrado"  # Cerrado biome monitoring
+```
+
+### 2. **raw_data**
+
+Controls whether to download the original data or the processed/enhanced version.
+
+- `TRUE`: Returns raw INPE data with limited municipality information
+- `FALSE`: Returns treated data with spatial intersection to identify all affected municipalities, standardized English variable names
+
+```r
+raw_data = FALSE  # logical
+```
+
+**Recommendation**: Use `raw_data = FALSE` to get the enhanced municipality identification from spatial intersection.
+
+### 3. **language**
+
+Output language for variable names and documentation.
+
+- `"pt"`: Portuguese
+- `"eng"`: English
+
+```r
+language = "eng"  # character string
+```
+
+
+---
+
+## Examples
+
+```{r eval=FALSE}
+# download treated DETER Amazon data
 deter_amz <- load_deter(
   dataset = "deter_amz",
-  raw_data = FALSE
+  raw_data = FALSE,
+  language = "eng"
+)
+
+# download treated DETER Cerrado data
+deter_cerrado <- load_deter(
+  dataset = "deter_cerrado",
+  raw_data = FALSE,
+  language = "eng"
 )
 ```
+
+## Data Notes
+
+### Raw Data Limitations
+
+- **Original INPE data**: Shows one alert per municipality, even when alerts overlap multiple municipalities
+- **Enhanced version**: Spatial intersection with IBGE 2019 municipality boundaries identifies all affected municipalities
+- **Advantage of treated data**: More complete geographic picture of deforestation extent
+
+### Data Structure
+
+Each alert/row typically contains:
+- **Spatial geometry**: Polygon coordinates (SF object)
+- **Detection date**: When the alert was issued
+- **Alert type**: Deforestation, forest degradation, or other disturbance
+- **Area**: Size of detected change in hectares
+- **Municipality**: Geographic unit identification
+- **State**: Brazilian state
+- **Metadata**: Satellite source, confidence level (varies by product)
+
+### Important Considerations
+
+1. **Alert types vary**: "Deforestation" is permanent forest loss; "degradation" is forest damage but not clear-cut
+2. **Near real-time data**: Alerts are issued frequently; data is continuously updated
+3. **Minimum detection size**: Varies by sensor; typically 25 hectares for Amazon, larger for Cerrado
+4. **CRS metadata**: Verify coordinate system after loading; typically UTM zones for Brazil
+5. **Overlapping municipalities**: Enhanced version accounts for alerts crossing municipality boundaries
+6. **False positives possible**: Satellite detection can occasionally misclassify cloud shadows or other features as forest loss
+
+---
+
+```
+
+

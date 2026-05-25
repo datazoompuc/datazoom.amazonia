@@ -17,7 +17,7 @@
 #'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
-#' # download treated Mapbiomas Cover data in English
+#' # download treated MapBiomas land cover data by municipality
 #' data <- load_mapbiomas(
 #'   dataset = "mapbiomas_cover",
 #'   raw_data = FALSE,
@@ -26,9 +26,11 @@
 #' )
 #'
 #' # download treated data on mining on indigenous lands
-#' data <- load_mapbiomas("mapbiomas_mining",
+#' data <- load_mapbiomas(
+#'   dataset = "mapbiomas_mining",
 #'   raw_data = FALSE,
-#'   geo_level = "indigenous_land"
+#'   geo_level = "indigenous_land",
+#'   language = "eng"
 #' )
 #'
 #' @export

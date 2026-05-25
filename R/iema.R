@@ -9,8 +9,11 @@
 #'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
-#' # Download treated data
-#' data <- load_iema(raw_data = FALSE)
+#' # download treated IEMA energy access data
+#' data <- load_iema(
+#'   raw_data = FALSE,
+#'   language = "eng"
+#' )
 #'
 #' @export
 

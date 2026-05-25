@@ -10,9 +10,7 @@
 #'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
-#' # Download treated (raw_data = FALSE) silviculture data (dataset = 'pevs_silviculture')
-#' # by state (geo_level = 'state') from 2012 (time_period =  2012)
-#' # in portuguese (language = "pt")
+#' # download treated silviculture data by state from 2012 in portuguese
 #' data <- load_pevs(
 #'   dataset = "pevs_silviculture",
 #'   raw_data = FALSE,
@@ -21,12 +19,13 @@
 #'   language = "pt"
 #' )
 #'
-#' # Download raw (raw_data = TRUE) forest crops data by region from 2012 to 2013 in english
+#' # download raw forest crops data by region from 2012 to 2013
 #' data <- load_pevs(
 #'   dataset = "pevs_forest_crops",
 #'   raw_data = TRUE,
 #'   geo_level = "region",
-#'   time_period = 2012:2013
+#'   time_period = 2012:2013,
+#'   language = "eng"
 #' )
 #'
 #' @export

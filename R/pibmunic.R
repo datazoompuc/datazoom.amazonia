@@ -8,7 +8,6 @@
 #'
 #' @return A \code{tibble}.
 #'
-#' @export
 #'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
@@ -16,8 +15,12 @@
 #' data <- load_pibmunic(
 #'   raw_data = FALSE,
 #'   geo_level = "state",
-#'   time_period = 2010:2012
+#'   time_period = 2010:2012,
+#'   language = "eng"
 #' )
+#'
+#' @export
+
 load_pibmunic <- function(dataset = "pibmunic", raw_data = FALSE,
                           geo_level, time_period,
                           language = "eng") {

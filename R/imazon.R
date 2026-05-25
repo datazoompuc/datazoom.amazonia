@@ -9,8 +9,11 @@
 #'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
-#' # Download treated data
-#' data <- load_imazon(raw_data = FALSE)
+#' # download treated Imazon deforestation pressure data
+#' data <- load_imazon(
+#'   raw_data = FALSE,
+#'   language = "eng"
+#' )
 #'
 #' @export
 

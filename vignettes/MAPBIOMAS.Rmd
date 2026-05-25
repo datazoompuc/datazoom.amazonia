@@ -13,49 +13,146 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+## Overview
 
-The MapBiomas project gathers data reporting the type of land covering each year by area, that is, for example, the area used for a temporary crop of soybeans. It also reports the transitions in land coverage between years.
+The MapBiomas project provides comprehensive satellite-based data on land cover and land use changes across Brazil. The project uses machine learning algorithms applied to Landsat satellite imagery to classify and track changes in biomes, land cover types, and economic activities over time. This dataset is essential for understanding deforestation, agricultural expansion, conservation outcomes, and landscape dynamics in the Amazon and other biomes.
 
-The data has yearly frequency and is available starting from the year 1985.
+MapBiomas represents one of the most detailed and scientifically rigorous sources of remote sensing data on Brazilian land cover, with coverage spanning from 1985 to present and annual updates.
 
-For all datasets, areas are measured in hectares (ha). 
+## Data Coverage
 
-***
+The MapBiomas dataset includes:
+
+- **Time Period**: Annual data from 1985 to 2023 (with updates continuing)
+- **Geographic Coverage**: All Brazilian biomes (Amazon, Cerrado, Atlantic Forest, Caatinga, Pampa, Pantanal)
+- **Spatial Resolution**: 30 meters (Landsat resolution)
+- **Temporal Frequency**: Annual maps with seasonal detail
+- **Update Schedule**: New data typically released annually with recent years added progressively
+- **Aggregation Levels**: Municipalities, indigenous lands, states, biomes, and protected areas
+
+## Available Datasets
+
+### 1. Land Cover (`"mapbiomas_cover"`)
+
+Annual maps of land cover types including:
+- **Forest Types**: Native forest, forest formation, forest plantation
+- **Non-Forest Vegetation**: Grassland/pasture, shrub vegetation, herbaceous
+- **Agricultural Land**: Temporary crops (annual/seasonal), perennial crops (sugarcane, coffee, cocoa)
+- **Urban Areas**: Urban/built-up land and infrastructure
+- **Water Bodies**: Rivers, lakes, reservoirs, aquaculture
+- **Non-vegetated**: Mining, bare soil, rock outcrops
+- **Other Categories**: Cloud coverage, nodata
+
+**Key Applications**: Deforestation monitoring, agricultural expansion, urbanization patterns, forest conservation
+
+### 2. Land Cover Transitions (`"mapbiomas_transition"`)
+
+Year-to-year changes in land cover including:
+- **Deforestation**: Conversion from forest to other uses
+- **Reforestation**: Conversion to forest types
+- **Agricultural Transitions**: Changes between crop types or from other uses to agriculture
+- **Degradation**: Forest to degraded/shrub vegetation
+- **Regeneration**: Abandoned areas returning to vegetation
+
+**Key Applications**: Deforestation tracking, regeneration assessment, agricultural dynamics, conservation effectiveness
+
+### 3. Deforestation and Regeneration (`"mapbiomas_deforestation_regeneration"`)
+
+Specific focus on forest cover changes:
+- **Deforestation**: Permanent loss of forest cover
+- **Forest Regeneration**: Secondary forest regrowth and natural recovery
+- **Degradation Signals**: Forest areas showing stress indicators
+- **Cumulative Deforestation**: Total forest loss since baseline
+
+**Key Applications**: Amazon monitoring, conservation evaluation, regeneration potential, climate impact studies
+
+### 4. Mining Activities (`"mapbiomas_mining"`)
+
+Areas used for mining operations:
+- **Active Mining**: Currently operational extraction sites
+- **Abandoned Mining**: Previous mining areas, potentially available for rehabilitation
+- **Mining Extent**: Total area impacted by mining activities
+- **Mining Types**: Surface mining, artisanal mining, infrastructure
+
+**Key Applications**: Environmental impact assessment, land degradation, restoration planning, environmental compliance
+
+### 5. Irrigation (`"mapbiomas_irrigation"`)
+
+**Note**: Temporarily unavailable - new collection coming soon
+
+Previously included:
+- **Irrigated Areas**: Extent of irrigation in agricultural systems
+- **Irrigation Type**: Drip, center-pivot, flood irrigation
+- **Crop Types Under Irrigation**: Which crops receive irrigation
+
+### 6. Water Bodies (`"mapbiomas_water"`)
+
+**Note**: Temporarily unavailable - new collection coming soon
+
+Previously included:
+- **Surface Water Extent**: Permanent and seasonal water bodies
+- **Water Type**: Natural rivers/lakes vs. artificial reservoirs
+- **Seasonal Variation**: Dry vs. wet season water extent
+
+### 7. Wildfire Burn Scars (`"mapbiomas_fire"`)
+
+Areas affected by wildfires:
+- **Burn Scars**: Areas burned in recent fires
+- **Fire Extent**: Total area impacted per year
+- **Fire Frequency**: Repeated burning in same areas (indicating high fire risk)
+- **Fire Season**: Temporal pattern of fires
+
+**Key Applications**: Fire monitoring, ecosystem vulnerability, climate impacts, fire management
+
+---
+
+## Function Parameters
+
 **Options:**
 
-  1. **dataset**: there are 7 possible choices:
+1. **dataset**: Seven possible choices (two temporarily unavailable)
+   - `"mapbiomas_cover"`: Land cover types
+   - `"mapbiomas_transition"`: Changes in land cover
+   - `"mapbiomas_deforestation_regeneration"`: Forest cover changes
+   - `"mapbiomas_mining"`: Mining areas
+   - `"mapbiomas_irrigation"`: Irrigated areas (temporarily unavailable)
+   - `"mapbiomas_water"`: Water bodies (temporarily unavailable)
+   - `"mapbiomas_fire"`: Wildfire burn scars
 
-      * `"mapbiomas_cover"`: types of land cover.
-      * `"mapbiomas_transition"`: changes in land cover.
-      * `"mapbiomas_deforestation_regeneration"`: deforestation and forest regeneration.
-      * `"mapbiomas_irrigation"` (temporarily unavailable, a new collection will be soon delivered): irrigated areas.
-      * `"mapbiomas_mining"`: areas used for mining.
-      * `"mapbiomas_water"` (temporarily unavailable, a new collection will be soon delivered): areas of water surface.
-      * `"mapbiomas_fire"`: areas of wildfire burn scars.
+2. **raw_data**: 
+   - `TRUE`: Data in original format from MapBiomas
+   - `FALSE`: Cleaned and standardized version (recommended for analysis)
 
-  2. **raw_data**: there are two options:
-  
-      * `TRUE`: if you want the data as it is originally.
-      * `FALSE`: if you want the treated version of the data. 
+3. **geo_level**: Varies by dataset
+   - For `"mapbiomas_cover"`: `"municipality"` or `"indigenous_land"`
+   - For `"mapbiomas_transition"`: `"municipality"` or `"biome"` (faster)
+   - For `"mapbiomas_deforestation_regeneration"`: `"municipality"` only
+   - For `"mapbiomas_mining"`: `"indigenous_land"` or `"municipality"`
+   - For `"mapbiomas_irrigation"`: `"state"` or `"biome"`
+   - For `"mapbiomas_water"`: `"municipality"`, `"state"`, or `"biome"`
+   - For `"mapbiomas_fire"`: `"state"` only
 
-  3. **geo_level**: 
-  
-      * For dataset `"mapbiomas_cover"`, can be `"municipality"` or `"indigenous_land"`
-      * For dataset `"mapbiomas_transition"`, can be `"municipality"` or `"biome"` (faster download)
-      * For dataset `"mapbiomas_deforestation_regeneration"`, can only be `"municipality"`
-      * For dataset `"mapbiomas_mining"`, can be `"indigenous_land"` or `"municipality"`
-      * For dataset `"mapbiomas_irrigation"`, can be `"state"` or `"biome"`
-      * For dataset `"mapbiomas_water"`, can be `"municipality"`, `"state"` or `"biome"`
-      * For dataset `"mapbiomas_fire"`, can only be `"state"`
+4. **language**: 
+   - `"pt"`: Portuguese language labels
+   - `"eng"`: English language
 
-  4. **language**: you can choose between Portuguese `("pt")` and English `("eng")`.
-  
-***
+---
 
-**Examples:** 
- 
+## Measurement Units and Notes
+
+- **All Areas**: Measured in hectares (ha)
+- **1 hectare**: Approximately 2.47 acres
+- **Validation**: MapBiomas uses field validation and visual interpretation to ensure accuracy
+- **Updates**: Historical data may be revised with new collections and improved algorithms
+
+---
+
+---
+
+## Examples
+
 ```{r eval=FALSE}
-# download treated Mapbiomas Cover data in English
+# download treated MapBiomas land cover data by municipality
 data <- load_mapbiomas(
   dataset = "mapbiomas_cover",
   raw_data = FALSE,
@@ -64,10 +161,19 @@ data <- load_mapbiomas(
 )
 
 # download treated data on mining on indigenous lands
-data <- load_mapbiomas("mapbiomas_mining",
+data <- load_mapbiomas(
+  dataset = "mapbiomas_mining",
   raw_data = FALSE,
-  geo_level = "indigenous_land"
+  geo_level = "indigenous_land",
+  language = "eng"
+)
+
+# download treated wildfire burn scar data by state
+data <- load_mapbiomas(
+  dataset = "mapbiomas_fire",
+  raw_data = FALSE,
+  geo_level = "state",
+  language = "eng"
 )
 ```
-
 

@@ -14,32 +14,157 @@ knitr::opts_chunk$set(
 )
 ```
 
-Loads disaggregated data on bilateral trade flows for more than 5000 products and 200 countries. The data is from the [CEPII](https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37&id=37) and is built from data directly reported by each country to the United Nations Statistical Division (Comtrade).
+## Overview
 
-As all of the data is packed into one single .zip file in the website, data on all years must be downloaded, even if not all of it is used. Therefore, downloading the data can take a long time.
+BACI (Base pour l'Analyse du Commerce International) is a comprehensive database of bilateral trade flows developed by [CEPII](https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37) (Centre d'Études Prospectives et d'Informations Internationales), a leading French research center on international trade. 
 
-***
-**Options:**
+This dataset provides:
 
-  1. **dataset**: there is one choice:
-      * `"HS92"` which follows the Harmonized System method
+- **Bilateral trade data**: Export and import flows between country pairs
+- **Product-level detail**: Over 5,000 distinct products classified by the Harmonized System (HS)
+- **Global coverage**: More than 200 countries and territories
+- **Historical depth**: Data spanning multiple decades of international commerce
+- **Quality assurance**: Reconciliation of mirror flows (exports reported by one country matched with imports reported by trading partner)
 
-  2. **raw_data**: there are two options:
-      * `TRUE`: if you want the data as it is originally.
-      * `FALSE`: if you want the treated version of the data. 
-  
-  3. **time_period**: picks the years for which the data will be downloaded
+The BACI dataset is widely used in academic research, policy analysis, and international trade studies due to its comprehensive coverage and quality control procedures.
 
-  4. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
-  
-***
+### Data Source and Methodology
 
-**Examples:**
-  
+BACI is constructed from UN Comtrade data with significant processing:
+- Reconciliation of discrepancies between reported imports and exports
+- Imputation of missing values using econometric techniques
+- Classification using the Harmonized System (HS) nomenclature
+- All values converted to USD for comparability
+
+For detailed methodological information, visit the [CEPII BACI documentation](https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37).
+
+---
+
+## Available Dataset
+
+### **HS92 (Harmonized System 1992)**
+
+The HS92 classification provides trade data organized under the 1992 version of the Harmonized System nomenclature.
+
+- **Coverage**: Bilateral trade flows for 5,000+ products (HS 6-digit level)
+- **Countries**: 200+ countries and territories
+- **Time period**: 1995 onwards (varies by country; most comprehensive from 2000 onwards)
+- **Variables**: Trade value (USD), quantity (where available), exporter, importer, product code
+- **Use cases**: 
+  - Analyzing trade specialization and comparative advantage
+  - Studying trade relationships between countries
+  - Product-level trade analysis
+  - Research on globalization and supply chains
+
+---
+
+## Important Information About Downloads
+
+### Download Size and Time
+
+ **Important**: The BACI dataset is very large. All data is packaged in a single compressed file on the CEPII server. **Even if you only need data for specific years, the entire dataset must be downloaded first, then processed locally.**
+
+- **Typical download size**: 500+ MB (compressed)
+- **Uncompressed size**: Several GB
+- **Download time**: Can take 30-60+ minutes depending on internet connection
+- **Processing time**: Additional time required after download for extraction and filtering
+
+**Recommendation**: Plan your download during off-peak hours or use a stable, high-speed connection.
+
+---
+
+## Function Parameters
+
+### 1. **dataset**
+
+Currently only one dataset is available:
+
+```r
+dataset = "HS92"  # Harmonized System 1992 classification
+```
+
+### 2. **raw_data**
+
+Controls whether to download the original data or the processed/cleaned version.
+
+- `TRUE`: Returns raw CEPII data with original formatting and column names
+- `FALSE`: Returns treated data with standardized English variable names and cleaned formatting
+
+```r
+raw_data = FALSE  # logical
+```
+
+### 3. **time_period**
+
+Specifies which year(s) to download. You can request single or multiple years.
+
+- **Available**: Generally 1995 onwards, though coverage varies by country
+- **Most complete**: 2000 onwards for the majority of countries
+- **Note**: Specifying years helps with filtering but still requires downloading the full dataset
+
+```r
+time_period = 2016              # single year
+time_period = c(2010, 2015)     # multiple specific years
+time_period = 2010:2020         # range (will select available years)
+```
+
+### 4. **language**
+
+Output language for variable names and documentation.
+
+- `"pt"`: Portuguese
+- `"eng"`: English
+
+```r
+language = "eng"  # character string
+```
+
+---
+---
+
+## Examples
+
 ```{r eval=FALSE}
-# download treated data for 2016 (takes a long time to download)
-clean_baci <- load_baci(
+# download treated trade data for 2016 (HS92 classification)
+# Warning: large download, may take a long time
+trade_2016 <- load_baci(
+  dataset = "HS92",
   raw_data = FALSE,
-  time_period = 2016
+  time_period = 2016,
+  language = "eng"
 )
 ```
+
+## Data Notes
+
+### Raw vs. Treated Data
+
+- **Raw data** (`raw_data = TRUE`): CEPII's original format with variable codes and potentially non-standard naming
+- **Treated data** (`raw_data = FALSE`): Standardized with English variable names, consistent column formatting, and ready for immediate analysis
+
+### Data Structure
+
+Each row typically represents a trade flow with:
+- **Exporter**: Country code (ISO 3-letter code)
+- **Importer**: Country code (ISO 3-letter code)
+- **Year**: Calendar year of the trade flow
+- **Product code**: HS 6-digit classification
+- **Product name**: Description of the product
+- **Value**: Trade value in USD
+- **Quantity**: Physical quantity (where available)
+
+### Country and Product Coverage
+
+- Most countries covered from 2000 onwards
+- Coverage varies by country; some countries have earlier data available
+- HS 6-digit codes ensure consistency with international standards
+- Product classifications may change over time as the HS is updated
+
+### Quality Notes
+
+- BACI reconciles mirror flows to improve data quality
+- Missing values may occur for certain country-product-year combinations
+- Some countries report data more frequently/accurately than others
+- Small trade flows may have been imputed or estimated
+
+---

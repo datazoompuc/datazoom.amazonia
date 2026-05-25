@@ -22,8 +22,8 @@ Loads information the mines being explored legally in Brazil, including their lo
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
-# Download treated data (raw_data = FALSE) in portuguese (language = "pt").
-data <- load_sigmine(
+# download treated active mining data in portuguese
+mining_active <- load_sigmine(
   dataset = "sigmine_active",
   raw_data = FALSE,
   language = "pt"

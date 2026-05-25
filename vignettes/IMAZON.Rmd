@@ -13,25 +13,138 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+## Overview
 
-Loads data categorizing each municipality by the level of deforestation pressure it faces. The categories used by Imazon have three levels, ranging from 0 to 3.
+[Imazon](https://imazon.org.br/) (Instituto do Homem e Meio Ambiente da Amazônia - Institute of Man and Environment of the Amazon) is an independent Brazilian research organization that produces its own deforestation monitoring and analysis. 
 
-***
-**Options:**
+This dataset provides:
 
-  1. **dataset**: `"imazon_shp"`
+- **Municipality-level deforestation pressure classification**: Risk assessment of deforestation threat
+- **Pressure categories**: Three-level classification system (0, 1, 2, 3) representing deforestation pressure intensity
+- **Geographic coverage**: Municipalities in the Legal Amazon region
+- **Municipal boundaries**: Provided as spatial features (shapefile format)
+- **Policy-relevant indicator**: Used in environmental monitoring and policy assessments
 
-  2. **raw_data**: there are two options:
-      * `TRUE`: if you want the data as it is originally.
-      * `FALSE`: if you want the treated version of the data.
+Imazon's deforestation pressure index helps identify which municipalities face high deforestation risk, valuable for targeted conservation, enforcement, and development planning.
 
-  3. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
-  
-***
+### Data Source
 
-**Examples:**
+Imazon's classification is based on:
+- Deforestation monitoring using satellite imagery
+- Analysis of deforestation trends and drivers
+- Risk assessment methodology to classify municipalities
+- Regular updates as monitoring data accumulates
+
+For more information, visit [Imazon Official Website](https://imazon.org.br/).
+
+---
+## Available Dataset
+
+### **imazon_shp (Imazon Municipality Pressure Index)**
+
+Municipality-level deforestation pressure classification with spatial geometries.
+
+- **Geographic unit**: Brazilian municipalities
+- **Coverage**: Legal Amazon municipalities
+- **Variables**: Municipality name, state, deforestation pressure category (0-3)
+- **Data format**: Shapefile / Simple Features (SF) spatial objects
+- **Update frequency**: Periodic updates as Imazon releases new assessments
+- **Use cases**:
+  - Identify high-risk deforestation municipalities
+  - Target conservation resources to threatened areas
+  - Analyze geographic patterns of deforestation pressure
+  - Environmental risk assessment
+  - Monitoring enforcement effectiveness
+  - Correlate pressure with socioeconomic variables
+
+---
+
+## Deforestation Pressure Categories
+
+Imazon's three-level classification system:
+| Category | Pressure Level | Description |
+|----------|---|---|
+| 0 | No/Low Pressure | Minimal deforestation threat |
+| 1 | Moderate Pressure | Some deforestation risk |
+| 2 | High Pressure | Significant deforestation threat |
+| 3 | Very High Pressure | Severe/Critical deforestation risk |
+
+---
+
+## Function Parameters
+
+### 1. **dataset**
+
+Only one dataset is available:
+
+```r
+dataset = "imazon_shp"  # Imazon municipality pressure classification
+```
+
+### 2. **raw_data**
+
+Controls whether to download the original data or the processed/cleaned version.
+
+- `TRUE`: Returns raw shapefile data exactly as provided by Imazon
+- `FALSE`: Returns treated data with standardized English variable names, consistent formatting, and SF object structure
+
+```r
+raw_data = FALSE  # logical
+```
+
+### 3. **language**
+
+Output language for variable names and documentation.
+
+- `"pt"`: Portuguese
+- `"eng"`: English
+
+```r
+language = "eng"  # character string
+```
+
+---
+
+## Examples
 
 ```{r eval=FALSE}
-# Download treated data
-data <- load_imazon(raw_data = FALSE)
+# download treated Imazon deforestation pressure data
+data <- load_imazon(
+  raw_data = FALSE,
+  language = "eng"
+)
 ```
+
+## Data Notes
+
+### Data Format
+
+- **Shapefile format**: Returned as Simple Features (SF) spatial objects
+- **Geometric representation**: Municipality polygons with pressure classification
+- **Attributes**: Municipality name, state, pressure category
+
+### Pressure Categories
+
+The 0-3 scale represents Imazon's assessment of deforestation risk:
+- Based on historical deforestation trends
+- Current forest cover
+- Accessibility and economic drivers
+- Human pressure factors
+
+### Important Limitations
+
+1. **Static classification**: This is a classification/index, not time-series deforestation data
+2. **Methodology may change**: Imazon's methodology for calculating pressure may be updated
+3. **Subjective risk assessment**: Classification involves judgment in addition to objective metrics
+4. **Not current alerts**: This is not real-time detection like DETER; it's a classification product
+5. **Municipal-level only**: Finer spatial resolution not available
+
+### Using with Other Datasets
+
+This dataset works well in combination with:
+- **DETER**: Compare pressure classification with actual recent deforestation
+- **DEGRAD**: Correlate pressure with degradation patterns
+- **CEMPRE**: Analyze relationship between employment and deforestation pressure
+- **COMEX**: Examine trade patterns in high-pressure vs low-pressure areas
+
+---

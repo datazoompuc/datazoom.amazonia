@@ -14,44 +14,194 @@ knitr::opts_chunk$set(
 )
 ```
 
-The Comex dataset gathers data extracted from [Siscomex (Integrated System of Foreign Trade)](https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta/), which is a database containing information from all products that are imported to or exported from Brazil. Using data reported from the companies which are responsible for the process of transporting the products, the system adheres to internationally standardized nomenclatures, such as the Harmonized System and the Mercosul Common Nomenclature (which pertains to members of the Mercosul organization). 
+## Overview
 
-The data has a monthly frequency and is available starting from the year 1989. From 1989 to 1996, a different system of nomenclatures was adopted, but all conversions are available on a dictionary in the Comex website (https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta/). Systems of nomenclature vary in the degree of detail in terms of the product involved, as well as other characteristics, such as unit and granularity of location. 
+COMEX (Comércio Exterior - Foreign Trade) dataset provides Brazil's official international trade statistics extracted from [Siscomex](https://www.gov.br/produtividade-e-comercio-exterior/pt-br/assuntos/comercio-exterior/estatisticas/), the Integrated System of Foreign Trade maintained by the Brazilian government.
 
-***
-**Options:**
+This dataset captures:
 
-  1. **dataset**: there are four choices:
-      * `"export_mun"`: selects exports data by municipality
-      * `"import_mun"`: selects imports data by municipality
-      * `"export_prod"`: selects exports data by producer
-      * `"import_prod"`: selects imports data by producer
+- **Export data**: Brazilian goods leaving the country, disaggregated by municipality and product
+- **Import data**: Foreign goods entering Brazil, disaggregated by municipality and product  
+- **Monthly frequency**: High-frequency trade data for detailed temporal analysis
+- **Product classification**: Detailed product codes and descriptions
+- **Geographic coverage**: Trade flows identified by Brazilian municipality
+- **Long historical coverage**: Available from 1989 onwards
 
-  2. **raw_data**: there are two options:
-      * `TRUE`: if you want the data as it is originally.
-      * `FALSE`: if you want the treated version of the data. 
-  
-  3. **time_period**: picks the years for which the data will be downloaded
+COMEX is the primary official source for Brazil's international trade statistics, widely used for trade policy analysis, business intelligence, academic research, and economic monitoring.
 
-  4. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
-  
-***
+### Data Source and Coverage
 
-**Examples:**
+COMEX data comes from:
+- Official records from Siscomex (Brazil's foreign trade system)
+- Mandatory declarations by exporters and importers
+- Updated monthly with current month data
+- Historical data from 1989 onwards
 
-```{r, eval = FALSE}
-# download treated (raw_data = FALSE) exports data by municipality (dataset = "export_mun")
-# from 2020 to 2021 (time_period = 2020:2021)
+**Important note on nomenclature**: From 1989 to 1996, Brazil used a different system of product nomenclature (NBLC - Nomenclatura Brasileira de Mercadorias). All conversions to the current nomenclature system are available and the package handles this transparently.
+
+For more information, visit the [Brazilian Ministry of Productivity, Employment and Foreign Trade](https://www.gov.br/produtividade-e-comercio-exterior/).
+
+---
+
+## Available Datasets
+
+### **1. export_mun (Exports by Municipality)**
+
+Export data disaggregated at the municipality level.
+
+- **Coverage**: All Brazilian municipalities engaged in international trade
+- **Frequency**: Monthly
+- **Time period**: 1989 onwards
+- **Key variables**: Export value (USD), quantity, product code, municipality, date
+- **Use cases**:
+  - Identify which municipalities are export hubs
+  - Analyze export diversification by region
+  - Track geographic shifts in export capacity
+  - Municipal-level trade policy impact assessment
+
+### **2. import_mun (Imports by Municipality)**
+
+Import data disaggregated at the municipality level.
+
+- **Coverage**: All Brazilian municipalities receiving imports
+- **Frequency**: Monthly
+- **Time period**: 1989 onwards
+- **Key variables**: Import value (USD), quantity, product code, municipality, date
+- **Use cases**:
+  - Understand which regions import specific products
+  - Analyze import dependency patterns
+  - Track geographic consumption patterns
+  - Regional supply chain analysis
+
+### **3. export_prod (Exports by Producer)**
+
+Export data organized by producer/exporter and product.
+
+- **Coverage**: All registered exporters in Brazil
+- **Frequency**: Monthly
+- **Time period**: 1989 onwards
+- **Key variables**: Export value (USD), quantity, product code, exporter code, date
+- **Use cases**:
+  - Firm-level export analysis
+  - Identify major exporters and their product mix
+  - Export concentration analysis
+  - Exporter persistence and dynamics
+
+### **4. import_prod (Imports by Producer)**
+
+Import data organized by importer/distributor and product.
+
+- **Coverage**: All registered importers in Brazil
+- **Frequency**: Monthly
+- **Time period**: 1989 onwards
+- **Key variables**: Import value (USD), quantity, product code, importer code, date
+- **Use cases**:
+  - Firm-level import behavior
+  - Supply chain relationships
+  - Importer concentration analysis
+  - International sourcing patterns
+
+---
+
+## Function Parameters
+
+### 1. **dataset**
+
+Selects which trade dataset to download.
+
+```r
+dataset = "export_mun"   # exports by municipality
+dataset = "import_mun"   # imports by municipality
+dataset = "export_prod"  # exports by producer/exporter
+dataset = "import_prod"  # imports by producer/importer
+```
+
+### 2. **raw_data**
+
+Controls whether to download the original data or the processed/cleaned version.
+
+- `TRUE`: Returns raw data exactly as published by Siscomex
+- `FALSE`: Returns treated data with standardized formatting, English variable names, and cleaned values
+
+```r
+raw_data = FALSE  # logical
+```
+
+### 3. **time_period**
+
+Specifies which year(s) to download. Available from 1989 onwards.
+
+```r
+time_period = 2020              # single year
+time_period = c(2018, 2020)     # specific years
+time_period = 2015:2020         # range of years
+```
+
+**Note**: Monthly data means each year can be quite large. Consider downloading specific years or ranges to manage file size.
+
+### 4. **language**
+
+Output language for variable names and documentation.
+
+- `"pt"`: Portuguese
+- `"eng"`: English
+
+```r
+language = "eng"  # character string
+```
+
+---
+## Examples
+
+```{r eval=FALSE}
+# download treated exports data by municipality from 2020 to 2021
 data <- load_br_trade(
   dataset = "export_mun",
   raw_data = FALSE,
-  time_period = 2020:2021
+  time_period = 2020:2021,
+  language = "eng"
 )
-# download treated(raw_data = FALSE) imports data by municipality (dataset = "import_mun")
-# from 2020 to 2021 (time_period = 2020:2021)
+
+# download treated imports data by municipality from 2020 to 2021
 data <- load_br_trade(
   dataset = "import_mun",
   raw_data = FALSE,
-  time_period = 2020:2021
+  time_period = 2020:2021,
+  language = "eng"
 )
 ```
+
+## Data Notes
+
+### Raw vs. Treated Data
+
+- **Raw data** (`raw_data = TRUE`): Original Siscomex format, potentially with inconsistencies and naming conventions from different time periods
+- **Treated data** (`raw_data = FALSE`): Standardized with English variable names, consistent units (USD for values), and cleaned formatting
+
+### Product Classification
+
+- **1989-1996**: Uses NBLC (Nomenclatura Brasileira de Mercadorias) - conversions are handled transparently
+- **1997 onwards**: Uses HS (Harmonized System) classification aligned with international standards
+- Product codes enable comparison with international trade databases
+
+### Data Characteristics
+
+1. **Monthly frequency**: Data is reported monthly; aggregation to annual or quarterly is straightforward
+2. **Producer vs. Municipality**: 
+   - Municipality data groups trade by geographic origin/destination
+   - Producer data groups by firm/exporter-importer code
+   - Use municipality for regional analysis, producer for firm analysis
+3. **Missing data**: Some small trade flows may not be reported
+4. **Currency**: All values in USD
+
+### Nomenclature Conversion
+
+When using data spanning 1989-1996 to 1997 onwards, be aware:
+- Product categories may differ between nomenclature systems
+- Conversions are available but not always 1:1
+- Compare very old with recent data with caution
+
+```
+
+
+

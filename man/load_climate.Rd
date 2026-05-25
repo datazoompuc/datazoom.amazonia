@@ -23,23 +23,25 @@ load_climate(
 
 \item{legal_amazon_only}{A \code{boolean} setting the return of Legal Amazon Data (\code{TRUE}) or Country's Data (\code{FALSE}). Defaults to \code{FALSE}}
 }
-\value{
-A \code{tibble}.
-}
 \description{
 Spatial data on climate variables, extracted from Climatology Lab's TerraClimate.
 }
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
-# Downloading maximum temperature data from 2000 to 2001
-max_temp <- load_climate(dataset = "max_temperature", time_period = 2000:2001)
+# download maximum temperature data from 2000 to 2001
+max_temp <- load_climate(
+  dataset = "max_temperature",
+  time_period = 2000:2001,
+  language = "eng"
+)
 
-# Downloading precipitation data only for the legal Amazon in 2010
-amz_precipitation <- load_climate(
+# download precipitation data only for the legal Amazon in 2010
+amz_precip <- load_climate(
   dataset = "precipitation",
   time_period = 2010,
-  legal_amazon_only = TRUE
+  legal_amazon_only = TRUE,
+  language = "eng"
 )
 \dontshow{\}) # examplesIf}
 }

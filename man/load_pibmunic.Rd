@@ -36,7 +36,8 @@ Loads information on gross domestic product at current prices, taxes, net of sub
 data <- load_pibmunic(
   raw_data = FALSE,
   geo_level = "state",
-  time_period = 2010:2012
+  time_period = 2010:2012,
+  language = "eng"
 )
 \dontshow{\}) # examplesIf}
 }
