@@ -23,6 +23,12 @@ LANGUAGE    <- "pt"
 RAW_DATA    <- FALSE
 GEO_LEVEL   <- "state"
 
+# Funções com time_period fixo (independe de TIME_PERIOD)
+# load_degrad: dados disponíveis apenas até 2016 (programa descontinuado)
+TIME_PERIOD_BY_FN <- list(
+  load_degrad = 2016
+)
+
 
 
 datasets_by_fn <- list(
@@ -38,12 +44,12 @@ datasets_by_fn <- list(
                     "import_prod"
   ),
   load_cempre   = "cempre",
-  load_censo_agro = c(
+  load_censoagro = c(
     "agricultural_land_area",
     "agricultural_area_use",
     "agricultural_employees_tractors",
     "agricultural_producer_condition",
-    "animal_species",
+    "animal_production",
     "animal_products",
     "vegetable_production_area",
     "vegetable_production_permanent",
@@ -195,8 +201,9 @@ for (fn_name in get_fns) {
     cat("  - dataset =", ds, "\n")
 
     args <- list()
+    tp <- if (!is.null(TIME_PERIOD_BY_FN[[fn_name]])) TIME_PERIOD_BY_FN[[fn_name]] else TIME_PERIOD
     if ("dataset"     %in% arg_names) args$dataset     <- ds
-    if ("time_period" %in% arg_names) args$time_period <- TIME_PERIOD
+    if ("time_period" %in% arg_names) args$time_period <- tp
     if ("raw_data"    %in% arg_names) args$raw_data    <- RAW_DATA
     if ("language"    %in% arg_names) args$language    <- LANGUAGE
 

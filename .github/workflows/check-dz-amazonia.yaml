@@ -23,7 +23,8 @@ jobs:
           - load_aneel
           - load_baci
           - load_br_trade
-          - load_censo_agro
+          - load_cempre
+          - load_censoagro
           - load_climate
           - load_degrad
           - load_deter
@@ -44,6 +45,7 @@ jobs:
 
     if: |
       github.event_name == 'schedule' ||
+      github.event.inputs.fn == null ||
       github.event.inputs.fn == '' ||
       github.event.inputs.fn == matrix.fn
 
