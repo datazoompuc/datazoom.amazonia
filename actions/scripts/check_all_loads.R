@@ -18,15 +18,23 @@ if (requireNamespace("googledrive", quietly = TRUE)) {
 }
 
 # Config
-TIME_PERIOD <- 2020
+TIME_PERIOD <- 2022  # ano conservador com boa cobertura na maioria das fontes; atualizar a cada 1-2 anos
 LANGUAGE    <- "pt"
 RAW_DATA    <- FALSE
 GEO_LEVEL   <- "state"
 
-# Funções com time_period fixo (independe de TIME_PERIOD)
-# load_degrad: dados disponíveis apenas até 2016 (programa descontinuado)
+# Overrides de time_period para funções com cadência não-anual ou anos válidos restritos
+# load_degrad: programa descontinuado, dados apenas até 2016
+# load_ips: anos válidos são 2014, 2018, 2021, 2023 — usar o mais recente
+# load_censoagro: Censo Agropecuário; anos disponíveis 1995, 2006, 2017 — usar o mais recente
 TIME_PERIOD_BY_FN <- list(
-  load_degrad = 2016
+  load_degrad    = 2016,
+)
+
+# Overrides de raw_data por dataset
+# seeg: o dataset agregado só funciona com raw_data = TRUE
+RAW_DATA_BY_DS <- list(
+  seeg = TRUE
 )
 
 
@@ -121,7 +129,7 @@ datasets_by_fn <- list(
     "clouds"
   ),
   load_seeg = c(
-    "seeg",
+    "seeg",           # raw_data = TRUE via RAW_DATA_BY_DS (conjunto bruto de todos os setores)
     "seeg_farming",
     "seeg_industry",
     "seeg_energy",
@@ -149,8 +157,18 @@ call_with_geo <- function(fn, args, geo_level = "state") {
     return(res)
   }
 
-  # fallback: tenta sem geo_level
-  do.call(fn, args)
+  # fallback: tenta sem geo_level (para funções onde geo_level é opcional)
+  res2 <- tryCatch(
+    do.call(fn, args),
+    error = function(e) e
+  )
+
+  if (!inherits(res2, "error")) {
+    return(res2)
+  }
+
+  # ambos falharam: propaga o erro ORIGINAL (com geo_level), não o do fallback
+  stop(conditionMessage(res))
 }
 
 
@@ -201,10 +219,11 @@ for (fn_name in get_fns) {
     cat("  - dataset =", ds, "\n")
 
     args <- list()
-    tp <- if (!is.null(TIME_PERIOD_BY_FN[[fn_name]])) TIME_PERIOD_BY_FN[[fn_name]] else TIME_PERIOD
+    tp  <- if (!is.null(TIME_PERIOD_BY_FN[[fn_name]])) TIME_PERIOD_BY_FN[[fn_name]] else TIME_PERIOD
+    raw <- if (!is.null(RAW_DATA_BY_DS[[ds]])) RAW_DATA_BY_DS[[ds]] else RAW_DATA
     if ("dataset"     %in% arg_names) args$dataset     <- ds
     if ("time_period" %in% arg_names) args$time_period <- tp
-    if ("raw_data"    %in% arg_names) args$raw_data    <- RAW_DATA
+    if ("raw_data"    %in% arg_names) args$raw_data    <- raw
     if ("language"    %in% arg_names) args$language    <- LANGUAGE
 
     out <- NULL
