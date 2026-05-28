@@ -29,6 +29,8 @@ GEO_LEVEL   <- "state"
 # load_censoagro: Censo Agropecuário; anos disponíveis 1995, 2006, 2017 — usar o mais recente
 TIME_PERIOD_BY_FN <- list(
   load_degrad    = 2016,
+  load_ips       = 2023,
+  load_censoagro = 2017
 )
 
 # Overrides de raw_data por dataset
