@@ -30,13 +30,20 @@ GEO_LEVEL   <- "state"
 TIME_PERIOD_BY_FN <- list(
   load_degrad    = 2016,
   load_ips       = 2023,
-  load_censoagro = 2017
+  load_censoagro = 2017,
+  load_pibmunic  = 2021   # max disponível no SIDRA é 2021
 )
 
 # Overrides de raw_data por dataset
 # seeg: o dataset agregado só funciona com raw_data = TRUE
 RAW_DATA_BY_DS <- list(
   seeg = TRUE
+)
+
+# Overrides de geo_level por dataset
+# livestock_production: só aceita geo_level = "municipality"
+GEO_LEVEL_BY_DS <- list(
+  livestock_production = "municipality"
 )
 
 
@@ -223,8 +230,10 @@ for (fn_name in get_fns) {
     args <- list()
     tp  <- if (!is.null(TIME_PERIOD_BY_FN[[fn_name]])) TIME_PERIOD_BY_FN[[fn_name]] else TIME_PERIOD
     raw <- if (!is.null(RAW_DATA_BY_DS[[ds]])) RAW_DATA_BY_DS[[ds]] else RAW_DATA
+    geo <- if (!is.null(GEO_LEVEL_BY_DS[[ds]])) GEO_LEVEL_BY_DS[[ds]] else GEO_LEVEL
     if ("dataset"     %in% arg_names) args$dataset     <- ds
     if ("time_period" %in% arg_names) args$time_period <- tp
+    if ("year"        %in% arg_names) args$year        <- tp  # ex: load_aneel usa "year" em vez de "time_period"
     if ("raw_data"    %in% arg_names) args$raw_data    <- raw
     if ("language"    %in% arg_names) args$language    <- LANGUAGE
 
@@ -234,7 +243,7 @@ for (fn_name in get_fns) {
     res <- tryCatch(
       withCallingHandlers(
         {
-          out <- call_with_geo(fn, args, geo_level = GEO_LEVEL)
+          out <- call_with_geo(fn, args, geo_level = geo)
           "OK"
         },
         warning = function(w) {
