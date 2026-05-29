@@ -42,8 +42,12 @@ RAW_DATA_BY_DS <- list(
 
 # Overrides de geo_level por dataset
 # livestock_production: só aceita geo_level = "municipality"
+# mapbiomas_transition: "biome" é muito menor que "municipality"
+# mapbiomas_mining: "indigenous_land" é menor que "municipality"
 GEO_LEVEL_BY_DS <- list(
-  livestock_production = "municipality"
+  livestock_production                  = "municipality",
+  mapbiomas_transition                  = "biome",
+  mapbiomas_mining                      = "indigenous_land"
 )
 
 
@@ -106,10 +110,10 @@ datasets_by_fn <- list(
   load_imazon = "imazon_shp",
   load_ips = "all",
   load_mapbiomas = c(
-    "mapbiomas_cover",
+    # "mapbiomas_cover",                    # arquivo ~578MB causa OOM no runner (opções: runner pago com mais RAM ou n_max em load_mapbiomas)
     "mapbiomas_transition",
     "mapbiomas_irrigation",
-    "mapbiomas_deforestation_regeneration",
+    # "mapbiomas_deforestation_regeneration", # arquivo ~578MB causa OOM no runner (opções: runner pago com mais RAM ou n_max em load_mapbiomas)
     "mapbiomas_mining",
     "mapbiomas_water",
     "mapbiomas_fire"
@@ -181,16 +185,13 @@ call_with_geo <- function(fn, args, geo_level = "state") {
 }
 
 
-# lista todas as funções exportadas do pacote que começam com "load_"
-# Exceto load_datasus
-fns <- ls("package:datazoom.amazonia")
-get_fns <- fns[startsWith(fns, "load_") & !endsWith(fns, "datasus")]
+get_fns <- names(datasets_by_fn)
 
 if (!is.null(target_fn)) {
-  if (!target_fn %in% get_fns){
+  if (!target_fn %in% get_fns) {
     stop("Função especificada em --fn não encontrada: ", target_fn)
   }
-  get_fns <- intersect(get_fns, target_fn)
+  get_fns <- target_fn
 }
 
 results <- data.frame(
