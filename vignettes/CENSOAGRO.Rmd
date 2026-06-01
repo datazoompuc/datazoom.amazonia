@@ -159,16 +159,16 @@ Defines which year(s) to download. Availability varies by dataset:
 
 | Dataset | Available Years |
 |---------|-----------------|
-| `agricultural_land_area` | 1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017 |
-| `agricultural_area_use` | 1970, 1975, 1980, 1985, 1995, 2006, 2017 |
-| `agricultural_employees_tractors` | 1970, 1975, 1980, 1985, 1995, 2006, 2017 |
-| `agricultural_producer_condition` | 1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017 |
-| `animal_production` | 1970, 1975, 1980, 1985, 1995, 2006, 2017 |
-| `animal_products` | 1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017 |
-| `vegetable_production_area` | 1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017 |
-| `vegetable_production_temporary` | 1970, 1975, 1980, 1985, 1995, 2006, 2017 |
-| `vegetable_production_permanent` | 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017 |
-| `livestock_production` | 2017 |
+| `agricultural_land_area` | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017` |
+| `agricultural_area_use` | `1970, 1975, 1980, 1985, 1995, 2006, 2017` |
+| `agricultural_employees_tractors` | `1970, 1975, 1980, 1985, 1995, 2006, 2017` |
+| `agricultural_producer_condition` | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017` |
+| `animal_production` | `1970, 1975, 1980, 1985, 1995, 2006, 2017` |
+| `animal_products` | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017` |
+| `vegetable_production_area` | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017` |
+| `vegetable_production_temporary` | `1970, 1975, 1980, 1985, 1995, 2006, 2017` |
+| `vegetable_production_permanent` | `1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017` |
+| `livestock_production` | `2017` |
 
 You can request a single year or a range of years:
 

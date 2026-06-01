@@ -177,7 +177,6 @@ if (nrow(partial_check) > 0) {
 ```
 
 ---
----
 
 ## Important Notes
 
@@ -204,8 +203,6 @@ The municipalities dataset includes spatial boundaries (when loaded as SF object
 - **Use**: Spatial operations, mapping, spatial joins with other geographic data
 
 ---
-
-
 
 ## Accessing Spatial Data
 
@@ -238,7 +235,6 @@ munic_by_state <- municipalities_sf %>%
   )
 ```
 
----
 ---
 
 ## Troubleshooting
@@ -275,8 +271,3 @@ munic_by_state <- municipalities_sf %>%
 - **Legal Amazon**: Official definition https://www.gov.br/
 - **Spatial data**: IBGE municipal boundaries available from various sources
 - **Within this package**: All geographic functions integrate this municipalities reference
-
-```
-```
-
-

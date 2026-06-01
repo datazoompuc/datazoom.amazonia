@@ -102,7 +102,7 @@ Specifies which year(s) to download. You can request single or multiple years.
 - **Most complete**: 2000 onwards for the majority of countries
 - **Note**: Specifying years helps with filtering but still requires downloading the full dataset
 
-```r
+```{r}
 time_period = 2016              # single year
 time_period = c(2010, 2015)     # multiple specific years
 time_period = 2010:2020         # range (will select available years)
@@ -115,7 +115,7 @@ Output language for variable names and documentation.
 - `"pt"`: Portuguese
 - `"eng"`: English
 
-```r
+```{r}
 language = "eng"  # character string
 ```
 
@@ -124,7 +124,7 @@ language = "eng"  # character string
 
 ## Examples
 
-```{r eval=FALSE}
+```{r, eval=FALSE}
 # download treated trade data for 2016 (HS92 classification)
 # Warning: large download, may take a long time
 trade_2016 <- load_baci(
