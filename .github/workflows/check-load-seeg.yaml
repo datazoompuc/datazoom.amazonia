@@ -1,8 +1,6 @@
 name: Check load_seeg
 
 on:
-  schedule:
-    - cron: "0 23 1 * *"
   workflow_dispatch:
 
 jobs:

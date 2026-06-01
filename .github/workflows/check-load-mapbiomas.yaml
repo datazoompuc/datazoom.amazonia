@@ -1,8 +1,6 @@
 name: Check load_mapbiomas
 
 on:
-  schedule:
-    - cron: "0 13 1 * *"
   workflow_dispatch:
 
 jobs:
