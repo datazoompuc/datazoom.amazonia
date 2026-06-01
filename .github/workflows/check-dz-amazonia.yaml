@@ -4,11 +4,6 @@ on:
   schedule:
     - cron: "0 3 1 * *"
   workflow_dispatch:
-    inputs:
-      fn:
-        description: "Função load_ a testar. Deixe vazio para testar todas."
-        required: false
-        default: ""
 
 jobs:
   check-downloads:
@@ -23,7 +18,8 @@ jobs:
           - load_aneel
           - load_baci
           - load_br_trade
-          - load_censo_agro
+          - load_cempre
+          - load_censoagro
           - load_climate
           - load_degrad
           - load_deter
@@ -41,11 +37,6 @@ jobs:
           - load_prodes
           - load_seeg
           - load_sigmine
-
-    if: |
-      github.event_name == 'schedule' ||
-      github.event.inputs.fn == '' ||
-      github.event.inputs.fn == matrix.fn
 
     steps:
       - name: Checkout repo

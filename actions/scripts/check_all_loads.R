@@ -18,10 +18,37 @@ if (requireNamespace("googledrive", quietly = TRUE)) {
 }
 
 # Config
-TIME_PERIOD <- 2020
+TIME_PERIOD <- 2022  # ano conservador com boa cobertura na maioria das fontes; atualizar a cada 1-2 anos
 LANGUAGE    <- "pt"
 RAW_DATA    <- FALSE
 GEO_LEVEL   <- "state"
+
+# Overrides de time_period para funções com cadência não-anual ou anos válidos restritos
+# load_degrad: programa descontinuado, dados apenas até 2016
+# load_ips: anos válidos são 2014, 2018, 2021, 2023 — usar o mais recente
+# load_censoagro: Censo Agropecuário; anos disponíveis 1995, 2006, 2017 — usar o mais recente
+TIME_PERIOD_BY_FN <- list(
+  load_degrad    = 2016,
+  load_ips       = 2023,
+  load_censoagro = 2017,
+  load_pibmunic  = 2021   # max disponível no SIDRA é 2021
+)
+
+# Overrides de raw_data por dataset
+# seeg: o dataset agregado só funciona com raw_data = TRUE
+RAW_DATA_BY_DS <- list(
+  seeg = TRUE
+)
+
+# Overrides de geo_level por dataset
+# livestock_production: só aceita geo_level = "municipality"
+# mapbiomas_transition: "biome" é muito menor que "municipality"
+# mapbiomas_mining: "indigenous_land" é menor que "municipality"
+GEO_LEVEL_BY_DS <- list(
+  livestock_production                  = "municipality",
+  mapbiomas_transition                  = "biome",
+  mapbiomas_mining                      = "indigenous_land"
+)
 
 
 
@@ -38,12 +65,12 @@ datasets_by_fn <- list(
                     "import_prod"
   ),
   load_cempre   = "cempre",
-  load_censo_agro = c(
+  load_censoagro = c(
     "agricultural_land_area",
     "agricultural_area_use",
     "agricultural_employees_tractors",
     "agricultural_producer_condition",
-    "animal_species",
+    "animal_production",
     "animal_products",
     "vegetable_production_area",
     "vegetable_production_permanent",
@@ -83,10 +110,10 @@ datasets_by_fn <- list(
   load_imazon = "imazon_shp",
   load_ips = "all",
   load_mapbiomas = c(
-    "mapbiomas_cover",
+    # "mapbiomas_cover",                    # arquivo ~578MB causa OOM no runner (opções: runner pago com mais RAM ou n_max em load_mapbiomas)
     "mapbiomas_transition",
     "mapbiomas_irrigation",
-    "mapbiomas_deforestation_regeneration",
+    # "mapbiomas_deforestation_regeneration", # arquivo ~578MB causa OOM no runner (opções: runner pago com mais RAM ou n_max em load_mapbiomas)
     "mapbiomas_mining",
     "mapbiomas_water",
     "mapbiomas_fire"
@@ -115,7 +142,7 @@ datasets_by_fn <- list(
     "clouds"
   ),
   load_seeg = c(
-    "seeg",
+    "seeg",           # raw_data = TRUE via RAW_DATA_BY_DS (conjunto bruto de todos os setores)
     "seeg_farming",
     "seeg_industry",
     "seeg_energy",
@@ -143,21 +170,28 @@ call_with_geo <- function(fn, args, geo_level = "state") {
     return(res)
   }
 
-  # fallback: tenta sem geo_level
-  do.call(fn, args)
+  # fallback: tenta sem geo_level (para funções onde geo_level é opcional)
+  res2 <- tryCatch(
+    do.call(fn, args),
+    error = function(e) e
+  )
+
+  if (!inherits(res2, "error")) {
+    return(res2)
+  }
+
+  # ambos falharam: propaga o erro ORIGINAL (com geo_level), não o do fallback
+  stop(conditionMessage(res))
 }
 
 
-# lista todas as funções exportadas do pacote que começam com "load_"
-# Exceto load_datasus
-fns <- ls("package:datazoom.amazonia")
-get_fns <- fns[startsWith(fns, "load_") & !endsWith(fns, "datasus")]
+get_fns <- names(datasets_by_fn)
 
 if (!is.null(target_fn)) {
-  if (!target_fn %in% get_fns){
+  if (!target_fn %in% get_fns) {
     stop("Função especificada em --fn não encontrada: ", target_fn)
   }
-  get_fns <- intersect(get_fns, target_fn)
+  get_fns <- target_fn
 }
 
 results <- data.frame(
@@ -195,9 +229,13 @@ for (fn_name in get_fns) {
     cat("  - dataset =", ds, "\n")
 
     args <- list()
+    tp  <- if (!is.null(TIME_PERIOD_BY_FN[[fn_name]])) TIME_PERIOD_BY_FN[[fn_name]] else TIME_PERIOD
+    raw <- if (!is.null(RAW_DATA_BY_DS[[ds]])) RAW_DATA_BY_DS[[ds]] else RAW_DATA
+    geo <- if (!is.null(GEO_LEVEL_BY_DS[[ds]])) GEO_LEVEL_BY_DS[[ds]] else GEO_LEVEL
     if ("dataset"     %in% arg_names) args$dataset     <- ds
-    if ("time_period" %in% arg_names) args$time_period <- TIME_PERIOD
-    if ("raw_data"    %in% arg_names) args$raw_data    <- RAW_DATA
+    if ("time_period" %in% arg_names) args$time_period <- tp
+    if ("year"        %in% arg_names) args$year        <- tp  # ex: load_aneel usa "year" em vez de "time_period"
+    if ("raw_data"    %in% arg_names) args$raw_data    <- raw
     if ("language"    %in% arg_names) args$language    <- LANGUAGE
 
     out <- NULL
@@ -206,7 +244,7 @@ for (fn_name in get_fns) {
     res <- tryCatch(
       withCallingHandlers(
         {
-          out <- call_with_geo(fn, args, geo_level = GEO_LEVEL)
+          out <- call_with_geo(fn, args, geo_level = geo)
           "OK"
         },
         warning = function(w) {
