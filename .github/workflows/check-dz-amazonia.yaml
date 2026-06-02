@@ -80,4 +80,139 @@ jobs:
           name: check-results-${{ matrix.fn }}
           path: check_results_${{ matrix.fn }}_*.csv
 
+  notify-slack:
+    runs-on: ubuntu-latest
+    needs: [check-downloads]
+    if: always()
 
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Build and send Slack summary
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          python3 << 'EOF'
+          import os, csv, json, urllib.request, glob
+          from collections import defaultdict
+
+          run_url = os.environ["RUN_URL"]
+          webhook  = os.environ["SLACK_WEBHOOK_URL"]
+
+          rows = []
+          for path in glob.glob("artifacts/**/*.csv", recursive=True):
+              with open(path) as f:
+                  rows.extend(list(csv.DictReader(f)))
+
+          def short_msg(msg, limit=120):
+              msg = msg.strip().replace("\n", " ")
+              return msg[:limit] + "…" if len(msg) > limit else msg
+
+          def group_by_fn(rows):
+              """Returns dict: fn -> list of rows, sorted by fn name then dataset."""
+              d = defaultdict(list)
+              for r in sorted(rows, key=lambda r: (r["function_name"], r["dataset"])):
+                  d[r["function_name"]].append(r)
+              return dict(sorted(d.items()))
+
+          def format_fn_block(fn, fn_rows, total_by_fn):
+              """Format one function block in style 2c."""
+              total = total_by_fn[fn]
+              bad = [r for r in fn_rows if r["status"] not in ("OK",)]
+              fail_rows = [r for r in bad if r["status"] in ("FAIL", "EMPTY")]
+              warn_rows = [r for r in bad if r["status"] in ("WARN", "WEIRD")]
+
+              # summary counts
+              parts = []
+              if fail_rows:
+                  parts.append(f"{len(fail_rows)}/{total} FAIL")
+              if warn_rows:
+                  parts.append(f"{len(warn_rows)}/{total} WARN")
+              summary = ", ".join(parts)
+
+              lines = [f"• `{fn}` — {summary}:"]
+
+              # group unique messages within fail and warn separately
+              for status_label, group in [("FAIL", fail_rows), ("WARN", warn_rows)]:
+                  if not group:
+                      continue
+                  # deduplicate messages
+                  msg_map = defaultdict(list)
+                  for r in group:
+                      msg_map[short_msg(r["message"])].append(r["dataset"])
+
+                  show_label = len(fail_rows) > 0 and len(warn_rows) > 0
+
+                  for msg, datasets in msg_map.items():
+                      prefix = f"{status_label}: " if show_label else ""
+                      if len(datasets) > 1:
+                          lines.append(f"　↳ {prefix}{msg} _({len(datasets)} datasets)_")
+                      else:
+                          lines.append(f"　↳ {prefix}{msg}")
+
+              return "\n".join(lines)
+
+          if not rows:
+              text = ":warning: *check-dz-amazonia*: nenhum artefato CSV encontrado."
+          else:
+              rows.sort(key=lambda r: (r["function_name"], r["dataset"]))
+              total_by_fn = defaultdict(int)
+              for r in rows:
+                  total_by_fn[r["function_name"]] += 1
+
+              all_fail = [r for r in rows if r["status"] in ("FAIL", "EMPTY")]
+              all_warn = [r for r in rows if r["status"] in ("WARN", "WEIRD")]
+              all_ok   = [r for r in rows if r["status"] == "OK"]
+
+              if all_fail:
+                  headline = f":red_circle: *check-dz-amazonia — {len(all_fail)} erro(s) encontrado(s)*"
+              elif all_warn:
+                  headline = f":large_yellow_circle: *check-dz-amazonia — {len(all_warn)} aviso(s)*"
+              else:
+                  headline = f":large_green_circle: *check-dz-amazonia — Tudo OK ({len(all_ok)} datasets)*"
+
+              lines = [headline, f"<{run_url}|Ver execução no GitHub Actions>", ""]
+
+              # functions with any problem (fail or warn), sorted alphabetically
+              bad_fns = sorted(set(
+                  r["function_name"] for r in rows
+                  if r["status"] not in ("OK",)
+              ))
+
+              if bad_fns:
+                  fn_rows_map = group_by_fn(rows)
+                  # separate fail-containing functions from warn-only
+                  fail_fns = [fn for fn in bad_fns if any(
+                      r["status"] in ("FAIL", "EMPTY") for r in fn_rows_map[fn]
+                  )]
+                  warn_fns = [fn for fn in bad_fns if fn not in fail_fns]
+
+                  if fail_fns:
+                      lines.append("*FAIL / EMPTY:*")
+                      for fn in fail_fns:
+                          lines.append(format_fn_block(fn, fn_rows_map[fn], total_by_fn))
+                      lines.append("")
+
+                  if warn_fns:
+                      lines.append("*WARN:*")
+                      for fn in warn_fns:
+                          lines.append(format_fn_block(fn, fn_rows_map[fn], total_by_fn))
+                      lines.append("")
+
+              lines.append(f"_Total: {len(all_ok)} OK · {len(all_fail)} FAIL/EMPTY · {len(all_warn)} WARN · {len(rows)} datasets verificados_")
+              lines.append("_PS: erros do tipo \"cannot open URL\" ou \"Error in Download\" podem ser falhas temporárias de conexão — rode novamente antes de investigar._")
+              text = "\n".join(lines)
+
+          payload = json.dumps({"text": text})
+          req = urllib.request.Request(
+              webhook,
+              data=payload.encode(),
+              headers={"Content-Type": "application/json"}
+          )
+          urllib.request.urlopen(req)
+          print("Notificação enviada ao Slack.")
+          EOF
