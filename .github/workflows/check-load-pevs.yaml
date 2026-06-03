@@ -1,8 +1,6 @@
 name: Check load_pevs
 
 on:
-  schedule:
-    - cron: "0 16 1 * *"
   workflow_dispatch:
 
 jobs:

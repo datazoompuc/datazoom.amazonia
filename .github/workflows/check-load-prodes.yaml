@@ -1,8 +1,6 @@
 name: Check load_prodes
 
 on:
-  schedule:
-    - cron: "0 21 1 * *"
   workflow_dispatch:
 
 jobs:
