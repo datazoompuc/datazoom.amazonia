@@ -105,7 +105,7 @@ jobs:
 
           rows = []
           for path in glob.glob("artifacts/**/*.csv", recursive=True):
-              with open(path) as f:
+              with open(path, encoding="utf-8", errors="replace") as f:
                   rows.extend(list(csv.DictReader(f)))
 
           def short_msg(msg, limit=120):
