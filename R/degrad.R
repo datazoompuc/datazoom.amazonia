@@ -97,52 +97,16 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
 
   # Remove useless column
   dat <- dat %>%
-    dplyr::select(-nome)
-
-  # Add sigla UF
-  ufs <- tibble::tribble(
-    ~uf, ~codigouf,
-    "AC", 12,
-    "AL", 27,
-    "AP", 16,
-    "AM", 13,
-    "BA", 29,
-    "CE", 23,
-    "ES", 32,
-    "GO", 52,
-    "MA", 21,
-    "MT", 51,
-    "MS", 50,
-    "MG", 31,
-    "PA", 15,
-    "PB", 25,
-    "PR", 41,
-    "PE", 26,
-    "PI", 22,
-    "RJ", 33,
-    "RN", 24,
-    "RS", 43,
-    "RO", 11,
-    "RR", 14,
-    "SC", 42,
-    "SP", 35,
-    "SE", 28,
-    "TO", 17,
-    "DF", 53
-  )
-
-
-  dat <- dat %>%
-    dplyr::mutate(codigouf = as.numeric(dplyr::coalesce(as.numeric(codigouf), 0))) %>%
-    dplyr::left_join(ufs, by = "codigouf", multiple = "first") %>%
-    dplyr::select(-codigouf, -area)
+    dplyr::select(-dplyr::any_of(c("nome", "codigouf", "area")))
 
 
   # Clean geometry
-  dat$geometry <- sf::st_set_crs(
-    dat$geometry,
-    "+proj=longlat +ellps=aust_SA +towgs84=-66.8700,4.3700,-38.5200,0.0,0.0,0.0,0.0 +no_defs"
-  )
+  if (is.na(sf::st_crs(dat$geometry))) {
+    dat$geometry <- sf::st_set_crs(
+      dat$geometry,
+      "+proj=longlat +ellps=aust_SA +towgs84=-66.8700,4.3700,-38.5200,0.0,0.0,0.0,0.0 +no_defs"
+    )
+  }
 
   dat$geometry <- dat$geometry %>%
     sf::st_make_valid()
@@ -174,7 +138,10 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
   amazon_municipalities <- dplyr::filter(datazoom.amazonia::municipalities, .data$legal_amazon == 1)
 
   # Filters geobr shapefiles to legal amazon municipalities
-  geo_amazon <- dplyr::filter(geo_br, .data$code_muni %in% amazon_municipalities$code_muni)
+  geo_amazon <- dplyr::filter(
+    geo_br,
+    as.numeric(.data$code_muni) %in% as.numeric(amazon_municipalities$code_muni)
+  )
 
   ###################
   ## Harmonize CRS ##
@@ -185,7 +152,7 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
 
   # Changing crs of both data to the common crs chosen above
   dat$geometry <- sf::st_make_valid(sf::st_transform(dat$geometry, operation_crs))
-  geo_amazon$geom <- sf::st_transform(geo_amazon$geom, operation_crs)
+  geo_amazon$geom <- sf::st_make_valid(sf::st_transform(geo_amazon$geom, operation_crs))
 
   ##########################################################
   ## Aggregation Municipality or State Level x Time Level ##
