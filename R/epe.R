@@ -227,6 +227,8 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
           "value" = valor,
           "year" = ano
         )
+    } else {
+      dat_mod <- dat
     }
   }
 
