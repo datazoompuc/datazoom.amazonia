@@ -202,8 +202,8 @@ load_ibama <- function(dataset,
         dplyr::across(dplyr::where(is.character), ~ dplyr::na_if(.x, "")),
         dplyr::across(ultima_atualizacao_relatorio, as.POSIXct, format = "%d/%m/%Y %H:%M")
       ) %>%
-      dplyr::mutate(dplyr::across(dplyr::starts_with("valor"), .fns = ~ gsub("[.]", "", .x))) %>%
-      dplyr::mutate(dplyr::across(dplyr::starts_with("valor"), ~ gsub("[,]", ".", .x) %>% as.numeric()))
+      dplyr::mutate(dplyr::across(dplyr::starts_with("valor"), .fns = ~ gsub("[.]", "", as.character(.x)))) %>%
+      dplyr::mutate(dplyr::across(dplyr::starts_with("valor"), ~ gsub("[,]", ".", as.character(.x)) %>% as.numeric()))
   }
 
   if (dataset == "embargoed_areas") {
