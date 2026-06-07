@@ -528,9 +528,12 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     a <- TRUE
     options(timeout = max(1000, getOption("timeout")))
   }
-  if (source %in% c("deter", "terraclimate", "baci", "sigmine", "mapbiomas")) {
+  if (source %in% c("deter", "terraclimate", "baci", "mapbiomas")) {
     download_method <- "curl"
     quiet <- FALSE
+  }
+  if (source == "sigmine") {
+    options(timeout = max(1000, getOption("timeout")))
   }
   if (source == "ibama") {
     download_method <- "curl"
@@ -587,7 +590,11 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       }
     }
     if (param$source == "sigmine") {
-      dat <- purrr::quietly(sf::read_sf)(file.path(dir, "BRASIL.shp"))$result
+      shp <- list.files(dir, pattern = "\\.shp$", full.names = TRUE, recursive = TRUE)
+      if (length(shp) == 0) {
+        stop("No shapefile found in the downloaded SIGMINE archive.")
+      }
+      dat <- purrr::quietly(sf::read_sf)(shp[1])$result
     }
     if (param$source == "ibama") {
       shp <- list.files(dir, pattern = "\\.shp$", full.names = TRUE, recursive = TRUE)
@@ -922,7 +929,7 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
     ## SIGMINE
 
-    "sigmine", "sigmine_active", NA, NA, NA, "https://app.anm.gov.br/dadosabertos/SIGMINE/PROCESSOS_MINERARIOS/BRASIL.zip",
+    "sigmine", "sigmine_active", NA, NA, NA, "https://dadosabertos.anm.gov.br/SIGMINE/BRASIL.zip",
 
     ## ANEEL
 
