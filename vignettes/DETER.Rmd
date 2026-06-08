@@ -39,7 +39,7 @@ DETER monitoring:
 
 For technical details, visit [INPE DETER System](http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter).
 
----
+***
 
 ## Available Datasets
 
@@ -76,7 +76,7 @@ DETER monitoring data for the Cerrado biome.
   - Compare forest and savanna degradation patterns
   - Track conservation effectiveness
 
----
+***
 
 ## Important Data Characteristics
 
@@ -89,7 +89,7 @@ This package provides an important enhancement: **spatial intersection with IBGE
 
 **Important note on CRS metadata**: The CRS (Coordinate Reference System) information may need verification after loading, as coordinate system metadata can sometimes be unclear in the original INPE data.
 
----
+***
 
 ## Function Parameters
 
@@ -127,7 +127,7 @@ language = "eng"  # character string
 ```
 
 
----
+***
 
 ## Examples
 
@@ -200,7 +200,7 @@ biome_comparison <- combined %>%
 print(biome_comparison)
 ```
 
----
+***
 
 ## Data Notes
 
@@ -230,7 +230,7 @@ Each alert/row typically contains:
 5. **Overlapping municipalities**: Enhanced version accounts for alerts crossing municipality boundaries
 6. **False positives possible**: Satellite detection can occasionally misclassify cloud shadows or other features as forest loss
 
----
+***
 
 ```
 

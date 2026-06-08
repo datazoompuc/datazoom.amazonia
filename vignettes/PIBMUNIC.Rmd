@@ -39,7 +39,7 @@ PIBMUNIC data is compiled by IBGE using:
 
 For more information, visit [IBGE National Accounts](https://www.ibge.gov.br/en/statistics/economic/national-accounts/).
 
----
+***
 
 ## Available Dataset
 
@@ -60,7 +60,7 @@ Complete municipal GDP statistics with sectoral detail.
   - Development planning and policy evaluation
   - Correlate with social/environmental indicators
 
----
+***
 
 ## Function Parameters
 
@@ -116,7 +116,7 @@ Output language for variable names.
 language = "eng"  # character string
 ```
 
----
+***
 
 ## Examples
 
@@ -153,7 +153,7 @@ poorest <- pib_munic %>%
 print("Poorest municipalities:")
 print(poorest)
 ```
----
+***
 
 ## Data Notes
 
@@ -188,5 +188,5 @@ Typical variables include:
 4. **Methodological changes**: IBGE occasionally updates national accounts methodology
 5. **Municipal boundaries**: Changed in 2021; affects historical comparisons
 
----
+***
 

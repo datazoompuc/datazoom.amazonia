@@ -40,7 +40,7 @@ PPM data is compiled from:
 
 For more information, visit [IBGE Livestock Statistics](https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry/).
 
----
+***
 
 ## Available Datasets
 
@@ -115,7 +115,7 @@ Aquaculture activities including fish, shrimp, and mollusk farming.
   - Fish and seafood production trends
   - Emerging aquaculture development
 
----
+***
 
 ## Function Parameters
 
@@ -178,7 +178,7 @@ Output language for variable names.
 language = "eng"  # character string
 ```
 
----
+***
 
 ## Examples
 
@@ -436,7 +436,7 @@ print("Top aquaculture states:")
 print(leading_aquaculture)
 ```
 
----
+***
 
 ## Data Notes
 
@@ -472,4 +472,4 @@ Each record typically contains:
 4. **Aquaculture newer**: Aquaculture data less complete for very early years
 5. **Methodology changes**: Survey methods may evolve; can affect comparability
 
----
+***

@@ -62,7 +62,7 @@ The function provides access to three distinct datasets tracking different stage
 5. **Entity Information**: Individual or corporate identifier, sector
 6. **Embargo Details**: Embargoed area size, land type, geographic descriptors
 
----
+***
 
 ## Data Aggregation
 
@@ -75,7 +75,7 @@ The function returns either:
   - Embargoed area totals
   - Fine totals and collection rates
 
----
+***
 
 ## Function Parameters
 
@@ -100,9 +100,9 @@ The function returns either:
    - `"pt"`: Portuguese language labels and names
    - `"eng"`: English language
 
----
+***
 
----
+***
 
 ## Practical Examples
 
@@ -183,7 +183,7 @@ raw_infractions <- load_ibama(
 str(raw_infractions)
 ```
 
----
+***
 
 ## Use Cases
 
@@ -194,6 +194,6 @@ str(raw_infractions)
 - **Business Impact**: Understand regulatory environment by sector and state
 - **Law Enforcement**: Analyze IBAMA effectiveness and resource allocation
 
----
+***
 
 

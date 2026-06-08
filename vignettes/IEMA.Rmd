@@ -56,7 +56,7 @@ The dataset addresses multiple aspects of energy poverty:
 - **Geographic Barriers**: Remote location and access challenges
 - **Population Characteristics**: Indigenous communities, rural settlements, urban poor
 
----
+***
 
 ## Function Parameters
 
@@ -72,7 +72,7 @@ The dataset addresses multiple aspects of energy poverty:
    - `"pt"`: Portuguese language
    - `"eng"`: English language
 
----
+***
 
 ## Data Limitations
 
@@ -81,7 +81,7 @@ Since this dataset captures a single year (2018), it represents a snapshot rathe
 - **Temporal Stability**: Conditions may have changed since 2018
 - **Recent Updates**: Users may need to contact IEMA for more recent data
 
----
+***
 
 
 ## Practical Examples
@@ -117,7 +117,7 @@ worst_access <- amazon_energy %>%
 print(worst_access[, c("municipality", "state", "population_without_energy")])
 ```
 
----
+***
 
 ## Use Cases
 
@@ -129,6 +129,6 @@ print(worst_access[, c("municipality", "state", "population_without_energy")])
 - **Environmental Impact**: Link energy access to deforestation and conservation
 - **Social Equity**: Analyze disparities in energy access across populations
 
----
+***
 
 
