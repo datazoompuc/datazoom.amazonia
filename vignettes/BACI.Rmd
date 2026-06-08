@@ -102,10 +102,11 @@ Specifies which year(s) to download. You can request single or multiple years.
 - **Most complete**: 2000 onwards for the majority of countries
 - **Note**: Specifying years helps with filtering but still requires downloading the full dataset
 
-```r
+```{r eval = FALSE}
 time_period = 2016              # single year
 time_period = c(2010, 2015)     # multiple specific years
 time_period = 2010:2020         # range (will select available years)
+```
 ```
 
 ### 4. **language**
@@ -115,7 +116,7 @@ Output language for variable names and documentation.
 - `"pt"`: Portuguese
 - `"eng"`: English
 
-```r
+```{r eval = FALSE}
 language = "eng"  # character string
 ```
 
