@@ -81,7 +81,7 @@ head(municipalities)
 amazon_municipalities <- municipalities %>%
   filter(legal_amazon == TRUE)
 ```
-
+```
 ### What It Contains
 
 The dataset includes all 5,570+ Brazilian municipalities with:
