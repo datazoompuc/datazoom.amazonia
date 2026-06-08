@@ -41,7 +41,7 @@ COMEX data comes from:
 
 For more information, visit the [Brazilian Ministry of Productivity, Employment and Foreign Trade](https://www.gov.br/produtividade-e-comercio-exterior/).
 
----
+***
 
 ## Available Datasets
 
@@ -101,7 +101,7 @@ Import data organized by importer/distributor and product.
   - Importer concentration analysis
   - International sourcing patterns
 
----
+***
 
 ## Function Parameters
 
@@ -150,7 +150,8 @@ Output language for variable names and documentation.
 language = "eng"  # character string
 ```
 
----
+***
+
 ## Examples
 
 ### Example 1: Top Exporting Municipalities
@@ -292,7 +293,8 @@ ggplot(annual_trends, aes(x = year, y = total_exports)) +
        y = "Total Exports (USD)") +
   theme_minimal()
 ```
----
+
+***
 
 ## Data Notes
 

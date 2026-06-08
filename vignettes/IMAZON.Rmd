@@ -37,7 +37,7 @@ Imazon's classification is based on:
 
 For more information, visit [Imazon Official Website](https://imazon.org.br/).
 
----
+***
 ## Available Dataset
 
 ### **imazon_shp (Imazon Municipality Pressure Index)**
@@ -57,7 +57,7 @@ Municipality-level deforestation pressure classification with spatial geometries
   - Monitoring enforcement effectiveness
   - Correlate pressure with socioeconomic variables
 
----
+***
 
 ## Deforestation Pressure Categories
 
@@ -69,7 +69,7 @@ Imazon's three-level classification system:
 | 2 | High Pressure | Significant deforestation threat |
 | 3 | Very High Pressure | Severe/Critical deforestation risk |
 
----
+***
 
 ## Function Parameters
 
@@ -103,7 +103,7 @@ Output language for variable names and documentation.
 language = "eng"  # character string
 ```
 
----
+***
 
 ## Examples
 ### Example 1: High-Pressure Municipalities
@@ -182,7 +182,7 @@ state_risk <- imazon_data %>%
 print(state_risk)
 ```
 
----
+***
 
 ## Data Notes
 
@@ -216,4 +216,4 @@ This dataset works well in combination with:
 - **CEMPRE**: Analyze relationship between employment and deforestation pressure
 - **COMEX**: Examine trade patterns in high-pressure vs low-pressure areas
 
----
+***
