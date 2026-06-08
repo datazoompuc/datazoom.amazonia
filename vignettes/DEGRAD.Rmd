@@ -39,7 +39,7 @@ DEGRAD monitoring:
 
 For information, visit [INPE Forest Monitoring](http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad).
 
----
+***
 
 ## Important Data Characteristics
 
@@ -61,7 +61,7 @@ This package enhances the raw DEGRAD data by:
 
 **Note on CRS**: Coordinate system metadata should be verified after loading, as original INPE data sometimes has unclear CRS information.
 
----
+***
 
 ## Available Dataset
 
@@ -81,7 +81,7 @@ Detailed monitoring of forest degradation across the Legal Amazon.
   - Forest fire impacts
   - Long-term degradation trends
 
----
+***
 
 ## Function Parameters
 
@@ -131,7 +131,7 @@ Output language for variable names and documentation.
 language = "eng"  # character string
 ```
 
----
+***
 
 ## Data Structure
 
@@ -146,7 +146,7 @@ The returned data is a Simple Features (SF) spatial object with:
 - **edition**: Which DEGRAD edition this event appears in
 - **Additional attributes**: Quality metrics, confidence levels (vary by edition)
 
----
+***
 
 
 ## Examples
@@ -181,7 +181,7 @@ top_degradation <- degrad_data %>%
 
 print(top_degradation)
 ```
----
+***
 
 ## Data Notes
 
@@ -218,7 +218,7 @@ Common degradation types include:
 4. **Detection limits**: Minimum detectable degradation size varies by methodology/edition
 5. **Not real-time**: This is annual analysis, not near-real-time detection like DETER
 
----
+***
 
 ```
 
