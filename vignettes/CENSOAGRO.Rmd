@@ -36,7 +36,7 @@ Data is collected at multiple geographic levels:
 
 Historical data spans from 1920 onwards, with different time series available for different datasets based on IBGE's survey methodology evolution.
 
----
+***
 
 ## Available Datasets
 
@@ -120,7 +120,7 @@ Specialized dataset on bovine cattle production and related establishments.
 - **Geographic levels**: Country, State, **Municipality** (unique to this dataset)
 - **Use case**: Detailed regional analysis of cattle ranching, including municipality-level data
 
----
+***
 
 ## Function Parameters
 
@@ -188,7 +188,7 @@ Output language for variable names and labels.
 language = "eng"  # character string
 ```
 
----
+***
 
 ## Examples
 
@@ -251,6 +251,6 @@ When using this data in research or publications, cite:
 
 > IBGE - Instituto Brasileiro de Geografia e Estatística. Censo Agropecuário. Available at: https://sidra.ibge.gov.br/pesquisa/censo-agropecuario
 
----
+***
 
 ```

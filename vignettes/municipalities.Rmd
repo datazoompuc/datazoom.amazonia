@@ -36,7 +36,7 @@ The municipalities dataset is compiled from:
 - **Spatial boundaries**: IBGE 2019 municipal boundary shapefile
 - **Maintained by**: datazoom.amazonia package developers
 
----
+***
 
 ## Dataset Structure
 
@@ -59,7 +59,7 @@ The municipalities dataset contains the following information:
 - **Region names**: Official Brazilian geographic regions
 - **Geographic boundaries**: Available as simple features (SF) objects for spatial analysis
 
----
+***
 
 ## Accessing the Dataset
 
@@ -90,7 +90,8 @@ The dataset includes all 5,570+ Brazilian municipalities with:
 - Legal Amazon flag for filtering
 - Spatial geometries for geographic analysis
 
----
+***
+
 ## Common Use Cases
 
 ### Use Case 1: Filter Data to Legal Amazon
@@ -138,7 +139,7 @@ print(paste("Fully in Amazon:", nrow(full_amazon)))
 print(paste("Partially in Amazon:", nrow(partial_amazon)))
 ```
 
----
+***
 
 ## Key Characteristics
 
@@ -176,7 +177,7 @@ if (nrow(partial_check) > 0) {
 }
 ```
 
----
+***
 
 ## Important Notes
 
@@ -202,7 +203,7 @@ The municipalities dataset includes spatial boundaries (when loaded as SF object
 - **CRS**: WGS84 (EPSG:4326)
 - **Use**: Spatial operations, mapping, spatial joins with other geographic data
 
----
+***
 
 ## Accessing Spatial Data
 
@@ -235,7 +236,7 @@ munic_by_state <- municipalities_sf %>%
   )
 ```
 
----
+***
 
 ## Troubleshooting
 
@@ -263,7 +264,7 @@ munic_by_state <- municipalities_sf %>%
 **Problem**: Partial municipalities causing data discrepancies
 **Solution**: Account for partial Amazon municipalities; some statistics are reported for Amazon portion only
 
----
+***
 
 ## Related Resources
 
