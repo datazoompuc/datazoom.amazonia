@@ -77,11 +77,35 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
   if (param$dataset == "energy_state_panel") {
     sheets <- "8.1 part 3"
   }
-  dat <- external_download(
-    source = param$source,
-    dataset = param$dataset,
-    sheet = sheets
-  )
+
+  if (param$dataset == "consumer_energy_consumption") {
+    temp <- tempfile(fileext = ".xlsx")
+    on.exit(unlink(temp), add = TRUE)
+
+    utils::download.file(
+      url = datasets_link(source = param$source, dataset = param$dataset, url = TRUE),
+      destfile = temp,
+      mode = "wb"
+    )
+
+    dat <- list(
+      readxl::read_xlsx(
+        temp,
+        sheet = sheets,
+        range = if (param$geo_level == "state") {
+          readxl::cell_limits(c(1, 2), c(60086, 9))
+        } else {
+          readxl::cell_limits(c(1, 2), c(18409, 8))
+        }
+      )
+    )
+  } else {
+    dat <- external_download(
+      source = param$source,
+      dataset = param$dataset,
+      sheet = sheets
+    )
+  }
 
   names(dat) <- sheets
 
