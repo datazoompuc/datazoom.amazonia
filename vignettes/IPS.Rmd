@@ -44,7 +44,7 @@ The Social Progress Index:
 
 For detailed methodology, visit [Social Progress Imperative](https://www.socialprogress.org/).
 
----
+***
 
 ## Available Dimensions
 
@@ -99,7 +99,7 @@ Environmental and deforestation indicators.
 - **Variables**: Forest cover, deforestation rates, environmental sustainability
 - **Use cases**: Forest monitoring, environmental assessment, climate/conservation analysis
 
----
+***
 
 ## Function Parameters
 
@@ -152,7 +152,8 @@ Output language for variable names and labels.
 language = "eng"  # character string
 ```
 
----
+***
+
 ## Examples
 
 ```{r eval=FALSE}
@@ -214,4 +215,4 @@ When comparing across years (2014, 2018, 2021, 2023):
 - Includes all states with Amazon territory
 - Some frontier/protected areas may lack complete data
 
----
+***
