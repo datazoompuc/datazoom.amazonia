@@ -33,6 +33,7 @@ Imports:
     googledrive,
     janitor,
     magrittr,
+    openxlsx,
     purrr,
     readr,
     readxl,
