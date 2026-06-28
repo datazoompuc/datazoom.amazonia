@@ -77,11 +77,36 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
   if (param$dataset == "energy_state_panel") {
     sheets <- "8.1 part 3"
   }
-  dat <- external_download(
-    source = param$source,
-    dataset = param$dataset,
-    sheet = sheets
-  )
+
+  if (param$dataset %in% c("consumer_energy_consumption", "industrial_energy_consumption")) {
+    # The EPE source file (Dados_abertos_Consumo_Mensal.xlsx) declares a corrupted
+    # "count" attribute in xl/sharedStrings.xml (~2^32), which makes readxl abort
+    # with "vector::reserve". openxlsx builds the shared strings from the actual
+    # entries and is not affected, so it is used to read these datasets.
+
+    temp <- tempfile(fileext = ".xlsx")
+    on.exit(unlink(temp), add = TRUE)
+
+    utils::download.file(
+      url = datasets_link(source = param$source, dataset = param$dataset, url = TRUE),
+      destfile = temp,
+      mode = "wb"
+    )
+
+    dat <- list(
+      openxlsx::read.xlsx(
+        temp,
+        sheet = sheets,
+        detectDates = TRUE
+      )
+    )
+  } else {
+    dat <- external_download(
+      source = param$source,
+      dataset = param$dataset,
+      sheet = sheets
+    )
+  }
 
   names(dat) <- sheets
 
@@ -227,6 +252,8 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
           "value" = valor,
           "year" = ano
         )
+    } else {
+      dat_mod <- dat
     }
   }
 

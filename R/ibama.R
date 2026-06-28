@@ -114,6 +114,16 @@ load_ibama <- function(dataset,
   ## Data Engineering ##
   ######################
 
+  if (dataset %in% c("collected_fines", "distributed_fines")) {
+    dat <- dat %>%
+      purrr::map(
+        ~ dplyr::mutate(
+          .x,
+          dplyr::across(dplyr::starts_with("valor"), as.character)
+        )
+      )
+  }
+
   dat <- dat %>%
     dplyr::bind_rows() %>%
     janitor::clean_names()
@@ -196,14 +206,14 @@ load_ibama <- function(dataset,
     # Changing dates to date format
     dat <- dat %>%
       dplyr::mutate(
-        dplyr::across(dplyr::any_of(c("data_auto", "data_pagamento")), as.Date, format = "%d/%m/%Y")
+        dplyr::across(dplyr::any_of(c("data_auto", "data_pagamento")), \(x) as.Date(x, format = "%d/%m/%Y"))
       ) %>%
       dplyr::mutate(
         dplyr::across(dplyr::where(is.character), ~ dplyr::na_if(.x, "")),
-        dplyr::across(ultima_atualizacao_relatorio, as.POSIXct, format = "%d/%m/%Y %H:%M")
+        dplyr::across(ultima_atualizacao_relatorio, \(x) as.POSIXct(x, format = "%d/%m/%Y %H:%M"))
       ) %>%
-      dplyr::mutate(dplyr::across(dplyr::starts_with("valor"), .fns = ~ gsub("[.]", "", .x))) %>%
-      dplyr::mutate(dplyr::across(dplyr::starts_with("valor"), ~ gsub("[,]", ".", .x) %>% as.numeric()))
+      dplyr::mutate(dplyr::across(dplyr::starts_with("valor"), .fns = ~ gsub("[.]", "", as.character(.x)))) %>%
+      dplyr::mutate(dplyr::across(dplyr::starts_with("valor"), ~ gsub("[,]", ".", as.character(.x)) %>% as.numeric()))
   }
 
   if (dataset == "embargoed_areas") {
