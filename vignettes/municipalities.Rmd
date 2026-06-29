@@ -1,282 +1,285 @@
----
-title: "legal_amazon"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{legal_amazon}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
-
-## Overview
-
-The `municipalities` dataset is a foundational reference dataset included in the datazoom.amazonia package. It contains key information about all Brazilian municipalities and identifies which are located in (or overlapping with) the Legal Amazon region.
-
-This dataset includes:
-
-- **Municipality identification**: Official names, codes (IBGE), and geographic identifiers
-- **Legal Amazon status**: Identifies whether each municipality is in the Legal Amazon
-- **Geographic information**: State, region, and spatial boundaries
-- **Supporting attributes**: Additional useful variables for geographic matching and analysis
-- **Historical coverage**: Updated to reflect current municipal boundaries (2019 onwards)
-
-The municipalities dataset is essential infrastructure for this package—most package functions that return geographic data match results to this municipalities reference to enable Legal Amazon filtering and consistent geographic identification.
-
-### Data Source
-
-The municipalities dataset is compiled from:
-- **IBGE**: Brazilian Institute of Geography and Statistics official municipal data
-- **Legal Amazon definition**: Based on official Brazilian government definition
-- **Spatial boundaries**: IBGE 2019 municipal boundary shapefile
-- **Maintained by**: datazoom.amazonia package developers
-
----
-
-## Dataset Structure
-
-The municipalities dataset contains the following information:
-
-### Key Variables
-
-- **code**: IBGE municipal code (unique identifier)
-- **name**: Official municipality name
-- **state**: Two-letter state abbreviation (e.g., "SP", "AM")
-- **state_code**: IBGE state code
-- **legal_amazon**: TRUE/FALSE indicating Legal Amazon membership
-- **region**: Geographic region (North, Northeast, Center-West, Southeast, South)
-- **geometry**: Spatial polygon (when using full SF object)
-
-### Data Types
-
-- **IBGE codes**: Numeric identifiers used throughout Brazilian statistics
-- **State abbreviations**: Standard two-letter codes for all 27 Brazilian states/federal district
-- **Region names**: Official Brazilian geographic regions
-- **Geographic boundaries**: Available as simple features (SF) objects for spatial analysis
-
----
-
-## Accessing the Dataset
-
-### In R Code
-
-```{r eval = FALSE}
-# Load Brazilian municipalities dataset
-data <- datazoom.amazonia::municipalities
-
-# Or after loading the package
-library(datazoom.amazonia)
-data <- municipalities
-
-# View structure
-str(municipalities)
-head(municipalities)
-
-# Filter for Legal Amazon municipalities only
-amazon_municipalities <- municipalities %>%
-  filter(legal_amazon == TRUE)
-```
-
-### What It Contains
-
-The dataset includes all 5,570+ Brazilian municipalities with:
-- Official IBGE identification codes
-- State and region classification
-- Legal Amazon flag for filtering
-- Spatial geometries for geographic analysis
-
----
-## Common Use Cases
-
-### Use Case 1: Filter Data to Legal Amazon
-
-Many analyses focus specifically on the Legal Amazon region. Use the municipalities dataset to identify relevant municipalities:
-
-```{r eval=FALSE}
-library(dplyr)
-# Load any dataset with municipality information
-data <- load_prodes(
-  dataset = "deforestation",
-  raw_data = FALSE,
-  geo_level = "municipality",
-  language = "eng"
-)
-
-# Filter to Legal Amazon using municipalities reference
-amazon_data <- data %>%
-  inner_join(
-    municipalities %>% 
-      filter(legal_amazon == TRUE) %>%
-      select(code, name),
-    by = c("municipality_code" = "code")
-  )
-```
-
-### Use Case 2: Partial Amazon Municipalities
-
- **Important**: Some municipalities are only partially within the Legal Amazon.
-
-For statistics reported at municipality level in this package:
-- **Partial Amazon municipalities**: Data is reported for only the Amazon-included portion
-- **Identification**: The municipalities dataset identifies these cases
-- **Interpretation**: When a municipality is partially in Amazon, reported statistics reflect the Amazon portion only
-
-```{r eval=FALSE}
-# Identify fully vs. partially included municipalities
-full_amazon <- municipalities %>%
-  filter(legal_amazon == TRUE & fully_included == TRUE)
-
-partial_amazon <- municipalities %>%
-  filter(legal_amazon == TRUE & fully_included == FALSE)
-
-print(paste("Fully in Amazon:", nrow(full_amazon)))
-print(paste("Partially in Amazon:", nrow(partial_amazon)))
-```
-
----
-
-## Key Characteristics
-
-### Municipal Coverage
-
-- **Total municipalities**: 5,570+ (exact number updated periodically)
-- **Geographic coverage**: All Brazilian territory
-- **Boundaries**: Based on IBGE 2019 definitions (latest update)
-- **Changes**: Municipal boundaries periodically updated (most recent: 2021)
-
-### Legal Amazon Definition
-
-The Legal Amazon includes:
-- **States**: All or parts of Acre, Amapá, Amazonas, Distrito Federal, Goiás, Maranhão, Mato Grosso, Mato Grosso do Sul, Pará, Rondônia, Roraima, Tocantins
-- **Municipalities**: 570+ municipalities fully or partially in Legal Amazon
-- **Definition**: Based on official Brazilian legislation (Law 8,001/1990)
-
-### Partial Inclusion
-
-Important note on municipality-level data:
-- **Partial municipalities**: Some municipalities extend beyond Legal Amazon boundaries
-- **Data reporting**: When data is reported at municipality level for partial municipalities, it reflects **only the Legal Amazon portion**
-- **Identification**: This dataset identifies which municipalities are partial
-
-```{r eval=FALSE}
-# Check for partial municipalities
-partial_check <- municipalities %>%
-  filter(legal_amazon == TRUE) %>%
-  filter(!is.na(amazon_percentage)) %>%
-  filter(amazon_percentage < 100)
-
-if (nrow(partial_check) > 0) {
-  print("Municipalities partially in Legal Amazon:")
-  print(partial_check)
-}
-```
-
----
----
-
-## Important Notes
-
-### Boundary Changes
-
-Brazilian municipalities occasionally undergo changes:
-- **New municipalities**: Created from existing ones (last major change 2021)
-- **Boundary adjustments**: IBGE periodically refines municipal boundaries
-- **Historical data**: When comparing very old data with recent data, be aware municipalities may have been reorganized
-
-### Code Consistency
-
-Always use IBGE municipality codes (not names) when:
-- Merging multiple datasets
-- Doing time-series analysis
-- Comparing across sources
-- Municipality names may change or be ambiguous; codes are unique and stable
-
-### Spatial Data
-
-The municipalities dataset includes spatial boundaries (when loaded as SF object):
-- **Format**: Simple features (SF) polygons
-- **CRS**: WGS84 (EPSG:4326)
-- **Use**: Spatial operations, mapping, spatial joins with other geographic data
-
----
-
-
-
-## Accessing Spatial Data
-
-### For Mapping and Spatial Analysis
-
-```{r eval=FALSE}
-library(sf)
-library(ggplot2)
-
-# Load municipalities with geometry
-municipalities_sf <- municipalities %>%
-  st_as_sf()  # If not already SF format
-
-# Map Legal Amazon
-amazon_map <- municipalities_sf %>%
-  filter(legal_amazon == TRUE)
-
-ggplot(amazon_map) +
-  geom_sf(fill = "lightgreen", color = "darkgreen") +
-  labs(title = "Legal Amazon Municipalities") +
-  theme_minimal()
-
-# Spatial operations example: count municipalities by state
-munic_by_state <- municipalities_sf %>%
-  group_by(state) %>%
-  summarize(
-    num_municipalities = n(),
-    total_area_km2 = sum(st_area(.), na.rm = TRUE) / 1e6,
-    .groups = 'drop'
-  )
-```
-
----
----
-
-## Troubleshooting
-
-### Matching Issues
-
-**Problem**: Municipality names don't match between datasets
-**Solution**: Use IBGE municipality codes instead of names for joining data
-
-**Problem**: Some municipalities missing after filtering
-**Solution**: Check for name spelling variations; use code-based matching
-
-### Geographic Analysis
-
-**Problem**: Spatial operations are slow
-**Solution**: Simplify geometries (`st_simplify()`) or work with state/region level first
-
-**Problem**: Mapping appears incorrect
-**Solution**: Verify CRS (should be WGS84); check for invalid geometries (`st_is_valid()`)
-
-### Data Integration
-
-**Problem**: Aggregating municipality data to regions
-**Solution**: Use `left_join()` with municipalities dataset to add region information
-
-**Problem**: Partial municipalities causing data discrepancies
-**Solution**: Account for partial Amazon municipalities; some statistics are reported for Amazon portion only
-
----
-
-## Related Resources
-
-- **IBGE**: https://www.ibge.gov.br/ (Brazilian statistics authority)
-- **Legal Amazon**: Official definition https://www.gov.br/
-- **Spatial data**: IBGE municipal boundaries available from various sources
-- **Within this package**: All geographic functions integrate this municipalities reference
-
-```
-```
-
-
+---
+title: "legal_amazon"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{legal_amazon}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Overview
+
+The `municipalities` dataset is a foundational reference dataset included in the datazoom.amazonia package. It contains key information about all Brazilian municipalities and identifies which are located in (or overlapping with) the Legal Amazon region.
+
+This dataset includes:
+
+- **Municipality identification**: Official names, codes (IBGE), and geographic identifiers
+- **Legal Amazon status**: Identifies whether each municipality is in the Legal Amazon
+- **Geographic information**: State, region, and spatial boundaries
+- **Supporting attributes**: Additional useful variables for geographic matching and analysis
+- **Historical coverage**: Updated to reflect current municipal boundaries (2019 onwards)
+
+The municipalities dataset is essential infrastructure for this package—most package functions that return geographic data match results to this municipalities reference to enable Legal Amazon filtering and consistent geographic identification.
+
+### Data Source
+
+The municipalities dataset is compiled from:
+- **IBGE**: Brazilian Institute of Geography and Statistics official municipal data
+- **Legal Amazon definition**: Based on official Brazilian government definition
+- **Spatial boundaries**: IBGE 2019 municipal boundary shapefile
+- **Maintained by**: datazoom.amazonia package developers
+
+---
+
+## Dataset Structure
+
+The municipalities dataset contains the following information:
+
+### Key Variables
+
+- **code**: IBGE municipal code (unique identifier)
+- **name**: Official municipality name
+- **state**: Two-letter state abbreviation (e.g., "SP", "AM")
+- **state_code**: IBGE state code
+- **legal_amazon**: TRUE/FALSE indicating Legal Amazon membership
+- **region**: Geographic region (North, Northeast, Center-West, Southeast, South)
+- **geometry**: Spatial polygon (when using full SF object)
+
+### Data Types
+
+- **IBGE codes**: Numeric identifiers used throughout Brazilian statistics
+- **State abbreviations**: Standard two-letter codes for all 27 Brazilian states/federal district
+- **Region names**: Official Brazilian geographic regions
+- **Geographic boundaries**: Available as simple features (SF) objects for spatial analysis
+
+---
+
+## Accessing the Dataset
+
+### In R Code
+
+```{r eval = FALSE}
+# Load Brazilian municipalities dataset
+data <- datazoom.amazonia::municipalities
+
+# Or after loading the package
+library(datazoom.amazonia)
+data <- municipalities
+
+# View structure
+str(municipalities)
+head(municipalities)
+
+# Filter for Legal Amazon municipalities only
+amazon_municipalities <- municipalities %>%
+  filter(legal_amazon == TRUE)
+```
+
+### What It Contains
+
+The dataset includes all 5,570+ Brazilian municipalities with:
+- Official IBGE identification codes
+- State and region classification
+- Legal Amazon flag for filtering
+- Spatial geometries for geographic analysis
+
+---
+
+## Common Use Cases
+
+### Use Case 1: Filter Data to Legal Amazon
+
+Many analyses focus specifically on the Legal Amazon region. Use the municipalities dataset to identify relevant municipalities:
+
+```{r eval=FALSE}
+library(dplyr)
+# Load any dataset with municipality information
+data <- load_prodes(
+  dataset = "deforestation",
+  raw_data = FALSE,
+  geo_level = "municipality",
+  language = "eng"
+)
+
+# Filter to Legal Amazon using municipalities reference
+amazon_data <- data %>%
+  inner_join(
+    municipalities %>% 
+      filter(legal_amazon == TRUE) %>%
+      select(code, name),
+    by = c("municipality_code" = "code")
+  )
+```
+
+### Use Case 2: Partial Amazon Municipalities
+
+ **Important**: Some municipalities are only partially within the Legal Amazon.
+
+For statistics reported at municipality level in this package:
+- **Partial Amazon municipalities**: Data is reported for only the Amazon-included portion
+- **Identification**: The municipalities dataset identifies these cases
+- **Interpretation**: When a municipality is partially in Amazon, reported statistics reflect the Amazon portion only
+
+```{r eval=FALSE}
+# Identify fully vs. partially included municipalities
+full_amazon <- municipalities %>%
+  filter(legal_amazon == TRUE & fully_included == TRUE)
+
+partial_amazon <- municipalities %>%
+  filter(legal_amazon == TRUE & fully_included == FALSE)
+
+print(paste("Fully in Amazon:", nrow(full_amazon)))
+print(paste("Partially in Amazon:", nrow(partial_amazon)))
+```
+
+---
+
+## Key Characteristics
+
+### Municipal Coverage
+
+- **Total municipalities**: 5,570+ (exact number updated periodically)
+- **Geographic coverage**: All Brazilian territory
+- **Boundaries**: Based on IBGE 2019 definitions (latest update)
+- **Changes**: Municipal boundaries periodically updated (most recent: 2021)
+
+### Legal Amazon Definition
+
+The Legal Amazon includes:
+- **States**: All or parts of Acre, Amapá, Amazonas, Distrito Federal, Goiás, Maranhão, Mato Grosso, Mato Grosso do Sul, Pará, Rondônia, Roraima, Tocantins
+- **Municipalities**: 570+ municipalities fully or partially in Legal Amazon
+- **Definition**: Based on official Brazilian legislation (Law 8,001/1990)
+
+### Partial Inclusion
+
+Important note on municipality-level data:
+- **Partial municipalities**: Some municipalities extend beyond Legal Amazon boundaries
+- **Data reporting**: When data is reported at municipality level for partial municipalities, it reflects **only the Legal Amazon portion**
+- **Identification**: This dataset identifies which municipalities are partial
+
+```{r eval=FALSE}
+# Check for partial municipalities
+partial_check <- municipalities %>%
+  filter(legal_amazon == TRUE) %>%
+  filter(!is.na(amazon_percentage)) %>%
+  filter(amazon_percentage < 100)
+
+if (nrow(partial_check) > 0) {
+  print("Municipalities partially in Legal Amazon:")
+  print(partial_check)
+}
+```
+
+---
+
+---
+
+## Important Notes
+
+### Boundary Changes
+
+Brazilian municipalities occasionally undergo changes:
+- **New municipalities**: Created from existing ones (last major change 2021)
+- **Boundary adjustments**: IBGE periodically refines municipal boundaries
+- **Historical data**: When comparing very old data with recent data, be aware municipalities may have been reorganized
+
+### Code Consistency
+
+Always use IBGE municipality codes (not names) when:
+- Merging multiple datasets
+- Doing time-series analysis
+- Comparing across sources
+- Municipality names may change or be ambiguous; codes are unique and stable
+
+### Spatial Data
+
+The municipalities dataset includes spatial boundaries (when loaded as SF object):
+- **Format**: Simple features (SF) polygons
+- **CRS**: WGS84 (EPSG:4326)
+- **Use**: Spatial operations, mapping, spatial joins with other geographic data
+
+---
+
+
+
+## Accessing Spatial Data
+
+### For Mapping and Spatial Analysis
+
+```{r eval=FALSE}
+library(sf)
+library(ggplot2)
+
+# Load municipalities with geometry
+municipalities_sf <- municipalities %>%
+  st_as_sf()  # If not already SF format
+
+# Map Legal Amazon
+amazon_map <- municipalities_sf %>%
+  filter(legal_amazon == TRUE)
+
+ggplot(amazon_map) +
+  geom_sf(fill = "lightgreen", color = "darkgreen") +
+  labs(title = "Legal Amazon Municipalities") +
+  theme_minimal()
+
+# Spatial operations example: count municipalities by state
+munic_by_state <- municipalities_sf %>%
+  group_by(state) %>%
+  summarize(
+    num_municipalities = n(),
+    total_area_km2 = sum(st_area(.), na.rm = TRUE) / 1e6,
+    .groups = 'drop'
+  )
+```
+
+---
+
+---
+
+## Troubleshooting
+
+### Matching Issues
+
+**Problem**: Municipality names don't match between datasets
+**Solution**: Use IBGE municipality codes instead of names for joining data
+
+**Problem**: Some municipalities missing after filtering
+**Solution**: Check for name spelling variations; use code-based matching
+
+### Geographic Analysis
+
+**Problem**: Spatial operations are slow
+**Solution**: Simplify geometries (`st_simplify()`) or work with state/region level first
+
+**Problem**: Mapping appears incorrect
+**Solution**: Verify CRS (should be WGS84); check for invalid geometries (`st_is_valid()`)
+
+### Data Integration
+
+**Problem**: Aggregating municipality data to regions
+**Solution**: Use `left_join()` with municipalities dataset to add region information
+
+**Problem**: Partial municipalities causing data discrepancies
+**Solution**: Account for partial Amazon municipalities; some statistics are reported for Amazon portion only
+
+---
+
+## Related Resources
+
+- **IBGE**: https://www.ibge.gov.br/ (Brazilian statistics authority)
+- **Legal Amazon**: Official definition https://www.gov.br/
+- **Spatial data**: IBGE municipal boundaries available from various sources
+- **Within this package**: All geographic functions integrate this municipalities reference
+
+```
+```
+
+

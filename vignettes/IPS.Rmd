@@ -1,217 +1,218 @@
----
-title: "Social Progress Index"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Social Progress Index}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
-
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
-
-## Overview
-
-The [Amazon Social Progress Index (IPS)](https://imazon.org.br/) is a comprehensive indicator framework that measures social and environmental progress in the Legal Amazon region. This collaborative initiative combines:
-
-- **Imazon** (Instituto do Homem e Meio Ambiente da Amazônia): Brazilian research organization
-- **Social Progress Imperative**: International organization focused on measuring societal well-being
-
-This dataset captures:
-
-- **Multi-dimensional development indicators**: Spanning 8 domains of social and environmental progress
-- **Municipality-level data**: All Legal Amazon municipalities assessed
-- **Quality of life metrics**: Health, education, sanitation, infrastructure
-- **Environmental indicators**: Forest cover, deforestation risk, sustainability
-- **Violence and safety**: Public safety and security metrics
-- **Temporal coverage**: Data from 2014, 2018, 2021, 2023
-- **Geographic coverage**: 570+ municipalities across Legal Amazon
-
-The IPS provides a holistic view of sustainable development, moving beyond simple economic measures (GDP) to encompass environmental sustainability and social well-being.
-
-### Data Source and Methodology
-
-The Social Progress Index:
-- Based on 50+ individual indicators across 12 domains
-- Uses data from government agencies, NGOs, and research institutions
-- Aggregated into 3 main dimensions and 12 subdimensions
-- Indexed to 0-100 scale for comparability
-- Methodologically rigorous with transparent weighting
-
-For detailed methodology, visit [Social Progress Imperative](https://www.socialprogress.org/).
-
----
-
-## Available Dimensions
-
-The IPS framework includes 8 main dataset options:
-
-### **1. all**
-Complete Social Progress Index with all dimensions and indicators.
-
-- **Coverage**: Comprehensive assessment across all domains
-- **Variables**: All indicators and index scores
-- **Use cases**: Holistic development analysis, overall progress tracking, multi-dimensional comparisons
-
-### **2. life_quality**
-Indicators related to quality of life and well-being.
-
-- **Variables**: Healthcare quality, life expectancy, nutrition, shelter quality
-- **Use cases**: Health and wellness analysis, living standards assessment, healthcare quality evaluation
-
-### **3. sanit_habit**
-Sanitation and habitat indicators.
-
-- **Variables**: Access to improved sanitation, water quality, housing conditions
-- **Use cases**: Infrastructure assessment, water and sanitation access analysis, housing quality evaluation
-
-### **4. violence**
-Public safety and violence indicators.
-
-- **Variables**: Crime rates, safety perceptions, homicide data
-- **Use cases**: Public safety analysis, violence hotspot identification, security trends
-
-### **5. educ**
-Education and literacy indicators.
-
-- **Variables**: School enrollment, literacy rates, educational attainment, quality of education
-- **Use cases**: Education access analysis, literacy trends, human capital assessment
-
-### **6. communic**
-Communication and connectivity indicators.
-
-- **Variables**: Internet access, mobile phone coverage, communication infrastructure
-- **Use cases**: Digital divide analysis, connectivity assessment, tech adoption patterns
-
-### **7. mortality**
-Health and mortality indicators.
-
-- **Variables**: Child mortality, maternal mortality, mortality rates by cause
-- **Use cases**: Health outcomes analysis, maternal/child health assessment, disease burden evaluation
-
-### **8. deforest**
-Environmental and deforestation indicators.
-
-- **Variables**: Forest cover, deforestation rates, environmental sustainability
-- **Use cases**: Forest monitoring, environmental assessment, climate/conservation analysis
-
----
-
-## Function Parameters
-
-### 1. **dataset**
-
-Selects which dimension(s) to download.
-
-```r
-dataset = "all"         # All dimensions
-dataset = "life_quality" # Quality of life metrics
-dataset = "sanit_habit"  # Sanitation and habitat
-dataset = "violence"     # Public safety and violence
-dataset = "educ"         # Education indicators
-dataset = "communic"     # Communication and connectivity
-dataset = "mortality"    # Health and mortality
-dataset = "deforest"     # Environmental and deforestation
-```
-
-### 2. **raw_data**
-
-Controls whether to download original or processed data.
-
-- `TRUE`: Returns raw data exactly as published
-- `FALSE`: Returns treated data with standardized English variable names and formatting
-
-```r
-raw_data = FALSE  # logical
-```
-
-### 3. **time_period**
-
-Specifies which assessment year(s) to download.
-
-**Available years**: 2014, 2018, 2021, 2023
-
-```r
-time_period = 2023              # Most recent
-time_period = c(2018, 2023)     # Specific years
-time_period = c(2014, 2018, 2021, 2023)  # Multiple years
-```
-
-### 4. **language**
-
-Output language for variable names and labels.
-
-- `"pt"`: Portuguese
-- `"eng"`: English
-
-```r
-language = "eng"  # character string
-```
-
----
-## Examples
-
-```{r eval=FALSE}
-# download raw IPS data from 2014
-data <- load_ips(
-  dataset = "all",
-  raw_data = TRUE,
-  time_period = 2014,
-  language = "eng"
-)
-
-# download treated deforestation IPS data from 2018 in portuguese
-data <- load_ips(
-  dataset = "deforest",
-  raw_data = FALSE,
-  time_period = 2018,
-  language = "pt"
-)
-```
-
-## Data Notes
-
-### Index Scales
-
-- **0-100 scale**: All indices standardized to 0-100 for comparison
-- **Higher is better**: Across all dimensions except deforestation (where higher forest index = better)
-- **Comparable across dimensions**: Standardized scale allows cross-dimension comparison
-
-### Dimensions and Indicators
-
-Each dimension contains multiple indicators:
-- **Life quality**: 4-6 indicators
-- **Sanitation/habitat**: 3-5 indicators  
-- **Violence**: 3-4 indicators
-- **Education**: 3-4 indicators
-- **Communication**: 2-3 indicators
-- **Mortality**: 3-4 indicators
-- **Deforestation**: 2-3 indicators
-
-(Exact number varies by year and methodology)
-
-### Temporal Comparisons
-
-When comparing across years (2014, 2018, 2021, 2023):
-- Methodology may have evolved between assessments
-- New indicators may have been added
-- Some municipalities may not have data in all years
-- Use caution comparing very old (2014) with recent (2023) data
-
-### Missing Data
-
-- Some municipalities may lack data for specific indicators
-- Remote or less accessible areas may have less complete data
-- Use `na.rm = TRUE` in aggregations to handle missing values
-
-### Geographic Coverage
-
-- Covers 570+ municipalities in the Legal Amazon
-- Includes all states with Amazon territory
-- Some frontier/protected areas may lack complete data
-
----
+---
+title: "Social Progress Index"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Social Progress Index}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Overview
+
+The [Amazon Social Progress Index (IPS)](https://imazon.org.br/) is a comprehensive indicator framework that measures social and environmental progress in the Legal Amazon region. This collaborative initiative combines:
+
+- **Imazon** (Instituto do Homem e Meio Ambiente da Amazônia): Brazilian research organization
+- **Social Progress Imperative**: International organization focused on measuring societal well-being
+
+This dataset captures:
+
+- **Multi-dimensional development indicators**: Spanning 8 domains of social and environmental progress
+- **Municipality-level data**: All Legal Amazon municipalities assessed
+- **Quality of life metrics**: Health, education, sanitation, infrastructure
+- **Environmental indicators**: Forest cover, deforestation risk, sustainability
+- **Violence and safety**: Public safety and security metrics
+- **Temporal coverage**: Data from 2014, 2018, 2021, 2023
+- **Geographic coverage**: 570+ municipalities across Legal Amazon
+
+The IPS provides a holistic view of sustainable development, moving beyond simple economic measures (GDP) to encompass environmental sustainability and social well-being.
+
+### Data Source and Methodology
+
+The Social Progress Index:
+- Based on 50+ individual indicators across 12 domains
+- Uses data from government agencies, NGOs, and research institutions
+- Aggregated into 3 main dimensions and 12 subdimensions
+- Indexed to 0-100 scale for comparability
+- Methodologically rigorous with transparent weighting
+
+For detailed methodology, visit [Social Progress Imperative](https://www.socialprogress.org/).
+
+---
+
+## Available Dimensions
+
+The IPS framework includes 8 main dataset options:
+
+### **1. all**
+Complete Social Progress Index with all dimensions and indicators.
+
+- **Coverage**: Comprehensive assessment across all domains
+- **Variables**: All indicators and index scores
+- **Use cases**: Holistic development analysis, overall progress tracking, multi-dimensional comparisons
+
+### **2. life_quality**
+Indicators related to quality of life and well-being.
+
+- **Variables**: Healthcare quality, life expectancy, nutrition, shelter quality
+- **Use cases**: Health and wellness analysis, living standards assessment, healthcare quality evaluation
+
+### **3. sanit_habit**
+Sanitation and habitat indicators.
+
+- **Variables**: Access to improved sanitation, water quality, housing conditions
+- **Use cases**: Infrastructure assessment, water and sanitation access analysis, housing quality evaluation
+
+### **4. violence**
+Public safety and violence indicators.
+
+- **Variables**: Crime rates, safety perceptions, homicide data
+- **Use cases**: Public safety analysis, violence hotspot identification, security trends
+
+### **5. educ**
+Education and literacy indicators.
+
+- **Variables**: School enrollment, literacy rates, educational attainment, quality of education
+- **Use cases**: Education access analysis, literacy trends, human capital assessment
+
+### **6. communic**
+Communication and connectivity indicators.
+
+- **Variables**: Internet access, mobile phone coverage, communication infrastructure
+- **Use cases**: Digital divide analysis, connectivity assessment, tech adoption patterns
+
+### **7. mortality**
+Health and mortality indicators.
+
+- **Variables**: Child mortality, maternal mortality, mortality rates by cause
+- **Use cases**: Health outcomes analysis, maternal/child health assessment, disease burden evaluation
+
+### **8. deforest**
+Environmental and deforestation indicators.
+
+- **Variables**: Forest cover, deforestation rates, environmental sustainability
+- **Use cases**: Forest monitoring, environmental assessment, climate/conservation analysis
+
+---
+
+## Function Parameters
+
+### 1. **dataset**
+
+Selects which dimension(s) to download.
+
+```r
+dataset = "all"         # All dimensions
+dataset = "life_quality" # Quality of life metrics
+dataset = "sanit_habit"  # Sanitation and habitat
+dataset = "violence"     # Public safety and violence
+dataset = "educ"         # Education indicators
+dataset = "communic"     # Communication and connectivity
+dataset = "mortality"    # Health and mortality
+dataset = "deforest"     # Environmental and deforestation
+```
+
+### 2. **raw_data**
+
+Controls whether to download original or processed data.
+
+- `TRUE`: Returns raw data exactly as published
+- `FALSE`: Returns treated data with standardized English variable names and formatting
+
+```r
+raw_data = FALSE  # logical
+```
+
+### 3. **time_period**
+
+Specifies which assessment year(s) to download.
+
+**Available years**: 2014, 2018, 2021, 2023
+
+```r
+time_period = 2023              # Most recent
+time_period = c(2018, 2023)     # Specific years
+time_period = c(2014, 2018, 2021, 2023)  # Multiple years
+```
+
+### 4. **language**
+
+Output language for variable names and labels.
+
+- `"pt"`: Portuguese
+- `"eng"`: English
+
+```r
+language = "eng"  # character string
+```
+
+---
+
+## Examples
+
+```{r eval=FALSE}
+# download raw IPS data from 2014
+data <- load_ips(
+  dataset = "all",
+  raw_data = TRUE,
+  time_period = 2014,
+  language = "eng"
+)
+
+# download treated deforestation IPS data from 2018 in portuguese
+data <- load_ips(
+  dataset = "deforest",
+  raw_data = FALSE,
+  time_period = 2018,
+  language = "pt"
+)
+```
+
+## Data Notes
+
+### Index Scales
+
+- **0-100 scale**: All indices standardized to 0-100 for comparison
+- **Higher is better**: Across all dimensions except deforestation (where higher forest index = better)
+- **Comparable across dimensions**: Standardized scale allows cross-dimension comparison
+
+### Dimensions and Indicators
+
+Each dimension contains multiple indicators:
+- **Life quality**: 4-6 indicators
+- **Sanitation/habitat**: 3-5 indicators  
+- **Violence**: 3-4 indicators
+- **Education**: 3-4 indicators
+- **Communication**: 2-3 indicators
+- **Mortality**: 3-4 indicators
+- **Deforestation**: 2-3 indicators
+
+(Exact number varies by year and methodology)
+
+### Temporal Comparisons
+
+When comparing across years (2014, 2018, 2021, 2023):
+- Methodology may have evolved between assessments
+- New indicators may have been added
+- Some municipalities may not have data in all years
+- Use caution comparing very old (2014) with recent (2023) data
+
+### Missing Data
+
+- Some municipalities may lack data for specific indicators
+- Remote or less accessible areas may have less complete data
+- Use `na.rm = TRUE` in aggregations to handle missing values
+
+### Geographic Coverage
+
+- Covers 570+ municipalities in the Legal Amazon
+- Includes all states with Amazon territory
+- Some frontier/protected areas may lack complete data
+
+---
