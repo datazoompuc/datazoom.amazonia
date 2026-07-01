@@ -23,6 +23,9 @@ load_climate(
 
 \item{legal_amazon_only}{A \code{boolean} setting the return of Legal Amazon Data (\code{TRUE}) or Country's Data (\code{FALSE}). Defaults to \code{FALSE}}
 }
+\value{
+An \code{sf} object with the selected climate data merged onto Brazilian municipalities.
+}
 \description{
 Spatial data on climate variables, extracted from Climatology Lab's TerraClimate.
 }
