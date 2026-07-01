@@ -6,6 +6,8 @@
 #' @inheritParams load_baci
 #' @param legal_amazon_only A \code{boolean} setting the return of Legal Amazon Data (\code{TRUE}) or Country's Data (\code{FALSE}). Defaults to \code{FALSE}
 #'
+#' @return An \code{sf} object with the selected climate data merged onto Brazilian municipalities.
+#'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
 #' # download maximum temperature data from 2000 to 2001
