@@ -197,6 +197,8 @@ for (fn_name in get_fns) {
     args <- list()
     if ("dataset"     %in% arg_names) args$dataset     <- ds
     if ("time_period" %in% arg_names) args$time_period <- TIME_PERIOD
+    # DEGRAD data ends in 2016 (discontinued, replaced by DETER-B); use a valid year
+    if (fn_name == "load_degrad") args$time_period <- 2016
     if ("raw_data"    %in% arg_names) args$raw_data    <- RAW_DATA
     if ("language"    %in% arg_names) args$language    <- LANGUAGE
 
