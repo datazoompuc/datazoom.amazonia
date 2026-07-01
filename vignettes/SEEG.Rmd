@@ -41,7 +41,7 @@ SEEG emissions estimates are compiled using:
 
 For more information, visit [SEEG Project](https://www.seeg.org.br/) and [Observatório do Clima](https://oc.eco.br/).
 
----
+***
 
 ## Available Datasets
 
@@ -154,7 +154,7 @@ Emissions from waste management, landfills, and waste treatment.
   - Identify waste management improvement opportunities
   - Evaluate circular economy potential
 
----
+***
 
 ## Important Data Characteristics
 
@@ -180,7 +180,7 @@ The data provided is from SEEG's Collection 9:
 - Downloads may take time depending on connection speed
 - Ensure sufficient disk space for storage
 
----
+***
 
 ## Function Parameters
 
@@ -233,7 +233,7 @@ language = "eng"  # character string
 
 **Note on timing**: Downloads may take considerable time due to file size.
 
----
+***
 
 ## Examples
 
@@ -344,4 +344,4 @@ Estimates follow:
 4. **Revisions**: Methodology may change in future SEEG releases
 5. **Sub-national uncertainty**: Municipal and state estimates have higher uncertainty than national
 
----
+***

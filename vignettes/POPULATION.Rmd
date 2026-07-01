@@ -36,7 +36,7 @@ Population data comes from:
 
 For more information, visit [IBGE Population Estimates](https://www.ibge.gov.br/en/statistics/social/population/).
 
----
+***
 
 ## Available Dataset
 
@@ -56,7 +56,7 @@ Official Brazilian population statistics and estimates.
   - Demographic planning and projections
   - Support for epidemiological and social statistics
 
----
+***
 
 ## Important Data Characteristics
 
@@ -75,7 +75,7 @@ Census years provide actual counts; other years are official projections.
 - **Includes**: Brazilian citizens and legal residents
 - **Reference date**: July 1 for most estimate years, September 1 for 2010 census
 
----
+***
 
 ## Function Parameters
 
@@ -133,7 +133,7 @@ Output language for variable names.
 language = "eng"  # character string
 ```
 
----
+***
 
 ## Examples
 
@@ -206,5 +206,5 @@ Simple and straightforward structure, useful as base for other calculations.
 4. **Boundary changes**: Municipal boundaries changed; affects historical comparisons
 5. **Definition**: Includes registered residents; may not match actual lived population
 
----
+***
 
