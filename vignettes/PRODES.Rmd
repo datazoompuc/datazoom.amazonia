@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-[PRODES](https://www.gov.br/inpe/) (Projeto de Monitoramento da Floresta Amazônica Brasileira - Project for Monitoring the Brazilian Amazon Forest) is Brazil's primary satellite-based deforestation monitoring system operated by [INPE](https://www.inpe.br/) (National Institute for Space Research).
+[PRODES](https://www.gov.br/inpe/pt-br) (Projeto de Monitoramento da Floresta Amazônica Brasileira - Project for Monitoring the Brazilian Amazon Forest) is Brazil's primary satellite-based deforestation monitoring system operated by [INPE](https://www.inpe.br/) (National Institute for Space Research).
 
 This dataset provides:
 
@@ -39,7 +39,7 @@ PRODES monitoring:
 - Recently (2020+) raster data published through [TerraBrasilis](https://terrabrasilis.dpi.inpe.br/)
 - Data available as both raster files and aggregated by municipality
 
-For more information, visit [INPE PRODES Project](https://www.gov.br/inpe/) and [TerraBrasilis](https://terrabrasilis.dpi.inpe.br/).
+For more information, visit [INPE PRODES Project](https://www.gov.br/inpe/pt-br) and [TerraBrasilis](https://terrabrasilis.dpi.inpe.br/).
 
 ---
 
