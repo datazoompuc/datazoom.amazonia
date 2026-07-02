@@ -41,7 +41,7 @@ SIGMINE data comes from:
 
 For more information, visit the [National Mining Agency (ANM)](https://www.gov.br/anm/pt-br) and mining databases.
 
----
+***
 
 ## Available Dataset
 
@@ -64,7 +64,7 @@ Comprehensive registry of legally operating mining projects in Brazil.
   - Environmental impact assessment
   - Conflict identification (mining vs. indigenous lands, protected areas)
 
----
+***
 
 ## Function Parameters
 
@@ -98,7 +98,7 @@ Output language for variable names and documentation.
 language = "eng"  # character string
 ```
 
----
+***
 
 ## Data Structure
 
@@ -112,7 +112,7 @@ SIGMINE data typically includes:
 - **Authorization**: Mining and environmental permits
 - **Geometry**: Spatial polygon of mining area (when available)
 
----
+***
 
 ## Examples
 
@@ -177,5 +177,5 @@ SIGMINE includes:
 4. **Spatial accuracy**: Boundaries may have uncertain precision
 5. **Definition changes**: Mining classification/categories may evolve
 
----
+***
 

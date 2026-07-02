@@ -65,7 +65,7 @@ omitted for the other datasets.
 
 **Examples:**  
   
-```{r eval=FALSE}
+```{r, eval=FALSE}
 # download treated data about energy generation
 clean_aneel <- load_aneel(
   dataset = "energy_generation",

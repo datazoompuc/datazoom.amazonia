@@ -1,8 +1,6 @@
 name: Check load_sigmine
 
 on:
-  schedule:
-    - cron: "0 1 2 * *"
   workflow_dispatch:
 
 jobs:

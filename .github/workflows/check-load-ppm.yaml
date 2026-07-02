@@ -1,8 +1,6 @@
 name: Check load_ppm
 
 on:
-  schedule:
-    - cron: "0 19 1 * *"
   workflow_dispatch:
 
 jobs:

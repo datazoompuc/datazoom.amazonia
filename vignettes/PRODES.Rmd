@@ -41,7 +41,7 @@ PRODES monitoring:
 
 For more information, visit [INPE PRODES Project](https://www.gov.br/inpe/pt-br) and [TerraBrasilis](https://terrabrasilis.dpi.inpe.br/).
 
----
+***
 
 ## Available Datasets
 
@@ -127,7 +127,7 @@ Cloud cover in satellite imagery (data quality indicator).
   - Identify areas needing re-analysis
   - Quantify monitoring gaps
 
----
+***
 
 ## Important Data Characteristics
 
@@ -153,7 +153,7 @@ When analyzing time trends, be aware that 2007 includes 19 years of accumulated 
 - **Municipality level**: Treated data aggregates raster to municipality boundaries
 - **Non-spatial**: Municipality aggregates don't retain spatial location (summarized only)
 
----
+***
 
 ## Function Parameters
 
@@ -215,7 +215,7 @@ Output language.
 language = "eng"  # character string
 ```
 
----
+***
 
 ## Examples
 
@@ -299,5 +299,5 @@ residual <- load_prodes(
 4. **Historical changes**: INPE occasionally revises historical estimates as methodology improves
 5. **Recent data provisional**: 2023 data may be subject to revision as final processing completes
 
----
+***
 

@@ -41,7 +41,7 @@ PEVS data comes from:
 
 For more information, visit [IBGE Agriculture Statistics](https://www.ibge.gov.br/en/statistics/economic/agriculture-forestry/).
 
----
+***
 
 ## Available Datasets
 
@@ -95,7 +95,7 @@ Total existing area used for silviculture operations, disaggregated by forest sp
   - Regional forest resource assessment
   - Support for long-term forest management planning
 
----
+***
 
 ## Function Parameters
 
@@ -162,7 +162,7 @@ Output language for variable names.
 language = "eng"  # character string
 ```
 
----
+***
 
 ## Examples
 
@@ -244,6 +244,6 @@ Exact categories vary by dataset and year.
 - **Quantity**: Varies by product (cubic meters for timber, tons for charcoal, etc.)
 - **Value**: Brazilian Real (R$) at current prices
 
----
+***
 
 

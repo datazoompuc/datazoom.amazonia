@@ -104,7 +104,7 @@ Areas affected by wildfires:
 
 **Key Applications**: Fire monitoring, ecosystem vulnerability, climate impacts, fire management
 
----
+***
 
 ## Function Parameters
 
@@ -136,7 +136,7 @@ Areas affected by wildfires:
    - `"pt"`: Portuguese language labels
    - `"eng"`: English language
 
----
+***
 
 ## Measurement Units and Notes
 
@@ -145,9 +145,9 @@ Areas affected by wildfires:
 - **Validation**: MapBiomas uses field validation and visual interpretation to ensure accuracy
 - **Updates**: Historical data may be revised with new collections and improved algorithms
 
----
+***
 
----
+***
 
 ## Examples
 

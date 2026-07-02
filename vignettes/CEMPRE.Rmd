@@ -51,7 +51,7 @@ Data can be retrieved with sector disaggregation or aggregate form:
 - **Sectoral Disaggregation**: Detailed breakdown by CNAE 2.0 (main divisions and subdivisions)
 - **Aggregate**: Total across all sectors
 
----
+***
 
 ## Function Parameters
 
@@ -78,7 +78,7 @@ Data can be retrieved with sector disaggregation or aggregate form:
    - `TRUE`: Data is returned separated and disaggregated by economic sector (CNAE)
    - `FALSE`: Data is aggregated across all sectors
 
---
+***
 
 ## Examples
 

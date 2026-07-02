@@ -41,7 +41,7 @@ TerraClimate data is compiled by:
 
 For more information, visit [TerraClimate Project](https://www.climatologylab.org/terraclimate.html).
 
----
+***
 
 ## Available Climate Variables
 
@@ -64,7 +64,7 @@ TerraClimate provides 13 main climate and water balance variables:
 | water_evaporation | aet | Actual Evapotranspiration | mm |
 | palmer_drought_severity_index | PDSI | Palmer Drought Severity Index | unitless |
 
----
+***
 
 ## Data Format and Coverage
 
@@ -86,7 +86,7 @@ TerraClimate provides 13 main climate and water balance variables:
 - **Size**: Large for multi-year, multi-variable downloads
 - **Access**: Downloaded from THREDDS server
 
----
+***
 
 ## Function Parameters
 
@@ -165,7 +165,7 @@ Output language for variable names and documentation.
 language = "eng"  # character string
 ```
 
----
+***
 
 ## Important Download Considerations
 
@@ -183,7 +183,7 @@ language = "eng"  # character string
 - Use high-speed internet connection
 - Have at least 10-50 GB free disk space for multi-year downloads
 
----
+***
 
 ## Examples
 
@@ -206,7 +206,8 @@ max_temp <- load_climate(
 )
 ```
 
----
+***
+
 
 ## Data Notes
 
@@ -248,5 +249,5 @@ Due to large file size:
 - **Extract points**: If doing point-based analysis, extract specific coordinates to simplify data
 - **Use cloud computing**: Consider cloud platforms (Google Earth Engine) for very large analyses
 
----
+***
 
