@@ -174,9 +174,3 @@ Each alert/row typically contains:
 4. **CRS metadata**: Verify coordinate system after loading; typically UTM zones for Brazil
 5. **Overlapping municipalities**: Enhanced version accounts for alerts crossing municipality boundaries
 6. **False positives possible**: Satellite detection can occasionally misclassify cloud shadows or other features as forest loss
-
----
-
-```
-
-

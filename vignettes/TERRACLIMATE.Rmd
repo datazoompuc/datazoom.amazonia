@@ -187,163 +187,25 @@ language = "eng"  # character string
 
 ## Examples
 
-### Example 1: Precipitation Patterns
-
-Analyze rainfall across the Amazon:
-
 ```{r eval=FALSE}
-library(raster)
-library(dplyr)
-
-# Download precipitation for one year in Amazon
+# download precipitation data for the Legal Amazon (2020)
 precip <- load_climate(
   dataset = "precipitation",
   time_period = 2020,
   legal_amazon_only = TRUE,
   language = "eng"
 )
-
-# Basic statistics
-summary(precip)
-
-# Plot precipitation
-plot(precip, main = "Amazon Precipitation (2020)")
-
-# Annual total (sum of months)
-annual_precip <- sum(precip, na.rm = TRUE)
-plot(annual_precip, main = "Annual Precipitation in Amazon")
 ```
 
-### Example 2: Temperature Trends
-
-Track temperature changes over time:
-
 ```{r eval=FALSE}
-library(raster)
-
-# Download max temperature for recent decade
+# download maximum temperature for multiple years, all of Brazil
 max_temp <- load_climate(
   dataset = "max_temperature",
-  time_period = 2010:2020,
-  legal_amazon_only = TRUE,
+  time_period = 2010:2012,
   language = "eng"
 )
-
-# Average temperature over period
-avg_temp <- mean(max_temp, na.rm = TRUE)
-plot(avg_temp, main = "Average Maximum Temperature (2010-2020)")
-
-# Temperature range: compare first and last year
-temp_2010 <- max_temp[[1:12]]  # First year
-temp_2020 <- max_temp[[(nlayers(max_temp)-11):nlayers(max_temp)]]  # Last year
-
-avg_2010 <- mean(temp_2010, na.rm = TRUE)
-avg_2020 <- mean(temp_2020, na.rm = TRUE)
-
-# Simple warming calculation
-temp_change <- avg_2020 - avg_2010
-plot(temp_change, main = "Temperature Change 2010-2020")
 ```
 
-### Example 3: Drought Assessment
-
-Analyze drought conditions using water deficit data:
-
-```{r eval=FALSE}
-library(raster)
-
-# Download climatic water deficit
-water_def <- load_climate(
-  dataset = "climatic_water_deficit",
-  time_period = 2020,
-  legal_amazon_only = TRUE,
-  language = "eng"
-)
-
-# Water deficit (high values = dry conditions)
-# Average deficit over year
-avg_water_def <- mean(water_def, na.rm = TRUE)
-plot(avg_water_def, main = "Average Climatic Water Deficit (2020)")
-
-# Identify dry areas (high deficit)
-drought_areas <- avg_water_def > quantile(avg_water_def, 0.75, na.rm = TRUE)
-plot(drought_areas, main = "High Drought Risk Areas")
-
-# Palmer Drought Severity Index for additional drought context
-pdsi <- load_climate(
-  dataset = "palmer_drought_severity_index",
-  time_period = 2020,
-  legal_amazon_only = TRUE,
-  language = "eng"
-)
-
-# PDSI: negative = drought, positive = wet
-plot(pdsi, main = "Palmer Drought Severity Index (2020)")
-```
-### Example 4: Radiation and Growing Season
-
-Analyze solar radiation and its relationship to temperature:
-
-```{r eval=FALSE}
-library(raster)
-
-# Download radiation and temperature
-radiation <- load_climate(
-  dataset = "shortwave_radiation_flux",
-  time_period = 2020,
-  legal_amazon_only = TRUE,
-  language = "eng"
-)
-
-temp <- load_climate(
-  dataset = "max_temperature",
-  time_period = 2020,
-  legal_amazon_only = TRUE,
-  language = "eng"
-)
-
-# Annual radiation total
-annual_radiation <- sum(radiation, na.rm = TRUE)
-plot(annual_radiation, main = "Annual Solar Radiation")
-
-# Average temperature
-avg_temp <- mean(temp, na.rm = TRUE)
-plot(avg_temp, main = "Average Maximum Temperature")
-
-# Correlation between radiation and temperature
-# (Simplified: stack and calculate)
-radiation_temp <- stack(annual_radiation, avg_temp)
-names(radiation_temp) <- c("Radiation", "Temperature")
-```
-
-### Example 5: Soil Moisture Dynamics
-
-Track seasonal soil moisture patterns:
-
-```{r eval=FALSE}
-library(raster)
-
-# Download soil moisture
-soil_moisture <- load_climate(
-  dataset = "soil_moisture",
-  time_period = 2020,
-  legal_amazon_only = TRUE,
-  language = "eng"
-)
-
-# Monthly stack (12 months if 1 year)
-plot(soil_moisture, main = "Monthly Soil Moisture (2020)")
-
-# Identify wet vs. dry months
-avg_soil <- mean(soil_moisture, na.rm = TRUE)
-
-# High vs. low moisture areas
-high_moisture <- soil_moisture > quantile(soil_moisture, 0.75, na.rm = TRUE)
-low_moisture <- soil_moisture < quantile(soil_moisture, 0.25, na.rm = TRUE)
-
-plot(high_moisture, main = "High Soil Moisture Areas")
-plot(low_moisture, main = "Low Soil Moisture Areas")
-```
 ---
 
 ## Data Notes

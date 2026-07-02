@@ -4966,8 +4966,6 @@ if (nrow(partial_check) > 0) {
 
 ------------------------------------------------------------------------
 
-------------------------------------------------------------------------
-
 ## Important Notes
 
 ### Boundary Changes
@@ -5027,8 +5025,6 @@ munic_by_state <- municipalities_sf %>%
 
 ------------------------------------------------------------------------
 
-------------------------------------------------------------------------
-
 ## Troubleshooting
 
 ### Matching Issues
@@ -5067,8 +5063,6 @@ are reported for Amazon portion only
   sources
 - **Within this package**: All geographic functions integrate this
   municipalities reference
-
-<!-- -->
 
 ## <a name="googledrive"></a> The ‘googledrive’ package
 

@@ -195,9 +195,3 @@ Common degradation types include:
 3. **Possible inconsistencies**: Classification and methodology may vary across editions
 4. **Detection limits**: Minimum detectable degradation size varies by methodology/edition
 5. **Not real-time**: This is annual analysis, not near-real-time detection like DETER
-
----
-
-```
-
-
