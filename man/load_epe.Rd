@@ -15,6 +15,9 @@ load_epe(dataset, geo_level = "state", raw_data = FALSE, language = "eng")
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.}
 }
+\value{
+A \code{list} of tibbles (if \code{raw_data} = \code{TRUE}) or a tibble (if \code{raw_data} = \code{FALSE}).
+}
 \description{
 Electrical Energy Monthly Consumption per Class or Industrial Sector
 }

@@ -252,5 +252,3 @@ When using this data in research or publications, cite:
 > IBGE - Instituto Brasileiro de Geografia e Estatística. Censo Agropecuário. Available at: https://sidra.ibge.gov.br/pesquisa/censo-agropecuario
 
 ***
-
-```

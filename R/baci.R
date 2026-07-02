@@ -50,7 +50,7 @@ load_baci <- function(dataset = "HS92", raw_data = FALSE, time_period,
   ## Downloading ##
   #################
 
-  base::message(base::cat("The download can take some time (~10-30mins)"))
+  base::message("The download can take some time (~10-30mins)")
 
   dat <- external_download(
     source = param$source,

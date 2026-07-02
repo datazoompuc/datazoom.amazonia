@@ -6,6 +6,8 @@
 #' @param geo_level Geographical level: "state" or "subsystem". Only applies to consumer or industrial datasets.
 #' @inheritParams load_baci
 #'
+#' @return A \code{list} of tibbles (if \code{raw_data} = \code{TRUE}) or a tibble (if \code{raw_data} = \code{FALSE}).
+#'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
 #' # download treated (raw_data = FALSE) data about

@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 ```
 ## Overview
 
-SIGMINE (Sistema de Informações Geográficas da Mineração - Mining Geographic Information System) is Brazil's official mining registry maintained by the [National Department of Mineral Production (DNPM)](https://www.gov.br/dnpm/) (now part of the Geological Service of Brazil - SGB-CPRM).
+SIGMINE (Sistema de Informações Geográficas da Mineração - Mining Geographic Information System) is Brazil's official mining registry maintained by the [National Mining Agency (ANM)](https://www.gov.br/anm/pt-br), the regulatory body that succeeded the former National Department of Mineral Production (DNPM).
 
 This dataset provides:
 
@@ -39,7 +39,7 @@ SIGMINE data comes from:
 - Updated continuously as mining permits are issued/revoked
 - Publicly accessible through government databases
 
-For more information, visit [SGB-CPRM](https://www.gov.br/cprm/) and mining databases.
+For more information, visit the [National Mining Agency (ANM)](https://www.gov.br/anm/pt-br) and mining databases.
 
 ***
 

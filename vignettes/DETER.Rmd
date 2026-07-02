@@ -176,7 +176,3 @@ Each alert/row typically contains:
 6. **False positives possible**: Satellite detection can occasionally misclassify cloud shadows or other features as forest loss
 
 ***
-
-```
-
-

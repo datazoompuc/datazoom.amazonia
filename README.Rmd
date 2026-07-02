@@ -50,6 +50,16 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 
 ```{r, echo=FALSE, message=FALSE}
 devtools::load_all()
+# Includes a vignette in the README, stripping its YAML front matter and
+# neutralizing body horizontal rules ("---") so pandoc does not misread them
+# as YAML metadata blocks when the vignettes are concatenated.
+include_vignette <- function(f) {
+  x <- readLines(f, encoding = "UTF-8", warn = FALSE)
+  hr <- grep("^---\\s*$", x)
+  if (length(hr) >= 2 && hr[1] == 1) x <- x[-(1:hr[2])]
+  x[grepl("^---\\s*$", x)] <- "***"
+  cat(knitr::knit_child(text = paste(x, collapse = "\n"), quiet = TRUE), sep = "\n")
+}
 ```
 
 
@@ -135,70 +145,82 @@ devtools::load_all()
 
 ## PRODES
 
-```{r child = "vignettes/PRODES.Rmd"}
+```{r results='asis', echo=FALSE}
+include_vignette("vignettes/PRODES.Rmd")
 ```
 
 ## DETER
 
-```{r child = "vignettes/DETER.Rmd"}
+```{r results='asis', echo=FALSE}
+include_vignette("vignettes/DETER.Rmd")
 ```
 
 ## DEGRAD
 
-```{r child = "vignettes/DEGRAD.Rmd"}
+```{r results='asis', echo=FALSE}
+include_vignette("vignettes/DEGRAD.Rmd")
 ```
 
 ## Imazon
 
-```{r child = "vignettes/IMAZON.Rmd"}
+```{r results='asis', echo=FALSE}
+include_vignette("vignettes/IMAZON.Rmd")
 ```
 
 &#x1F534; This function uses the `googledrive` package to download data. In case of authentication errors, see [googledrive](#googledrive).
 
 ## IBAMA
 
-```{r child = "vignettes/IBAMA.Rmd"}
+```{r results='asis', echo=FALSE}
+include_vignette("vignettes/IBAMA.Rmd")
 ```
 
 ## MapBiomas
 
-```{r child = "vignettes/MAPBIOMAS.Rmd"}
+```{r results='asis', echo=FALSE}
+include_vignette("vignettes/MAPBIOMAS.Rmd")
 ```
 
 ## TerraClimate
 
-```{r child = "vignettes/TERRACLIMATE.Rmd"}
+```{r results='asis', echo=FALSE}
+include_vignette("vignettes/TERRACLIMATE.Rmd")
 ```
 
 ## SEEG
 
-```{r child = "vignettes/SEEG.Rmd"}
+```{r results='asis', echo=FALSE}
+include_vignette("vignettes/SEEG.Rmd")
 ```
 
 &#x1F534; This function uses the `googledrive` package to download data at the municipality level. In case of authentication errors, see [googledrive](#googledrive).
 
 ## CENSOAGRO
 
-```{r child = "vignettes/CENSOAGRO.Rmd"}
+```{r results='asis', echo=FALSE}
+include_vignette("vignettes/CENSOAGRO.Rmd")
 ```
 
 # Social Data
 
 ## IPS
 
-```{r child = "vignettes/IPS.Rmd"}
+```{r results='asis', echo=FALSE}
+include_vignette("vignettes/IPS.Rmd")
 ```
 
 ## IEMA
 
-```{r child = "vignettes/IEMA.Rmd"}
+```{r results='asis', echo=FALSE}
+include_vignette("vignettes/IEMA.Rmd")
 ```
 
 &#x1F534; This function uses the `googledrive` package to download data. In case of authentication errors, see [googledrive](#googledrive).
 
 ## Population
 
-```{r child = "vignettes/POPULATION.Rmd"}
+```{r results='asis', echo=FALSE}
+include_vignette("vignettes/POPULATION.Rmd")
 ```
 
 
@@ -206,64 +228,76 @@ devtools::load_all()
 
 ## COMEX
 
-```{r child = "vignettes/COMEX.Rmd"}
+```{r results='asis', echo=FALSE}
+include_vignette("vignettes/COMEX.Rmd")
 ```
 
 ## BACI
 
-```{r child = "vignettes/BACI.Rmd"}
+```{r results='asis', echo=FALSE}
+include_vignette("vignettes/BACI.Rmd")
 ```
 
 ## PIB-Munic
 
-```{r child = "vignettes/PIBMUNIC.Rmd"}
+```{r results='asis', echo=FALSE}
+include_vignette("vignettes/PIBMUNIC.Rmd")
 ```
 
 ## CEMPRE
 
-```{r child = "vignettes/CEMPRE.Rmd"}
+```{r results='asis', echo=FALSE}
+include_vignette("vignettes/CEMPRE.Rmd")
 ```
 
 ## PAM
 
-```{r child = "vignettes/PAM.Rmd"}
+```{r results='asis', echo=FALSE}
+include_vignette("vignettes/PAM.Rmd")
 ```
 
 ## PEVS
 
-```{r child = "vignettes/PEVS.Rmd"}
+```{r results='asis', echo=FALSE}
+include_vignette("vignettes/PEVS.Rmd")
 ```
 
 ## PPM
 
-```{r child = "vignettes/PPM.Rmd"}
+```{r results='asis', echo=FALSE}
+include_vignette("vignettes/PPM.Rmd")
 ```
 
 ## SIGMINE
 
-```{r child = "vignettes/SIGMINE.Rmd"}
+```{r results='asis', echo=FALSE}
+include_vignette("vignettes/SIGMINE.Rmd")
 ```
 
 ## ANEEL
 
-```{r child = "vignettes/ANEEL.Rmd"}
+```{r results='asis', echo=FALSE}
+include_vignette("vignettes/ANEEL.Rmd")
 ```
 
 ## EPE
 
-```{r child = "vignettes/EPE.Rmd"}
+```{r results='asis', echo=FALSE}
+include_vignette("vignettes/EPE.Rmd")
 ```
 
 # Other tools
 
 ## Legal Amazon Municipalities
 
-```{r child = "vignettes/municipalities.Rmd"}
+```{r results='asis', echo=FALSE}
+include_vignette("vignettes/municipalities.Rmd")
 ```
 
 ## <a name="googledrive"></a> The 'googledrive' package
 
-```{r child = "vignettes/GOOGLEDRIVE.Rmd"}
+```{r results='asis', echo=FALSE}
+include_vignette("vignettes/GOOGLEDRIVE.Rmd")
 ```
 
 ## Credits

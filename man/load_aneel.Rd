@@ -17,6 +17,9 @@ load_aneel(dataset, raw_data = FALSE, language = "eng", year = NULL)
 Required for the "energy_development_budget" dataset.
 Ignored for the other datasets.}
 }
+\value{
+A \code{data.frame}: the raw source data when \code{raw_data = TRUE}, or a treated \code{tibble} when \code{raw_data = FALSE}.
+}
 \description{
 National Electric Energy Agency - ANEEL
 }

@@ -8,6 +8,8 @@
 #'   Ignored for the other datasets.
 #' @inheritParams load_baci
 #'
+#' @return A \code{data.frame}: the raw source data when \code{raw_data = TRUE}, or a treated \code{tibble} when \code{raw_data = FALSE}.
+#'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
 #' # download treated data about energy generation

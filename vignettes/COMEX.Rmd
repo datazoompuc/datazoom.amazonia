@@ -201,8 +201,3 @@ When using data spanning 1989-1996 to 1997 onwards, be aware:
 - Product categories may differ between nomenclature systems
 - Conversions are available but not always 1:1
 - Compare very old with recent data with caution
-
-```
-
-
-

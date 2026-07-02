@@ -269,6 +269,6 @@ munic_by_state <- municipalities_sf %>%
 ## Related Resources
 
 - **IBGE**: https://www.ibge.gov.br/ (Brazilian statistics authority)
-- **Legal Amazon**: Official definition https://www.gov.br/
+- **Legal Amazon**: Official definition https://www.gov.br/pt-br
 - **Spatial data**: IBGE municipal boundaries available from various sources
 - **Within this package**: All geographic functions integrate this municipalities reference

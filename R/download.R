@@ -81,7 +81,7 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
 
 
   if (param$geo_reg %in% c("Brazil", "Region", "State")) {
-    base::message(base::cat("Downloading Data at the", param$geo_reg, "level")) ## Show Message
+    base::message("Downloading Data at the ", param$geo_reg, " level") ## Show Message
 
     ## Download
 
@@ -105,7 +105,7 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
       stop("Error in Download.")
     }
 
-    base::message(base::cat("Download Succesfully Completed!"))
+    base::message("Download Succesfully Completed!")
 
     return(dat)
   }
@@ -124,7 +124,7 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
     names(uf_list) <- uf_list
 
     dat_raw_uf <- purrr::map(uf_list, function(uf) {
-      base::message(base::cat(which(uf == uf_list), "in", length(uf_list), "states...\n"))
+      base::message(which(uf == uf_list), " in ", length(uf_list), " states...\n")
 
       suppressMessages(
         get_sidra_safe(
@@ -154,12 +154,12 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
     rm(dat_mod_uf)
 
     if (length(missed_uf) > 0) {
-      base::message(base::cat(
-        "Download at the State Level Completed!", length(missed_uf), "failed.\n",
+      base::message(
+        "Download at the State Level Completed! ", length(missed_uf), " failed.\n",
         "Attempting to Download at the Mesoregion Level..."
-      ))
+      )
     } else if (length(missed_uf) == 0) {
-      base::message(base::cat("Download Succesfully Completed!"))
+      base::message("Download Succesfully Completed!")
 
       return(dat_uf)
     }
@@ -181,7 +181,7 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
       names(meso_reg_list) <- meso_reg_list
 
       dat_raw_meso <- purrr::map(meso_reg_list, function(meso_reg) {
-        base::message(base::cat(which(meso_reg == meso_reg_list), "in", length(meso_reg_list), "mesoregions...\n"))
+        base::message(which(meso_reg == meso_reg_list), " in ", length(meso_reg_list), " mesoregions...\n")
 
         base::suppressMessages(
           get_sidra_safe(
@@ -214,12 +214,12 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
       rm(dat_mod_meso)
 
       if (length(missed_meso) > 0) {
-        base::message(base::cat(
-          "Download at the Mesoregion Level Completed!", length(missed_meso), "failed.\n",
+        base::message(
+          "Download at the Mesoregion Level Completed! ", length(missed_meso), " failed.\n",
           "Attempting to Download at the Microregion Level...\n"
-        ))
+        )
       } else if (length(missed_meso) == 0) {
-        base::message(base::cat("Download Succesfully Completed!"))
+        base::message("Download Succesfully Completed!")
 
         return(dat_uf)
       }
@@ -241,7 +241,7 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
         names(micro_reg_list) <- micro_reg_list
 
         dat_raw_micro <- purrr::map(micro_reg_list, function(micro_reg) {
-          base::message(base::cat(which(micro_reg == micro_reg_list), "in", length(micro_reg_list), "microregions...\n"))
+          base::message(which(micro_reg == micro_reg_list), " in ", length(micro_reg_list), " microregions...\n")
 
           base::suppressMessages(
             get_sidra_safe(
@@ -274,14 +274,14 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
         rm(dat_mod_micro)
 
         if (length(missed_micro) > 0) {
-          base::message(base::cat(
+          base::message(
             length(missed_micro),
-            "missed API requests at the Microregion level.
+            " missed API requests at the Microregion level.
                               Please report this problem to package developers..."
-          ))
+          )
         }
         if (length(missed_micro) == 0) {
-          base::message(base::cat("Download Succesfully Completed!"))
+          base::message("Download Succesfully Completed!")
 
           return(dat_uf)
         }

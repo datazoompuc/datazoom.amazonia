@@ -3,6 +3,7 @@
 ^.gitignore$
 ^datazoom\.amazonia\.Rproj$
 ^\.Rproj\.user$
+^\.Rhistory$
 ^LICENSE\.md$
 ^\.travis\.yml$
 ^data-raw$

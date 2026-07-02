@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 ```
 ## Overview
 
-SEEG (Sistema de Estimativa de Emissões e Remoções de Gases de Efeito Estufa - System of Estimates of Emissions and Removals of Greenhouse Gases) is Brazil's most comprehensive greenhouse gas emissions database developed by [Observatório do Clima](https://www.observatoriodoclima.org.br/) (Climate Observatory).
+SEEG (Sistema de Estimativa de Emissões e Remoções de Gases de Efeito Estufa - System of Estimates of Emissions and Removals of Greenhouse Gases) is Brazil's most comprehensive greenhouse gas emissions database developed by [Observatório do Clima](https://oc.eco.br/) (Climate Observatory).
 
 This dataset provides:
 
@@ -39,7 +39,7 @@ SEEG emissions estimates are compiled using:
 - Peer-reviewed scientific research
 - Regular updates as new government data becomes available
 
-For more information, visit [SEEG Project](https://seeg.org.br/) and [Observatório do Clima](https://www.observatoriodoclima.org.br/).
+For more information, visit [SEEG Project](https://www.seeg.org.br/) and [Observatório do Clima](https://oc.eco.br/).
 
 ***
 

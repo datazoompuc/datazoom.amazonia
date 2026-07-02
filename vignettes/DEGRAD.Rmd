@@ -197,7 +197,3 @@ Common degradation types include:
 5. **Not real-time**: This is annual analysis, not near-real-time detection like DETER
 
 ***
-
-```
-
-
