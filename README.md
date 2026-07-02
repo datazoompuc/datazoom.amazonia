@@ -669,89 +669,109 @@ product)
 6.  **False positives possible**: Satellite detection can occasionally
     misclassify cloud shadows or other features as forest loss
 
+## DEGRAD
+
+## Overview
+
+The [DEGRAD
+project](http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad)
+is a research initiative that uses satellite imagery to monitor forest
+degradation in the Amazon. Unlike DETER’s near real-time alerts, DEGRAD
+provides a more detailed annual analysis of forest degradation patterns.
+
+This dataset captures:
+
+- **Forest degradation monitoring**: Tracks areas where forests are
+  being damaged without complete clearing
+- **Annual editions**: Data released as yearly reports with accumulated
+  observations
+- **Spatial polygons**: Detailed geographic boundaries of degradation
+  events
+- **Municipality linkage**: Enhanced version links degradation areas to
+  affected municipalities
+- **Historical coverage**: Multiple years of degradation monitoring from
+  2007 onwards
+
+DEGRAD data is valuable for understanding forest degradation as a
+distinct phenomenon from clear-cut deforestation, important for carbon
+accounting, biodiversity protection, and understanding transition stages
+toward complete forest loss.
+
+### Data Source and Methodology
+
+DEGRAD monitoring: - Conducted by INPE’s forest monitoring programs -
+Uses satellite imagery interpretation to identify forest degradation
+signs - Focuses on selective logging, small-scale agriculture, forest
+fires, and other degrading activities - Released as annual editions with
+comprehensive analysis - Limited documentation available (original INPE
+documentation is sparse)
+
+For information, visit [INPE Forest
+Monitoring](http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad).
+
 ------------------------------------------------------------------------
 
+## Important Data Characteristics
 
-    ## DEGRAD
+### Data Organization
 
+**Important**: DEGRAD data is organized differently than real-time
+systems. Key points:
 
-    ## Overview
+1.  **Yearly editions**: Data is organized by publication year (e.g.,
+    “DEGRAD 2016”), not event year
+2.  **Mixed event years**: A DEGRAD edition may contain degradation
+    events from different years
+    - Example: DEGRAD 2016 edition may include events detected in 2015
+      or even earlier
+3.  **Documentation limited**: Original INPE documentation is minimal;
+    users should be aware of potential inconsistencies
 
-    The [DEGRAD project](http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad) is a research initiative that uses satellite imagery to monitor forest degradation in the Amazon. Unlike DETER's near real-time alerts, DEGRAD provides a more detailed annual analysis of forest degradation patterns.
+### Spatial Integration
 
-    This dataset captures:
+This package enhances the raw DEGRAD data by: - Intersecting DEGRAD
+spatial polygons with IBGE municipality boundaries (2019 version) -
+Providing municipality identification for each degradation event -
+Converting to Simple Features (SF) objects for spatial analysis
 
-    - **Forest degradation monitoring**: Tracks areas where forests are being damaged without complete clearing
-    - **Annual editions**: Data released as yearly reports with accumulated observations
-    - **Spatial polygons**: Detailed geographic boundaries of degradation events
-    - **Municipality linkage**: Enhanced version links degradation areas to affected municipalities
-    - **Historical coverage**: Multiple years of degradation monitoring from 2007 onwards
+**Note on CRS**: Coordinate system metadata should be verified after
+loading, as original INPE data sometimes has unclear CRS information.
 
-    DEGRAD data is valuable for understanding forest degradation as a distinct phenomenon from clear-cut deforestation, important for carbon accounting, biodiversity protection, and understanding transition stages toward complete forest loss.
+------------------------------------------------------------------------
 
-    ### Data Source and Methodology
+## Available Dataset
 
-    DEGRAD monitoring:
-    - Conducted by INPE's forest monitoring programs
-    - Uses satellite imagery interpretation to identify forest degradation signs
-    - Focuses on selective logging, small-scale agriculture, forest fires, and other degrading activities
-    - Released as annual editions with comprehensive analysis
-    - Limited documentation available (original INPE documentation is sparse)
+### **degrad (Forest Degradation)**
 
-    For information, visit [INPE Forest Monitoring](http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad).
+Detailed monitoring of forest degradation across the Legal Amazon.
 
-    ***
+- **Coverage**: Legal Amazon region with focus on degradation detection
+- **Time period**: 2007 onwards (but events within editions may vary)
+- **Spatial unit**: Polygons/spatial geometries with municipality
+  identification
+- **Variables**: Event date/year, degradation type/cause, area,
+  municipality, state, edition
+- **Data format**: Simple Features (SF) spatial objects with geographic
+  boundaries
+- **Use cases**:
+  - Distinguish degradation from complete deforestation
+  - Analyze forest degradation hotspots
+  - Understand selective logging extent
+  - Carbon stock assessment
+  - Forest fire impacts
+  - Long-term degradation trends
 
-    ## Important Data Characteristics
+------------------------------------------------------------------------
 
-    ### Data Organization
+## Function Parameters
 
-     **Important**: DEGRAD data is organized differently than real-time systems. Key points:
+### 1. **dataset**
 
-    1. **Yearly editions**: Data is organized by publication year (e.g., "DEGRAD 2016"), not event year
-    2. **Mixed event years**: A DEGRAD edition may contain degradation events from different years
-       - Example: DEGRAD 2016 edition may include events detected in 2015 or even earlier
-    3. **Documentation limited**: Original INPE documentation is minimal; users should be aware of potential inconsistencies
+Only one dataset is available:
 
-    ### Spatial Integration
-
-    This package enhances the raw DEGRAD data by:
-    - Intersecting DEGRAD spatial polygons with IBGE municipality boundaries (2019 version)
-    - Providing municipality identification for each degradation event
-    - Converting to Simple Features (SF) objects for spatial analysis
-
-    **Note on CRS**: Coordinate system metadata should be verified after loading, as original INPE data sometimes has unclear CRS information.
-
-    ***
-
-    ## Available Dataset
-
-    ### **degrad (Forest Degradation)**
-    Detailed monitoring of forest degradation across the Legal Amazon.
-
-    - **Coverage**: Legal Amazon region with focus on degradation detection
-    - **Time period**: 2007 onwards (but events within editions may vary)
-    - **Spatial unit**: Polygons/spatial geometries with municipality identification
-    - **Variables**: Event date/year, degradation type/cause, area, municipality, state, edition
-    - **Data format**: Simple Features (SF) spatial objects with geographic boundaries
-    - **Use cases**:
-      - Distinguish degradation from complete deforestation
-      - Analyze forest degradation hotspots
-      - Understand selective logging extent
-      - Carbon stock assessment
-      - Forest fire impacts
-      - Long-term degradation trends
-
-    ***
-
-    ## Function Parameters
-
-    ### 1. **dataset**
-
-    Only one dataset is available:
-
-    ```r
-    dataset = "degrad"  # Forest degradation monitoring
+``` r
+dataset = "degrad"  # Forest degradation monitoring
+```
 
 ### 2. **raw_data**
 
@@ -869,79 +889,87 @@ degradation causes
 5.  **Not real-time**: This is annual analysis, not near-real-time
     detection like DETER
 
+## Imazon
+
+## Overview
+
+[Imazon](https://imazon.org.br/) (Instituto do Homem e Meio Ambiente da
+Amazônia - Institute of Man and Environment of the Amazon) is an
+independent Brazilian research organization that produces its own
+deforestation monitoring and analysis.
+
+This dataset provides:
+
+- **Municipality-level deforestation pressure classification**: Risk
+  assessment of deforestation threat
+- **Pressure categories**: Three-level classification system (0, 1,
+  2, 3) representing deforestation pressure intensity
+- **Geographic coverage**: Municipalities in the Legal Amazon region
+- **Municipal boundaries**: Provided as spatial features (shapefile
+  format)
+- **Policy-relevant indicator**: Used in environmental monitoring and
+  policy assessments
+
+Imazon’s deforestation pressure index helps identify which
+municipalities face high deforestation risk, valuable for targeted
+conservation, enforcement, and development planning.
+
+### Data Source
+
+Imazon’s classification is based on: - Deforestation monitoring using
+satellite imagery - Analysis of deforestation trends and drivers - Risk
+assessment methodology to classify municipalities - Regular updates as
+monitoring data accumulates
+
+For more information, visit [Imazon Official
+Website](https://imazon.org.br/).
+
 ------------------------------------------------------------------------
 
+## Available Dataset
 
-    ## Imazon
+### **imazon_shp (Imazon Municipality Pressure Index)**
 
+Municipality-level deforestation pressure classification with spatial
+geometries.
 
-    ## Overview
+- **Geographic unit**: Brazilian municipalities
+- **Coverage**: Legal Amazon municipalities
+- **Variables**: Municipality name, state, deforestation pressure
+  category (0-3)
+- **Data format**: Shapefile / Simple Features (SF) spatial objects
+- **Update frequency**: Periodic updates as Imazon releases new
+  assessments
+- **Use cases**:
+  - Identify high-risk deforestation municipalities
+  - Target conservation resources to threatened areas
+  - Analyze geographic patterns of deforestation pressure
+  - Environmental risk assessment
+  - Monitoring enforcement effectiveness
+  - Correlate pressure with socioeconomic variables
 
-    [Imazon](https://imazon.org.br/) (Instituto do Homem e Meio Ambiente da Amazônia - Institute of Man and Environment of the Amazon) is an independent Brazilian research organization that produces its own deforestation monitoring and analysis. 
+------------------------------------------------------------------------
 
-    This dataset provides:
+## Deforestation Pressure Categories
 
-    - **Municipality-level deforestation pressure classification**: Risk assessment of deforestation threat
-    - **Pressure categories**: Three-level classification system (0, 1, 2, 3) representing deforestation pressure intensity
-    - **Geographic coverage**: Municipalities in the Legal Amazon region
-    - **Municipal boundaries**: Provided as spatial features (shapefile format)
-    - **Policy-relevant indicator**: Used in environmental monitoring and policy assessments
+Imazon’s three-level classification system: \| Category \| Pressure
+Level \| Description \| \|———-\|—\|—\| \| 0 \| No/Low Pressure \|
+Minimal deforestation threat \| \| 1 \| Moderate Pressure \| Some
+deforestation risk \| \| 2 \| High Pressure \| Significant deforestation
+threat \| \| 3 \| Very High Pressure \| Severe/Critical deforestation
+risk \|
 
-    Imazon's deforestation pressure index helps identify which municipalities face high deforestation risk, valuable for targeted conservation, enforcement, and development planning.
+------------------------------------------------------------------------
 
-    ### Data Source
+## Function Parameters
 
-    Imazon's classification is based on:
-    - Deforestation monitoring using satellite imagery
-    - Analysis of deforestation trends and drivers
-    - Risk assessment methodology to classify municipalities
-    - Regular updates as monitoring data accumulates
+### 1. **dataset**
 
-    For more information, visit [Imazon Official Website](https://imazon.org.br/).
+Only one dataset is available:
 
-    ***
-
-    ## Available Dataset
-
-    ### **imazon_shp (Imazon Municipality Pressure Index)**
-
-    Municipality-level deforestation pressure classification with spatial geometries.
-
-    - **Geographic unit**: Brazilian municipalities
-    - **Coverage**: Legal Amazon municipalities
-    - **Variables**: Municipality name, state, deforestation pressure category (0-3)
-    - **Data format**: Shapefile / Simple Features (SF) spatial objects
-    - **Update frequency**: Periodic updates as Imazon releases new assessments
-    - **Use cases**:
-      - Identify high-risk deforestation municipalities
-      - Target conservation resources to threatened areas
-      - Analyze geographic patterns of deforestation pressure
-      - Environmental risk assessment
-      - Monitoring enforcement effectiveness
-      - Correlate pressure with socioeconomic variables
-
-    ***
-
-    ## Deforestation Pressure Categories
-
-    Imazon's three-level classification system:
-    | Category | Pressure Level | Description |
-    |----------|---|---|
-    | 0 | No/Low Pressure | Minimal deforestation threat |
-    | 1 | Moderate Pressure | Some deforestation risk |
-    | 2 | High Pressure | Significant deforestation threat |
-    | 3 | Very High Pressure | Severe/Critical deforestation risk |
-
-    ***
-
-    ## Function Parameters
-
-    ### 1. **dataset**
-
-    Only one dataset is available:
-
-    ```r
-    dataset = "imazon_shp"  # Imazon municipality pressure classification
+``` r
+dataset = "imazon_shp"  # Imazon municipality pressure classification
+```
 
 ### 2. **raw_data**
 
@@ -1516,163 +1544,20 @@ space for multi-year downloads
 
 ## Examples
 
-### Example 1: Precipitation Patterns
-
-Analyze rainfall across the Amazon:
-
 ``` r
-library(raster)
-library(dplyr)
-
-# Download precipitation for one year in Amazon
+# download precipitation data for the Legal Amazon (2020)
 precip <- load_climate(
   dataset = "precipitation",
   time_period = 2020,
   legal_amazon_only = TRUE,
   language = "eng"
 )
-
-# Basic statistics
-summary(precip)
-
-# Plot precipitation
-plot(precip, main = "Amazon Precipitation (2020)")
-
-# Annual total (sum of months)
-annual_precip <- sum(precip, na.rm = TRUE)
-plot(annual_precip, main = "Annual Precipitation in Amazon")
-```
-
-### Example 2: Temperature Trends
-
-Track temperature changes over time:
-
-``` r
-library(raster)
-
-# Download max temperature for recent decade
+# download maximum temperature for multiple years, all of Brazil
 max_temp <- load_climate(
   dataset = "max_temperature",
-  time_period = 2010:2020,
-  legal_amazon_only = TRUE,
+  time_period = 2010:2012,
   language = "eng"
 )
-
-# Average temperature over period
-avg_temp <- mean(max_temp, na.rm = TRUE)
-plot(avg_temp, main = "Average Maximum Temperature (2010-2020)")
-
-# Temperature range: compare first and last year
-temp_2010 <- max_temp[[1:12]]  # First year
-temp_2020 <- max_temp[[(nlayers(max_temp)-11):nlayers(max_temp)]]  # Last year
-
-avg_2010 <- mean(temp_2010, na.rm = TRUE)
-avg_2020 <- mean(temp_2020, na.rm = TRUE)
-
-# Simple warming calculation
-temp_change <- avg_2020 - avg_2010
-plot(temp_change, main = "Temperature Change 2010-2020")
-```
-
-### Example 3: Drought Assessment
-
-Analyze drought conditions using water deficit data:
-
-``` r
-library(raster)
-
-# Download climatic water deficit
-water_def <- load_climate(
-  dataset = "climatic_water_deficit",
-  time_period = 2020,
-  legal_amazon_only = TRUE,
-  language = "eng"
-)
-
-# Water deficit (high values = dry conditions)
-# Average deficit over year
-avg_water_def <- mean(water_def, na.rm = TRUE)
-plot(avg_water_def, main = "Average Climatic Water Deficit (2020)")
-
-# Identify dry areas (high deficit)
-drought_areas <- avg_water_def > quantile(avg_water_def, 0.75, na.rm = TRUE)
-plot(drought_areas, main = "High Drought Risk Areas")
-
-# Palmer Drought Severity Index for additional drought context
-pdsi <- load_climate(
-  dataset = "palmer_drought_severity_index",
-  time_period = 2020,
-  legal_amazon_only = TRUE,
-  language = "eng"
-)
-
-# PDSI: negative = drought, positive = wet
-plot(pdsi, main = "Palmer Drought Severity Index (2020)")
-```
-
-### Example 4: Radiation and Growing Season
-
-Analyze solar radiation and its relationship to temperature:
-
-``` r
-library(raster)
-
-# Download radiation and temperature
-radiation <- load_climate(
-  dataset = "shortwave_radiation_flux",
-  time_period = 2020,
-  legal_amazon_only = TRUE,
-  language = "eng"
-)
-
-temp <- load_climate(
-  dataset = "max_temperature",
-  time_period = 2020,
-  legal_amazon_only = TRUE,
-  language = "eng"
-)
-
-# Annual radiation total
-annual_radiation <- sum(radiation, na.rm = TRUE)
-plot(annual_radiation, main = "Annual Solar Radiation")
-
-# Average temperature
-avg_temp <- mean(temp, na.rm = TRUE)
-plot(avg_temp, main = "Average Maximum Temperature")
-
-# Correlation between radiation and temperature
-# (Simplified: stack and calculate)
-radiation_temp <- stack(annual_radiation, avg_temp)
-names(radiation_temp) <- c("Radiation", "Temperature")
-```
-
-### Example 5: Soil Moisture Dynamics
-
-Track seasonal soil moisture patterns:
-
-``` r
-library(raster)
-
-# Download soil moisture
-soil_moisture <- load_climate(
-  dataset = "soil_moisture",
-  time_period = 2020,
-  legal_amazon_only = TRUE,
-  language = "eng"
-)
-
-# Monthly stack (12 months if 1 year)
-plot(soil_moisture, main = "Monthly Soil Moisture (2020)")
-
-# Identify wet vs. dry months
-avg_soil <- mean(soil_moisture, na.rm = TRUE)
-
-# High vs. low moisture areas
-high_moisture <- soil_moisture > quantile(soil_moisture, 0.75, na.rm = TRUE)
-low_moisture <- soil_moisture < quantile(soil_moisture, 0.25, na.rm = TRUE)
-
-plot(high_moisture, main = "High Soil Moisture Areas")
-plot(low_moisture, main = "Low Soil Moisture Areas")
 ```
 
 ------------------------------------------------------------------------
@@ -2401,116 +2286,145 @@ When using this data in research or publications, cite:
 > Agropecuário. Available at:
 > <https://sidra.ibge.gov.br/pesquisa/censo-agropecuario>
 
+# Social Data
+
+## IPS
+
+## Overview
+
+The [Amazon Social Progress Index (IPS)](https://imazon.org.br/) is a
+comprehensive indicator framework that measures social and environmental
+progress in the Legal Amazon region. This collaborative initiative
+combines:
+
+- **Imazon** (Instituto do Homem e Meio Ambiente da Amazônia): Brazilian
+  research organization
+- **Social Progress Imperative**: International organization focused on
+  measuring societal well-being
+
+This dataset captures:
+
+- **Multi-dimensional development indicators**: Spanning 8 domains of
+  social and environmental progress
+- **Municipality-level data**: All Legal Amazon municipalities assessed
+- **Quality of life metrics**: Health, education, sanitation,
+  infrastructure
+- **Environmental indicators**: Forest cover, deforestation risk,
+  sustainability
+- **Violence and safety**: Public safety and security metrics
+- **Temporal coverage**: Data from 2014, 2018, 2021, 2023
+- **Geographic coverage**: 570+ municipalities across Legal Amazon
+
+The IPS provides a holistic view of sustainable development, moving
+beyond simple economic measures (GDP) to encompass environmental
+sustainability and social well-being.
+
+### Data Source and Methodology
+
+The Social Progress Index: - Based on 50+ individual indicators across
+12 domains - Uses data from government agencies, NGOs, and research
+institutions - Aggregated into 3 main dimensions and 12 subdimensions -
+Indexed to 0-100 scale for comparability - Methodologically rigorous
+with transparent weighting
+
+For detailed methodology, visit [Social Progress
+Imperative](https://www.socialprogress.org/).
+
 ------------------------------------------------------------------------
 
+## Available Dimensions
 
-    # Social Data
+The IPS framework includes 8 main dataset options:
 
-    ## IPS
+### **1. all**
 
+Complete Social Progress Index with all dimensions and indicators.
 
-    ## Overview
+- **Coverage**: Comprehensive assessment across all domains
+- **Variables**: All indicators and index scores
+- **Use cases**: Holistic development analysis, overall progress
+  tracking, multi-dimensional comparisons
 
-    The [Amazon Social Progress Index (IPS)](https://imazon.org.br/) is a comprehensive indicator framework that measures social and environmental progress in the Legal Amazon region. This collaborative initiative combines:
+### **2. life_quality**
 
-    - **Imazon** (Instituto do Homem e Meio Ambiente da Amazônia): Brazilian research organization
-    - **Social Progress Imperative**: International organization focused on measuring societal well-being
+Indicators related to quality of life and well-being.
 
-    This dataset captures:
+- **Variables**: Healthcare quality, life expectancy, nutrition, shelter
+  quality
+- **Use cases**: Health and wellness analysis, living standards
+  assessment, healthcare quality evaluation
 
-    - **Multi-dimensional development indicators**: Spanning 8 domains of social and environmental progress
-    - **Municipality-level data**: All Legal Amazon municipalities assessed
-    - **Quality of life metrics**: Health, education, sanitation, infrastructure
-    - **Environmental indicators**: Forest cover, deforestation risk, sustainability
-    - **Violence and safety**: Public safety and security metrics
-    - **Temporal coverage**: Data from 2014, 2018, 2021, 2023
-    - **Geographic coverage**: 570+ municipalities across Legal Amazon
+### **3. sanit_habit**
 
-    The IPS provides a holistic view of sustainable development, moving beyond simple economic measures (GDP) to encompass environmental sustainability and social well-being.
+Sanitation and habitat indicators.
 
-    ### Data Source and Methodology
+- **Variables**: Access to improved sanitation, water quality, housing
+  conditions
+- **Use cases**: Infrastructure assessment, water and sanitation access
+  analysis, housing quality evaluation
 
-    The Social Progress Index:
-    - Based on 50+ individual indicators across 12 domains
-    - Uses data from government agencies, NGOs, and research institutions
-    - Aggregated into 3 main dimensions and 12 subdimensions
-    - Indexed to 0-100 scale for comparability
-    - Methodologically rigorous with transparent weighting
+### **4. violence**
 
-    For detailed methodology, visit [Social Progress Imperative](https://www.socialprogress.org/).
+Public safety and violence indicators.
 
-    ***
+- **Variables**: Crime rates, safety perceptions, homicide data
+- **Use cases**: Public safety analysis, violence hotspot
+  identification, security trends
 
-    ## Available Dimensions
+### **5. educ**
 
-    The IPS framework includes 8 main dataset options:
+Education and literacy indicators.
 
-    ### **1. all**
-    Complete Social Progress Index with all dimensions and indicators.
+- **Variables**: School enrollment, literacy rates, educational
+  attainment, quality of education
+- **Use cases**: Education access analysis, literacy trends, human
+  capital assessment
 
-    - **Coverage**: Comprehensive assessment across all domains
-    - **Variables**: All indicators and index scores
-    - **Use cases**: Holistic development analysis, overall progress tracking, multi-dimensional comparisons
+### **6. communic**
 
-    ### **2. life_quality**
-    Indicators related to quality of life and well-being.
+Communication and connectivity indicators.
 
-    - **Variables**: Healthcare quality, life expectancy, nutrition, shelter quality
-    - **Use cases**: Health and wellness analysis, living standards assessment, healthcare quality evaluation
+- **Variables**: Internet access, mobile phone coverage, communication
+  infrastructure
+- **Use cases**: Digital divide analysis, connectivity assessment, tech
+  adoption patterns
 
-    ### **3. sanit_habit**
-    Sanitation and habitat indicators.
+### **7. mortality**
 
-    - **Variables**: Access to improved sanitation, water quality, housing conditions
-    - **Use cases**: Infrastructure assessment, water and sanitation access analysis, housing quality evaluation
+Health and mortality indicators.
 
-    ### **4. violence**
-    Public safety and violence indicators.
+- **Variables**: Child mortality, maternal mortality, mortality rates by
+  cause
+- **Use cases**: Health outcomes analysis, maternal/child health
+  assessment, disease burden evaluation
 
-    - **Variables**: Crime rates, safety perceptions, homicide data
-    - **Use cases**: Public safety analysis, violence hotspot identification, security trends
+### **8. deforest**
 
-    ### **5. educ**
-    Education and literacy indicators.
+Environmental and deforestation indicators.
 
-    - **Variables**: School enrollment, literacy rates, educational attainment, quality of education
-    - **Use cases**: Education access analysis, literacy trends, human capital assessment
+- **Variables**: Forest cover, deforestation rates, environmental
+  sustainability
+- **Use cases**: Forest monitoring, environmental assessment,
+  climate/conservation analysis
 
-    ### **6. communic**
-    Communication and connectivity indicators.
+------------------------------------------------------------------------
 
-    - **Variables**: Internet access, mobile phone coverage, communication infrastructure
-    - **Use cases**: Digital divide analysis, connectivity assessment, tech adoption patterns
+## Function Parameters
 
-    ### **7. mortality**
-    Health and mortality indicators.
+### 1. **dataset**
 
-    - **Variables**: Child mortality, maternal mortality, mortality rates by cause
-    - **Use cases**: Health outcomes analysis, maternal/child health assessment, disease burden evaluation
+Selects which dimension(s) to download.
 
-    ### **8. deforest**
-    Environmental and deforestation indicators.
-
-    - **Variables**: Forest cover, deforestation rates, environmental sustainability
-    - **Use cases**: Forest monitoring, environmental assessment, climate/conservation analysis
-
-    ***
-
-    ## Function Parameters
-
-    ### 1. **dataset**
-
-    Selects which dimension(s) to download.
-
-    ```r
-    dataset = "all"         # All dimensions
-    dataset = "life_quality" # Quality of life metrics
-    dataset = "sanit_habit"  # Sanitation and habitat
-    dataset = "violence"     # Public safety and violence
-    dataset = "educ"         # Education indicators
-    dataset = "communic"     # Communication and connectivity
-    dataset = "mortality"    # Health and mortality
-    dataset = "deforest"     # Environmental and deforestation
+``` r
+dataset = "all"         # All dimensions
+dataset = "life_quality" # Quality of life metrics
+dataset = "sanit_habit"  # Sanitation and habitat
+dataset = "violence"     # Public safety and violence
+dataset = "educ"         # Education indicators
+dataset = "communic"     # Communication and connectivity
+dataset = "mortality"    # Health and mortality
+dataset = "deforest"     # Environmental and deforestation
+```
 
 ### 2. **raw_data**
 
@@ -3159,77 +3073,98 @@ categories may differ between nomenclature systems - Conversions are
 available but not always 1:1 - Compare very old with recent data with
 caution
 
+## BACI
 
-    ## BACI
+## Overview
 
+BACI (Base pour l’Analyse du Commerce International) is a comprehensive
+database of bilateral trade flows developed by
+[CEPII](https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37)
+(Centre d’Études Prospectives et d’Informations Internationales), a
+leading French research center on international trade.
 
-    ## Overview
+This dataset provides:
 
-    BACI (Base pour l'Analyse du Commerce International) is a comprehensive database of bilateral trade flows developed by [CEPII](https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37) (Centre d'Études Prospectives et d'Informations Internationales), a leading French research center on international trade. 
+- **Bilateral trade data**: Export and import flows between country
+  pairs
+- **Product-level detail**: Over 5,000 distinct products classified by
+  the Harmonized System (HS)
+- **Global coverage**: More than 200 countries and territories
+- **Historical depth**: Data spanning multiple decades of international
+  commerce
+- **Quality assurance**: Reconciliation of mirror flows (exports
+  reported by one country matched with imports reported by trading
+  partner)
 
-    This dataset provides:
+The BACI dataset is widely used in academic research, policy analysis,
+and international trade studies due to its comprehensive coverage and
+quality control procedures.
 
-    - **Bilateral trade data**: Export and import flows between country pairs
-    - **Product-level detail**: Over 5,000 distinct products classified by the Harmonized System (HS)
-    - **Global coverage**: More than 200 countries and territories
-    - **Historical depth**: Data spanning multiple decades of international commerce
-    - **Quality assurance**: Reconciliation of mirror flows (exports reported by one country matched with imports reported by trading partner)
+### Data Source and Methodology
 
-    The BACI dataset is widely used in academic research, policy analysis, and international trade studies due to its comprehensive coverage and quality control procedures.
+BACI is constructed from UN Comtrade data with significant processing: -
+Reconciliation of discrepancies between reported imports and exports -
+Imputation of missing values using econometric techniques -
+Classification using the Harmonized System (HS) nomenclature - All
+values converted to USD for comparability
 
-    ### Data Source and Methodology
+For detailed methodological information, visit the [CEPII BACI
+documentation](https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37).
 
-    BACI is constructed from UN Comtrade data with significant processing:
-    - Reconciliation of discrepancies between reported imports and exports
-    - Imputation of missing values using econometric techniques
-    - Classification using the Harmonized System (HS) nomenclature
-    - All values converted to USD for comparability
+------------------------------------------------------------------------
 
-    For detailed methodological information, visit the [CEPII BACI documentation](https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37).
+## Available Dataset
 
-    ***
+### **HS92 (Harmonized System 1992)**
 
-    ## Available Dataset
+The HS92 classification provides trade data organized under the 1992
+version of the Harmonized System nomenclature.
 
-    ### **HS92 (Harmonized System 1992)**
+- **Coverage**: Bilateral trade flows for 5,000+ products (HS 6-digit
+  level)
+- **Countries**: 200+ countries and territories
+- **Time period**: 1995 onwards (varies by country; most comprehensive
+  from 2000 onwards)
+- **Variables**: Trade value (USD), quantity (where available),
+  exporter, importer, product code
+- **Use cases**:
+  - Analyzing trade specialization and comparative advantage
+  - Studying trade relationships between countries
+  - Product-level trade analysis
+  - Research on globalization and supply chains
 
-    The HS92 classification provides trade data organized under the 1992 version of the Harmonized System nomenclature.
+------------------------------------------------------------------------
 
-    - **Coverage**: Bilateral trade flows for 5,000+ products (HS 6-digit level)
-    - **Countries**: 200+ countries and territories
-    - **Time period**: 1995 onwards (varies by country; most comprehensive from 2000 onwards)
-    - **Variables**: Trade value (USD), quantity (where available), exporter, importer, product code
-    - **Use cases**: 
-      - Analyzing trade specialization and comparative advantage
-      - Studying trade relationships between countries
-      - Product-level trade analysis
-      - Research on globalization and supply chains
+## Important Information About Downloads
 
-    ***
+### Download Size and Time
 
-    ## Important Information About Downloads
+**Important**: The BACI dataset is very large. All data is packaged in a
+single compressed file on the CEPII server. **Even if you only need data
+for specific years, the entire dataset must be downloaded first, then
+processed locally.**
 
-    ### Download Size and Time
+- **Typical download size**: 500+ MB (compressed)
+- **Uncompressed size**: Several GB
+- **Download time**: Can take 30-60+ minutes depending on internet
+  connection
+- **Processing time**: Additional time required after download for
+  extraction and filtering
 
-     **Important**: The BACI dataset is very large. All data is packaged in a single compressed file on the CEPII server. **Even if you only need data for specific years, the entire dataset must be downloaded first, then processed locally.**
+**Recommendation**: Plan your download during off-peak hours or use a
+stable, high-speed connection.
 
-    - **Typical download size**: 500+ MB (compressed)
-    - **Uncompressed size**: Several GB
-    - **Download time**: Can take 30-60+ minutes depending on internet connection
-    - **Processing time**: Additional time required after download for extraction and filtering
+------------------------------------------------------------------------
 
-    **Recommendation**: Plan your download during off-peak hours or use a stable, high-speed connection.
+## Function Parameters
 
-    ***
+### 1. **dataset**
 
-    ## Function Parameters
+Currently only one dataset is available:
 
-    ### 1. **dataset**
-
-    Currently only one dataset is available:
-
-    ```r
-    dataset = "HS92"  # Harmonized System 1992 classification
+``` r
+dataset = "HS92"  # Harmonized System 1992 classification
+```
 
 ### 2. **raw_data**
 
