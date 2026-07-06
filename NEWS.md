@@ -1,3 +1,5 @@
+# datazoom.amazonia (development version)
+
 # datazoom.amazonia 1.2.0
 
   * Added `"energy_state_panel"` dataset to `load_epe`: yearly energy production by source and state (2011-2024), from EPE's BEN Chapter 8 (Dados Estaduais). 
