@@ -410,16 +410,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
   }
 
-  ## SEEG
-
-  # Download path depends on geo_level
-
-  if (source == "seeg") {
-    if (geo_level == "municipality") {
-      path <- "https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd"
-    }
-  }
-
   ## TerraClimate
 
   # Download path depends on geographical parameters
@@ -525,7 +515,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   }
   if (source == "prodes") {
     message("This may take a while.\n")
-    a <- TRUE
     options(timeout = max(1000, getOption("timeout")))
   }
   if (source %in% c("deter", "terraclimate", "baci", "mapbiomas")) {
@@ -905,7 +894,6 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
     "pam", "passion_fruit", "1613/c82/2738", "1988-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
     "pam", "peach", "1613/c82/2742", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
     "pam", "pear", "1613/c82/2741", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "permanent_crops", "1613/all/all", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
     "pam", "permanent_total", "1613/c82/0", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
     "pam", "quince", "1613/c82/2739", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
     "pam", "rubber_coagulated_latex", "1613/c82/2721", "1981-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
@@ -950,7 +938,7 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
     ## Shapefile from github repository
 
 
-    "internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds",
+    "internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.githubusercontent.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds",
   )
 
   # returns only the desired rows
