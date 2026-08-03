@@ -58,57 +58,16 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
 
   check_params(param)
 
-  # plucking sheet corresponding to each dataset/geo_level
+  # plucking sheet corresponding to each dataset/geo_level (one manifest row
+  # per (dataset, geo_level) combination -- see
+  # inst/extdata/manifest/v1/datasets_link.csv)
 
-  sheets <- tibble::tribble(
-    ~dataset, ~geo_level, ~sheet,
-    "mapbiomas_cover", "any", "COVERAGE_9",
-    "mapbiomas_transition", "biome", "TRANSITION_9",
-    "mapbiomas_transition", "municipality", "TRANSITION_9",
-    "mapbiomas_deforestation_regeneration", "municipality", "DEF_SECVEG",
-    "mapbiomas_irrigation", "state", "UF",
-    "mapbiomas_irrigation", "biome", "BIOME",
-    "mapbiomas_mining", "municipality", "CITY_STATE_BIOME",
-    "mapbiomas_mining", "indigenous_land", "IL",
-    "mapbiomas_water", "state", "states_annual",
-    "mapbiomas_water", "biome", "biomes_annual",
-    "mapbiomas_water", "municipality", "mun_annual",
-    "mapbiomas_fire", "state", "a_ANNUAL",
-  )
+  sheet <- dataset_field(param$source, param$dataset, "sheet", geo_level = param$geo_level)
 
-  sheet <- sheets %>%
-    dplyr::filter(
-      dataset == param$dataset,
-      geo_level %in% c(param$geo_level, "any")
-    ) %>%
-    dplyr::select(sheet) %>%
-    unlist()
+  ## MapBiomas collection number (per dataset, does not depend on geo_level)
 
-  ## MapBiomas collections
-
-  if (dataset %in% c(
-    "mapbiomas_cover",
-    "mapbiomas_transition",
-    "mapbiomas_deforestation_regeneration"
-  )) {
-    message("Data from MapBiomas - Collection 9\n")
-  }
-
-  if (dataset %in% c("mapbiomas_mining")) {
-    message("Data from Mapbiomas - Collection 8\n")
-  }
-
-  if (dataset %in% c("mapbiomas_irrigation")) {
-    message("Data from Mapbiomas - Collection 7\n")
-  }
-
-  if (dataset %in% c("mapbiomas_fire")) {
-    message("Data from Mapbiomas - Collection 3\n")
-  }
-
-  if (dataset %in% c("mapbiomas_water")) {
-    message("Data from Mapbiomas - Collection 2\n")
-  }
+  collection <- dataset_field(param$source, param$dataset, "collection")
+  message("Data from MapBiomas - Collection ", collection, "\n")
 
   #################
   ## Downloading ##

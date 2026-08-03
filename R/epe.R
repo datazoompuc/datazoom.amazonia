@@ -57,7 +57,11 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
   # defining sheet names for each dataset
 
   if (param$dataset == "national_energy_balance") {
-    sheets <- as.character(2003:2023)
+    # one sheet per year in the workbook -- read the valid range from the
+    # manifest's available_time instead of hardcoding it, since it grows by
+    # one year with every BEN edition
+    available <- dataset_field(param$source, param$dataset, "available_time")
+    sheets <- as.character(eval(parse(text = stringr::str_replace(available, "-", ":"))))
   }
   if (param$dataset == "consumer_energy_consumption") {
     if (param$geo_level == "state") {
@@ -77,7 +81,7 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
   }
 
   if (param$dataset == "energy_state_panel") {
-    sheets <- "8.1 part 3"
+    sheets <- dataset_field(param$source, param$dataset, "sheet")
   }
 
   if (param$dataset %in% c("consumer_energy_consumption", "industrial_energy_consumption")) {

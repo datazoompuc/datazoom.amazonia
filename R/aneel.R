@@ -55,13 +55,19 @@ if (param$dataset == "energy_development_budget") {
     stop("For 'energy_development_budget', you must provide 'year'.")
   }
 
-  invalid_years <- setdiff(as.integer(param$year), 2017:2022)
+  # valid years come from the manifest's available_time -- one row per year
+  # (see inst/extdata/manifest/v1/datasets_link.csv) -- instead of a
+  # hardcoded range that must be edited in R code whenever ANEEL adds a year
+  available <- dataset_field(param$source, param$dataset, "available_time")
+  valid_years <- eval(parse(text = stringr::str_replace(available, "-", ":")))
+
+  invalid_years <- setdiff(as.integer(param$year), valid_years)
 
   if (length(invalid_years) > 0) {
     stop(
       "Year(s) not available for 'energy_development_budget': ",
       paste(invalid_years, collapse = ", "),
-      ". Valid years: 2017-2022."
+      ". Valid years: ", available, "."
     )
   }
 }

@@ -60,7 +60,7 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
   ## Bind Global Variables ##
   ###########################
 
-  . <- area_km2 <- km <- ID <- prodes_amazonia_legal_2023 <- name_muni <- NULL
+  . <- area_km2 <- km <- ID <- name_muni <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -75,9 +75,12 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
   )
 
   # forcing years
+  # native_vegetation/non_forest/hydrography/clouds only exist for a single
+  # year -- read from the manifest's available_time instead of hardcoding it,
+  # so a PRODES year rollover does not require a code change here too.
 
   if (!param$dataset %in% c("deforestation", "residual_deforestation")) {
-    param$time_period <- 2023
+    param$time_period <- as.numeric(dataset_field(param$source, param$dataset, "available_time"))
   }
 
   # check if dataset and time_period are supported
@@ -106,6 +109,11 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
   ######################
 
   # raster has values for each dataset/year
+  #
+  # This legend (year offsets and fixed codes) is PRODES' own raster encoding
+  # scheme, not a URL or a version stamp -- it cannot be derived from the
+  # manifest. If INPE changes the encoding in a future collection, this must
+  # be re-verified and updated by hand alongside `layer_name` below.
 
   if (param$dataset == "deforestation") raster_codes <- param$time_period - 2000
   if (param$dataset == "residual_deforestation") raster_codes <- param$time_period - 1960
@@ -113,6 +121,12 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
   if (param$dataset == "non_forest") raster_codes <- 101
   if (param$dataset == "hydrography") raster_codes <- 91
   if (param$dataset == "clouds") raster_codes <- 99
+
+  # name of the raster band/column produced by the downloaded file -- lives
+  # in the manifest (layer_name) because it changes whenever the PRODES
+  # filename itself changes (e.g. a new year in "prodes_amazonia_legal_2023")
+
+  layer <- dataset_field(param$source, param$dataset, "layer_name")
 
   message("Downloading map of Brazilian municipalities")
 
@@ -176,17 +190,17 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
         # add km2 units
 
         counts <- counts %>%
-          dplyr::mutate(dplyr::across(prodes_amazonia_legal_2023, ~ units::set_units(., "km^2")))
+          dplyr::mutate(dplyr::across(dplyr::all_of(layer), ~ units::set_units(., "km^2")))
 
         # drop cities with no pixels
 
         counts <- counts %>%
-          tidyr::drop_na(prodes_amazonia_legal_2023)
+          tidyr::drop_na(dplyr::all_of(layer))
 
         # rename variable to match the dataset
 
         counts <- counts %>%
-          dplyr::rename(!!paste(param$dataset, "km2", sep = "_") := prodes_amazonia_legal_2023)
+          dplyr::rename(!!paste(param$dataset, "km2", sep = "_") := !!rlang::sym(layer))
 
         # return data frame
         counts
