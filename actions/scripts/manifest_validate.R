@@ -18,7 +18,8 @@ KEY_COLS <- c("survey", "dataset", "geo_level", "year")
 # still carries an unresolved placeholder -- both are exempt from the HTTP
 # check (see build_manifest.R validate_candidate()).
 is_http_exempt <- function(row) {
-  !is.na(row$sidra_code) ||
+  is.na(row$link) ||
+    !is.na(row$sidra_code) ||
     identical(row$survey, "internal") ||
     identical(row$survey, "terraclimate") ||
     grepl("\\$(year|state|file_name)\\$", row$link)
@@ -197,6 +198,11 @@ validate_http <- function(candidate, changed_keys, min_bytes = 10000) {
 # check can validate, and would break already-installed package versions.
 VERSION_TOKEN_RE <- "(collection_[0-9]+|COL\\.?[0-9]+|V[0-9]{6}|/20[0-9]{2}/[0-9]{2}/|_20[0-9]{2}\\.)"
 
+file_ext <- function(url) {
+  if (is.na(url)) return(NA_character_)
+  tolower(sub(".*\\.([a-zA-Z0-9]+)(\\?.*)?$", "\\1", url))
+}
+
 classify_row_change <- function(old_row, new_row) {
   non_link_changed <- !identical(
     old_row[setdiff(MANIFEST_ALL_COLS, "link")],
@@ -207,6 +213,17 @@ classify_row_change <- function(old_row, new_row) {
   }
   if (identical(old_row$link, new_row$link)) {
     return("none")
+  }
+
+  # A changed file extension (e.g. a source silently swapping .csv for
+  # .zip on the same resource, as ANEEL was observed doing live for
+  # energy_enterprises_distributed while building this) means external_download()'s
+  # file_extension inference and its downstream read function (fread vs
+  # read_sf vs unzip) may now be wrong -- that is exactly the kind of
+  # "shape of the data changed" risk Tier B exists for, even though no
+  # version-looking token in the URL changed at all.
+  if (!identical(file_ext(old_row$link), file_ext(new_row$link))) {
+    return("B")
   }
 
   old_tokens <- regmatches(old_row$link, gregexpr(VERSION_TOKEN_RE, old_row$link))[[1]]
