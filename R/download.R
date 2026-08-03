@@ -330,39 +330,33 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## Construct Links ##
   #####################
 
-  ## Pull URL from datasets_link
+  ## Pull URL from the manifest
+  #
+  # dataset_url() resolves the most specific matching row for
+  # (source, dataset, geo_level, year), so geo_level/year-dependent URLs
+  # (MapBiomas overrides, ANEEL CDE per-year links, ...) no longer need a
+  # dedicated branch here -- they are just more specific rows in the
+  # manifest (inst/extdata/manifest/v1/datasets_link.csv).
 
-  param$url <- datasets_link(
+  param$url <- dataset_url(
     source = param$source,
     dataset = param$dataset,
-    url = TRUE
+    geo_level = param$geo_level,
+    year = param$year
   )
 
-  # For most sources, the URL in datasets_link is already the URL needed for the download
+  if (is.na(param$url)) {
+    stop(
+      "No download URL found for source '", param$source, "', dataset '", param$dataset, "'",
+      if (!is.null(param$year)) paste0(", year ", paste(param$year, collapse = ", ")) else "",
+      if (!is.null(param$geo_level)) paste0(", geo_level '", param$geo_level, "'") else "",
+      "."
+    )
+  }
+
+  # For most sources, the URL in the manifest is already the URL needed for the download
 
   path <- param$url
-
-
-  if (identical(path, "aneel_cde_$year$")) {
-    cde_urls <- c(
-      "2017" = "https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/684a68fd-4278-4af1-bcf2-c02810dd7c0c/download/cde-beneficiarios-rede-basica-2017.csv",
-      "2018" = "https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/237f3f67-4795-4bd7-a4d2-5f6071ef39af/download/cde-beneficiarios-rede-basica-2018.csv",
-      "2019" = "https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/0bd1f129-39c5-4edc-b272-3f1d11181cca/download/cde-beneficiarios-rede-basica-2019.csv",
-      "2020" = "https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/f77bb713-cc06-406a-baa8-246acc357ff5/download/cde-beneficiarios-rede-basica-2020.csv",
-      "2021" = "https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/cdf1b068-7c76-462a-ab57-d6619ad290fa/download/cde-beneficiarios-rede-basica-2021.csv",
-      "2022" = "https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/e390baae-5304-4a94-854f-0905094b3357/download/cde-beneficiarios-rede-basica-2022.csv"
-    )
-
-    if (is.null(param$year)) {
-      stop("For 'energy_development_budget', please provide 'year'.")
-    }
-
-    if (!as.character(param$year) %in% names(cde_urls)) {
-      stop("Year not available for 'energy_development_budget'.")
-    }
-
-    path <- unname(cde_urls[as.character(param$year)])
-  }
 
   ## Filling in URLs
 
@@ -387,28 +381,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   ##### Exceptions only #####
 
-  # If the datasets_link URL is the download path you need,
+  # If the manifest URL is the download path you need,
   # do not change this section for a new function
-
-  ## MapBiomas
-
-  # Download path depends on dataset and geo_level
-
-  if (source == "mapbiomas") {
-    if (dataset == "mapbiomas_cover") {
-      if (param$geo_level == "indigenous_land") {
-        path <- "https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2024/08/MAPBIOMAS_BRAZIL-COL.9-INDIGENOUS_LANDS-1.xlsx"
-      }
-    }
-    if (dataset == "mapbiomas_transition") {
-      if (param$geo_level == "biome") {
-        path <- "https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2024/08/MAPBIOMAS_BRAZIL-COL.9-BIOMES.xlsx"
-      }
-      if (param$geo_level == "municipality") {
-        path <- "https://storage.googleapis.com/mapbiomas-public/initiatives/brasil/collection_9/downloads/mapbiomas_brasil_col9_state_municipality.xlsx"
-      }
-    }
-  }
 
   ## TerraClimate
 
@@ -574,12 +548,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       dat$year <- param$year
     }
     if (param$source == "deter") {
-      if (param$dataset == "deter_amz") {
-        dat <- sf::read_sf(file.path(dir, "deter-amz-deter-public.shp"))
-      }
-      if (param$dataset == "deter_cerrado") {
-        dat <- sf::read_sf(file.path(dir, "deter_public.shp"))
-      }
+      shp_name <- dataset_field(param$source, param$dataset, "archive_file")
+      dat <- sf::read_sf(file.path(dir, shp_name))
     }
     if (param$source == "sigmine") {
       shp <- list.files(dir, pattern = "\\.shp$", full.names = TRUE, recursive = TRUE)
@@ -594,9 +564,12 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       dat <- tibble::as_tibble(dat_sf)
     }
     if (param$source == "baci") {
-      # as year can be a vector, sets up expressions of the form "*YYYY_V202401b.csv" for each year to match file names
-      file_expression <- paste0("*", param$year, "_V202601.csv")
-      # now turning into *XXXX_V202401b.csv|YYYY_V202401b.csv|ZZZZ_V202401b.csv" to match as regex
+      # archive_file carries the same version stamp as the URL (e.g.
+      # "*$year$_V202601.csv"), so the two never drift apart -- as year can
+      # be a vector, str_replace() recycles it into one expression per year
+      archive_file <- dataset_field(param$source, param$dataset, "archive_file")
+      file_expression <- stringr::str_replace(archive_file, "\\$year\\$", as.character(param$year))
+      # now turning into *XXXX_V202601.csv|YYYY_V202601.csv|ZZZZ_V202601.csv" to match as regex
       file_expression <- paste0(file_expression, collapse = "|")
 
       file <- list.files(dir, pattern = file_expression, full.names = TRUE) %>%

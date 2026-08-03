@@ -50,23 +50,11 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
 
   check_params(param)
 
-  # .shp file names for each year
-
-  file_list <- c(
-    "2007" = "Degrad2007_Final_pol.shp",
-    "2008" = "Degrad2008_Final_pol.shp",
-    "2009" = "Degrad2009_Final_pol.shp",
-    "2010" = "DEGRAD_2010_UF_pol.shp",
-    "2011" = "DEGRAD_2011_INPE_pol.shp",
-    "2012" = "DEGRAD_2012_INPE_pol.shp",
-    "2013" = "DEGRAD_2013_INPE_pol.shp",
-    "2014" = "DEGRAD_2014_pol.shp",
-    "2015" = "DEGRAD_2015.shp",
-    "2016" = "DEGRAD_2016_pol.shp"
-  )
+  # .shp file names for each year (one manifest row per year --
+  # see inst/extdata/manifest/v1/datasets_link.csv)
 
   file_names <- param$time_period %>%
-    dplyr::recode(!!!file_list)
+    purrr::map_chr(~ dataset_field(param$source, param$dataset, "archive_file", year = .))
 
 
   ######################

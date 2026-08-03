@@ -90,7 +90,7 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
     on.exit(unlink(temp), add = TRUE)
 
     utils::download.file(
-      url = datasets_link(source = param$source, dataset = param$dataset, url = TRUE),
+      url = dataset_url(source = param$source, dataset = param$dataset),
       destfile = temp,
       mode = "wb"
     )
