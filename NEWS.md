@@ -1,5 +1,7 @@
 # datazoom.amazonia (development version)
 
+  * Internal: the hardcoded URL table inside `datasets_link()` was migrated to a versioned CSV manifest (`inst/extdata/manifest/v1/datasets_link.csv`), fetched at runtime with a silent fallback to the packaged snapshot when the network is unavailable. No exported function's signature or behavior changed; this only affects how source URLs are looked up internally, so that broken links (MapBiomas collection bumps, PRODES year rollovers, BACI version stamps, ANEEL CDE years) can be fixed by editing the manifest instead of waiting for a CRAN release.
+
 # datazoom.amazonia 1.2.0
 
   * Added `"energy_state_panel"` dataset to `load_epe`: yearly energy production by source and state (2011-2024), from EPE's BEN Chapter 8 (Dados Estaduais). 
