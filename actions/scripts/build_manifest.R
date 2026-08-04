@@ -30,6 +30,14 @@
 #   Rscript actions/scripts/build_manifest.R --dry-run
 #   Rscript actions/scripts/build_manifest.R --dry-run --only aneel
 #   Rscript actions/scripts/build_manifest.R --dry-run --only aneel --only baci
+#   Rscript actions/scripts/build_manifest.R --dry-run --check-all
+#
+# --check-all additionally probes every non-exempt `url` in the candidate
+# manifest (not just the rows a resolver just changed) and REPORTS which
+# ones are broken -- it never adds to `errors` or changes the exit code, so
+# a long-standing, documented break (e.g. epe/energy_state_panel, 404 since
+# before this flag existed) stays visible on every run instead of only
+# being noticed the next time that row happens to change.
 #
 # Exit codes:
 #   0  candidate validated; no changes, or only Tier A changes (safe to commit)
@@ -61,6 +69,7 @@ SCRAPERS_DIR <- file.path(repo_root, "actions", "scrapers")
 
 args <- commandArgs(trailingOnly = TRUE)
 dry_run <- "--dry-run" %in% args
+check_all <- "--check-all" %in% args
 only_sources <- character(0)
 i <- which(args == "--only")
 for (idx in i) {
@@ -140,8 +149,14 @@ for (src in names(registry)) {
 
   for (i in seq_len(nrow(result))) {
     r <- result[i, ]
+    # dataset uses %in%, not ==, for the same reason geo_level/year already
+    # do: r$dataset can be NA (a resolver updating a survey-DEFAULT row --
+    # e.g. resolve_prodes()/resolve_seeg()/resolve_ips() writing shared
+    # version/url/docs_url once instead of once per dataset). `==` against
+    # NA yields NA for every row, which which() drops -- silently treating
+    # every update to a default row as a brand-new row and duplicating it.
     match_idx <- which(
-      candidate$survey == r$survey & candidate$dataset == r$dataset &
+      candidate$survey == r$survey & candidate$dataset %in% r$dataset &
         candidate$geo_level %in% r$geo_level & candidate$year %in% r$year
     )
     cols_present <- intersect(names(r), MANIFEST_ALL_COLS)
@@ -178,6 +193,36 @@ if (length(errors) == 0 && tiering$n_changed > 0) {
   errors <- c(errors, validate_http(candidate, tiering$changed_keys))
 }
 
+# ---- Optional full manifest health scan (--check-all) ------------------------
+#
+# validate_http() above only probes CHANGED rows -- a row that has been
+# broken for a while (e.g. epe/energy_state_panel's manifested URL, 404
+# since before this script existed) never shows up there, because nothing
+# about it changed. --check-all probes every non-exempt url in the
+# manifest and REPORTS what it finds; it never adds to `errors`, so a
+# long-known, documented break never fails the scheduled run -- it just
+# stays visible instead of being forgotten.
+
+manifest_health_report <- function(candidate) {
+  broken <- list()
+  for (i in seq_len(nrow(candidate))) {
+    row <- candidate[i, ]
+    if (is_http_exempt(row)) next
+    probe <- probe_url(row$url)
+    if (!isTRUE(probe$ok)) {
+      broken[[length(broken) + 1]] <- list(
+        survey = row$survey, dataset = row$dataset,
+        geo_level = row$geo_level, year = row$year,
+        url = row$url,
+        reason = if (isFALSE(probe$ok)) probe$reason else "probe skipped (curl unavailable)"
+      )
+    }
+  }
+  broken
+}
+
+health <- if (check_all) manifest_health_report(candidate) else NULL
+
 # ---- Report ------------------------------------------------------------------
 
 report <- list(
@@ -191,7 +236,8 @@ report <- list(
   n_changed = tiering$n_changed,
   changed_keys = tiering$changed_keys,
   tier = tiering$overall,
-  validation_errors = errors
+  validation_errors = errors,
+  manifest_health = health
 )
 
 report_path <- file.path(tempdir(), "manifest_report.json")
@@ -214,6 +260,23 @@ if (length(errors) > 0) {
 }
 cat("====================================================================\n")
 
+if (check_all) {
+  cat("\n================ manifest health (--check-all, report-only) ================\n")
+  if (length(health) == 0) {
+    cat("All non-exempt URLs responded OK.\n")
+  } else {
+    for (h in health) {
+      key <- sprintf(
+        "%s/%s%s%s", h$survey, if (is.na(h$dataset)) "<default>" else h$dataset,
+        if (is.na(h$geo_level)) "" else paste0("/", h$geo_level),
+        if (is.na(h$year)) "" else paste0("/", h$year)
+      )
+      cat(sprintf(" - %s: %s (%s)\n", key, h$reason, h$url))
+    }
+  }
+  cat("==============================================================================\n")
+}
+
 summary_path <- Sys.getenv("GITHUB_STEP_SUMMARY", "")
 if (nzchar(summary_path)) {
   con <- file(summary_path, open = "a")
@@ -223,7 +286,8 @@ if (nzchar(summary_path)) {
     sprintf("- Changed keys: %d", tiering$n_changed),
     sprintf("- Tier: %s", tiering$overall),
     sprintf("- Resolvers OK: %s", if (length(resolver_ok)) paste(resolver_ok, collapse = ", ") else "(none)"),
-    sprintf("- Resolvers FAILED: %s", if (length(resolver_failed)) paste(names(resolver_failed), collapse = ", ") else "(none)")
+    sprintf("- Resolvers FAILED: %s", if (length(resolver_failed)) paste(names(resolver_failed), collapse = ", ") else "(none)"),
+    if (check_all) sprintf("- Manifest health (--check-all): %d broken URL(s)", length(health)) else NULL
   ), con)
   close(con)
 }

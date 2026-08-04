@@ -1,7 +1,7 @@
 # Golden regression: datasets_link() must keep returning exactly the same
 # table across the manifest schema normalization (5-tier field coalescing,
 # see R/manifest.R and the "Normalizar o schema do manifest" plan), except
-# for three DELIBERATE changes made by that normalization:
+# for a handful of DELIBERATE changes:
 #
 #   1. The column "link" is renamed "url" -- no external contract ever
 #      depended on the literal name "link" (see R/manifest.R's header).
@@ -16,6 +16,11 @@
 #   3. available_geo is now stored lowercase. check_params.R already
 #      lowercased it at read time before comparing against a user-supplied
 #      geo_level, so this is a storage-only change with no behavior effect.
+#   4. epe/national_energy_balance's url and available_time were updated
+#      2026-08-04 (see R/epe.R's header and actions/scrapers/resolve_epe.R):
+#      the old SharePoint workbook (2003-2023) was replaced by EPE's
+#      consolidated BEN table (1970-2025), verified live to be a strict
+#      superset covering the same accounts.
 #
 # The fixture was captured right before normalization. Row order is not
 # significant (both sides sorted by (survey, dataset) before comparing).
@@ -24,7 +29,17 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
   dplyr::rename(url = link) %>%
   dplyr::mutate(
     url = ifelse(!is.na(sidra_code), NA_character_, url),
-    available_geo = tolower(available_geo)
+    available_geo = tolower(available_geo),
+    url = ifelse(
+      survey == "epe" & dataset == "national_energy_balance",
+      "https://dashboard.epe.gov.br/apps/livro-ben/livro/pt/dados/tabela_balanco_energitico_consolidado.xlsx",
+      url
+    ),
+    available_time = ifelse(
+      survey == "epe" & dataset == "national_energy_balance",
+      "1970-2025",
+      available_time
+    )
   )
 
 test_that("datasets_link() returns the exact pre-normalization column set and order", {

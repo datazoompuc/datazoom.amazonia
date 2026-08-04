@@ -4,6 +4,12 @@
 
   * Internal: the manifest schema was normalized to a 5-tier field-coalescing model (survey default -> dataset -> geo_level/year overrides), replacing the previous one-self-contained-row-per-override shape. `link`/`collection` were renamed `url`/`version`, and SIDRA rows' documentation landing page moved from `url` to a new `docs_url` column (`url` is genuinely absent for SIDRA-sourced datasets, which are downloaded via `sidra_code`, not a URL). No exported function changed; `datasets_link()` keeps its exact pre-existing column set and values. Filled manifest cells dropped from 1093 to 293 by letting a value live in exactly one place instead of being repeated across every row that needed it.
 
+  * `load_epe(dataset = "national_energy_balance")`'s source changed from EPE's old one-workbook-per-edition SharePoint file (2003-2023, one sheet per year, reconstructed into long format by hand) to EPE's own consolidated BEN table, which is already long-format and covers 1970-2025. **Breaking for `raw_data = TRUE`**: this now returns a list of one tibble instead of one tibble per year. Account (`conta`/`account`) labels also changed from a synthetic uppercase reconstruction (e.g. `"TRANSFORMACAO - REFINARIAS DE PETROLEO"`) to the source's own labels (e.g. `"Refinarias de Petróleo"`), and a new `tipo`/`type` column (Fontes de Energia Primária/Secundária/Total) is now available, previously implicit and unrecoverable from the old workbook's column headers.
+
+  * `load_epe(dataset = "energy_state_panel")`'s source URL was found to be discontinued (EPE restructured its "Anuário Estatístico" from 8+ chapters to 4; no current publication has the same state x generation-source breakdown). The dataset is left in place, pointing at a `docs_url` for anyone investigating a replacement, but downloads for it will keep failing until EPE republishes something equivalent or a maintainer picks a narrower substitute.
+
+  * Refreshed the CI resolvers (`actions/scrapers/`) for PRODES, EPE and (new, detect-only) SEEG/IPS -- `resolve_prodes.R` and `resolve_epe.R` were previously documented no-ops. `build_manifest.R` gained a `--check-all` flag that reports every broken manifest URL (not just recently-changed ones) without failing the run, so long-standing breaks like the one above stay visible.
+
 # datazoom.amazonia 1.2.0
 
   * Added `"energy_state_panel"` dataset to `load_epe`: yearly energy production by source and state (2011-2024), from EPE's BEN Chapter 8 (Dados Estaduais). 

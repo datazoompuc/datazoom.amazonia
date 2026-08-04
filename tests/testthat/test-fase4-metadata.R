@@ -57,9 +57,13 @@ test_that("EPE energy_state_panel sheet matches the old hardcoded literal", {
 })
 
 test_that("EPE national_energy_balance available_time still parses into the expected year range", {
+  # Updated 2026-08-04 when national_energy_balance's source moved from the
+  # old one-sheet-per-year SharePoint workbook (2003-2023) to EPE's
+  # consolidated BEN table (1970-2025) -- see R/epe.R and
+  # actions/scrapers/resolve_epe.R's headers.
   available <- dataset_field("epe", "national_energy_balance", "available_time")
   years <- eval(parse(text = stringr::str_replace(available, "-", ":")))
-  expect_equal(years, 2003:2023)
+  expect_equal(years, 1970:2025)
 })
 
 test_that("ANEEL energy_development_budget available_time still parses into 2017:2022", {

@@ -40,14 +40,14 @@ degrad,degrad,,2016,,,,,,DEGRAD_2016_pol.shp,,,,
 deter,,,,,,,,municipality,,,,,
 deter,deter_amz,,,,http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-amz/shape,,2016-2022,,deter-amz-deter-public.shp,,,,
 deter,deter_cerrado,,,,http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-cerrado/shape,,2018-2022,,deter_public.shp,,,,
-epe,consumer_energy_consumption,,,,https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx,,2004-2025,"region, subsystem, state",,,,,
+epe,consumer_energy_consumption,,,,https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx,,2004-2025,"region, subsystem, state",,,,,epe
 epe,consumer_energy_consumption,state,,,,,,,,CONSUMO E NUMCONS SAM UF,,,
 epe,consumer_energy_consumption,subsystem,,,,,,,,CONSUMO E NUMCONS SAM,,,
-epe,energy_state_panel,,,,https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/PublicacoesArquivos/publicacao-145/topico-515/Cap%C3%ADtulo%208%20(Dados%20Estaduais).xlsx,,2011-2024,state,,8.1 part 3,,,epe
-epe,industrial_energy_consumption,,,,https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx,,2004-2025,"region, subsystem, state",,,,,
+epe,energy_state_panel,,,,https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/PublicacoesArquivos/publicacao-145/topico-515/Cap%C3%ADtulo%208%20(Dados%20Estaduais).xlsx,https://www.epe.gov.br/pt/publicacoes-dados-abertos/publicacoes/anuario-estatistico-de-energia-eletrica,2011-2024,state,,8.1 part 3,,,
+epe,industrial_energy_consumption,,,,https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx,,2004-2025,"region, subsystem, state",,,,,epe
 epe,industrial_energy_consumption,state,,,,,,,,SETOR INDUSTRIAL POR UF,,,
 epe,industrial_energy_consumption,subsystem,,,,,,,,SETOR INDUSTRIAL POR RG,,,
-epe,national_energy_balance,,,,https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/PublicacoesArquivos/publicacao-819/topico-716/Anexo%20IX%20-%20Balan%C3%A7os%20Consolidados%20(em%20tep)%201970%20a%202023.xlsx,,2003-2023,,,,,,epe
+epe,national_energy_balance,,,,https://dashboard.epe.gov.br/apps/livro-ben/livro/pt/dados/tabela_balanco_energitico_consolidado.xlsx,,1970-2025,,,Sheet1,,,epe
 ibama,,,,,,,,municipality,,,,,
 ibama,collected_fines,,,,https://dadosabertos.ibama.gov.br/dados/SICAFI/$state$/Arrecadacao/arrecadacaobenstutelados.csv,,,,,,,,
 ibama,distributed_fines,,,,https://dadosabertos.ibama.gov.br/dados/SICAFI/$state$/Quantidade/multasDistribuidasBensTutelados.csv,,,,,,,,
@@ -55,7 +55,7 @@ ibama,embargoed_areas,,,,https://pamgia.ibama.gov.br/geoservicos/arquivos/adm_em
 iema,iema,,,,https://drive.google.com/uc?export=download&id=10JMRtzu3k95vl8cQmHkVMQ9nJovvIeNl,,2018,municipality,,,,,
 imazon,imazon_shp,,,,https://docs.google.com/uc?export=download&id=1JHc2J_U8VXHVuWVsi8wVBnNzZ37y1ehv,,2020,municipality,,,,,
 internal,geo_municipalities,,,,https://raw.githubusercontent.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds,,2020,municipality,,,,,
-ips,,,,,https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx,,"2014, 2018, 2021, 2023",,,,,,
+ips,,,,,https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx,,"2014, 2018, 2021, 2023",,,,,,ips
 ips,all,,,,,,,,,,,,
 ips,communic,,,,,,,,,,,,
 ips,deforest,,,,,,,,,,,,
@@ -174,14 +174,14 @@ ppm,ppm_aquaculture,,,3940,,,2013-2023,,,,,,
 ppm,ppm_cow_farming,,,94,,,,,,,,,
 ppm,ppm_livestock_inventory,,,3939,,,,,,,,,
 ppm,ppm_sheep_farming,,,95,,,,,,,,,
-prodes,,,,,https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2023.zip,,2023,municipality,,,prodes_amazonia_legal_2023,,
-prodes,clouds,,,,,,,,,,,,prodes
-prodes,deforestation,,,,,,2007-2023,,,,,,prodes
-prodes,hydrography,,,,,,,,,,,,prodes
-prodes,native_vegetation,,,,,,,,,,,,prodes
-prodes,non_forest,,,,,,,,,,,,prodes
-prodes,residual_deforestation,,,,,,2010-2023,,,,,,prodes
-seeg,,,,,https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd,,2000-2018,"country, state, municipality",,,,,
+prodes,,,,,https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2023.zip,,2023,municipality,,,prodes_amazonia_legal_2023,,prodes
+prodes,clouds,,,,,,,,,,,,
+prodes,deforestation,,,,,,2007-2023,,,,,,
+prodes,hydrography,,,,,,,,,,,,
+prodes,native_vegetation,,,,,,,,,,,,
+prodes,non_forest,,,,,,,,,,,,
+prodes,residual_deforestation,,,,,,2010-2023,,,,,,
+seeg,,,,,https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd,,2000-2018,"country, state, municipality",,,,,seeg
 seeg,seeg,,,,,,,,,,,,
 seeg,seeg_energy,,,,,,,,,,,,
 seeg,seeg_farming,,,,,,,,,,,,

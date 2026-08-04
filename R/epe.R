@@ -34,7 +34,7 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
 
   uf <- regiao <- sistema <- classe <- tipo_consumidor <- consumo <- consumidores <- setor_industrial <- data_excel <- NULL
 
-  . <- ano_tag <- conta <- bloco <- fonte <- valor <- ano <- account <- year <- value <- data <- total_produzido <- hidro <- eolica <- solar <- nuclear <- termo <- cana <- lenha <- lixivia <- outras_fontes_renovaveis <- carvao_vapor <- gas_natural <- gas_de_coqueira <- combustivel <- diesel <- outras_fontes_nao_renovaveis <- amz_legal <- state <- legal_amazon <- total_produced <- hydro <- wind <- other_renewable_sources <- steam_coal <- natural_gas <- coke_oven_gas <- fuel_oil <- diesel_oil <- other_non_renewable_sources <- NULL
+  . <- ano_tag <- conta <- grupo <- tipo <- bloco <- fonte <- valor <- ano <- account <- year <- value <- data <- total_produzido <- hidro <- eolica <- solar <- nuclear <- termo <- cana <- lenha <- lixivia <- outras_fontes_renovaveis <- carvao_vapor <- gas_natural <- gas_de_coqueira <- combustivel <- diesel <- outras_fontes_nao_renovaveis <- amz_legal <- state <- legal_amazon <- total_produced <- hydro <- wind <- other_renewable_sources <- steam_coal <- natural_gas <- coke_oven_gas <- fuel_oil <- diesel_oil <- other_non_renewable_sources <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -57,11 +57,11 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
   # defining sheet names for each dataset
 
   if (param$dataset == "national_energy_balance") {
-    # one sheet per year in the workbook -- read the valid range from the
-    # manifest's available_time instead of hardcoding it, since it grows by
-    # one year with every BEN edition
-    available <- dataset_field(param$source, param$dataset, "available_time")
-    sheets <- as.character(parse_years(available))
+    # single sheet: the manifest points at EPE's consolidated BEN table
+    # (grupo/tipo/fonte/ano/valor, already long-format, 1970-current) instead
+    # of the old one-sheet-per-year workbook -- see the Data Engineering
+    # section below for why that removed most of this dataset's cleaning code
+    sheets <- dataset_field(param$source, param$dataset, "sheet")
   }
   if (param$dataset %in% c("consumer_energy_consumption", "industrial_energy_consumption")) {
     # sheet name per geo_level -- one manifest override row per (dataset,
@@ -117,58 +117,19 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
   ######################
 
   if (param$dataset == "national_energy_balance") {
-    # clean each sheet separately
+    # the consolidated table (see this file's header) already comes
+    # long-format, one row per (grupo, tipo, fonte, ano) -- unlike the old
+    # one-sheet-per-year workbook, there is no header-row surgery or
+    # pivot_longer() left to do; only rename "grupo" to match this
+    # dataset's existing account-column name and coerce types (readxl
+    # leaves ano/valor as character/numeric depending on cell formatting).
 
-    dat <- dat %>%
-      purrr::imap(
-        function(df, year) {
-          names(df) <- as.character(unlist(df[3, ]))
-
-          names(df)[1] <- "conta"
-
-          # remove initial 3 rows
-
-          df <- df[-(1:3), ]
-
-          # reshaping into long format
-
-          df <- df %>%
-            tidyr::pivot_longer(
-              cols = -conta,
-              names_to = "fonte",
-              values_to = "valor"
-            ) %>%
-            dplyr::mutate(
-              bloco = dplyr::case_when(
-                conta == "TOTAL TRANSFORMACAO" ~ "TRANSFORMACAO",
-                conta == "CONSUMO FINAL" ~ "CONSUMO",
-                conta == "AJUSTES" ~ "CONSUMO",
-                .default = NA_character_
-              )
-            ) %>%
-            tidyr::fill(bloco, .direction = "down") %>%
-            dplyr::mutate(
-              conta = dplyr::case_when(
-                bloco == "TRANSFORMACAO" & !stringr::str_detect(conta, "^TRANSFORMACAO") ~ paste0("TRANSFORMACAO - ", conta),
-                bloco == "CONSUMO" & !stringr::str_detect(conta, "^CONSUMO") ~ paste0("CONSUMO - ", conta),
-                is.na(bloco) & !stringr::str_detect(conta, "^CONTA") ~ paste0("CONTA - ", conta),
-                .default = conta
-              )
-            ) %>%
-            dplyr::select(-bloco)
-
-          df <- df %>%
-            dplyr::mutate(
-              valor = suppressWarnings(as.numeric(valor)),
-              ano = year
-            )
-        }
+    dat <- dat[[1]] %>%
+      dplyr::rename(conta = grupo) %>%
+      dplyr::mutate(
+        ano = as.integer(ano),
+        valor = suppressWarnings(as.numeric(valor))
       )
-
-    # combine them
-
-    dat <- dat %>%
-      dplyr::bind_rows()
   }
 
   if (param$dataset %in% c("consumer_energy_consumption", "industrial_energy_consumption")) {
@@ -244,6 +205,7 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
       dat_mod <- dat %>%
         dplyr::rename(
           "account" = conta,
+          "type" = tipo,
           "source" = fonte,
           "value" = valor,
           "year" = ano

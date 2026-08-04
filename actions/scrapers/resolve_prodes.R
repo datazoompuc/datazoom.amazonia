@@ -1,85 +1,97 @@
 # actions/scrapers/resolve_prodes.R
 #
-# PRODES is the hardest of the five sources, and is documented here as a
-# KNOWN-INCOMPLETE resolver rather than a working one -- verified live
-# while writing this (2026-08-03):
+# PRODES is served through a public JSON API that TerraBrasilis' own
+# /downloads/ page calls client-side -- confirmed by reading that page's own
+# JS (`base_url+'/business/api/v1/download/all'`), NOT by scraping HTML.
+# `GET .../business/api/v1/download/all` returns a flat JSON array, one
+# entry per published file, each with `name`, `link` (relative to the API
+# host), `category` and `enabled`.
 #
-#   - The raster directory does not support autoindex listing:
-#     https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/
-#     returns 403, exactly like it did before this branch existed.
+# VERIFIED LIVE (2026-08-04): the entry for the Legal Amazon deforestation
+# raster has
+#   link = "/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip"
+# -- confirming the filename now carries BOTH the data year (2025) and a
+# publish-date stamp (v20260408, YYYYMMDD), a naming change made after the
+# manifest's committed URL ("..._2023.zip", no date stamp) was written; that
+# committed URL already returns 404 live. The zip's central directory was
+# inspected directly (no assumption): it contains exactly one .tif, named
+# "prodes_amazonia_legal_2025_v20260408.tif" -- i.e. the raster's own
+# basename matches the zip's basename byte-for-byte, which is what
+# `layer_name` below relies on (terra::rast() names an unlabeled
+# single-band GeoTIFF's layer after its own file basename -- see
+# R/prodes.R's `layer` variable and R/download.R's prodes branch).
 #
-#   - The filename pattern hardcoded in the manifest today
-#     ("prodes_amazonia_legal_2023.zip") ALSO now returns 403 live. The
-#     real, currently-working URL (confirmed live by hand) is:
-#       prodes_amazonia_legal_2025_v20260408.zip
-#     i.e. the naming scheme gained a SECOND version component -- a
-#     publish-date stamp ("_v20260408", presumably an 8-digit YYYYMMDD) on
-#     top of the data year ("2025") -- that did not exist when the
-#     hardcoded URL was written. This means the manifest's PRODES row is
-#     ALREADY stale as of this exercise: a real, live-discovered example of
-#     exactly the problem this whole migration exists to solve.
-#
-#   - https://terrabrasilis.dpi.inpe.br/downloads/ (suggested as a possible
-#     scrape target) is a general news/marketing slider page, not a file
-#     listing -- it links to blog posts about PRODES updates, not to the
-#     zip file itself, so it cannot be regex-matched into a working URL
-#     without an extra hop into whichever blog post is current (and blog
-#     post URLs are themselves not predictable).
-#
-# Given the date-stamp component is NOT derivable from the year alone (it
-# is set whenever INPE republishes a file, not on a fixed schedule), URL
-# probing (works for BACI, which only varies by year+month) and directory
-# autoindex (works for nothing here, blocked) both fail. A working resolver
-# would need to follow the data.inpe.br/biomasbr news feed (or a similar
-# announcement channel) to find whichever post announces the latest
-# release and extract the link/date from there -- deliberately deferred:
-# this needs its own investigation, not a guess baked into CI.
-#
-# Until that follow-up lands, this resolver documents the finding and
-# fails cleanly every time it runs: build_manifest.R records it as a
-# failed resolver, the PRODES rows in the manifest stay exactly as they
-# are (hand-maintained), and the validation gate's plain HTTP check (which
-# runs independently of any resolver) is what will actually notice the
-# 403 on every scheduled run until a human fixes the row by hand or a
-# future resolver ships. PRODES is "always Tier B" in this design
-# regardless (a year/collection change here alters the raster legend
-# codes in R/prodes.R:110-115, which no automated check can validate), so
-# nothing here would have been auto-committed even if it worked.
+# All 6 PRODES dataset rows (clouds/deforestation/hydrography/
+# native_vegetation/non_forest/residual_deforestation) share one url,
+# layer_name and version on the "prodes" survey-default row (dataset = NA)
+# -- this resolver writes there, not to the individual dataset rows, to
+# avoid re-introducing the duplication the manifest schema normalization
+# removed (see R/manifest.R's 5-tier coalescing docs).
 
 resolve_prodes <- function(rows) {
-  if (!requireNamespace("curl", quietly = TRUE)) {
-    stop("resolve_prodes() needs the 'curl' package (CI-only; not a package Import).")
+  if (!requireNamespace("jsonlite", quietly = TRUE) || !requireNamespace("curl", quietly = TRUE)) {
+    stop("resolve_prodes() needs the 'jsonlite' and 'curl' packages (CI-only; not package Imports).")
   }
 
-  probe <- function(url, timeout_s = 20) {
-    h <- curl::new_handle(nobody = TRUE, timeout = timeout_s, followlocation = TRUE)
-    resp <- tryCatch(curl::curl_fetch_memory(url, handle = h), error = function(e) NULL)
-    if (is.null(resp)) NA_integer_ else resp$status_code
-  }
-
-  dir_status <- probe("https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/")
-
-  # NOTE: `rows` is the set of dataset rows tagged resolver == "prodes". All
-  # six of them share the same url (and layer_name), so after the schema
-  # normalization that value lives on the "prodes" survey-default row
-  # instead of being repeated six times here -- rows$url[1] will typically
-  # be NA. current_status stays NA in that case, which is fine: it's a
-  # diagnostic aside in the stop() message below, not load-bearing.
-  current_link <- if (nrow(rows) > 0) rows$url[1] else NA_character_
-  current_status <- if (!is.na(current_link)) probe(current_link) else NA_integer_
-
-  stop(
-    "resolve_prodes() is a documented no-op (see file header): PRODES' real ",
-    "download URL now includes an unpredictable publish-date stamp ",
-    "(e.g. 'prodes_amazonia_legal_2025_v20260408.zip') that cannot be ",
-    "derived from the year alone, directory autoindex is blocked (HTTP ",
-    dir_status, " on the raster/ directory), and the currently manifested ",
-    "URL itself returns HTTP ", current_status, " live. A working resolver ",
-    "needs to follow INPE's announcement channel (data.inpe.br/biomasbr) ",
-    "instead of guessing a filename -- deferred pending that investigation. ",
-    "PRODES rows are left untouched (hand-maintained); this source is ",
-    "'always Tier B' by design even when a resolver exists, since a ",
-    "year/collection change here also affects the raster legend codes in ",
-    "R/prodes.R, which no automated check can validate."
+  api_url <- "https://terrabrasilis.dpi.inpe.br/business/api/v1/download/all"
+  resp <- tryCatch(
+    curl::curl_fetch_memory(api_url, handle = curl::new_handle(timeout = 30)),
+    error = function(e) stop("resolve_prodes(): request failed for ", api_url, ": ", conditionMessage(e))
   )
+  if (resp$status_code != 200) {
+    stop("resolve_prodes(): TerraBrasilis download API returned HTTP ", resp$status_code)
+  }
+
+  entries <- jsonlite::fromJSON(rawToChar(resp$content), simplifyVector = FALSE)
+  links <- vapply(entries, function(e) if (is.null(e$link)) NA_character_ else e$link, character(1))
+  enabled <- vapply(entries, function(e) isTRUE(e$enabled), logical(1))
+
+  pattern <- "^/download/dataset/legal-amz-prodes/raster/(prodes_amazonia_legal_([0-9]{4})_v([0-9]{8}))\\.zip$"
+  matches <- regmatches(links, regexec(pattern, links))
+  hit_idx <- which(enabled & vapply(matches, length, integer(1)) > 0)
+
+  if (length(hit_idx) == 0) {
+    stop(
+      "resolve_prodes(): no enabled entry matching ",
+      "'prodes_amazonia_legal_<year>_v<YYYYMMDD>.zip' found in the ",
+      "TerraBrasilis download API response. The raster naming scheme or ",
+      "API shape may have changed -- see this file's header for the ",
+      "pattern last verified live."
+    )
+  }
+
+  # more than one edition can be listed at once (e.g. while a new one is
+  # being published alongside the outgoing one) -- keep the newest stamp.
+  hits <- matches[hit_idx]
+  stamps <- vapply(hits, function(m) m[4], character(1))
+  best <- hit_idx[order(stamps, decreasing = TRUE)][1]
+  m <- matches[[best]]
+
+  layer_name <- m[2]
+  year <- m[3]
+  stamp <- m[4]
+  url <- paste0("https://terrabrasilis.dpi.inpe.br", links[best])
+
+  base <- tibble::tibble(
+    survey = "prodes", dataset = NA_character_,
+    geo_level = NA_character_, year = NA_character_,
+    url = url, layer_name = layer_name, version = stamp,
+    available_time = year, resolver = "prodes"
+  )
+
+  # deforestation/residual_deforestation are PRODES' two multi-year series;
+  # their available_time keeps its documented start year and extends to
+  # whatever year the API just reported.
+  deforestation <- tibble::tibble(
+    survey = "prodes", dataset = "deforestation",
+    geo_level = NA_character_, year = NA_character_,
+    available_time = paste("2007", year, sep = "-")
+  )
+  residual <- tibble::tibble(
+    survey = "prodes", dataset = "residual_deforestation",
+    geo_level = NA_character_, year = NA_character_,
+    available_time = paste("2010", year, sep = "-")
+  )
+
+  dplyr::bind_rows(base, deforestation, residual)
 }
