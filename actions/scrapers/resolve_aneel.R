@@ -60,7 +60,7 @@ resolve_aneel <- function(rows) {
   out$cde_years <- tibble::tibble(
     survey = "aneel", dataset = "energy_development_budget",
     geo_level = NA_character_, year = found_years,
-    link = found_urls
+    url = found_urls
   )
   out$cde_base <- tibble::tibble(
     survey = "aneel", dataset = "energy_development_budget",
@@ -81,7 +81,7 @@ resolve_aneel <- function(rows) {
   out$enterprises <- tibble::tibble(
     survey = "aneel", dataset = "energy_enterprises_distributed",
     geo_level = NA_character_, year = NA_character_,
-    link = urls2[match_idx[1]]
+    url = urls2[match_idx[1]]
   )
 
   dplyr::bind_rows(out)

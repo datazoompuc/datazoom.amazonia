@@ -7,9 +7,9 @@
 # download a multi-gigabyte file -- verified live while writing this: the
 # zip is >2GB, HEAD returns instantly, a GET does not).
 #
-# The whole point of this resolver: it emits `link` AND `archive_file`
-# TOGETHER, using the same stamp, in the same manifest row -- structurally
-# eliminating the old bug where the URL's version stamp
+# The whole point of this resolver: it emits `url`, `archive_file`, AND
+# `version` TOGETHER, using the same stamp, in the same manifest row --
+# structurally eliminating the old bug where the URL's version stamp
 # (download.R:820, pre-migration) and the inner-file regex
 # (download.R:609, pre-migration) had to be updated in two separate places
 # and could silently drift apart.
@@ -50,7 +50,8 @@ resolve_baci <- function(rows) {
   tibble::tibble(
     survey = "baci", dataset = "HS92",
     geo_level = NA_character_, year = NA_character_,
-    link = url_for(found_stamp),
-    archive_file = paste0("*$year$_V", found_stamp, ".csv")
+    url = url_for(found_stamp),
+    archive_file = paste0("*$year$_V", found_stamp, ".csv"),
+    version = found_stamp
   )
 }

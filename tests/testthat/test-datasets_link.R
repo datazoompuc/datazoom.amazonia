@@ -1,31 +1,42 @@
 # Golden regression: datasets_link() must keep returning exactly the same
-# table (same columns, same rows, same values) across the manifest migration.
-# The fixture was captured right after the Fase 0 cleanup (duplicate
-# "pam"/"permanent_crops" row removed, dead SEEG override removed, the
-# raw.github.com -> raw.githubusercontent.com fix applied) and BEFORE any
-# manifest code existed, so it locks in the "no-op refactor" promise of
-# Fase 1. Row order is no longer significant after Fase 3 added new override
-# rows to the manifest (sorted survey/dataset/geo_level/year), so both sides
-# are sorted by (survey, dataset) before comparing.
+# table across the manifest schema normalization (5-tier field coalescing,
+# see R/manifest.R and the "Normalizar o schema do manifest" plan), except
+# for three DELIBERATE changes made by that normalization:
+#
+#   1. The column "link" is renamed "url" -- no external contract ever
+#      depended on the literal name "link" (see R/manifest.R's header).
+#   2. For the ~100 SIDRA-sourced rows (sidra_code not NA), the value that
+#      used to sit in "link" was a documentation landing page, never
+#      actually downloaded (SIDRA data comes from sidra_code via the
+#      sidrar API) -- it now lives in the separate "docs_url" column, and
+#      "url" is genuinely NA for these rows. Nothing in R/ ever read
+#      datasets_link()'s link/url field for a SIDRA-sourced dataset (they
+#      all call sidra_download() directly), so this is a safe behavior
+#      change, verified explicitly below and in test-dataset_url.R.
+#   3. available_geo is now stored lowercase. check_params.R already
+#      lowercased it at read time before comparing against a user-supplied
+#      geo_level, so this is a storage-only change with no behavior effect.
+#
+# The fixture was captured right before normalization. Row order is not
+# significant (both sides sorted by (survey, dataset) before comparing).
 
-fixture <- readRDS(test_path("fixtures", "datasets_link_pre.rds"))
+fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
+  dplyr::rename(url = link) %>%
+  dplyr::mutate(
+    url = ifelse(!is.na(sidra_code), NA_character_, url),
+    available_geo = tolower(available_geo)
+  )
 
-test_that("datasets_link() returns the exact pre-migration column set and order", {
+test_that("datasets_link() returns the exact pre-normalization column set and order", {
   expect_equal(
     names(datasets_link()),
-    c("survey", "dataset", "sidra_code", "available_time", "available_geo", "link")
+    c("survey", "dataset", "sidra_code", "available_time", "available_geo", "url")
   )
 })
 
-test_that("datasets_link() matches the golden fixture except for the one Fase 3 change", {
+test_that("datasets_link() matches the golden fixture (schema normalization is a no-op beyond the two documented changes)", {
   actual <- datasets_link() %>% dplyr::arrange(survey, dataset)
   expected <- fixture %>% dplyr::arrange(survey, dataset)
-
-  # ANEEL's base-row link intentionally became NA in Fase 3: the six CDE
-  # years (2017-2022) are now individual override rows resolved by
-  # dataset_url() (see test-dataset_url.R) instead of a sentinel string
-  # ("aneel_cde_$year$") resolved by a hardcoded UUID map in download.R.
-  expected$link[expected$survey == "aneel" & expected$dataset == "energy_development_budget"] <- NA_character_
 
   expect_equal(actual, expected)
 })
@@ -59,7 +70,7 @@ test_that("a representative sample of url = TRUE values resolve to non-NA string
     c("baci", "HS92"),
     c("comex", "export_prod"),
     c("ibama", "distributed_fines"),
-    c("aneel", "energy_generation"), # energy_development_budget's base link is intentionally NA -- see test-dataset_url.R
+    c("aneel", "energy_generation"), # energy_development_budget's base url is intentionally NA -- see test-dataset_url.R
     c("epe", "national_energy_balance"),
     c("degrad", "degrad"),
     c("sigmine", "sigmine_active"),
@@ -72,5 +83,12 @@ test_that("a representative sample of url = TRUE values resolve to non-NA string
     expect_type(url, "character")
     expect_false(is.na(url))
     expect_true(nchar(url) > 0)
+  }
+})
+
+test_that("SIDRA-sourced datasets have NA url -- their data comes from sidra_code, not a download link", {
+  for (s in list(c("pam", "acai"), c("cempre", "cempre"), c("population", "population"))) {
+    url <- datasets_link(source = s[1], dataset = s[2], url = TRUE)
+    expect_true(is.na(url))
   }
 })

@@ -8,21 +8,23 @@
 
 MANIFEST_ALL_COLS <- c(
   "survey", "dataset", "geo_level", "year", "sidra_code",
-  "available_time", "available_geo", "link",
-  "archive_file", "sheet", "collection", "layer_name", "resolver"
+  "url", "docs_url", "available_time", "available_geo",
+  "archive_file", "sheet", "layer_name", "version", "resolver"
 )
 
 KEY_COLS <- c("survey", "dataset", "geo_level", "year")
 
-# Rows whose link is never actually fetched by download.file(), or whose link
+# Rows whose url is never actually fetched by download.file(), or whose url
 # still carries an unresolved placeholder -- both are exempt from the HTTP
-# check (see build_manifest.R validate_candidate()).
+# check (see build_manifest.R validate_candidate()). SIDRA rows need no
+# special case here: since the schema normalization, their landing page
+# lives in docs_url and url is simply NA, already covered by the first
+# condition.
 is_http_exempt <- function(row) {
-  is.na(row$link) ||
-    !is.na(row$sidra_code) ||
+  is.na(row$url) ||
     identical(row$survey, "internal") ||
     identical(row$survey, "terraclimate") ||
-    grepl("\\$(year|state|file_name)\\$", row$link)
+    grepl("\\$(year|state|file_name)\\$", row$url)
 }
 
 # ---- 1-5: structural validation -------------------------------------------
@@ -73,12 +75,29 @@ validate_no_deletions <- function(old, candidate) {
 
 validate_unique_base_row <- function(candidate) {
   errors <- character(0)
-  base_rows <- candidate[is.na(candidate$geo_level) & is.na(candidate$year), ]
+
+  # at most one dataset-base row (geo_level/year both NA) per (survey, dataset)
+  base_rows <- candidate[
+    !is.na(candidate$dataset) & is.na(candidate$geo_level) & is.na(candidate$year),
+  ]
   dup <- duplicated(base_rows[, c("survey", "dataset")])
   if (any(dup)) {
     bad <- unique(paste(base_rows$survey[dup], base_rows$dataset[dup], sep = "/"))
     errors <- c(errors, paste("duplicate base row for:", paste(bad, collapse = ", ")))
   }
+
+  # at most one survey-default row (dataset == NA) per survey -- this is the
+  # row every dataset in that survey coalesces missing fields from, so two
+  # of them would make resolution ambiguous
+  default_rows <- candidate[is.na(candidate$dataset), ]
+  dup_default <- duplicated(default_rows$survey)
+  if (any(dup_default)) {
+    errors <- c(errors, paste(
+      "duplicate survey-default row for:",
+      paste(unique(default_rows$survey[dup_default]), collapse = ", ")
+    ))
+  }
+
   override_keys <- candidate[, KEY_COLS]
   dup2 <- duplicated(override_keys)
   if (any(dup2)) {
@@ -96,13 +115,13 @@ validate_placeholders <- function(old, candidate) {
   old_key <- paste(old$survey, old$dataset, old$geo_level, old$year, sep = "\r")
   common <- intersect(key, old_key)
   for (k in common) {
-    old_link <- old$link[old_key == k][1]
-    new_link <- candidate$link[key == k][1]
-    if (!setequal(extract_placeholders(old_link)[[1]], extract_placeholders(new_link)[[1]])) {
+    old_url <- old$url[old_key == k][1]
+    new_url <- candidate$url[key == k][1]
+    if (!setequal(extract_placeholders(old_url)[[1]], extract_placeholders(new_url)[[1]])) {
       errors <- c(errors, paste("placeholder set changed for", gsub("\r", "/", k)))
     }
     allowed <- c("$year$", "$state$", "$file_name$")
-    bad <- setdiff(extract_placeholders(new_link)[[1]], allowed)
+    bad <- setdiff(extract_placeholders(new_url)[[1]], allowed)
     if (length(bad) > 0) {
       errors <- c(errors, paste("unknown placeholder(s) in", gsub("\r", "/", k), ":", paste(bad, collapse = ", ")))
     }
@@ -160,26 +179,26 @@ validate_http <- function(candidate, changed_keys, min_bytes = 10000) {
     row <- rows[i, ]
     if (is_http_exempt(row)) next
 
-    probe <- probe_url(row$link)
+    probe <- probe_url(row$url)
     if (isFALSE(probe$ok)) {
       errors <- c(errors, sprintf(
         "%s/%s: HTTP check failed (%s) for %s",
-        row$survey, row$dataset, probe$reason, row$link
+        row$survey, row$dataset, probe$reason, row$url
       ))
       next
     }
     if (isTRUE(probe$ok)) {
-      binary_ext <- grepl("\\.(zip|xlsx|csv|nc|tif|shp)$", row$link, ignore.case = TRUE)
+      binary_ext <- grepl("\\.(zip|xlsx|csv|nc|tif|shp)$", row$url, ignore.case = TRUE)
       if (binary_ext && !is.na(probe$content_type) && grepl("text/html", probe$content_type, fixed = TRUE)) {
         errors <- c(errors, sprintf(
-          "%s/%s: server returned text/html for a binary-extension link (likely an error page): %s",
-          row$survey, row$dataset, row$link
+          "%s/%s: server returned text/html for a binary-extension url (likely an error page): %s",
+          row$survey, row$dataset, row$url
         ))
       }
       if (binary_ext && !is.na(probe$content_length) && probe$content_length < min_bytes) {
         errors <- c(errors, sprintf(
           "%s/%s: response too small (%d bytes) for %s",
-          row$survey, row$dataset, probe$content_length, row$link
+          row$survey, row$dataset, probe$content_length, row$url
         ))
       }
     }
@@ -190,12 +209,17 @@ validate_http <- function(candidate, changed_keys, min_bytes = 10000) {
 
 # ---- Tiering ---------------------------------------------------------------
 
-# A changed row is Tier A only if every version-looking token embedded in
-# the link is byte-identical to before (collection numbers, BACI/PRODES
-# version stamps, dated upload paths) AND no non-link column changed. Any
-# other difference is Tier B: it may change the SHAPE of the downloaded
-# data (a new MapBiomas sheet, a new PRODES raster legend), which no HTTP
-# check can validate, and would break already-installed package versions.
+# A changed row is Tier A only if the resource's own version stamp (the
+# `version` column, e.g. a MapBiomas collection number or a BACI/PRODES
+# release tag) is byte-identical to before AND no other non-url column
+# changed. Any other difference is Tier B: it may change the SHAPE of the
+# downloaded data (a new MapBiomas sheet, a new PRODES raster legend), which
+# no HTTP check can validate, and would break already-installed package
+# versions.
+#
+# The regex below is kept as a SECONDARY check on the url itself, for
+# sources whose resolver does not (yet) populate `version` -- it catches a
+# version-looking token changing even when the structured column didn't.
 VERSION_TOKEN_RE <- "(collection_[0-9]+|COL\\.?[0-9]+|V[0-9]{6}|/20[0-9]{2}/[0-9]{2}/|_20[0-9]{2}\\.)"
 
 file_ext <- function(url) {
@@ -204,14 +228,14 @@ file_ext <- function(url) {
 }
 
 classify_row_change <- function(old_row, new_row) {
-  non_link_changed <- !identical(
-    old_row[setdiff(MANIFEST_ALL_COLS, "link")],
-    new_row[setdiff(MANIFEST_ALL_COLS, "link")]
+  non_url_changed <- !identical(
+    old_row[setdiff(MANIFEST_ALL_COLS, "url")],
+    new_row[setdiff(MANIFEST_ALL_COLS, "url")]
   )
-  if (non_link_changed) {
+  if (non_url_changed) {
     return("B")
   }
-  if (identical(old_row$link, new_row$link)) {
+  if (identical(old_row$url, new_row$url)) {
     return("none")
   }
 
@@ -222,12 +246,16 @@ classify_row_change <- function(old_row, new_row) {
   # read_sf vs unzip) may now be wrong -- that is exactly the kind of
   # "shape of the data changed" risk Tier B exists for, even though no
   # version-looking token in the URL changed at all.
-  if (!identical(file_ext(old_row$link), file_ext(new_row$link))) {
+  if (!identical(file_ext(old_row$url), file_ext(new_row$url))) {
     return("B")
   }
 
-  old_tokens <- regmatches(old_row$link, gregexpr(VERSION_TOKEN_RE, old_row$link))[[1]]
-  new_tokens <- regmatches(new_row$link, gregexpr(VERSION_TOKEN_RE, new_row$link))[[1]]
+  # primary check: the structured `version` column (already covered by the
+  # non_url_changed comparison above -- if it changed, this function
+  # returned "B" already). Reaching here means `version` did NOT change (or
+  # is NA on both sides), so fall back to the secondary regex on the url.
+  old_tokens <- regmatches(old_row$url, gregexpr(VERSION_TOKEN_RE, old_row$url))[[1]]
+  new_tokens <- regmatches(new_row$url, gregexpr(VERSION_TOKEN_RE, new_row$url))[[1]]
 
   if (setequal(old_tokens, new_tokens)) "A" else "B"
 }

@@ -30,19 +30,20 @@ test_that("MapBiomas sheet matches the old hardcoded tribble, per dataset/geo_le
   expect_equal(dataset_field("mapbiomas", "mapbiomas_fire", "sheet", geo_level = "state"), "a_ANNUAL")
 })
 
-test_that("MapBiomas collection number matches the old hardcoded messages, regardless of geo_level", {
-  expect_equal(dataset_field("mapbiomas", "mapbiomas_cover", "collection"), "9")
-  expect_equal(dataset_field("mapbiomas", "mapbiomas_transition", "collection"), "9")
-  expect_equal(dataset_field("mapbiomas", "mapbiomas_deforestation_regeneration", "collection"), "9")
-  expect_equal(dataset_field("mapbiomas", "mapbiomas_mining", "collection"), "8")
-  expect_equal(dataset_field("mapbiomas", "mapbiomas_irrigation", "collection"), "7")
-  expect_equal(dataset_field("mapbiomas", "mapbiomas_fire", "collection"), "3")
-  expect_equal(dataset_field("mapbiomas", "mapbiomas_water", "collection"), "2")
+test_that("MapBiomas version (collection) number matches the old hardcoded messages, regardless of geo_level", {
+  expect_equal(dataset_field("mapbiomas", "mapbiomas_cover", "version"), "9")
+  expect_equal(dataset_field("mapbiomas", "mapbiomas_transition", "version"), "9")
+  expect_equal(dataset_field("mapbiomas", "mapbiomas_deforestation_regeneration", "version"), "9")
+  expect_equal(dataset_field("mapbiomas", "mapbiomas_mining", "version"), "8")
+  expect_equal(dataset_field("mapbiomas", "mapbiomas_irrigation", "version"), "7")
+  expect_equal(dataset_field("mapbiomas", "mapbiomas_fire", "version"), "3")
+  expect_equal(dataset_field("mapbiomas", "mapbiomas_water", "version"), "2")
 })
 
 test_that("new MapBiomas override rows (irrigation/mining/water) still resolve the correct URL", {
-  # These rows exist only to carry `sheet` -- their link must be identical
-  # to the base row's, or dataset_url() would silently break the download.
+  # These rows exist only to carry `sheet` -- they carry no `url` of their
+  # own at all, so dataset_url() must fall through to the dataset's base
+  # row for every geo_level, or the download would silently break.
   for (ds in c("mapbiomas_irrigation", "mapbiomas_mining", "mapbiomas_water")) {
     base_url <- dataset_url("mapbiomas", ds)
     for (geo in strsplit(datasets_link(source = "mapbiomas", dataset = ds)$available_geo, ", ")[[1]]) {

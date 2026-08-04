@@ -59,7 +59,13 @@ resolve_prodes <- function(rows) {
 
   dir_status <- probe("https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/")
 
-  current_link <- if (nrow(rows) > 0) rows$link[1] else NA_character_
+  # NOTE: `rows` is the set of dataset rows tagged resolver == "prodes". All
+  # six of them share the same url (and layer_name), so after the schema
+  # normalization that value lives on the "prodes" survey-default row
+  # instead of being repeated six times here -- rows$url[1] will typically
+  # be NA. current_status stays NA in that case, which is fine: it's a
+  # diagnostic aside in the stop() message below, not load-bearing.
+  current_link <- if (nrow(rows) > 0) rows$url[1] else NA_character_
   current_status <- if (!is.na(current_link)) probe(current_link) else NA_integer_
 
   stop(

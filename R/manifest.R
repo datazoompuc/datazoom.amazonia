@@ -9,6 +9,25 @@
 # fall back silently to the packaged snapshot when the network is
 # unavailable, slow, or the remote file is missing/malformed.
 #
+# SCHEMA (5-tier field coalescing)
+# ---------------------------------
+# A row is either a survey DEFAULT (dataset is NA -- values shared by every
+# dataset in that survey) or a DATASET row (dataset is set), which may
+# itself be overridden for a specific geo_level and/or year. Resolving a
+# single field walks from most to least specific and stops at the first
+# non-NA value:
+#
+#   1. (survey, dataset, geo_level, year)  -- fully specific override
+#   2. (survey, dataset, geo_level, NA)    -- override by geographic level
+#   3. (survey, dataset, NA, year)         -- override by year
+#   4. (survey, dataset, NA, NA)           -- the dataset's own row
+#   5. (survey, NA, NA, NA)                -- the survey's default row
+#
+# A cell left empty means "inherit from the next tier down" -- it does NOT
+# mean "no value". This is what lets e.g. DEGRAD's ten yearly rows carry
+# only the one thing that actually changes per year (archive_file) instead
+# of repeating the shared URL and available_time ten times over.
+#
 # Everything here is internal. The only thing every other file in the
 # package should call is datasets_link() (R/download.R), which keeps its
 # pre-existing signature and return shape untouched.
@@ -18,17 +37,26 @@
 
 MANIFEST_REL <- file.path("extdata", "manifest", "v1", "datasets_link.csv")
 
-MANIFEST_CORE_COLS <- c(
-  "survey", "dataset", "geo_level", "year", "sidra_code",
-  "available_time", "available_geo", "link",
-  "archive_file", "sheet", "collection", "layer_name", "resolver"
+# The 4 key columns (never inherited) plus the 10 value columns (each
+# resolved independently via the 5-tier walk above).
+MANIFEST_KEY_COLS <- c("survey", "dataset", "geo_level", "year")
+
+MANIFEST_VALUE_COLS <- c(
+  "sidra_code", "url", "docs_url",
+  "available_time", "available_geo",
+  "archive_file", "sheet", "layer_name", "version",
+  "resolver"
 )
 
-# The 6 columns datasets_link() has always returned, in their original order.
-# This is the contract that keeps every existing call site untouched.
+MANIFEST_CORE_COLS <- c(MANIFEST_KEY_COLS, MANIFEST_VALUE_COLS)
+
+# The 6 columns datasets_link() has always returned, in their original
+# order, with "link" now named "url" (see NEWS: no external contract ever
+# depended on that literal name -- nothing outside this file greps `$link`
+# off its result).
 DATASETS_LINK_COLS <- c(
   "survey", "dataset", "sidra_code",
-  "available_time", "available_geo", "link"
+  "available_time", "available_geo", "url"
 )
 
 #' URL of the remote manifest.
@@ -65,13 +93,22 @@ read_manifest_file <- function(path) {
 #' truncated file before it gets cached for the rest of the session.
 #' @noRd
 validate_manifest <- function(x) {
+  dataset <- survey <- n <- NULL
+
   stopifnot(
     is.data.frame(x),
     all(MANIFEST_CORE_COLS %in% names(x)),
     nrow(x) >= 150,
-    !any(is.na(x$survey)),
-    !any(is.na(x$dataset))
+    !any(is.na(x$survey))
   )
+
+  # at most one survey-default row (dataset == NA) per survey
+  n_defaults <- x %>%
+    dplyr::filter(is.na(dataset)) %>%
+    dplyr::count(survey) %>%
+    dplyr::pull(n)
+  stopifnot(all(n_defaults <= 1))
+
   invisible(TRUE)
 }
 
@@ -184,52 +221,103 @@ manifest_info <- function() {
 
 `%||%` <- function(x, y) if (is.null(x)) y else x
 
-#' Most-specific-match lookup used by external_download().
+#' Parse a manifest "available_time" string into an integer vector of years.
 #'
-#' Resolution order: (survey, dataset, geo_level, year) ->
-#' (survey, dataset, geo_level, NA) -> (survey, dataset, NA, year) ->
-#' (survey, dataset, NA, NA). Falls back to the base row (both override keys
-#' NA) whenever geo_level/year are not supplied or have no specific override.
+#' Grammar: comma-separated tokens, each either a single year ("2023") or a
+#' range ("2007-2016"). This is the ONE parser for that grammar -- it
+#' replaces three separate ad-hoc implementations that used to live in
+#' check_params.R (comma+hyphen aware), epe.R and aneel.R (hyphen-only, via
+#' eval(parse(text = ...)), which silently mishandled comma lists).
 #' @noRd
-dataset_row <- function(source, dataset, geo_level = NULL, year = NULL) {
-  survey <- NULL
-
-  tbl <- link_table() %>%
-    dplyr::filter(survey == source, dataset == !!dataset)
-
-  if (nrow(tbl) == 0) {
-    return(tbl)
+parse_years <- function(x) {
+  if (is.null(x) || is.na(x)) {
+    return(integer(0))
   }
 
+  tokens <- trimws(strsplit(x, ",")[[1]])
+
+  years <- lapply(tokens, function(tok) {
+    if (grepl("-", tok, fixed = TRUE)) {
+      bounds <- as.integer(trimws(strsplit(tok, "-", fixed = TRUE)[[1]]))
+      seq.int(bounds[1], bounds[2])
+    } else {
+      as.integer(tok)
+    }
+  })
+
+  unlist(years, use.names = FALSE)
+}
+
+#' The 5 candidate row-sets for (source, dataset, geo_level, year), ordered
+#' from most to least specific (see the tier table in the file header).
+#' Each element is a 0-or-1-row data frame; dataset_field() takes the first
+#' non-NA value of the requested field walking down the list.
+#' @noRd
+dataset_rows <- function(source, dataset, geo_level = NULL, year = NULL) {
+  survey <- NULL
+
+  tbl <- link_table()
   geo_level <- if (is.null(geo_level)) NA_character_ else as.character(geo_level)
   year <- if (is.null(year)) NA_character_ else as.character(year)
 
-  candidates <- list(
-    tbl[tbl$geo_level %in% geo_level & tbl$year %in% year, ],
-    tbl[tbl$geo_level %in% geo_level & is.na(tbl$year), ],
-    tbl[is.na(tbl$geo_level) & tbl$year %in% year, ],
-    tbl[is.na(tbl$geo_level) & is.na(tbl$year), ]
+  ds <- tbl[tbl$survey == source & !is.na(tbl$dataset) & tbl$dataset == dataset, ]
+  default_row <- tbl[tbl$survey == source & is.na(tbl$dataset), ]
+
+  list(
+    ds[ds$geo_level %in% geo_level & ds$year %in% year, ],
+    ds[ds$geo_level %in% geo_level & is.na(ds$year), ],
+    ds[is.na(ds$geo_level) & ds$year %in% year, ],
+    ds[is.na(ds$geo_level) & is.na(ds$year), ],
+    default_row
   )
-
-  for (cand in candidates) {
-    if (nrow(cand) > 0) {
-      return(cand[1, ])
-    }
-  }
-
-  tbl[0, ]
 }
 
+#' Resolve a single field by walking the 5 tiers from dataset_rows() and
+#' returning the first non-NA value. This is the one place the "empty cell
+#' = inherit from the tier below" rule is implemented.
 #' @noRd
 dataset_field <- function(source, dataset, field, geo_level = NULL, year = NULL) {
-  row <- dataset_row(source, dataset, geo_level, year)
-  if (nrow(row) == 0) {
-    return(NA_character_)
+  tiers <- dataset_rows(source, dataset, geo_level, year)
+
+  for (tier in tiers) {
+    if (nrow(tier) == 0) next
+    val <- tier[[field]][1]
+    if (!is.na(val)) return(val)
   }
-  row[[field]]
+
+  NA_character_
 }
 
 #' @noRd
 dataset_url <- function(source, dataset, geo_level = NULL, year = NULL) {
-  dataset_field(source, dataset, "link", geo_level, year)
+  dataset_field(source, dataset, "url", geo_level, year)
+}
+
+#' One row per (survey, dataset) -- the survey-default-only base rows,
+#' overrides excluded -- with every value column coalesced against the
+#' survey's default row. This is what datasets_link() and check_params()'s
+#' "list every supported dataset" queries consume; it never sees geo_level/
+#' year overrides, which stay reachable only through dataset_field().
+#' @noRd
+effective_table <- function() {
+  survey <- dataset <- geo_level <- year <- NULL
+
+  tbl <- link_table()
+
+  ds_base <- tbl %>%
+    dplyr::filter(!is.na(dataset), is.na(geo_level), is.na(year))
+
+  defaults <- tbl %>%
+    dplyr::filter(is.na(dataset)) %>%
+    dplyr::select(survey, dplyr::all_of(MANIFEST_VALUE_COLS)) %>%
+    dplyr::rename_with(~ paste0(., "__default"), dplyr::all_of(MANIFEST_VALUE_COLS))
+
+  out <- ds_base %>%
+    dplyr::left_join(defaults, by = "survey")
+
+  for (col in MANIFEST_VALUE_COLS) {
+    out[[col]] <- dplyr::coalesce(out[[col]], out[[paste0(col, "__default")]])
+  }
+
+  out %>% dplyr::select(dplyr::all_of(MANIFEST_CORE_COLS))
 }

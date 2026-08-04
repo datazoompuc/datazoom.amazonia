@@ -61,23 +61,13 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
     # manifest's available_time instead of hardcoding it, since it grows by
     # one year with every BEN edition
     available <- dataset_field(param$source, param$dataset, "available_time")
-    sheets <- as.character(eval(parse(text = stringr::str_replace(available, "-", ":"))))
+    sheets <- as.character(parse_years(available))
   }
-  if (param$dataset == "consumer_energy_consumption") {
-    if (param$geo_level == "state") {
-      sheets <- "CONSUMO E NUMCONS SAM UF"
-    }
-    if (param$geo_level == "subsystem") {
-      sheets <- "CONSUMO E NUMCONS SAM"
-    }
-  }
-  if (param$dataset == "industrial_energy_consumption") {
-    if (param$geo_level == "state") {
-      sheets <- "SETOR INDUSTRIAL POR UF"
-    }
-    if (param$geo_level == "subsystem") {
-      sheets <- "SETOR INDUSTRIAL POR RG"
-    }
+  if (param$dataset %in% c("consumer_energy_consumption", "industrial_energy_consumption")) {
+    # sheet name per geo_level -- one manifest override row per (dataset,
+    # geo_level), the same pattern already used for MapBiomas (see
+    # inst/extdata/manifest/v1/datasets_link.csv)
+    sheets <- dataset_field(param$source, param$dataset, "sheet", geo_level = param$geo_level)
   }
 
   if (param$dataset == "energy_state_panel") {

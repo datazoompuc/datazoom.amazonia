@@ -68,17 +68,17 @@ resolve_mapbiomas <- function(rows) {
       out$mining_municipality <- tibble::tibble(
         survey = "mapbiomas", dataset = "mapbiomas_mining",
         geo_level = "municipality", year = NA_character_,
-        link = mining_hit[1], collection = col
+        url = mining_hit[1], version = col
       )
       out$mining_indigenous <- tibble::tibble(
         survey = "mapbiomas", dataset = "mapbiomas_mining",
         geo_level = "indigenous_land", year = NA_character_,
-        link = mining_hit[1], collection = col
+        url = mining_hit[1], version = col
       )
       out$mining_base <- tibble::tibble(
         survey = "mapbiomas", dataset = "mapbiomas_mining",
         geo_level = NA_character_, year = NA_character_,
-        collection = col
+        version = col
       )
     }
 
@@ -94,14 +94,14 @@ resolve_mapbiomas <- function(rows) {
       out$cover_indigenous <- tibble::tibble(
         survey = "mapbiomas", dataset = "mapbiomas_cover",
         geo_level = "indigenous_land", year = NA_character_,
-        link = indigenous_hit[1]
+        url = indigenous_hit[1]
       )
     }
     if (length(biomes_hit) >= 1) {
       out$transition_biome <- tibble::tibble(
         survey = "mapbiomas", dataset = "mapbiomas_transition",
         geo_level = "biome", year = NA_character_,
-        link = biomes_hit[1]
+        url = biomes_hit[1]
       )
     }
   }
@@ -156,8 +156,8 @@ resolve_mapbiomas <- function(rows) {
       out$cover_base <- tibble::tibble(
         survey = "mapbiomas", dataset = "mapbiomas_cover",
         geo_level = NA_character_, year = NA_character_,
-        link = paste0("https://storage.googleapis.com/mapbiomas-public/", cover_file[1]),
-        collection = as.character(newer$n)
+        url = paste0("https://storage.googleapis.com/mapbiomas-public/", cover_file[1]),
+        version = as.character(newer$n)
       )
     }
     defor_file <- grep("deforestation", newer$names, value = TRUE, ignore.case = TRUE)
@@ -165,8 +165,8 @@ resolve_mapbiomas <- function(rows) {
       out$deforestation_regeneration <- tibble::tibble(
         survey = "mapbiomas", dataset = "mapbiomas_deforestation_regeneration",
         geo_level = NA_character_, year = NA_character_,
-        link = paste0("https://storage.googleapis.com/mapbiomas-public/", defor_file[1]),
-        collection = as.character(newer$n)
+        url = paste0("https://storage.googleapis.com/mapbiomas-public/", defor_file[1]),
+        version = as.character(newer$n)
       )
     }
   }

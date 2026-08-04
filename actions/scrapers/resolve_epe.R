@@ -88,7 +88,7 @@ resolve_epe <- function(rows) {
     out$national_energy_balance <- tibble::tibble(
       survey = "epe", dataset = "national_energy_balance",
       geo_level = NA_character_, year = NA_character_,
-      link = paste0("https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/", ben_hit[1]),
+      url = paste0("https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/", ben_hit[1]),
       available_time = if (!is.na(years[1, 2])) paste(years[1, 2], years[1, 3], sep = "-") else NA_character_
     )
   }
@@ -96,7 +96,7 @@ resolve_epe <- function(rows) {
     out$energy_state_panel <- tibble::tibble(
       survey = "epe", dataset = "energy_state_panel",
       geo_level = NA_character_, year = NA_character_,
-      link = paste0("https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/", panel_hit[1])
+      url = paste0("https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/", panel_hit[1])
     )
   }
 

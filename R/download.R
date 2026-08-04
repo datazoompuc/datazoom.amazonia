@@ -661,17 +661,20 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
   # It now lives in inst/extdata/manifest/v1/datasets_link.csv (see
   # R/manifest.R), refreshed by a scheduled GitHub Action and fetched at
   # runtime with a silent fallback to the packaged snapshot. This function
-  # keeps its original signature and return shape -- only base rows (no
-  # geo_level/year override) are ever visible here, in the original 6
-  # columns and order, so every existing call site is unaffected.
+  # keeps its original signature and return shape -- effective_table() has
+  # already coalesced each dataset's row against its survey's default row
+  # and dropped both the survey-default rows themselves and any geo_level/
+  # year override rows, so exactly one row per (survey, dataset) is ever
+  # visible here, in the original 6 columns and order (with "link" now
+  # named "url" -- no call site ever depended on that literal name; see
+  # R/manifest.R). Every existing call site is unaffected.
 
   survey <- geo_level <- year <- NULL
   sidra_code <- available_time <- available_geo <- NULL
 
-  link <- link_table() %>%
-    dplyr::filter(is.na(geo_level), is.na(year)) %>%
+  link <- effective_table() %>%
     dplyr::select(
-      survey, dataset, sidra_code, available_time, available_geo, link
+      survey, dataset, sidra_code, available_time, available_geo, url
     )
 
   if (!is.null(source)) {
@@ -686,7 +689,7 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
   if (url) {
     link <- link %>%
-      purrr::pluck("link")
+      purrr::pluck("url")
   }
 
   return(link)

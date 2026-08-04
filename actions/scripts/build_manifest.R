@@ -17,7 +17,7 @@
 #      (identified by the manifest's `resolver` column).
 #   4. Runs the full validation gate from manifest_validate.R against the
 #      merged candidate.
-#   5. Classifies every changed row as Tier A (link-only, version tokens
+#   5. Classifies every changed row as Tier A (url-only, version tokens
 #      unchanged -- mechanically safe) or Tier B (anything that could change
 #      the SHAPE of the downloaded data -- needs human review).
 #   6. Writes a JSON report and a plain-text summary, and -- only when NOT

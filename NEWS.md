@@ -2,6 +2,8 @@
 
   * Internal: the hardcoded URL table inside `datasets_link()` was migrated to a versioned CSV manifest (`inst/extdata/manifest/v1/datasets_link.csv`), fetched at runtime with a silent fallback to the packaged snapshot when the network is unavailable. No exported function's signature or behavior changed; this only affects how source URLs are looked up internally, so that broken links (MapBiomas collection bumps, PRODES year rollovers, BACI version stamps, ANEEL CDE years) can be fixed by editing the manifest instead of waiting for a CRAN release.
 
+  * Internal: the manifest schema was normalized to a 5-tier field-coalescing model (survey default -> dataset -> geo_level/year overrides), replacing the previous one-self-contained-row-per-override shape. `link`/`collection` were renamed `url`/`version`, and SIDRA rows' documentation landing page moved from `url` to a new `docs_url` column (`url` is genuinely absent for SIDRA-sourced datasets, which are downloaded via `sidra_code`, not a URL). No exported function changed; `datasets_link()` keeps its exact pre-existing column set and values. Filled manifest cells dropped from 1093 to 293 by letting a value live in exactly one place instead of being repeated across every row that needed it.
+
 # datazoom.amazonia 1.2.0
 
   * Added `"energy_state_panel"` dataset to `load_epe`: yearly energy production by source and state (2011-2024), from EPE's BEN Chapter 8 (Dados Estaduais). 

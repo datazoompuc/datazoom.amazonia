@@ -66,7 +66,7 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
 
   ## MapBiomas collection number (per dataset, does not depend on geo_level)
 
-  collection <- dataset_field(param$source, param$dataset, "collection")
+  collection <- dataset_field(param$source, param$dataset, "version")
   message("Data from MapBiomas - Collection ", collection, "\n")
 
   #################

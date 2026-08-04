@@ -38,23 +38,12 @@ check_params <- function(param) {
     supp_time_period_str <- datasets_link(source = param$source, dataset = param$dataset) %>%
       purrr::pluck("available_time")
 
-    # separating by commas: 2003, 2007, 2014 -> c(2003, 2007, 2014)
+    # parse_years() is the one parser for the manifest's "available_time"
+    # grammar (comma-separated years and/or ranges, e.g. "2003, 2007-2014")
+    # -- see R/manifest.R. It replaces the split-by-comma/hyphen-then-eval
+    # logic that used to live only here.
 
-    supp_time_period <- supp_time_period_str %>%
-      stringr::str_split(",", simplify = TRUE)
-
-    # separating by hyphens: 2003 - 2007 -> 2003:2007
-
-    supp_time_period <- supp_time_period %>%
-      purrr::map(
-        function(str) {
-          str %>%
-            stringr::str_replace("-", ":") %>%
-            parse(text = .) %>%
-            eval()
-        }
-      ) %>%
-      unlist()
+    supp_time_period <- parse_years(supp_time_period_str)
 
 
     if (!all(param$time_period %in% supp_time_period)) {
