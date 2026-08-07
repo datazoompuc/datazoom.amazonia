@@ -226,13 +226,38 @@ for (src in names(registry)) {
       new_row$resolver <- src
       candidate <- dplyr::bind_rows(candidate, tibble::as_tibble(new_row))
     } else {
-      candidate[match_idx[1], cols_present] <- r[1, cols_present]
+      # Only overwrite fields the resolver actually set a non-NA value for.
+      # A resolver's contract is "return only the values you want to
+      # change" -- but when a resolver dplyr::bind_rows()'s together several
+      # differently-shaped sub-tibbles (one per dataset/field it touches,
+      # e.g. resolve_epe.R), any column one sub-tibble lacks gets padded
+      # with NA on every OTHER row in the bind. Blindly writing all of
+      # cols_present would treat that NA-padding as "clear this field",
+      # silently wiping a perfectly good existing value the resolver never
+      # intended to touch -- confirmed live: resolve_epe.R's 3 sub-tibbles
+      # don't share columns, and without this guard its run blanked
+      # national_energy_balance's url and consumer/industrial_energy_
+      # consumption's available_time on every existing-row update.
+      non_na_cols <- cols_present[!is.na(r[1, cols_present])]
+      candidate[match_idx[1], non_na_cols] <- r[1, non_na_cols]
     }
   }
 
   cat("OK (", nrow(result), "row(s) touched)\n")
   resolver_ok <- c(resolver_ok, src)
 }
+
+# Brand-new rows (see the bind_rows() branch above) land at the end of
+# `candidate`, not next to their siblings. Re-sort to the manifest's existing
+# convention -- survey, then dataset/geo_level/year -- so a diff against the
+# previous manifest stays readable instead of showing new rows appended at
+# EOF. coalesce(..., "") (not a plain NA-last sort) keeps each survey's
+# NA-dataset default row first, matching how every existing survey block is
+# already ordered.
+candidate <- dplyr::arrange(
+  candidate, survey,
+  dplyr::coalesce(dataset, ""), dplyr::coalesce(geo_level, ""), dplyr::coalesce(year, "")
+)
 
 # ---- Validate ----------------------------------------------------------------
 

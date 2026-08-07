@@ -54,6 +54,26 @@
 #      gained a resolver tag ("epe") now that resolve_epe.R actively
 #      maintains their url. Their base rows (geo_level = year = NA) are
 #      likewise always in scope regardless of OVERRIDE_QUERIED_FIELDS.
+#   6. 2026-08-07: the manifest was regenerated for real (the previous
+#      committed copy had never actually been refreshed since a09670c --
+#      see build_manifest.R's OUT_DIR/RUNNER_TEMP fix and the "Stage Tier B
+#      candidate" workflow step). PRODES's 6 dataset rows (url, version,
+#      layer_name, available_time) all move together to TerraBrasilis' live
+#      filename, now year + publish-date stamped (see resolve_prodes.R).
+#   7. ANEEL: energy_development_budget's available_time widens to include
+#      2023/2024 (published after the committed range was written); the
+#      enterprises_distributed resource silently changed extension from
+#      .csv to .zip on ANEEL's own server (this was already a known, live
+#      finding from a09670c's own resolver testing -- see NEWS.md/the branch
+#      report's bugs section -- just never landed in the committed manifest
+#      until this regeneration actually staged it).
+#   8. MapBiomas mining bumped from collection 8 to 9 (both override-row
+#      urls and the base row's version); the base row's own url is
+#      deliberately left at the old COL8.0 file, since resolve_mapbiomas.R
+#      only ever writes url onto mining's geo_level-specific override rows,
+#      never its base row (see that file's mining_base tibble).
+#   9. BACI gained a version (its committed row never had one before this
+#      resolver actually ran for real).
 
 matrix <- readRDS(test_path("fixtures", "resolution_matrix_pre.rds"))
 
@@ -78,6 +98,20 @@ reachable <- matrix %>%
         "https://www.epe.gov.br/pt/publicacoes-dados-abertos/publicacoes/anuario-estatistico-de-energia-eletrica",
       survey == "epe" & dataset == "energy_state_panel" & field == "resolver" ~ NA_character_,
       survey == "epe" & dataset %in% c("consumer_energy_consumption", "industrial_energy_consumption") & field == "resolver" ~ "epe",
+      survey == "prodes" & field == "url" ~
+        "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip",
+      survey == "prodes" & field == "version" ~ "20260408",
+      survey == "prodes" & field == "layer_name" ~ "prodes_amazonia_legal_2025_v20260408",
+      survey == "prodes" & dataset == "deforestation" & field == "available_time" ~ "2007-2025",
+      survey == "prodes" & dataset == "residual_deforestation" & field == "available_time" ~ "2010-2025",
+      survey == "prodes" & field == "available_time" ~ "2025",
+      survey == "aneel" & dataset == "energy_development_budget" & field == "available_time" ~ "2017-2024",
+      survey == "aneel" & dataset == "energy_enterprises_distributed" & field == "url" ~
+        "https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/b1bd71e7-d0ad-4214-9053-cbd58e9564a7/download/empreendimento-geracao-distribuida.zip",
+      survey == "mapbiomas" & dataset == "mapbiomas_mining" & field == "url" & !is.na(geo_level) ~
+        "https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2025/03/TABELA-MINERACAO-MAPBIOMAS-COL9.0.xlsx",
+      survey == "mapbiomas" & dataset == "mapbiomas_mining" & field == "version" ~ "9",
+      survey == "baci" & dataset == "HS92" & field == "version" ~ "202601",
       TRUE ~ value
     )
   )

@@ -68,7 +68,13 @@ resolve_prodes <- function(rows) {
   m <- matches[[best]]
 
   layer_name <- m[2]
-  year <- m[3]
+  # Named release_year, not year: tibble() evaluates arguments left-to-right
+  # and lets a later argument reference an earlier one BY COLUMN NAME, so
+  # `available_time = year` below would silently resolve to the `year =
+  # NA_character_` column just defined in the same tibble() call instead of
+  # this variable -- confirmed live (see resolve_prodes(NULL) output showing
+  # available_time == "2007-NA"/"2010-NA" before this rename).
+  release_year <- m[3]
   stamp <- m[4]
   url <- paste0("https://terrabrasilis.dpi.inpe.br", links[best])
 
@@ -76,7 +82,7 @@ resolve_prodes <- function(rows) {
     survey = "prodes", dataset = NA_character_,
     geo_level = NA_character_, year = NA_character_,
     url = url, layer_name = layer_name, version = stamp,
-    available_time = year, resolver = "prodes"
+    available_time = release_year, resolver = "prodes"
   )
 
   # deforestation/residual_deforestation are PRODES' two multi-year series;
@@ -85,12 +91,12 @@ resolve_prodes <- function(rows) {
   deforestation <- tibble::tibble(
     survey = "prodes", dataset = "deforestation",
     geo_level = NA_character_, year = NA_character_,
-    available_time = paste("2007", year, sep = "-")
+    available_time = paste("2007", release_year, sep = "-")
   )
   residual <- tibble::tibble(
     survey = "prodes", dataset = "residual_deforestation",
     geo_level = NA_character_, year = NA_character_,
-    available_time = paste("2010", year, sep = "-")
+    available_time = paste("2010", release_year, sep = "-")
   )
 
   dplyr::bind_rows(base, deforestation, residual)

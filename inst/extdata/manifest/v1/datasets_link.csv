@@ -1,14 +1,16 @@
 survey,dataset,geo_level,year,sidra_code,url,docs_url,available_time,available_geo,archive_file,sheet,layer_name,version,resolver
-aneel,energy_development_budget,,,,,,2017-2022,,,,,,aneel
+aneel,energy_development_budget,,,,,https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c,2017-2024,,,,,,aneel
 aneel,energy_development_budget,,2017,,https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/684a68fd-4278-4af1-bcf2-c02810dd7c0c/download/cde-beneficiarios-rede-basica-2017.csv,,,,,,,,
 aneel,energy_development_budget,,2018,,https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/237f3f67-4795-4bd7-a4d2-5f6071ef39af/download/cde-beneficiarios-rede-basica-2018.csv,,,,,,,,
 aneel,energy_development_budget,,2019,,https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/0bd1f129-39c5-4edc-b272-3f1d11181cca/download/cde-beneficiarios-rede-basica-2019.csv,,,,,,,,
 aneel,energy_development_budget,,2020,,https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/f77bb713-cc06-406a-baa8-246acc357ff5/download/cde-beneficiarios-rede-basica-2020.csv,,,,,,,,
 aneel,energy_development_budget,,2021,,https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/cdf1b068-7c76-462a-ab57-d6619ad290fa/download/cde-beneficiarios-rede-basica-2021.csv,,,,,,,,
 aneel,energy_development_budget,,2022,,https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/e390baae-5304-4a94-854f-0905094b3357/download/cde-beneficiarios-rede-basica-2022.csv,,,,,,,,
-aneel,energy_enterprises_distributed,,,,https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/b1bd71e7-d0ad-4214-9053-cbd58e9564a7/download/empreendimento-geracao-distribuida.csv,,,,,,,,aneel
+aneel,energy_development_budget,,2023,,https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/4fae7803-c71e-4c52-a221-112eea7135ab/download/cde-beneficiarios-rede-basica-2023.csv,,,,,,,,
+aneel,energy_development_budget,,2024,,https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/e5231715-4245-4c18-9e67-f52ea56816be/download/cde-beneficiarios-rede-basica-2024.csv,,,,,,,,
+aneel,energy_enterprises_distributed,,,,https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/b1bd71e7-d0ad-4214-9053-cbd58e9564a7/download/empreendimento-geracao-distribuida.zip,https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2,,,,,,,aneel
 aneel,energy_generation,,,,https://git.aneel.gov.br/publico/centralconteudo/-/raw/main/relatorioseindicadores/geracao/BD_SIGA.xlsx?inline=false,,1908-2021,municipality,,,,,
-baci,HS92,,,,https://www.cepii.fr/DATA_DOWNLOAD/baci/data/BACI_HS92_V202601.zip,,1995-2024,country,*$year$_V202601.csv,,,,baci
+baci,HS92,,,,https://www.cepii.fr/DATA_DOWNLOAD/baci/data/BACI_HS92_V202601.zip,https://www.cepii.fr/DATA_DOWNLOAD/baci/doc/baci_webpage.html,1995-2024,country,*$year$_V202601.csv,,,202601,baci
 cempre,cempre,,,6449,,https://sidra.ibge.gov.br/pesquisa/cempre/tabelas,2006-2020,"country, state, municipality",,,,,
 censoagro,,,,,,https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais,,"country, state",,,,,
 censoagro,agricultural_area_use,,,264,,,"1970, 1975, 1980, 1985, 1995, 2006",,,,,,
@@ -55,7 +57,7 @@ ibama,embargoed_areas,,,,https://pamgia.ibama.gov.br/geoservicos/arquivos/adm_em
 iema,iema,,,,https://drive.google.com/uc?export=download&id=10JMRtzu3k95vl8cQmHkVMQ9nJovvIeNl,,2018,municipality,,,,,
 imazon,imazon_shp,,,,https://docs.google.com/uc?export=download&id=1JHc2J_U8VXHVuWVsi8wVBnNzZ37y1ehv,,2020,municipality,,,,,
 internal,geo_municipalities,,,,https://raw.githubusercontent.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds,,2020,municipality,,,,,
-ips,,,,,https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx,,"2014, 2018, 2021, 2023",,,,,,ips
+ips,,,,,https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,,ips
 ips,all,,,,,,,,,,,,
 ips,communic,,,,,,,,,,,,
 ips,deforest,,,,,,,,,,,,
@@ -65,16 +67,16 @@ ips,mortality,,,,,,,,,,,,
 ips,sanit_habit,,,,,,,,,,,,
 ips,violence,,,,,,,,,,,,
 mapbiomas,,,,,,,1985-2023,,,,,,
-mapbiomas,mapbiomas_cover,,,,https://storage.googleapis.com/mapbiomas-public/initiatives/brasil/collection_9/statistics/mapbiomas_brazil_col_coverage_biome_state_municipality.xlsx,,,"municipality, indigenous_land",,COVERAGE_9,,9,mapbiomas
+mapbiomas,mapbiomas_cover,,,,https://storage.googleapis.com/mapbiomas-public/initiatives/brasil/collection_9/statistics/mapbiomas_brazil_col_coverage_biome_state_municipality.xlsx,https://brasil.mapbiomas.org/estatisticas/,,"municipality, indigenous_land",,COVERAGE_9,,9,mapbiomas
 mapbiomas,mapbiomas_cover,indigenous_land,,,https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2024/08/MAPBIOMAS_BRAZIL-COL.9-INDIGENOUS_LANDS-1.xlsx,,,,,,,,
-mapbiomas,mapbiomas_deforestation_regeneration,,,,https://storage.googleapis.com/mapbiomas-public/initiatives/brasil/collection_9/downloads/mapbiomas_brasil_col9_deforestation_and_secondary_vegetation_state_municipality.xlsx,,,municipality,,DEF_SECVEG,,9,mapbiomas
+mapbiomas,mapbiomas_deforestation_regeneration,,,,https://storage.googleapis.com/mapbiomas-public/initiatives/brasil/collection_9/downloads/mapbiomas_brasil_col9_deforestation_and_secondary_vegetation_state_municipality.xlsx,https://brasil.mapbiomas.org/estatisticas/,,municipality,,DEF_SECVEG,,9,mapbiomas
 mapbiomas,mapbiomas_fire,,,,https://storage.googleapis.com/mapbiomas-public/brasil/fire/collection_3_stats/MB-Fogo-3-Biome-State.xlsx,,,state,,a_ANNUAL,,3,
 mapbiomas,mapbiomas_irrigation,,,,https://mapbiomas-br-site.s3.amazonaws.com/downloads/Estatisticas%20/Colecao_7_Irrigacao_Biomes_UF.xlsx,,2000-2019,"state, biome",,,,7,
 mapbiomas,mapbiomas_irrigation,biome,,,,,,,,BIOME,,,
 mapbiomas,mapbiomas_irrigation,state,,,,,,,,UF,,,
-mapbiomas,mapbiomas_mining,,,,https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2023/09/TABELA-MINERACAO-MAPBIOMAS-COL8.0.xlsx,,1985-2022,"municipality, indigenous_land",,,,8,mapbiomas
-mapbiomas,mapbiomas_mining,indigenous_land,,,,,,,,IL,,,
-mapbiomas,mapbiomas_mining,municipality,,,,,,,,CITY_STATE_BIOME,,,
+mapbiomas,mapbiomas_mining,,,,https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2023/09/TABELA-MINERACAO-MAPBIOMAS-COL8.0.xlsx,https://brasil.mapbiomas.org/estatisticas/,1985-2022,"municipality, indigenous_land",,,,9,mapbiomas
+mapbiomas,mapbiomas_mining,indigenous_land,,,https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2025/03/TABELA-MINERACAO-MAPBIOMAS-COL9.0.xlsx,,,,,IL,,,
+mapbiomas,mapbiomas_mining,municipality,,,https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2025/03/TABELA-MINERACAO-MAPBIOMAS-COL9.0.xlsx,,,,,CITY_STATE_BIOME,,,
 mapbiomas,mapbiomas_transition,,,,https://brasil.mapbiomas.org/estatisticas/,,,"municipality, biome",,TRANSITION_9,,9,mapbiomas
 mapbiomas,mapbiomas_transition,biome,,,https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2024/08/MAPBIOMAS_BRAZIL-COL.9-BIOMES.xlsx,,,,,,,,
 mapbiomas,mapbiomas_transition,municipality,,,https://storage.googleapis.com/mapbiomas-public/initiatives/brasil/collection_9/downloads/mapbiomas_brasil_col9_state_municipality.xlsx,,,,,,,,
@@ -174,13 +176,13 @@ ppm,ppm_aquaculture,,,3940,,,2013-2023,,,,,,
 ppm,ppm_cow_farming,,,94,,,,,,,,,
 ppm,ppm_livestock_inventory,,,3939,,,,,,,,,
 ppm,ppm_sheep_farming,,,95,,,,,,,,,
-prodes,,,,,https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2023.zip,,2023,municipality,,,prodes_amazonia_legal_2023,,prodes
+prodes,,,,,https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip,https://terrabrasilis.dpi.inpe.br/app/dashboard/deforestation/biomes/legal_amazon/rates,2025,municipality,,,prodes_amazonia_legal_2025_v20260408,20260408,prodes
 prodes,clouds,,,,,,,,,,,,
-prodes,deforestation,,,,,,2007-2023,,,,,,
+prodes,deforestation,,,,,,2007-2025,,,,,,
 prodes,hydrography,,,,,,,,,,,,
 prodes,native_vegetation,,,,,,,,,,,,
 prodes,non_forest,,,,,,,,,,,,
-prodes,residual_deforestation,,,,,,2010-2023,,,,,,
+prodes,residual_deforestation,,,,,,2010-2025,,,,,,
 seeg,,,,,https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd,,2000-2018,"country, state, municipality",,,,,seeg
 seeg,seeg,,,,,,,,,,,,
 seeg,seeg_energy,,,,,,,,,,,,

@@ -4,12 +4,17 @@
 # tests check the manifest-reading side (dataset_field()/dataset_url()) --
 # the exact same values the R code now derives instead of hardcoding.
 
-test_that("PRODES layer_name matches the old hardcoded raster band name", {
+test_that("PRODES layer_name matches the manifest's current resolved value", {
+  # Updated 2026-08-07 when the prodes resolver was fixed (a tibble()
+  # column-shadowing bug meant available_time -- not layer_name -- was
+  # wrong; see resolve_prodes.R) and re-run for real, picking up TerraBrasilis'
+  # live filename (year + publish-date stamp). This value moves every time
+  # the manifest is refreshed -- that's expected, not a regression.
   for (ds in c("deforestation", "residual_deforestation", "native_vegetation",
                "non_forest", "hydrography", "clouds")) {
     expect_equal(
       dataset_field("prodes", ds, "layer_name"),
-      "prodes_amazonia_legal_2023"
+      "prodes_amazonia_legal_2025_v20260408"
     )
   }
 })
@@ -34,17 +39,22 @@ test_that("MapBiomas version (collection) number matches the old hardcoded messa
   expect_equal(dataset_field("mapbiomas", "mapbiomas_cover", "version"), "9")
   expect_equal(dataset_field("mapbiomas", "mapbiomas_transition", "version"), "9")
   expect_equal(dataset_field("mapbiomas", "mapbiomas_deforestation_regeneration", "version"), "9")
-  expect_equal(dataset_field("mapbiomas", "mapbiomas_mining", "version"), "8")
+  expect_equal(dataset_field("mapbiomas", "mapbiomas_mining", "version"), "9") # bumped 8->9 by the live resolver run, 2026-08-07
   expect_equal(dataset_field("mapbiomas", "mapbiomas_irrigation", "version"), "7")
   expect_equal(dataset_field("mapbiomas", "mapbiomas_fire", "version"), "3")
   expect_equal(dataset_field("mapbiomas", "mapbiomas_water", "version"), "2")
 })
 
-test_that("new MapBiomas override rows (irrigation/mining/water) still resolve the correct URL", {
+test_that("new MapBiomas override rows (irrigation/water) still resolve the correct URL", {
   # These rows exist only to carry `sheet` -- they carry no `url` of their
   # own at all, so dataset_url() must fall through to the dataset's base
   # row for every geo_level, or the download would silently break.
-  for (ds in c("mapbiomas_irrigation", "mapbiomas_mining", "mapbiomas_water")) {
+  # mapbiomas_mining is deliberately excluded here since 2026-08-07: the live
+  # resolver now writes a real per-geo_level `url` directly onto its
+  # indigenous_land/municipality override rows (see resolve_mapbiomas.R), so
+  # those rows no longer fall through to the base row at all -- the premise
+  # this test checks no longer applies to mining specifically.
+  for (ds in c("mapbiomas_irrigation", "mapbiomas_water")) {
     base_url <- dataset_url("mapbiomas", ds)
     for (geo in strsplit(datasets_link(source = "mapbiomas", dataset = ds)$available_geo, ", ")[[1]]) {
       expect_equal(dataset_url("mapbiomas", ds, geo_level = tolower(geo)), base_url)
@@ -66,8 +76,10 @@ test_that("EPE national_energy_balance available_time still parses into the expe
   expect_equal(years, 1970:2025)
 })
 
-test_that("ANEEL energy_development_budget available_time still parses into 2017:2022", {
+test_that("ANEEL energy_development_budget available_time still parses into 2017:2024", {
+  # Updated 2026-08-07: the aneel resolver found 2023 and 2024 CDE resources
+  # published after the manifest's committed range (2017:2022) was written.
   available <- dataset_field("aneel", "energy_development_budget", "available_time")
   years <- eval(parse(text = stringr::str_replace(available, "-", ":")))
-  expect_equal(years, 2017:2022)
+  expect_equal(years, 2017:2024)
 })

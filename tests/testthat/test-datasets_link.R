@@ -21,6 +21,15 @@
 #      the old SharePoint workbook (2003-2023) was replaced by EPE's
 #      consolidated BEN table (1970-2025), verified live to be a strict
 #      superset covering the same accounts.
+#   5. All 6 PRODES dataset rows' url now resolves to TerraBrasilis' live,
+#      year + publish-date stamped filename (see resolve_prodes.R and
+#      test-resolution-matrix.R item 6) instead of the stale committed
+#      2023 file -- the manifest was regenerated for real 2026-08-07. Their
+#      available_time moves the same way (2023 -> 2025 release year).
+#   6. ANEEL: energy_development_budget's available_time widens to
+#      2017-2024 (new years published), and energy_enterprises_distributed's
+#      resource changed extension from .csv to .zip on ANEEL's own server
+#      -- see test-resolution-matrix.R item 7 for the same two changes.
 #
 # The fixture was captured right before normalization. Row order is not
 # significant (both sides sorted by (survey, dataset) before comparing).
@@ -38,6 +47,28 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
     available_time = ifelse(
       survey == "epe" & dataset == "national_energy_balance",
       "1970-2025",
+      available_time
+    ),
+    url = ifelse(
+      survey == "prodes",
+      "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip",
+      url
+    ),
+    url = ifelse(
+      survey == "aneel" & dataset == "energy_enterprises_distributed",
+      "https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/b1bd71e7-d0ad-4214-9053-cbd58e9564a7/download/empreendimento-geracao-distribuida.zip",
+      url
+    ),
+    available_time = ifelse(
+      survey == "prodes" & dataset == "deforestation", "2007-2025",
+      ifelse(
+        survey == "prodes" & dataset == "residual_deforestation", "2010-2025",
+        ifelse(survey == "prodes", "2025", available_time)
+      )
+    ),
+    available_time = ifelse(
+      survey == "aneel" & dataset == "energy_development_budget",
+      "2017-2024",
       available_time
     )
   )
