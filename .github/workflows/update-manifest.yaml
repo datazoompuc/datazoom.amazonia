@@ -54,7 +54,15 @@ jobs:
         id: build
         run: |
           set +e
-          Rscript --vanilla actions/scripts/build_manifest.R
+          # --skip seeg: the seeg resolver works fine locally (verified with a
+          # browser User-Agent) but returns HTTP 403 specifically when run from
+          # a GitHub Actions runner -- most likely IP-range/WAF blocking on
+          # SEEG's side, confirmed by a live manual run of this workflow. Until
+          # that's resolved, excluding it here keeps the other six resolvers
+          # running and auto-committing/PR-ing normally instead of failing the
+          # whole job with exit 30 every week. Remove this flag once seeg is
+          # reachable from CI again -- see WEBSCRAPING_BETA_REPORT.
+          Rscript --vanilla actions/scripts/build_manifest.R --skip seeg
           echo "exit_code=$?" >> "$GITHUB_OUTPUT"
 
       - name: Smoke test candidate manifest (Tier A / no-change path only)

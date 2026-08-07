@@ -30,6 +30,7 @@
 #   Rscript actions/scripts/build_manifest.R --dry-run
 #   Rscript actions/scripts/build_manifest.R --dry-run --only aneel
 #   Rscript actions/scripts/build_manifest.R --dry-run --only aneel --only baci
+#   Rscript actions/scripts/build_manifest.R --dry-run --skip seeg
 #   Rscript actions/scripts/build_manifest.R --dry-run --check-all
 #
 # --check-all additionally probes every non-exempt `url` in the candidate
@@ -38,6 +39,19 @@
 # a long-standing, documented break (e.g. epe/energy_state_panel, 404 since
 # before this flag existed) stays visible on every run instead of only
 # being noticed the next time that row happens to change.
+#
+# --skip <source> excludes one resolver from this run entirely (repeatable,
+# same shape as --only). This is NOT the same as blanking a row's `resolver`
+# column in the manifest -- that column only decides which rows an already-
+# discovered resolver owns, so a blanked-but-still-discovered resolver would
+# run, get zero owned rows, and be recorded as a failure below (see the
+# empty-result check after "Run resolvers"). --skip removes it from the
+# registry before it ever runs, so its rows are simply left untouched and no
+# failure is recorded. Added to let a resolver that is known-broken in one
+# environment (e.g. seeg returns HTTP 403 specifically from GitHub Actions
+# runners, not locally -- see WEBSCRAPING_BETA_REPORT) stop failing the
+# scheduled run without silently dropping every OTHER future resolver the
+# way a hardcoded --only whitelist in the workflow file would.
 #
 # Exit codes:
 #   0  candidate validated; no changes, or only Tier A changes (safe to commit)
@@ -75,6 +89,11 @@ i <- which(args == "--only")
 for (idx in i) {
   if (idx < length(args)) only_sources <- c(only_sources, args[idx + 1])
 }
+skip_sources <- character(0)
+i <- which(args == "--skip")
+for (idx in i) {
+  if (idx < length(args)) skip_sources <- c(skip_sources, args[idx + 1])
+}
 
 # ---- Load resolvers ----------------------------------------------------------
 # Fase 2 ships this driver with ZERO resolvers registered -- it only
@@ -103,8 +122,22 @@ if (length(only_sources) > 0) {
   registry <- registry[only_sources]
 }
 
+if (length(skip_sources) > 0) {
+  unknown <- setdiff(skip_sources, names(registry))
+  if (length(unknown) > 0) {
+    stop(
+      "--skip referenced resolver(s) not registered (or already excluded by --only): ",
+      paste(unknown, collapse = ", ")
+    )
+  }
+  registry <- registry[setdiff(names(registry), skip_sources)]
+}
+
 cat(sprintf("build_manifest.R: %d resolver(s) registered, %d selected to run.\n",
             length(resolver_names), length(registry)))
+if (length(skip_sources) > 0) {
+  cat("Skipped by --skip:", paste(skip_sources, collapse = ", "), "\n")
+}
 
 # ---- Read the current manifest ----------------------------------------------
 
@@ -229,6 +262,7 @@ report <- list(
   timestamp = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
   dry_run = dry_run,
   resolvers_run = names(registry),
+  resolvers_skipped = skip_sources,
   resolvers_ok = resolver_ok,
   resolvers_failed = resolver_failed,
   rows_old = nrow(old),
@@ -254,6 +288,7 @@ cat("Changed keys:", tiering$n_changed, "\n")
 cat("Tier:", tiering$overall, "\n")
 cat("Resolvers OK:", if (length(resolver_ok)) paste(resolver_ok, collapse = ", ") else "(none)", "\n")
 cat("Resolvers FAILED:", if (length(resolver_failed)) paste(names(resolver_failed), collapse = ", ") else "(none)", "\n")
+cat("Resolvers SKIPPED (--skip):", if (length(skip_sources)) paste(skip_sources, collapse = ", ") else "(none)", "\n")
 if (length(errors) > 0) {
   cat("Validation errors:\n")
   cat(paste(" -", errors, collapse = "\n"), "\n")
@@ -287,6 +322,7 @@ if (nzchar(summary_path)) {
     sprintf("- Tier: %s", tiering$overall),
     sprintf("- Resolvers OK: %s", if (length(resolver_ok)) paste(resolver_ok, collapse = ", ") else "(none)"),
     sprintf("- Resolvers FAILED: %s", if (length(resolver_failed)) paste(names(resolver_failed), collapse = ", ") else "(none)"),
+    sprintf("- Resolvers SKIPPED (--skip): %s", if (length(skip_sources)) paste(skip_sources, collapse = ", ") else "(none)"),
     if (check_all) sprintf("- Manifest health (--check-all): %d broken URL(s)", length(health)) else NULL
   ), con)
   close(con)
