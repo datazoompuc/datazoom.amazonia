@@ -20,11 +20,23 @@
 #   5. Classifies every changed row as Tier A (url-only, version tokens
 #      unchanged -- mechanically safe) or Tier B (anything that could change
 #      the SHAPE of the downloaded data -- needs human review).
-#   6. Writes a JSON report and a plain-text summary, and -- only when NOT
-#      running with --dry-run -- writes the candidate manifest to disk so
-#      the calling workflow can decide whether to commit it (Tier A) or open
-#      a PR (Tier B). --dry-run always confines its output to tempdir() and
-#      never overwrites the committed manifest.
+#   6. Writes a JSON report and a plain-text summary to OUT_DIR, and always
+#      writes the candidate manifest to OUT_DIR too. OUT_DIR is RUNNER_TEMP
+#      when set (GitHub Actions' job-scoped temp dir, which survives across
+#      steps/processes within the same job) or R's own tempdir() otherwise
+#      (local/interactive runs) -- plain tempdir() would NOT work for the CI
+#      case, because R deletes its own session tempdir() when the Rscript
+#      process exits, and each workflow step is a separate process. Only when
+#      NOT running with --dry-run AND the result is Tier A / no-change does
+#      it also overwrite the committed manifest in place (inst/extdata/
+#      manifest/v1/datasets_link.csv) -- Tier B candidates are deliberately
+#      left in OUT_DIR only; it is the CALLING WORKFLOW's job to stage that
+#      candidate onto the committed path itself before opening a review PR
+#      (see the "Stage Tier B candidate" step in update-manifest.yaml). Both
+#      resolved OUT_DIR paths are exposed to the workflow as candidate_path /
+#      report_path step outputs via GITHUB_OUTPUT (same pattern as
+#      GITHUB_STEP_SUMMARY below), since a later step's shell has no other
+#      way to know them.
 #
 # Usage:
 #   Rscript actions/scripts/build_manifest.R --dry-run
@@ -78,6 +90,18 @@ source(file.path(repo_root, "actions", "scripts", "manifest_validate.R"))
 
 MANIFEST_PATH <- file.path(repo_root, "inst", "extdata", "manifest", "v1", "datasets_link.csv")
 SCRAPERS_DIR <- file.path(repo_root, "actions", "scrapers")
+
+# R deletes its own tempdir() when the Rscript process exits, but the report
+# and candidate CSV this script writes need to survive into LATER, separate
+# workflow steps (a fresh process each) that read them back via GITHUB_OUTPUT.
+# RUNNER_TEMP is a directory GitHub Actions provisions for the whole job (not
+# tied to any one step/process) and cleans up itself at job end -- use it when
+# present; fall back to tempdir() for local/interactive runs, where everything
+# happens inside this one process anyway.
+OUT_DIR <- {
+  d <- Sys.getenv("RUNNER_TEMP", "")
+  if (nzchar(d)) d else tempdir()
+}
 
 # ---- CLI args ---------------------------------------------------------------
 
@@ -274,7 +298,7 @@ report <- list(
   manifest_health = health
 )
 
-report_path <- file.path(tempdir(), "manifest_report.json")
+report_path <- file.path(OUT_DIR, "manifest_report.json")
 if (requireNamespace("jsonlite", quietly = TRUE)) {
   jsonlite::write_json(report, report_path, auto_unbox = TRUE, pretty = TRUE, na = "null")
   cat("\nReport written to:", report_path, "\n")
@@ -330,9 +354,23 @@ if (nzchar(summary_path)) {
 
 # ---- Write candidate + decide exit code --------------------------------------
 
-candidate_out <- file.path(tempdir(), "datasets_link_candidate.csv")
+candidate_out <- file.path(OUT_DIR, "datasets_link_candidate.csv")
 readr::write_csv(candidate, candidate_out, na = "")
 cat("\nCandidate manifest written to:", candidate_out, "\n")
+
+# ---- Expose real paths to the calling workflow ------------------------------
+# tempdir() is randomized per R session, so bash steps in the workflow have no
+# way to know these paths unless we tell them. Mirrors the GITHUB_STEP_SUMMARY
+# pattern above; safe to run outside CI (falls through silently).
+gh_output_path <- Sys.getenv("GITHUB_OUTPUT", "")
+if (nzchar(gh_output_path)) {
+  con <- file(gh_output_path, open = "a")
+  writeLines(c(
+    sprintf("candidate_path=%s", candidate_out),
+    sprintf("report_path=%s", report_path)
+  ), con)
+  close(con)
+}
 
 if (!dry_run && length(errors) == 0 && tiering$overall %in% c("none", "A")) {
   readr::write_csv(candidate, MANIFEST_PATH, na = "")

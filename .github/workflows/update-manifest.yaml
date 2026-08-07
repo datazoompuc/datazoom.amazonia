@@ -68,7 +68,7 @@ jobs:
       - name: Smoke test candidate manifest (Tier A / no-change path only)
         if: steps.build.outputs.exit_code == '0'
         env:
-          DZ_CANDIDATE: /tmp/datasets_link_candidate.csv
+          DZ_CANDIDATE: ${{ steps.build.outputs.candidate_path }}
         run: |
           Rscript -e 'options(datazoom.amazonia.manifest_url = paste0("file://", Sys.getenv("DZ_CANDIDATE")), datazoom.amazonia.use_remote_manifest = TRUE)' \
                   -e 'devtools::load_all("."); datazoom.amazonia:::clear_manifest_cache(); print(nrow(datazoom.amazonia:::link_table()))'
@@ -85,6 +85,11 @@ jobs:
           else
             echo "No changes to commit."
           fi
+
+      - name: Stage Tier B candidate onto the committed manifest path
+        if: steps.build.outputs.exit_code == '10'
+        run: |
+          cp "${{ steps.build.outputs.candidate_path }}" inst/extdata/manifest/v1/datasets_link.csv
 
       - name: Open PR for Tier B changes
         if: steps.build.outputs.exit_code == '10'
@@ -142,8 +147,8 @@ jobs:
         with:
           name: manifest-report
           path: |
-            /tmp/manifest_report.json
-            /tmp/datasets_link_candidate.csv
+            ${{ steps.build.outputs.report_path }}
+            ${{ steps.build.outputs.candidate_path }}
           if-no-files-found: ignore
 
       - name: Fail the run if build_manifest.R signaled a problem
