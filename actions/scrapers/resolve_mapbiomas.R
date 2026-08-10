@@ -65,15 +65,21 @@ resolve_mapbiomas <- function(rows) {
     mining_hit <- grep("TABELA-MINERACAO-MAPBIOMAS-COL", hrefs, value = TRUE, ignore.case = TRUE)
     if (length(mining_hit) >= 1) {
       col <- stringr::str_match(mining_hit[1], "COL([0-9]+)\\.")[, 2]
+      # version is written ONLY on mining_base, not on the two override rows
+      # below -- they already inherit it via the 5-tier lookup (R/manifest.R),
+      # and writing it explicitly here made every run re-add a value
+      # test-manifest-schema.R's anti-duplication check (correctly) strips
+      # back out, an infinite Tier-B-PR loop caught live 2026-08-07. url stays
+      # on both override rows since mining_base intentionally carries none.
       out$mining_municipality <- tibble::tibble(
         survey = "mapbiomas", dataset = "mapbiomas_mining",
         geo_level = "municipality", year = NA_character_,
-        url = mining_hit[1], version = col
+        url = mining_hit[1]
       )
       out$mining_indigenous <- tibble::tibble(
         survey = "mapbiomas", dataset = "mapbiomas_mining",
         geo_level = "indigenous_land", year = NA_character_,
-        url = mining_hit[1], version = col
+        url = mining_hit[1]
       )
       out$mining_base <- tibble::tibble(
         survey = "mapbiomas", dataset = "mapbiomas_mining",
