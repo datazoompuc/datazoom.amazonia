@@ -51,8 +51,9 @@ jobs:
           # jsonlite/curl are CI-only (used by the resolver scripts under
           # actions/, which are .Rbuildignore'd -- they are deliberately NOT
           # in DESCRIPTION's Imports, see each resolver's own header comment).
-          # devtools installs the smoke-test step's own tool.
-          Rscript -e 'install.packages(c("jsonlite", "curl", "devtools"))'
+          # devtools installs the smoke-test step's own tool; remotes is
+          # devtools::install_deps()'s own dependency, not bundled with it.
+          Rscript -e 'install.packages(c("jsonlite", "curl", "devtools", "remotes"))'
           # Everything the PACKAGE itself needs (dplyr, sf, sidrar, tidyr,
           # googledrive, ...) comes straight from DESCRIPTION's Imports via
           # install_deps(), instead of a second hand-maintained list here --
