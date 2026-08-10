@@ -40,6 +40,14 @@ jobs:
         with:
           fetch-depth: 0
 
+      # sf (a DESCRIPTION Import, per devtools::install_deps() below) needs
+      # these system libraries to actually load on Ubuntu, even from an RSPM
+      # binary -- same fix already applied in render-readme.yaml.
+      - name: Install Spatial System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgdal-dev libgeos-dev libproj-dev libudunits2-dev
+
       - name: Setup R
         uses: r-lib/actions/setup-r@v2
         with:
