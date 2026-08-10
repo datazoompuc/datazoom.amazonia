@@ -46,9 +46,19 @@ jobs:
           r-version: "release"
           use-public-rspm: true
 
-      - name: Install resolver dependencies
+      - name: Install resolver + package dependencies
         run: |
-          Rscript -e 'install.packages(c("readr","dplyr","tibble","purrr","stringr","jsonlite","curl","devtools"))'
+          # jsonlite/curl are CI-only (used by the resolver scripts under
+          # actions/, which are .Rbuildignore'd -- they are deliberately NOT
+          # in DESCRIPTION's Imports, see each resolver's own header comment).
+          # devtools installs the smoke-test step's own tool.
+          Rscript -e 'install.packages(c("jsonlite", "curl", "devtools"))'
+          # Everything the PACKAGE itself needs (dplyr, sf, sidrar, tidyr,
+          # googledrive, ...) comes straight from DESCRIPTION's Imports via
+          # install_deps(), instead of a second hand-maintained list here --
+          # a hardcoded duplicate is exactly what went stale and broke the
+          # smoke-test step the first time it ever actually ran (2026-08-10).
+          Rscript -e 'devtools::install_deps(dependencies = TRUE)'
 
       - name: Run build_manifest.R
         id: build
