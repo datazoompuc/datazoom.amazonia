@@ -428,7 +428,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     filename <- paste0(
       "agg_terraclimate_",
       param$dataset_code,
-      "_1958_CurrentYear_GLOBE.nc"
+      "_1950_CurrentYear_GLOBE.nc"
     )
 
     path <- paste0(
