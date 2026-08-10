@@ -48,7 +48,7 @@ jobs:
 
       - name: Install resolver dependencies
         run: |
-          Rscript -e 'install.packages(c("readr","dplyr","tibble","purrr","stringr","jsonlite","curl"))'
+          Rscript -e 'install.packages(c("readr","dplyr","tibble","purrr","stringr","jsonlite","curl","devtools"))'
 
       - name: Run build_manifest.R
         id: build
