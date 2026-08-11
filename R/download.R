@@ -705,13 +705,27 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
     ########################
 
     ## PRODES
+    #
+    # TEMPORARY FIX (see this branch, prodes_update): the committed 2023
+    # file 404s live. TerraBrasilis' filenames now carry a publish-date
+    # stamp on top of the data year -- verified live against the public
+    # download-listing API TerraBrasilis' own downloads page calls
+    # (https://terrabrasilis.dpi.inpe.br/business/api/v1/download/all),
+    # and the zip's internal .tif/.qml/.txt basenames confirmed via a
+    # ranged request against the archive's own central directory (no need
+    # to pull the full ~133MB file). This is a manual, hardcoded patch in
+    # the old pattern -- it is NOT meant to be the long-term fix. A
+    # CSV-manifest + scheduled-resolver system that automates exactly this
+    # class of update already exists on another branch and is not yet
+    # merged; once it is, this hardcoded row (and the matching literal in
+    # R/prodes.R) should be removed in favor of it, not extended further.
 
-    "prodes", "deforestation", NA, "2007-2023", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2023.zip",
-    "prodes", "residual_deforestation", NA, "2010-2023", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2023.zip",
-    "prodes", "native_vegetation", NA, "2023", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2023.zip",
-    "prodes", "non_forest", NA, "2023", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2023.zip",
-    "prodes", "hydrography", NA, "2023", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2023.zip",
-    "prodes", "clouds", NA, "2023", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2023.zip",
+    "prodes", "deforestation", NA, "2007-2025", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip",
+    "prodes", "residual_deforestation", NA, "2010-2025", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip",
+    "prodes", "native_vegetation", NA, "2025", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip",
+    "prodes", "non_forest", NA, "2025", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip",
+    "prodes", "hydrography", NA, "2025", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip",
+    "prodes", "clouds", NA, "2025", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip",
 
     ## DETER
 

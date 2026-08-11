@@ -4,28 +4,28 @@
 #'
 #' @param dataset A dataset name. Can be one of "deforestation", "residual_deforestation", "native_vegetation", "hydrography", "non_forest", or "clouds".
 #' @param time_period A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.
-#'    * Between 2007 - 2023 for dataset "deforestation". Deforestation for 2007 includes all cumulative deforestation up to 2007. For other years, deforestation is incremental
-#'    * Between 2010 - 2023 for dataset "residual_deforestation"
-#'    * Only 2023 for all other datasets
+#'    * Between 2007 - 2025 for dataset "deforestation". Deforestation for 2007 includes all cumulative deforestation up to 2007. For other years, deforestation is incremental
+#'    * Between 2010 - 2025 for dataset "residual_deforestation"
+#'    * Only 2025 for all other datasets
 #' @inheritParams load_baci
 #'
 #' @return A \code{tibble} with the selected data if raw_data is \code{FALSE}, and a \code{SpatRaster} is \code{TRUE}.
 #'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
-#' # download treated deforestation data for 2023
+#' # download treated deforestation data for 2025
 #' deforestation <- load_prodes(
 #'   dataset = "deforestation",
 #'   raw_data = FALSE,
-#'   time_period = 2023,
+#'   time_period = 2025,
 #'   language = "eng"
 #' )
 #'
-#' # download treated deforestation data for 2008 to 2023
+#' # download treated deforestation data for 2008 to 2025
 #' deforestation_series <- load_prodes(
 #'   dataset = "deforestation",
 #'   raw_data = FALSE,
-#'   time_period = 2008:2023,
+#'   time_period = 2008:2025,
 #'   language = "eng"
 #' )
 #'
@@ -42,7 +42,7 @@
 #' @export
 
 load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
-                        time_period = 2023, language = "eng") {
+                        time_period = 2025, language = "eng") {
   if (!requireNamespace("terra", quietly = TRUE)) {
     stop(
       "Package \"terra\" must be installed to use this function.",
@@ -60,7 +60,7 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
   ## Bind Global Variables ##
   ###########################
 
-  . <- area_km2 <- km <- ID <- prodes_amazonia_legal_2023 <- name_muni <- NULL
+  . <- area_km2 <- km <- ID <- prodes_amazonia_legal_2025_v20260408 <- name_muni <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -77,7 +77,7 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
   # forcing years
 
   if (!param$dataset %in% c("deforestation", "residual_deforestation")) {
-    param$time_period <- 2023
+    param$time_period <- 2025
   }
 
   # check if dataset and time_period are supported
@@ -176,17 +176,17 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
         # add km2 units
 
         counts <- counts %>%
-          dplyr::mutate(dplyr::across(prodes_amazonia_legal_2023, ~ units::set_units(., "km^2")))
+          dplyr::mutate(dplyr::across(prodes_amazonia_legal_2025_v20260408, ~ units::set_units(., "km^2")))
 
         # drop cities with no pixels
 
         counts <- counts %>%
-          tidyr::drop_na(prodes_amazonia_legal_2023)
+          tidyr::drop_na(prodes_amazonia_legal_2025_v20260408)
 
         # rename variable to match the dataset
 
         counts <- counts %>%
-          dplyr::rename(!!paste(param$dataset, "km2", sep = "_") := prodes_amazonia_legal_2023)
+          dplyr::rename(!!paste(param$dataset, "km2", sep = "_") := prodes_amazonia_legal_2025_v20260408)
 
         # return data frame
         counts

@@ -1,5 +1,7 @@
 # datazoom.amazonia (development version)
 
+  * Fixed `load_prodes()`'s download URL, which returned HTTP 404 (INPE renamed the file to carry a publish-date stamp on top of the data year). Data now runs through 2025; `time_period` defaults and docs updated to match.
+
 # datazoom.amazonia 1.2.0
 
   * Added `"energy_state_panel"` dataset to `load_epe`: yearly energy production by source and state (2011-2024), from EPE's BEN Chapter 8 (Dados Estaduais). 
