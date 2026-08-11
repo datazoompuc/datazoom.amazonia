@@ -205,7 +205,7 @@ Clear-cut deforestation areas (complete forest loss).
 - **Coverage**: Entire Legal Amazon region
 - **Time period**:
   - 2007: Cumulative deforestation from 1988 to 2007
-  - 2008-2023: Annual incremental deforestation (year-specific)
+  - 2008-2025: Annual incremental deforestation (year-specific)
 - **Data types**:
   - Raw: Raster/grid data (SpatRaster format)
   - Treated: Municipality-level area aggregates
@@ -222,7 +222,7 @@ Deforestation that was not captured in previous surveys (detected
 through improved methodology).
 
 - **Coverage**: Legal Amazon
-- **Time period**: 2010-2023
+- **Time period**: 2010-2025
 - **Data types**: Raster or municipality aggregates
 - **Variables**: Additional detected deforestation (hectares)
 - **Use cases**:
@@ -235,7 +235,7 @@ through improved methodology).
 Remaining native forest and natural vegetation areas.
 
 - **Coverage**: All vegetation in Legal Amazon
-- **Time period**: 2023 (snapshot of current state)
+- **Time period**: 2025 (snapshot of current state)
 - **Data types**: Raster only
 - **Variables**: Forest and vegetation extent
 - **Use cases**:
@@ -248,7 +248,7 @@ Remaining native forest and natural vegetation areas.
 Water bodies and hydrographic features.
 
 - **Coverage**: All water features in Amazon
-- **Time period**: 2023
+- **Time period**: 2025
 - **Data types**: Raster only
 - **Variables**: Water body extent
 - **Use cases**:
@@ -261,7 +261,7 @@ Non-forest areas including savanna, grasslands, and other vegetation
 types.
 
 - **Coverage**: Legal Amazon region
-- **Time period**: 2023
+- **Time period**: 2025
 - **Data types**: Raster only
 - **Variables**: Non-forest vegetation extent
 - **Use cases**:
@@ -274,7 +274,7 @@ types.
 Cloud cover in satellite imagery (data quality indicator).
 
 - **Coverage**: Legal Amazon
-- **Time period**: 2023
+- **Time period**: 2025
 - **Data types**: Raster only
 - **Variables**: Cloud-covered areas where analysis is uncertain
 - **Use cases**:
@@ -300,7 +300,7 @@ Cloud cover in satellite imagery (data quality indicator).
 | Year      | Type        | Definition                                   |
 |-----------|-------------|----------------------------------------------|
 | 2007      | Cumulative  | All deforestation from 1988-2007             |
-| 2008-2023 | Incremental | Deforestation detected in that specific year |
+| 2008-2025 | Incremental | Deforestation detected in that specific year |
 
 When analyzing time trends, be aware that 2007 includes 19 years of
 accumulated loss.
@@ -325,10 +325,10 @@ Selects which landscape classification to download.
 ``` r
 dataset = "deforestation"             # Clear-cut deforestation (main product)
 dataset = "residual_deforestation"    # Previously undetected deforestation
-dataset = "native_vegetation"         # Remaining forests and vegetation (2023 only)
-dataset = "hydrography"               # Water bodies (2023 only)
-dataset = "non_forest"                # Savanna and other non-forest (2023 only)
-dataset = "clouds"                    # Cloud cover (2023 only)
+dataset = "native_vegetation"         # Remaining forests and vegetation (2025 only)
+dataset = "hydrography"               # Water bodies (2025 only)
+dataset = "non_forest"                # Savanna and other non-forest (2025 only)
+dataset = "clouds"                    # Cloud cover (2025 only)
 ```
 
 ### 2. **raw_data**
@@ -353,12 +353,12 @@ Specifies which year(s) to download.
 
 | Dataset                  | Available Years                            |
 |--------------------------|--------------------------------------------|
-| `deforestation`          | 2007 (cumulative), 2008-2023 (incremental) |
-| `residual_deforestation` | 2010-2023                                  |
-| `native_vegetation`      | 2023 only                                  |
-| `hydrography`            | 2023 only                                  |
-| `non_forest`             | 2023 only                                  |
-| `clouds`                 | 2023 only                                  |
+| `deforestation`          | 2007 (cumulative), 2008-2025 (incremental) |
+| `residual_deforestation` | 2010-2025                                  |
+| `native_vegetation`      | 2025 only                                  |
+| `hydrography`            | 2025 only                                  |
+| `non_forest`             | 2025 only                                  |
+| `clouds`                 | 2025 only                                  |
 
 ``` r
 time_period = 2020              # single year
@@ -384,11 +384,11 @@ language = "eng"  # character string
 ### Example 1: Deforestation data for a single year
 
 ``` r
-# download treated deforestation data for 2023
+# download treated deforestation data for 2025
 deforestation <- load_prodes(
   dataset = "deforestation",
   raw_data = FALSE,
-  time_period = 2023,
+  time_period = 2025,
   language = "eng"
 )
 ```
@@ -396,11 +396,11 @@ deforestation <- load_prodes(
 ### Example 2: Deforestation data over multiple years
 
 ``` r
-# download treated deforestation data for 2008 to 2023
+# download treated deforestation data for 2008 to 2025
 deforestation_series <- load_prodes(
   dataset = "deforestation",
   raw_data = FALSE,
-  time_period = 2008:2023,
+  time_period = 2008:2025,
   language = "eng"
 )
 ```
@@ -408,11 +408,11 @@ deforestation_series <- load_prodes(
 ### Example 3: Cumulative forest loss since 1988
 
 ``` r
-# download 2007 (cumulative 1988-2007) plus all years up to 2023
+# download 2007 (cumulative 1988-2007) plus all years up to 2025
 all_deforestation <- load_prodes(
   dataset = "deforestation",
   raw_data = FALSE,
-  time_period = c(2007, 2008:2023),
+  time_period = c(2007, 2008:2025),
   language = "eng"
 )
 ```
@@ -467,7 +467,7 @@ residual <- load_prodes(
     significant computing resources
 4.  **Historical changes**: INPE occasionally revises historical
     estimates as methodology improves
-5.  **Recent data provisional**: 2023 data may be subject to revision as
+5.  **Recent data provisional**: 2025 data may be subject to revision as
     final processing completes
 
 ------------------------------------------------------------------------
