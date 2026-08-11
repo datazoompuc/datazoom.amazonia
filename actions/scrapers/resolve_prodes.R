@@ -23,12 +23,19 @@
 #
 # All 6 PRODES dataset rows (clouds/deforestation/hydrography/
 # native_vegetation/non_forest/residual_deforestation) share one url,
-# layer_name and version on the "prodes" survey-default row (dataset = NA)
-# -- this resolver writes there, not to the individual dataset rows, to
-# avoid re-introducing the duplication the manifest schema normalization
-# removed (see R/manifest.R's 5-tier coalescing docs).
+# layer_name and version -- under the self-sufficient-rows schema
+# (R/manifest.R) each of those 6 rows must carry its own copy explicitly,
+# so this resolver fans them out across every dataset in `rows` (the
+# manifest rows currently tagged resolver == "prodes") instead of writing
+# a single shared row the others used to inherit from.
 
 resolve_prodes <- function(rows) {
+  if (is.null(rows) || nrow(rows) == 0) {
+    stop(
+      "resolve_prodes(): no manifest rows tagged resolver == 'prodes' -- ",
+      "cannot tell which datasets to update. Check the resolver column."
+    )
+  }
   if (!requireNamespace("jsonlite", quietly = TRUE) || !requireNamespace("curl", quietly = TRUE)) {
     stop("resolve_prodes() needs the 'jsonlite' and 'curl' packages (CI-only; not package Imports).")
   }
@@ -78,26 +85,22 @@ resolve_prodes <- function(rows) {
   stamp <- m[4]
   url <- paste0("https://terrabrasilis.dpi.inpe.br", links[best])
 
-  base <- tibble::tibble(
-    survey = "prodes", dataset = NA_character_,
-    geo_level = NA_character_, year = NA_character_,
-    url = url, layer_name = layer_name, version = stamp,
-    available_time = release_year, resolver = "prodes"
-  )
-
   # deforestation/residual_deforestation are PRODES' two multi-year series;
   # their available_time keeps its documented start year and extends to
-  # whatever year the API just reported.
-  deforestation <- tibble::tibble(
-    survey = "prodes", dataset = "deforestation",
-    geo_level = NA_character_, year = NA_character_,
-    available_time = paste("2007", release_year, sep = "-")
-  )
-  residual <- tibble::tibble(
-    survey = "prodes", dataset = "residual_deforestation",
-    geo_level = NA_character_, year = NA_character_,
-    available_time = paste("2010", release_year, sep = "-")
+  # whatever year the API just reported. The other four datasets
+  # (clouds/hydrography/native_vegetation/non_forest) only ever cover the
+  # single most recent release year.
+  datasets <- unique(rows$dataset)
+  available_time <- dplyr::case_when(
+    datasets == "deforestation" ~ paste("2007", release_year, sep = "-"),
+    datasets == "residual_deforestation" ~ paste("2010", release_year, sep = "-"),
+    TRUE ~ release_year
   )
 
-  dplyr::bind_rows(base, deforestation, residual)
+  tibble::tibble(
+    survey = "prodes", dataset = datasets,
+    geo_level = NA_character_, year = NA_character_,
+    url = url, layer_name = layer_name, version = stamp,
+    available_time = available_time, resolver = "prodes"
+  )
 }

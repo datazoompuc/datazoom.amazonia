@@ -21,6 +21,12 @@
 # `energy_state_panel` is intentionally NOT resolved (see its own section).
 
 resolve_epe <- function(rows) {
+  if (is.null(rows) || nrow(rows) == 0) {
+    stop(
+      "resolve_epe(): no manifest rows tagged resolver == 'epe' -- ",
+      "cannot tell which rows to update. Check the resolver column."
+    )
+  }
   if (!requireNamespace("curl", quietly = TRUE)) {
     stop("resolve_epe() needs the 'curl' package (CI-only; not a package Import).")
   }
@@ -44,6 +50,14 @@ resolve_epe <- function(rows) {
   # VERIFIED LIVE (2026-08-04): this "Dados Abertos" page links
   # Dados_abertos_Consumo_Mensal.xlsx directly in the HTML -- no SharePoint
   # web part involved, unlike the "Publicacoes" pages above.
+  #
+  # Both datasets' base row AND their state/subsystem/region geo_level
+  # overrides point at this one shared file -- under the old 5-tier model
+  # the overrides left url NA and inherited it from the base row; under
+  # self-sufficient rows there is no inheritance, so every one of those
+  # rows must be written explicitly here or it would silently go stale the
+  # next time this url actually changes (this is what write onto every
+  # geo_level in `rows` below fixes).
 
   consumo_html <- fetch_html(
     "https://www.epe.gov.br/pt/publicacoes-dados-abertos/dados-abertos/dados-do-consumo-mensal-de-energia-eletrica"
@@ -58,13 +72,16 @@ resolve_epe <- function(rows) {
       href <- sub('"$', "", href)
       url <- paste0("https://www.epe.gov.br", href)
 
+      consumer_geo <- rows$geo_level[rows$dataset == "consumer_energy_consumption"]
+      industrial_geo <- rows$geo_level[rows$dataset == "industrial_energy_consumption"]
+
       out$consumer <- tibble::tibble(
         survey = "epe", dataset = "consumer_energy_consumption",
-        geo_level = NA_character_, year = NA_character_, url = url
+        geo_level = consumer_geo, year = NA_character_, url = url
       )
       out$industrial <- tibble::tibble(
         survey = "epe", dataset = "industrial_energy_consumption",
-        geo_level = NA_character_, year = NA_character_, url = url
+        geo_level = industrial_geo, year = NA_character_, url = url
       )
     }
   }

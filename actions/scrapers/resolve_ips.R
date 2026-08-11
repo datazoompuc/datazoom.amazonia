@@ -13,10 +13,18 @@
 # reads FOUR year-sheets ("2014", "2018", "2021", "2023") out of one Google
 # Drive workbook; the Strapi file found here is a single year's workbook, a
 # different shape. Emits only `version` (the year found) + `docs_url`,
-# never `url` -- see resolve_seeg.R's header for why a detect-only resolver
-# must not emit a `url` the package isn't ready to read yet.
+# fanned out across every IPS dataset row in `rows` (the manifest rows
+# tagged resolver == "ips") -- never `url`, same reasoning as
+# resolve_seeg.R for why a detect-only resolver must not emit a `url` the
+# package isn't ready to read yet.
 
 resolve_ips <- function(rows) {
+  if (is.null(rows) || nrow(rows) == 0) {
+    stop(
+      "resolve_ips(): no manifest rows tagged resolver == 'ips' -- ",
+      "cannot tell which datasets to update. Check the resolver column."
+    )
+  }
   if (!requireNamespace("curl", quietly = TRUE)) {
     stop("resolve_ips() needs the 'curl' package (CI-only; not a package Import).")
   }
@@ -69,7 +77,7 @@ resolve_ips <- function(rows) {
   year <- sub(".*IPS_Amazonia_([0-9]{4})_.*", "\\1", hit)
 
   tibble::tibble(
-    survey = "ips", dataset = NA_character_,
+    survey = "ips", dataset = unique(rows$dataset),
     geo_level = NA_character_, year = NA_character_,
     version = year, docs_url = "https://ipsamazonia.org.br/"
   )

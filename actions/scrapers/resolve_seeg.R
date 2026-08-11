@@ -13,15 +13,20 @@
 # means re-verifying those against its actual layout first (a 258MB
 # download), which is out of scope for this CI script.
 #
-# Emitting only `version` + `docs_url` on the "seeg" survey-default row
-# means: the FIRST run after a real SEEG release opens exactly one Tier B
-# PR recording the new version number (classify_row_change() treats any
-# `version` change as Tier B, see actions/scripts/manifest_validate.R).
-# Every subsequent run is a no-op until the number changes again -- a
-# resolver that emitted `url` here without R/seeg.R being ready to read it
-# would instead open an IDENTICAL Tier B PR every single scheduled run.
+# Emitting only `version` + `docs_url`, fanned out across every "seeg_*"
+# dataset row in `rows` (the manifest rows tagged resolver == "seeg"), so
+# every run either changes nothing or opens exactly one PR recording the
+# new version number -- a resolver that emitted `url` here without
+# R/seeg.R being ready to read it would instead open an identical PR every
+# single scheduled run.
 
 resolve_seeg <- function(rows) {
+  if (is.null(rows) || nrow(rows) == 0) {
+    stop(
+      "resolve_seeg(): no manifest rows tagged resolver == 'seeg' -- ",
+      "cannot tell which datasets to update. Check the resolver column."
+    )
+  }
   if (!requireNamespace("curl", quietly = TRUE)) {
     stop("resolve_seeg() needs the 'curl' package (CI-only; not a package Import).")
   }
@@ -59,7 +64,7 @@ resolve_seeg <- function(rows) {
   version <- sub(".*-([0-9.]+)\\.xlsx$", "\\1", hit)
 
   tibble::tibble(
-    survey = "seeg", dataset = NA_character_,
+    survey = "seeg", dataset = unique(rows$dataset),
     geo_level = NA_character_, year = NA_character_,
     version = version, docs_url = "https://seeg.eco.br/dados/"
   )

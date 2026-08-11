@@ -76,6 +76,12 @@ validate_no_deletions <- function(old, candidate) {
 validate_unique_base_row <- function(candidate) {
   errors <- character(0)
 
+  # every row is a real dataset row -- no survey-default (dataset = NA) row
+  # exists under the self-sufficient-rows schema (see R/manifest.R)
+  if (any(is.na(candidate$dataset))) {
+    errors <- c(errors, "survey-default row(s) (dataset = NA) found -- not allowed")
+  }
+
   # at most one dataset-base row (geo_level/year both NA) per (survey, dataset)
   base_rows <- candidate[
     !is.na(candidate$dataset) & is.na(candidate$geo_level) & is.na(candidate$year),
@@ -86,23 +92,85 @@ validate_unique_base_row <- function(candidate) {
     errors <- c(errors, paste("duplicate base row for:", paste(bad, collapse = ", ")))
   }
 
-  # at most one survey-default row (dataset == NA) per survey -- this is the
-  # row every dataset in that survey coalesces missing fields from, so two
-  # of them would make resolution ambiguous
-  default_rows <- candidate[is.na(candidate$dataset), ]
-  dup_default <- duplicated(default_rows$survey)
-  if (any(dup_default)) {
-    errors <- c(errors, paste(
-      "duplicate survey-default row for:",
-      paste(unique(default_rows$survey[dup_default]), collapse = ", ")
-    ))
-  }
-
   override_keys <- candidate[, KEY_COLS]
   dup2 <- duplicated(override_keys)
   if (any(dup2)) {
     errors <- c(errors, "duplicate override key (survey, dataset, geo_level, year) found")
   }
+  errors
+}
+
+# Every row must be self-sufficient at READ TIME: dataset_field() (R/
+# manifest.R) does a single exact-key lookup with no fallthrough between
+# rows, keyed on geo_level for a dataset that has any geo_level rows, or on
+# year for one that has any year rows. That only works if the row set is
+# actually COMPLETE relative to what the dataset's base row declares --
+# this is the CI-side half of that contract (the runtime half is "read
+# whatever row matches, or NA"; this validator is what stops a candidate
+# from shipping a dataset that's missing a row for a geo_level/year it
+# claims to support).
+validate_key_completeness <- function(candidate) {
+  errors <- character(0)
+
+  parse_years_local <- function(x) {
+    if (is.na(x) || !nzchar(x)) return(integer(0))
+    toks <- trimws(strsplit(x, ",")[[1]])
+    unlist(lapply(toks, function(tok) {
+      if (grepl("-", tok, fixed = TRUE)) {
+        b <- as.integer(trimws(strsplit(tok, "-", fixed = TRUE)[[1]]))
+        seq.int(b[1], b[2])
+      } else {
+        as.integer(tok)
+      }
+    }))
+  }
+
+  base <- candidate[!is.na(candidate$dataset) & is.na(candidate$geo_level) & is.na(candidate$year), ]
+  overrides <- candidate[!is.na(candidate$dataset) & (!is.na(candidate$geo_level) | !is.na(candidate$year)), ]
+
+  for (i in seq_len(nrow(base))) {
+    s <- base$survey[i]
+    d <- base$dataset[i]
+    ov <- overrides[overrides$survey == s & overrides$dataset == d, ]
+    if (nrow(ov) == 0) next
+
+    has_geo <- any(!is.na(ov$geo_level))
+    has_year <- any(!is.na(ov$year))
+    if (has_geo && has_year) {
+      errors <- c(errors, paste0(
+        s, "/", d, ": mixes geo_level and year overrides -- dataset_field() ",
+        "can only key on one at a time"
+      ))
+      next
+    }
+
+    if (has_geo) {
+      declared_raw <- base$available_geo[i]
+      declared <- if (is.na(declared_raw)) character(0) else trimws(strsplit(declared_raw, ",")[[1]])
+      declared <- tolower(declared[nzchar(declared)])
+      present <- tolower(ov$geo_level[!is.na(ov$geo_level)])
+      missing <- setdiff(declared, present)
+      if (length(missing) > 0) {
+        errors <- c(errors, paste0(
+          s, "/", d, ": available_geo declares '", paste(missing, collapse = ", "),
+          "' but no matching geo_level row exists"
+        ))
+      }
+    }
+
+    if (has_year) {
+      declared <- parse_years_local(base$available_time[i])
+      present <- as.integer(ov$year[!is.na(ov$year)])
+      missing <- setdiff(declared, present)
+      if (length(missing) > 0) {
+        errors <- c(errors, paste0(
+          s, "/", d, ": available_time declares year(s) ", paste(missing, collapse = ", "),
+          " but no matching year row exists"
+        ))
+      }
+    }
+  }
+
   errors
 }
 
@@ -174,32 +242,31 @@ validate_http <- function(candidate, changed_keys, min_bytes = 10000) {
   errors <- character(0)
   key <- paste(candidate$survey, candidate$dataset, candidate$geo_level, candidate$year, sep = "\r")
   rows <- candidate[key %in% changed_keys, ]
+  rows <- rows[!vapply(seq_len(nrow(rows)), function(i) is_http_exempt(rows[i, ]), logical(1)), ]
+  if (nrow(rows) == 0) return(errors)
 
-  for (i in seq_len(nrow(rows))) {
-    row <- rows[i, ]
-    if (is_http_exempt(row)) next
+  # Several self-sufficient rows can legitimately share one url (e.g. all
+  # three mapbiomas_mining rows, or epe's per-geo_level overrides -- see
+  # actions/scrapers/resolve_mapbiomas.R / resolve_epe.R). Probe each
+  # DISTINCT url once, not once per row that happens to carry a copy of it.
+  for (u in unique(rows$url)) {
+    offenders <- rows[rows$url == u, ]
+    label <- paste(unique(paste(offenders$survey, offenders$dataset, sep = "/")), collapse = ", ")
 
-    probe <- probe_url(row$url)
+    probe <- probe_url(u)
     if (isFALSE(probe$ok)) {
-      errors <- c(errors, sprintf(
-        "%s/%s: HTTP check failed (%s) for %s",
-        row$survey, row$dataset, probe$reason, row$url
-      ))
+      errors <- c(errors, sprintf("%s: HTTP check failed (%s) for %s", label, probe$reason, u))
       next
     }
     if (isTRUE(probe$ok)) {
-      binary_ext <- grepl("\\.(zip|xlsx|csv|nc|tif|shp)$", row$url, ignore.case = TRUE)
+      binary_ext <- grepl("\\.(zip|xlsx|csv|nc|tif|shp)$", u, ignore.case = TRUE)
       if (binary_ext && !is.na(probe$content_type) && grepl("text/html", probe$content_type, fixed = TRUE)) {
         errors <- c(errors, sprintf(
-          "%s/%s: server returned text/html for a binary-extension url (likely an error page): %s",
-          row$survey, row$dataset, row$url
+          "%s: server returned text/html for a binary-extension url (likely an error page): %s", label, u
         ))
       }
       if (binary_ext && !is.na(probe$content_length) && probe$content_length < min_bytes) {
-        errors <- c(errors, sprintf(
-          "%s/%s: response too small (%d bytes) for %s",
-          row$survey, row$dataset, probe$content_length, row$url
-        ))
+        errors <- c(errors, sprintf("%s: response too small (%d bytes) for %s", label, probe$content_length, u))
       }
     }
   }
@@ -207,79 +274,26 @@ validate_http <- function(candidate, changed_keys, min_bytes = 10000) {
   errors
 }
 
-# ---- Tiering ---------------------------------------------------------------
-
-# A changed row is Tier A only if the resource's own version stamp (the
-# `version` column, e.g. a MapBiomas collection number or a BACI/PRODES
-# release tag) is byte-identical to before AND no other non-url column
-# changed. Any other difference is Tier B: it may change the SHAPE of the
-# downloaded data (a new MapBiomas sheet, a new PRODES raster legend), which
-# no HTTP check can validate, and would break already-installed package
-# versions.
+# ---- Change detection -------------------------------------------------------
 #
-# The regex below is kept as a SECONDARY check on the url itself, for
-# sources whose resolver does not (yet) populate `version` -- it catches a
-# version-looking token changing even when the structured column didn't.
-VERSION_TOKEN_RE <- "(collection_[0-9]+|COL\\.?[0-9]+|V[0-9]{6}|/20[0-9]{2}/[0-9]{2}/|_20[0-9]{2}\\.)"
+# Every change now goes through the same path -- open a PR for human review
+# (see .github/workflows/update-manifest.yaml) -- so there is no tiering to
+# compute anymore, only "did this key's row change, or is it new".
 
-file_ext <- function(url) {
-  if (is.na(url)) return(NA_character_)
-  tolower(sub(".*\\.([a-zA-Z0-9]+)(\\?.*)?$", "\\1", url))
-}
-
-classify_row_change <- function(old_row, new_row) {
-  non_url_changed <- !identical(
-    old_row[setdiff(MANIFEST_ALL_COLS, "url")],
-    new_row[setdiff(MANIFEST_ALL_COLS, "url")]
-  )
-  if (non_url_changed) {
-    return("B")
-  }
-  if (identical(old_row$url, new_row$url)) {
-    return("none")
-  }
-
-  # A changed file extension (e.g. a source silently swapping .csv for
-  # .zip on the same resource, as ANEEL was observed doing live for
-  # energy_enterprises_distributed while building this) means external_download()'s
-  # file_extension inference and its downstream read function (fread vs
-  # read_sf vs unzip) may now be wrong -- that is exactly the kind of
-  # "shape of the data changed" risk Tier B exists for, even though no
-  # version-looking token in the URL changed at all.
-  if (!identical(file_ext(old_row$url), file_ext(new_row$url))) {
-    return("B")
-  }
-
-  # primary check: the structured `version` column (already covered by the
-  # non_url_changed comparison above -- if it changed, this function
-  # returned "B" already). Reaching here means `version` did NOT change (or
-  # is NA on both sides), so fall back to the secondary regex on the url.
-  old_tokens <- regmatches(old_row$url, gregexpr(VERSION_TOKEN_RE, old_row$url))[[1]]
-  new_tokens <- regmatches(new_row$url, gregexpr(VERSION_TOKEN_RE, new_row$url))[[1]]
-
-  if (setequal(old_tokens, new_tokens)) "A" else "B"
-}
-
-classify_candidate <- function(old, candidate) {
+detect_changes <- function(old, candidate) {
   old_key <- paste(old$survey, old$dataset, old$geo_level, old$year, sep = "\r")
   new_key <- paste(candidate$survey, candidate$dataset, candidate$geo_level, candidate$year, sep = "\r")
 
-  tiers <- character(0)
   changed_keys <- character(0)
-
   for (k in intersect(old_key, new_key)) {
-    tier <- classify_row_change(old[old_key == k, ][1, ], candidate[new_key == k, ][1, ])
-    if (tier != "none") {
-      tiers <- c(tiers, tier)
+    o <- old[old_key == k, MANIFEST_ALL_COLS][1, ]
+    n <- candidate[new_key == k, MANIFEST_ALL_COLS][1, ]
+    if (!identical(o, n)) {
       changed_keys <- c(changed_keys, k)
     }
   }
   added <- setdiff(new_key, old_key)
-  if (length(added) > 0) {
-    tiers <- c(tiers, rep("B", length(added)))
-    changed_keys <- c(changed_keys, added)
-  }
+  changed_keys <- c(changed_keys, added)
 
-  overall <- if (length(tiers) == 0) "none" else if (all(tiers == "A")) "A" else "B"
-  list(overall = overall, changed_keys = changed_keys, n_changed = length(changed_keys))
+  list(changed_keys = changed_keys, n_changed = length(changed_keys))
 }

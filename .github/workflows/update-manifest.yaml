@@ -78,49 +78,37 @@ jobs:
           # a GitHub Actions runner -- most likely IP-range/WAF blocking on
           # SEEG's side, confirmed by a live manual run of this workflow. Until
           # that's resolved, excluding it here keeps the other six resolvers
-          # running and auto-committing/PR-ing normally instead of failing the
-          # whole job with exit 30 every week. Remove this flag once seeg is
-          # reachable from CI again -- see WEBSCRAPING_BETA_REPORT.
+          # running and PR-ing normally instead of failing the whole job with
+          # exit 30 every week. Remove this flag once seeg is reachable from
+          # CI again -- see WEBSCRAPING_BETA_REPORT.
           Rscript --vanilla actions/scripts/build_manifest.R --skip seeg
           echo "exit_code=$?" >> "$GITHUB_OUTPUT"
 
-      - name: Smoke test candidate manifest (Tier A / no-change path only)
-        if: steps.build.outputs.exit_code == '0'
-        env:
-          DZ_CANDIDATE: ${{ steps.build.outputs.candidate_path }}
-        run: |
-          Rscript -e 'options(datazoom.amazonia.manifest_url = paste0("file://", Sys.getenv("DZ_CANDIDATE")), datazoom.amazonia.use_remote_manifest = TRUE)' \
-                  -e 'devtools::load_all("."); datazoom.amazonia:::clear_manifest_cache(); print(nrow(datazoom.amazonia:::link_table()))'
-
-      - name: Commit Tier A refresh
-        if: steps.build.outputs.exit_code == '0'
-        run: |
-          if ! git diff --quiet -- inst/extdata/manifest/v1/datasets_link.csv; then
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add inst/extdata/manifest/v1/datasets_link.csv
-            git commit -m "chore(manifest): refresh URLs [skip ci]"
-            git push
-          else
-            echo "No changes to commit."
-          fi
-
-      - name: Stage Tier B candidate onto the committed manifest path
+      - name: Stage candidate onto the committed manifest path
         if: steps.build.outputs.exit_code == '10'
         run: |
           cp "${{ steps.build.outputs.candidate_path }}" inst/extdata/manifest/v1/datasets_link.csv
 
-      - name: Open PR for Tier B changes
+      # Smoke-tested BEFORE opening the PR, not after merging it -- every
+      # change (however small) goes through review now, so this is the
+      # only remaining chance to catch a candidate that would break
+      # link_table()/dataset_field() before a human ever looks at the diff.
+      - name: Smoke test staged candidate manifest
+        if: steps.build.outputs.exit_code == '10'
+        run: |
+          Rscript -e 'options(datazoom.amazonia.use_remote_manifest = FALSE)' \
+                  -e 'devtools::load_all("."); datazoom.amazonia:::clear_manifest_cache(); print(nrow(datazoom.amazonia:::link_table()))'
+
+      - name: Open PR for review
         if: steps.build.outputs.exit_code == '10'
         uses: peter-evans/create-pull-request@v6
         with:
           commit-message: "chore(manifest): candidate refresh needs review"
-          title: "Manifest refresh: review needed (Tier B changes)"
+          title: "Manifest refresh: review needed"
           body: |
-            One or more resolvers found a change that may affect the SHAPE of
-            downloaded data (a new collection/version token, an added or
-            removed row, a changed sheet/archive_file/available_time). These
-            are never auto-committed -- see manifest_report.json in the run
+            One or more resolvers found a change to the manifest. Nothing is
+            ever auto-committed -- every change, however small, is opened as
+            a PR for human review. See manifest_report.json in the run
             artifacts for the full diff and HTTP validation report.
 
             Checklist before merging:

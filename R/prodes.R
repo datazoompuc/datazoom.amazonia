@@ -111,9 +111,15 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
   # raster has values for each dataset/year
   #
   # This legend (year offsets and fixed codes) is PRODES' own raster encoding
-  # scheme, not a URL or a version stamp -- it cannot be derived from the
-  # manifest. If INPE changes the encoding in a future collection, this must
-  # be re-verified and updated by hand alongside `layer_name` below.
+  # scheme. It is not in the manifest, but INPE does ship it in the same zip
+  # as the .tif, as a QGIS style file (prodes_amazonia_legal_<year>_v<date>.qml)
+  # with a <colorPalette> of value/label pairs (e.g. value="7" label="7 d2007").
+  # download.R only keeps the *.tif from the zip and discards the .qml/.txt
+  # sidecars, so this mapping is hardcoded here instead of read at runtime.
+  # If INPE changes the encoding in a future collection, re-check the .qml
+  # from that release's zip and update by hand alongside `layer_name` below.
+  # Note: code 99 (clouds) was absent from the 2025 .qml/.txt (likely zero
+  # cloud pixels that year) and could not be re-verified against that release.
 
   if (param$dataset == "deforestation") raster_codes <- param$time_period - 2000
   if (param$dataset == "residual_deforestation") raster_codes <- param$time_period - 1960

@@ -9,24 +9,31 @@
 # fall back silently to the packaged snapshot when the network is
 # unavailable, slow, or the remote file is missing/malformed.
 #
-# SCHEMA (5-tier field coalescing)
-# ---------------------------------
-# A row is either a survey DEFAULT (dataset is NA -- values shared by every
-# dataset in that survey) or a DATASET row (dataset is set), which may
-# itself be overridden for a specific geo_level and/or year. Resolving a
-# single field walks from most to least specific and stops at the first
-# non-NA value:
+# SCHEMA (self-sufficient rows, exact-key lookup)
+# ------------------------------------------------
+# Every row is either a DATASET's base row (geo_level and year both NA) or
+# one of its geo_level/year overrides. There is no survey-default row and
+# no field-by-field inheritance: every row carries every value it needs,
+# even when that repeats a value also present on the dataset's base row
+# (e.g. DEGRAD's ten yearly rows each carry their own archive_file AND
+# their own copy of url/available_time). A blank cell means the field
+# genuinely has no value for that row -- never "look elsewhere".
 #
-#   1. (survey, dataset, geo_level, year)  -- fully specific override
-#   2. (survey, dataset, geo_level, NA)    -- override by geographic level
-#   3. (survey, dataset, NA, year)         -- override by year
-#   4. (survey, dataset, NA, NA)           -- the dataset's own row
-#   5. (survey, NA, NA, NA)                -- the survey's default row
+# Resolving (source, dataset, field, geo_level, year) is a single lookup:
+#   - if the dataset has any geo_level-keyed rows, match geo_level exactly
+#     (falling back to NA/no-geo_level only when the caller passed none);
+#   - else if the dataset has any year-keyed rows, match year exactly;
+#   - else match the dataset's one base row.
+# No dataset mixes geo_level and year overrides today; see dataset_field().
 #
-# A cell left empty means "inherit from the next tier down" -- it does NOT
-# mean "no value". This is what lets e.g. DEGRAD's ten yearly rows carry
-# only the one thing that actually changes per year (archive_file) instead
-# of repeating the shared URL and available_time ten times over.
+# This replaced an earlier 5-tier field-coalescing model (a blank cell
+# meant "inherit from the next tier down") -- see NEWS.md and
+# data-raw/denormalize_manifest.R for why and how it was migrated away
+# from: inheritance was the direct cause of several live bugs (a resolver
+# and its own anti-duplication test fighting over whether an override row
+# was allowed to state its own version; a base row left silently stale
+# because only its overrides were ever updated; bind_rows() NA-padding
+# being misread as "clear this field").
 #
 # Everything here is internal. The only thing every other file in the
 # package should call is datasets_link() (R/download.R), which keeps its
@@ -37,8 +44,8 @@
 
 MANIFEST_REL <- file.path("extdata", "manifest", "v1", "datasets_link.csv")
 
-# The 4 key columns (never inherited) plus the 10 value columns (each
-# resolved independently via the 5-tier walk above).
+# The 4 key columns plus the 10 value columns each row carries explicitly
+# (see the schema note above).
 MANIFEST_KEY_COLS <- c("survey", "dataset", "geo_level", "year")
 
 MANIFEST_VALUE_COLS <- c(
@@ -93,21 +100,15 @@ read_manifest_file <- function(path) {
 #' truncated file before it gets cached for the rest of the session.
 #' @noRd
 validate_manifest <- function(x) {
-  dataset <- survey <- n <- NULL
-
   stopifnot(
     is.data.frame(x),
     all(MANIFEST_CORE_COLS %in% names(x)),
     nrow(x) >= 150,
-    !any(is.na(x$survey))
+    !any(is.na(x$survey)),
+    # every row is a real dataset row -- no survey-default (dataset = NA)
+    # row exists under the self-sufficient-rows schema
+    !any(is.na(x$dataset))
   )
-
-  # at most one survey-default row (dataset == NA) per survey
-  n_defaults <- x %>%
-    dplyr::filter(is.na(dataset)) %>%
-    dplyr::count(survey) %>%
-    dplyr::pull(n)
-  stopifnot(all(n_defaults <= 1))
 
   invisible(TRUE)
 }
@@ -248,44 +249,33 @@ parse_years <- function(x) {
   unlist(years, use.names = FALSE)
 }
 
-#' The 5 candidate row-sets for (source, dataset, geo_level, year), ordered
-#' from most to least specific (see the tier table in the file header).
-#' Each element is a 0-or-1-row data frame; dataset_field() takes the first
-#' non-NA value of the requested field walking down the list.
-#' @noRd
-dataset_rows <- function(source, dataset, geo_level = NULL, year = NULL) {
-  survey <- NULL
-
-  tbl <- link_table()
-  geo_level <- if (is.null(geo_level)) NA_character_ else as.character(geo_level)
-  year <- if (is.null(year)) NA_character_ else as.character(year)
-
-  ds <- tbl[tbl$survey == source & !is.na(tbl$dataset) & tbl$dataset == dataset, ]
-  default_row <- tbl[tbl$survey == source & is.na(tbl$dataset), ]
-
-  list(
-    ds[ds$geo_level %in% geo_level & ds$year %in% year, ],
-    ds[ds$geo_level %in% geo_level & is.na(ds$year), ],
-    ds[is.na(ds$geo_level) & ds$year %in% year, ],
-    ds[is.na(ds$geo_level) & is.na(ds$year), ],
-    default_row
-  )
-}
-
-#' Resolve a single field by walking the 5 tiers from dataset_rows() and
-#' returning the first non-NA value. This is the one place the "empty cell
-#' = inherit from the tier below" rule is implemented.
+#' Resolve a single field for (source, dataset, geo_level, year) with a
+#' single exact-key lookup -- no fallthrough between rows. Every row is
+#' self-sufficient (see the file header), so once the right row is found,
+#' its value for `field` (possibly NA, meaning "genuinely no value") is the
+#' answer.
+#'
+#' Callers (download.R, epe.R, mapbiomas.R, ...) pass geo_level/year on
+#' every call regardless of whether the dataset actually varies by them.
+#' geo_level is matched exactly only for datasets that HAVE geo_level rows;
+#' same for year. A dataset never has both kinds of override (checked by
+#' validate_key_completeness() in actions/scripts/manifest_validate.R), so
+#' matching them independently is unambiguous.
 #' @noRd
 dataset_field <- function(source, dataset, field, geo_level = NULL, year = NULL) {
-  tiers <- dataset_rows(source, dataset, geo_level, year)
+  tbl <- link_table()
+  ds <- tbl[tbl$survey == source & !is.na(tbl$dataset) & tbl$dataset == dataset, ]
 
-  for (tier in tiers) {
-    if (nrow(tier) == 0) next
-    val <- tier[[field]][1]
-    if (!is.na(val)) return(val)
-  }
+  g <- if (is.null(geo_level)) NA_character_ else as.character(geo_level)
+  y <- if (is.null(year)) NA_character_ else as.character(year)
 
-  NA_character_
+  if (!any(!is.na(ds$geo_level))) g <- NA_character_
+  if (!any(!is.na(ds$year))) y <- NA_character_
+
+  hit <- ds[ds$geo_level %in% g & ds$year %in% y, ]
+  if (nrow(hit) == 0) return(NA_character_)
+
+  hit[[field]][1]
 }
 
 #' @noRd
@@ -293,31 +283,17 @@ dataset_url <- function(source, dataset, geo_level = NULL, year = NULL) {
   dataset_field(source, dataset, "url", geo_level, year)
 }
 
-#' One row per (survey, dataset) -- the survey-default-only base rows,
-#' overrides excluded -- with every value column coalesced against the
-#' survey's default row. This is what datasets_link() and check_params()'s
-#' "list every supported dataset" queries consume; it never sees geo_level/
-#' year overrides, which stay reachable only through dataset_field().
+#' One row per (survey, dataset) -- each dataset's base row, geo_level/year
+#' overrides excluded. This is what datasets_link() and check_params()'s
+#' "list every supported dataset" queries consume; overrides stay reachable
+#' only through dataset_field().
 #' @noRd
 effective_table <- function() {
-  survey <- dataset <- geo_level <- year <- NULL
+  geo_level <- year <- NULL
 
   tbl <- link_table()
 
-  ds_base <- tbl %>%
-    dplyr::filter(!is.na(dataset), is.na(geo_level), is.na(year))
-
-  defaults <- tbl %>%
-    dplyr::filter(is.na(dataset)) %>%
-    dplyr::select(survey, dplyr::all_of(MANIFEST_VALUE_COLS)) %>%
-    dplyr::rename_with(~ paste0(., "__default"), dplyr::all_of(MANIFEST_VALUE_COLS))
-
-  out <- ds_base %>%
-    dplyr::left_join(defaults, by = "survey")
-
-  for (col in MANIFEST_VALUE_COLS) {
-    out[[col]] <- dplyr::coalesce(out[[col]], out[[paste0(col, "__default")]])
-  }
-
-  out %>% dplyr::select(dplyr::all_of(MANIFEST_CORE_COLS))
+  tbl %>%
+    dplyr::filter(is.na(geo_level), is.na(year)) %>%
+    dplyr::select(dplyr::all_of(MANIFEST_CORE_COLS))
 }

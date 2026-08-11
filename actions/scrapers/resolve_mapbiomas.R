@@ -20,6 +20,17 @@
 #       NA on those rows in the manifest); nothing on that host indicates
 #       version or freshness, so it is HTTP-checked only, never resolved.
 #
+# Every row this resolver emits carries every value column it can determine
+# for that row -- under the self-sufficient-rows schema (R/manifest.R)
+# there is no inheritance between a dataset's base row and its geo_level
+# overrides, so e.g. mapbiomas_mining's two override rows can no longer
+# borrow `version` from their base row at read time; this resolver writes
+# it on all three explicitly. Fields it genuinely cannot determine (e.g.
+# mapbiomas_transition's base/municipality rows -- see that section below)
+# are simply left out of the row it returns, which build_manifest.R's
+# non_na_cols merge leaves untouched -- that is a real "unknown", not
+# something to guess at.
+#
 # Verified live against the real site while writing this (2026-08-03): the
 # WordPress page has been restructured since the hardcoded URLs were
 # written. `mapbiomas_mining` genuinely moved from COL8.0 to COL9.0 -- a
@@ -38,81 +49,11 @@ resolve_mapbiomas <- function(rows) {
 
   out <- list()
 
-  ## -- (b) WordPress scraping: real HTML, real regex ------------------------
-
-  wp_html <- tryCatch({
-    resp <- curl::curl_fetch_memory(
-      "https://brasil.mapbiomas.org/estatisticas/",
-      handle = curl::new_handle(timeout = 30)
-    )
-    if (resp$status_code != 200) stop("HTTP ", resp$status_code)
-    txt <- rawToChar(resp$content)
-    Encoding(txt) <- "UTF-8"
-    txt
-  }, error = function(e) {
-    message("resolve_mapbiomas(): could not fetch the WordPress statistics page: ", conditionMessage(e))
-    NULL
-  })
-
-  if (!is.null(wp_html)) {
-    hrefs <- unique(regmatches(wp_html, gregexpr('href="[^"]*\\.xlsx"', wp_html, ignore.case = TRUE))[[1]])
-    hrefs <- sub('^href="', "", hrefs)
-    hrefs <- sub('"$', "", hrefs)
-
-    # mining: single Brazil-wide file, collection number embedded in the
-    # name itself (TABELA-MINERACAO-MAPBIOMAS-COL9.0.xlsx) -- both
-    # geo_level rows (municipality, indigenous_land) share this one URL.
-    mining_hit <- grep("TABELA-MINERACAO-MAPBIOMAS-COL", hrefs, value = TRUE, ignore.case = TRUE)
-    if (length(mining_hit) >= 1) {
-      col <- stringr::str_match(mining_hit[1], "COL([0-9]+)\\.")[, 2]
-      # version is written ONLY on mining_base, not on the two override rows
-      # below -- they already inherit it via the 5-tier lookup (R/manifest.R),
-      # and writing it explicitly here made every run re-add a value
-      # test-manifest-schema.R's anti-duplication check (correctly) strips
-      # back out, an infinite Tier-B-PR loop caught live 2026-08-07. url stays
-      # on both override rows since mining_base intentionally carries none.
-      out$mining_municipality <- tibble::tibble(
-        survey = "mapbiomas", dataset = "mapbiomas_mining",
-        geo_level = "municipality", year = NA_character_,
-        url = mining_hit[1]
-      )
-      out$mining_indigenous <- tibble::tibble(
-        survey = "mapbiomas", dataset = "mapbiomas_mining",
-        geo_level = "indigenous_land", year = NA_character_,
-        url = mining_hit[1]
-      )
-      out$mining_base <- tibble::tibble(
-        survey = "mapbiomas", dataset = "mapbiomas_mining",
-        geo_level = NA_character_, year = NA_character_,
-        version = col
-      )
-    }
-
-    # cover (indigenous_land) / transition (biome): only touched if the
-    # OLD single-file naming still exists on the page. As of this writing
-    # it does not (site restructured to per-region files) -- see the file
-    # header above. Left in so this starts working again automatically
-    # the day MapBiomas republishes a matching Brazil-wide file.
-    indigenous_hit <- grep("INDIGENOUS_LANDS", hrefs, value = TRUE, ignore.case = TRUE)
-    biomes_hit <- grep("COL\\.[0-9]+-BIOMES", hrefs, value = TRUE, ignore.case = TRUE)
-
-    if (length(indigenous_hit) >= 1) {
-      out$cover_indigenous <- tibble::tibble(
-        survey = "mapbiomas", dataset = "mapbiomas_cover",
-        geo_level = "indigenous_land", year = NA_character_,
-        url = indigenous_hit[1]
-      )
-    }
-    if (length(biomes_hit) >= 1) {
-      out$transition_biome <- tibble::tibble(
-        survey = "mapbiomas", dataset = "mapbiomas_transition",
-        geo_level = "biome", year = NA_character_,
-        url = biomes_hit[1]
-      )
-    }
-  }
-
   ## -- (a) GCS JSON listing: discover a newer, FULLY POPULATED collection --
+  # Run FIRST (not last) so its result -- the current collection number --
+  # is available below when building mapbiomas_cover's rows, all of which
+  # must carry the same `version` regardless of which sub-resolver found
+  # their `url`.
 
   gcs_list <- function(prefix, delimiter = "/") {
     url <- paste0(
@@ -156,15 +97,14 @@ resolve_mapbiomas <- function(rows) {
     NULL
   })
 
+  cover_gcs_url <- NULL
+  cover_version <- NULL
   if (!is.null(newer)) {
+    cover_version <- as.character(newer$n)
+
     cover_file <- grep("coverage", newer$names, value = TRUE, ignore.case = TRUE)
     if (length(cover_file) >= 1) {
-      out$cover_base <- tibble::tibble(
-        survey = "mapbiomas", dataset = "mapbiomas_cover",
-        geo_level = NA_character_, year = NA_character_,
-        url = paste0("https://storage.googleapis.com/mapbiomas-public/", cover_file[1]),
-        version = as.character(newer$n)
-      )
+      cover_gcs_url <- paste0("https://storage.googleapis.com/mapbiomas-public/", cover_file[1])
     }
     defor_file <- grep("deforestation", newer$names, value = TRUE, ignore.case = TRUE)
     if (length(defor_file) >= 1) {
@@ -172,7 +112,98 @@ resolve_mapbiomas <- function(rows) {
         survey = "mapbiomas", dataset = "mapbiomas_deforestation_regeneration",
         geo_level = NA_character_, year = NA_character_,
         url = paste0("https://storage.googleapis.com/mapbiomas-public/", defor_file[1]),
-        version = as.character(newer$n)
+        version = cover_version
+      )
+    }
+  }
+
+  ## -- (b) WordPress scraping: real HTML, real regex ------------------------
+
+  wp_html <- tryCatch({
+    resp <- curl::curl_fetch_memory(
+      "https://brasil.mapbiomas.org/estatisticas/",
+      handle = curl::new_handle(timeout = 30)
+    )
+    if (resp$status_code != 200) stop("HTTP ", resp$status_code)
+    txt <- rawToChar(resp$content)
+    Encoding(txt) <- "UTF-8"
+    txt
+  }, error = function(e) {
+    message("resolve_mapbiomas(): could not fetch the WordPress statistics page: ", conditionMessage(e))
+    NULL
+  })
+
+  if (!is.null(wp_html)) {
+    hrefs <- unique(regmatches(wp_html, gregexpr('href="[^"]*\\.xlsx"', wp_html, ignore.case = TRUE))[[1]])
+    hrefs <- sub('^href="', "", hrefs)
+    hrefs <- sub('"$', "", hrefs)
+
+    # mining: single Brazil-wide file, collection number embedded in the
+    # name itself (TABELA-MINERACAO-MAPBIOMAS-COL9.0.xlsx) -- all three
+    # rows (base, municipality, indigenous_land) share this one url, and
+    # each now carries its own copy of version too (no more relying on the
+    # base row to supply it by inheritance -- see the file header).
+    mining_hit <- grep("TABELA-MINERACAO-MAPBIOMAS-COL", hrefs, value = TRUE, ignore.case = TRUE)
+    if (length(mining_hit) >= 1) {
+      col <- stringr::str_match(mining_hit[1], "COL([0-9]+)\\.")[, 2]
+
+      out$mining_base <- tibble::tibble(
+        survey = "mapbiomas", dataset = "mapbiomas_mining",
+        geo_level = NA_character_, year = NA_character_,
+        url = mining_hit[1], version = col
+      )
+      out$mining_municipality <- tibble::tibble(
+        survey = "mapbiomas", dataset = "mapbiomas_mining",
+        geo_level = "municipality", year = NA_character_,
+        url = mining_hit[1], version = col
+      )
+      out$mining_indigenous <- tibble::tibble(
+        survey = "mapbiomas", dataset = "mapbiomas_mining",
+        geo_level = "indigenous_land", year = NA_character_,
+        url = mining_hit[1], version = col
+      )
+    }
+
+    # cover: url has two independent sources depending on geo_level --
+    # indigenous_land gets its own per-region file when the WordPress page
+    # still links the old naming (see file header, not guaranteed); base
+    # and municipality (which never had a distinct source of its own --
+    # see the "3 missing rows" note in the migration plan) both mirror the
+    # GCS-derived Brazil-wide file. version is uniform across all three
+    # whenever the GCS lookup above found one, even for rows whose url
+    # this run left untouched.
+    indigenous_hit <- grep("INDIGENOUS_LANDS", hrefs, value = TRUE, ignore.case = TRUE)
+
+    if (length(indigenous_hit) >= 1) {
+      out$cover_indigenous <- tibble::tibble(
+        survey = "mapbiomas", dataset = "mapbiomas_cover",
+        geo_level = "indigenous_land", year = NA_character_,
+        url = indigenous_hit[1], version = cover_version
+      )
+    }
+    if (!is.null(cover_gcs_url)) {
+      out$cover_base <- tibble::tibble(
+        survey = "mapbiomas", dataset = "mapbiomas_cover",
+        geo_level = NA_character_, year = NA_character_,
+        url = cover_gcs_url, version = cover_version
+      )
+      out$cover_municipality <- tibble::tibble(
+        survey = "mapbiomas", dataset = "mapbiomas_cover",
+        geo_level = "municipality", year = NA_character_,
+        url = cover_gcs_url, version = cover_version
+      )
+    }
+
+    # transition: base/municipality have no unambiguous replacement source
+    # (see file header) and are deliberately left untouched, same as
+    # before this file's self-sufficient-rows rewrite -- only the biome
+    # override has a real, detectable source.
+    biomes_hit <- grep("COL\\.[0-9]+-BIOMES", hrefs, value = TRUE, ignore.case = TRUE)
+    if (length(biomes_hit) >= 1) {
+      out$transition_biome <- tibble::tibble(
+        survey = "mapbiomas", dataset = "mapbiomas_transition",
+        geo_level = "biome", year = NA_character_,
+        url = biomes_hit[1]
       )
     }
   }

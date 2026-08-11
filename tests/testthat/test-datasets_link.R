@@ -33,6 +33,11 @@
 #
 # The fixture was captured right before normalization. Row order is not
 # significant (both sides sorted by (survey, dataset) before comparing).
+#
+# The manifest was later denormalized again (survey-default rows removed,
+# every row made self-sufficient -- see data-raw/denormalize_manifest.R);
+# that migration only changed STORAGE, not any value datasets_link() (or
+# anything else in R/) resolves, so none of the 6 deltas above needed a 7th.
 
 fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
   dplyr::rename(url = link) %>%
