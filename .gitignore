@@ -21,3 +21,6 @@ vignettes/*.pdf
 *.utf8.md
 *.knit.md
 .Renviron
+
+# Local Claude Code tooling (skills, etc.) -- not part of the shipped package
+.claude/
