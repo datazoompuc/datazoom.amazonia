@@ -4,14 +4,21 @@
 # here is the exact literal the old hardcoded branch used to return -- this
 # proves the migration changed WHERE the value lives, not what it is.
 
-test_that("MapBiomas geo_level overrides resolve to the old hardcoded literals", {
+test_that("MapBiomas geo_level overrides resolve to their Dataverse-hosted urls", {
+  # Updated 2026-08-19 when mapbiomas moved from a mix of GCS/WordPress
+  # links to the MapBiomas Dataverse archive (data.mapbiomas.org) -- see
+  # resolve_mapbiomas.R's header for what was investigated and why each
+  # row landed where it did. mapbiomas_transition/municipality is the one
+  # row deliberately left untouched: no Collection 10+ substitute exists
+  # on Dataverse for it (verified live), so it still points at its
+  # original GCS url.
   expect_equal(
     dataset_url("mapbiomas", "mapbiomas_cover", geo_level = "indigenous_land"),
-    "https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2024/08/MAPBIOMAS_BRAZIL-COL.9-INDIGENOUS_LANDS-1.xlsx"
+    "https://data.mapbiomas.org/api/access/datafile/266?format=original"
   )
   expect_equal(
     dataset_url("mapbiomas", "mapbiomas_transition", geo_level = "biome"),
-    "https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2024/08/MAPBIOMAS_BRAZIL-COL.9-BIOMES.xlsx"
+    "https://data.mapbiomas.org/api/access/datafile/457?format=original"
   )
   expect_equal(
     dataset_url("mapbiomas", "mapbiomas_transition", geo_level = "municipality"),
@@ -19,12 +26,15 @@ test_that("MapBiomas geo_level overrides resolve to the old hardcoded literals",
   )
 })
 
-test_that("MapBiomas falls back to the base row when geo_level has no override", {
-  # mapbiomas_cover + "municipality" was never overridden -- always used the
-  # base row's link, both before and after the migration.
+test_that("MapBiomas cover/municipality resolves to its own explicit override row", {
+  # mapbiomas_cover has a real, explicit "municipality" row -- there is no
+  # base row left to fall back to at all (see R/manifest.R). Its url
+  # genuinely differs from the "indigenous_land" row's (see
+  # test-datasets_link.R: this is exactly why the dataset's collapsed
+  # datasets_link() url is NA -- the rows disagree, on purpose).
   expect_equal(
     dataset_url("mapbiomas", "mapbiomas_cover", geo_level = "municipality"),
-    "https://storage.googleapis.com/mapbiomas-public/initiatives/brasil/collection_9/statistics/mapbiomas_brazil_col_coverage_biome_state_municipality.xlsx"
+    "https://data.mapbiomas.org/api/access/datafile/535?format=original"
   )
 })
 
@@ -75,11 +85,19 @@ test_that("DEGRAD archive_file is resolved per year and the link stays $year$-te
   expect_match(url_2010, "\\$year\\$")
 })
 
-test_that("datasets_link() (base rows only) is unaffected by the new override rows", {
-  # The override rows added in Fase 3 must never leak into the 6-column,
-  # base-row-only view that check_params() and the 8 SIDRA loaders rely on.
+test_that("datasets_link() (one synthesized row per dataset) is unaffected by override rows", {
+  # The override rows added in Fase 3 must never leak into the 6-column
+  # view that check_params() and the 8 SIDRA loaders rely on -- updated
+  # 2026-08-19 when the base-row-per-dataset concept was removed (see
+  # R/manifest.R): effective_table() now synthesizes exactly one display
+  # row per (survey, dataset) by collapsing each keyed dataset's rows to
+  # their agreed value (or NA if they genuinely disagree -- see
+  # test-datasets_link.R for the enumerated cases where they do), rather
+  # than reading a real base row that always existed as its own row.
   expect_equal(nrow(datasets_link(source = "mapbiomas", dataset = "mapbiomas_cover")), 1)
   expect_equal(nrow(datasets_link(source = "aneel", dataset = "energy_development_budget")), 1)
   expect_equal(nrow(datasets_link(source = "degrad", dataset = "degrad")), 1)
+  # aneel's per-year urls always disagree (each year is a different CSV) --
+  # NA here for the same reason before and after this migration.
   expect_true(is.na(datasets_link(source = "aneel", dataset = "energy_development_budget", url = TRUE)))
 })

@@ -441,6 +441,16 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (source %in% c("seeg", "iema", "ips")) {
     file_extension <- ".xlsx"
   }
+  if (source == "mapbiomas") {
+    # Dataverse-hosted urls (inst/extdata/manifest/v1/datasets_link.csv,
+    # see actions/scrapers/resolve_mapbiomas.R) end in
+    # ".../api/access/datafile/{id}?format=original" -- no ".xlsx" at the
+    # end for the extension-sniffing above to find, same shape of problem
+    # as the googledrive-hosted sources above. Every mapbiomas source
+    # (Dataverse or the couple of rows still pointing at a legacy .xlsx
+    # url) is genuinely an xlsx file.
+    file_extension <- ".xlsx"
+  }
   if (source == "terraclimate") {
     file_extension <- ".nc"
   }

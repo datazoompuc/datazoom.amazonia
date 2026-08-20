@@ -73,7 +73,43 @@ validate_no_deletions <- function(old, candidate) {
   errors
 }
 
-validate_unique_base_row <- function(candidate) {
+# The subset of value columns expected to be genuinely dataset-wide rather
+# than spread across per-row values -- mirrors R/manifest.R's
+# MANIFEST_META_COLS exactly (kept as its own constant here, not imported,
+# for the same reason MANIFEST_ALL_COLS above is its own constant rather
+# than R/manifest.R's MANIFEST_CORE_COLS: this file runs standalone in CI,
+# never loading the actual package -- see this file's own header). Same
+# exclusions for the same reason: docs_url/version deliberately vary per
+# row for some keyed MapBiomas datasets now (one geo_level pinned to an
+# older Dataverse collection than its siblings), so they are NOT meta.
+VALIDATOR_META_COLS <- c("sidra_code", "available_time", "available_geo", "layer_name", "resolver")
+
+# Known, deliberate exceptions to "every VALIDATOR_META_COLS field agrees
+# within a dataset". Narrower than excluding a whole column from
+# VALIDATOR_META_COLS/MANIFEST_META_COLS (which would also block that
+# column's LEGITIMATE uses on every OTHER dataset -- e.g. available_time
+# is exactly how aneel.R/prodes.R validate a requested year, and removing
+# it from meta entirely would break that). Each entry here means: this one
+# field genuinely, permanently varies for this one dataset, because its
+# rows are sourced from different underlying files with different real
+# time/version coverage -- not a bug to fix. Confirmed no code reads this
+# exact (dataset, field) pair without a key today (the only dataset_meta()
+# callers, aneel.R and prodes.R, never target this dataset) -- if that ever
+# changes, that new call site needs a key, not a wider allowlist here.
+KNOWN_META_DISAGREEMENTS <- list(
+  list(survey = "mapbiomas", dataset = "mapbiomas_transition", field = "available_time")
+  # mapbiomas_transition/municipality is still sourced from the older
+  # Collection-9 GCS file (1985-2023); its base/biome siblings moved to a
+  # newer Dataverse file (1985-2024) -- see actions/scrapers/resolve_mapbiomas.R.
+)
+
+is_known_meta_disagreement <- function(survey, dataset, field) {
+  any(vapply(KNOWN_META_DISAGREEMENTS, function(k) {
+    identical(k$survey, survey) && identical(k$dataset, dataset) && identical(k$field, field)
+  }, logical(1)))
+}
+
+validate_row_grouping <- function(candidate) {
   errors <- character(0)
 
   # every row is a real dataset row -- no survey-default (dataset = NA) row
@@ -82,21 +118,70 @@ validate_unique_base_row <- function(candidate) {
     errors <- c(errors, "survey-default row(s) (dataset = NA) found -- not allowed")
   }
 
-  # at most one dataset-base row (geo_level/year both NA) per (survey, dataset)
-  base_rows <- candidate[
-    !is.na(candidate$dataset) & is.na(candidate$geo_level) & is.na(candidate$year),
-  ]
-  dup <- duplicated(base_rows[, c("survey", "dataset")])
+  dup <- duplicated(candidate[, KEY_COLS])
   if (any(dup)) {
-    bad <- unique(paste(base_rows$survey[dup], base_rows$dataset[dup], sep = "/"))
-    errors <- c(errors, paste("duplicate base row for:", paste(bad, collapse = ", ")))
+    errors <- c(errors, "duplicate (survey, dataset, geo_level, year) key found")
   }
 
-  override_keys <- candidate[, KEY_COLS]
-  dup2 <- duplicated(override_keys)
-  if (any(dup2)) {
-    errors <- c(errors, "duplicate override key (survey, dataset, geo_level, year) found")
+  # A (survey, dataset) group is either UNKEYED (exactly one row, blank
+  # key) or KEYED (every row carries a real geo_level or year -- no
+  # blank-key row at all). Never both: a group mixing a blank-key row with
+  # real override rows is exactly the "stale row nobody keeps in sync"
+  # shape base rows were removed for (see R/manifest.R's header -- the
+  # committed mapbiomas_mining base row sat on a dead collection number for
+  # weeks after both its real override rows had already moved on).
+  groups <- unique(candidate[!is.na(candidate$dataset), c("survey", "dataset")])
+  for (i in seq_len(nrow(groups))) {
+    s <- groups$survey[i]
+    d <- groups$dataset[i]
+    rows <- candidate[candidate$survey == s & !is.na(candidate$dataset) & candidate$dataset == d, ]
+    has_blank <- any(is.na(rows$geo_level) & is.na(rows$year))
+    has_real <- any(!is.na(rows$geo_level) | !is.na(rows$year))
+    if (has_blank && has_real) {
+      errors <- c(errors, paste0(
+        s, "/", d, ": mixes a blank-key row with real geo_level/year override ",
+        "rows -- a dataset is either unkeyed (one row) or keyed (no blank-key row), never both"
+      ))
+    }
+    if (has_blank && nrow(rows) > 1) {
+      errors <- c(errors, paste0(s, "/", d, ": unkeyed (blank-key) dataset has more than one row"))
+    }
   }
+
+  errors
+}
+
+# Every keyed dataset's rows must agree on every VALIDATOR_META_COLS field
+# -- this is what makes dataset_meta()'s stop() (R/manifest.R) unreachable
+# against a manifest that actually passes validation. Any real disagreement
+# here means either the data is wrong (fix it) or the field genuinely does
+# vary per row for this dataset and does not belong in VALIDATOR_META_COLS/
+# MANIFEST_META_COLS at all (as already true for docs_url/version on
+# several MapBiomas datasets -- see that constant's comment).
+validate_dataset_level_agreement <- function(candidate) {
+  errors <- character(0)
+
+  groups <- unique(candidate[!is.na(candidate$dataset), c("survey", "dataset")])
+  for (i in seq_len(nrow(groups))) {
+    s <- groups$survey[i]
+    d <- groups$dataset[i]
+    rows <- candidate[candidate$survey == s & !is.na(candidate$dataset) & candidate$dataset == d, ]
+    if (nrow(rows) <= 1) next
+
+    for (col in VALIDATOR_META_COLS) {
+      if (is_known_meta_disagreement(s, d, col)) next
+      vals <- unique(rows[[col]][!is.na(rows[[col]])])
+      if (length(vals) > 1) {
+        errors <- c(errors, paste0(
+          s, "/", d, ": rows disagree on '", col, "' ('", paste(vals, collapse = "' vs '"),
+          "') -- dataset_meta() would stop() on this; either make the rows agree, ",
+          "or if this field genuinely varies per row for this dataset, remove it ",
+          "from MANIFEST_META_COLS/VALIDATOR_META_COLS and read it with a key instead"
+        ))
+      }
+    }
+  }
+
   errors
 }
 
@@ -104,11 +189,19 @@ validate_unique_base_row <- function(candidate) {
 # manifest.R) does a single exact-key lookup with no fallthrough between
 # rows, keyed on geo_level for a dataset that has any geo_level rows, or on
 # year for one that has any year rows. That only works if the row set is
-# actually COMPLETE relative to what the dataset's base row declares --
-# this is the CI-side half of that contract (the runtime half is "read
-# whatever row matches, or NA"; this validator is what stops a candidate
-# from shipping a dataset that's missing a row for a geo_level/year it
-# claims to support).
+# actually COMPLETE relative to what the dataset's rows collectively
+# declare -- this is the CI-side half of that contract (the runtime half is
+# "read whatever row matches, or NA"; this validator is what stops a
+# candidate from shipping a dataset that's missing a row for a geo_level/
+# year it claims to support, OR carrying a row for one it doesn't declare).
+#
+# There is no base row anymore to read available_geo/available_time off of
+# (see R/manifest.R) -- both are VALIDATOR_META_COLS, so every row of a
+# keyed dataset is expected to carry the SAME value; that agreed value (not
+# any one particular row's) is what "declared" means below. If the rows
+# disagree, validate_dataset_level_agreement() already reports it -- this
+# function skips the check rather than reporting it a second time under a
+# more confusing message.
 validate_key_completeness <- function(candidate) {
   errors <- character(0)
 
@@ -125,17 +218,21 @@ validate_key_completeness <- function(candidate) {
     }))
   }
 
-  base <- candidate[!is.na(candidate$dataset) & is.na(candidate$geo_level) & is.na(candidate$year), ]
-  overrides <- candidate[!is.na(candidate$dataset) & (!is.na(candidate$geo_level) | !is.na(candidate$year)), ]
+  agreed <- function(x) {
+    vals <- unique(x[!is.na(x)])
+    if (length(vals) == 1) vals else NA_character_
+  }
 
-  for (i in seq_len(nrow(base))) {
-    s <- base$survey[i]
-    d <- base$dataset[i]
-    ov <- overrides[overrides$survey == s & overrides$dataset == d, ]
-    if (nrow(ov) == 0) next
+  groups <- unique(candidate[!is.na(candidate$dataset), c("survey", "dataset")])
 
-    has_geo <- any(!is.na(ov$geo_level))
-    has_year <- any(!is.na(ov$year))
+  for (i in seq_len(nrow(groups))) {
+    s <- groups$survey[i]
+    d <- groups$dataset[i]
+    rows <- candidate[candidate$survey == s & !is.na(candidate$dataset) & candidate$dataset == d, ]
+    if (nrow(rows) <= 1) next # unkeyed -- nothing to check
+
+    has_geo <- any(!is.na(rows$geo_level))
+    has_year <- any(!is.na(rows$year))
     if (has_geo && has_year) {
       errors <- c(errors, paste0(
         s, "/", d, ": mixes geo_level and year overrides -- dataset_field() ",
@@ -145,27 +242,44 @@ validate_key_completeness <- function(candidate) {
     }
 
     if (has_geo) {
-      declared_raw <- base$available_geo[i]
-      declared <- if (is.na(declared_raw)) character(0) else trimws(strsplit(declared_raw, ",")[[1]])
+      declared_raw <- agreed(rows$available_geo)
+      if (is.na(declared_raw)) next # disagreement reported elsewhere
+      declared <- trimws(strsplit(declared_raw, ",")[[1]])
       declared <- tolower(declared[nzchar(declared)])
-      present <- tolower(ov$geo_level[!is.na(ov$geo_level)])
+      present <- tolower(rows$geo_level[!is.na(rows$geo_level)])
       missing <- setdiff(declared, present)
+      extra <- setdiff(present, declared)
       if (length(missing) > 0) {
         errors <- c(errors, paste0(
           s, "/", d, ": available_geo declares '", paste(missing, collapse = ", "),
           "' but no matching geo_level row exists"
         ))
       }
+      if (length(extra) > 0) {
+        errors <- c(errors, paste0(
+          s, "/", d, ": geo_level row(s) '", paste(extra, collapse = ", "),
+          "' exist but available_geo doesn't declare them"
+        ))
+      }
     }
 
     if (has_year) {
-      declared <- parse_years_local(base$available_time[i])
-      present <- as.integer(ov$year[!is.na(ov$year)])
+      declared_raw <- agreed(rows$available_time)
+      if (is.na(declared_raw)) next # disagreement reported elsewhere
+      declared <- parse_years_local(declared_raw)
+      present <- as.integer(rows$year[!is.na(rows$year)])
       missing <- setdiff(declared, present)
+      extra <- setdiff(present, declared)
       if (length(missing) > 0) {
         errors <- c(errors, paste0(
           s, "/", d, ": available_time declares year(s) ", paste(missing, collapse = ", "),
           " but no matching year row exists"
+        ))
+      }
+      if (length(extra) > 0) {
+        errors <- c(errors, paste0(
+          s, "/", d, ": year row(s) ", paste(extra, collapse = ", "),
+          " exist but available_time doesn't declare them"
         ))
       }
     }

@@ -57,8 +57,12 @@ if (param$dataset == "energy_development_budget") {
 
   # valid years come from the manifest's available_time -- one row per year
   # (see inst/extdata/manifest/v1/datasets_link.csv) -- instead of a
-  # hardcoded range that must be edited in R code whenever ANEEL adds a year
-  available <- dataset_field(param$source, param$dataset, "available_time")
+  # hardcoded range that must be edited in R code whenever ANEEL adds a year.
+  # available_time is the same across all of this dataset's year rows (a
+  # dataset-wide fact, not a per-row one), so this is the one legitimate
+  # cross-row read -- dataset_meta(), not dataset_field() with no key (see
+  # R/manifest.R).
+  available <- dataset_meta(param$source, param$dataset, "available_time")
   valid_years <- parse_years(available)
 
   invalid_years <- setdiff(as.integer(param$year), valid_years)

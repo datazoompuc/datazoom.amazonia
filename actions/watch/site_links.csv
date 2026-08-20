@@ -1,0 +1,4 @@
+source,page,label,collection,url,host,strategy,first_seen
+mapbiomas,https://brasil.mapbiomas.org/downloads/estatisticas/,Estatísticas | Cobertura 30m - Coleção 11 | AMACRO,11,https://brasil.mapbiomas.org/wp-content/uploads/sites/3/2026/08/MAPBIOMAS_BRAZIL-COVERAGE_STATISTIC_COL.11-AMACRO_STATE_BIOME.xlsx,brasil.mapbiomas.org,row_block,2026-08-19
+mapbiomas,https://brasil.mapbiomas.org/downloads/estatisticas/,Estatísticas | Cobertura 30m - Coleção 11 | Biomas e Estados,11,https://brasil.mapbiomas.org/wp-content/uploads/sites/3/2026/08/MAPBIOMAS_BRAZIL-COL.11-BIOME_STATE.xlsx,brasil.mapbiomas.org,row_block,2026-08-19
+mapbiomas,https://brasil.mapbiomas.org/downloads/estatisticas/,"Estatísticas | Cobertura 30m - Coleção 11 | Biomas, Estados e Municípios",11,https://drive.google.com/uc?id=1ZRobxa-pK4AYo3kYqMZ6Fww1TMULO25M,drive.google.com,row_block,2026-08-19

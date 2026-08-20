@@ -57,14 +57,15 @@ resolve_aneel <- function(rows) {
     stop("resolve_aneel(): no year-tagged CDE CSV resources found -- ANEEL package layout may have changed.")
   }
 
+  # available_time is dataset-wide (read via dataset_meta(), see
+  # R/aneel.R) but there is no base row left to write it onto -- every one
+  # of this dataset's rows must carry the SAME copy of it explicitly (see
+  # R/manifest.R's self-sufficient-rows schema), so it's fanned across
+  # every year row instead of written once.
   out$cde_years <- tibble::tibble(
     survey = "aneel", dataset = "energy_development_budget",
     geo_level = NA_character_, year = found_years,
-    url = found_urls
-  )
-  out$cde_base <- tibble::tibble(
-    survey = "aneel", dataset = "energy_development_budget",
-    geo_level = NA_character_, year = NA_character_,
+    url = found_urls,
     available_time = paste(min(as.integer(found_years)), max(as.integer(found_years)), sep = "-")
   )
 

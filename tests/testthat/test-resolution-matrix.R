@@ -1,42 +1,38 @@
-# Behavior-preservation golden for the self-sufficient-rows migration (see
-# R/manifest.R and data-raw/denormalize_manifest.R). The fixture
-# (resolution_matrix_tiered.rds, captured by
-# data-raw/capture_resolution_matrix.R) records what the OLD 5-tier
-# dataset_field() answered for every (survey, dataset, geo_level, year,
-# field) combination reachable from real R/ code, run against the manifest
-# as it stood immediately BEFORE the migration.
+# RETIRED 2026-08-19 by the "delete manifest base rows" migration -- see
+# R/manifest.R and tests/testthat/test-resolution-matrix-v2.R, which
+# replaces this file's job.
 #
-# Unlike its predecessor (resolution_matrix_pre.rds / the old
-# test-resolution-matrix.R), this fixture is captured from a script that
-# actually exists and is re-runnable (data-raw/capture_resolution_matrix.R
-# -- the previous fixture's cited generator, data-raw/
-# capture_resolution_matrix.R, never actually existed in this repo despite
-# being referenced by name).
+# This file used to be the behavior-preservation golden for the
+# self-sufficient-rows migration: resolution_matrix_tiered.rds (captured
+# by data-raw/capture_resolution_matrix.R, itself kept for provenance) asked
+# dataset_field() for every (survey, dataset, geo_level, year, field)
+# combination reachable from real R/ code -- INCLUDING a blank-key
+# (geo_level = NULL, year = NULL) query for every dataset, keyed or not,
+# since at capture time that query legitimately resolved to the dataset's
+# base row.
 #
-# The assertion below has NO case_when patches. Every value captured here
-# is expected to come back byte-identical from the new exact-key-match
-# dataset_field() against the MIGRATED manifest -- that is the whole point
-# of capturing it first: any mismatch is a real regression introduced by
-# the migration, not a documented, deliberate difference.
+# The base-row-deletion migration makes that exact query type -- a blank
+# key against a KEYED dataset -- a hard stop() (see R/manifest.R's
+# dataset_field()). Replaying resolution_matrix_tiered.rds's ~90 blank-key
+# entries for the 9 datasets that used to have a base row would all now
+# "fail" -- but every one of those failures is the new guard correctly
+# firing, not a regression. Patching around that with more case_when
+# exceptions here would be exactly the kind of mismatch the manifest-
+# maintenance skill says to go fix (or, here, retire) rather than paper
+# over: this fixture's blank-key entries test a query shape the migration
+# deliberately made illegal, not a value the migration might have gotten
+# wrong.
+#
+# resolution_matrix_tiered.rds and capture_resolution_matrix.R are left in
+# place for historical reference (they document what the OLD 5-tier
+# resolver returned, prior to two later migrations), but nothing replays
+# them anymore. test-resolution-matrix-v2.R (fixture:
+# resolution_matrix_keyed.rds, generator: data-raw/
+# capture_resolution_matrix_v2.R) is the current behavior-preservation
+# golden -- captured with the same real-row-only query set this migration
+# actually needed, and it explicitly asserts the ~90 former-base-row
+# queries now stop() instead of silently expecting them to still resolve.
 
-matrix <- readRDS(test_path("fixtures", "resolution_matrix_tiered.rds"))
-
-test_that("every captured pre-migration resolution result is reproduced exactly", {
-  actual <- mapply(
-    function(survey, dataset, geo_level, year, field) {
-      dataset_field(survey, dataset, field, geo_level = geo_level, year = year)
-    },
-    matrix$survey, matrix$dataset, matrix$geo_level, matrix$year, matrix$field
-  )
-
-  expect_equal(unname(actual), matrix$value)
-})
-
-test_that("the resolution matrix fixture actually covers something (sanity check on the fixture itself)", {
-  expect_true(nrow(matrix) > 1000)
-  expect_true(all(c("url", "version") %in% matrix$field))
-  # some non-NA values must exist for each renamed field, or the rename
-  # itself would go untested
-  expect_true(any(!is.na(matrix$value[matrix$field == "url"])))
-  expect_true(any(!is.na(matrix$value[matrix$field == "version"])))
+test_that("resolution_matrix_tiered.rds is retired -- see test-resolution-matrix-v2.R", {
+  skip("Retired 2026-08-19: this fixture's blank-key queries against now-keyed datasets are exactly what the base-row-deletion migration made illegal. See test-resolution-matrix-v2.R.")
 })

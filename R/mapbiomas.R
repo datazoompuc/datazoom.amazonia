@@ -2,12 +2,13 @@
 #'
 #' @description Loads information about land cover and use
 #'
-#' @param dataset A dataset name ("mapbiomas_cover", "mapbiomas_transition", "mapbiomas_irrigation", "mapbiomas_deforestation_regeneration", "mapbiomas_mining", "mapbiomas_water" or "mapbiomas_fire")
+#' @param dataset A dataset name ("mapbiomas_cover", "mapbiomas_transition", "mapbiomas_irrigation", "mapbiomas_deforestation_regeneration", "mapbiomas_secondary_vegetation", "mapbiomas_mining", "mapbiomas_water" or "mapbiomas_fire")
 #' @inheritParams load_baci
 #' @param geo_level A \code{string} that defines the geographic level of the data
 #'   * For dataset "mapbiomas_cover", can only be "municipality"
 #'   * For dataset "mapbiomas_transition", can be "municipality" or "biome" (faster download)
 #'   * For dataset "mapbiomas_deforestation_regeneration", can only be "municipality"
+#'   * For dataset "mapbiomas_secondary_vegetation", can only be "municipality"
 #'   * For dataset "mapbiomas_mining", can be "indigenous_land" or "municipality"
 #'   * For dataset "mapbiomas_irrigation" (temporarily unavailable, a new collection will be soon delivered), can be "state" or "biome"
 #'   * For dataset "mapbiomas_water"(temporarily unavailable, a new collection will be soon delivered), can be "municipality", "state" or "biome"
@@ -30,6 +31,14 @@
 #'   dataset = "mapbiomas_mining",
 #'   raw_data = FALSE,
 #'   geo_level = "indigenous_land",
+#'   language = "eng"
+#' )
+#'
+#' # download treated data on secondary vegetation by municipality
+#' data <- load_mapbiomas(
+#'   dataset = "mapbiomas_secondary_vegetation",
+#'   raw_data = FALSE,
+#'   geo_level = "municipality",
 #'   language = "eng"
 #' )
 #'
@@ -64,9 +73,17 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
 
   sheet <- dataset_field(param$source, param$dataset, "sheet", geo_level = param$geo_level)
 
-  ## MapBiomas collection number (per dataset, does not depend on geo_level)
+  ## MapBiomas collection number -- NOT dataset-wide: several MapBiomas
+  ## datasets deliberately pin one geo_level to an older Dataverse
+  ## collection than its siblings (e.g. mapbiomas_mining/indigenous_land is
+  ## intentionally one collection behind municipality's -- see
+  ## actions/scrapers/resolve_mapbiomas.R). Reading this with the row's own
+  ## geo_level (dataset_field(), not dataset_meta()) is what makes the
+  ## printed collection number actually match the file being downloaded for
+  ## every geo_level, not just the ones that happen to share the base row's
+  ## old value.
 
-  collection <- dataset_field(param$source, param$dataset, "version")
+  collection <- dataset_field(param$source, param$dataset, "version", geo_level = param$geo_level)
   message("Data from MapBiomas - Collection ", collection, "\n")
 
   #################

@@ -12,7 +12,7 @@ load_mapbiomas(
 )
 }
 \arguments{
-\item{dataset}{A dataset name ("mapbiomas_cover", "mapbiomas_transition", "mapbiomas_irrigation", "mapbiomas_deforestation_regeneration", "mapbiomas_mining", "mapbiomas_water" or "mapbiomas_fire")}
+\item{dataset}{A dataset name ("mapbiomas_cover", "mapbiomas_transition", "mapbiomas_irrigation", "mapbiomas_deforestation_regeneration", "mapbiomas_secondary_vegetation", "mapbiomas_mining", "mapbiomas_water" or "mapbiomas_fire")}
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
@@ -21,6 +21,7 @@ load_mapbiomas(
 \item For dataset "mapbiomas_cover", can only be "municipality"
 \item For dataset "mapbiomas_transition", can be "municipality" or "biome" (faster download)
 \item For dataset "mapbiomas_deforestation_regeneration", can only be "municipality"
+\item For dataset "mapbiomas_secondary_vegetation", can only be "municipality"
 \item For dataset "mapbiomas_mining", can be "indigenous_land" or "municipality"
 \item For dataset "mapbiomas_irrigation" (temporarily unavailable, a new collection will be soon delivered), can be "state" or "biome"
 \item For dataset "mapbiomas_water"(temporarily unavailable, a new collection will be soon delivered), can be "municipality", "state" or "biome"
@@ -51,6 +52,14 @@ data <- load_mapbiomas(
   dataset = "mapbiomas_mining",
   raw_data = FALSE,
   geo_level = "indigenous_land",
+  language = "eng"
+)
+
+# download treated data on secondary vegetation by municipality
+data <- load_mapbiomas(
+  dataset = "mapbiomas_secondary_vegetation",
+  raw_data = FALSE,
+  geo_level = "municipality",
   language = "eng"
 )
 \dontshow{\}) # examplesIf}

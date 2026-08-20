@@ -84,7 +84,12 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
     on.exit(unlink(temp), add = TRUE)
 
     utils::download.file(
-      url = dataset_url(source = param$source, dataset = param$dataset),
+      # geo_level passed explicitly -- consumer/industrial_energy_consumption
+      # are keyed by geo_level (see inst/extdata/manifest/v1/datasets_link.csv),
+      # and there is no base row left to silently fall back to (see
+      # R/manifest.R). This matches the "sheets" lookup right above, which
+      # already keyed on param$geo_level.
+      url = dataset_url(source = param$source, dataset = param$dataset, geo_level = param$geo_level),
       destfile = temp,
       mode = "wb"
     )

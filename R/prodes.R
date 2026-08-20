@@ -80,7 +80,13 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
   # so a PRODES year rollover does not require a code change here too.
 
   if (!param$dataset %in% c("deforestation", "residual_deforestation")) {
-    param$time_period <- as.numeric(dataset_field(param$source, param$dataset, "available_time"))
+    # single-year datasets -- available_time is dataset-wide here (all of
+    # PRODES's datasets are unkeyed today), so this is the one legitimate
+    # cross-row read: dataset_meta(), not dataset_field() with no key (see
+    # R/manifest.R). Using dataset_meta() rather than relying on today's
+    # unkeyed-ness keeps this call correct if PRODES ever adds a real
+    # geo_level/year override to one of these datasets.
+    param$time_period <- as.numeric(dataset_meta(param$source, param$dataset, "available_time"))
   }
 
   # check if dataset and time_period are supported
@@ -130,9 +136,11 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
 
   # name of the raster band/column produced by the downloaded file -- lives
   # in the manifest (layer_name) because it changes whenever the PRODES
-  # filename itself changes (e.g. a new year in "prodes_amazonia_legal_2023")
+  # filename itself changes (e.g. a new year in "prodes_amazonia_legal_2023").
+  # dataset-wide, not per-row -- dataset_meta(), same reasoning as
+  # available_time above.
 
-  layer <- dataset_field(param$source, param$dataset, "layer_name")
+  layer <- dataset_meta(param$source, param$dataset, "layer_name")
 
   message("Downloading map of Brazilian municipalities")
 

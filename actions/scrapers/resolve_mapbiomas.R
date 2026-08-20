@@ -1,218 +1,316 @@
 # actions/scrapers/resolve_mapbiomas.R
 #
-# MapBiomas is split across three genuinely different mechanisms, mirrored
-# here as three independent, best-effort sub-resolvers. A failure/no-match
-# in one never blocks the others -- each simply omits the rows it could not
-# confidently resolve, which build_manifest.R's merge logic already treats
-# as "leave those rows unchanged" (see actions/scripts/build_manifest.R).
+# MapBiomas is resolved through a single mechanism: the MapBiomas Dataverse
+# archive (data.mapbiomas.org) -- a real Harvard Dataverse installation with
+# a documented REST API (Search API + Data Access API), permanent DOIs, and
+# versioned files. VERIFIED LIVE (2026-08-19): downloadable with no
+# authentication via GET /api/access/datafile/{id}?format=original -- the
+# ?format=original param recovers the real multi-sheet xlsx even for files
+# Dataverse "ingested" into a flattened .tab. This replaced the old
+# GCS-bucket-listing mechanism, which lagged MapBiomas's own releases by
+# months (confirmed: the bucket still had no statistics/ folder for
+# Collection 10/11 when Dataverse already had Collection 10.1).
 #
-#   (a) Google Cloud Storage JSON listing API (storage.googleapis.com) --
-#       NOT scraping, a documented public API. Used to discover whether a
-#       newer, fully-populated collection exists for the Brazil-wide
-#       coverage/deforestation statistics.
-#   (b) WordPress HTML scraping (brasil.mapbiomas.org/estatisticas/) -- the
-#       one genuine HTML-scraping case here: readLines-equivalent fetch +
-#       regex over <a href="...xlsx"> links, classified by filename
-#       keyword. This is the real thing the whole "where is scraping"
-#       question was about.
-#   (c) Legacy S3 bucket (mapbiomas-br-site.s3.amazonaws.com) for
-#       irrigation/water -- intentionally NOT touched here (resolver stays
-#       NA on those rows in the manifest); nothing on that host indicates
-#       version or freshness, so it is HTTP-checked only, never resolved.
+# This file used to ALSO watch brasil.mapbiomas.org/downloads/estatisticas/
+# (the WordPress statistics page) as a freshness check on mapbiomas_cover's
+# docs_url. That mechanism is gone -- it never spoke for any dataset besides
+# mapbiomas_cover, couldn't see a link disappearing (no candidate found was
+# indistinguishable from "nothing new"), and compared collection numbers
+# like "10.1" vs "11" as a guess about a labeling convention MapBiomas
+# doesn't actually owe anyone. It's been replaced by a proper site-link
+# INVENTORY (actions/scripts/site_inventory.R + actions/scrapers/
+# watch_mapbiomas.R) that records every download link that page advertises
+# and diffs it run over run -- see watch_mapbiomas.R's header for the full
+# writeup, including the same June->August 2026 template-rebuild evidence
+# that used to live in this file. The site no longer writes anything to the
+# manifest at all: manifest = what we download, inventory = what the site
+# advertises. docs_url below stays the stable Dataverse DOI.
 #
-# Every row this resolver emits carries every value column it can determine
-# for that row -- under the self-sufficient-rows schema (R/manifest.R)
-# there is no inheritance between a dataset's base row and its geo_level
-# overrides, so e.g. mapbiomas_mining's two override rows can no longer
-# borrow `version` from their base row at read time; this resolver writes
-# it on all three explicitly. Fields it genuinely cannot determine (e.g.
-# mapbiomas_transition's base/municipality rows -- see that section below)
-# are simply left out of the row it returns, which build_manifest.R's
-# non_na_cols merge leaves untouched -- that is a real "unknown", not
-# something to guess at.
+# Every row this resolver emits carries every value column it can
+# determine for that row -- self-sufficient rows, no inheritance (see
+# R/manifest.R). Fields it cannot determine are simply left out of the
+# row it returns.
 #
-# Verified live against the real site while writing this (2026-08-03): the
-# WordPress page has been restructured since the hardcoded URLs were
-# written. `mapbiomas_mining` genuinely moved from COL8.0 to COL9.0 -- a
-# real, detectable update. `mapbiomas_cover`/`mapbiomas_transition`'s old
-# single-Brazil-wide-file URLs have no unambiguous replacement anymore (the
-# site now serves per-region files instead), so this resolver deliberately
-# does NOT guess a replacement for those -- it omits them rather than risk
-# writing a wrong URL. A human has to look at that one.
+# ---- What was investigated and where each row landed (2026-08-19) -----
+#
+# For every (dataset, geo_level), the Dataverse Search API was queried,
+# candidates sorted newest-collection-first, and EACH candidate's actual
+# file was downloaded and its sheet names inspected (via readxl::
+# excel_sheets()) before trusting it -- a URL returning 200 is not enough,
+# the sheet R/mapbiomas.R expects has to actually be there. Findings:
+#
+#   - mapbiomas_cover (base+municipality): Collection 10.1, sheet
+#     COVERAGE_10.1. indigenous_land: a DIFFERENT Dataverse dataset
+#     (special-territories one), Collection 10, sheet
+#     COVERAGE_INDIGENOUS_TERRITORIES.
+#   - mapbiomas_transition (base+biome): Collection 10, sheet
+#     TRANSITION_10 (same file as that collection's coverage sheet).
+#     municipality: NO SUBSTITUTE EXISTS on Dataverse at any collection --
+#     its "Collection 9 by states and municipalities" dataset is
+#     mislabeled and only actually contains a coverage sheet, verified by
+#     downloading it. Deliberately not queried below; that row's existing
+#     GCS url (mapbiomas_brasil_col9_state_municipality.xlsx) stays
+#     untouched -- confirmed still working this session (483,946 rows).
+#   - mapbiomas_deforestation_regeneration (municipality): Collection 10
+#     split what used to be one combined DEF_SECVEG sheet into two
+#     separate files. This row now points at the deforestation-only file
+#     (sheet DEFORESTATION); the regeneration/secondary-vegetation half
+#     is the new mapbiomas_secondary_vegetation dataset below.
+#   - mapbiomas_mining (base+municipality): Collection 9, sheet
+#     CITY_STATE_BIOME (fixes a dead link -- the old COL8.0 WordPress
+#     upload 404s). indigenous_land: Collection 9's file DROPPED the IL
+#     sheet entirely (verified on both Dataverse's copy and the current
+#     WordPress-hosted COL9.0 upload) -- the newest-first walk below
+#     naturally lands on Collection 8, which still has it. Not hardcoded;
+#     if Dataverse ever re-adds an IL sheet to a newer collection this
+#     will pick it back up automatically.
+#   - mapbiomas_fire (state): only Collection 3 exists on Dataverse at
+#     all (no Collection 5 stats file yet, only its ATBD handbook) --
+#     same collection as before, but now via a working host (fixes a
+#     dead link).
+#   - mapbiomas_water (base+municipality, biome separately): Collection 4,
+#     sheets WATER_CITY_ANNUAL / WATER_BIOME_ANNUAL (fixes a dead link).
+#     state: Collection 4's file has NO state-level sheet at all
+#     (WATER_CITY_*/WATER_BIOME_*/WATER_SUBBASIN_* only) -- not queried
+#     below; that row's existing Collection-2 S3 url stays untouched.
+#   - mapbiomas_irrigation: no irrigation statistics dataset exists on
+#     Dataverse at all (only ATBD handbooks + an unrelated "Agriculture
+#     statistics" dataset). Not queried below; stays exactly as-is,
+#     resolver-free, same posture as epe/energy_state_panel.
+#
+# Re-verify all of this at implementation/maintenance time, not just
+# trust this comment -- Dataverse content changes over time same as
+# anything else.
 
 `%||%` <- function(x, y) if (is.null(x)) y else x
 
 resolve_mapbiomas <- function(rows) {
-  if (!requireNamespace("jsonlite", quietly = TRUE) || !requireNamespace("curl", quietly = TRUE)) {
-    stop("resolve_mapbiomas() needs the 'jsonlite' and 'curl' packages (CI-only; not package Imports).")
+  if (!requireNamespace("jsonlite", quietly = TRUE) ||
+      !requireNamespace("curl", quietly = TRUE) ||
+      !requireNamespace("readxl", quietly = TRUE)) {
+    stop("resolve_mapbiomas() needs 'jsonlite', 'curl', and 'readxl' (CI-only; not package Imports).")
   }
 
   out <- list()
 
-  ## -- (a) GCS JSON listing: discover a newer, FULLY POPULATED collection --
-  # Run FIRST (not last) so its result -- the current collection number --
-  # is available below when building mapbiomas_cover's rows, all of which
-  # must carry the same `version` regardless of which sub-resolver found
-  # their `url`.
+  ## ============================================================ ##
+  ## Dataverse: search -> verify sheet -> emit                    ##
+  ## ============================================================ ##
 
-  gcs_list <- function(prefix, delimiter = "/") {
-    url <- paste0(
-      "https://storage.googleapis.com/storage/v1/b/mapbiomas-public/o",
-      "?prefix=", utils::URLencode(prefix, reserved = TRUE),
-      "&delimiter=", utils::URLencode(delimiter, reserved = TRUE)
+  dv_base <- "https://data.mapbiomas.org"
+
+  dv_get_json <- function(url, timeout_s = 30) {
+    resp <- tryCatch(
+      curl::curl_fetch_memory(url, handle = curl::new_handle(timeout = timeout_s)),
+      error = function(e) NULL
     )
-    resp <- tryCatch(curl::curl_fetch_memory(url, handle = curl::new_handle(timeout = 30)), error = function(e) NULL)
     if (is.null(resp) || resp$status_code != 200) return(NULL)
-    jsonlite::fromJSON(rawToChar(resp$content), simplifyVector = FALSE)
+    tryCatch(jsonlite::fromJSON(rawToChar(resp$content), simplifyVector = FALSE), error = function(e) NULL)
   }
 
-  # Guards against unrelated folders (e.g. "collection_71", a soil-beta
-  # project observed live in this bucket, numerically far ahead of the
-  # real land-use collection number) being mistaken for "the latest
-  # collection" -- only look a few numbers ahead of what we already have,
-  # and only accept a candidate if its statistics/ folder actually has a
-  # "coverage" file in it (collection_10 was live but still EMPTY when
-  # this was written -- correctly produces no match, not a wrong one).
-  find_newer_gcs_collection <- function(current = 9L, look_ahead = 5L) {
-    base <- gcs_list("initiatives/brasil/")
-    if (is.null(base)) return(NULL)
-    prefixes <- unlist(base$prefixes %||% list())
-    candidates <- prefixes[grepl("^initiatives/brasil/collection_[0-9]+/$", prefixes)]
-    nums <- as.integer(sub(".*collection_([0-9]+)/$", "\\1", candidates))
-    nums <- nums[!is.na(nums) & nums > current & nums <= current + look_ahead]
-    if (length(nums) == 0) return(NULL)
+  # Dataverse's Search API -- documented, not scraped. subtree restricts to
+  # the MapBiomas brazil-landcover Dataverse specifically.
+  dv_search <- function(query) {
+    url <- paste0(
+      dv_base, "/api/search?q=", utils::URLencode(query, reserved = TRUE),
+      "&subtree=brazil-landcover&type=dataset&per_page=20"
+    )
+    j <- dv_get_json(url)
+    if (is.null(j) || is.null(j$data) || is.null(j$data$items)) return(list())
+    j$data$items
+  }
 
-    for (n in sort(nums, decreasing = TRUE)) {
-      listing <- gcs_list(paste0("initiatives/brasil/collection_", n, "/statistics/"), delimiter = "")
-      names_ <- vapply(listing$items %||% list(), function(x) x$name, character(1))
-      if (any(grepl("coverage", names_, ignore.case = TRUE))) {
-        return(list(n = n, names = names_))
+  dv_dataset_files <- function(global_id) {
+    url <- paste0(dv_base, "/api/datasets/:persistentId/?persistentId=", global_id)
+    j <- dv_get_json(url)
+    if (is.null(j) || is.null(j$data$latestVersion$files)) return(list())
+    lapply(j$data$latestVersion$files, function(f) f$dataFile)
+  }
+
+  dv_access_url <- function(file_id) {
+    paste0(dv_base, "/api/access/datafile/", file_id, "?format=original")
+  }
+
+  dv_doi_url <- function(global_id) {
+    paste0("https://doi.org/", sub("^doi:", "", global_id))
+  }
+
+  # A hit's actual sheet layout is the only thing that matters -- a 200
+  # response is not enough (see file header: Dataverse's "Collection 9 by
+  # municipality" dataset is mislabeled and doesn't contain what its own
+  # title claims). Downloads the real file (?format=original) to inspect
+  # it; skips anything implausibly large rather than hanging CI on it --
+  # every real target file observed this session was well under this.
+  dv_file_sheets <- function(file_id, max_bytes = 2e8) {
+    head_resp <- tryCatch(
+      curl::curl_fetch_memory(
+        dv_access_url(file_id),
+        handle = curl::new_handle(nobody = TRUE, timeout = 20)
+      ),
+      error = function(e) NULL
+    )
+    if (!is.null(head_resp)) {
+      len <- suppressWarnings(as.numeric(curl::parse_headers_list(head_resp$headers)[["content-length"]][1]))
+      if (!is.na(len) && len > max_bytes) return(NULL)
+    }
+
+    temp <- tempfile(fileext = ".xlsx")
+    on.exit(unlink(temp), add = TRUE)
+    ok <- tryCatch({
+      curl::curl_download(dv_access_url(file_id), temp, quiet = TRUE, handle = curl::new_handle(timeout = 120))
+      TRUE
+    }, error = function(e) FALSE)
+    if (!isTRUE(ok)) return(NULL)
+
+    tryCatch(readxl::excel_sheets(temp), error = function(e) NULL)
+  }
+
+  # "Collection 10.1" / "Coleção 11" -- Dataverse titles this dataset's own
+  # collection number consistently; ATBD handbooks/factsheets also say
+  # "Collection N" so is_real_stats_hit() below filters those out
+  # separately rather than relying on this regex alone.
+  extract_collection <- function(name) {
+    m <- regmatches(name, regexpr("Collection\\s+([0-9]+(?:\\.[0-9]+)?)", name, ignore.case = TRUE))
+    if (length(m) == 0 || !nzchar(m)) return(NA_character_)
+    sub(".*?([0-9]+(?:\\.[0-9]+)?)$", "\\1", m)
+  }
+
+  is_real_stats_hit <- function(name) {
+    grepl("statistics", name, ignore.case = TRUE) &&
+      !grepl("ATBD|Handbook|Destaques|Factsheet|Fact_|Fact-", name, ignore.case = TRUE)
+  }
+
+  # Walk candidates newest-collection-first; take the FIRST whose actual
+  # file has a sheet matching sheet_pattern. This is what makes
+  # mapbiomas_mining/indigenous_land land on Collection 8 (Collection 9's
+  # file dropped the IL sheet) without hardcoding "8" anywhere -- if a
+  # future collection re-adds a matching sheet, this picks it up on its
+  # own, no code change needed.
+  resolve_via_dataverse <- function(dataset, geo_levels, query, sheet_pattern) {
+    items <- tryCatch(dv_search(query), error = function(e) NULL)
+    if (is.null(items) || length(items) == 0) return(NULL)
+
+    names_ <- vapply(items, function(it) it$name %||% "", character(1))
+    keep <- vapply(names_, is_real_stats_hit, logical(1))
+    items <- items[keep]
+    names_ <- names_[keep]
+    if (length(items) == 0) return(NULL)
+
+    cols <- vapply(names_, extract_collection, character(1))
+    ord <- order(suppressWarnings(as.numeric(cols)), decreasing = TRUE, na.last = TRUE)
+    items <- items[ord]
+    cols <- cols[ord]
+
+    for (i in seq_along(items)) {
+      if (is.na(cols[i])) next
+      gid <- items[[i]]$global_id
+      if (is.null(gid)) next
+
+      files <- tryCatch(dv_dataset_files(gid), error = function(e) list())
+      for (f in files) {
+        if (is.null(f$id)) next
+        sheets <- dv_file_sheets(f$id)
+        if (is.null(sheets)) next
+        hit <- grep(sheet_pattern, sheets, ignore.case = TRUE, value = TRUE)
+        if (length(hit) >= 1) {
+          return(tibble::tibble(
+            survey = "mapbiomas", dataset = dataset,
+            geo_level = geo_levels, year = NA_character_,
+            url = dv_access_url(f$id), version = cols[i],
+            sheet = hit[1], docs_url = dv_doi_url(gid)
+          ))
+        }
       }
     }
     NULL
   }
 
-  newer <- tryCatch(find_newer_gcs_collection(), error = function(e) {
-    message("resolve_mapbiomas(): GCS collection lookup failed: ", conditionMessage(e))
-    NULL
-  })
+  # See the file header for what's deliberately NOT in this list
+  # (mapbiomas_transition/municipality, mapbiomas_water/state,
+  # mapbiomas_irrigation -- all investigated, none have a Dataverse
+  # substitute).
+  #
+  # geo_levels values here match the manifest's ACTUAL row shape exactly --
+  # there is no base row anymore for any dataset that has real geo_level
+  # overrides (see R/manifest.R and NEWS.md: a base row could silently
+  # drift stale relative to its own overrides, which is exactly what had
+  # happened to mapbiomas_mining's before this migration). A dataset with
+  # real overrides (cover, transition, mining, water below) lists ONLY its
+  # real geo_level values -- never NA_character_ alongside them, or the
+  # emitted row would never match anything in the manifest and would get
+  # bind_rows()'d as a brand-new, duplicate row instead of updating the
+  # right one. A dataset with NO overrides at all (deforestation_regeneration,
+  # secondary_vegetation, fire) is base-row-only in the OLD sense but really
+  # just "unkeyed, one row, geo_level blank" now -- those still use
+  # geo_levels = NA_character_, because that IS their one real row's key.
+  configs <- list(
+    list(dataset = "mapbiomas_cover", geo_levels = "municipality",
+         query = "Coverage statistics by biomes, states and municipalities",
+         sheet_pattern = "^COVERAGE"),
+    list(dataset = "mapbiomas_cover", geo_levels = "indigenous_land",
+         query = "Coverage and transitions statistics by special territories - Indigenous Territories",
+         sheet_pattern = "^COVERAGE"),
+    list(dataset = "mapbiomas_transition", geo_levels = "biome",
+         query = "Coverage and transitions statistics by biomes and states",
+         sheet_pattern = "^TRANSITION"),
+    # Unkeyed (single row, geo_level blank) -- deforestation_regeneration
+    # and secondary_vegetation have no override rows at all in the
+    # manifest, same shape as mapbiomas_fire below. geo_levels = NA here IS
+    # that one row's real key, not a "base row" fallback.
+    list(dataset = "mapbiomas_deforestation_regeneration", geo_levels = NA_character_,
+         query = "Deforestation statistics by biomes, states and municipalities",
+         sheet_pattern = "^DEFORESTATION"),
+    list(dataset = "mapbiomas_secondary_vegetation", geo_levels = NA_character_,
+         query = "Secondary vegetation statistics by biomes, states and municipalities",
+         sheet_pattern = "^SECONDARY_VEGETATION"),
+    list(dataset = "mapbiomas_mining", geo_levels = "municipality",
+         query = "Mining statistics",
+         sheet_pattern = "^CITY_STATE_BIOME"),
+    list(dataset = "mapbiomas_mining", geo_levels = "indigenous_land",
+         query = "Mining statistics",
+         sheet_pattern = "^IL$"),
+    # Also unkeyed, like deforestation_regeneration/secondary_vegetation --
+    # mapbiomas_fire has no override rows in the manifest (available_geo
+    # says "state" descriptively, but that is not a key). This previously
+    # read geo_levels = "state" literally, which would have emitted a row
+    # that could never match the manifest's real (blank-key) row -- a
+    # latent version of the exact duplication bug already fixed above for
+    # deforestation_regeneration/secondary_vegetation. It never actually
+    # fired because MapBiomas's "Fire scar statistics" Dataverse search has
+    # been returning no hits (checked live, 2026-08-19) -- fixed anyway,
+    # correctness here shouldn't depend on that staying true.
+    list(dataset = "mapbiomas_fire", geo_levels = NA_character_,
+         query = "Fire scar statistics",
+         sheet_pattern = "^a_ANNUAL"),
+    list(dataset = "mapbiomas_water", geo_levels = "municipality",
+         query = "Water surface statistics",
+         sheet_pattern = "^WATER_CITY_ANNUAL"),
+    list(dataset = "mapbiomas_water", geo_levels = "biome",
+         query = "Water surface statistics",
+         sheet_pattern = "^WATER_BIOME_ANNUAL")
+  )
 
-  cover_gcs_url <- NULL
-  cover_version <- NULL
-  if (!is.null(newer)) {
-    cover_version <- as.character(newer$n)
-
-    cover_file <- grep("coverage", newer$names, value = TRUE, ignore.case = TRUE)
-    if (length(cover_file) >= 1) {
-      cover_gcs_url <- paste0("https://storage.googleapis.com/mapbiomas-public/", cover_file[1])
-    }
-    defor_file <- grep("deforestation", newer$names, value = TRUE, ignore.case = TRUE)
-    if (length(defor_file) >= 1) {
-      out$deforestation_regeneration <- tibble::tibble(
-        survey = "mapbiomas", dataset = "mapbiomas_deforestation_regeneration",
-        geo_level = NA_character_, year = NA_character_,
-        url = paste0("https://storage.googleapis.com/mapbiomas-public/", defor_file[1]),
-        version = cover_version
-      )
-    }
-  }
-
-  ## -- (b) WordPress scraping: real HTML, real regex ------------------------
-
-  wp_html <- tryCatch({
-    resp <- curl::curl_fetch_memory(
-      "https://brasil.mapbiomas.org/estatisticas/",
-      handle = curl::new_handle(timeout = 30)
+  for (cfg in configs) {
+    res <- tryCatch(
+      resolve_via_dataverse(cfg$dataset, cfg$geo_levels, cfg$query, cfg$sheet_pattern),
+      error = function(e) {
+        message("resolve_mapbiomas(): Dataverse lookup failed for ", cfg$dataset, ": ", conditionMessage(e))
+        NULL
+      }
     )
-    if (resp$status_code != 200) stop("HTTP ", resp$status_code)
-    txt <- rawToChar(resp$content)
-    Encoding(txt) <- "UTF-8"
-    txt
-  }, error = function(e) {
-    message("resolve_mapbiomas(): could not fetch the WordPress statistics page: ", conditionMessage(e))
-    NULL
-  })
-
-  if (!is.null(wp_html)) {
-    hrefs <- unique(regmatches(wp_html, gregexpr('href="[^"]*\\.xlsx"', wp_html, ignore.case = TRUE))[[1]])
-    hrefs <- sub('^href="', "", hrefs)
-    hrefs <- sub('"$', "", hrefs)
-
-    # mining: single Brazil-wide file, collection number embedded in the
-    # name itself (TABELA-MINERACAO-MAPBIOMAS-COL9.0.xlsx) -- all three
-    # rows (base, municipality, indigenous_land) share this one url, and
-    # each now carries its own copy of version too (no more relying on the
-    # base row to supply it by inheritance -- see the file header).
-    mining_hit <- grep("TABELA-MINERACAO-MAPBIOMAS-COL", hrefs, value = TRUE, ignore.case = TRUE)
-    if (length(mining_hit) >= 1) {
-      col <- stringr::str_match(mining_hit[1], "COL([0-9]+)\\.")[, 2]
-
-      out$mining_base <- tibble::tibble(
-        survey = "mapbiomas", dataset = "mapbiomas_mining",
-        geo_level = NA_character_, year = NA_character_,
-        url = mining_hit[1], version = col
-      )
-      out$mining_municipality <- tibble::tibble(
-        survey = "mapbiomas", dataset = "mapbiomas_mining",
-        geo_level = "municipality", year = NA_character_,
-        url = mining_hit[1], version = col
-      )
-      out$mining_indigenous <- tibble::tibble(
-        survey = "mapbiomas", dataset = "mapbiomas_mining",
-        geo_level = "indigenous_land", year = NA_character_,
-        url = mining_hit[1], version = col
-      )
-    }
-
-    # cover: url has two independent sources depending on geo_level --
-    # indigenous_land gets its own per-region file when the WordPress page
-    # still links the old naming (see file header, not guaranteed); base
-    # and municipality (which never had a distinct source of its own --
-    # see the "3 missing rows" note in the migration plan) both mirror the
-    # GCS-derived Brazil-wide file. version is uniform across all three
-    # whenever the GCS lookup above found one, even for rows whose url
-    # this run left untouched.
-    indigenous_hit <- grep("INDIGENOUS_LANDS", hrefs, value = TRUE, ignore.case = TRUE)
-
-    if (length(indigenous_hit) >= 1) {
-      out$cover_indigenous <- tibble::tibble(
-        survey = "mapbiomas", dataset = "mapbiomas_cover",
-        geo_level = "indigenous_land", year = NA_character_,
-        url = indigenous_hit[1], version = cover_version
-      )
-    }
-    if (!is.null(cover_gcs_url)) {
-      out$cover_base <- tibble::tibble(
-        survey = "mapbiomas", dataset = "mapbiomas_cover",
-        geo_level = NA_character_, year = NA_character_,
-        url = cover_gcs_url, version = cover_version
-      )
-      out$cover_municipality <- tibble::tibble(
-        survey = "mapbiomas", dataset = "mapbiomas_cover",
-        geo_level = "municipality", year = NA_character_,
-        url = cover_gcs_url, version = cover_version
-      )
-    }
-
-    # transition: base/municipality have no unambiguous replacement source
-    # (see file header) and are deliberately left untouched, same as
-    # before this file's self-sufficient-rows rewrite -- only the biome
-    # override has a real, detectable source.
-    biomes_hit <- grep("COL\\.[0-9]+-BIOMES", hrefs, value = TRUE, ignore.case = TRUE)
-    if (length(biomes_hit) >= 1) {
-      out$transition_biome <- tibble::tibble(
-        survey = "mapbiomas", dataset = "mapbiomas_transition",
-        geo_level = "biome", year = NA_character_,
-        url = biomes_hit[1]
-      )
+    if (!is.null(res)) {
+      key <- paste(cfg$dataset, paste(cfg$geo_levels, collapse = "+"), sep = "__")
+      out[[key]] <- res
     }
   }
 
   if (length(out) == 0) {
     stop(
-      "resolve_mapbiomas(): found no confidently-matched update on either the ",
-      "WordPress page or the GCS bucket. This can legitimately mean 'nothing ",
-      "changed' -- check manually before treating it as a scraper break."
+      "resolve_mapbiomas(): found no confidently-matched update from ",
+      "Dataverse this run. This can legitimately mean 'nothing changed' -- ",
+      "check manually before treating it as a scraper break. (The WordPress ",
+      "statistics page is watched separately -- see watch_mapbiomas.R -- and ",
+      "no longer affects this resolver's own success/failure.)"
     )
   }
 
