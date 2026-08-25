@@ -174,7 +174,7 @@ seeg,seeg_farming,,,,https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT
 seeg,seeg_industry,,,,https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd,,2000-2018,"country, state, municipality",,,,,seeg
 seeg,seeg_land,,,,https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd,,2000-2018,"country, state, municipality",,,,,seeg
 seeg,seeg_residuals,,,,https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd,,2000-2018,"country, state, municipality",,,,,seeg
-sigmine,sigmine_active,,,,https://dadosabertos.anm.gov.br/SIGMINE/BRASIL.zip,,,,,,,,
+sigmine,sigmine_active,,,,https://dadosabertos.anm.gov.br/SIGMINE/BRASIL.zip,,,"state, municipality",,,,,
 terraclimate,climatic_water_deficit,,,,http://thredds.northwestknowledge.net:8080/thredds/ncss,,1958-2022,municipality,,,,,
 terraclimate,max_temperature,,,,http://thredds.northwestknowledge.net:8080/thredds/ncss,,1958-2022,municipality,,,,,
 terraclimate,min_temperature,,,,http://thredds.northwestknowledge.net:8080/thredds/ncss,,1958-2022,municipality,,,,,
