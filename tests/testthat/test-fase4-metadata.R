@@ -34,7 +34,12 @@ test_that("MapBiomas sheet matches the current Dataverse-verified value, per dat
   # used to share. mapbiomas_transition/municipality and
   # mapbiomas_water/state are the two rows deliberately left untouched:
   # no Dataverse substitute exists for either (verified live).
-  expect_equal(dataset_field("mapbiomas", "mapbiomas_cover", "sheet", geo_level = "municipality"), "COVERAGE_10.1")
+  # Updated 2026-08-24: cover/municipality moved off Dataverse's
+  # "Collection 10.1" dataset -- its COVERAGE_10.1 sheet matches by name
+  # but has no municipality code column at all (verified live). Lands on
+  # the "Collection 10" dataset's COVERAGE_10 sheet instead, which does --
+  # see resolve_mapbiomas.R's dv_file_layout() and required_col_pattern.
+  expect_equal(dataset_field("mapbiomas", "mapbiomas_cover", "sheet", geo_level = "municipality"), "COVERAGE_10")
   expect_equal(dataset_field("mapbiomas", "mapbiomas_cover", "sheet", geo_level = "indigenous_land"), "COVERAGE_INDIGENOUS_TERRITORIES")
   expect_equal(dataset_field("mapbiomas", "mapbiomas_transition", "sheet", geo_level = "biome"), "TRANSITION_10")
   expect_equal(dataset_field("mapbiomas", "mapbiomas_transition", "sheet", geo_level = "municipality"), "TRANSITION_9")
@@ -62,8 +67,10 @@ test_that("MapBiomas version (collection) number matches the current Dataverse-v
   # base row left to answer a no-key query for a keyed dataset). Only the
   # genuinely unkeyed datasets (deforestation_regeneration,
   # secondary_vegetation, fire) still resolve without a key.
-  expect_equal(dataset_field("mapbiomas", "mapbiomas_cover", "version", geo_level = "municipality"), "10.1")
-  expect_equal(dataset_field("mapbiomas", "mapbiomas_cover", "version", geo_level = "indigenous_land"), "10")
+  # Updated 2026-08-24: 10.1 -> 10, same reason as the sheet test above.
+  expect_equal(dataset_field("mapbiomas", "mapbiomas_cover", "version", geo_level = "municipality"), "10")
+  # Updated 2026-08-24: 10 -> 10.1, see test-dataset_url.R for why.
+  expect_equal(dataset_field("mapbiomas", "mapbiomas_cover", "version", geo_level = "indigenous_land"), "10.1")
   expect_equal(dataset_field("mapbiomas", "mapbiomas_transition", "version", geo_level = "biome"), "10")
   expect_equal(dataset_field("mapbiomas", "mapbiomas_transition", "version", geo_level = "municipality"), "9")
   expect_equal(dataset_field("mapbiomas", "mapbiomas_deforestation_regeneration", "version"), "10")

@@ -24,7 +24,7 @@ load_mapbiomas(
 \item For dataset "mapbiomas_secondary_vegetation", can only be "municipality"
 \item For dataset "mapbiomas_mining", can be "indigenous_land" or "municipality"
 \item For dataset "mapbiomas_irrigation" (temporarily unavailable, a new collection will be soon delivered), can be "state" or "biome"
-\item For dataset "mapbiomas_water"(temporarily unavailable, a new collection will be soon delivered), can be "municipality", "state" or "biome"
+\item For dataset "mapbiomas_water", can be "municipality" or "biome" ("state" is currently unavailable -- the upstream source link is dead; check the manifest, \code{inst/extdata/manifest/v1/datasets_link.csv}, before assuming this has changed)
 \item For dataset "mapbiomas_fire", can only be "state"
 }}
 

@@ -94,12 +94,6 @@ MANIFEST_CORE_COLS <- c(MANIFEST_KEY_COLS, MANIFEST_VALUE_COLS)
 # keyed dataset now, structurally and permanently, not as a bug to fix.
 # Read them with dataset_field() and a real key instead (see R/mapbiomas.R).
 MANIFEST_META_COLS <- c("sidra_code", "available_time", "available_geo", "layer_name", "resolver")
-# One further, narrower exception lives in actions/scripts/manifest_validate.R's
-# KNOWN_META_DISAGREEMENTS: mapbiomas_transition's available_time also
-# varies per row (its municipality file is older than its siblings'), but
-# available_time stays in this list because it's correctly meta for every
-# other dataset that reads it (aneel.R, prodes.R) -- nothing calls
-# dataset_meta() for that specific (dataset, field) pair today.
 
 # The 6 columns datasets_link() has always returned, in their original
 # order, with "link" now named "url" (see NEWS: no external contract ever

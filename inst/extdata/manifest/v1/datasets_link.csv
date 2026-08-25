@@ -59,9 +59,9 @@ ips,life_quality,,,,https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kE
 ips,mortality,,,,https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,,ips
 ips,sanit_habit,,,,https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,,ips
 ips,violence,,,,https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,,ips
-mapbiomas,mapbiomas_cover,indigenous_land,,,https://data.mapbiomas.org/api/access/datafile/266?format=original,https://doi.org/10.58053/MapBiomas/8RGIOR,1985-2024,"municipality, indigenous_land",,COVERAGE_INDIGENOUS_TERRITORIES,,10,mapbiomas
-mapbiomas,mapbiomas_cover,municipality,,,https://data.mapbiomas.org/api/access/datafile/535?format=original,https://doi.org/10.58053/MapBiomas/SJZOLT,1985-2024,"municipality, indigenous_land",,COVERAGE_10.1,,10.1,mapbiomas
-mapbiomas,mapbiomas_deforestation_regeneration,,,,https://data.mapbiomas.org/api/access/datafile/485?format=original,https://doi.org/10.58053/MapBiomas/ZUTHSX,1985-2024,municipality,,DEFORESTATION,,10,mapbiomas
+mapbiomas,mapbiomas_cover,indigenous_land,,,https://data.mapbiomas.org/api/access/datafile/523?format=original,https://doi.org/10.58053/MapBiomas/1F2TLA,1985-2024,"municipality, indigenous_land",,COVERAGE_INDIGENOUS_TERRITORIES,,10.1,mapbiomas
+mapbiomas,mapbiomas_cover,municipality,,,https://data.mapbiomas.org/api/access/datafile/254?format=original,https://doi.org/10.58053/MapBiomas/IBQPF6,1985-2024,"municipality, indigenous_land",,COVERAGE_10,,10,mapbiomas
+mapbiomas,mapbiomas_deforestation_regeneration,,,,https://data.mapbiomas.org/api/access/datafile/485?format=original,https://doi.org/10.58053/MapBiomas/ZUTHSX,1987-2024,municipality,,DEFORESTATION,,10,mapbiomas
 mapbiomas,mapbiomas_fire,,,,https://data.mapbiomas.org/api/access/datafile/230?format=original,https://doi.org/10.58053/MapBiomas/W2KSHU,1985-2023,state,,a_ANNUAL,,3,mapbiomas
 mapbiomas,mapbiomas_irrigation,biome,,,https://mapbiomas-br-site.s3.amazonaws.com/downloads/Estatisticas%20/Colecao_7_Irrigacao_Biomes_UF.xlsx,,2000-2019,"state, biome",,BIOME,,7,
 mapbiomas,mapbiomas_irrigation,state,,,https://mapbiomas-br-site.s3.amazonaws.com/downloads/Estatisticas%20/Colecao_7_Irrigacao_Biomes_UF.xlsx,,2000-2019,"state, biome",,UF,,7,

@@ -65,6 +65,19 @@
 #      municipality row is still sourced from the older, shorter-coverage
 #      Collection 9 GCS file) -- 5 cells differ in total, not 3, verified
 #      by direct replay rather than assumed.
+#   9. 2026-08-24: fixed R/mapbiomas.R's treatment code for Collection 10's
+#      restructured workbooks (see NEWS.md and R/mapbiomas.R's
+#      mapbiomas_treat()). Two manifest cells changed as part of that fix,
+#      both superseding delta #7's values: mapbiomas_cover/municipality's
+#      url moved from Dataverse file 535 ("Collection 10.1", which turned
+#      out to have no municipality code column at all, verified live) to
+#      file 254 ("Collection 10", the same file MapBiomas also serves off
+#      GCS) -- doesn't change the fixture comparison below since delta #8
+#      already collapses mapbiomas_cover's url to NA regardless. And
+#      mapbiomas_deforestation_regeneration's available_time was corrected
+#      from "1985-2024" to "1987-2024" -- the DEFORESTATION sheet's first
+#      year column is actually 1987, verified live; leaving it at 1985
+#      would have made check_params() silently accept time_period = 1985.
 #
 # The fixture was captured right before normalization. Row order is not
 # significant (both sides sorted by (survey, dataset) before comparing).
@@ -115,7 +128,7 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
       available_time
     ),
     url = dplyr::case_when(
-      survey == "mapbiomas" & dataset == "mapbiomas_cover" ~ "https://data.mapbiomas.org/api/access/datafile/535?format=original",
+      survey == "mapbiomas" & dataset == "mapbiomas_cover" ~ "https://data.mapbiomas.org/api/access/datafile/254?format=original",
       survey == "mapbiomas" & dataset == "mapbiomas_deforestation_regeneration" ~ "https://data.mapbiomas.org/api/access/datafile/485?format=original",
       survey == "mapbiomas" & dataset == "mapbiomas_fire" ~ "https://data.mapbiomas.org/api/access/datafile/230?format=original",
       survey == "mapbiomas" & dataset == "mapbiomas_mining" ~ "https://data.mapbiomas.org/api/access/datafile/336?format=original",
@@ -124,7 +137,9 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
       TRUE ~ url
     ),
     available_time = dplyr::case_when(
-      survey == "mapbiomas" & dataset %in% c("mapbiomas_cover", "mapbiomas_deforestation_regeneration", "mapbiomas_transition") ~ "1985-2024",
+      survey == "mapbiomas" & dataset %in% c("mapbiomas_cover", "mapbiomas_transition") ~ "1985-2024",
+      # delta #9 -- corrected from 1985-2024, see file header
+      survey == "mapbiomas" & dataset == "mapbiomas_deforestation_regeneration" ~ "1987-2024",
       TRUE ~ available_time
     )
   ) %>%

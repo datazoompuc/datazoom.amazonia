@@ -94,6 +94,15 @@ jobs:
           # header for why the manifest and the inventory are separate files.
           mkdir -p actions/watch
           cp "${{ steps.build.outputs.inventory_path }}" actions/watch/site_links.csv
+          # mapbiomas_cache_path is only set (non-empty) when
+          # resolve_mapbiomas() actually recorded a new verdict this run --
+          # see mapbiomas_resolver_cache.R's header. A run where the cache
+          # was already fully warm (nothing new checked) leaves this empty;
+          # skip the copy entirely rather than staging a blank/missing file.
+          if [ -n "${{ steps.build.outputs.mapbiomas_cache_path }}" ]; then
+            mkdir -p actions/cache
+            cp "${{ steps.build.outputs.mapbiomas_cache_path }}" actions/cache/mapbiomas_resolver_cache.csv
+          fi
 
       # Smoke-tested BEFORE opening the PR, not after merging it -- every
       # change (however small) goes through review now, so this is the
@@ -109,36 +118,24 @@ jobs:
       # the PR for the real changes from whichever resolvers succeeded;
       # the separate "Open issue" step below (now also triggered on 11)
       # covers the failure, instead of it silently blocking this PR.
+      # Body composed by build_manifest.R itself (pr_body_path), not inlined
+      # here -- that's what lets it append a MapBiomas-specific fragility
+      # section (which R/mapbiomas.R lines to re-check, by line number) only
+      # on runs where a mapbiomas row actually changed, instead of a generic
+      # reminder on every PR regardless of what changed.
       - name: Open PR for review
         if: steps.build.outputs.exit_code == '10' || steps.build.outputs.exit_code == '11'
         uses: peter-evans/create-pull-request@v6
         with:
           commit-message: "chore(manifest): candidate refresh needs review"
           title: "Manifest refresh: review needed"
-          body: |
-            One or more resolvers/watchers found a change to the manifest
-            and/or the site-link inventory (actions/watch/site_links.csv --
-            see site_inventory.R's header for what that file tracks).
-            Nothing is ever auto-committed -- every change, however small,
-            is opened as a PR for human review. See manifest_report.json in
-            the run artifacts for the full diff, including which inventory
-            links were added/removed/changed.
-
-            Checklist before merging:
-            - [ ] Confirm the new URL(s) actually serve the expected data
-            - [ ] Re-run the affected `check-load-<source>.yaml` workflow
-            - [ ] If a collection/version bump, check whether R/*.R hardcodes
-                  anything that also needs to change (sheet names, raster
-                  legend codes -- see prodes.R, mapbiomas.R, epe.R)
-            - [ ] If a link was added or removed in the inventory diff,
-                  check whether the corresponding manifest row needs a
-                  matching change (a resolver failure elsewhere would
-                  otherwise go unnoticed even though the site already moved)
+          body-path: ${{ steps.build.outputs.pr_body_path }}
           branch: manifest-refresh-review
           labels: manifest
           add-paths: |
             inst/extdata/manifest/v1/datasets_link.csv
             actions/watch/site_links.csv
+            actions/cache/mapbiomas_resolver_cache.csv
 
       - name: Open issue on validation/resolver/watcher failure
         if: steps.build.outputs.exit_code == '11' || steps.build.outputs.exit_code == '20' || steps.build.outputs.exit_code == '30'
@@ -208,6 +205,8 @@ jobs:
             ${{ steps.build.outputs.report_path }}
             ${{ steps.build.outputs.candidate_path }}
             ${{ steps.build.outputs.inventory_path }}
+            ${{ steps.build.outputs.pr_body_path }}
+            ${{ steps.build.outputs.mapbiomas_cache_path }}
           if-no-files-found: ignore
 
       - name: Fail the run if build_manifest.R signaled a problem

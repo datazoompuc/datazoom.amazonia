@@ -30,11 +30,14 @@
 #      hiding as a pass.
 #
 # datasets_link()'s delta against its own pre-migration snapshot is
-# EXPECTED to differ in exactly 5 cells (not patched away, not zero-diffed
-# away either) -- see test-datasets_link.R's delta #8 for the full
-# explanation of which 5 and why. This file only asserts the row/column
-# shape stays consistent and that delta count; test-datasets_link.R is the
-# canonical place the specific cells are pinned.
+# EXPECTED to differ in exactly 5 cells from the base-row-deletion migration
+# itself (not patched away, not zero-diffed away either) -- see
+# test-datasets_link.R's delta #8 for the full explanation of which 5 and
+# why -- PLUS 1 more cell from a later, unrelated fix (delta #9, 2026-08-24:
+# mapbiomas_deforestation_regeneration's available_time corrected). 6 total,
+# also enumerated explicitly below rather than assumed. This file only
+# asserts the row/column shape stays consistent and the delta count;
+# test-datasets_link.R is the canonical place the specific cells are pinned.
 
 matrix <- readRDS(test_path("fixtures", "resolution_matrix_keyed.rds"))
 
@@ -53,11 +56,39 @@ is_known_base_row_dataset <- function(s, d) {
   any(vapply(KNOWN_BASE_ROW_DATASETS, function(k) identical(k[1], s) && identical(k[2], d), logical(1)))
 }
 
-test_that("every real-key entry in resolution_matrix_keyed.rds resolves byte-identically after the migration", {
+# 2026-08-24 addendum: fixing R/mapbiomas.R's treatment of Collection 10's
+# restructured workbooks (see NEWS.md) required 5 real manifest-cell changes
+# on top of the base-row-deletion migration this fixture was captured to
+# verify -- so these REAL-KEY entries are legitimately expected to differ
+# from the fixture's (older) value. Enumerated explicitly, not exempted as a
+# class or by dataset, per the skill's capture-first rule: any mismatch this
+# list doesn't name is still a real regression to go fix, not to wave through.
+# 3 more added the same day: the resolver's own newest-first walk (run for
+# real, with the verification cache's timeout bug already fixed) found a
+# genuinely newer Dataverse dataset for mapbiomas_cover/indigenous_land
+# (file 523, Collection 10.1) than this session's earlier manual
+# investigation had found (file 266, Collection 10) -- verified structurally
+# compatible before accepting (see resolve_mapbiomas.R's header).
+KNOWN_POST_CAPTURE_DELTAS <- c(
+  "mapbiomas\rmapbiomas_cover\rmunicipality\rNA\rurl",
+  "mapbiomas\rmapbiomas_cover\rmunicipality\rNA\rdocs_url",
+  "mapbiomas\rmapbiomas_cover\rmunicipality\rNA\rsheet",
+  "mapbiomas\rmapbiomas_cover\rmunicipality\rNA\rversion",
+  "mapbiomas\rmapbiomas_deforestation_regeneration\rNA\rNA\ravailable_time",
+  "mapbiomas\rmapbiomas_cover\rindigenous_land\rNA\rurl",
+  "mapbiomas\rmapbiomas_cover\rindigenous_land\rNA\rdocs_url",
+  "mapbiomas\rmapbiomas_cover\rindigenous_land\rNA\rversion"
+)
+post_capture_key <- function(s, d, g, y, f) {
+  paste(s, d, ifelse(is.na(g), "NA", g), ifelse(is.na(y), "NA", y), f, sep = "\r")
+}
+
+test_that("every real-key entry in resolution_matrix_keyed.rds resolves byte-identically after the migration, except 5 known post-capture deltas", {
   real_rows <- matrix[!(is.na(matrix$geo_level) & is.na(matrix$year) & mapply(is_known_base_row_dataset, matrix$survey, matrix$dataset)), ]
   expect_gt(nrow(real_rows), 0)
 
   mismatches <- character(0)
+  known_delta_hits <- character(0)
   for (i in seq_len(nrow(real_rows))) {
     row <- real_rows[i, ]
     g <- if (is.na(row$geo_level)) NULL else row$geo_level
@@ -65,11 +96,17 @@ test_that("every real-key entry in resolution_matrix_keyed.rds resolves byte-ide
     new_val <- dataset_field(row$survey, row$dataset, row$field, geo_level = g, year = y)
     same <- (is.na(row$value) && is.na(new_val)) || (!is.na(row$value) && !is.na(new_val) && row$value == new_val)
     if (!isTRUE(same)) {
-      mismatches <- c(mismatches, paste(row$survey, row$dataset, row$geo_level, row$year, row$field, "old=", row$value, "new=", new_val))
+      key <- post_capture_key(row$survey, row$dataset, row$geo_level, row$year, row$field)
+      if (key %in% KNOWN_POST_CAPTURE_DELTAS) {
+        known_delta_hits <- c(known_delta_hits, key)
+      } else {
+        mismatches <- c(mismatches, paste(row$survey, row$dataset, row$geo_level, row$year, row$field, "old=", row$value, "new=", new_val))
+      }
     }
   }
 
   expect_equal(mismatches, character(0))
+  expect_setequal(known_delta_hits, KNOWN_POST_CAPTURE_DELTAS)
 })
 
 test_that("every former base-row query now stops -- the guard has no gap", {
@@ -90,7 +127,13 @@ test_that("every former base-row query now stops -- the guard has no gap", {
   expect_equal(still_works, character(0))
 })
 
-test_that("datasets_link() keeps the same rows/columns and differs in exactly 5 cells (see test-datasets_link.R delta #8)", {
+test_that("datasets_link() keeps the same rows/columns and differs in exactly 6 cells (see test-datasets_link.R deltas #8-#9)", {
+  # 5 cells from delta #8 (the base-row-deletion migration this fixture was
+  # captured to verify) + 1 more from delta #9 (2026-08-24,
+  # mapbiomas_deforestation_regeneration's available_time corrected from
+  # "1985-2024" to "1987-2024" -- see NEWS.md and test-datasets_link.R).
+  # cover's url stays NA either way (its rows still disagree, just on a
+  # different pair of URLs now), so that doesn't add a 7th.
   old_snap <- readRDS(test_path("fixtures", "datasets_link_pre_baserow_deletion.rds"))
   new_snap <- datasets_link()
 
@@ -114,5 +157,5 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 5 
     }
   }
 
-  expect_equal(delta, 5)
+  expect_equal(delta, 6)
 })

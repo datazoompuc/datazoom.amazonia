@@ -12,9 +12,16 @@ test_that("MapBiomas geo_level overrides resolve to their Dataverse-hosted urls"
   # row deliberately left untouched: no Collection 10+ substitute exists
   # on Dataverse for it (verified live), so it still points at its
   # original GCS url.
+  # Updated 2026-08-24: 266 (Collection 10) -> 523 (Collection 10.1) -- the
+  # live resolver found a newer "Indigenous Territories" coverage dataset
+  # on Dataverse that didn't turn up in this session's earlier manual
+  # investigation. Verified structurally compatible before accepting it
+  # (state/state_acronym collision already handled by mapbiomas_treat();
+  # indigenous_territories column matches the name-based territory lookup;
+  # it even adds a geocode column 266 didn't have).
   expect_equal(
     dataset_url("mapbiomas", "mapbiomas_cover", geo_level = "indigenous_land"),
-    "https://data.mapbiomas.org/api/access/datafile/266?format=original"
+    "https://data.mapbiomas.org/api/access/datafile/523?format=original"
   )
   expect_equal(
     dataset_url("mapbiomas", "mapbiomas_transition", geo_level = "biome"),
@@ -32,9 +39,15 @@ test_that("MapBiomas cover/municipality resolves to its own explicit override ro
   # genuinely differs from the "indigenous_land" row's (see
   # test-datasets_link.R: this is exactly why the dataset's collapsed
   # datasets_link() url is NA -- the rows disagree, on purpose).
+  #
+  # Updated 2026-08-24: file 535 (Dataverse's "Collection 10.1" dataset)
+  # was replaced with file 254 ("Collection 10", same dataset MapBiomas
+  # also mirrors on GCS) -- 535's sheet has no municipality code column at
+  # all, verified live. See resolve_mapbiomas.R's header and
+  # R/mapbiomas.R's mapbiomas_treat() for the full story.
   expect_equal(
     dataset_url("mapbiomas", "mapbiomas_cover", geo_level = "municipality"),
-    "https://data.mapbiomas.org/api/access/datafile/535?format=original"
+    "https://data.mapbiomas.org/api/access/datafile/254?format=original"
   )
 })
 

@@ -120,6 +120,8 @@ script_dir <- dirname(normalizePath(script_path, mustWork = FALSE))
 repo_root <- normalizePath(file.path(script_dir, "..", ".."), mustWork = FALSE)
 source(file.path(repo_root, "actions", "scripts", "manifest_validate.R"))
 source(file.path(repo_root, "actions", "scripts", "site_inventory.R"))
+source(file.path(repo_root, "actions", "scripts", "mapbiomas_fragility.R"))
+source(file.path(repo_root, "actions", "scripts", "mapbiomas_resolver_cache.R"))
 
 MANIFEST_PATH <- file.path(repo_root, "inst", "extdata", "manifest", "v1", "datasets_link.csv")
 INVENTORY_PATH <- file.path(repo_root, "actions", "watch", "site_links.csv")
@@ -342,6 +344,42 @@ for (src in names(registry)) {
   resolver_ok <- c(resolver_ok, src)
 }
 
+# ---- Resolver verification cache diff ---------------------------------------
+# See mapbiomas_resolver_cache.R's header. resolve_mapbiomas() writes a
+# candidate cache as a SIDE EFFECT (not through its normal return value,
+# which is reserved for manifest rows) and signals via these globals
+# whether anything changed -- absent/FALSE if resolve_mapbiomas() was
+# skipped entirely (--only excluded it) or genuinely found nothing new to
+# record. Folded into total_changed below so a run that only refreshed
+# cache entries (no real manifest/inventory change) still opens a small PR
+# rather than silently updating a committed file with no review -- see this
+# feature's plan for why that's an accepted tradeoff, not a bug.
+mapbiomas_cache_out <- NA_character_
+cache_diff_n <- 0
+if (isTRUE(get0("mapbiomas_cache_changed", ifnotfound = FALSE))) {
+  mapbiomas_cache_out <- get0("mapbiomas_cache_candidate_path", ifnotfound = NA_character_)
+  if (!is.na(mapbiomas_cache_out) && file.exists(mapbiomas_cache_out)) {
+    committed_cache_path <- file.path(repo_root, "actions", "cache", "mapbiomas_resolver_cache.csv")
+    old_cache <- read_resolver_cache(committed_cache_path)
+    new_cache <- read_resolver_cache(mapbiomas_cache_out)
+    cache_key <- function(df) paste(df$dataset, dplyr::coalesce(df$geo_level, ""), df$file_id, sep = "\r")
+    old_key <- cache_key(old_cache)
+    new_key <- cache_key(new_cache)
+    added <- sum(!(new_key %in% old_key))
+    removed <- sum(!(old_key %in% new_key))
+    changed <- 0
+    for (k in intersect(old_key, new_key)) {
+      o <- old_cache[old_key == k, RESOLVER_CACHE_COLS][1, ]
+      n <- new_cache[new_key == k, RESOLVER_CACHE_COLS][1, ]
+      # checked_at is informational only (human debugging) -- never counts
+      # as a real change, same posture as the inventory's first_seen column.
+      cmp_cols <- setdiff(RESOLVER_CACHE_COLS, "checked_at")
+      if (!identical(as.list(o[cmp_cols]), as.list(n[cmp_cols]))) changed <- changed + 1
+    }
+    cache_diff_n <- added + removed + changed
+  }
+}
+
 # ---- Run watchers and merge their output ------------------------------------
 #
 # Unlike a resolver (which patches individual manifest rows field-by-field),
@@ -484,6 +522,7 @@ report <- list(
   inventory_added = fmt_inventory_rows(inv_diff$added),
   inventory_removed = fmt_inventory_rows(inv_diff$removed),
   inventory_changed = fmt_inventory_rows(inv_diff$changed),
+  n_mapbiomas_cache_changed = cache_diff_n,
   validation_errors = errors,
   manifest_health = health
 )
@@ -508,6 +547,7 @@ cat(sprintf(
   "Inventory changes: %d (added %d / removed %d / changed %d)\n",
   inv_diff$n, nrow(inv_diff$added), nrow(inv_diff$removed), nrow(inv_diff$changed)
 ))
+cat("MapBiomas resolver cache changes:", cache_diff_n, "\n")
 if (length(errors) > 0) {
   cat("Validation errors:\n")
   cat(paste(" -", errors, collapse = "\n"), "\n")
@@ -547,6 +587,7 @@ if (nzchar(summary_path)) {
       "- Inventory changes: %d (added %d / removed %d / changed %d)",
       inv_diff$n, nrow(inv_diff$added), nrow(inv_diff$removed), nrow(inv_diff$changed)
     ),
+    sprintf("- MapBiomas resolver cache changes: %d", cache_diff_n),
     if (check_all) sprintf("- Manifest health (--check-all): %d broken URL(s)", length(health)) else NULL
   ), con)
   close(con)
@@ -562,6 +603,58 @@ inventory_out <- file.path(OUT_DIR, "site_links_candidate.csv")
 write_inventory(candidate_inventory, inventory_out)
 cat("Candidate inventory written to:", inventory_out, "\n")
 
+# ---- PR body ------------------------------------------------------------------
+# Composed here (not left as a static string in update-manifest.yaml) so the
+# MapBiomas fragility section below can be included only when it's actually
+# relevant -- a resolver change to, say, ANEEL shouldn't carry a reminder
+# about R/mapbiomas.R lines nobody touched this run.
+
+pr_body_lines <- c(
+  "One or more resolvers/watchers found a change to the manifest",
+  "and/or the site-link inventory (actions/watch/site_links.csv --",
+  "see site_inventory.R's header for what that file tracks).",
+  "Nothing is ever auto-committed -- every change, however small,",
+  "is opened as a PR for human review. See manifest_report.json in",
+  "the run artifacts for the full diff, including which inventory",
+  "links were added/removed/changed.",
+  "",
+  "Checklist before merging:",
+  "- [ ] Confirm the new URL(s) actually serve the expected data",
+  "- [ ] Re-run the affected `check-load-<source>.yaml` workflow",
+  "- [ ] If a collection/version bump, check whether R/*.R hardcodes",
+  "      anything that also needs to change (sheet names, raster",
+  "      legend codes -- see prodes.R, mapbiomas.R, epe.R)",
+  "- [ ] If a link was added or removed in the inventory diff,",
+  "      check whether the corresponding manifest row needs a",
+  "      matching change (a resolver failure elsewhere would",
+  "      otherwise go unnoticed even though the site already moved)"
+)
+
+# detect_changes()'s keys are "survey\rdataset\rgeo_level\ryear" (see
+# manifest_validate.R) -- a leading "mapbiomas\r" identifies a MapBiomas row.
+mapbiomas_changed <- any(startsWith(changes$changed_keys, "mapbiomas\r"))
+if (isTRUE(mapbiomas_changed)) {
+  fragility_notes <- collect_mapbiomas_fragility_notes(file.path(repo_root, "R", "mapbiomas.R"))
+  if (length(fragility_notes) > 0) {
+    pr_body_lines <- c(
+      pr_body_lines,
+      "",
+      "**MapBiomas structural fragility check** -- a mapbiomas manifest row",
+      "changed this run. R/mapbiomas.R's treatment of the downloaded file",
+      "makes several assumptions about its SHAPE, not just its column names,",
+      "that a collection bump can silently violate without erroring. Re-check",
+      "these specifically (see mapbiomas_treat()'s header in R/mapbiomas.R for",
+      "the tagging convention this list is generated from):",
+      "",
+      paste0("- ", fragility_notes)
+    )
+  }
+}
+
+pr_body_path <- file.path(OUT_DIR, "pr_body.md")
+writeLines(pr_body_lines, pr_body_path)
+cat("PR body written to:", pr_body_path, "\n")
+
 # ---- Expose real paths to the calling workflow ------------------------------
 # tempdir() is randomized per R session, so bash steps in the workflow have no
 # way to know these paths unless we tell them. Mirrors the GITHUB_STEP_SUMMARY
@@ -572,7 +665,9 @@ if (nzchar(gh_output_path)) {
   writeLines(c(
     sprintf("candidate_path=%s", candidate_out),
     sprintf("inventory_path=%s", inventory_out),
-    sprintf("report_path=%s", report_path)
+    sprintf("report_path=%s", report_path),
+    sprintf("pr_body_path=%s", pr_body_path),
+    sprintf("mapbiomas_cache_path=%s", if (is.na(mapbiomas_cache_out)) "" else mapbiomas_cache_out)
   ), con)
   close(con)
 }
@@ -594,7 +689,7 @@ if (length(errors) > 0) {
 # actually found this run. Exit 11 carries both signals at once so
 # update-manifest.yaml can open the PR AND raise the issue, instead of one
 # silently winning over the other.
-total_changed <- changes$n_changed + inv_diff$n
+total_changed <- changes$n_changed + inv_diff$n + cache_diff_n
 total_failed <- length(resolver_failed) + length(watcher_failed)
 
 if (total_changed > 0 && total_failed > 0) {

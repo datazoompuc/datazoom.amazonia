@@ -23,7 +23,7 @@ MapBiomas represents one of the most detailed and scientifically rigorous source
 
 The MapBiomas dataset includes:
 
-- **Time Period**: Annual data from 1985 to 2023 (with updates continuing)
+- **Time Period**: Annual data from 1985 onwards; the exact final year varies by dataset and even by `geo_level` within the same dataset (most run through 2024, a few still stop at 2023 or earlier) -- see **Measurement Units and Notes** below for how to check the year range for a specific `(dataset, geo_level)` pair before assuming it matches another
 - **Geographic Coverage**: All Brazilian biomes (Amazon, Cerrado, Atlantic Forest, Caatinga, Pampa, Pantanal)
 - **Spatial Resolution**: 30 meters (Landsat resolution)
 - **Temporal Frequency**: Annual maps with seasonal detail
@@ -56,17 +56,26 @@ Year-to-year changes in land cover including:
 
 **Key Applications**: Deforestation tracking, regeneration assessment, agricultural dynamics, conservation effectiveness
 
-### 3. Deforestation and Regeneration (`"mapbiomas_deforestation_regeneration"`)
+### 3. Deforestation (`"mapbiomas_deforestation_regeneration"`)
 
-Specific focus on forest cover changes:
+Specific focus on forest loss:
 - **Deforestation**: Permanent loss of forest cover
-- **Forest Regeneration**: Secondary forest regrowth and natural recovery
 - **Degradation Signals**: Forest areas showing stress indicators
 - **Cumulative Deforestation**: Total forest loss since baseline
 
-**Key Applications**: Amazon monitoring, conservation evaluation, regeneration potential, climate impact studies
+**Note**: despite the name, this dataset covers deforestation only. Starting with Collection 10, MapBiomas splits what used to be one combined file into two separate ones -- the regeneration half is now its own dataset, `"mapbiomas_secondary_vegetation"` (below).
 
-### 4. Mining Activities (`"mapbiomas_mining"`)
+**Key Applications**: Amazon monitoring, conservation evaluation, climate impact studies
+
+### 4. Secondary Vegetation (`"mapbiomas_secondary_vegetation"`)
+
+Forest regrowth and natural recovery on previously deforested land:
+- **Forest Regeneration**: Secondary forest regrowth and natural recovery
+- **Regeneration Extent**: Total area of returning vegetation
+
+**Key Applications**: Regeneration assessment, conservation evaluation, climate impact studies
+
+### 5. Mining Activities (`"mapbiomas_mining"`)
 
 Areas used for mining operations:
 - **Active Mining**: Currently operational extraction sites
@@ -76,25 +85,23 @@ Areas used for mining operations:
 
 **Key Applications**: Environmental impact assessment, land degradation, restoration planning, environmental compliance
 
-### 5. Irrigation (`"mapbiomas_irrigation"`)
+### 6. Irrigation (`"mapbiomas_irrigation"`)
 
-**Note**: Temporarily unavailable - new collection coming soon
+**Note**: Temporarily unavailable -- no irrigation statistics file exists on MapBiomas's Dataverse archive at any collection (checked live; only ATBD methodology handbooks and an unrelated agriculture-statistics dataset). Left in place pointing at documentation for whoever investigates a replacement.
 
 Previously included:
 - **Irrigated Areas**: Extent of irrigation in agricultural systems
 - **Irrigation Type**: Drip, center-pivot, flood irrigation
 - **Crop Types Under Irrigation**: Which crops receive irrigation
 
-### 6. Water Bodies (`"mapbiomas_water"`)
+### 7. Water Bodies (`"mapbiomas_water"`)
 
-**Note**: Temporarily unavailable - new collection coming soon
+`"municipality"` and `"biome"` work. **`"state"` is unavailable**: no MapBiomas collection publishes a state-level water sheet upstream (checked live). Previously all three geo_levels were dead; municipality and biome now point at working links.
 
-Previously included:
-- **Surface Water Extent**: Permanent and seasonal water bodies
-- **Water Type**: Natural rivers/lakes vs. artificial reservoirs
-- **Seasonal Variation**: Dry vs. wet season water extent
+- **Surface Water Extent**: Permanent and seasonal water bodies, by municipality or biome
+- **Seasonal Variation**: Not broken out at annual granularity in the current source
 
-### 7. Wildfire Burn Scars (`"mapbiomas_fire"`)
+### 8. Wildfire Burn Scars (`"mapbiomas_fire"`)
 
 Areas affected by wildfires:
 - **Burn Scars**: Areas burned in recent fires
@@ -110,16 +117,17 @@ Areas affected by wildfires:
 
 **Options:**
 
-1. **dataset**: Seven possible choices (two temporarily unavailable)
+1. **dataset**: Eight possible choices (irrigation temporarily unavailable)
    - `"mapbiomas_cover"`: Land cover types
    - `"mapbiomas_transition"`: Changes in land cover
-   - `"mapbiomas_deforestation_regeneration"`: Forest cover changes
+   - `"mapbiomas_deforestation_regeneration"`: Deforestation only (see note above -- regeneration moved to its own dataset)
+   - `"mapbiomas_secondary_vegetation"`: Forest regeneration/regrowth
    - `"mapbiomas_mining"`: Mining areas
    - `"mapbiomas_irrigation"`: Irrigated areas (temporarily unavailable)
-   - `"mapbiomas_water"`: Water bodies (temporarily unavailable)
+   - `"mapbiomas_water"`: Water bodies (`"state"` unavailable; municipality/biome work)
    - `"mapbiomas_fire"`: Wildfire burn scars
 
-2. **raw_data**: 
+2. **raw_data**:
    - `TRUE`: Data in original format from MapBiomas
    - `FALSE`: Cleaned and standardized version (recommended for analysis)
 
@@ -127,12 +135,13 @@ Areas affected by wildfires:
    - For `"mapbiomas_cover"`: `"municipality"` or `"indigenous_land"`
    - For `"mapbiomas_transition"`: `"municipality"` or `"biome"` (faster)
    - For `"mapbiomas_deforestation_regeneration"`: `"municipality"` only
+   - For `"mapbiomas_secondary_vegetation"`: `"municipality"` only
    - For `"mapbiomas_mining"`: `"indigenous_land"` or `"municipality"`
    - For `"mapbiomas_irrigation"`: `"state"` or `"biome"`
-   - For `"mapbiomas_water"`: `"municipality"`, `"state"`, or `"biome"`
+   - For `"mapbiomas_water"`: `"municipality"` or `"biome"` (`"state"` currently unavailable)
    - For `"mapbiomas_fire"`: `"state"` only
 
-4. **language**: 
+4. **language**:
    - `"pt"`: Portuguese language labels
    - `"eng"`: English language
 
@@ -144,6 +153,7 @@ Areas affected by wildfires:
 - **1 hectare**: Approximately 2.47 acres
 - **Validation**: MapBiomas uses field validation and visual interpretation to ensure accuracy
 - **Updates**: Historical data may be revised with new collections and improved algorithms
+- **Collections differ across datasets, and even across `geo_level`s of the same dataset.** MapBiomas does not release every dataset on the same collection at the same time, and this package sometimes deliberately pins one `geo_level` behind its siblings when a newer collection is missing a sheet it needs (e.g. `"mapbiomas_mining"`'s `"indigenous_land"` row is one collection behind its `"municipality"` row -- verified live; MapBiomas dropped that sheet from the newer file). Don't assume one row's collection or year range applies to another row of the same dataset. Check `datasets_link(source = "mapbiomas")` or `inst/extdata/manifest/v1/datasets_link.csv` for the exact collection (`version`) and year range (`available_time`) backing any specific `(dataset, geo_level)` pair.
 
 ***
 
