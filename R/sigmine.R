@@ -4,16 +4,26 @@
 #'
 #' @param dataset A dataset name ("sigmine_active")
 #' @inheritParams load_baci
+#' @param geo_level A \code{string} that defines the geographic level of the data. Can be "state" or "municipality".
 #'
 #' @return A \code{tibble}.
 #'
 #'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
-#' # download treated active mining data in portuguese
+#' # download treated active mining data in portuguese, by state
 #' mining_active <- load_sigmine(
 #'   dataset = "sigmine_active",
 #'   raw_data = FALSE,
+#'   geo_level = "state",
+#'   language = "pt"
+#' )
+#'
+#' # download treated active mining data in portuguese, by municipality
+#' mining_active_munic <- load_sigmine(
+#'   dataset = "sigmine_active",
+#'   raw_data = FALSE,
+#'   geo_level = "municipality",
 #'   language = "pt"
 #' )
 #'
@@ -21,12 +31,14 @@
 
 load_sigmine <- function(dataset = "sigmine_active",
                          raw_data = FALSE,
+                         geo_level = "state",
                          language = "eng") {
   ##############################
   ## Binding Global Variables ##
   ##############################
 
-  survey <- link <- nome <- uf <- NULL
+  survey <- link <- nome <- uf <- processo <- geometry <- NULL
+  code_muni <- name_muni <- abbrev_state <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -35,10 +47,11 @@ load_sigmine <- function(dataset = "sigmine_active",
   param <- list()
   param$source <- "sigmine"
   param$dataset <- dataset
+  param$geo_level <- geo_level
   param$language <- language
   param$raw_data <- raw_data
 
-  # check if dataset is supported
+  # check if dataset and geo_level are supported
 
   check_params(param)
 
@@ -67,15 +80,80 @@ load_sigmine <- function(dataset = "sigmine_active",
       )
     ))
 
+  a$area_ha <- a$area_ha * 10000
+  names(a)[names(a) == "area_ha"] <- "area_m2"
+
+  #########################################
+  ## Municipality-level spatial matching ##
+  #########################################
+
+  # The raw data only carries a "uf" (state) column natively. To support
+  # geo_level = "municipality", we spatially join each mining process to
+  # the municipality polygon it falls in, using the package's internal
+  # municipality shapefile (same source used by load_prodes()).
+  #
+  # We use the CENTROID of each mining polygon, not the polygon itself, to
+  # avoid double-counting when a mine's polygon straddles two municipality
+  # borders (confirmed to happen with the full polygon: ~9600 duplicated
+  # "processo" entries when joining on the polygon vs. near-zero with the
+  # centroid).
+  #
+  # The s2 spherical geometry engine is turned off for this join: several
+  # polygons in the raw SIGMINE data have invalid geometries (self
+  # intersections) that s2 refuses to process even after st_make_valid().
+  # Planar geometry is an acceptable approximation at the scale of a single
+  # mining process / municipality.
+
+  if (geo_level == "municipality") {
+    munic_shp <- external_download(source = "internal", dataset = "geo_municipalities")
+
+    a_sf <- a %>%
+      sf::st_zm(drop = TRUE, what = "ZM") %>%
+      sf::st_make_valid()
+
+    sf::sf_use_s2(FALSE)
+    a_centroid <- sf::st_centroid(a_sf)
+    a_munic <- sf::st_join(a_centroid, munic_shp, join = sf::st_intersects)
+    sf::sf_use_s2(TRUE)
+
+    # The raw ANM data itself contains duplicated "processo" entries
+    # (confirmed independent of the spatial join: same magnitude of
+    # duplicates appears in the raw download). Keep only the first
+    # occurrence of each process.
+    a_munic <- a_munic %>%
+      dplyr::distinct(processo, .keep_all = TRUE)
+
+    a <- a_munic %>%
+      sf::st_drop_geometry() %>%
+      dplyr::rename(
+        municipality_code = code_muni,
+        municipality = name_muni,
+        state_from_shp = abbrev_state
+      )
+
+    # keep the ANM-reported "uf" as-is; municipality shapefile's own
+    # abbrev_state is dropped to avoid ambiguity between the two sources
+    a$state_from_shp <- NULL
+  }
+
+  ##############################
+  ## Translate Variable Names ##
+  ##############################
+
   if (language == "pt") {
-    a$area_ha <- a$area_ha * 10000
     names(a)[names(a) == "ult_evento"] <- "ultimo_evento"
     names(a)[names(a) == "nome"] <- "empresa"
     names(a)[names(a) == "subs"] <- "mineral"
     names(a)[names(a) == "uso"] <- "uso"
-    names(a)[names(a) == "area_ha"] <- "area_m2"
+    if (geo_level == "municipality") {
+      names(a)[names(a) == "municipality_code"] <- "cod_municipio"
+      names(a)[names(a) == "municipality"] <- "municipio"
+      names(a)[names(a) == "code_state"] <- "cod_uf"
+      names(a)[names(a) == "name_state"] <- "nome_uf"
+      names(a)[names(a) == "code_region"] <- "cod_regiao"
+      names(a)[names(a) == "name_region"] <- "nome_regiao"
+    }
   } else if (language == "eng") {
-    a$area_ha <- a$area_ha * 10000
     names(a)[names(a) == "numero"] <- "number"
     names(a)[names(a) == "ult_evento"] <- "last_event"
     names(a)[names(a) == "uf"] <- "state"
@@ -86,7 +164,6 @@ load_sigmine <- function(dataset = "sigmine_active",
     names(a)[names(a) == "nome"] <- "company"
     names(a)[names(a) == "subs"] <- "mineral"
     names(a)[names(a) == "uso"] <- "use"
-    names(a)[names(a) == "area_ha"] <- "area_m2"
   }
 
   return(a)
