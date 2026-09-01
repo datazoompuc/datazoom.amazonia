@@ -356,6 +356,7 @@ for (src in names(registry)) {
 # feature's plan for why that's an accepted tradeoff, not a bug.
 mapbiomas_cache_out <- NA_character_
 cache_diff_n <- 0
+new_fail_rows <- NULL
 if (isTRUE(get0("mapbiomas_cache_changed", ifnotfound = FALSE))) {
   mapbiomas_cache_out <- get0("mapbiomas_cache_candidate_path", ifnotfound = NA_character_)
   if (!is.na(mapbiomas_cache_out) && file.exists(mapbiomas_cache_out)) {
@@ -371,12 +372,30 @@ if (isTRUE(get0("mapbiomas_cache_changed", ifnotfound = FALSE))) {
     for (k in intersect(old_key, new_key)) {
       o <- old_cache[old_key == k, RESOLVER_CACHE_COLS][1, ]
       n <- new_cache[new_key == k, RESOLVER_CACHE_COLS][1, ]
-      # checked_at is informational only (human debugging) -- never counts
-      # as a real change, same posture as the inventory's first_seen column.
-      cmp_cols <- setdiff(RESOLVER_CACHE_COLS, "checked_at")
+      # checked_at is informational only (human debugging); reason is
+      # informational metadata about a verdict, not the verdict itself --
+      # neither ever counts as a real change, same posture as the
+      # inventory's first_seen column. Excluding `reason` here is what
+      # makes it STRUCTURALLY impossible for a reason-string edit alone to
+      # move cache_diff_n (and therefore total_changed), not just true by
+      # argument.
+      cmp_cols <- setdiff(RESOLVER_CACHE_COLS, c("checked_at", "reason"))
       if (!identical(as.list(o[cmp_cols]), as.list(n[cmp_cols]))) changed <- changed + 1
     }
     cache_diff_n <- added + removed + changed
+
+    # Informational side-channel ONLY -- see new_failed_files() in
+    # mapbiomas_resolver_cache.R. Deliberately computed AFTER cache_diff_n
+    # and never folded into it: a new-but-rejected candidate must not move
+    # total_changed, an exit code, or whether a PR opens. Wrapped so a bug
+    # in a notification feature can never take down a manifest run.
+    new_fail_rows <- tryCatch(
+      new_failed_files(old_cache, new_cache),
+      error = function(e) {
+        message("new_failed_files() failed (notification skipped): ", conditionMessage(e))
+        NULL
+      }
+    )
   }
 }
 
@@ -451,6 +470,24 @@ errors <- c(
 changes <- detect_changes(old, candidate)
 inv_diff <- diff_inventory(old_inventory, candidate_inventory)
 
+# Watcher Slack signal. `length(watcher_ok) > 0` is the right guard, not
+# `length(watcher_failed) == 0`: a watcher that FAILS `next`s (see the
+# watcher loop above) BEFORE its rows replace anything in
+# candidate_inventory, so a failed watcher contributes exactly zero to
+# inv_diff by construction -- candidate_inventory starts as a copy of
+# old_inventory. Any diff we see therefore provably came from a watcher
+# that succeeded, which is the confirmed requirement: failures never go to
+# Slack, they keep going to the GitHub issue path, untouched.
+#
+# `length(errors) == 0` additionally guards against notifying on a diff
+# that validate_inventory() (already run into `errors` above) rejected --
+# e.g. a scrape that came back structurally malformed. Without this, a
+# rejected diff would still produce a Slack message (with no PR to back it
+# up, since exit 20 opens an issue instead), which reads as a normal
+# heads-up when it's actually invalid data a human needs to go debug via
+# the issue instead.
+watch_notify <- length(watcher_ok) > 0 && inv_diff$n > 0 && length(errors) == 0
+
 if (length(errors) == 0 && changes$n_changed > 0) {
   errors <- c(errors, validate_http(candidate, changes$changed_keys))
 }
@@ -523,6 +560,21 @@ report <- list(
   inventory_removed = fmt_inventory_rows(inv_diff$removed),
   inventory_changed = fmt_inventory_rows(inv_diff$changed),
   n_mapbiomas_cache_changed = cache_diff_n,
+  n_mapbiomas_new_fail = if (is.null(new_fail_rows)) 0L else nrow(new_fail_rows),
+  # Purely additive -- the "Open issue" workflow step only reads
+  # resolvers_failed/watchers_failed/validation_errors by name, so adding
+  # sibling keys here cannot affect it.
+  mapbiomas_new_fail = if (is.null(new_fail_rows) || nrow(new_fail_rows) == 0) {
+    character(0)
+  } else {
+    sprintf(
+      "%s | %s | %s | %s",
+      new_fail_rows$file_id, new_fail_rows$dataset,
+      ifelse(is.na(new_fail_rows$geo_level), "NA", new_fail_rows$geo_level),
+      dplyr::coalesce(new_fail_rows$reason, "NA")
+    )
+  },
+  n_inventory_changed_notified = isTRUE(watch_notify),
   validation_errors = errors,
   manifest_health = health
 )
@@ -655,6 +707,94 @@ pr_body_path <- file.path(OUT_DIR, "pr_body.md")
 writeLines(pr_body_lines, pr_body_path)
 cat("PR body written to:", pr_body_path, "\n")
 
+# ---- Slack notification payloads (informational side-channel) --------------
+#
+# The message BODY is composed here, in R, where the structured data already
+# lives, and handed to the workflow as a single already-JSON-escaped line on
+# GITHUB_OUTPUT. That's deliberate: the sibling datazoom_viz repo builds a
+# multi-line value with a bash heredoc and interpolates it straight into a
+# JSON string literal, which produces invalid JSON the moment there are two
+# or more items and makes the Slack step fail silently. Escaping in R with
+# jsonlite (the same library that already writes the report) means the value
+# is JSON-valid by construction, and the workflow never re-parses anything.
+#
+# Nothing here is gated on dry_run: GITHUB_OUTPUT being unset is the guard,
+# exactly like the GITHUB_STEP_SUMMARY block above. A local --dry-run run is
+# therefore Slack-silent with no extra branch.
+
+SLACK_MAX_BULLETS <- 8L
+
+# Slack mrkdwn treats &, < and > as markup. Escape them in TEXT we
+# interpolate (scraped labels can contain any of them); never inside a URL,
+# where <url|label> needs the raw characters.
+slack_text_escape <- function(x) {
+  x <- gsub("&", "&amp;", x, fixed = TRUE)
+  x <- gsub("<", "&lt;",  x, fixed = TRUE)
+  gsub(">", "&gt;", x, fixed = TRUE)
+}
+
+# Turns a character vector into ONE line whose newlines are the literal two
+# characters \ and n, correctly escaped for embedding in a JSON string.
+# jsonlite handles quotes, backslashes, control characters and newlines in
+# one pass -- no hand-rolled regex chain to get subtly wrong.
+slack_line <- function(lines) {
+  if (length(lines) == 0) return("")
+  s <- paste(lines, collapse = "\n")
+  if (!requireNamespace("jsonlite", quietly = TRUE)) {
+    # Degraded fallback: at minimum, never emit a real newline.
+    return(gsub("[\r\n\t\"\\\\]", " ", s))
+  }
+  j <- as.character(jsonlite::toJSON(s, auto_unbox = TRUE))  # includes the outer quotes
+  substr(j, 2L, nchar(j) - 1L)
+}
+
+# "• label (col=N) -- <url|host>" -- shorter and clickable, vs the raw-URL
+# one-liners fmt_inventory_rows() writes into the JSON report.
+fmt_inventory_slack <- function(df, heading) {
+  if (nrow(df) == 0) return(character(0))
+  bullets <- sprintf(
+    "• %s (col=%s) — <%s|%s>",
+    slack_text_escape(df$label),
+    ifelse(is.na(df$collection), "NA", df$collection),
+    df$url, slack_text_escape(df$host)
+  )
+  extra <- length(bullets) - SLACK_MAX_BULLETS
+  bullets <- utils::head(bullets, SLACK_MAX_BULLETS)
+  if (extra > 0) bullets <- c(bullets, sprintf("• ...and %d more (see the run artifact)", extra))
+  c(sprintf("*%s (%d):*", heading, nrow(df)), bullets)
+}
+
+watch_slack_text <- if (isTRUE(watch_notify)) {
+  slack_line(c(
+    fmt_inventory_slack(inv_diff$added,   "Added"),
+    fmt_inventory_slack(inv_diff$removed, "Removed"),
+    fmt_inventory_slack(inv_diff$changed, "Changed")
+  ))
+} else ""
+
+# --- new-but-rejected Dataverse candidates ---
+new_fail_notify <- !is.null(new_fail_rows) && nrow(new_fail_rows) > 0
+new_fail_lines <- character(0)
+if (isTRUE(new_fail_notify)) {
+  known_ids <- if (exists("old_cache")) unique(old_cache$file_id) else character(0)
+  kind <- ifelse(new_fail_rows$file_id %in% known_ids, "content replaced", "new file")
+  new_fail_lines <- sprintf(
+    "• file %s (%s) — %s/%s — %s\n   <%s|open on Dataverse>",
+    new_fail_rows$file_id, kind,
+    new_fail_rows$dataset,
+    ifelse(is.na(new_fail_rows$geo_level), "—", new_fail_rows$geo_level),
+    slack_text_escape(dplyr::coalesce(new_fail_rows$reason, "reason not recorded")),
+    # Mirrors dv_access_url() in resolve_mapbiomas.R (a closure, not
+    # reachable from here) -- keep the two in sync if the Dataverse base
+    # URL ever moves.
+    paste0("https://data.mapbiomas.org/api/access/datafile/", new_fail_rows$file_id, "?format=original")
+  )
+  extra <- length(new_fail_lines) - SLACK_MAX_BULLETS
+  new_fail_lines <- utils::head(new_fail_lines, SLACK_MAX_BULLETS)
+  if (extra > 0) new_fail_lines <- c(new_fail_lines, sprintf("• ...and %d more", extra))
+}
+new_fail_slack_text <- if (isTRUE(new_fail_notify)) slack_line(new_fail_lines) else ""
+
 # ---- Expose real paths to the calling workflow ------------------------------
 # tempdir() is randomized per R session, so bash steps in the workflow have no
 # way to know these paths unless we tell them. Mirrors the GITHUB_STEP_SUMMARY
@@ -662,13 +802,25 @@ cat("PR body written to:", pr_body_path, "\n")
 gh_output_path <- Sys.getenv("GITHUB_OUTPUT", "")
 if (nzchar(gh_output_path)) {
   con <- file(gh_output_path, open = "a")
-  writeLines(c(
+  # enc2utf8()+useBytes: inventory labels are Portuguese with accents
+  # (confirmed live in actions/watch/site_links.csv) and must survive into
+  # $GITHUB_OUTPUT regardless of the runner's locale.
+  writeLines(enc2utf8(c(
     sprintf("candidate_path=%s", candidate_out),
     sprintf("inventory_path=%s", inventory_out),
     sprintf("report_path=%s", report_path),
     sprintf("pr_body_path=%s", pr_body_path),
-    sprintf("mapbiomas_cache_path=%s", if (is.na(mapbiomas_cache_out)) "" else mapbiomas_cache_out)
-  ), con)
+    sprintf("mapbiomas_cache_path=%s", if (is.na(mapbiomas_cache_out)) "" else mapbiomas_cache_out),
+    # --- Slack side-channel (informational; never affects the exit code) ---
+    sprintf("watch_notify=%s", if (isTRUE(watch_notify)) "true" else "false"),
+    sprintf("watch_n_added=%d",   nrow(inv_diff$added)),
+    sprintf("watch_n_removed=%d", nrow(inv_diff$removed)),
+    sprintf("watch_n_changed=%d", nrow(inv_diff$changed)),
+    sprintf("watch_slack_text=%s", watch_slack_text),
+    sprintf("new_fail_notify=%s", if (isTRUE(new_fail_notify)) "true" else "false"),
+    sprintf("new_fail_n=%d", if (isTRUE(new_fail_notify)) nrow(new_fail_rows) else 0L),
+    sprintf("new_fail_slack_text=%s", new_fail_slack_text)
+  )), con, useBytes = TRUE)
   close(con)
 }
 

@@ -133,6 +133,19 @@ resolve_mapbiomas <- function(rows) {
   }
   resolver_cache_before <- resolver_cache
 
+  # Side-channel for dv_file_layout()'s rejection reason. dv_file_layout()
+  # keeps returning a bare NULL on every rejection -- deliberately: every
+  # caller's `is.null(layout)` test, and therefore the entire newest-first
+  # walk's control flow, stays byte-for-byte what it was. The REASON is
+  # published here instead, read immediately after the call. Declared in
+  # this frame (dv_file_layout() is a closure defined below, inside this
+  # same function, so `<<-` from within it resolves here) so it's scoped to
+  # one resolve_mapbiomas() invocation -- same convention resolver_cache
+  # itself already uses. Informational only: feeds the "new Dataverse file
+  # spotted, doesn't qualify" Slack ping in build_manifest.R, never read by
+  # cache_lookup() or anything that affects which candidate gets chosen.
+  layout_reason <- NA_character_
+
   ## ============================================================ ##
   ## Dataverse: search -> verify sheet -> emit                    ##
   ## ============================================================ ##
@@ -201,7 +214,15 @@ resolve_mapbiomas <- function(rows) {
   # doesn't qualify" and moves on to the next-older candidate, exactly the
   # fallback mechanism that already makes mapbiomas_mining/indigenous_land
   # land on Collection 8 when Collection 9's file drops the IL sheet.
+  # Rejections ADDITIONALLY publish a human-readable reason via the
+  # enclosing `layout_reason` binding -- informational only (feeds a Slack
+  # ping in build_manifest.R); the return value here, and therefore every
+  # bit of this walk's behavior, is unchanged by that.
   dv_file_layout <- function(file_id, sheet_pattern, required_col_pattern = NULL, max_bytes = 2e8) {
+    # Reset per call -- without this, a reason left over from a previous
+    # candidate could be attributed to this one.
+    layout_reason <<- NA_character_
+
     head_resp <- tryCatch(
       curl::curl_fetch_memory(
         dv_access_url(file_id),
@@ -211,7 +232,10 @@ resolve_mapbiomas <- function(rows) {
     )
     if (!is.null(head_resp)) {
       len <- suppressWarnings(as.numeric(curl::parse_headers_list(head_resp$headers)[["content-length"]][1]))
-      if (!is.na(len) && len > max_bytes) return(NULL)
+      if (!is.na(len) && len > max_bytes) {
+        layout_reason <<- sprintf("file too large to inspect (%.0f bytes > %.0f)", len, max_bytes)
+        return(NULL)
+      }
     }
 
     temp <- tempfile(fileext = ".xlsx")
@@ -258,16 +282,29 @@ resolve_mapbiomas <- function(rows) {
     }
 
     sheets <- tryCatch(readxl::excel_sheets(temp), error = function(e) NULL)
-    if (is.null(sheets)) return(NULL)
+    if (is.null(sheets)) {
+      layout_reason <<- "not a readable workbook (excel_sheets() failed)"
+      return(NULL)
+    }
 
     hit <- grep(sheet_pattern, sheets, ignore.case = TRUE, value = TRUE)
-    if (length(hit) == 0) return(NULL)
+    if (length(hit) == 0) {
+      layout_reason <<- sprintf(
+        "no sheet matching %s (sheets: %s)",
+        sheet_pattern, paste(utils::head(sheets, 12), collapse = ", ")
+      )
+      return(NULL)
+    }
 
     header <- tryCatch(names(readxl::read_excel(temp, sheet = hit[1], n_max = 0)), error = function(e) NULL)
-    if (is.null(header)) return(NULL)
+    if (is.null(header)) {
+      layout_reason <<- sprintf("sheet %s has no readable header row", hit[1])
+      return(NULL)
+    }
 
     if (!is.null(required_col_pattern) &&
         !any(grepl(required_col_pattern, header, ignore.case = TRUE))) {
+      layout_reason <<- sprintf("sheet %s has no column matching %s", hit[1], required_col_pattern)
       return(NULL)
     }
 
@@ -350,7 +387,11 @@ resolve_mapbiomas <- function(rows) {
           resolver_cache <<- cache_upsert(
             resolver_cache, dataset, geo_levels, f$id, checksum, fp,
             verdict = if (is.null(layout)) "fail" else "pass",
-            sheet = if (is.null(layout)) NA_character_ else layout$sheet
+            sheet = if (is.null(layout)) NA_character_ else layout$sheet,
+            # Recorded for the informational side-channel only (see
+            # build_manifest.R's new-failed-file Slack ping). Never read by
+            # cache_lookup(), never a change signal in the cache diff.
+            reason = if (is.null(layout)) layout_reason else NA_character_
           )
         }
 

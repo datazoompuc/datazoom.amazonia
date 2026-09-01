@@ -124,6 +124,7 @@ jobs:
       # on runs where a mapbiomas row actually changed, instead of a generic
       # reminder on every PR regardless of what changed.
       - name: Open PR for review
+        id: pr
         if: steps.build.outputs.exit_code == '10' || steps.build.outputs.exit_code == '11'
         uses: peter-evans/create-pull-request@v6
         with:
@@ -136,6 +137,53 @@ jobs:
             inst/extdata/manifest/v1/datasets_link.csv
             actions/watch/site_links.csv
             actions/cache/mapbiomas_resolver_cache.csv
+
+      # ---- Informational Slack side-channel -------------------------------
+      # Failures NEVER come here -- resolver/watcher/validation failures keep
+      # going to the "Open issue" step below, unchanged. These two steps only
+      # ever report things that SUCCEEDED and found something.
+      #
+      # !cancelled() rather than the default success(): a red smoke-test or
+      # a create-pull-request hiccup should not swallow the news that the
+      # MapBiomas site changed. When the build step never got far enough to
+      # write the output, the boolean is empty/absent and the step no-ops.
+      #
+      # continue-on-error: a missing/revoked SLACK_WEBHOOK_URL secret must
+      # never turn a healthy manifest run red -- the final "Fail the run"
+      # step is driven by build_manifest.R's exit code and nothing else,
+      # and that must stay true regardless of Slack delivery succeeding.
+      #
+      # Message text is composed in build_manifest.R and arrives here as ONE
+      # already-JSON-escaped line (see that file's "Slack notification
+      # payloads" section) -- no bash re-parsing of the report or the CSVs.
+      #
+      # Prerequisite: a SLACK_WEBHOOK_URL secret must exist on this repo (or
+      # be inherited from an org-level secret) for these to actually deliver
+      # anything -- continue-on-error means the pipeline stays healthy
+      # either way, but no message arrives until the secret is set.
+      - name: Notify Slack -- MapBiomas site inventory changed
+        if: ${{ !cancelled() && steps.build.outputs.watch_notify == 'true' }}
+        continue-on-error: true
+        uses: slackapi/slack-github-action@v2.1.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": ":satellite: *MapBiomas site inventory changed* — ${{ steps.build.outputs.watch_n_added }} added / ${{ steps.build.outputs.watch_n_removed }} removed / ${{ steps.build.outputs.watch_n_changed }} changed\n\n${{ steps.build.outputs.watch_slack_text }}\n\n_<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow run>_${{ steps.pr.outputs.pull-request-url && format(' · <{0}|Review PR>', steps.pr.outputs.pull-request-url) || '' }}"
+            }
+
+      - name: Notify Slack -- new Dataverse file rejected by the resolver
+        if: ${{ !cancelled() && steps.build.outputs.new_fail_notify == 'true' }}
+        continue-on-error: true
+        uses: slackapi/slack-github-action@v2.1.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": ":mag: *New MapBiomas Dataverse file(s) spotted — none usable* (${{ steps.build.outputs.new_fail_n }})\nThe resolver inspected file content it had never seen before and rejected it. The manifest itself is untouched -- a file that had PASSED would show up as a manifest PR instead -- but recording the rejection still updates the resolver cache, so the routine cache-only PR may still open for that; this ping is just faster than digging through its diff.\n\n${{ steps.build.outputs.new_fail_slack_text }}\n\n_<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow run>_"
+            }
 
       - name: Open issue on validation/resolver/watcher failure
         if: steps.build.outputs.exit_code == '11' || steps.build.outputs.exit_code == '20' || steps.build.outputs.exit_code == '30'

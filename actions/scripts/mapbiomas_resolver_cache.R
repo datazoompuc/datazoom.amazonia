@@ -48,7 +48,7 @@
 
 RESOLVER_CACHE_COLS <- c(
   "dataset", "geo_level", "file_id", "checksum",
-  "rules_fingerprint", "verdict", "sheet", "checked_at"
+  "rules_fingerprint", "verdict", "sheet", "reason", "checked_at"
 )
 
 read_resolver_cache <- function(path) {
@@ -59,7 +59,7 @@ read_resolver_cache <- function(path) {
     )
     return(tibble::as_tibble(empty))
   }
-  readr::read_csv(
+  df <- readr::read_csv(
     path,
     col_types = readr::cols(.default = readr::col_character()),
     na = c("", "NA"),
@@ -67,6 +67,16 @@ read_resolver_cache <- function(path) {
     progress = FALSE,
     lazy = FALSE
   )
+  # Schema tolerance: a cache written under an OLDER column set (e.g. the
+  # 183-row file committed before `reason` existed) is still perfectly
+  # valid -- the columns that DO exist are the ones lookup trusts. Fill any
+  # column THIS version knows about but the file lacks with NA, and drop
+  # anything unknown, so every consumer downstream (build_manifest.R's
+  # cache diff, cache_upsert()'s positional row replacement) can assume the
+  # canonical shape unconditionally. Keep this permanently, not just as a
+  # one-time migration shim -- it's cheap defense for the next column too.
+  for (col in setdiff(RESOLVER_CACHE_COLS, names(df))) df[[col]] <- NA_character_
+  df[, RESOLVER_CACHE_COLS]
 }
 
 write_resolver_cache <- function(df, path) {
@@ -127,16 +137,23 @@ cache_lookup <- function(cache, dataset, geo_level, file_id, checksum, fingerpri
 # history), or appends a new one.
 cache_upsert <- function(cache, dataset, geo_level, file_id, checksum,
                           fingerprint, verdict, sheet,
+                          reason = NA_character_,
                           checked_at = format(Sys.Date())) {
   g <- geo_level %||% NA_character_
   key_match <- cache$dataset == dataset &
     (is.na(cache$geo_level) & is.na(g) | !is.na(cache$geo_level) & !is.na(g) & cache$geo_level == g) &
     cache$file_id == as.character(file_id)
 
+  # Column order here MUST match RESOLVER_CACHE_COLS: the replace branch
+  # below assigns `cache[key_match, ] <- new_row[...]` POSITIONALLY, not by
+  # name. A drifted order would silently write values into the wrong
+  # columns with no error -- see test-mapbiomas-resolver-cache.R's
+  # old-schema-upsert test for the direct proof this stays safe.
   new_row <- tibble::tibble(
     dataset = dataset, geo_level = g, file_id = as.character(file_id),
     checksum = checksum, rules_fingerprint = fingerprint,
-    verdict = verdict, sheet = sheet %||% NA_character_, checked_at = checked_at
+    verdict = verdict, sheet = sheet %||% NA_character_,
+    reason = reason %||% NA_character_, checked_at = checked_at
   )
 
   if (any(key_match)) {
@@ -145,4 +162,60 @@ cache_upsert <- function(cache, dataset, geo_level, file_id, checksum,
   } else {
     dplyr::bind_rows(cache, new_row)
   }
+}
+
+## ============================================================ ##
+## New-candidate detection (informational side-channel only)    ##
+## ============================================================ ##
+
+# Rows in `new` whose FILE CONTENT the resolver had never inspected before
+# (per `old`) and which came back "fail" this run. This exists purely to
+# feed an informational Slack ping -- it is read-only with respect to the
+# manifest, never feeds cache_diff_n/total_changed, and never influences an
+# exit code. See build_manifest.R's call site.
+#
+# "Never inspected before" is keyed on (file_id, checksum), NOT on the full
+# cache key, for three separate reasons:
+#   - dedupe: the SAME physical Dataverse file can back up to 5 different
+#     (dataset, geo_level) config rows, so a full-key comparison would
+#     report one new file up to five times.
+#   - content replacement: cache_upsert() is keyed on
+#     (dataset, geo_level, file_id), so MapBiomas swapping a file's content
+#     under an unchanged id reads as a "changed" row, not an "added" one --
+#     but it is genuinely content nobody has ever checked, so it counts.
+#   - rules changes: if only rules_fingerprint moved (a maintainer tightened
+#     sheet_pattern/required_col_pattern), the FILE is not new -- our rule
+#     is. Keying on (file_id, checksum) correctly stays silent there.
+#
+# Deliberately NOT reported: a re-confirmed known fail (same file_id, same
+# checksum, already fail in `old`); and a new file that PASSES (that already
+# produces a real manifest change and opens a PR through the normal path --
+# a second ping would be redundant). Nothing about a re-confirmed fail
+# changed, and a weekly ping about unchanging state is exactly the noise
+# this project rejected a `last_seen` inventory column over.
+#
+# Coverage caveat, worth knowing rather than assuming away: this only sees
+# files the walk actually reached this run. resolve_via_dataverse() returns
+# on the first PASS, so candidates older than the winning one are never
+# inspected/cached in that run -- fine, since those are not "new" anyway.
+# And enumeration itself is gated by dv_search() + is_real_stats_hit() + a
+# parseable "Collection N" in the title, so a genuinely new Dataverse
+# DATASET that misses those filters is invisible to this mechanism too.
+new_failed_files <- function(old, new) {
+  empty <- new[0, , drop = FALSE]
+  if (nrow(new) == 0) return(empty)
+  # A cold/empty committed cache is a BOOTSTRAP, not news -- reporting all
+  # ~176 historical fails as "new" on a first seeding run would be pure
+  # noise. Stay silent; the seed PR itself is the review artifact.
+  if (nrow(old) == 0) return(empty)
+
+  content_key <- function(df) {
+    paste(df$file_id, dplyr::coalesce(df$checksum, ""), sep = "\r")
+  }
+  is_fail <- !is.na(new$verdict) & new$verdict == "fail"
+  fresh   <- !(content_key(new) %in% content_key(old))
+  hits    <- new[is_fail & fresh, , drop = FALSE]
+  if (nrow(hits) == 0) return(empty)
+  # One line per physical file, not per config row that happened to reach it.
+  hits[!duplicated(hits$file_id), , drop = FALSE]
 }

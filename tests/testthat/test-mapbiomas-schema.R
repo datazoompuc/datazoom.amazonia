@@ -132,6 +132,31 @@ test_that("TRANSITION_9 (x-prefixed window columns, municipality) still pivots t
   expect_true("municipality_code" %in% names(out))
 })
 
+test_that("pt language: class_level_N_from/_to are renamed, not left untouched", {
+  # Real header, both live collections currently in use for this dataset:
+  # TRANSITION_9 (GCS, municipality) and TRANSITION_10 (Dataverse, biome)
+  # both use class_level_1_from..4_from / class_level_1_to..4_to -- verified
+  # live 2026-09-01 by streaming TRANSITION_9's actual header via HTTP range
+  # reads, not assumed. There is no from_level_N/to_level_N PREFIX form in
+  # real data -- the original rule matched that shape and therefore matched
+  # nothing here, silently. This is the direct regression guard for the fix.
+  dat <- tibble::tibble(
+    country = "Brasil", state = "Acre", municipality = "Rio Branco",
+    `municipality - state` = "Rio Branco - AC", geocode = 1200401, feature_id = 1,
+    class_from = "Forest", class_to = "Pasture",
+    class_level_1_from = "Forest", class_level_2_from = "Forest",
+    class_level_3_from = "Forest", class_level_4_from = "Forest",
+    class_level_1_to = "Farming", class_level_2_to = "Pasture",
+    class_level_3_to = "Pasture", class_level_4_to = "Pasture",
+    `1985_1986` = 5, `1990_1995` = 8
+  )
+  out <- mapbiomas_treat(dat, mb_param("mapbiomas_transition", "municipality", language = "pt"))
+
+  expect_true(all(c("class_level_1_de", "class_level_2_de", "class_level_3_de", "class_level_4_de") %in% names(out)))
+  expect_true(all(c("class_level_1_para", "class_level_2_para", "class_level_3_para", "class_level_4_para") %in% names(out)))
+  expect_false(any(grepl("_from$|_to$", names(out))))
+})
+
 test_that("DEFORESTATION's renamed municipality code column (geocode_municipality) is caught", {
   # Real header (Dataverse file 485, sheet DEFORESTATION): country, biome,
   # state, municipality, geocode_municipality, class, transition_name,

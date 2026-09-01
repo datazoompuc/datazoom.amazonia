@@ -5,7 +5,7 @@
 #' @param dataset A dataset name ("mapbiomas_cover", "mapbiomas_transition", "mapbiomas_irrigation", "mapbiomas_deforestation_regeneration", "mapbiomas_secondary_vegetation", "mapbiomas_mining", "mapbiomas_water" or "mapbiomas_fire")
 #' @inheritParams load_baci
 #' @param geo_level A \code{string} that defines the geographic level of the data
-#'   * For dataset "mapbiomas_cover", can only be "municipality"
+#'   * For dataset "mapbiomas_cover", can be "municipality" or "indigenous_land"
 #'   * For dataset "mapbiomas_transition", can be "municipality" or "biome" (faster download)
 #'   * For dataset "mapbiomas_deforestation_regeneration", can only be "municipality"
 #'   * For dataset "mapbiomas_secondary_vegetation", can only be "municipality"
@@ -272,13 +272,18 @@ mapbiomas_treat <- function(dat, param) {
         "territory_code" ~ "cod_territorio",
         .default = .
       )) %>%
-      # FRAGILE: depends on the literal substrings "to_level"/"from_level"
-      # appearing as PREFIXES. Collection 10's transition columns are
-      # already suffixed (class_level_N_from/_to, not from_level_N) --
-      # this rule may already be silently inert post-migration; worth
-      # confirming directly, not just watching for a future break.
-      dplyr::rename_with(~ stringr::str_replace(., "to_level", "para_level")) %>%
-      dplyr::rename_with(~ stringr::str_replace(., "from_level", "de_level"))
+      # FRAGILE: assumes the direction suffix ("_from"/"_to") is the very
+      # end of the column name (class_level_1_from, class_level_1_to, ...).
+      # Verified live against BOTH collections currently in use for this
+      # dataset -- mapbiomas_transition/municipality is still pinned to
+      # Collection 9 (TRANSITION_9, real GCS file) while /biome is on
+      # Collection 10 (TRANSITION_10, Dataverse) -- and both use this exact
+      # suffixed shape; there is no from_level_N/to_level_N prefix form in
+      # real data. A future collection moving the direction marker
+      # elsewhere in the name (or dropping the trailing "_from"/"_to")
+      # would silently stop matching here, same failure mode as before.
+      dplyr::rename_with(~ stringr::str_replace(., "_to$", "_para")) %>%
+      dplyr::rename_with(~ stringr::str_replace(., "_from$", "_de"))
   }
 
   if (param$language == "eng") {
