@@ -98,11 +98,10 @@ load_sigmine <- function(dataset = "sigmine_active",
   # "processo" entries when joining on the polygon vs. near-zero with the
   # centroid).
   #
-  # The s2 spherical geometry engine is turned off for this join: several
-  # polygons in the raw SIGMINE data have invalid geometries (self
-  # intersections) that s2 refuses to process even after st_make_valid().
-  # Planar geometry is an acceptable approximation at the scale of a single
-  # mining process / municipality.
+  # Several polygons in the raw SIGMINE data have invalid geometries (self
+  # intersections) that trip up spatial operations even after
+  # st_make_valid(); the fix used here is reprojecting to a planar CRS
+  # before computing centroids (see below), rather than disabling s2.
 
   if (geo_level == "municipality") {
     munic_shp <- external_download(source = "internal", dataset = "geo_municipalities")
@@ -111,10 +110,20 @@ load_sigmine <- function(dataset = "sigmine_active",
       sf::st_zm(drop = TRUE, what = "ZM") %>%
       sf::st_make_valid()
 
-    sf::sf_use_s2(FALSE)
-    a_centroid <- sf::st_centroid(a_sf)
-    a_munic <- sf::st_join(a_centroid, munic_shp, join = sf::st_intersects)
-    sf::sf_use_s2(TRUE)
+    # Reprojeta para um CRS planar brasileiro antes de calcular o centroide.
+    # Calcular o centroide com sf_use_s2(FALSE) (abordagem anterior) fazia o
+    # GEOS tratar graus de lon/lat como coordenadas cartesianas planas, o que
+    # distorce o resultado -- e distorce mais exatamente nos polígonos
+    # alongados que cruzam fronteira municipal, que são o caso que esta
+    # técnica tenta resolver bem. Reprojetar para um CRS já planar (métrico)
+    # antes do centroide evita essa distorção sem precisar desligar o s2.
+    operation_crs <- sf::st_crs("+proj=poly +lat_0=0 +lon_0=-54 +x_0=5000000 +y_0=10000000 +ellps=aust_SA +units=m +no_defs")
+
+    a_sf_proj     <- sf::st_transform(a_sf, operation_crs)
+    munic_shp_proj <- sf::st_transform(munic_shp, operation_crs)
+
+    a_centroid <- sf::st_centroid(a_sf_proj)
+    a_munic <- sf::st_join(a_centroid, munic_shp_proj, join = sf::st_intersects)
 
     # The raw ANM data itself contains duplicated "processo" entries
     # (confirmed independent of the spatial join: same magnitude of
