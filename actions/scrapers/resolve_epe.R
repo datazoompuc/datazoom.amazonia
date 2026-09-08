@@ -46,6 +46,15 @@
 # much smaller scale (EPE's consolidated tables are tens of KB to a few MB,
 # not MapBiomas's 78MB+ Dataverse candidates walked newest-first -- no
 # verification cache is warranted for files this small and this un-walked).
+#
+# 2026-09-08 (later same day): each block's verdict (pass/fail, with reason)
+# also gets recorded into the shared resolver alert cache (actions/scripts/
+# resolver_alert_cache.R -- generalizes resolve_mapbiomas.R's own
+# new-Dataverse-file-rejected Slack signal). Purely additive: the
+# block_failures/partial_failures machinery above is completely unchanged --
+# this only lets build_manifest.R ping Slack the first time a block starts
+# failing for a NEW reason, without re-pinging every run it stays broken the
+# same way (see resolve_prodes.R's identical wiring for the same mechanism).
 
 resolve_epe <- function(rows) {
   if (is.null(rows) || nrow(rows) == 0) {
@@ -291,6 +300,53 @@ resolve_epe <- function(rows) {
       }
     }
   }
+
+  ## -- resolver alert cache: see this file's header and resolve_prodes.R's --
+  ## identical wiring. Runs regardless of whether the stop() below fires --
+  ## a failure this severe (every block down) is exactly the case a human
+  ## most needs the Slack ping for, not less. repo_root/OUT_DIR are
+  ## build_manifest.R globals already in scope here (source()d into that
+  ## environment); fall back to an in-memory-only cache if somehow missing.
+  alert_cache_path <- tryCatch(
+    file.path(repo_root, "actions", "cache", "resolver_alerts.csv"),
+    error = function(e) NA_character_
+  )
+  alert_cache <- if (!is.na(alert_cache_path)) {
+    read_resolver_alert_cache(alert_cache_path)
+  } else {
+    read_resolver_alert_cache(tempfile())
+  }
+  epe_blocks <- list(
+    list(label = "consumer/industrial_energy_consumption", ok = !is.null(out$consumer)),
+    list(label = "national_energy_balance", ok = !is.null(out$ben)),
+    list(label = "energy_state_panel", ok = !is.null(out$panel))
+  )
+  for (blk in epe_blocks) {
+    blk_failures <- grep(paste0("^", blk$label, ": "), block_failures, value = TRUE, fixed = FALSE)
+    if (length(blk_failures) > 0) {
+      for (reason in blk_failures) {
+        alert_cache <- alert_cache_upsert(
+          alert_cache,
+          source = "epe", item_key = paste(blk$label, reason, sep = "\r"),
+          dataset = blk$label, geo_level = NA_character_,
+          verdict = "fail", reason = reason
+        )
+      }
+    } else if (isTRUE(blk$ok)) {
+      alert_cache <- alert_cache_upsert(
+        alert_cache,
+        source = "epe", item_key = blk$label,
+        dataset = blk$label, geo_level = NA_character_,
+        verdict = "pass", reason = NA_character_
+      )
+    }
+  }
+  epe_alert_out_path <- tryCatch(
+    file.path(OUT_DIR, "epe_alert_cache_candidate.csv"),
+    error = function(e) tempfile(fileext = ".csv")
+  )
+  write_resolver_alert_cache(alert_cache, epe_alert_out_path)
+  assign("epe_alert_cache_candidate_path", epe_alert_out_path, envir = .GlobalEnv)
 
   if (length(out) == 0) {
     stop(

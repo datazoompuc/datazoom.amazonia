@@ -84,6 +84,18 @@
 #      Chapter 8 page publishes a consolidated, already-tidy generation-by-
 #      source table. url and available_time both change (2011-2024 ->
 #      2011-2025); see R/epe.R and resolve_epe.R's headers.
+#  11. 2026-09-08 (PRODES/BACI resolver audit): a new survey/dataset,
+#      baci_dic/product_codes, was added -- the Brazilian COMEX product-code
+#      dictionary R/baci.R's load_baci_dic() downloads (balanca.economia.
+#      gov.br's NCM_SH.csv) used to be a URL hardcoded straight into that
+#      function, off-manifest and unmonitored; it now has a manifest row of
+#      its own (kept under its own survey, not "baci", so it can't pass
+#      check_params()'s dataset validation for load_baci() -- see
+#      R/baci.R's header) and load_baci_dic() reads it via dataset_url()
+#      instead of the literal. PRODES' 6 docs_url cells were also fixed
+#      (were pointing at a dashboard app, not the real downloads landing
+#      page) but docs_url isn't one of datasets_link()'s returned columns,
+#      so that change doesn't touch this fixture.
 #
 # The fixture was captured right before normalization. Row order is not
 # significant (both sides sorted by (survey, dataset) before comparing).
@@ -168,6 +180,13 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
       sidra_code = NA_character_, available_time = "1985-2024",
       available_geo = "municipality",
       url = "https://data.mapbiomas.org/api/access/datafile/310?format=original"
+    ),
+    # Delta #11 -- see file header. Genuinely new row, not a value change.
+    tibble::tibble(
+      survey = "baci_dic", dataset = "product_codes",
+      sidra_code = NA_character_, available_time = NA_character_,
+      available_geo = NA_character_,
+      url = "https://balanca.economia.gov.br/balanca/bd/tabelas/NCM_SH.csv"
     )
   ) %>%
   dplyr::mutate(

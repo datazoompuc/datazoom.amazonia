@@ -122,6 +122,8 @@ source(file.path(repo_root, "actions", "scripts", "manifest_validate.R"))
 source(file.path(repo_root, "actions", "scripts", "site_inventory.R"))
 source(file.path(repo_root, "actions", "scripts", "fragility_notes.R"))
 source(file.path(repo_root, "actions", "scripts", "mapbiomas_resolver_cache.R"))
+source(file.path(repo_root, "actions", "scripts", "zip_remote_listing.R"))
+source(file.path(repo_root, "actions", "scripts", "resolver_alert_cache.R"))
 
 MANIFEST_PATH <- file.path(repo_root, "inst", "extdata", "manifest", "v1", "datasets_link.csv")
 INVENTORY_PATH <- file.path(repo_root, "actions", "watch", "site_links.csv")
@@ -418,6 +420,74 @@ if (isTRUE(get0("mapbiomas_cache_changed", ifnotfound = FALSE))) {
   }
 }
 
+# ---- Resolver alert cache diff (PRODES/EPE "new candidate, doesn't fit ------
+# criteria" -- see actions/scripts/resolver_alert_cache.R's header) ----------
+#
+# Generalizes the MapBiomas cache-diff block directly above: resolve_prodes()/
+# resolve_epe() each stash their OWN source's candidate rows via a global
+# (prodes_alert_cache_candidate_path/epe_alert_cache_candidate_path), never a
+# shared mutable object -- merge_resolver_alert_source() combines whichever
+# of those actually ran into ONE final table on top of the committed cache,
+# correct even if both sources changed something the same run. Same two-
+# quantities split as the MapBiomas block above: resolver_alert_cache_diff_n
+# (literal row-level diff, folded into total_changed so cache-only bookkeeping
+# still opens a small reviewable PR) is kept separate from new_alert_rows
+# (the Slack-worthy subset -- informational only, NEVER folds into
+# total_changed/exit code, same posture new_fail_rows already has).
+resolver_alerts_out <- NA_character_
+resolver_alert_cache_diff_n <- 0
+new_alert_rows <- NULL
+{
+  committed_alert_path <- file.path(repo_root, "actions", "cache", "resolver_alerts.csv")
+  committed_alerts <- read_resolver_alert_cache(committed_alert_path)
+  merged_alerts <- committed_alerts
+  any_source_ran <- FALSE
+
+  for (src_label in c("prodes", "epe")) {
+    candidate_path <- get0(paste0(src_label, "_alert_cache_candidate_path"), ifnotfound = NA_character_)
+    if (!is.na(candidate_path) && file.exists(candidate_path)) {
+      any_source_ran <- TRUE
+      source_rows <- read_resolver_alert_cache(candidate_path)
+      merged_alerts <- merge_resolver_alert_source(merged_alerts, src_label, source_rows)
+    }
+  }
+
+  if (isTRUE(any_source_ran)) {
+    alert_key <- function(df) paste(df$source, df$item_key, sep = "\r")
+    old_key <- alert_key(committed_alerts)
+    new_key <- alert_key(merged_alerts)
+    added <- sum(!(new_key %in% old_key))
+    removed <- sum(!(old_key %in% new_key))
+    changed <- 0
+    for (k in intersect(old_key, new_key)) {
+      o <- committed_alerts[old_key == k, RESOLVER_ALERT_COLS][1, ]
+      n <- merged_alerts[new_key == k, RESOLVER_ALERT_COLS][1, ]
+      # checked_at excluded from the comparison for the same reason
+      # cache_diff_n excludes it above: a timestamp-only refresh must not
+      # move total_changed.
+      cmp_cols <- setdiff(RESOLVER_ALERT_COLS, "checked_at")
+      if (!identical(as.list(o[cmp_cols]), as.list(n[cmp_cols]))) changed <- changed + 1
+    }
+    resolver_alert_cache_diff_n <- added + removed + changed
+
+    resolver_alerts_out <- tryCatch(
+      file.path(OUT_DIR, "resolver_alerts_candidate.csv"),
+      error = function(e) tempfile(fileext = ".csv")
+    )
+    write_resolver_alert_cache(merged_alerts, resolver_alerts_out)
+
+    # Informational side-channel ONLY -- same posture as new_fail_rows
+    # above: never folds into resolver_alert_cache_diff_n/total_changed.
+    new_alert_rows <- tryCatch(
+      new_resolver_alerts(committed_alerts, merged_alerts),
+      error = function(e) {
+        message("new_resolver_alerts() failed (notification skipped): ", conditionMessage(e))
+        NULL
+      }
+    )
+  }
+}
+
 # ---- Run watchers and merge their output ------------------------------------
 #
 # Unlike a resolver (which patches individual manifest rows field-by-field),
@@ -594,6 +664,17 @@ report <- list(
       dplyr::coalesce(new_fail_rows$reason, "NA")
     )
   },
+  n_resolver_alert_cache_changed = resolver_alert_cache_diff_n,
+  n_resolver_new_alert = if (is.null(new_alert_rows)) 0L else nrow(new_alert_rows),
+  resolver_new_alert = if (is.null(new_alert_rows) || nrow(new_alert_rows) == 0) {
+    character(0)
+  } else {
+    sprintf(
+      "%s | %s | %s",
+      new_alert_rows$source, new_alert_rows$dataset,
+      dplyr::coalesce(new_alert_rows$reason, "NA")
+    )
+  },
   n_inventory_changed_notified = isTRUE(watch_notify),
   validation_errors = errors,
   manifest_health = health
@@ -621,6 +702,7 @@ cat(sprintf(
   inv_diff$n, nrow(inv_diff$added), nrow(inv_diff$removed), nrow(inv_diff$changed)
 ))
 cat("MapBiomas resolver cache changes:", cache_diff_n, "\n")
+cat("Resolver alert cache changes:", resolver_alert_cache_diff_n, "\n")
 if (length(errors) > 0) {
   cat("Validation errors:\n")
   cat(paste(" -", errors, collapse = "\n"), "\n")
@@ -662,6 +744,7 @@ if (nzchar(summary_path)) {
       inv_diff$n, nrow(inv_diff$added), nrow(inv_diff$removed), nrow(inv_diff$changed)
     ),
     sprintf("- MapBiomas resolver cache changes: %d", cache_diff_n),
+    sprintf("- Resolver alert cache changes: %d", resolver_alert_cache_diff_n),
     if (check_all) sprintf("- Manifest health (--check-all): %d broken URL(s)", length(health)) else NULL
   ), con)
   close(con)
@@ -823,6 +906,23 @@ if (isTRUE(new_fail_notify)) {
 }
 new_fail_slack_text <- if (isTRUE(new_fail_notify)) slack_line(new_fail_lines) else ""
 
+# --- PRODES/EPE: new candidate failed content verification -------------------
+# See actions/scripts/resolver_alert_cache.R's header. Same informational-
+# only posture as the MapBiomas block directly above.
+resolver_alert_notify <- !is.null(new_alert_rows) && nrow(new_alert_rows) > 0
+resolver_alert_lines <- character(0)
+if (isTRUE(resolver_alert_notify)) {
+  resolver_alert_lines <- sprintf(
+    "• %s / %s — %s",
+    new_alert_rows$source, new_alert_rows$dataset,
+    slack_text_escape(dplyr::coalesce(new_alert_rows$reason, "reason not recorded"))
+  )
+  extra <- length(resolver_alert_lines) - SLACK_MAX_BULLETS
+  resolver_alert_lines <- utils::head(resolver_alert_lines, SLACK_MAX_BULLETS)
+  if (extra > 0) resolver_alert_lines <- c(resolver_alert_lines, sprintf("• ...and %d more", extra))
+}
+resolver_alert_slack_text <- if (isTRUE(resolver_alert_notify)) slack_line(resolver_alert_lines) else ""
+
 # ---- Expose real paths to the calling workflow ------------------------------
 # tempdir() is randomized per R session, so bash steps in the workflow have no
 # way to know these paths unless we tell them. Mirrors the GITHUB_STEP_SUMMARY
@@ -839,6 +939,7 @@ if (nzchar(gh_output_path)) {
     sprintf("report_path=%s", report_path),
     sprintf("pr_body_path=%s", pr_body_path),
     sprintf("mapbiomas_cache_path=%s", if (is.na(mapbiomas_cache_out)) "" else mapbiomas_cache_out),
+    sprintf("resolver_alerts_path=%s", if (is.na(resolver_alerts_out)) "" else resolver_alerts_out),
     # --- Slack side-channel (informational; never affects the exit code) ---
     sprintf("watch_notify=%s", if (isTRUE(watch_notify)) "true" else "false"),
     sprintf("watch_n_added=%d",   nrow(inv_diff$added)),
@@ -847,7 +948,10 @@ if (nzchar(gh_output_path)) {
     sprintf("watch_slack_text=%s", watch_slack_text),
     sprintf("new_fail_notify=%s", if (isTRUE(new_fail_notify)) "true" else "false"),
     sprintf("new_fail_n=%d", if (isTRUE(new_fail_notify)) nrow(new_fail_rows) else 0L),
-    sprintf("new_fail_slack_text=%s", new_fail_slack_text)
+    sprintf("new_fail_slack_text=%s", new_fail_slack_text),
+    sprintf("resolver_alert_notify=%s", if (isTRUE(resolver_alert_notify)) "true" else "false"),
+    sprintf("resolver_alert_n=%d", if (isTRUE(resolver_alert_notify)) nrow(new_alert_rows) else 0L),
+    sprintf("resolver_alert_slack_text=%s", resolver_alert_slack_text)
   )), con, useBytes = TRUE)
   close(con)
 }
@@ -869,7 +973,7 @@ if (length(errors) > 0) {
 # actually found this run. Exit 11 carries both signals at once so
 # update-manifest.yaml can open the PR AND raise the issue, instead of one
 # silently winning over the other.
-total_changed <- changes$n_changed + inv_diff$n + cache_diff_n
+total_changed <- changes$n_changed + inv_diff$n + cache_diff_n + resolver_alert_cache_diff_n
 total_failed <- length(resolver_failed) + length(watcher_failed) + length(resolver_partial_failed)
 
 if (total_changed > 0 && total_failed > 0) {

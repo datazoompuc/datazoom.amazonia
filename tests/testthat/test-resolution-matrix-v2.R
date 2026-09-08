@@ -42,6 +42,14 @@
 # consistent and the delta count; test-datasets_link.R is the canonical
 # place the specific cells are pinned.
 #
+# A 9th thing changed the same day (2026-09-08, PRODES/BACI resolver audit,
+# delta #11 in test-datasets_link.R) but is deliberately NOT part of the
+# "8 cells" count below: a brand-new row, baci_dic/product_codes, was added
+# to the manifest. It's a new row, not a changed cell on an existing one --
+# doesn't fit "same rows, different values" the way the other 8 do, so it's
+# split out and asserted separately in the datasets_link() test at the
+# bottom of this file instead of folded into the delta count.
+#
 # Note this file's OWN matrix (resolution_matrix_keyed.rds, captured
 # per-field via dataset_field(), not just datasets_link()'s 6-column
 # output) also picks up every docs_url/sheet/resolver change alongside
@@ -105,7 +113,16 @@ KNOWN_POST_CAPTURE_DELTAS <- c(
   "epe\renergy_state_panel\rNA\rNA\rdocs_url",
   "epe\renergy_state_panel\rNA\rNA\ravailable_time",
   "epe\renergy_state_panel\rNA\rNA\rsheet",
-  "epe\renergy_state_panel\rNA\rNA\rresolver"
+  "epe\renergy_state_panel\rNA\rNA\rresolver",
+  # 2026-09-08 (PRODES/BACI resolver audit): PRODES' docs_url was pointing
+  # at a dashboard app, not the real downloads landing page -- fixed for
+  # all 6 PRODES rows (see test-datasets_link.R delta #11).
+  "prodes\rclouds\rNA\rNA\rdocs_url",
+  "prodes\rdeforestation\rNA\rNA\rdocs_url",
+  "prodes\rhydrography\rNA\rNA\rdocs_url",
+  "prodes\rnative_vegetation\rNA\rNA\rdocs_url",
+  "prodes\rnon_forest\rNA\rNA\rdocs_url",
+  "prodes\rresidual_deforestation\rNA\rNA\rdocs_url"
 )
 post_capture_key <- function(s, d, g, y, f) {
   paste(s, d, ifelse(is.na(g), "NA", g), ifelse(is.na(y), "NA", y), f, sep = "\r")
@@ -163,11 +180,23 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 8 
   # epe/energy_state_panel's url and available_time -- see NEWS.md and
   # test-datasets_link.R). cover's url stays NA either way (its rows still
   # disagree, just on a different pair of URLs now), so that doesn't add
-  # another cell here -- and the docs_url-only EPE changes (delta #10's
-  # sibling hand-edits) don't count in THIS test either, since docs_url
-  # isn't one of datasets_link()'s 6 output columns.
+  # another cell here -- and the docs_url-only EPE/PRODES changes (delta
+  # #10's sibling hand-edits, delta #11's PRODES fix) don't count in THIS
+  # test either, since docs_url isn't one of datasets_link()'s 6 output
+  # columns.
   old_snap <- readRDS(test_path("fixtures", "datasets_link_pre_baserow_deletion.rds"))
   new_snap <- datasets_link()
+
+  # baci_dic/product_codes is a genuinely NEW row (delta #11,
+  # test-datasets_link.R) -- a new row, not a changed cell on an existing
+  # one, so it doesn't fit "same rows, different values" the way the other
+  # 8 cells do. Assert it separately, then exclude it before the row-for-row
+  # comparison below.
+  new_baci_dic <- new_snap[new_snap$survey == "baci_dic", ]
+  expect_equal(nrow(new_baci_dic), 1)
+  expect_equal(new_baci_dic$dataset, "product_codes")
+  expect_equal(new_baci_dic$url, "https://balanca.economia.gov.br/balanca/bd/tabelas/NCM_SH.csv")
+  new_snap <- new_snap[new_snap$survey != "baci_dic", ]
 
   expect_equal(nrow(old_snap), nrow(new_snap))
   expect_setequal(names(old_snap), names(new_snap))

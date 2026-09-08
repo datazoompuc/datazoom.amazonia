@@ -103,6 +103,14 @@ jobs:
             mkdir -p actions/cache
             cp "${{ steps.build.outputs.mapbiomas_cache_path }}" actions/cache/mapbiomas_resolver_cache.csv
           fi
+          # resolver_alerts_path is only set (non-empty) when resolve_prodes()
+          # or resolve_epe() actually recorded a new verdict this run -- see
+          # actions/scripts/resolver_alert_cache.R's header. Same empty-skip
+          # posture as the MapBiomas cache copy directly above.
+          if [ -n "${{ steps.build.outputs.resolver_alerts_path }}" ]; then
+            mkdir -p actions/cache
+            cp "${{ steps.build.outputs.resolver_alerts_path }}" actions/cache/resolver_alerts.csv
+          fi
 
       # Smoke-tested BEFORE opening the PR, not after merging it -- every
       # change (however small) goes through review now, so this is the
@@ -137,6 +145,7 @@ jobs:
             inst/extdata/manifest/v1/datasets_link.csv
             actions/watch/site_links.csv
             actions/cache/mapbiomas_resolver_cache.csv
+            actions/cache/resolver_alerts.csv
 
       # ---- Informational Slack side-channel -------------------------------
       # Failures NEVER come here -- resolver/watcher/validation failures keep
@@ -183,6 +192,18 @@ jobs:
           payload: |
             {
               "text": ":mag: *New MapBiomas Dataverse file(s) spotted — none usable* (${{ steps.build.outputs.new_fail_n }})\nThe resolver inspected file content it had never seen before and rejected it. The manifest itself is untouched -- a file that had PASSED would show up as a manifest PR instead -- but recording the rejection still updates the resolver cache, so the routine cache-only PR may still open for that; this ping is just faster than digging through its diff.\n\n${{ steps.build.outputs.new_fail_slack_text }}\n\n_<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow run>_"
+            }
+
+      - name: Notify Slack -- PRODES/EPE new candidate failed content verification
+        if: ${{ !cancelled() && steps.build.outputs.resolver_alert_notify == 'true' }}
+        continue-on-error: true
+        uses: slackapi/slack-github-action@v2.1.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": ":mag: *New PRODES/EPE content-check failure(s) spotted* (${{ steps.build.outputs.resolver_alert_n }})\nA resolver found a candidate it hadn't checked before (a new PRODES release, or a new EPE page failure mode) and its content didn't match what R/prodes.R or R/epe.R expects. The manifest itself is untouched -- this is a faster heads-up than digging through the resolver's own failure trail, and won't repeat for the same known cause on later runs.\n\n${{ steps.build.outputs.resolver_alert_slack_text }}\n\n_<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow run>_"
             }
 
       - name: Open issue on validation/resolver/watcher failure

@@ -76,11 +76,21 @@ test_that("external_download() stops with an informative error for the out-of-ra
 })
 
 test_that("BACI archive_file carries the same version stamp as the URL", {
+  # Stamp-agnostic on purpose: resolve_baci.R's whole point is emitting
+  # url/archive_file/version together from ONE stamp (see that file's
+  # header) -- a hardcoded "V202601" here would go red on every legitimate
+  # refresh, the exact "this test breaks on success" failure mode. Assert
+  # the actual invariant instead: whatever stamp the url carries, archive_file
+  # must carry the same one.
   url <- dataset_url("baci", "HS92")
   archive_file <- dataset_field("baci", "HS92", "archive_file")
 
-  expect_match(url, "V202601\\.zip$")
-  expect_equal(archive_file, "*$year$_V202601.csv")
+  url_stamp <- sub(".*_V([0-9]{6})\\.zip$", "\\1", url)
+  archive_stamp <- sub(".*_V([0-9]{6})\\.csv$", "\\1", archive_file)
+
+  expect_match(url, "_V[0-9]{6}\\.zip$")
+  expect_equal(archive_file, sprintf("*$year$_V%s.csv", url_stamp))
+  expect_equal(url_stamp, archive_stamp)
 })
 
 test_that("DETER archive_file matches the old hardcoded shapefile names", {

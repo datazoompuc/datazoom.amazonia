@@ -4,9 +4,10 @@
 #'
 #' @param dataset A dataset name. Can be one of "deforestation", "residual_deforestation", "native_vegetation", "hydrography", "non_forest", or "clouds".
 #' @param time_period A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.
-#'    * Between 2007 - 2023 for dataset "deforestation". Deforestation for 2007 includes all cumulative deforestation up to 2007. For other years, deforestation is incremental
-#'    * Between 2010 - 2023 for dataset "residual_deforestation"
-#'    * Only 2023 for all other datasets
+#'    * Between 2007 - 2025 for dataset "deforestation". Deforestation for 2007 includes all cumulative deforestation up to 2007. For other years, deforestation is incremental
+#'    * Between 2010 - 2025 for dataset "residual_deforestation"
+#'    * Only 2025 for all other datasets
+#'    (these ranges track the manifest's available_time -- see inst/extdata/manifest/v1/datasets_link.csv -- and move forward every time resolve_prodes.R picks up a new PRODES release; re-check them here if this doc goes stale again)
 #' @inheritParams load_baci
 #'
 #' @return A \code{tibble} with the selected data if raw_data is \code{FALSE}, and a \code{SpatRaster} is \code{TRUE}.
@@ -126,6 +127,12 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
   # from that release's zip and update by hand alongside `layer_name` below.
   # Note: code 99 (clouds) was absent from the 2025 .qml/.txt (likely zero
   # cloud pixels that year) and could not be re-verified against that release.
+  # FRAGILE: hardcoded here, at LOAD time, not verified per-run. As of
+  # 2026-09-08 resolve_prodes.R DOES cross-check the other 5 codes against
+  # the live .qml on every manifest refresh (see that file's header) -- but
+  # only at resolver/PR-review time, not here. A code change that slips past
+  # that check anyway (or a manual manifest edit bypassing the resolver)
+  # would only surface as a wrong/empty raster_codes match, not an error.
 
   if (param$dataset == "deforestation") raster_codes <- param$time_period - 2000
   if (param$dataset == "residual_deforestation") raster_codes <- param$time_period - 1960
@@ -174,6 +181,10 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
 
         message("Aggregating pixel values into <1km^2 rectangles")
 
+        # FRAGILE: (40, 20) assumes PRODES' raster keeps its current pixel
+        # resolution and grid orientation. A resolution change upstream
+        # would silently change what "aggregate to <1km^2" actually
+        # produces -- no error, just a wrong area calculation downstream.
         df <- df %>%
           terra::aggregate(fact = c(40, 20), fun = "mean")
 
@@ -228,6 +239,12 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
 
   # remove exceding municipality
   ## Passagem Franca (MA) is at 43.95o west, thus mistakenly included through the 44o west rule
+  # FRAGILE: a single hardcoded municipality name, matched by exact string.
+  # If IBGE's municipality boundaries shift, or another municipality edges
+  # over the same 44 degrees-west rule in a future geo_municipalities
+  # release, this filter neither catches the new case nor notices if
+  # "Passagem Franca" itself stops needing the exclusion -- no error either
+  # way, just a silently wrong municipality count.
   dat <- dat %>%
     dplyr::filter(name_muni != "Passagem Franca")
 
@@ -236,6 +253,10 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
   ################################
 
   if (param$language == "pt") {
+    # FRAGILE: this map must track the manifest's dataset names AND this
+    # function's own hardcoded "<dataset>_km2" rename (line ~217) by hand --
+    # a new PRODES dataset, or a renamed existing one, silently leaves that
+    # column un-translated in pt output instead of erroring.
     col_names <- c(
       cod_ibge = "code_muni",
       municipio = "name_muni",

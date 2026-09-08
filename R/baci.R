@@ -108,6 +108,13 @@ load_baci <- function(dataset = "HS92", raw_data = FALSE, time_period,
   ## Harmonizing Variable Names ##
   ################################
 
+  # FRAGILE: both rename blocks below assume BACI's raw column names are
+  # exactly t/k/v/q (plus i/j/product from the joins above) -- CEPII's own
+  # documented schema, but nothing here re-verifies it against the actual
+  # downloaded file. A column rename or reorder upstream would make
+  # dplyr::rename() error on a missing column (loud) or, worse, silently
+  # rename the WRONG column if CEPII ever reused one of these single letters
+  # for something else.
   if (param$language == "eng") {
     dat_mod <- dat %>%
       dplyr::rename(
@@ -146,7 +153,18 @@ load_baci_dic <- function(language) {
   ## Download Dictionary ##
   #########################
 
-  url <- "https://balanca.economia.gov.br/balanca/bd/tabelas/NCM_SH.csv"
+  # This table is Brazilian COMEX's own product-code dictionary
+  # (balanca.economia.gov.br), not part of CEPII's BACI archive itself --
+  # kept in the manifest under its own survey/dataset ("baci_dic"/
+  # "product_codes") rather than under "baci" so it doesn't pass
+  # check_params()'s dataset validation for load_baci() as if it were an
+  # actual BACI dataset. Reading it via dataset_url() (instead of the
+  # literal URL this used to hardcode) means the manifest's own resolver
+  # pipeline can at least see and HTTP-probe this dependency, even though it
+  # has no dedicated resolver of its own -- see resolve_epe.R's/
+  # resolve_baci.R's headers for what a resolver for it would look like if
+  # this URL ever needs one.
+  url <- dataset_url(source = "baci_dic", dataset = "product_codes")
 
   base::message("Downloading dictionary for product codes")
 
@@ -164,6 +182,13 @@ load_baci_dic <- function(language) {
 
   # Harmonizing names
 
+  # FRAGILE: co_sh6/no_sh6_por/no_sh6_ing are this off-manifest source's
+  # (balanca.economia.gov.br's NCM_SH.csv, a Brazilian COMEX table, not
+  # CEPII) column names after janitor::clean_names() -- if that table's
+  # headers change, this select() errors on a missing column rather than
+  # silently mismatching (dplyr::select() is at least loud about it), but
+  # there's no check anywhere before this point that catches it earlier or
+  # more clearly.
   dic <- dic %>%
     dplyr::select(
       "product_code" = co_sh6,
@@ -174,6 +199,11 @@ load_baci_dic <- function(language) {
   dic <- dic %>%
     dplyr::select(c(product_code, "product" = paste0("product_", language)))
 
+  # FRAGILE: as.integer() on a non-numeric product_code (e.g. if the source
+  # ever ships a code with a letter or leading zero lost) coerces to NA
+  # silently, per R's usual as.integer() behavior -- no warning surfaces
+  # here, and the row just fails to join later instead of erroring where the
+  # actual problem is.
   dic <- dic %>%
     dplyr::mutate(dplyr::across(product_code, as.integer))
 

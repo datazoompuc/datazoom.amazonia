@@ -41,7 +41,9 @@ source(file.path(actions_dir, "scripts", "fragility_notes.R"), local = TRUE)
 # silent entirely should fail these).
 tagged_sources <- list(
   list(r_path = file.path(pkg_root, "R", "mapbiomas.R"), label = "R/mapbiomas.R", min_tags = 8),
-  list(r_path = file.path(pkg_root, "R", "epe.R"), label = "R/epe.R", min_tags = 3)
+  list(r_path = file.path(pkg_root, "R", "epe.R"), label = "R/epe.R", min_tags = 3),
+  list(r_path = file.path(pkg_root, "R", "prodes.R"), label = "R/prodes.R", min_tags = 4),
+  list(r_path = file.path(pkg_root, "R", "baci.R"), label = "R/baci.R", min_tags = 3)
 )
 
 for (src in tagged_sources) {
