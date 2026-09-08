@@ -264,6 +264,18 @@ seed_new_row <- function(candidate, survey, dataset) {
 
 resolver_ok <- character(0)
 resolver_failed <- list()
+# 2026-09-08: a resolver covering several independent sub-sources in one
+# function (e.g. resolve_epe.R's 3 blocks) can have ONE of them fail while
+# the others succeed -- that's neither `resolver_ok` (something genuinely
+# didn't resolve) nor `resolver_failed` (the successful rows still need
+# merging, so `next`-ing past the merge below would silently discard them).
+# A resolver signals this by returning its normal successful tibble with a
+# `partial_failures` attribute (character vector of reasons) attached --
+# read below, right after a successful merge, and folded into total_failed
+# the same way resolver_failed/watcher_failed already are, so this can
+# still trip exit code 11 (changes + a failure) instead of looking like a
+# clean run.
+resolver_partial_failed <- list()
 
 for (src in names(registry)) {
   cat("Running resolver:", src, "... ")
@@ -340,7 +352,14 @@ for (src in names(registry)) {
     }
   }
 
-  cat("OK (", nrow(result), "row(s) touched)\n")
+  partial <- attr(result, "partial_failures")
+  if (!is.null(partial) && length(partial) > 0) {
+    cat("OK (", nrow(result), "row(s) touched) -- but with", length(partial), "partial failure(s):\n")
+    cat(paste("   -", partial, collapse = "\n"), "\n")
+    resolver_partial_failed[[src]] <- partial
+  } else {
+    cat("OK (", nrow(result), "row(s) touched)\n")
+  }
   resolver_ok <- c(resolver_ok, src)
 }
 
@@ -548,6 +567,7 @@ report <- list(
   resolvers_skipped = skip_sources,
   resolvers_ok = resolver_ok,
   resolvers_failed = resolver_failed,
+  resolvers_partial_failed = resolver_partial_failed,
   watchers_run = names(watch_registry),
   watchers_ok = watcher_ok,
   watchers_failed = watcher_failed,
@@ -592,6 +612,7 @@ cat("Rows: ", nrow(old), "->", nrow(candidate), "\n")
 cat("Changed keys:", changes$n_changed, "\n")
 cat("Resolvers OK:", if (length(resolver_ok)) paste(resolver_ok, collapse = ", ") else "(none)", "\n")
 cat("Resolvers FAILED:", if (length(resolver_failed)) paste(names(resolver_failed), collapse = ", ") else "(none)", "\n")
+cat("Resolvers PARTIALLY FAILED:", if (length(resolver_partial_failed)) paste(names(resolver_partial_failed), collapse = ", ") else "(none)", "\n")
 cat("Resolvers SKIPPED (--skip):", if (length(skip_sources)) paste(skip_sources, collapse = ", ") else "(none)", "\n")
 cat("Watchers OK:", if (length(watcher_ok)) paste(watcher_ok, collapse = ", ") else "(none)", "\n")
 cat("Watchers FAILED:", if (length(watcher_failed)) paste(names(watcher_failed), collapse = ", ") else "(none)", "\n")
@@ -632,6 +653,7 @@ if (nzchar(summary_path)) {
     sprintf("- Changed keys: %d", changes$n_changed),
     sprintf("- Resolvers OK: %s", if (length(resolver_ok)) paste(resolver_ok, collapse = ", ") else "(none)"),
     sprintf("- Resolvers FAILED: %s", if (length(resolver_failed)) paste(names(resolver_failed), collapse = ", ") else "(none)"),
+    sprintf("- Resolvers PARTIALLY FAILED: %s", if (length(resolver_partial_failed)) paste(names(resolver_partial_failed), collapse = ", ") else "(none)"),
     sprintf("- Resolvers SKIPPED (--skip): %s", if (length(skip_sources)) paste(skip_sources, collapse = ", ") else "(none)"),
     sprintf("- Watchers OK: %s", if (length(watcher_ok)) paste(watcher_ok, collapse = ", ") else "(none)"),
     sprintf("- Watchers FAILED: %s", if (length(watcher_failed)) paste(names(watcher_failed), collapse = ", ") else "(none)"),
@@ -842,7 +864,7 @@ if (length(errors) > 0) {
 # update-manifest.yaml can open the PR AND raise the issue, instead of one
 # silently winning over the other.
 total_changed <- changes$n_changed + inv_diff$n + cache_diff_n
-total_failed <- length(resolver_failed) + length(watcher_failed)
+total_failed <- length(resolver_failed) + length(watcher_failed) + length(resolver_partial_failed)
 
 if (total_changed > 0 && total_failed > 0) {
   cat("\nRESULT: changes present, but one or more resolvers/watchers also failed. Exit code 11.\n")

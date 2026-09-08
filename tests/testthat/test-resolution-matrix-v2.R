@@ -34,10 +34,19 @@
 # itself (not patched away, not zero-diffed away either) -- see
 # test-datasets_link.R's delta #8 for the full explanation of which 5 and
 # why -- PLUS 1 more cell from a later, unrelated fix (delta #9, 2026-08-24:
-# mapbiomas_deforestation_regeneration's available_time corrected). 6 total,
-# also enumerated explicitly below rather than assumed. This file only
-# asserts the row/column shape stays consistent and the delta count;
-# test-datasets_link.R is the canonical place the specific cells are pinned.
+# mapbiomas_deforestation_regeneration's available_time corrected), PLUS 2
+# more from delta #10 (2026-09-08: epe/energy_state_panel's url and
+# available_time, migrated to the BEN dashboard's Chapter 8 table -- see
+# test-datasets_link.R). 8 total, also enumerated explicitly below rather
+# than assumed. This file only asserts the row/column shape stays
+# consistent and the delta count; test-datasets_link.R is the canonical
+# place the specific cells are pinned.
+#
+# Note this file's OWN matrix (resolution_matrix_keyed.rds, captured
+# per-field via dataset_field(), not just datasets_link()'s 6-column
+# output) also picks up every docs_url/sheet/resolver change alongside
+# url/available_time -- KNOWN_POST_CAPTURE_DELTAS below is a superset of
+# the 8 cells above for exactly that reason.
 
 matrix <- readRDS(test_path("fixtures", "resolution_matrix_keyed.rds"))
 
@@ -77,7 +86,26 @@ KNOWN_POST_CAPTURE_DELTAS <- c(
   "mapbiomas\rmapbiomas_deforestation_regeneration\rNA\rNA\ravailable_time",
   "mapbiomas\rmapbiomas_cover\rindigenous_land\rNA\rurl",
   "mapbiomas\rmapbiomas_cover\rindigenous_land\rNA\rdocs_url",
-  "mapbiomas\rmapbiomas_cover\rindigenous_land\rNA\rversion"
+  "mapbiomas\rmapbiomas_cover\rindigenous_land\rNA\rversion",
+  # 2026-09-08: two sessions of hand-edits/migrations on EPE, none of which
+  # touch the base-row-deletion migration this fixture actually verifies --
+  # (a) docs_url filled in by hand for 7 previously-blank rows (the "mother
+  # source" landing page for each dataset), (b) energy_state_panel migrated
+  # from its discontinued Chapter 8 workbook to the BEN dashboard's
+  # consolidated generation table (url, available_time, sheet, resolver all
+  # change -- see test-datasets_link.R's delta #10 and R/epe.R's header).
+  "epe\rconsumer_energy_consumption\rregion\rNA\rdocs_url",
+  "epe\rconsumer_energy_consumption\rstate\rNA\rdocs_url",
+  "epe\rconsumer_energy_consumption\rsubsystem\rNA\rdocs_url",
+  "epe\rindustrial_energy_consumption\rregion\rNA\rdocs_url",
+  "epe\rindustrial_energy_consumption\rstate\rNA\rdocs_url",
+  "epe\rindustrial_energy_consumption\rsubsystem\rNA\rdocs_url",
+  "epe\rnational_energy_balance\rNA\rNA\rdocs_url",
+  "epe\renergy_state_panel\rNA\rNA\rurl",
+  "epe\renergy_state_panel\rNA\rNA\rdocs_url",
+  "epe\renergy_state_panel\rNA\rNA\ravailable_time",
+  "epe\renergy_state_panel\rNA\rNA\rsheet",
+  "epe\renergy_state_panel\rNA\rNA\rresolver"
 )
 post_capture_key <- function(s, d, g, y, f) {
   paste(s, d, ifelse(is.na(g), "NA", g), ifelse(is.na(y), "NA", y), f, sep = "\r")
@@ -127,13 +155,17 @@ test_that("every former base-row query now stops -- the guard has no gap", {
   expect_equal(still_works, character(0))
 })
 
-test_that("datasets_link() keeps the same rows/columns and differs in exactly 6 cells (see test-datasets_link.R deltas #8-#9)", {
+test_that("datasets_link() keeps the same rows/columns and differs in exactly 8 cells (see test-datasets_link.R deltas #8-#10)", {
   # 5 cells from delta #8 (the base-row-deletion migration this fixture was
   # captured to verify) + 1 more from delta #9 (2026-08-24,
   # mapbiomas_deforestation_regeneration's available_time corrected from
-  # "1985-2024" to "1987-2024" -- see NEWS.md and test-datasets_link.R).
-  # cover's url stays NA either way (its rows still disagree, just on a
-  # different pair of URLs now), so that doesn't add a 7th.
+  # "1985-2024" to "1987-2024") + 2 more from delta #10 (2026-09-08,
+  # epe/energy_state_panel's url and available_time -- see NEWS.md and
+  # test-datasets_link.R). cover's url stays NA either way (its rows still
+  # disagree, just on a different pair of URLs now), so that doesn't add
+  # another cell here -- and the docs_url-only EPE changes (delta #10's
+  # sibling hand-edits) don't count in THIS test either, since docs_url
+  # isn't one of datasets_link()'s 6 output columns.
   old_snap <- readRDS(test_path("fixtures", "datasets_link_pre_baserow_deletion.rds"))
   new_snap <- datasets_link()
 
@@ -157,5 +189,5 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 6 
     }
   }
 
-  expect_equal(delta, 6)
+  expect_equal(delta, 8)
 })

@@ -151,8 +151,18 @@ test_that("MapBiomas water/state deliberately does NOT share the other geo_level
   expect_false(identical(dataset_url("mapbiomas", "mapbiomas_water", geo_level = "state"), anchor))
 })
 
-test_that("EPE energy_state_panel sheet matches the old hardcoded literal", {
-  expect_equal(dataset_field("epe", "energy_state_panel", "sheet"), "8.1 part 3")
+test_that("EPE energy_state_panel sheet matches the current source", {
+  # Updated 2026-09-08 when energy_state_panel's source moved from the old
+  # discontinued Chapter 8 workbook (sheet "8.1 part 3") to the BEN
+  # dashboard's consolidated generation-by-source table (single "Sheet1")
+  # -- see R/epe.R and actions/scrapers/resolve_epe.R's headers.
+  expect_equal(dataset_field("epe", "energy_state_panel", "sheet"), "Sheet1")
+})
+
+test_that("EPE energy_state_panel available_time still parses into the expected year range", {
+  available <- dataset_field("epe", "energy_state_panel", "available_time")
+  years <- eval(parse(text = stringr::str_replace(available, "-", ":")))
+  expect_equal(years, 2011:2025)
 })
 
 test_that("EPE national_energy_balance available_time still parses into the expected year range", {

@@ -209,10 +209,24 @@ jobs:
               const fmtFailures = (obj, label) => {
                 const entries = Object.entries(obj || {});
                 if (entries.length === 0) return [];
-                return [`**${label}:**`, ...entries.map(([k, v]) => `- \`${k}\`: ${v}`), ""];
+                // A value can be a single string (resolvers_failed/
+                // watchers_failed: one message per source) or an array of
+                // strings (resolvers_partial_failed: a resolver covering
+                // several sub-sources, e.g. resolve_epe.R, can report more
+                // than one reason for the same source) -- flatten either
+                // shape to one line per reason instead of letting Array's
+                // default toString() join them with a bare comma.
+                return [
+                  `**${label}:**`,
+                  ...entries.flatMap(([k, v]) =>
+                    (Array.isArray(v) ? v : [v]).map(msg => `- \`${k}\`: ${msg}`)
+                  ),
+                  ""
+                ];
               };
               bodyLines = bodyLines.concat(
                 fmtFailures(report.resolvers_failed, "Resolvers failed"),
+                fmtFailures(report.resolvers_partial_failed, "Resolvers partially failed (some rows still updated)"),
                 fmtFailures(report.watchers_failed, "Watchers failed"),
               );
               if ((report.validation_errors || []).length > 0) {

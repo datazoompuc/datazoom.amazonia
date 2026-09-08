@@ -78,6 +78,12 @@
 #      from "1985-2024" to "1987-2024" -- the DEFORESTATION sheet's first
 #      year column is actually 1987, verified live; leaving it at 1985
 #      would have made check_params() silently accept time_period = 1985.
+#  10. 2026-09-08: epe/energy_state_panel's old source (a discontinued
+#      Anuário chapter workbook) was replaced with the same BEN dashboard
+#      book national_energy_balance already reads (delta #4) -- its own
+#      Chapter 8 page publishes a consolidated, already-tidy generation-by-
+#      source table. url and available_time both change (2011-2024 ->
+#      2011-2025); see R/epe.R and resolve_epe.R's headers.
 #
 # The fixture was captured right before normalization. Row order is not
 # significant (both sides sorted by (survey, dataset) before comparing).
@@ -103,6 +109,16 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
     available_time = ifelse(
       survey == "epe" & dataset == "national_energy_balance",
       "1970-2025",
+      available_time
+    ),
+    url = ifelse(
+      survey == "epe" & dataset == "energy_state_panel",
+      "https://dashboard.epe.gov.br/apps/livro-ben/livro/pt/dados/tabela_geracao_eletricidade_por_fonte.xlsx",
+      url
+    ),
+    available_time = ifelse(
+      survey == "epe" & dataset == "energy_state_panel",
+      "2011-2025",
       available_time
     ),
     url = ifelse(

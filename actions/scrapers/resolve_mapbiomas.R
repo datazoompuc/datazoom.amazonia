@@ -101,6 +101,29 @@
 # Re-verify all of this at implementation/maintenance time, not just
 # trust this comment -- Dataverse content changes over time same as
 # anything else.
+#
+# 2026-09-08 (audit follow-up, applied to resolve_epe.R first): the per-
+# config `for (cfg in configs)` loop below used to only ever `message()` on
+# a thrown error and otherwise treat any NULL from resolve_via_dataverse()
+# the same way, whether it meant "genuinely found no matching candidate"
+# or "Dataverse's search/files API errored for this one config" -- dv_
+# search()/dv_dataset_files() both silently swallowed a transport/parse
+# failure into an empty result via dv_get_json(). That's the exact
+# "couldn't check" vs. "checked and it's not there" conflation this file's
+# OWN dv_file_layout() had already been fixed for once (the 120s timeout
+# bug, see its comment) -- just one layer further out, and still present.
+# A single config silently failing this way while the other ~12 succeed
+# produced no error, no `resolvers_failed` entry, and no PR/issue -- the
+# affected row just goes stale with zero visibility, indefinitely.
+# dv_get_json() now throws on a real transport/parse failure instead of
+# returning NULL, dv_search()/dv_dataset_files() no longer catch that
+# internally, and the per-config tryCatch records it into
+# `config_failures`, returned as a `partial_failures` attribute
+# `build_manifest.R` reads generically. A config that legitimately walks
+# every real candidate and finds no matching sheet/column is UNCHANGED --
+# that's still a plain NULL, not an error, and is not recorded as a
+# failure (e.g. mapbiomas_fire's search has legitimately returned nothing
+# for a while now; that must keep looking like "no update," not "broken").
 
 `%||%` <- function(x, y) if (is.null(x)) y else x
 
@@ -152,13 +175,30 @@ resolve_mapbiomas <- function(rows) {
 
   dv_base <- "https://data.mapbiomas.org"
 
+  # 2026-09-08: used to swallow every failure (network error, non-200,
+  # unparseable body) into a bare NULL, which both callers below then read
+  # as "no results" -- indistinguishable from a query that genuinely has
+  # zero matches (e.g. mapbiomas_fire's Dataverse search really has been
+  # returning nothing, see the configs list below). That's the same
+  # "couldn't check" vs. "checked and it's not there" conflation
+  # dv_file_layout()'s download step already had to be fixed for once
+  # (see its own comment) -- applied here too: a genuine transport/parse
+  # failure now THROWS, and neither caller catches it internally anymore,
+  # so it propagates all the way to resolve_mapbiomas()'s per-config
+  # tryCatch and gets recorded as a real partial failure instead of
+  # silently looking like "nothing new this run."
   dv_get_json <- function(url, timeout_s = 30) {
     resp <- tryCatch(
       curl::curl_fetch_memory(url, handle = curl::new_handle(timeout = timeout_s)),
-      error = function(e) NULL
+      error = function(e) stop("network error: ", conditionMessage(e))
     )
-    if (is.null(resp) || resp$status_code != 200) return(NULL)
-    tryCatch(jsonlite::fromJSON(rawToChar(resp$content), simplifyVector = FALSE), error = function(e) NULL)
+    if (resp$status_code != 200) {
+      stop("HTTP ", resp$status_code)
+    }
+    tryCatch(
+      jsonlite::fromJSON(rawToChar(resp$content), simplifyVector = FALSE),
+      error = function(e) stop("could not parse JSON response: ", conditionMessage(e))
+    )
   }
 
   # Dataverse's Search API -- documented, not scraped. subtree restricts to
@@ -334,7 +374,14 @@ resolve_mapbiomas <- function(rows) {
   # own, no code change needed.
   resolve_via_dataverse <- function(dataset, geo_levels, query, sheet_pattern,
                                      required_col_pattern = NULL) {
-    items <- tryCatch(dv_search(query), error = function(e) NULL)
+    # No tryCatch here (unlike before 2026-09-08): dv_search() now THROWS on
+    # a real transport/parse failure (see dv_get_json()'s header) and this
+    # is deliberately left to propagate out to resolve_mapbiomas()'s
+    # per-config tryCatch, so a Dataverse outage gets recorded as a real
+    # failure instead of silently reading as "this config found nothing."
+    # A genuinely empty search result (dv_search() returning list()) still
+    # reaches here normally, unaffected.
+    items <- dv_search(query)
     if (is.null(items) || length(items) == 0) return(NULL)
 
     names_ <- vapply(items, function(it) it$name %||% "", character(1))
@@ -353,7 +400,13 @@ resolve_mapbiomas <- function(rows) {
       gid <- items[[i]]$global_id
       if (is.null(gid)) next
 
-      files <- tryCatch(dv_dataset_files(gid), error = function(e) list())
+      # Same reasoning as dv_search() above -- and the same silent-downgrade
+      # risk as dv_file_layout()'s download step: a transient failure
+      # fetching THIS (candidate) dataset's file list must not be treated
+      # as "this candidate doesn't qualify," or the walk would silently
+      # fall through and select an older, wrong candidate instead of the
+      # real newest one. Let it propagate -- no tryCatch here.
+      files <- dv_dataset_files(gid)
       for (f in files) {
         if (is.null(f$id)) next
 
@@ -478,12 +531,26 @@ resolve_mapbiomas <- function(rows) {
          sheet_pattern = "^WATER_BIOME_ANNUAL")
   )
 
+  # 2026-09-08: config_failures accumulates a REAL failure reason per config
+  # -- a thrown error (network/HTTP/parse failure, now that dv_search()/
+  # dv_dataset_files()/dv_file_layout() all propagate those instead of
+  # swallowing them into NULL). A config that legitimately walked every
+  # candidate and found no matching sheet/column still returns a bare NULL,
+  # not an error -- that's NOT recorded here, it's a real "no confident
+  # match yet" answer (e.g. mapbiomas_fire's search has legitimately been
+  # empty for a while, see the configs list above), same as before this
+  # change. See resolve_epe.R's header for the same partial_failures
+  # pattern, applied there first.
+  config_failures <- character(0)
+
   for (cfg in configs) {
+    cfg_label <- paste0(cfg$dataset, if (!is.na(cfg$geo_levels)) paste0("/", cfg$geo_levels) else "")
     res <- tryCatch(
       resolve_via_dataverse(cfg$dataset, cfg$geo_levels, cfg$query, cfg$sheet_pattern,
                             cfg$required_col_pattern),
       error = function(e) {
         message("resolve_mapbiomas(): Dataverse lookup failed for ", cfg$dataset, ": ", conditionMessage(e))
+        config_failures <<- c(config_failures, paste0(cfg_label, ": ", conditionMessage(e)))
         NULL
       }
     )
@@ -520,9 +587,26 @@ resolve_mapbiomas <- function(rows) {
       "Dataverse this run. This can legitimately mean 'nothing changed' -- ",
       "check manually before treating it as a scraper break. (The WordPress ",
       "statistics page is watched separately -- see watch_mapbiomas.R -- and ",
-      "no longer affects this resolver's own success/failure.)"
+      "no longer affects this resolver's own success/failure.)",
+      if (length(config_failures) > 0) {
+        paste0(
+          "\nReal failures, not just 'no match' (", length(config_failures), "):\n- ",
+          paste(config_failures, collapse = "\n- ")
+        )
+      } else {
+        ""
+      }
     )
   }
 
-  dplyr::bind_rows(out)
+  result <- dplyr::bind_rows(out)
+  if (length(config_failures) > 0) {
+    # At least one config genuinely failed (network/parse/download error),
+    # but at least one other DID resolve -- don't stop() here, that would
+    # also discard the configs that succeeded. Attach the failure(s) as an
+    # attribute build_manifest.R already reads generically (see
+    # resolve_epe.R's header for the same mechanism, applied there first).
+    attr(result, "partial_failures") <- config_failures
+  }
+  result
 }

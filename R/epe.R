@@ -25,6 +25,76 @@
 #'   raw_data = FALSE
 #' )
 #'
+#' @noRd
+epe_energy_state_panel_treat <- function(raw) {
+  # Extracted out of load_epe() so it can be unit-tested against a small
+  # hand-built tibble without a network download -- see
+  # tests/testthat/test-epe-schema.R and the "closures can't be
+  # unit-tested" gotcha in the manifest-maintenance skill (mapbiomas_treat()
+  # is the precedent this follows).
+
+  uf <- grupo <- fonte <- ano <- valor <- amz_legal <- NULL
+
+  amz_legal_estados <- c("Amapa", "Acre", "Amazonas", "Mato Grosso",
+                         "Tocantins", "Maranhao", "Rondonia", "Roraima", "Para")
+
+  # `fonte`'s 16 real values (verified against the live file) map 1:1 onto
+  # the 16 columns the rest of this function -- and load_epe()'s English
+  # rename -- already expect. This map is the only thing standing in for
+  # the old sheet's fixed column order; if EPE ever adds or renames a
+  # fonte, the stop() below surfaces it instead of silently dropping the
+  # new category.
+  fonte_map <- c(
+    "Geração total"              = "total_produzido",
+    "Hidro"                      = "hidro",
+    "Eólica"                     = "eolica",
+    "Solar"                      = "solar",
+    "Nuclear"                    = "nuclear",
+    "Termo"                      = "termo",
+    "Bagaço de cana"             = "cana",
+    "Lenha"                      = "lenha",
+    "Lixívia"                    = "lixivia",
+    "Out. Fontes renováveis"     = "outras_fontes_renovaveis",
+    "Carvão vapor"               = "carvao_vapor",
+    "Gás natural"                = "gas_natural",
+    "Gás de coqueria"            = "gas_de_coqueira",
+    "Óleo combustível"           = "combustivel",
+    "Óleo diesel"                = "diesel",
+    "Out. Fontes não renováveis" = "outras_fontes_nao_renovaveis"
+  )
+
+  unmapped <- setdiff(unique(raw$fonte), names(fonte_map))
+  if (length(unmapped) > 0) {
+    stop(
+      "load_epe(): energy_state_panel's source has new/changed `fonte` ",
+      "values this fonte_map doesn't know about: ",
+      paste(unmapped, collapse = ", "),
+      " -- update the map in R/epe.R before trusting this dataset."
+    )
+  }
+
+  raw %>%
+    dplyr::filter(grupo != "Brasil") %>%
+    dplyr::mutate(fonte = fonte_map[fonte]) %>%
+    tidyr::pivot_wider(
+      id_cols = c(grupo, ano),
+      names_from = fonte,
+      values_from = valor
+    ) %>%
+    dplyr::rename(uf = grupo) %>%
+    dplyr::mutate(
+      # source capitalizes the connector as "Do"/"De" on 3 multi-word
+      # names (e.g. "Mato Grosso Do Sul") -- normalize to the standard
+      # lowercase connector before transliterating, matching the
+      # convention the old hand-parsed sheet already used.
+      uf = stringr::str_replace_all(uf, " Do ", " do "),
+      uf = stringr::str_replace_all(uf, " De ", " de "),
+      uf = stringi::stri_trans_general(uf, "Latin-ASCII"),
+      amz_legal = dplyr::if_else(uf %in% amz_legal_estados, 1L, 0L)
+    ) %>%
+    dplyr::mutate(dplyr::across(-c(uf, amz_legal), as.numeric))
+}
+
 #' @export
 load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = "eng") {
   ##############################
@@ -151,55 +221,16 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
 
 
   if (param$dataset == "energy_state_panel") {
-    raw <- dat[[1]]
-
-    amz_legal_estados <- c("Amapa", "Acre", "Amazonas", "Mato Grosso",
-                           "Tocantins", "Maranhao", "Rondonia", "Roraima", "Para")
-
-    # Cada bloco de ano começa com "ANO BASE XXXX" na col 1
-    ano_rows <- which(grepl("ANO BASE", as.character(raw[[1]]), ignore.case = TRUE))
-    anos     <- as.integer(stringr::str_extract(as.character(raw[[1]][ano_rows]), "\\d{4}"))
-    raw$ano_tag <- NA_integer_
-    for (i in seq_along(ano_rows)) {
-      end_row <- if (i < length(ano_rows)) ano_rows[i + 1] - 1 else nrow(raw)
-      raw$ano_tag[ano_rows[i]:end_row] <- anos[i]
-    }
-
-    dat_mod <- raw %>%
-      dplyr::filter(!is.na(ano_tag)) %>%
-      dplyr::filter(!is.na(suppressWarnings(as.numeric(as.character(.[[2]]))))) %>%
-      dplyr::filter(stringr::str_detect(as.character(.[[1]]), "[:lower:]")) %>%
-      dplyr::select(
-        uf                             = 1,
-        total_produzido                = 2,
-        hidro                          = 3,
-        eolica                         = 4,
-        solar                          = 5,
-        nuclear                        = 6,
-        termo                          = 7,
-        cana                           = 8,
-        lenha                          = 9,
-        lixivia                        = 10,
-        outras_fontes_renovaveis       = 11,
-        carvao_vapor                   = 12,
-        gas_natural                    = 13,
-        gas_de_coqueira                = 14,
-        combustivel                    = 15,
-        diesel                         = 16,
-        outras_fontes_nao_renovaveis   = 17,
-        ano                            = ano_tag
-      ) %>%
-      dplyr::mutate(
-        uf = dplyr::case_when(
-          uf == "Mato G. do Sul"  ~ "Mato Grosso do Sul",
-          uf == "Rio G. do Sul"   ~ "Rio Grande do Sul",
-          uf == "Rio G. do Norte" ~ "Rio Grande do Norte",
-          TRUE ~ uf
-        ),
-        uf = stringi::stri_trans_general(uf, "Latin-ASCII"),
-        amz_legal = dplyr::if_else(uf %in% amz_legal_estados, 1L, 0L)
-      ) %>%
-      dplyr::mutate(dplyr::across(-c(uf, amz_legal), as.numeric))
+    # SOURCE SHAPE (verified live 2026-09-08, see resolve_epe.R's own header
+    # for the investigation): a long-format table -- macro_grupo, grupo,
+    # fonte, ano, valor -- one row per (region, state-or-"Brasil", source,
+    # year), 6721 rows. `grupo` carries "Brasil" as a national total
+    # alongside the 26 states + DF; this dataset is state-level only (there
+    # was no national row in the old hand-parsed sheet either), so the
+    # "Brasil" rows are dropped rather than pivoted in as a 28th state.
+    # See epe_energy_state_panel_treat() above for the actual transform --
+    # extracted so it's unit-testable without a network download.
+    dat_mod <- epe_energy_state_panel_treat(dat[[1]])
   }
   ################################
   ## Harmonizing Variable Names ##
