@@ -1,7 +1,7 @@
 # actions/scripts/mapbiomas_resolver_cache.R
 #
 # Pure helpers, no top-level execution -- split out the same way
-# mapbiomas_fragility.R is, so this can be sourced on its own by
+# fragility_notes.R is, so this can be sourced on its own by
 # resolve_mapbiomas.R AND by tests, without pulling in build_manifest.R's
 # full pipeline (which is NOT safe to source() directly -- it runs the
 # whole resolver pipeline over the network at the top level).

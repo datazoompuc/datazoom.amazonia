@@ -44,6 +44,13 @@ epe_energy_state_panel_treat <- function(raw) {
   # the old sheet's fixed column order; if EPE ever adds or renames a
   # fonte, the stop() below surfaces it instead of silently dropping the
   # new category.
+  # FRAGILE: a hardcoded 16-entry lookup with a stop() guard for anything
+  # unmapped -- good defensively, but this is the LOADER catching a shape
+  # change, not the resolver (resolve_epe.R's verify_table_columns() only
+  # checks grupo/fonte/ano/valor/macro_grupo are present, not fonte's
+  # actual values). A user's load_epe() call breaks with a clear error the
+  # moment EPE adds/renames a fonte; a PR reviewer merging the resolver's
+  # auto-refresh has no earlier signal that this map needs a matching edit.
   fonte_map <- c(
     "Geração total"              = "total_produzido",
     "Hidro"                      = "hidro",
@@ -74,6 +81,12 @@ epe_energy_state_panel_treat <- function(raw) {
   }
 
   raw %>%
+    # FRAGILE: assumes "Brasil" is the only aggregate value `grupo` ever
+    # carries in this source. If EPE ever adds macro-region rows into
+    # `grupo` itself (today regions only live in the separate macro_grupo
+    # column, already dropped upstream), they'd silently be treated as a
+    # 28th/29th "state" instead of being filtered out here -- no error,
+    # just a wrong row count nothing currently asserts against.
     dplyr::filter(grupo != "Brasil") %>%
     dplyr::mutate(fonte = fonte_map[fonte]) %>%
     tidyr::pivot_wider(
@@ -87,6 +100,12 @@ epe_energy_state_panel_treat <- function(raw) {
       # names (e.g. "Mato Grosso Do Sul") -- normalize to the standard
       # lowercase connector before transliterating, matching the
       # convention the old hand-parsed sheet already used.
+      # FRAGILE: assumes exactly these two connector words, exactly this
+      # casing bug, on exactly today's 3 affected state names. A 4th state
+      # appearing with different capitalization, or EPE fixing/breaking
+      # the casing differently, would silently mis-normalize or leave a
+      # name uncorrected -- no error either way, no test currently checks
+      # every uf value's exact spelling.
       uf = stringr::str_replace_all(uf, " Do ", " do "),
       uf = stringr::str_replace_all(uf, " De ", " de "),
       uf = stringi::stri_trans_general(uf, "Latin-ASCII"),

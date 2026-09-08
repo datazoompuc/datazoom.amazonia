@@ -120,7 +120,7 @@ script_dir <- dirname(normalizePath(script_path, mustWork = FALSE))
 repo_root <- normalizePath(file.path(script_dir, "..", ".."), mustWork = FALSE)
 source(file.path(repo_root, "actions", "scripts", "manifest_validate.R"))
 source(file.path(repo_root, "actions", "scripts", "site_inventory.R"))
-source(file.path(repo_root, "actions", "scripts", "mapbiomas_fragility.R"))
+source(file.path(repo_root, "actions", "scripts", "fragility_notes.R"))
 source(file.path(repo_root, "actions", "scripts", "mapbiomas_resolver_cache.R"))
 
 MANIFEST_PATH <- file.path(repo_root, "inst", "extdata", "manifest", "v1", "datasets_link.csv")
@@ -705,20 +705,26 @@ pr_body_lines <- c(
 )
 
 # detect_changes()'s keys are "survey\rdataset\rgeo_level\ryear" (see
-# manifest_validate.R) -- a leading "mapbiomas\r" identifies a MapBiomas row.
-mapbiomas_changed <- any(startsWith(changes$changed_keys, "mapbiomas\r"))
-if (isTRUE(mapbiomas_changed)) {
-  fragility_notes <- collect_mapbiomas_fragility_notes(file.path(repo_root, "R", "mapbiomas.R"))
+# manifest_validate.R) -- a leading "<source>\r" identifies a row as
+# belonging to that source. One generic loop over FRAGILITY_SOURCES
+# (fragility_notes.R) replaces what used to be a mapbiomas-only block here;
+# adding a new source's fragility check is now a row in that list, not a
+# copy-pasted block in this file.
+for (fsrc in FRAGILITY_SOURCES) {
+  src_changed <- any(startsWith(changes$changed_keys, paste0(fsrc$changed_prefix, "\r")))
+  if (!isTRUE(src_changed)) next
+
+  fragility_notes <- collect_fragility_notes(file.path(repo_root, fsrc$r_path), label = fsrc$label)
   if (length(fragility_notes) > 0) {
     pr_body_lines <- c(
       pr_body_lines,
       "",
-      "**MapBiomas structural fragility check** -- a mapbiomas manifest row",
-      "changed this run. R/mapbiomas.R's treatment of the downloaded file",
-      "makes several assumptions about its SHAPE, not just its column names,",
-      "that a collection bump can silently violate without erroring. Re-check",
-      "these specifically (see mapbiomas_treat()'s header in R/mapbiomas.R for",
-      "the tagging convention this list is generated from):",
+      sprintf("**%s structural fragility check** -- a %s manifest row changed", fsrc$label, fsrc$changed_prefix),
+      sprintf("this run. %s's treatment of the downloaded file makes several", fsrc$label),
+      "assumptions about its SHAPE, not just its column names, that a",
+      "collection/version bump can silently violate without erroring.",
+      sprintf("Re-check these specifically (see %s's header in %s for the", fsrc$treat_fn, fsrc$label),
+      "tagging convention this list is generated from):",
       "",
       paste0("- ", fragility_notes)
     )

@@ -117,12 +117,13 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
 #
 # Every assumption below about the SHAPE of the incoming file (not just its
 # column names) is tagged "# FRAGILE:". actions/scripts/build_manifest.R
-# greps this file for that tag (collect_mapbiomas_fragility_notes()) and
-# names the affected lines in the PR body whenever a MapBiomas manifest row
-# changes -- so a reviewer knows exactly what to re-check even when the
-# resolver's own diff looks like "just a URL". Keep the tag on its own
-# comment line directly above the code it describes; the collector pairs
-# each tag with the next non-comment line number.
+# greps this file for that tag (collect_fragility_notes(), generic across
+# every source in fragility_notes.R's FRAGILITY_SOURCES -- R/epe.R does the
+# same) and names the affected lines in the PR body whenever a MapBiomas
+# manifest row changes -- so a reviewer knows exactly what to re-check even
+# when the resolver's own diff looks like "just a URL". Keep the tag on its
+# own comment line directly above the code it describes; the collector
+# pairs each tag with the next non-comment line number.
 mapbiomas_treat <- function(dat, param) {
   ###########################
   ## Bind Global Variables ##
