@@ -136,13 +136,18 @@ load_sigmine <- function(dataset = "sigmine_active",
       sf::st_drop_geometry() %>%
       dplyr::rename(
         municipality_code = code_muni,
-        municipality = name_muni,
-        state_from_shp = abbrev_state
+        municipality = name_muni
       )
 
-    # keep the ANM-reported "uf" as-is; municipality shapefile's own
-    # abbrev_state is dropped to avoid ambiguity between the two sources
-    a$state_from_shp <- NULL
+    # The ANM-reported "uf" column has ~4% missing values (confirmed via
+    # sum(is.na(dat$uf))), which fragments municipalities into two separate
+    # groups downstream when "uf" is used to build a group key (e.g.
+    # "Juruti - PA" and "Juruti - NA" for the same municipality). The
+    # municipality shapefile's abbrev_state, coming from the spatial join,
+    # is always present and authoritative for which state the municipality
+    # belongs to -- so we overwrite the ANM's "uf" with it instead of
+    # keeping both columns.
+    a$uf <- a_munic$abbrev_state
   }
 
   ##############################
