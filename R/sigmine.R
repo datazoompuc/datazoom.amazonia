@@ -110,14 +110,24 @@ load_sigmine <- function(dataset = "sigmine_active",
       sf::st_zm(drop = TRUE, what = "ZM") %>%
       sf::st_make_valid()
 
-    # Reprojeta para um CRS planar brasileiro antes de calcular o centroide.
-    # Calcular o centroide com sf_use_s2(FALSE) (abordagem anterior) fazia o
-    # GEOS tratar graus de lon/lat como coordenadas cartesianas planas, o que
-    # distorce o resultado -- e distorce mais exatamente nos polígonos
-    # alongados que cruzam fronteira municipal, que são o caso que esta
-    # técnica tenta resolver bem. Reprojetar para um CRS já planar (métrico)
-    # antes do centroide evita essa distorção sem precisar desligar o s2.
-    operation_crs <- sf::st_crs("+proj=poly +lat_0=0 +lon_0=-54 +x_0=5000000 +y_0=10000000 +ellps=aust_SA +units=m +no_defs")
+    # Reprojeta para um CRS planar brasileiro antes de calcular o centroide,
+    # em vez de desligar o s2 (que fazia o GEOS tratar graus de lon/lat como
+    # coordenadas cartesianas planas, distorcendo o resultado -- pior
+    # exatamente nos polígonos alongados que cruzam fronteira municipal,
+    # caso que esta técnica tenta resolver bem).
+    #
+    # Projeção Albers Equal Area (+proj=aea), não Polyconic: um centroide é
+    # uma média ponderada por área, e Albers preserva área localmente (fator
+    # de escala de área = 1 em toda a projeção); Polyconic é adequada para
+    # cálculos de distância, não de área, e pode enviesar o centroide.
+    # Parâmetros padrão do IBGE para o Brasil: meridiano central -54°,
+    # latitude de origem -12°, paralelos padrão -2° e -22°.
+    #
+    # Elipsoide GRS80, não aust_SA (datum SAD69): nem o shapefile de
+    # municípios (SIRGAS2000/EPSG:4674) nem os dados de origem da ANM
+    # (também SIRGAS2000) usam SAD69 -- aust_SA forçava uma conversão de
+    # datum desnecessária antes mesmo do cálculo do centroide.
+    operation_crs <- sf::st_crs("+proj=aea +lat_1=-2 +lat_2=-22 +lat_0=-12 +lon_0=-54 +x_0=5000000 +y_0=10000000 +ellps=GRS80 +units=m +no_defs")
 
     a_sf_proj     <- sf::st_transform(a_sf, operation_crs)
     munic_shp_proj <- sf::st_transform(munic_shp, operation_crs)
