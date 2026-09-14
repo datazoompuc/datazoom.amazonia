@@ -443,7 +443,7 @@ new_alert_rows <- NULL
   merged_alerts <- committed_alerts
   any_source_ran <- FALSE
 
-  for (src_label in c("prodes", "epe")) {
+  for (src_label in RESOLVER_ALERT_SOURCES) {
     candidate_path <- get0(paste0(src_label, "_alert_cache_candidate_path"), ifnotfound = NA_character_)
     if (!is.na(candidate_path) && file.exists(candidate_path)) {
       any_source_ran <- TRUE

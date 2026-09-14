@@ -123,31 +123,11 @@ resolve_prodes <- function(rows) {
   ## stays broken) is already in the committed cache and won't re-alert --
   ## the stop() calls below are UNCHANGED (still open a GitHub issue every
   ## run via resolver_failed); this is a purely additive side channel.
-  ## repo_root is a build_manifest.R global already in scope here (this file
-  ## is source()d into that environment, same as resolve_mapbiomas.R's own
-  ## cache read) -- falls back to an in-memory-only cache if somehow
-  ## missing, so a standalone/test invocation degrades gracefully.
-  alert_cache_path <- tryCatch(
-    file.path(repo_root, "actions", "cache", "resolver_alerts.csv"),
-    error = function(e) NA_character_
-  )
-  alert_cache <- if (!is.na(alert_cache_path)) {
-    read_resolver_alert_cache(alert_cache_path)
-  } else {
-    read_resolver_alert_cache(tempfile())
-  }
+  ## alert_recorder() owns the read/upsert/write/global-stash boilerplate
+  ## (shared with resolve_epe.R/resolve_ips.R) -- see its header.
+  alert_rec <- alert_recorder("prodes")
   record_prodes_verdict <- function(verdict, reason = NA_character_) {
-    alert_cache <<- alert_cache_upsert(
-      alert_cache,
-      source = "prodes", item_key = stamp, dataset = "(all)", geo_level = NA_character_,
-      verdict = verdict, reason = reason
-    )
-    out_path <- tryCatch(
-      file.path(OUT_DIR, "prodes_alert_cache_candidate.csv"),
-      error = function(e) tempfile(fileext = ".csv")
-    )
-    write_resolver_alert_cache(alert_cache, out_path)
-    assign("prodes_alert_cache_candidate_path", out_path, envir = .GlobalEnv)
+    alert_rec(item_key = stamp, dataset = "(all)", verdict = verdict, reason = reason)
   }
 
   ## -- verify the zip's actual contents, not just the API's filename --------

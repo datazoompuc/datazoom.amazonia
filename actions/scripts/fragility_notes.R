@@ -61,5 +61,6 @@ FRAGILITY_SOURCES <- list(
   list(changed_prefix = "mapbiomas", r_path = file.path("R", "mapbiomas.R"), label = "R/mapbiomas.R", treat_fn = "mapbiomas_treat()"),
   list(changed_prefix = "epe", r_path = file.path("R", "epe.R"), label = "R/epe.R", treat_fn = "epe_energy_state_panel_treat()"),
   list(changed_prefix = "prodes", r_path = file.path("R", "prodes.R"), label = "R/prodes.R", treat_fn = "load_prodes()"),
-  list(changed_prefix = "baci", r_path = file.path("R", "baci.R"), label = "R/baci.R", treat_fn = "load_baci()")
+  list(changed_prefix = "baci", r_path = file.path("R", "baci.R"), label = "R/baci.R", treat_fn = "load_baci()"),
+  list(changed_prefix = "ips", r_path = file.path("R", "ips.R"), label = "R/ips.R", treat_fn = "load_ips()")
 )

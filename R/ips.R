@@ -99,33 +99,20 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
 
   check_params(param)
 
-  # Picking which sheet to download
-
-  sheet_list <- c(
-    "2014" = "2014",
-    "2018" = "2018 ",
-    "2021" = "2021",
-    "2023" = "2023"
-  )
-
-  sheets <- param$time_period %>%
-    {
-      purrr::quietly(dplyr::recode)
-    }(!!!sheet_list) %>%
-    purrr::pluck("result")
-
-  if (any(is.na(sheets))) {
-    stop("Some of the years you request aren't available. Check documentation for time availability.")
-  }
-
   ##############
   ## Download ##
   ##############
 
+  # Which upstream tab to open for each requested year is resolved at read
+  # time, not here -- see R/download.R's ips branch and ips_match_sheets()
+  # below. Requested years are passed straight through as the "sheet"
+  # param; check_params() already warned above if one isn't in this
+  # dataset's manifest available_time.
+
   dat <- external_download(
     dataset = param$dataset,
     source = param$source,
-    sheet = sheets
+    sheet = param$time_period
   )
 
   if (param$raw_data) {
@@ -151,6 +138,13 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
 
   # removing years from column names to be able to match columns from different years
 
+  # FRAGILE: hardcoded year range. A tab added upstream outside 2012-2023
+  # (e.g. a future "2027" release) would have its year suffix silently NOT
+  # stripped from its column names, so those columns fail to align with the
+  # rest when bind_rows() stacks all years below -- no error, just columns
+  # that don't merge. Re-check this range whenever IPS_Amazonia's available
+  # years change (see resolve_ips.R, which derives available_time from the
+  # live workbook's own tabs).
   strs_to_remove <- paste0("_", 2012:2023, collapse = "|")
 
   dat <- dat %>%
@@ -289,6 +283,11 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
 
   # keep only columns containing the strings in var_list
 
+  # FRAGILE: dplyr::contains() is substring matching, not exact-name
+  # matching -- a new upstream column that happens to CONTAIN one of these
+  # strings (e.g. anything with "moradia" in it landing in sanit_habit's
+  # var_list) silently joins a dataset it doesn't belong to. No error either
+  # way; only a wider/narrower-than-expected column set downstream.
   dat <- dat %>%
     dplyr::select(dplyr::contains(var_list))
 
@@ -301,6 +300,10 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
   }
 
   if (language == "eng") {
+    # FRAGILE: dplyr::any_of() renames whatever matches and silently leaves
+    # everything else alone -- if IPS Amazônia ever renames a source column
+    # upstream, the pt name just passes through untranslated instead of
+    # erroring, and this map goes stale without any signal that it has.
     dat_mod <- dat %>%
       dplyr::rename(dplyr::any_of(
         c(
@@ -382,4 +385,36 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
   ####################
 
   return(dat_mod)
+}
+
+#' Match requested IPS years to the workbook's own tab names.
+#'
+#' FRAGILE: assumes every non-glossary upstream tab is year-named. IPS
+#' Amazônia's workbook doesn't title its year tabs consistently -- the 2018
+#' tab is literally `"2018 "` (trailing space), verified live 2026-09-14 --
+#' so this matches on the year DIGITS (trimws() + as.integer()) rather than
+#' the raw string, and returns the VERBATIM upstream name (space intact) for
+#' `readxl::read_xlsx(sheet = .)` to open, since readxl's own sheet lookup is
+#' an exact string match. If IPS Amazônia ever ships a non-year-named tab
+#' this stops working -- see R/download.R's ips branch, the only caller.
+#'
+#' @param sheet_names Character vector, the workbook's own `readxl::excel_sheets()`.
+#' @param years Integer/character vector of years actually requested.
+#' @return `sheet_names`, subset and reordered to match `years` 1:1.
+#' @noRd
+ips_match_sheets <- function(sheet_names, years) {
+  norm <- suppressWarnings(as.integer(trimws(sheet_names)))
+  idx <- match(as.integer(years), norm)
+
+  if (anyNA(idx)) {
+    missing_years <- years[is.na(idx)]
+    stop(
+      "ips_match_sheets(): no tab found for year(s) ",
+      paste(missing_years, collapse = ", "),
+      " -- tabs found in the workbook: ",
+      paste(sheet_names, collapse = ", ")
+    )
+  }
+
+  sheet_names[idx]
 }

@@ -96,6 +96,14 @@
 #      (were pointing at a dashboard app, not the real downloads landing
 #      page) but docs_url isn't one of datasets_link()'s returned columns,
 #      so that change doesn't touch this fixture.
+#  12. 2026-09-14: resolve_ips.R stopped being detect-only -- all 8 IPS
+#      rows' url moved off the manifest's old Google Drive link (confirmed
+#      owned by a personal gmail account, not Datazoom, not in Datazoom's
+#      shared Drive folder -- a one-off personal upload) onto IPS
+#      Amazônia's own Strapi-hosted workbook (verified live to be a
+#      drop-in replacement: identical sheets, row counts, and cleaned
+#      column names on all 4 year tabs -- see resolve_ips.R's header).
+#      version (not one of this fixture's columns) is now populated too.
 #
 # The fixture was captured right before normalization. Row order is not
 # significant (both sides sorted by (survey, dataset) before comparing).
@@ -141,6 +149,12 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
     url = ifelse(
       survey == "aneel" & dataset == "energy_enterprises_distributed",
       "https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/b1bd71e7-d0ad-4214-9053-cbd58e9564a7/download/empreendimento-geracao-distribuida.zip",
+      url
+    ),
+    # Delta #12 -- see file header.
+    url = ifelse(
+      survey == "ips",
+      "https://painel.ipsamazonia.org.br/uploads/IPS_Amazonia_2023_dc7f4721ef.xlsx",
       url
     ),
     available_time = ifelse(

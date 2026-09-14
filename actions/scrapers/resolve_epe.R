@@ -304,18 +304,10 @@ resolve_epe <- function(rows) {
   ## -- resolver alert cache: see this file's header and resolve_prodes.R's --
   ## identical wiring. Runs regardless of whether the stop() below fires --
   ## a failure this severe (every block down) is exactly the case a human
-  ## most needs the Slack ping for, not less. repo_root/OUT_DIR are
-  ## build_manifest.R globals already in scope here (source()d into that
-  ## environment); fall back to an in-memory-only cache if somehow missing.
-  alert_cache_path <- tryCatch(
-    file.path(repo_root, "actions", "cache", "resolver_alerts.csv"),
-    error = function(e) NA_character_
-  )
-  alert_cache <- if (!is.na(alert_cache_path)) {
-    read_resolver_alert_cache(alert_cache_path)
-  } else {
-    read_resolver_alert_cache(tempfile())
-  }
+  ## most needs the Slack ping for, not less. alert_recorder() owns the
+  ## read/upsert/write/global-stash boilerplate (shared with resolve_prodes.R/
+  ## resolve_ips.R) -- see its header.
+  alert_rec <- alert_recorder("epe")
   epe_blocks <- list(
     list(label = "consumer/industrial_energy_consumption", ok = !is.null(out$consumer)),
     list(label = "national_energy_balance", ok = !is.null(out$ben)),
@@ -325,28 +317,12 @@ resolve_epe <- function(rows) {
     blk_failures <- grep(paste0("^", blk$label, ": "), block_failures, value = TRUE, fixed = FALSE)
     if (length(blk_failures) > 0) {
       for (reason in blk_failures) {
-        alert_cache <- alert_cache_upsert(
-          alert_cache,
-          source = "epe", item_key = paste(blk$label, reason, sep = "\r"),
-          dataset = blk$label, geo_level = NA_character_,
-          verdict = "fail", reason = reason
-        )
+        alert_rec(item_key = paste(blk$label, reason, sep = "\r"), dataset = blk$label, verdict = "fail", reason = reason)
       }
     } else if (isTRUE(blk$ok)) {
-      alert_cache <- alert_cache_upsert(
-        alert_cache,
-        source = "epe", item_key = blk$label,
-        dataset = blk$label, geo_level = NA_character_,
-        verdict = "pass", reason = NA_character_
-      )
+      alert_rec(item_key = blk$label, dataset = blk$label, verdict = "pass")
     }
   }
-  epe_alert_out_path <- tryCatch(
-    file.path(OUT_DIR, "epe_alert_cache_candidate.csv"),
-    error = function(e) tempfile(fileext = ".csv")
-  )
-  write_resolver_alert_cache(alert_cache, epe_alert_out_path)
-  assign("epe_alert_cache_candidate_path", epe_alert_out_path, envir = .GlobalEnv)
 
   if (length(out) == 0) {
     stop(

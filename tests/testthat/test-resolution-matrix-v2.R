@@ -37,18 +37,23 @@
 # mapbiomas_deforestation_regeneration's available_time corrected), PLUS 2
 # more from delta #10 (2026-09-08: epe/energy_state_panel's url and
 # available_time, migrated to the BEN dashboard's Chapter 8 table -- see
-# test-datasets_link.R). 8 total, also enumerated explicitly below rather
+# test-datasets_link.R), PLUS 8 more from delta #12 (2026-09-14: all 8 IPS
+# rows' url, resolve_ips.R stopped being detect-only -- see
+# test-datasets_link.R). 16 total, also enumerated explicitly below rather
 # than assumed. This file only asserts the row/column shape stays
 # consistent and the delta count; test-datasets_link.R is the canonical
 # place the specific cells are pinned.
 #
-# A 9th thing changed the same day (2026-09-08, PRODES/BACI resolver audit,
-# delta #11 in test-datasets_link.R) but is deliberately NOT part of the
-# "8 cells" count below: a brand-new row, baci_dic/product_codes, was added
-# to the manifest. It's a new row, not a changed cell on an existing one --
-# doesn't fit "same rows, different values" the way the other 8 do, so it's
-# split out and asserted separately in the datasets_link() test at the
-# bottom of this file instead of folded into the delta count.
+# Two other things changed the same general period but are deliberately NOT
+# part of the "16 cells" count below: (a) 2026-09-08 (PRODES/BACI resolver
+# audit, delta #11 in test-datasets_link.R), a brand-new row, baci_dic/
+# product_codes, was added to the manifest; (b) 2026-09-14 (delta #12), IPS's
+# version field changed alongside its url, but version isn't one of
+# datasets_link()'s 6 output columns. Neither fits "same rows, different
+# values in an existing output column" the way the 16 do, so (a) is asserted
+# separately in the datasets_link() test at the bottom of this file instead
+# of folded into the delta count, and (b) simply isn't visible to this
+# fixture at all.
 #
 # Note this file's OWN matrix (resolution_matrix_keyed.rds, captured
 # per-field via dataset_field(), not just datasets_link()'s 6-column
@@ -122,7 +127,29 @@ KNOWN_POST_CAPTURE_DELTAS <- c(
   "prodes\rhydrography\rNA\rNA\rdocs_url",
   "prodes\rnative_vegetation\rNA\rNA\rdocs_url",
   "prodes\rnon_forest\rNA\rNA\rdocs_url",
-  "prodes\rresidual_deforestation\rNA\rNA\rdocs_url"
+  "prodes\rresidual_deforestation\rNA\rNA\rdocs_url",
+  # 2026-09-14: resolve_ips.R stopped being detect-only -- all 8 IPS rows'
+  # url moved off the manifest's old Google Drive link (confirmed owned by
+  # a personal gmail account, not Datazoom -- see resolve_ips.R's header)
+  # onto IPS Amazônia's own Strapi-hosted workbook (verified live to be a
+  # drop-in replacement -- see resolve_ips.R's header), and version is now
+  # populated. See test-datasets_link.R's delta #12.
+  "ips\rall\rNA\rNA\rurl",
+  "ips\rall\rNA\rNA\rversion",
+  "ips\rcommunic\rNA\rNA\rurl",
+  "ips\rcommunic\rNA\rNA\rversion",
+  "ips\rdeforest\rNA\rNA\rurl",
+  "ips\rdeforest\rNA\rNA\rversion",
+  "ips\reduc\rNA\rNA\rurl",
+  "ips\reduc\rNA\rNA\rversion",
+  "ips\rlife_quality\rNA\rNA\rurl",
+  "ips\rlife_quality\rNA\rNA\rversion",
+  "ips\rmortality\rNA\rNA\rurl",
+  "ips\rmortality\rNA\rNA\rversion",
+  "ips\rsanit_habit\rNA\rNA\rurl",
+  "ips\rsanit_habit\rNA\rNA\rversion",
+  "ips\rviolence\rNA\rNA\rurl",
+  "ips\rviolence\rNA\rNA\rversion"
 )
 post_capture_key <- function(s, d, g, y, f) {
   paste(s, d, ifelse(is.na(g), "NA", g), ifelse(is.na(y), "NA", y), f, sep = "\r")
@@ -172,18 +199,20 @@ test_that("every former base-row query now stops -- the guard has no gap", {
   expect_equal(still_works, character(0))
 })
 
-test_that("datasets_link() keeps the same rows/columns and differs in exactly 8 cells (see test-datasets_link.R deltas #8-#10)", {
+test_that("datasets_link() keeps the same rows/columns and differs in exactly 16 cells (see test-datasets_link.R deltas #8-#12)", {
   # 5 cells from delta #8 (the base-row-deletion migration this fixture was
   # captured to verify) + 1 more from delta #9 (2026-08-24,
   # mapbiomas_deforestation_regeneration's available_time corrected from
   # "1985-2024" to "1987-2024") + 2 more from delta #10 (2026-09-08,
   # epe/energy_state_panel's url and available_time -- see NEWS.md and
-  # test-datasets_link.R). cover's url stays NA either way (its rows still
-  # disagree, just on a different pair of URLs now), so that doesn't add
-  # another cell here -- and the docs_url-only EPE/PRODES changes (delta
-  # #10's sibling hand-edits, delta #11's PRODES fix) don't count in THIS
-  # test either, since docs_url isn't one of datasets_link()'s 6 output
-  # columns.
+  # test-datasets_link.R) + 8 more from delta #12 (2026-09-14, all 8 IPS
+  # rows' url -- see test-datasets_link.R). cover's url stays NA either
+  # way (its rows still disagree, just on a different pair of URLs now),
+  # so that doesn't add another cell here -- and the docs_url-only
+  # EPE/PRODES changes (delta #10's sibling hand-edits, delta #11's PRODES
+  # fix) don't count in THIS test either, since docs_url isn't one of
+  # datasets_link()'s 6 output columns (nor is version, IPS's other
+  # changed field).
   old_snap <- readRDS(test_path("fixtures", "datasets_link_pre_baserow_deletion.rds"))
   new_snap <- datasets_link()
 
@@ -218,5 +247,5 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 8 
     }
   }
 
-  expect_equal(delta, 8)
+  expect_equal(delta, 16)
 })

@@ -52,14 +52,14 @@ ibama,embargoed_areas,,,,https://pamgia.ibama.gov.br/geoservicos/arquivos/adm_em
 iema,iema,,,,https://drive.google.com/uc?export=download&id=10JMRtzu3k95vl8cQmHkVMQ9nJovvIeNl,,2018,municipality,,,,,
 imazon,imazon_shp,,,,https://docs.google.com/uc?export=download&id=1JHc2J_U8VXHVuWVsi8wVBnNzZ37y1ehv,,2020,municipality,,,,,
 internal,geo_municipalities,,,,https://raw.githubusercontent.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds,,2020,municipality,,,,,
-ips,all,,,,https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,,ips
-ips,communic,,,,https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,,ips
-ips,deforest,,,,https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,,ips
-ips,educ,,,,https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,,ips
-ips,life_quality,,,,https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,,ips
-ips,mortality,,,,https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,,ips
-ips,sanit_habit,,,,https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,,ips
-ips,violence,,,,https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,,ips
+ips,all,,,,https://painel.ipsamazonia.org.br/uploads/IPS_Amazonia_2023_dc7f4721ef.xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,2023_dc7f4721ef,ips
+ips,communic,,,,https://painel.ipsamazonia.org.br/uploads/IPS_Amazonia_2023_dc7f4721ef.xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,2023_dc7f4721ef,ips
+ips,deforest,,,,https://painel.ipsamazonia.org.br/uploads/IPS_Amazonia_2023_dc7f4721ef.xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,2023_dc7f4721ef,ips
+ips,educ,,,,https://painel.ipsamazonia.org.br/uploads/IPS_Amazonia_2023_dc7f4721ef.xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,2023_dc7f4721ef,ips
+ips,life_quality,,,,https://painel.ipsamazonia.org.br/uploads/IPS_Amazonia_2023_dc7f4721ef.xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,2023_dc7f4721ef,ips
+ips,mortality,,,,https://painel.ipsamazonia.org.br/uploads/IPS_Amazonia_2023_dc7f4721ef.xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,2023_dc7f4721ef,ips
+ips,sanit_habit,,,,https://painel.ipsamazonia.org.br/uploads/IPS_Amazonia_2023_dc7f4721ef.xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,2023_dc7f4721ef,ips
+ips,violence,,,,https://painel.ipsamazonia.org.br/uploads/IPS_Amazonia_2023_dc7f4721ef.xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,2023_dc7f4721ef,ips
 mapbiomas,mapbiomas_cover,indigenous_land,,,https://data.mapbiomas.org/api/access/datafile/523?format=original,https://doi.org/10.58053/MapBiomas/1F2TLA,1985-2024,"municipality, indigenous_land",,COVERAGE_INDIGENOUS_TERRITORIES,,10.1,mapbiomas
 mapbiomas,mapbiomas_cover,municipality,,,https://data.mapbiomas.org/api/access/datafile/254?format=original,https://doi.org/10.58053/MapBiomas/IBQPF6,1985-2024,"municipality, indigenous_land",,COVERAGE_10,,10,mapbiomas
 mapbiomas,mapbiomas_deforestation_regeneration,,,,https://data.mapbiomas.org/api/access/datafile/485?format=original,https://doi.org/10.58053/MapBiomas/ZUTHSX,1987-2024,municipality,,DEFORESTATION,,10,mapbiomas

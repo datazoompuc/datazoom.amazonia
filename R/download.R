@@ -613,7 +613,12 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
 
   } else if (param$source == "ips") {
-    dat <- param$sheet %>%
+    # param$sheet carries the requested YEARS (see load_ips()), not raw tab
+    # names -- resolved against the workbook's own tabs here so a whitespace
+    # quirk (IPS Amazônia's "2018 " tab, verified live) can't break an exact
+    # readxl::read_xlsx(sheet = ...) match. See ips_match_sheets() (R/ips.R).
+    sheets <- ips_match_sheets(readxl::excel_sheets(temp), param$sheet)
+    dat <- sheets %>%
       purrr::map(
         ~ readxl::read_xlsx(temp, sheet = .)
       )

@@ -37,6 +37,15 @@
 `%||%` <- function(x, y) if (is.null(x)) y else x
 
 ## ============================================================ ##
+## Which sources plug into the shared cache -- table-driven the  ##
+## same way FRAGILITY_SOURCES is (fragility_notes.R): a new      ##
+## source is one line here, not a new copy of build_manifest.R's ##
+## merge loop.                                                   ##
+## ============================================================ ##
+
+RESOLVER_ALERT_SOURCES <- c("prodes", "epe", "ips")
+
+## ============================================================ ##
 ## Schema                                                       ##
 ## ============================================================ ##
 
@@ -94,6 +103,55 @@ alert_cache_upsert <- function(cache, source, item_key, dataset = NA_character_,
   } else {
     cache[match_idx[1], RESOLVER_ALERT_COLS] <- new_row[1, RESOLVER_ALERT_COLS]
     cache
+  }
+}
+
+## ============================================================ ##
+## Recorder (per-resolver convenience wrapper)                  ##
+## ============================================================ ##
+
+# resolve_prodes.R, resolve_epe.R and resolve_ips.R each need the same four
+# steps every time they check a candidate: read the committed cache once,
+# upsert a verdict row, write the accumulated result to a candidate file
+# under OUT_DIR, and assign("<source>_alert_cache_candidate_path", ...,
+# envir = .GlobalEnv) so build_manifest.R's merge loop can find it even if
+# the resolver itself later stop()s (confirmed safe: the tryCatch() wrapping
+# each resolver's call in build_manifest.R catches the error but never rolls
+# back a global assignment made before it). alert_recorder() is that
+# boilerplate, extracted once instead of copied a third time.
+#
+# repo_root/OUT_DIR are build_manifest.R globals every resolver file is
+# source()d into (same convention resolve_mapbiomas.R's own cache read
+# already relies on) -- cache_path/out_dir let a standalone/test invocation
+# override them explicitly instead of silently depending on globals that
+# may not exist there, degrading to an in-memory-only cache if neither is
+# available.
+alert_recorder <- function(source, cache_path = NULL, out_dir = NULL) {
+  if (is.null(cache_path)) {
+    cache_path <- tryCatch(
+      file.path(get("repo_root", envir = .GlobalEnv), "actions", "cache", "resolver_alerts.csv"),
+      error = function(e) NA_character_
+    )
+  }
+  cache <- if (!is.na(cache_path)) read_resolver_alert_cache(cache_path) else read_resolver_alert_cache(tempfile())
+
+  function(item_key, verdict, reason = NA_character_, dataset = NA_character_, geo_level = NA_character_) {
+    cache <<- alert_cache_upsert(
+      cache,
+      source = source, item_key = item_key, dataset = dataset, geo_level = geo_level,
+      verdict = verdict, reason = reason
+    )
+    if (is.null(out_dir)) {
+      out_dir <- tryCatch(get("OUT_DIR", envir = .GlobalEnv), error = function(e) NA_character_)
+    }
+    candidate_path <- if (!is.na(out_dir)) {
+      file.path(out_dir, paste0(source, "_alert_cache_candidate.csv"))
+    } else {
+      tempfile(fileext = ".csv")
+    }
+    write_resolver_alert_cache(cache, candidate_path)
+    assign(paste0(source, "_alert_cache_candidate_path"), candidate_path, envir = .GlobalEnv)
+    invisible(cache)
   }
 }
 
