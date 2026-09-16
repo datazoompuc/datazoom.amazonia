@@ -123,9 +123,10 @@ if (param$dataset == "energy_development_budget") {
 
   ######################
   ## Data Engineering ##
-  ######################
-
   if (param$dataset == "energy_enterprises_distributed") {
+    # FRAGILE: assumes numeric coordinate and power columns have Brazilian thousand
+    # separators (.) and decimal commas (,) to strip/convert. If ANEEL changes
+    # formatting or exports clean numerics directly, gsub() may alter valid values.
     dat <- dat %>%
       janitor::clean_names() %>%
       dplyr::mutate_if(is.character, function(var) {
@@ -143,6 +144,9 @@ if (param$dataset == "energy_development_budget") {
         dplyr::across(dplyr::starts_with("mda"), ~ gsub("[,]", ".", .x) %>% as.numeric()),
         dplyr::across(dplyr::starts_with("num_coord"), ~ gsub("[,]", ".", .x) %>% as.numeric())
       ) %>%
+      # FRAGILE: exact string match on dsc_modalidade_habilitado categories.
+      # If ANEEL alters or introduces new modality labels, case_when() silently
+      # assigns 'Indefinido' to all unmapped rows.
       dplyr::mutate(
         sig_modalidade_empreendimento = dplyr::case_when(
           dsc_modalidade_habilitado == "Geracao na propria UC" ~ "Microgera\u00e7\u00e3o ou Minigera\u00e7\u00e3o distribu\u00edda",
@@ -205,8 +209,8 @@ if (param$dataset == "energy_development_budget") {
       }
     )
 
-  # changing operation_start to date format
-
+  # FRAGILE: assumes operation_start is formatted as DD/MM/YYYY. If upstream
+  # changes to ISO YYYY-MM-DD or datetime format, as.Date() produces NAs silently.
   dat <- dat %>%
     dplyr::mutate(
       dplyr::across(operation_start, \(x) as.Date(x, format = "%d/%m/%Y", origin = "1970-01-01"))
@@ -216,6 +220,8 @@ if (param$dataset == "energy_development_budget") {
   ## Harmonizing Variable Names ##
   ################################
 
+  # FRAGILE: exact upstream column names expected in Portuguese harmonization.
+  # If ANEEL renames any of these columns, recode silently leaves them untouched.
   if (param$language == "pt") {
     dat_mod <- dat %>%
       dplyr::rename_with(dplyr::recode,
@@ -229,6 +235,8 @@ if (param$dataset == "energy_development_budget") {
       )
   }
 
+  # FRAGILE: exact upstream column names expected in English harmonization.
+  # If ANEEL changes database attribute names, recode silently leaves columns in Portuguese.
   if (param$language == "eng") {
     dat_mod <- dat %>%
       dplyr::rename_with(dplyr::recode,
