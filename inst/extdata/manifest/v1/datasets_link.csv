@@ -169,12 +169,12 @@ prodes,hydrography,,,,https://terrabrasilis.dpi.inpe.br/download/dataset/legal-a
 prodes,native_vegetation,,,,https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip,https://terrabrasilis.dpi.inpe.br/downloads/,2025,municipality,,,prodes_amazonia_legal_2025_v20260408,20260408,prodes
 prodes,non_forest,,,,https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip,https://terrabrasilis.dpi.inpe.br/downloads/,2025,municipality,,,prodes_amazonia_legal_2025_v20260408,20260408,prodes
 prodes,residual_deforestation,,,,https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip,https://terrabrasilis.dpi.inpe.br/downloads/,2010-2025,municipality,,,prodes_amazonia_legal_2025_v20260408,20260408,prodes
-seeg,seeg,,,,https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd,,2000-2018,"country, state, municipality",,,,,seeg
-seeg,seeg_energy,,,,https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd,,2000-2018,"country, state, municipality",,,,,seeg
-seeg,seeg_farming,,,,https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd,,2000-2018,"country, state, municipality",,,,,seeg
-seeg,seeg_industry,,,,https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd,,2000-2018,"country, state, municipality",,,,,seeg
-seeg,seeg_land,,,,https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd,,2000-2018,"country, state, municipality",,,,,seeg
-seeg,seeg_residuals,,,,https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd,,2000-2018,"country, state, municipality",,,,,seeg
+seeg,seeg,,,,https://seeg.eco.br/wp-content/uploads/2025/12/Dados-municipais-resumido-CO2e-GWP-AR5-13.0.xlsx,https://seeg.eco.br/dados/,1970-2024,"country, state, municipality",,,,13.0,seeg
+seeg,seeg_energy,,,,https://seeg.eco.br/wp-content/uploads/2025/12/Dados-municipais-resumido-CO2e-GWP-AR5-13.0.xlsx,https://seeg.eco.br/dados/,1970-2024,"country, state, municipality",,,,13.0,seeg
+seeg,seeg_farming,,,,https://seeg.eco.br/wp-content/uploads/2025/12/Dados-municipais-resumido-CO2e-GWP-AR5-13.0.xlsx,https://seeg.eco.br/dados/,1970-2024,"country, state, municipality",,,,13.0,seeg
+seeg,seeg_industry,,,,https://seeg.eco.br/wp-content/uploads/2025/12/Dados-municipais-resumido-CO2e-GWP-AR5-13.0.xlsx,https://seeg.eco.br/dados/,1970-2024,"country, state, municipality",,,,13.0,seeg
+seeg,seeg_land,,,,https://seeg.eco.br/wp-content/uploads/2025/12/Dados-municipais-resumido-CO2e-GWP-AR5-13.0.xlsx,https://seeg.eco.br/dados/,1970-2024,"country, state, municipality",,,,13.0,seeg
+seeg,seeg_residuals,,,,https://seeg.eco.br/wp-content/uploads/2025/12/Dados-municipais-resumido-CO2e-GWP-AR5-13.0.xlsx,https://seeg.eco.br/dados/,1970-2024,"country, state, municipality",,,,13.0,seeg
 sigmine,sigmine_active,,,,https://dadosabertos.anm.gov.br/SIGMINE/BRASIL.zip,,,,,,,,
 terraclimate,climatic_water_deficit,,,,http://thredds.northwestknowledge.net:8080/thredds/ncss,,1958-2022,municipality,,,,,
 terraclimate,max_temperature,,,,http://thredds.northwestknowledge.net:8080/thredds/ncss,,1958-2022,municipality,,,,,

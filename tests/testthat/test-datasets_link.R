@@ -104,6 +104,14 @@
 #      drop-in replacement: identical sheets, row counts, and cleaned
 #      column names on all 4 year tabs -- see resolve_ips.R's header).
 #      version (not one of this fixture's columns) is now populated too.
+#  13. 2026-09-15: resolve_seeg.R stopped being detect-only -- all 6 SEEG
+#      rows' url moved off the manifest's old Google Drive link onto
+#      seeg.eco.br's own live v13.0 file (verified live by downloading and
+#      comparing both workbooks' pivot-cache definitions: a genuine schema
+#      restructuring, not just a version bump -- see R/seeg.R's header).
+#      available_time widens from 2000-2018 to 1970-2024 (the new file's
+#      real year-column span). version and docs_url (not one of this
+#      fixture's columns) are now populated too.
 #
 # The fixture was captured right before normalization. Row order is not
 # significant (both sides sorted by (survey, dataset) before comparing).
@@ -156,6 +164,17 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
       survey == "ips",
       "https://painel.ipsamazonia.org.br/uploads/IPS_Amazonia_2023_dc7f4721ef.xlsx",
       url
+    ),
+    # Delta #13 -- see file header.
+    url = ifelse(
+      survey == "seeg",
+      "https://seeg.eco.br/wp-content/uploads/2025/12/Dados-municipais-resumido-CO2e-GWP-AR5-13.0.xlsx",
+      url
+    ),
+    available_time = ifelse(
+      survey == "seeg",
+      "1970-2024",
+      available_time
     ),
     available_time = ifelse(
       survey == "prodes" & dataset == "deforestation", "2007-2025",

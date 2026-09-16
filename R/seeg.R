@@ -63,30 +63,17 @@
 
 load_seeg <- function(dataset, raw_data = FALSE,
                       geo_level, language = "eng") {
-  # Checking for googledrive package (in Suggests)
-
-  if (!requireNamespace("googledrive", quietly = TRUE)) {
-    stop(
-      "Package \"googledrive\" must be installed to use this function.",
-      call. = FALSE
-    )
-  }
-
   ##############################
   ## Binding Global Variables ##
   ##############################
 
-  survey <- link <- ibge <- x2000 <- x2018 <- id_code <- tipo_de_emissao <- NULL
-  city <- state <- nivel_1 <- municipio <- territorio <- x2000 <- x2018 <- NULL
-  nivel_1 <- nivel_2 <- nivel_3 <- nivel_4 <- nivel_5 <- nivel_6 <- NULL
-  produto <- atividade_economica <- Valor <- Ano <- estado <- setor <- NULL
-  processos_geradores_emissoes <- fonte_de_emissoes <- emissores <- gas <- NULL
-  emissao_remocao_bunker <- producao_emissores <- categorias_emissao <- NULL
-  atividade_geradora <- categorias_processos_geradores <- year <- state <- NULL
-  sector <- emitters_production <- emitters <- economic_activity <- product <- NULL
-  value <- emissions_category <- activity <- generating_processes_categories <- NULL
-  biome <- biome_area <- transition_type <- emission_removal_bunker <- NULL
-  emissions_sources <- emissions_type <- emissions_generating_processes <- emission_bunker <- NULL
+  ibge <- city <- state <- municipio <- estado <- setor <- id_territorio <- NULL
+  setor_de_emissao <- categoria_emissora <- sub_categoria_emissora <- NULL
+  emissao_remocao_bunker <- categoria_emissao <- subcategoria_emissao <- NULL
+  recorte <- atividade_geral <- tipo_residuo <- tipo_emissao <- via_emissao <- NULL
+  year <- Ano <- Valor <- value <- NULL
+  sector <- emission_category <- emission_subcategory <- waste_stream <- general_activity <- NULL
+  emission_type <- emission_pathway <- emission_scope <- x1970 <- x2024 <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -125,8 +112,26 @@ load_seeg <- function(dataset, raw_data = FALSE,
   }
 
   # Picking which sheet to download
+  #
+  # 2026-09-15: "Dados" replaces the pre-v13.0 "BD GEE Municipios GWP-AR5"
+  # sheet -- see this file's header for the full schema migration (NIVEL
+  # 1..6 restructured into Setor de emissão/Categoria emissora/Sub-categoria
+  # emissora/Recorte/Atividade geral; year range widened from 2000-2018 to
+  # 1970-2024; gas/produto dropped at municipality grain). Verified live via
+  # resolve_seeg.R's structural check before this became the manifest's
+  # real url (actions/scrapers/resolve_seeg.R).
+  #
+  # FRAGILE: every pivot_longer()/across() call below hardcodes the column
+  # range x1970:x2024. If a future upload adds a year (e.g. 2025), this
+  # range does NOT expand on its own -- tidyselect just excludes the new
+  # column from output silently, no error, so the new year's data would
+  # vanish from every sector's output. resolve_seeg.R's live year-field
+  # check (against the manifest's available_time) is the thing that's
+  # actually supposed to catch this drift and force a manual range update
+  # here -- this hardcoded range is only as safe as that check staying wired
+  # up.
 
-  sheet <- "BD GEE Municipios GWP-AR5"
+  sheet <- "Dados"
 
   ##############
   ## Download ##
@@ -147,34 +152,60 @@ load_seeg <- function(dataset, raw_data = FALSE,
       stringi::stri_trans_general(str = var, id = "Latin-ASCII")
     })
 
+  # FRAGILE: one row per (municipality x full category path) that has any
+  # non-zero value across 1970-2024 -- confirmed live NOT to be a full
+  # cross product (most, not all, categories apply to all 5570
+  # municipalities). Also confirmed live to include exactly one
+  # non-municipality row (id_territorio == "1BR", municipio == "BR (NA)",
+  # estado == "Nao Alocado" after Latin-ASCII stripping) representing
+  # emissions the source itself doesn't attribute to any municipality --
+  # kept (not dropped) at every geo_level so a real quantity is never
+  # silently discarded from a total; at geo_level == "municipality" it
+  # surfaces as its own row with municipio/estado/ibge coerced to NA (same
+  # convention the pre-v13.0 code already used for its own "NA"-string
+  # placeholders, see the ibge/municipio/estado case_when() calls below).
+  #
+  # FRAGILE: every sector/geo_level/language branch below repeats the same
+  # three id_territorio/municipio assumptions about the source file's
+  # current format, none of them re-derived from the data itself:
+  #   - `id_territorio == "1BR"` is a hardcoded literal sentinel for the
+  #     unallocated-emissions row. If a future upload spells this sentinel
+  #     differently, the comparison just never matches -- the row stops
+  #     being coerced to NA and is instead treated as a real (garbage)
+  #     municipality.
+  #   - `substring(id_territorio, 2)` assumes id_territorio is always
+  #     exactly a 1-character prefix + the IBGE code (confirmed against 5
+  #     real municipalities, not all 5570). A future format with a
+  #     differently-sized prefix would silently produce a wrong, truncated
+  #     IBGE code rather than erroring.
+  #   - `sub(" \\([A-Za-z]{2}\\)$", "", municipio)` assumes municipality
+  #     names always end in a literal " (XX)" two-letter suffix. A format
+  #     change there (suffix dropped, 3 letters, full state name in
+  #     parens) either silently leaves the suffix in `municipio` or strips
+  #     the wrong substring.
 
   ## Return Raw Data
+  #
+  # The Dados sheet is already municipality-grained -- state/country levels
+  # are real sums over municipality rows, computed here exactly like the
+  # pre-v13.0 code did, just against the new column names.
 
-  if(param$geo_level == "state"){
-    dat <- dat %>% dplyr::group_by(nivel_1,
-                                   nivel_2,
-                                   nivel_3,
-                                   nivel_4,
-                                   nivel_5,
-                                   nivel_6,
-                                   tipo_de_emissao,
-                                   gas,
-                                   territorio,
-                                   atividade_economica,
-                                   produto) %>% dplyr::summarise(dplyr::across(x2000:x2018, \(x) sum(x, na.rm = FALSE))) %>% dplyr::ungroup()
+  if (param$geo_level == "state") {
+    dat <- dat %>%
+      dplyr::group_by(
+        setor_de_emissao, categoria_emissora, sub_categoria_emissora,
+        recorte, atividade_geral, emissao_remocao_bunker, estado
+      ) %>%
+      dplyr::summarise(dplyr::across(x1970:x2024, \(x) sum(x, na.rm = FALSE)), .groups = "drop")
   }
 
-  if(param$geo_level == "country"){
-    dat <- dat %>% dplyr::group_by(nivel_1,
-                                   nivel_2,
-                                   nivel_3,
-                                   nivel_4,
-                                   nivel_5,
-                                   nivel_6,
-                                   tipo_de_emissao,
-                                   gas,,
-                                   atividade_economica,
-                                   produto) %>% dplyr::summarise(dplyr::across(x2000:x2018, \(x) sum(x, na.rm = FALSE))) %>% dplyr::ungroup()
+  if (param$geo_level == "country") {
+    dat <- dat %>%
+      dplyr::group_by(
+        setor_de_emissao, categoria_emissora, sub_categoria_emissora,
+        recorte, atividade_geral, emissao_remocao_bunker
+      ) %>%
+      dplyr::summarise(dplyr::across(x1970:x2024, \(x) sum(x, na.rm = FALSE)), .groups = "drop")
   }
 
   if (param$dataset == "seeg" & param$raw_data) {
@@ -182,1642 +213,1249 @@ load_seeg <- function(dataset, raw_data = FALSE,
   }
 
 
-  if (!"estado" %in% names(dat)) {
-    if ("territorio" %in% names(dat)) {
-      # caso mais comum: usar a UF que estava em `territorio`
-      dat <- dat %>% dplyr::mutate(estado = territorio)
-    } else {
-      # se realmente não tiver info de UF, cria como NA (ex.: geo_level = "country")
-      dat <- dat %>% dplyr::mutate(estado = NA_character_)
-    }
-  }
-
-
-  ## Raw Data = FALSE
-
-  if (param$dataset == "seeg_farming" & param$geo_level == "municipality" & param$language == "pt") {
-    dat <- dat %>%
-      tidyr::pivot_longer(
-        cols = x2000:x2018,
-        names_to = "Ano",
-        names_prefix = "x",
-        values_to = "Valor"
-      )
-    ## Changing column name, filtering by the specific sector and harmonizing variables
-    dat <- dat %>%
-      dplyr::filter(nivel_1 == "Agropecuaria") %>%
-      dplyr::rename(
-        setor = nivel_1, processos_geradores_emissoes = nivel_2,
-        tipo_emissao = nivel_4,
-        emissores_diretos_e_indiretos = nivel_3,
-        fonte_de_emissoes = nivel_5,
-        emissores = nivel_6,
-        emissao_remocao = tipo_de_emissao
-      ) %>%
-      dplyr::mutate(atividade_economica = dplyr::case_when(
-        atividade_economica == "PEC" ~ "Pecuaria",
-        atividade_economica == "AGR" ~ "Agricultura"
-      )) %>%
-      dplyr::mutate(produto = dplyr::case_when(
-        produto == "ALIM_BEBIDAS" ~ "Alimentos/Bebidas",
-        produto == "CAR" ~ "Carne",
-        produto == "CAR/LEI" ~ "Carne/Leite",
-        produto == "CAR/LEI/ALIM_BEBIDAS" ~ "Carne/Leite/Alimentos/Bebidas",
-        produto == "LEI" ~ "Leite"
-      ))
-    dat <- dat %>%
-      dplyr::relocate(
-        Ano, municipio, territorio, ibge, setor, processos_geradores_emissoes, fonte_de_emissoes, emissores, gas, atividade_economica, produto,
-        Valor
-      )
-
-    dat <- dat %>%
-      dplyr::mutate(municipio = dplyr::case_when(
-        municipio == "NA" ~ NA_character_,
-        TRUE ~ municipio
-      )) %>%
-      dplyr::mutate(territorio = dplyr::case_when(
-        territorio == "NA" ~ NA_character_,
-        TRUE ~ territorio
-      )) %>%
-      dplyr::mutate(ibge = dplyr::case_when(
-        ibge == "NA" ~ NA_character_,
-        TRUE ~ ibge
-      ))
-  }
-
-
-  if (param$dataset == "seeg_farming" & param$geo_level %in% c("country", "state") & param$language == "pt") {
-    ## Create Longer Data - Years as a Variable
-
-    dat <- dat %>%
-      tidyr::pivot_longer(
-        cols = x2000:x2018,
-        names_to = "Ano",
-        names_prefix = "x",
-        values_to = "Valor"
-      )
-    ## Changing column name, filtering by the specific sector and harmonizing variables
-    dat <- dat %>%
-      dplyr::filter(nivel_1 == "Agropecuaria") %>%
-      dplyr::rename(
-        setor = nivel_1, processos_geradores_emissoes = nivel_2,
-        tipo_emissao = nivel_4,
-        emissores_diretos_e_indiretos = nivel_3,
-        fonte_de_emissoes = nivel_5,
-        emissores = nivel_6
-      ) %>%
-      dplyr::mutate(atividade_economica = dplyr::case_when(
-        atividade_economica == "PEC" ~ "Pecuaria",
-        atividade_economica == "AGR" ~ "Agricultura"
-      )) %>%
-      dplyr::mutate(produto = dplyr::case_when(
-        produto == "ALIM_BEBIDAS" ~ "Alimentos/Bebidas",
-        produto == "CAR" ~ "Carne",
-        produto == "CAR/LEI" ~ "Carne/Leite",
-        produto == "CAR/LEI/ALIM_BEBIDAS" ~ "Carne/Leite/Alimentos/Bebidas",
-        produto == "LEI" ~ "Leite"
-      ))
-
-    dat <- dat %>%
-      dplyr::relocate(
-        Ano, estado, setor, processos_geradores_emissoes, fonte_de_emissoes, emissores, gas, atividade_economica, produto,
-        Valor
-      )
-    dat <- dat %>%
-      dplyr::mutate(estado = dplyr::case_when(
-        estado == "NA" ~ NA_character_,
-        TRUE ~ estado
-      ))
-  }
-
-
-  if (param$dataset == "seeg_industry" & param$geo_level == "municipality" & param$language == "pt") {
-    dat <- dat %>%
-      tidyr::pivot_longer(
-        cols = x2000:x2018,
-        names_to = "Ano",
-        names_prefix = "x",
-        values_to = "Valor"
-      )
-    ## Changing column name, filtering by the specific sector and harmonizing variables
-    dat <- dat %>%
-      dplyr::filter(nivel_1 == "Processos Industriais") %>%
-      dplyr::rename(
-        setor = nivel_1, processos_geradores_emissoes = nivel_2,
-        producao_emissores = nivel_3,
-        emissores = nivel_4,
-        emissao = tipo_de_emissao
-      ) %>%
-      dplyr::select(-c(nivel_6, nivel_5)) %>%
-      dplyr::mutate(atividade_economica = dplyr::case_when(
-        atividade_economica == "CIM" ~ "Industria Cimenteira",
-        atividade_economica == "ENE_ELET" ~ "Industria Energia Eletrica",
-        atividade_economica == "MET" ~ "Industria Metaleira",
-        atividade_economica == "Outra_IND" ~ "Outra Industria",
-        atividade_economica == "HFC" ~ "HFC"
-      ))
-
-    dat <- dat %>%
-      dplyr::relocate(Ano, municipio, territorio, setor, processos_geradores_emissoes, producao_emissores, emissores, gas, atividade_economica, produto, Valor)
-
-    dat <- dat %>%
-      dplyr::mutate(municipio = dplyr::case_when(
-        municipio == "NA" ~ NA_character_,
-        TRUE ~ municipio
-      )) %>%
-      dplyr::mutate(territorio = dplyr::case_when(
-        territorio == "NA" ~ NA_character_,
-        TRUE ~ territorio
-      )) %>%
-      dplyr::mutate(ibge = dplyr::case_when(
-        ibge == "NA" ~ NA_character_,
-        TRUE ~ ibge
-      ))
-  }
-
-
-  if (param$dataset == "seeg_industry" & param$geo_level %in% c("country", "state") & param$language == "pt") {
-    ## Create Longer Data - Years as a Variable
-
-    dat <- dat %>%
-      tidyr::pivot_longer(
-        cols = x2000:x2018,
-        names_to = "Ano",
-        names_prefix = "x",
-        values_to = "Valor"
-      )
-    ## Changing column name, filtering by the specific sector and harmonizing variables
-    dat <- dat %>%
-      dplyr::filter(nivel_1 == "Processos Industriais") %>%
-      dplyr::rename(
-        setor = nivel_1, processos_geradores_emissoes = nivel_2,
-        producao_emissores = nivel_3,
-        emissores = nivel_4,
-        emissao_bunker = emissao_remocao_bunker
-      ) %>%
-      dplyr::select(-c(nivel_6, nivel_5)) %>%
-      dplyr::mutate(atividade_economica = dplyr::case_when(
-        atividade_economica == "CIM" ~ "Industria Cimenteira",
-        atividade_economica == "ENE_ELET" ~ "Industria Energia Eletrica",
-        atividade_economica == "MET" ~ "Industria Metaleira",
-        atividade_economica == "Outra_IND" ~ "Outra Industria",
-        atividade_economica == "HFC" ~ "HFC"
-      )) %>%
-      dplyr::mutate(produto = dplyr::case_when(
-        produto == "ALU" ~ "Aluminio",
-        produto == "ACO" ~ "Aco"
-      ))
-    dat <- dat %>%
-      dplyr::relocate(Ano, estado, setor, processos_geradores_emissoes, producao_emissores, emissores, gas, atividade_economica, produto, Valor)
-
-    dat <- dat %>%
-      dplyr::mutate(estado = dplyr::case_when(
-        estado == "NA" ~ NA_character_,
-        TRUE ~ estado
-      ))
-  }
-
-  if (param$dataset == "seeg_energy" & param$geo_level == "municipality" & param$language == "pt") {
-    dat <- dat %>%
-      tidyr::pivot_longer(
-        cols = x2000:x2018,
-        names_to = "Ano",
-        names_prefix = "x",
-        values_to = "Valor"
-      )
-    ## Changing column name, filtering by the specific sector and harmonizing variables
-    dat <- dat %>%
-      dplyr::filter(nivel_1 == "Energia") %>%
-      dplyr::rename(
-        setor = nivel_1, tipo_emissao = nivel_2,
-        processos_geradores_emissoes = nivel_3,
-        atividade_geradora = nivel_4,
-        fonte_energetica = nivel_5,
-        emissores = nivel_6,
-        emission_bunker = tipo_de_emissao
-      ) %>%
-      dplyr::mutate(produto = dplyr::case_when(
-        produto == "ALIM_BEBIDAS" ~ "Alimentos/Bebidas",
-        produto == "ENE_ELET" ~ "Energia Eletrica",
-        produto == "ALU" ~ "Aluminio"
-      )) %>%
-      dplyr::select(-atividade_economica)
-
-    dat <- dat %>%
-      dplyr::relocate(Ano, municipio, territorio, setor)
-
-    dat <- dat %>%
-      dplyr::mutate(municipio = dplyr::case_when(
-        municipio == "NA" ~ NA_character_,
-        TRUE ~ municipio
-      )) %>%
-      dplyr::mutate(territorio = dplyr::case_when(
-        territorio == "NA" ~ NA_character_,
-        TRUE ~ territorio
-      )) %>%
-      dplyr::mutate(ibge = dplyr::case_when(
-        ibge == "NA" ~ NA_character_,
-        TRUE ~ ibge
-      ))
-  }
-
-
-  if (param$dataset == "seeg_energy" & param$geo_level %in% c("country", "state") & param$language == "pt") {
-    ## Create Longer Data - Years as a Variable
-
-    dat <- dat %>%
-      tidyr::pivot_longer(
-        cols = x2000:x2018,
-        names_to = "Ano",
-        names_prefix = "x",
-        values_to = "Valor"
-      )
-    ## Changing column name, filtering by the specific sector and harmonizing variables
-    dat <- dat %>%
-      dplyr::filter(nivel_1 == "Energia") %>%
-      dplyr::rename(
-        setor = nivel_1, tipo_emissao = nivel_2,
-        processos_geradores_emissoes = nivel_3,
-        atividade_geradora = nivel_4,
-        fonte_energetica = nivel_5,
-        emissores = nivel_6
-      ) %>%
-      dplyr::mutate(produto = dplyr::case_when(
-        produto == "ALIM_BEBIDAS" ~ "Alimentos/Bebidas",
-        produto == "ENE_ELET" ~ "Energia Eletrica",
-        produto == "ALU" ~ "Aluminio"
-      )) %>%
-      dplyr::select(-atividade_economica)
-
-
-
-    dat <- dat %>%
-      dplyr::relocate(Ano, estado, setor)
-
-    dat <- dat %>%
-      dplyr::mutate(estado = dplyr::case_when(
-        estado == "NA" ~ NA_character_,
-        TRUE ~ estado
-      ))
-  }
-
-
-  if (param$dataset == "seeg_land" & param$geo_level == "municipality" & param$language == "pt") {
-    dat <- dat %>%
-      tidyr::pivot_longer(
-        cols = x2000:x2018,
-        names_to = "Ano",
-        names_prefix = "x",
-        values_to = "Valor"
-      )
-    ## Changing column name, filtering by the specific sector and harmonizing variables
-    dat <- dat %>%
-      dplyr::filter(nivel_1 == "Mudanca de Uso da Terra e Floresta") %>%
-      dplyr::filter(!is.na(Valor)) %>%
-      dplyr::rename(
-        setor = nivel_1, processos_geradores_emissoes = nivel_2,
-        bioma = nivel_3,
-        area_bioma = nivel_4,
-        local_atividade_geradora = nivel_5,
-        atividade_geradora = nivel_6,
-        emissao_remocao = tipo_de_emissao
-      ) %>%
-      dplyr::mutate(atividade_economica = dplyr::case_when(
-        atividade_economica == "AGROPEC" ~ "Agropecuaria",
-        atividade_economica == "Conservacao" ~ "Conservacao"
-      )) %>%
-      dplyr::select(-produto)
-
-    dat <- dat %>%
-      dplyr::relocate(Ano, municipio, territorio, setor, processos_geradores_emissoes, atividade_economica)
-
-    dat <- dat %>%
-      dplyr::mutate(municipio = dplyr::case_when(
-        municipio == "NA" ~ NA_character_,
-        TRUE ~ municipio
-      )) %>%
-      dplyr::mutate(territorio = dplyr::case_when(
-        territorio == "NA" ~ NA_character_,
-        TRUE ~ territorio
-      )) %>%
-      dplyr::mutate(ibge = dplyr::case_when(
-        ibge == "NA" ~ NA_character_,
-        TRUE ~ ibge
-      ))
-  }
-
-  if (param$dataset == "seeg_land" & param$geo_level %in% c("country", "state") & param$language == "pt") {
-    ## Create Longer Data - Years as a Variable
-
-    dat <- dat %>%
-      tidyr::pivot_longer(
-        cols = x2000:x2018,
-        names_to = "Ano",
-        names_prefix = "x",
-        values_to = "Valor"
-      )
-    ## Changing column name, filtering by the specific sector and harmonizing variables
-    dat <- dat %>%
-      dplyr::filter(nivel_1 == "Mudanca de Uso da Terra e Floresta") %>%
-      dplyr::filter(!is.na(Valor)) %>%
-      dplyr::rename(
-        setor = nivel_1, processos_geradores_emissoes = nivel_2,
-        bioma = nivel_3,
-        area_bioma = nivel_4,
-        local_atividade_geradora = nivel_5,
-        atividade_geradora = nivel_6
-      ) %>%
-      dplyr::mutate(atividade_economica = dplyr::case_when(
-        atividade_economica == "AGROPEC" ~ "Agropecuaria",
-        atividade_economica == "Conservacao" ~ "Conservacao"
-      )) %>%
-      dplyr::select(-produto)
-
-    dat <- dat %>%
-      dplyr::relocate(Ano, estado, setor, processos_geradores_emissoes, atividade_economica)
-
-    dat <- dat %>%
-      dplyr::mutate(estado = dplyr::case_when(
-        estado == "NA" ~ NA_character_,
-        TRUE ~ estado
-      ))
-  }
+  # -------------------------------------------------------------------------
+  # seeg_residuals ("Residuos" sector)
+  #
+  # Verified live against the real v13.0 file (66,559 residuals rows) cross-
+  # tabulated against the pre-v13.0 file's equivalent "Residuos" rows
+  # (71,865 rows) -- see the plan/session notes for the full crosstab. What
+  # was confirmed:
+  #
+  #   - categoria_emissora (5 values) is a clean 1:1 relabel of the old
+  #     NIVEL 3 (e.g. "Efluentes Liquidos Domesticos" -> "Efluentes
+  #     domesticos"), no case_when needed for PT output.
+  #   - sub_categoria_emissora (13 values) is a near-1:1 relabel of the old
+  #     NIVEL 4 for every category EXCEPT "Disposicao final": there, the OLD
+  #     file split by WASTE TYPE (sewage sludge / municipal solid waste /
+  #     healthcare waste, 3 old NIVEL 4 values, row counts don't total the
+  #     same as the new file's 2 subcategories), the NEW file instead splits
+  #     by DISPOSAL SITE TYPE ("aterros controlados ou lixoes" / "aterros
+  #     sanitarios") -- a genuine methodology change for that one category,
+  #     not a renaming, so no old-to-new value mapping is attempted for it.
+  #   - recorte (Diretas/Efluentes Liquidos/Residuos solidos) and
+  #     atividade_geral (Producao Industrial/Saneamento Basico) are BOTH
+  #     genuinely new dimensions with no old-schema equivalent (old NIVEL 2,
+  #     which had a similar-looking 2-value shape, groups categories
+  #     differently -- e.g. it lumped domestic AND industrial effluents
+  #     together, recorte/atividade_geral do not) -- kept as their own new
+  #     columns rather than forced into old NIVEL 2's name/shape.
+  #   - old atividade_economica/produto/gas are confirmed absent from the
+  #     v13.0 Dados sheet entirely (not folded into any other field) --
+  #     dropped, not reconstructed.
+  #   - id_territorio = "1" + the old 7-digit IBGE municipality code,
+  #     confirmed against 5 real municipalities across 5 different states
+  #     (Abatia/PR, Abaetetuba/PA, Abadia de Goias/GO, Manaus/AM, Rio
+  #     Branco/AC) -- stripped back to the classic ibge code here.
+  #   - municipio embeds " (UF)" as a suffix (e.g. "Abatia (PR)") and estado
+  #     is now the full Portuguese state name (e.g. "Parana") instead of the
+  #     old 2-letter UF code.
+  # FRAGILE: a real, confirmed format change on `estado` -- municipio is
+  # stripped back to a plain name (matching the old shape) but estado is
+  # passed through as the source gives it, NOT reduced back to a 2-letter
+  # code, since that would require a name->UF lookup this session did not
+  # verify against every one of the 27 real values. Every sector/language
+  # branch shares this same estado passthrough.
+  #   - Confirmed live: exactly one row (id_territorio == "1BR", municipio ==
+  #     "BR (NA)", estado == "Nao Alocado" after this file's ASCII-strip) is
+  #     not a real municipality -- it represents emissions the source itself
+  #     doesn't attribute to any municipality. Kept at every geo_level (a
+  #     real quantity, dropping it would understate totals); at
+  #     geo_level == "municipality" its municipio/estado/ibge are coerced to
+  #     NA (same convention the pre-v13.0 code already used for its own
+  #     "NA"-string geography placeholders).
+  # FRAGILE: every branch below hardcodes the literal filter
+  #     setor_de_emissao == "Residuos". A future rename of this sector's
+  #     label makes every seeg_residuals branch silently return zero rows
+  #     instead of erroring.
+  # -------------------------------------------------------------------------
 
   if (param$dataset == "seeg_residuals" & param$geo_level == "municipality" & param$language == "pt") {
     dat <- dat %>%
+      dplyr::filter(setor_de_emissao == "Residuos") %>%
       tidyr::pivot_longer(
-        cols = x2000:x2018,
+        cols = x1970:x2024,
         names_to = "Ano",
         names_prefix = "x",
         values_to = "Valor"
-      )
-    ## Changing column name, filtering by the specific sector and harmonizing variables
-    dat <- dat %>%
-      dplyr::filter(nivel_1 == "Residuos") %>%
-      dplyr::rename(
-        setor = nivel_1, categorias_emissao = nivel_2,
-        processos_geradores_emissoes = nivel_3,
-        atividade_geradora = nivel_4,
-        categorias_processos_geradores = nivel_5,
-        emissao_bunker = tipo_de_emissao
       ) %>%
-      dplyr::select(-nivel_6) %>%
-      dplyr::mutate(atividade_economica = dplyr::case_when(
-        atividade_economica == "PEC" ~ "Pecuaria",
-        atividade_economica == "Outra_IND" ~ "Outra Industria",
-        atividade_economica == "SANEAMENTO" ~ "Saneamento"
-      ))
-
-    dat <- dat %>%
-      dplyr::mutate(municipio = dplyr::case_when(
-        municipio == "NA" ~ NA_character_,
-        TRUE ~ municipio
-      )) %>%
-      dplyr::mutate(territorio = dplyr::case_when(
-        territorio == "NA" ~ NA_character_,
-        TRUE ~ territorio
-      )) %>%
-      dplyr::mutate(ibge = dplyr::case_when(
-        ibge == "NA" ~ NA_character_,
-        TRUE ~ ibge
-      ))
-
-
-    dat <- dat %>%
-      dplyr::relocate(Ano, municipio, territorio, ibge, setor, categorias_emissao, processos_geradores_emissoes, atividade_geradora, categorias_processos_geradores, atividade_economica, produto, Valor)
+      dplyr::rename(
+        setor = setor_de_emissao,
+        categoria_emissao = categoria_emissora,
+        subcategoria_emissao = sub_categoria_emissora,
+        tipo_residuo = recorte,
+        tipo_emissao = emissao_remocao_bunker
+      ) %>%
+      dplyr::mutate(
+        ibge = dplyr::if_else(id_territorio == "1BR", NA_character_, substring(id_territorio, 2)),
+        municipio = dplyr::if_else(id_territorio == "1BR", NA_character_, sub(" \\([A-Za-z]{2}\\)$", "", municipio)),
+        estado = dplyr::if_else(id_territorio == "1BR", NA_character_, estado)
+      ) %>%
+      dplyr::select(-id_territorio) %>%
+      dplyr::relocate(
+        Ano, municipio, estado, ibge, setor, categoria_emissao, subcategoria_emissao,
+        tipo_residuo, atividade_geral, tipo_emissao, Valor
+      )
   }
-
 
   if (param$dataset == "seeg_residuals" & param$geo_level %in% c("country", "state") & param$language == "pt") {
-    ## Create Longer Data - Years as a Variable
-
     dat <- dat %>%
+      dplyr::filter(setor_de_emissao == "Residuos") %>%
       tidyr::pivot_longer(
-        cols = x2000:x2018,
+        cols = x1970:x2024,
         names_to = "Ano",
         names_prefix = "x",
         values_to = "Valor"
-      )
-    ## Changing column name, filtering by the specific sector and harmonizing variables
-    dat <- dat %>%
-      dplyr::filter(nivel_1 == "Residuos") %>%
-      dplyr::rename(
-        setor = nivel_1, categorias_emissao = nivel_2,
-        processos_geradores_emissoes = nivel_3,
-        atividade_geradora = nivel_4,
-        categorias_processos_geradores = nivel_5,
-        emissao_bunker = emissao_remocao_bunker
       ) %>%
-      dplyr::select(-nivel_6) %>%
-      dplyr::mutate(atividade_economica = dplyr::case_when(
-        atividade_economica == "PEC" ~ "Pecuaria",
-        atividade_economica == "Outra_IND" ~ "Outra Industria",
-        atividade_economica == "SANEAMENTO" ~ "Saneamento"
-      )) %>%
-      dplyr::mutate(produto = dplyr::case_when(
-        produto == "ALIM_BEBIDAS" ~ "Alimentos/Bebidas",
-        produto == "CAR" ~ "Carne"
-      )) %>%
-      dplyr::mutate(estado = dplyr::case_when(
-        estado == "NA" ~ NA_character_,
-        TRUE ~ estado
-      ))
-
-    dat <- dat %>%
-      dplyr::relocate(Ano, estado, setor, categorias_emissao, processos_geradores_emissoes, atividade_geradora, categorias_processos_geradores, atividade_economica, produto, Valor)
-  }
-
-
-  if (param$dataset == "seeg_energy" & param$geo_level == "municipality" & param$language == "eng") {
-    dat <- dat %>%
-      tidyr::pivot_longer(
-        cols = x2000:x2018,
-        names_to = "year",
-        names_prefix = "x",
-        values_to = "value"
+      dplyr::rename(
+        setor = setor_de_emissao,
+        categoria_emissao = categoria_emissora,
+        subcategoria_emissao = sub_categoria_emissora,
+        tipo_residuo = recorte,
+        tipo_emissao = emissao_remocao_bunker
       )
 
-    dat <- dat %>%
-      dplyr::filter(nivel_1 == "Energia") %>%
-      dplyr::rename(
-        sector = nivel_1,
-        emission_type = nivel_2,
-        emissions_generating_processes = nivel_3,
-        activity = nivel_4,
-        energetic_source = nivel_5,
-        emitters = nivel_6,
-        emission_bunker = tipo_de_emissao,
-        product = produto,
-        city = municipio,
-        state = territorio
-      ) %>%
-      dplyr::mutate(product = dplyr::case_when(
-        product == "ALIM_BEBIDAS" ~ "Food/Beverages",
-        product == "ENE_ELET" ~ "Eletric energy",
-        product == "ALU" ~ "Aluminum"
-      )) %>%
-      dplyr::mutate(sector = dplyr::case_when(sector == "Energia" ~ "Energy")) %>%
-      dplyr::mutate(emission_type = dplyr::case_when(
-        emission_type == "Emissoes Fugitivas" ~ "Fugitive emissions",
-        emission_type == "Emissoes pela Queima de Combustiveis" ~ "Emissions from fuel burning"
-      )) %>%
-      dplyr::mutate(emissions_generating_processes = dplyr::case_when(
-        emissions_generating_processes == "Agropecuario" ~ "Farming",
-        emissions_generating_processes == "Geracao de Eletricidade (Servico Publico)" ~ "Eletricity generation (public service)",
-        emissions_generating_processes == "Nao Identificado" ~ "Not Identified",
-        emissions_generating_processes == "Publico" ~ "Public",
-        emissions_generating_processes == "Transportes" ~ "Transports",
-        emissions_generating_processes == "Comercial" ~ "Business",
-        emissions_generating_processes == "Industrial" ~ "Industrial",
-        emissions_generating_processes == "Producao de Combustiveis" ~ "Fuel production",
-        emissions_generating_processes == "Residencial" ~ "Residential"
-      )) %>%
-      dplyr::mutate(activity = dplyr::case_when(
-        activity == "Aereo" ~ "Air",
-        activity == "Cimento" ~ "Cement",
-        activity == "Ferro Ligas" ~ "Iron garters",
-        activity == "Mineracao e pelotizacao" ~ "Mining and pelletizing",
-        activity == "Outras industrias" ~ "Other industries",
-        activity == "Producao de carvao mineral e outros" ~ " Mineral coal production and others",
-        activity == "Refino de petroleo" ~ "Oil refining",
-        activity == "Transporte de gas natural" ~ "Natural gas transport",
-        activity == "Alimentos e bebidas" ~ "Food and beverages",
-        activity == "Exploracao de petroleo e gas natural" ~ "Oil and natural gas exploration",
-        activity == "Ferroviario" ~ "Railroad",
-        activity == "Nao ferrosos e outros da metalurgia" ~ "Non-ferrous and other metallurgy",
-        activity == "Papel e celulose" ~ "Paper and Cellulose",
-        activity == "Producao de carvao vegetal" ~ "Charcoal production",
-        activity == "Rodoviario" ~ "Road",
-        activity == "Ceramica" ~ "Ceramics",
-        activity == "Ferro gusa e aco" ~ "Pig iron and steel",
-        activity == "Hidroviario" ~ "Waterway",
-        activity == "NAO SE APLICA" ~ "Not Applicable",
-        activity == "Producao de Alcool" ~ "Alcohol production",
-        activity == "Quimica" ~ "Chemical",
-        activity == "Textil" ~ "Textile"
-      )) %>%
-      dplyr::mutate(energetic_source = dplyr::case_when(
-        energetic_source == "Alcatrao" ~ "Tar",
-        energetic_source == "Biogas" ~ "Biogas",
-        energetic_source == "Carvao vapor 3300" ~ "Steam coal 3300",
-        energetic_source == "Carvao vapor 4500" ~ "Steam coal 4500",
-        energetic_source == "Carvao vapor 5900" ~ "Steam coal 5900",
-        energetic_source == "Carvao vegetal" ~ "Charcoal",
-        energetic_source == "Diesel de petroleo" ~ "Petroleum diesel",
-        energetic_source == "Gas de coqueria" ~ "Coke oven gas",
-        energetic_source == "Gas natural seco" ~ "Dry natural gas",
-        energetic_source == "Gasolina C" ~ "Gasoline C",
-        energetic_source == "Lenha" ~ "Firewood",
-        energetic_source == "Nafta" ~ "Naphta",
-        energetic_source == "Outras biomassas" ~ "Other biomasses",
-        energetic_source == "Petroleo" ~ "Oil",
-        energetic_source == "Querosene iluminante" ~ "Illuminating kerosene",
-        energetic_source == "Petroleo e gas natural" ~ "Oil and natural gas",
-        energetic_source == "Outras nao renovaveis" ~ "Other non-renewable",
-        energetic_source == "Oleo combustivel" ~ "Fuel oil",
-        energetic_source == "Lenha carvoejamento" ~ "Charcoal firewood",
-        energetic_source == "Gasolina de aviacao" ~ "Aviation gasoline",
-        energetic_source == "Gas natural umido" ~ "Umid natural gas",
-        energetic_source == "Gas de refinaria" ~ "Refinery gas",
-        energetic_source == "Gas canalizado RJ" ~ "Piped gas RJ",
-        energetic_source == "Coque de carvao mineral" ~ "Coal coke",
-        energetic_source == "Carvao vapor 6000" ~ "Steam coal 6000",
-        energetic_source == "Carvao vapor 4700" ~ "Steam coal 4700",
-        energetic_source == "Carvao vapor 3700" ~ "Steam coal 3700",
-        energetic_source == "Carvao mineral" ~ "Mineral coal",
-        energetic_source == "Alcool hidratado" ~ "Hydrated alcohol",
-        energetic_source == "Bagaco de cana" ~ "Sugarcane bagasse",
-        energetic_source == "Carvao vapor 3100" ~ "Steam coal 3100",
-        energetic_source == "Carvao vapor 4200" ~ "Steam coal 4200",
-        energetic_source == "Carvao vapor 5200" ~ "Steam coal 5200",
-        energetic_source == "Carvao vapor sem especificacao" ~ "Steam coal without specification",
-        energetic_source == "Coque de petroleo" ~ "Oil coke",
-        energetic_source == "Gas canalizadp SP" ~ "Piped gas SP",
-        energetic_source == "Gas natural" ~ "Natural gas",
-        energetic_source == "Gasolina autmotiva" ~ "Automotive gasoline",
-        energetic_source == "GLP" ~ "Liquefied oil gas",
-        energetic_source == "Lixivia" ~ "Bleach",
-        energetic_source == "Oleo diesel" ~ "Diesel oil",
-        energetic_source == "Outros energeticos de petroleo" ~ "Other petroleum energy",
-        energetic_source == "Querosene de aviacao" ~ "Aviation kerosene"
-      )) %>%
-      dplyr::mutate(emitters = dplyr::case_when(
-        emitters == "Aeronaves" ~ "Airplanes",
-        emitters == "Carvoarias" ~ "Charcoals",
-        emitters == "Comerciais Leves" ~ "Light commercials",
-        emitters == "Locomotivas" ~ "Locomotives",
-        emitters == "Onibus" ~ "Bus",
-        emitters == "Automoveis" ~ "Automobiles",
-        emitters == "Centrais Eletricas Autoprodutoras" ~ "Self-producing power plants",
-        emitters == "Consumo Final Energetico" ~ "Final energy consumption",
-        emitters == "Motocicletas" ~ "Motorbikes",
-        emitters == "Caminhoes" ~ "Trucks",
-        emitters == "Centrais Eletricas de Servico Publico" ~ "Public service power plants",
-        emitters == "Embarcacoes" ~ "Vessels",
-        emitters == "NAO SE APLICA" ~ "Not Applicable"
-      )) %>%
-      dplyr::mutate(emission_bunker = dplyr::case_when(
-        emission_bunker == "Emissao" ~ "Emission",
-        emission_bunker == "Bunker" ~ "Bunker",
-        emission_bunker == "Remocao" ~ "Removal",
-        .default = emission_bunker
-      )) %>%
-      dplyr::select(-atividade_economica)
-
-    dat <- dat %>%
-      dplyr::relocate(year, city, state, sector)
-
-    dat <- dat %>%
-      dplyr::mutate(city = dplyr::case_when(
-        city == "NA" ~ NA_character_,
-        TRUE ~ city
-      )) %>%
-      dplyr::mutate(state = dplyr::case_when(
-        state == "NA" ~ NA_character_,
-        TRUE ~ state
-      )) %>%
-      dplyr::mutate(ibge = dplyr::case_when(
-        ibge == "NA" ~ NA_character_,
-        TRUE ~ ibge
-      ))
-  }
-
-  if (param$dataset == "seeg_energy" & param$geo_level %in% c("country", "state") & param$language == "eng") {
-    dat <- dat %>%
-      tidyr::pivot_longer(
-        cols = x2000:x2018,
-        names_to = "year",
-        names_prefix = "x",
-        values_to = "value"
-      )
-
-    dat <- dat %>%
-      dplyr::filter(nivel_1 == "Energia") %>%
-      dplyr::rename(
-        sector = nivel_1, state = estado,
-        emission_type = nivel_2,
-        emissions_generating_processes = nivel_3,
-        activity = nivel_4,
-        energetic_source = nivel_5,
-        emitters = nivel_6,
-        emission_bunker = tipo_de_emissao,
-        product = produto
-      ) %>%
-      dplyr::mutate(product = dplyr::case_when(
-        product == "ALIM_BEBIDAS" ~ "Food/Beverages",
-        product == "ENE_ELET" ~ "Eletric energy",
-        product == "ALU" ~ "Aluminum"
-      )) %>%
-      dplyr::mutate(sector = dplyr::case_when(sector == "Energia" ~ "Energy")) %>%
-      dplyr::mutate(emission_type = dplyr::case_when(
-        emission_type == "Emissoes Fugitivas" ~ "Fugitive emissions",
-        emission_type == "Emissoes pela Queima de Combustiveis" ~ "Emissions from fuel burning"
-      )) %>%
-      dplyr::mutate(emissions_generating_processes = dplyr::case_when(
-        emissions_generating_processes == "Agropecuario" ~ "Farming",
-        emissions_generating_processes == "Geracao de Eletricidade (Servico Publico)" ~ "Eletricity generation (public service)",
-        emissions_generating_processes == "Nao Identificado" ~ "Not Identified",
-        emissions_generating_processes == "Publico" ~ "Public",
-        emissions_generating_processes == "Transportes" ~ "Transports",
-        emissions_generating_processes == "Comercial" ~ "Business",
-        emissions_generating_processes == "Industrial" ~ "Industrial",
-        emissions_generating_processes == "Producao de Combustiveis" ~ "Fuel production",
-        emissions_generating_processes == "Residencial" ~ "Residential"
-      )) %>%
-      dplyr::mutate(activity = dplyr::case_when(
-        activity == "Aereo" ~ "Air",
-        activity == "Cimento" ~ "Cement",
-        activity == "Ferro Ligas" ~ "Iron garters",
-        activity == "Mineracao e pelotizacao" ~ "Mining and pelletizing",
-        activity == "Outras industrias" ~ "Other industries",
-        activity == "Producao de carvao mineral e outros" ~ " Mineral coal production and others",
-        activity == "Refino de petroleo" ~ "Oil refining",
-        activity == "Transporte de gas natural" ~ "Natural gas transport",
-        activity == "Alimentos e bebidas" ~ "Food and beverages",
-        activity == "Exploracao de petroleo e gas natural" ~ "Oil and natural gas exploration",
-        activity == "Ferroviario" ~ "Railroad",
-        activity == "Nao ferrosos e outros da metalurgia" ~ "Non-ferrous and other metallurgy",
-        activity == "Papel e celulose" ~ "Paper and Cellulose",
-        activity == "Producao de carvao vegetal" ~ "Charcoal production",
-        activity == "Rodoviario" ~ "Road",
-        activity == "Ceramica" ~ "Ceramics",
-        activity == "Ferro gusa e aco" ~ "Pig iron and steel",
-        activity == "Hidroviario" ~ "Waterway",
-        activity == "NAO SE APLICA" ~ "Not Applicable",
-        activity == "Producao de Alcool" ~ "Alcohol production",
-        activity == "Quimica" ~ "Chemical",
-        activity == "Textil" ~ "Textile"
-      )) %>%
-      dplyr::mutate(energetic_source = dplyr::case_when(
-        energetic_source == "Alcatrao" ~ "Tar",
-        energetic_source == "Biogas" ~ "Biogas",
-        energetic_source == "Carvao vapor 3300" ~ "Steam coal 3300",
-        energetic_source == "Carvao vapor 4500" ~ "Steam coal 4500",
-        energetic_source == "Carvao vapor 5900" ~ "Steam coal 5900",
-        energetic_source == "Carvao vegetal" ~ "Charcoal",
-        energetic_source == "Diesel de petroleo" ~ "Petroleum diesel",
-        energetic_source == "Gas de coqueria" ~ "Coke oven gas",
-        energetic_source == "Gas natural seco" ~ "Dry natural gas",
-        energetic_source == "Gasolina C" ~ "Gasoline C",
-        energetic_source == "Lenha" ~ "Firewood",
-        energetic_source == "Nafta" ~ "Naphta",
-        energetic_source == "Outras biomassas" ~ "Other biomasses",
-        energetic_source == "Petroleo" ~ "Oil",
-        energetic_source == "Querosene iluminante" ~ "Illuminating kerosene",
-        energetic_source == "Petroleo e gas natural" ~ "Oil and natural gas",
-        energetic_source == "Outras nao renovaveis" ~ "Other non-renewable",
-        energetic_source == "Oleo combustivel" ~ "Fuel oil",
-        energetic_source == "Lenha carvoejamento" ~ "Charcoal firewood",
-        energetic_source == "Gasolina de aviacao" ~ "Aviation gasoline",
-        energetic_source == "Gas natural umido" ~ "Umid natural gas",
-        energetic_source == "Gas de refinaria" ~ "Refinery gas",
-        energetic_source == "Gas canalizado RJ" ~ "Piped gas RJ",
-        energetic_source == "Coque de carvao mineral" ~ "Coal coke",
-        energetic_source == "Carvao vapor 6000" ~ "Steam coal 6000",
-        energetic_source == "Carvao vapor 4700" ~ "Steam coal 4700",
-        energetic_source == "Carvao vapor 3700" ~ "Steam coal 3700",
-        energetic_source == "Carvao mineral" ~ "Mineral coal",
-        energetic_source == "Alcool hidratado" ~ "Hydrated alcohol",
-        energetic_source == "Bagaco de cana" ~ "Sugarcane bagasse",
-        energetic_source == "Carvao vapor 3100" ~ "Steam coal 3100",
-        energetic_source == "Carvao vapor 4200" ~ "Steam coal 4200",
-        energetic_source == "Carvao vapor 5200" ~ "Steam coal 5200",
-        energetic_source == "Carvao vapor sem especificacao" ~ "Steam coal without specification",
-        energetic_source == "Coque de petroleo" ~ "Oil coke",
-        energetic_source == "Gas canalizadp SP" ~ "Piped gas SP",
-        energetic_source == "Gas natural" ~ "Natural gas",
-        energetic_source == "Gasolina autmotiva" ~ "Automotive gasoline",
-        energetic_source == "GLP" ~ "Liquefied oil gas",
-        energetic_source == "Lixivia" ~ "Bleach",
-        energetic_source == "Oleo diesel" ~ "Diesel oil",
-        energetic_source == "Outros energeticos de petroleo" ~ "Other petroleum energy",
-        energetic_source == "Querosene de aviacao" ~ "Aviation kerosene"
-      )) %>%
-      dplyr::mutate(emitters = dplyr::case_when(
-        emitters == "Aeronaves" ~ "Airplanes",
-        emitters == "Carvoarias" ~ "Charcoals",
-        emitters == "Comerciais Leves" ~ "Light commercials",
-        emitters == "Locomotivas" ~ "Locomotives",
-        emitters == "Onibus" ~ "Bus",
-        emitters == "Automoveis" ~ "Automobiles",
-        emitters == "Centrais Eletricas Autoprodutoras" ~ "Self-producing power plants",
-        emitters == "Consumo Final Energetico" ~ "Final energy consumption",
-        emitters == "Motocicletas" ~ "Motorbikes",
-        emitters == "Caminhoes" ~ "Trucks",
-        emitters == "Centrais Eletricas de Servico Publico" ~ "Public service power plants",
-        emitters == "Embarcacoes" ~ "Vessels",
-        emitters == "NAO SE APLICA" ~ "Not Applicable"
-      )) %>%
-      dplyr::mutate(emission_bunker = dplyr::case_when(
-        emission_bunker == "Emissao" ~ "Emission",
-        emission_bunker == "Bunker" ~ "Bunker"
-      )) %>%
-      dplyr::select(-atividade_economica)
-
-    dat <- dat %>%
-      dplyr::mutate(state = dplyr::case_when(
-        state == "NA" ~ NA_character_,
-        TRUE ~ state
-      ))
-
-    dat <- dat %>%
-      dplyr::relocate(year, state, sector)
-  }
-
-  if (param$dataset == "seeg_industry" & param$geo_level == "municipality" & param$language == "eng") {
-    dat <- dat %>%
-      tidyr::pivot_longer(
-        cols = x2000:x2018,
-        names_to = "year",
-        names_prefix = "x",
-        values_to = "value"
-      )
-    ## Changing column name, filtering by the specific sector and harmonizing variables
-    dat <- dat %>%
-      dplyr::filter(nivel_1 == "Processos Industriais") %>%
-      dplyr::rename(
-        sector = nivel_1, emissions_generating_processes = nivel_2,
-        emitters_production = nivel_3,
-        emitters = nivel_4,
-        emission_bunker = tipo_de_emissao,
-        city = municipio,
-        state = territorio,
-        economic_activity = atividade_economica,
-        product = produto
-      ) %>%
-      dplyr::select(-c(nivel_6, nivel_5)) %>%
-      dplyr::mutate(sector = dplyr::case_when(sector == "Processos Industriais" ~ "Industrial Processes")) %>%
-      dplyr::mutate(emissions_generating_processes = dplyr::case_when(
-        emissions_generating_processes == "Emissoes de HFCs" ~ "HFC Emissions",
-        emissions_generating_processes == "Producao de Metais" ~ "Metal Production",
-        emissions_generating_processes == "Uso de SF6" ~ "SF6 Use",
-        emissions_generating_processes == "Industria Quimica" ~ "Chemical Industry",
-        emissions_generating_processes == "Produtos Minerais" ~ "Mineral Products",
-        emissions_generating_processes == "Uso Nao-Energetico de Combustiveis e Uso de Solventes" ~ "Non-Energy Use of Fuels and Use of Solvents"
-      )) %>%
-      dplyr::mutate(emitters_production = dplyr::case_when(
-        emitters_production == "Consumo de Barrilha" ~ "Barrel Consumption",
-        emitters_production == "Equipamentos Eletricos" ~ "Eletric Equipment",
-        emitters_production == "Producao de ABS" ~ "ABS Plastic Production",
-        emitters_production == "Producao de Acido Fosforico" ~ "Production of Phosphoric Acid",
-        emitters_production == "Producao de Acrilonitrila" ~ "Acrylonitrile Production",
-        emitters_production == "Producao de Amonia" ~ "Ammonia Production",
-        emitters_production == "Producao de Borracha de butadieno estireno (SBR)" ~ "Production of Styrene Butadiene Rubber",
-        emitters_production == "Producao de Caprolactama" ~ "Production of Caprolactam",
-        emitters_production == "Producao de Cimento" ~ "Cement Production",
-        emitters_production == "Producao de Coque de Petroleo Calcinado" ~ "Production of Calcined Petroleum Coke",
-        emitters_production == "Producao de Estireno" ~ "Styrene production",
-        emitters_production == "Producao de Etilbenzeno" ~ "Ethylbenzene production",
-        emitters_production == "Producao de Ferroligas" ~ "Ferroalloy Production",
-        emitters_production == "Producao de Magnesio" ~ "Magnesium Production",
-        emitters_production == "Producao de Negro-de-fumo" ~ "Carbon Black Production",
-        emitters_production == "Producao de Oxido de Eteno" ~ "Ethylene Oxide Production",
-        emitters_production == "Producao de Polietileno PEAD" ~ "HDPE Polyethylene Production",
-        emitters_production == "Producao de Polietileno PELBD" ~ "LLDPE Polyethylene Production",
-        emitters_production == "Producao de Propeno" ~ "Propylene Production",
-        emitters_production == "Producao de Vidro" ~ "Glass Production",
-        emitters_production == "Producao de PVC" ~ "PVC Production",
-        emitters_production == "Producao de Polipropileno" ~ "Polypropylene Production",
-        emitters_production == "Producao de Polietileno PEBD" ~ "LDPE Polyethylene Production",
-        emitters_production == "Producao de Poliestireno" ~ "Polystyrene Production",
-        emitters_production == "Producao de Outros Nao-Ferrosos" ~ "Production of Other Non-Ferrous",
-        emitters_production == "Producao de Metanol" ~ "Methanol Production",
-        emitters_production == "Producao de Formaldeido" ~ "Formaldehyde Production",
-        emitters_production == "Producao de Ferro Gusa e Aco" ~ "Pig Iron and Steel Production",
-        emitters_production == "Producao de Eteno" ~ "Ethene Production",
-        emitters_production == "Producao de Dicloroetano" ~ "Dichloroethane Production",
-        emitters_production == "Producao de Cloreto de Vinila" ~ "Vinyl Chloride Production",
-        emitters_production == "Producao de Carbureto de Calcio" ~ "Calcium Carbide Production",
-        emitters_production == "Producao de Cal" ~ "Lime Production",
-        emitters_production == "Producao de Anidrido Ftalico" ~ "Production of Phthalic Anhydride",
-        emitters_production == "Producao de Aluminio" ~ "Aluminum Production",
-        emitters_production == "Producao de Acido Nitrico" ~ "Nitric Acid Production",
-        emitters_production == "Producao de Acido Adipico" ~ "Adipic Acid Production",
-        emitters_production == "NAO SE APLICA" ~ "Not Applicable",
-        emitters_production == "Consumo Final Nao Energetico" ~ "Non-Energy Final Consumption"
-      )) %>%
-      dplyr::mutate(emitters = dplyr::case_when(
-        emitters == "Cal Calcitica" ~ "Calcitic lime",
-        emitters == "Consumo de Calcario" ~ "Limestone Consumption",
-        emitters == "Consumo em Outros Setores" ~ "Consumption in Other Sectors",
-        emitters == "Tecnologia Soderberg" ~ "Soderberg Technology",
-        emitters == "Cal Dolomitica" ~ "Dolomitic Lime",
-        emitters == "Consumo de Combustiveis Redutores" ~ "Consumption of Reducing Fuels",
-        emitters == "NAO SE APLICA" ~ "Not Applicable",
-        emitters == "Uso de SF6" ~ "SF6 Use",
-        emitters == "Cal Magnesiana" ~ "Magnesian Lime",
-        emitters == "Consumo de Dolomita" ~ "Dolomite Consumption",
-        emitters == "Tecnologia Prebaked Anode" ~ "Prebaked Anode Technology"
-      )) %>%
-      dplyr::mutate(emission_bunker = dplyr::case_when(emission_bunker == "Emissao" ~ "Emission")) %>%
-      dplyr::mutate(economic_activity = dplyr::case_when(
-        economic_activity == "CIM" ~ "Cement Industry",
-        economic_activity == "ENE_ELET" ~ "Eletric Power Industry",
-        economic_activity == "MET" ~ "Metal Industry",
-        economic_activity == "Outra_IND" ~ "Other Industry",
-        economic_activity == "HFC" ~ "HFC"
-      ))
-    dat <- dat %>%
-      dplyr::mutate(city = dplyr::case_when(
-        city == "NA" ~ NA_character_,
-        TRUE ~ city
-      )) %>%
-      dplyr::mutate(state = dplyr::case_when(
-        state == "NA" ~ NA_character_,
-        TRUE ~ state
-      )) %>%
-      dplyr::mutate(ibge = dplyr::case_when(
-        ibge == "NA" ~ NA_character_,
-        TRUE ~ ibge
-      )) %>%
-      dplyr::mutate(product = dplyr::case_when(
-        product == "ALU" ~ "Aluminum",
-        product == "ACO" ~ "Steel"
-      ))
-    dat <- dat %>%
-      dplyr::relocate(year, city, state, sector, emissions_generating_processes, emitters_production, emitters, economic_activity, gas, product, value)
-  }
-
-
-  if (param$dataset == "seeg_industry" & param$geo_level %in% c("country", "state") & param$language == "eng") {
-    dat <- dat %>%
-      tidyr::pivot_longer(
-        cols = x2000:x2018,
-        names_to = "year",
-        names_prefix = "x",
-        values_to = "value"
-      )
-    ## Changing column name, filtering by the specific sector and harmonizing variables
-    dat <- dat %>%
-      dplyr::filter(nivel_1 == "Processos Industriais") %>%
-      dplyr::rename(
-        sector = nivel_1, emissions_generating_processes = nivel_2,
-        emitters_production = nivel_3,
-        emitters = nivel_4,
-        emission_bunker = tipo_de_emissao,
-        economic_activity = atividade_economica,
-        product = produto,
-        state = estado
-      ) %>%
-      dplyr::select(-c(nivel_6, nivel_5)) %>%
-      dplyr::mutate(sector = dplyr::case_when(sector == "Processos Industriais" ~ "Industrial Processes")) %>%
-      dplyr::mutate(emissions_generating_processes = dplyr::case_when(
-        emissions_generating_processes == "Emissoes de HFCs" ~ "HFC Emissions",
-        emissions_generating_processes == "Producao de Metais" ~ "Metal Production",
-        emissions_generating_processes == "Uso de SF6" ~ "SF6 Use",
-        emissions_generating_processes == "Industria Quimica" ~ "Chemical Industry",
-        emissions_generating_processes == "Produtos Minerais" ~ "Mineral Products",
-        emissions_generating_processes == "Uso Nao-Energetico de Combustiveis e Uso de Solventes" ~ "Non-Energy Use of Fuels and Use of Solvents"
-      )) %>%
-      dplyr::mutate(emitters_production = dplyr::case_when(
-        emitters_production == "Consumo de Barrilha" ~ "Barrel Consumption",
-        emitters_production == "Equipamentos Eletricos" ~ "Eletric Equipment",
-        emitters_production == "Producao de ABS" ~ "ABS Plastic Production",
-        emitters_production == "Producao de Acido Fosforico" ~ "Production of Phosphoric Acid",
-        emitters_production == "Producao de Acrilonitrila" ~ "Acrylonitrile Production",
-        emitters_production == "Producao de Amonia" ~ "Ammonia Production",
-        emitters_production == "Producao de Borracha de butadieno estireno (SBR)" ~ "Production of Styrene Butadiene Rubber",
-        emitters_production == "Producao de Caprolactama" ~ "Production of Caprolactam",
-        emitters_production == "Producao de Cimento" ~ "Cement Production",
-        emitters_production == "Producao de Coque de Petroleo Calcinado" ~ "Production of Calcined Petroleum Coke",
-        emitters_production == "Producao de Estireno" ~ "Styrene production",
-        emitters_production == "Producao de Etilbenzeno" ~ "Ethylbenzene production",
-        emitters_production == "Producao de Ferroligas" ~ "Ferroalloy Production",
-        emitters_production == "Producao de Magnesio" ~ "Magnesium Production",
-        emitters_production == "Producao de Negro-de-fumo" ~ "Carbon Black Production",
-        emitters_production == "Producao de Oxido de Eteno" ~ "Ethylene Oxide Production",
-        emitters_production == "Producao de Polietileno PEAD" ~ "HDPE Polyethylene Production",
-        emitters_production == "Producao de Polietileno PELBD" ~ "LLDPE Polyethylene Production",
-        emitters_production == "Producao de Propeno" ~ "Propylene Production",
-        emitters_production == "Producao de Vidro" ~ "Glass Production",
-        emitters_production == "Producao de PVC" ~ "PVC Production",
-        emitters_production == "Producao de Polipropileno" ~ "Polypropylene Production",
-        emitters_production == "Producao de Polietileno PEBD" ~ "LDPE Polyethylene Production",
-        emitters_production == "Producao de Poliestireno" ~ "Polystyrene Production",
-        emitters_production == "Producao de Outros Nao-Ferrosos" ~ "Production of Other Non-Ferrous",
-        emitters_production == "Producao de Metanol" ~ "Methanol Production",
-        emitters_production == "Producao de Formaldeido" ~ "Formaldehyde Production",
-        emitters_production == "Producao de Ferro Gusa e Aco" ~ "Pig Iron and Steel Production",
-        emitters_production == "Producao de Eteno" ~ "Ethene Production",
-        emitters_production == "Producao de Dicloroetano" ~ "Dichloroethane Production",
-        emitters_production == "Producao de Cloreto de Vinila" ~ "Vinyl Chloride Production",
-        emitters_production == "Producao de Carbureto de Calcio" ~ "Calcium Carbide Production",
-        emitters_production == "Producao de Cal" ~ "Lime Production",
-        emitters_production == "Producao de Anidrido Ftalico" ~ "Production of Phthalic Anhydride",
-        emitters_production == "Producao de Aluminio" ~ "Aluminum Production",
-        emitters_production == "Producao de Acido Nitrico" ~ "Nitric Acid Production",
-        emitters_production == "Producao de Acido Adipico" ~ "Adipic Acid Production",
-        emitters_production == "NAO SE APLICA" ~ "Not Applicable",
-        emitters_production == "Consumo Final Nao Energetico" ~ "Non-Energy Final Consumption"
-      )) %>%
-      dplyr::mutate(emitters = dplyr::case_when(
-        emitters == "Cal Calcitica" ~ "Calcitic lime",
-        emitters == "Consumo de Calcario" ~ "Limestone Consumption",
-        emitters == "Consumo em Outros Setores" ~ "Consumption in Other Sectors",
-        emitters == "Tecnologia Soderberg" ~ "Soderberg Technology",
-        emitters == "Cal Dolomitica" ~ "Dolomitic Lime",
-        emitters == "Consumo de Combustiveis Redutores" ~ "Consumption of Reducing Fuels",
-        emitters == "NAO SE APLICA" ~ "Not Applicable",
-        emitters == "Uso de SF6" ~ "SF6 Use",
-        emitters == "Cal Magnesiana" ~ "Magnesian Lime",
-        emitters == "Consumo de Dolomita" ~ "Dolomite Consumption",
-        emitters == "Tecnologia Prebaked Anode" ~ "Prebaked Anode Technology"
-      )) %>%
-      dplyr::mutate(emission_bunker = dplyr::case_when(emission_bunker == "Emissao" ~ "Emission")) %>%
-      dplyr::mutate(economic_activity = dplyr::case_when(
-        economic_activity == "CIM" ~ "Cement Industry",
-        economic_activity == "ENE_ELET" ~ "Eletric Power Industry",
-        economic_activity == "MET" ~ "Metal Industry",
-        economic_activity == "Outra_IND" ~ "Other Industry",
-        economic_activity == "HFC" ~ "HFC"
-      )) %>%
-      dplyr::mutate(product = dplyr::case_when(
-        product == "ALU" ~ "Aluminum",
-        product == "ACO" ~ "Steel"
-      ))
-
-
-    dat <- dat %>%
-      dplyr::mutate(state = dplyr::case_when(
-        state == "NA" ~ NA_character_,
-        TRUE ~ state
-      ))
-
-    dat <- dat %>%
-      dplyr::relocate(year, state, sector, emissions_generating_processes, emitters_production, emitters, economic_activity, gas, product, value)
+    if (param$geo_level == "state") {
+      dat <- dat %>%
+        dplyr::relocate(
+          Ano, estado, setor, categoria_emissao, subcategoria_emissao,
+          tipo_residuo, atividade_geral, tipo_emissao, Valor
+        )
+    } else {
+      dat <- dat %>%
+        dplyr::relocate(
+          Ano, setor, categoria_emissao, subcategoria_emissao,
+          tipo_residuo, atividade_geral, tipo_emissao, Valor
+        )
+    }
   }
 
   if (param$dataset == "seeg_residuals" & param$geo_level == "municipality" & param$language == "eng") {
     dat <- dat %>%
+      dplyr::filter(setor_de_emissao == "Residuos") %>%
       tidyr::pivot_longer(
-        cols = x2000:x2018,
+        cols = x1970:x2024,
         names_to = "year",
         names_prefix = "x",
         values_to = "value"
-      )
-
-    dat <- dat %>%
-      dplyr::filter(nivel_1 == "Residuos") %>%
-      dplyr::rename(
-        sector = nivel_1, emissions_category = nivel_2,
-        emissions_generating_processes = nivel_3,
-        activity = nivel_4,
-        generating_processes_categories = nivel_5,
-        emission_bunker = tipo_de_emissao,
-        product = produto,
-        economic_activity = atividade_economica,
-        city = municipio,
-        state = territorio
       ) %>%
-      dplyr::select(-nivel_6) %>%
-      dplyr::mutate(economic_activity = dplyr::case_when(
-        economic_activity == "PEC" ~ "Livestock",
-        economic_activity == "Outra_IND" ~ "Other industry",
-        economic_activity == "SANEAMENTO" ~ "Sanitation"
-      )) %>%
-      dplyr::mutate(product = dplyr::case_when(
-        product == "ALIM_BEBIDAS" ~ "Food/Beverages",
-        product == "CAR" ~ "Meat"
-      )) %>%
-      dplyr::mutate(sector = dplyr::case_when(sector == "Residuos" ~ "Waste")) %>%
-      dplyr::mutate(emissions_category = dplyr::case_when(
-        emissions_category == "Efluentes Liquidos" ~ "Liquid Effluents",
-        emissions_category == "Residuos Solidos" ~ "Solid Waste"
-      )) %>%
-      dplyr::mutate(emissions_generating_processes = dplyr::case_when(
-        emissions_generating_processes == "Disposicao Final de Residuos Solidos" ~ "Final Disposal of Solid Waste",
-        emissions_generating_processes == "Efluentes Liquidos Industriais" ~ "Industrial Liquid Effluents",
-        emissions_generating_processes == "Tratamento Biologico de Residuos Solidos" ~ "Biological Treatment of Solid Waste",
-        emissions_generating_processes == "Efluentes Liquidos Domesticos" ~ "Domestic Liquid Effluents",
-        emissions_generating_processes == "Incineracao ou queima a ceu aberto" ~ "Incineration or open burning"
-      )) %>%
-      dplyr::mutate(activity = dplyr::case_when(
-        activity == "Producao de Carne Bovina" ~ "Beef Production",
-        activity == "NAO SE APLICA" ~ "Not Applicable",
-        activity == "Producao de Cerveja" ~ "Beer Production",
-        activity == "Producao de Leite Cru" ~ "Raw Dairy Production",
-        activity == "Producao de Carne Suina" ~ "Prok Production",
-        activity == "Producao de Carne Avicola" ~ "Poultry Meat Production",
-        activity == "Producao de Celulose" ~ "Cellulose Production",
-        activity == "Producao de Leite Pasteurizado" ~ "Pasteurized Dairy Production",
-        activity == "Residuos Solidos Urbanos" ~ "Urban Solid Waste",
-        activity == "Residuos de Servicos de Saude" ~ "Health Services Waste",
-        activity == "Queima de Residuos a Ceu Aberto" ~ "Open-air Waste Burning",
-        activity == "Tratamento de Residuos por Incineracao" ~ "Waste Treatment by Incineration",
-        activity == "Lodo de ETE" ~ "Sewage Treatment Plant Sludge"
-      )) %>%
-      dplyr::mutate(generating_processes_categories = dplyr::case_when(
-        generating_processes_categories == "Compostagem" ~ "Compost",
-        generating_processes_categories == "Residuos de Servicos de Saude" ~ "Health Services Waste",
-        generating_processes_categories == "Disposicao em Aterro Sanitario" ~ "Landfill Disposal",
-        generating_processes_categories == "Disposicao em Aterro Controlado ou Lixao" ~ "Disposal in Controlled Landfill or Landfill",
-        generating_processes_categories == "NAO SE APLICA" ~ "Not Applicable",
-        generating_processes_categories == "Residuos Solidos Urbanos" ~ "Urban Solid Waste"
-      )) %>%
-      dplyr::mutate(emission_bunker = dplyr::case_when(emission_bunker == "Emissao" ~ "Emission")) %>%
-      dplyr::mutate(city = dplyr::case_when(
-        city == "NA" ~ NA_character_,
-        TRUE ~ city
-      )) %>%
-      dplyr::mutate(state = dplyr::case_when(
-        state == "NA" ~ NA_character_,
-        TRUE ~ state
-      )) %>%
-      dplyr::mutate(ibge = dplyr::case_when(
-        ibge == "NA" ~ NA_character_,
-        TRUE ~ ibge
-      ))
-    dat <- dat %>%
-      dplyr::relocate(year, city, state, sector, emissions_category, emissions_generating_processes, activity, generating_processes_categories, economic_activity, product, value)
+      dplyr::rename(
+        sector = setor_de_emissao,
+        emission_category = categoria_emissora,
+        emission_subcategory = sub_categoria_emissora,
+        waste_stream = recorte,
+        general_activity = atividade_geral,
+        emission_type = emissao_remocao_bunker
+      ) %>%
+      dplyr::mutate(
+        ibge = dplyr::if_else(id_territorio == "1BR", NA_character_, substring(id_territorio, 2)),
+        city = dplyr::if_else(id_territorio == "1BR", NA_character_, sub(" \\([A-Za-z]{2}\\)$", "", municipio)),
+        state = dplyr::if_else(id_territorio == "1BR", NA_character_, estado)
+      ) %>%
+      dplyr::select(-id_territorio, -municipio, -estado) %>%
+      seeg_residuals_translate() %>%
+      dplyr::relocate(
+        year, city, state, ibge, sector, emission_category, emission_subcategory,
+        waste_stream, general_activity, emission_type, value
+      )
   }
-
 
   if (param$dataset == "seeg_residuals" & param$geo_level %in% c("country", "state") & param$language == "eng") {
     dat <- dat %>%
+      dplyr::filter(setor_de_emissao == "Residuos") %>%
       tidyr::pivot_longer(
-        cols = x2000:x2018,
+        cols = x1970:x2024,
         names_to = "year",
         names_prefix = "x",
         values_to = "value"
-      )
-
-    dat <- dat %>%
-      dplyr::filter(nivel_1 == "Residuos") %>%
-      dplyr::rename(
-        sector = nivel_1, emissions_category = nivel_2,
-        emissions_generating_processes = nivel_3,
-        activity = nivel_4,
-        generating_processes_categories = nivel_5,
-        emission_bunker = tipo_de_emissao,
-        product = produto,
-        economic_activity = atividade_economica,
-        state = estado
       ) %>%
-      dplyr::select(-nivel_6) %>%
-      dplyr::mutate(economic_activity = dplyr::case_when(
-        economic_activity == "PEC" ~ "Livestock",
-        economic_activity == "Outra_IND" ~ "Other industry",
-        economic_activity == "SANEAMENTO" ~ "Sanitation"
-      )) %>%
-      dplyr::mutate(product = dplyr::case_when(
-        product == "ALIM_BEBIDAS" ~ "Food/Beverages",
-        product == "CAR" ~ "Meat"
-      )) %>%
-      dplyr::mutate(state = dplyr::case_when(
-        state == "BA" ~ "BA",
-        state == "ES" ~ "ES",
-        state == "MA" ~ "MA",
-        state == "NA" ~ as.character(NA),
-        state == "PA" ~ "PA",
-        state == "RJ" ~ "RJ",
-        state == "RS" ~ "RS",
-        state == "SP" ~ "SP",
-        state == "AC" ~ "AC",
-        state == "AL" ~ "AL",
-        state == "AP" ~ "AP",
-        state == "CE" ~ "CE",
-        state == "DF" ~ "DF",
-        state == "ES" ~ "ES",
-        state == "GO" ~ "GO",
-        state == "MG" ~ "MG",
-        state == "MS" ~ "MS",
-        state == "MT" ~ "MT",
-        state == "PB" ~ "PB",
-        state == "PE" ~ "PE",
-        state == "PI" ~ "PI",
-        state == "PR" ~ "PR",
-        state == "RN" ~ "RN",
-        state == "RO" ~ "RO",
-        state == "RR" ~ "RR",
-        state == "SC" ~ "SC",
-        state == "SE" ~ "SE",
-        state == "TO" ~ "TO",
-        state == "AM" ~ "AM"
-      )) %>%
-      dplyr::mutate(sector = dplyr::case_when(sector == "Residuos" ~ "Waste")) %>%
-      dplyr::mutate(emissions_category = dplyr::case_when(
-        emissions_category == "Efluentes Liquidos" ~ "Liquid Effluents",
-        emissions_category == "Residuos Solidos" ~ "Solid Waste"
-      )) %>%
-      dplyr::mutate(emissions_generating_processes = dplyr::case_when(
-        emissions_generating_processes == "Disposicao Final de Residuos Solidos" ~ "Final Disposal of Solid Waste",
-        emissions_generating_processes == "Efluentes Liquidos Industriais" ~ "Industrial Liquid Effluents",
-        emissions_generating_processes == "Tratamento Biologico de Residuos Solidos" ~ "Biological Treatment of Solid Waste",
-        emissions_generating_processes == "Efluentes Liquidos Domesticos" ~ "Domestic Liquid Effluents",
-        emissions_generating_processes == "Incineracao ou queima a ceu aberto" ~ "Incineration or open burning"
-      )) %>%
-      dplyr::mutate(activity = dplyr::case_when(
-        activity == "Producao de Carne Bovina" ~ "Beef Production",
-        activity == "NAO SE APLICA" ~ "Not Applicable",
-        activity == "Producao de Cerveja" ~ "Beer Production",
-        activity == "Producao de Leite Cru" ~ "Raw Dairy Production",
-        activity == "Producao de Carne Suina" ~ "Prok Production",
-        activity == "Producao de Carne Avicola" ~ "Poultry Meat Production",
-        activity == "Producao de Celulose" ~ "Cellulose Production",
-        activity == "Producao de Leite Pasteurizado" ~ "Pasteurized Dairy Production",
-        activity == "Residuos Solidos Urbanos" ~ "Urban Solid Waste",
-        activity == "Residuos de Servicos de Saude" ~ "Health Services Waste",
-        activity == "Queima de Residuos a Ceu Aberto" ~ "Open-air Waste Burning",
-        activity == "Tratamento de Residuos por Incineracao" ~ "Waste Treatment by Incineration",
-        activity == "Lodo de ETE" ~ "Sewage Treatment Plant Sludge"
-      )) %>%
-      dplyr::mutate(generating_processes_categories = dplyr::case_when(
-        generating_processes_categories == "Compostagem" ~ "Compost",
-        generating_processes_categories == "Residuos de Servicos de Saude" ~ "Health Services Waste",
-        generating_processes_categories == "Disposicao em Aterro Sanitario" ~ "Landfill Disposal",
-        generating_processes_categories == "Disposicao em Aterro Controlado ou Lixao" ~ "Disposal in Controlled Landfill or Landfill",
-        generating_processes_categories == "NAO SE APLICA" ~ "Not Applicable",
-        generating_processes_categories == "Residuos Solidos Urbanos" ~ "Urban Solid Waste"
-      )) %>%
-      dplyr::mutate(emission_bunker = dplyr::case_when(emission_bunker == "Emissao" ~ "Emission"))
-
-    dat <- dat %>%
-      dplyr::mutate(state = dplyr::case_when(
-        state == "NA" ~ NA_character_,
-        TRUE ~ state
-      ))
-
-    dat <- dat %>%
-      dplyr::relocate(year, state, sector, emissions_category, emissions_generating_processes, activity, generating_processes_categories, economic_activity, product, value)
-  }
-
-
-  if (param$dataset == "seeg_land" & param$geo_level == "municipality" & param$language == "eng") {
-    dat <- dat %>%
-      tidyr::pivot_longer(
-        cols = x2000:x2018,
-        names_to = "year",
-        names_prefix = "x",
-        values_to = "value"
-      )
-    ## Changing column name, filtering by the specific sector and harmonizing variables
-    dat <- dat %>%
-      dplyr::filter(nivel_1 == "Mudanca de Uso da Terra e Floresta") %>%
-      dplyr::filter(!is.na(value)) %>%
       dplyr::rename(
-        sector = nivel_1, emissions_generating_processes = nivel_2,
-        biome = nivel_3,
-        biome_area = nivel_4,
-        transition_type = nivel_5,
-        category = nivel_6,
-        emission_removal_bunker = tipo_de_emissao,
-        economic_activity = atividade_economica,
-        city = municipio,
-        state = territorio
+        sector = setor_de_emissao,
+        emission_category = categoria_emissora,
+        emission_subcategory = sub_categoria_emissora,
+        waste_stream = recorte,
+        general_activity = atividade_geral,
+        emission_type = emissao_remocao_bunker
       ) %>%
-      dplyr::mutate(sector = dplyr::case_when(sector == "Mudanca de Uso da Terra e Floresta" ~ "Land and Forest Use Change")) %>%
-      dplyr::mutate(emissions_generating_processes = dplyr::case_when(
-        emissions_generating_processes == "Alteracoes de Uso do Solo" ~ "Changes in Soil Use",
-        emissions_generating_processes == "Remocao por Vegetacao Secundaria" ~ "Removal by Secondary Vegetation",
-        emissions_generating_processes == "Remocao em Areas Protegidas" ~ "Removal in Protected Areas",
-        emissions_generating_processes == "Residuos Florestais" ~ "Forest Waste",
-        emissions_generating_processes == "Remocao por Mudanca de Uso da Terra" ~ "Removal for Land Use Change"
-      )) %>%
-      dplyr::mutate(biome = dplyr::case_when(
-        biome == "Amazonia" ~ "Amazon",
-        biome == "Caatinga" ~ "Caatinga",
-        biome == "Cerrado" ~ "Cerrado",
-        biome == "Mata Atlantica" ~ "Mata Atlantica",
-        biome == "Pampa" ~ "Pampa",
-        biome == "Pantanal" ~ "Pantanal"
-      )) %>%
-      dplyr::mutate(biome_area = dplyr::case_when(
-        biome_area == "em Area Protegida" ~ "In Protected Area",
-        biome_area == "fora de Area Protegida" ~ "Outside Protected Area",
-        biome_area == "NAO SE APLICA" ~ "Not Applicable"
-      )) %>%
-      dplyr::mutate(transition_type = dplyr::case_when(
-        transition_type == "Desmatamento" ~ "Deforestation",
-        transition_type == "Regeneracao" ~ "Regeneration",
-        transition_type == "NAO SE APLICA" ~ "Not Applicable",
-        transition_type == "Vegetacao nativa estavel" ~ "Stable Native Vegetation",
-        transition_type == "Outras Mudancas de uso da terra" ~ "Other Land Use Changes"
-      )) %>%
-      dplyr::mutate(activity = dplyr::case_when(
-        category == "Area sem vegetacao -- Floresta secundaria" ~ "Area without Vegetation -- Secondary Forest",
-        category == "Area sem vegetacao -- Silvicultura" ~ "Area without Vegetation -- Forestry",
-        category == "Area sem vegetacao -- Uso agropecuario" ~ "Area without Vegetation -- Farming Use",
-        category == "Area sem vegetacao -- Vegetacao nao florestal secundaria" ~ "Area without Vegetation -- Secondary Non-Forest Vegetation",
-        category == "Floresta primaria -- Area sem vegetacao" ~ "Primary Forest -- Area without Vegetation",
-        category == "Floresta primaria -- Floresta primaria" ~ "Primary Forest -- Primary Forest",
-        category == "Floresta primaria -- Silvicultura" ~ "Primary Forest -- Forestry",
-        category == "Floresta primaria -- Uso agropecuario" ~ "Primary Forest -- Farming Use",
-        category == "Floresta secundaria -- Area sem vegetacao" ~ "Secondary Forest -- Area without Vegetation",
-        category == "Floresta secundaria -- Floresta secundaria" ~ "Secondary Forest -- Secondary Forest",
-        category == "Floresta secundaria -- Silvicultura" ~ "Secondary Forest -- Forestry",
-        category == "Floresta secundaria -- Uso agropecuario" ~ "Secondary Forest -- Farming Use",
-        category == "NAO SE APLICA" ~ "Not Applicable",
-        category == "Silvicultura -- Area sem vegetacao" ~ "Forestry -- Area without Vegetation",
-        category == "Silvicultura -- Floresta Secundaria" ~ "Forestry -- Secondary Forest",
-        category == "Silvicultura -- Uso agropecuario" ~ "Forestry -- Farming Use",
-        category == "Silvicultura -- Vegetacao nao florestal secundaria" ~ "Forestry -- Secondary non-Forest Vegetation",
-        category == "Uso agropecuario -- Area sem vegetacao" ~ "Farming Use -- Area without vegetation",
-        category == "Uso agropecuario -- Floresta secundaria" ~ "Farming Use -- Secondary Forest",
-        category == "Uso agropecuario -- Silvicultura" ~ "Farming Use -- Forestry",
-        category == "Uso agropecuario -- Uso agropecuario" ~ "Farming Use -- Farming Use",
-        category == "Uso agropecuario -- Vegetacao nao florestal secundaria" ~ "Farming Use -- Secondary non-Forest Vegetation",
-        category == "Vegetacao nao florestal primaria -- Area sem vegetacao" ~ "Primary non-Forest Vegetation -- Area without Vegetation",
-        category == "Vegetacao nao florestal primaria -- Silvicultura" ~ "Primary Non-Forest Vegetation -- Forestry",
-        category == "Vegetacao nao florestal primaria -- Uso agropecuario" ~ "Primary non-Forest Vegetation -- Farming use",
-        category == "Vegetacao nao florestal primaria -- Vegetacao nao florestal primaria" ~ "Primary non-Forest Vegetation -- Primary non-Forest Vegetation",
-        category == "Vegetacao nao florestal secundaria -- Area sem vegetacao" ~ "Secondary non-Forest Vegetation -- Area without Vegetation",
-        category == "Vegetacao nao florestal secundaria -- Silvicultura" ~ "Secondary non-Forest Vegetation -- Forestry",
-        category == "Vegetacao nao florestal secundaria -- Uso agropecuario" ~ "Secondary non-Forest Vegetation -- Farming use",
-        category == "Vegetacao nao florestal secundaria -- Vegetacao nao florestal secundaria" ~ "Secondary non-Forest Vegetation"
-      )) %>%
-      dplyr::mutate(emission_removal_bunker = dplyr::case_when(
-        emission_removal_bunker == "Emissao" ~ "Emission",
-        emission_removal_bunker == "Remocao" ~ "Removal",
-        emission_removal_bunker == "Remocao proxy" ~ "Proxy Removal"
-      )) %>%
-      dplyr::mutate(economic_activity = dplyr::case_when(
-        economic_activity == "AGROPEC" ~ "Farming",
-        economic_activity == "Conservacao" ~ "Conservation"
-      )) %>%
-      dplyr::select(-produto)
+      seeg_residuals_translate()
 
-    dat <- dat %>%
-      dplyr::mutate(city = dplyr::case_when(
-        city == "NA" ~ NA_character_,
-        TRUE ~ city
-      )) %>%
-      dplyr::mutate(state = dplyr::case_when(
-        state == "NA" ~ NA_character_,
-        TRUE ~ state
-      )) %>%
-      dplyr::mutate(ibge = dplyr::case_when(
-        ibge == "NA" ~ NA_character_,
-        TRUE ~ ibge
-      ))
-
-    dat <- dat %>%
-      dplyr::relocate(year, city, state, sector, emissions_generating_processes, economic_activity, biome, biome_area, transition_type, emission_removal_bunker)
-  }
-
-  if (param$dataset == "seeg_land" & param$geo_level %in% c("country", "state") & param$language == "eng") {
-    dat <- dat %>%
-      tidyr::pivot_longer(
-        cols = x2000:x2018,
-        names_to = "year",
-        names_prefix = "x",
-        values_to = "value"
-      )
-    ## Changing column name, filtering by the specific sector and harmonizing variables
-    dat <- dat %>%
-      dplyr::filter(nivel_1 == "Mudanca de Uso da Terra e Floresta") %>%
-      dplyr::filter(!is.na(value)) %>%
-      dplyr::rename(
-        sector = nivel_1, emissions_generating_processes = nivel_2,
-        biome = nivel_3,
-        biome_area = nivel_4,
-        transition_type = nivel_5,
-        category = nivel_6,
-        emission_removal_bunker = tipo_de_emissao,
-        economic_activity = atividade_economica,
-        state = estado
-      ) %>%
-      dplyr::mutate(sector = dplyr::case_when(sector == "Mudanca de Uso da Terra e Floresta" ~ "Land and Forest Use Change")) %>%
-      dplyr::mutate(emissions_generating_processes = dplyr::case_when(
-        emissions_generating_processes == "Alteracoes de Uso do Solo" ~ "Changes in Soil Use",
-        emissions_generating_processes == "Remocao por Vegetacao Secundaria" ~ "Removal by Secondary Vegetation",
-        emissions_generating_processes == "Remocao em Areas Protegidas" ~ "Removal in Protected Areas",
-        emissions_generating_processes == "Residuos Florestais" ~ "Forest Waste",
-        emissions_generating_processes == "Remocao por Mudanca de Uso da Terra" ~ "Removal for Land Use Change"
-      )) %>%
-      dplyr::mutate(biome = dplyr::case_when(
-        biome == "Amazonia" ~ "Amazon",
-        biome == "Caatinga" ~ "Caatinga",
-        biome == "Cerrado" ~ "Cerrado",
-        biome == "Mata Atlantica" ~ "Mata Atlantica",
-        biome == "Pampa" ~ "Pampa",
-        biome == "Pantanal" ~ "Pantanal"
-      )) %>%
-      dplyr::mutate(biome_area = dplyr::case_when(
-        biome_area == "em Area Protegida" ~ "In Protected Area",
-        biome_area == "fora de Area Protegida" ~ "Outside Protected Area",
-        biome_area == "NAO SE APLICA" ~ "Not Applicable"
-      )) %>%
-      dplyr::mutate(transition_type = dplyr::case_when(
-        transition_type == "Desmatamento" ~ "Deforestation",
-        transition_type == "Regeneracao" ~ "Regeneration",
-        transition_type == "NAO SE APLICA" ~ "Not Applicable",
-        transition_type == "Vegetacao nativa estavel" ~ "Stable Native Vegetation",
-        transition_type == "Outras Mudancas de uso da terra" ~ "Other Land Use Changes"
-      )) %>%
-      dplyr::mutate(activity = dplyr::case_when(
-        category == "Area sem vegetacao -- Floresta secundaria" ~ "Area without Vegetation -- Secondary Forest",
-        category == "Area sem vegetacao -- Silvicultura" ~ "Area without Vegetation -- Forestry",
-        category == "Area sem vegetacao -- Uso agropecuario" ~ "Area without Vegetation -- Farming Use",
-        category == "Area sem vegetacao -- Vegetacao nao florestal secundaria" ~ "Area without Vegetation -- Secondary Non-Forest Vegetation",
-        category == "Floresta primaria -- Area sem vegetacao" ~ "Primary Forest -- Area without Vegetation",
-        category == "Floresta primaria -- Floresta primaria" ~ "Primary Forest -- Primary Forest",
-        category == "Floresta primaria -- Silvicultura" ~ "Primary Forest -- Forestry",
-        category == "Floresta primaria -- Uso agropecuario" ~ "Primary Forest -- Farming Use",
-        category == "Floresta secundaria -- Area sem vegetacao" ~ "Secondary Forest -- Area without Vegetation",
-        category == "Floresta secundaria -- Floresta secundaria" ~ "Secondary Forest -- Secondary Forest",
-        category == "Floresta secundaria -- Silvicultura" ~ "Secondary Forest -- Forestry",
-        category == "Floresta secundaria -- Uso agropecuario" ~ "Secondary Forest -- Farming Use",
-        category == "NAO SE APLICA" ~ "Not Applicable",
-        category == "Silvicultura -- Area sem vegetacao" ~ "Forestry -- Area without Vegetation",
-        category == "Silvicultura -- Floresta Secundaria" ~ "Forestry -- Secondary Forest",
-        category == "Silvicultura -- Uso agropecuario" ~ "Forestry -- Farming Use",
-        category == "Silvicultura -- Vegetacao nao florestal secundaria" ~ "Forestry -- Secondary non-Forest Vegetation",
-        category == "Uso agropecuario -- Area sem vegetacao" ~ "Farming Use -- Area without vegetation",
-        category == "Uso agropecuario -- Floresta secundaria" ~ "Farming Use -- Secondary Forest",
-        category == "Uso agropecuario -- Silvicultura" ~ "Farming Use -- Forestry",
-        category == "Uso agropecuario -- Uso agropecuario" ~ "Farming Use -- Farming Use",
-        category == "Uso agropecuario -- Vegetacao nao florestal secundaria" ~ "Farming Use -- Secondary non-Forest Vegetation",
-        category == "Vegetacao nao florestal primaria -- Area sem vegetacao" ~ "Primary non-Forest Vegetation -- Area without Vegetation",
-        category == "Vegetacao nao florestal primaria -- Silvicultura" ~ "Primary Non-Forest Vegetation -- Forestry",
-        category == "Vegetacao nao florestal primaria -- Uso agropecuario" ~ "Primary non-Forest Vegetation -- Farming use",
-        category == "Vegetacao nao florestal primaria -- Vegetacao nao florestal primaria" ~ "Primary non-Forest Vegetation -- Primary non-Forest Vegetation",
-        category == "Vegetacao nao florestal secundaria -- Area sem vegetacao" ~ "Secondary non-Forest Vegetation -- Area without Vegetation",
-        category == "Vegetacao nao florestal secundaria -- Silvicultura" ~ "Secondary non-Forest Vegetation -- Forestry",
-        category == "Vegetacao nao florestal secundaria -- Uso agropecuario" ~ "Secondary non-Forest Vegetation -- Farming use",
-        category == "Vegetacao nao florestal secundaria -- Vegetacao nao florestal secundaria" ~ "Secondary non-Forest Vegetation"
-      )) %>%
-      dplyr::mutate(emission_removal_bunker = dplyr::case_when(
-        emission_removal_bunker == "Emissao" ~ "Emission",
-        emission_removal_bunker == "Remocao" ~ "Removal",
-        emission_removal_bunker == "Remocao proxy" ~ "Proxy Removal"
-      )) %>%
-      dplyr::mutate(economic_activity = dplyr::case_when(
-        economic_activity == "AGROPEC" ~ "Farming",
-        economic_activity == "Conservacao" ~ "Conservation"
-      )) %>%
-      dplyr::select(-produto)
-
-    dat <- dat %>%
-      dplyr::mutate(state = dplyr::case_when(
-        state == "NA" ~ NA_character_,
-        TRUE ~ state
-      ))
-
-    dat <- dat %>%
-      dplyr::relocate(year, state, sector, emissions_generating_processes, economic_activity, biome, biome_area, transition_type, emission_removal_bunker)
-  }
-
-  if (param$dataset == "seeg_farming" & param$geo_level == "municipality" & param$language == "eng") {
-    dat <- dat %>%
-      tidyr::pivot_longer(
-        cols = x2000:x2018,
-        names_to = "year",
-        names_prefix = "x",
-        values_to = "value"
-      )
-    ## Changing column name, filtering by the specific sector and harmonizing variables
-    dat <- dat %>%
-      dplyr::filter(nivel_1 == "Agropecuaria") %>%
-      dplyr::rename(
-        sector = nivel_1, emissions_generating_processes = nivel_2,
-        emissions_type = nivel_4,
-        direct_indirect_emitters = nivel_3,
-        emissions_sources = nivel_5,
-        emitters = nivel_6,
-        economic_activity = atividade_economica,
-        product = produto,
-        emission_removal_bunker = tipo_de_emissao,
-        city = municipio,
-        state = territorio
-      ) %>%
-      dplyr::mutate(economic_activity = dplyr::case_when(
-        economic_activity == "PEC" ~ "Farming",
-        economic_activity == "AGR" ~ "Agriculture"
-      )) %>%
-      dplyr::mutate(sector = dplyr::case_when(sector == "Agropecuaria" ~ "Farming")) %>%
-      dplyr::mutate(emissions_generating_processes = dplyr::case_when(
-        emissions_generating_processes == "Cultivo do Arroz" ~ "Rice Cultivation",
-        emissions_generating_processes == "Fermentacao Enterica" ~ "Enteric Fermentation",
-        emissions_generating_processes == "Manejo de Dejetos Animais" ~ "Animal Waste Management",
-        emissions_generating_processes == "Queima de Residuos Agricolas" ~ "Agricultural Waste Burning",
-        emissions_generating_processes == "Solos Manejados" ~ "Managed Soils"
-      )) %>%
-      dplyr::mutate(emissions_sources = dplyr::case_when(
-        emissions_sources == "Animal" ~ "Animal",
-        emissions_sources == "Vegetal" ~ "Plant",
-        emissions_sources == "Outros" ~ "Others"
-      )) %>%
-      dplyr::mutate(emitters = dplyr::case_when(
-        emitters == "Algodao" ~ "Cottage",
-        emitters == "Arroz" ~ "Rice",
-        emitters == "Aves" ~ "Birds",
-        emitters == "Cana de Acucar" ~ "Sugar Cane",
-        emitters == "Equino" ~ "Equine",
-        emitters == "Fertilizantes Sinteticos" ~ "Synthetic Fertilizers",
-        emitters == "Gado de Corte" ~ "Beef Cattle",
-        emitters == "Lavouras Cultivadas sob Sistema Convencional" ~ "Crops Cultivated under Conventional System",
-        emitters == "Mandioca" ~ "Cassava",
-        emitters == "Muar" ~ "Mule",
-        emitters == "Outros" ~ "Others",
-        emitters == "Pastagem" ~ "Pasture",
-        emitters == "Pastagem Degradada" ~ "Degraded Pasture",
-        emitters == "Soja" ~ "Soil",
-        emitters == "Suinos" ~ "Swine",
-        emitters == "Trigo" ~ "Wheat",
-        emitters == "Vinhaca" ~ "Vinasse",
-        emitters == "Uso de Calcario" ~ "Limestone Usage",
-        emitters == "Torta de Filtro" ~ "Filter Cake",
-        emitters == "Solos organicos" ~ "Organic Soils",
-        emitters == "Sistemas Integrados Lavoura-Pecuaria-Floresta" ~ "Integrated Crop-Livestock-Forestry Systems",
-        emitters == "Pastagem Bem Manejada" ~ "Well Managed Pasture",
-        emitters == "Ovino" ~ "Sheep",
-        emitters == "Outras Culturas" ~ "Other Cultures",
-        emitters == "Milho" ~ "Corn",
-        emitters == "Lavouras Cultivadas sob Sistema Plantio Direto" ~ "Crops Cultivated under no-till System",
-        emitters == "Gado de Leite" ~ "Dairy Cattle",
-        emitters == "Florestas Plantadas" ~ "Planted Forests",
-        emitters == "Feijao" ~ "Beans",
-        emitters == "Caprino" ~ "Goat",
-        emitters == "Bubalino" ~ "Buffalo",
-        emitters == "Asinino" ~ "Asinine",
-        emitters == "Aplicacao de Ureia" ~ "Urea Application"
-      )) %>%
-      dplyr::mutate(direct_indirect_emitters = dplyr::case_when(
-        direct_indirect_emitters == "Diretas" ~ "Direct",
-        direct_indirect_emitters == "Indiretas" ~ "Indirect"
-      )) %>%
-      dplyr::mutate(emissions_type = dplyr::case_when(
-        emissions_type == "Aplicacao de residuos organicos" ~ "Application of Organic Waste",
-        emissions_type == "Deposicao de dejetos em pastagem" ~ "Pasture Waste Disposal",
-        emissions_type == "Lixiviacao" ~ "Leaching",
-        emissions_type == "Outros" ~ "Others",
-        emissions_type == "Solos organicos" ~ "Organic Soils",
-        emissions_type == "Deposicao Atmosferica" ~ "Atmospheric Deposition",
-        emissions_type == "Fertilizantes Sinteticos" ~ "Synthetic Fertilizers",
-        emissions_type == "Mineralizacao de N associado a perda de C no solo" ~ "Mineralization of N Associated with Loss of C in the Soil",
-        emissions_type == "Residuos Agricolas" ~ "Agricultural Waste",
-        emissions_type == "Variacao dos Estoques de Carbono no Solo" ~ "Changes in Carbon Soil Stocks"
-      )) %>%
-      dplyr::mutate(emission_removal_bunker = dplyr::case_when(
-        emission_removal_bunker == "Emissao" ~ "Emission",
-        emission_removal_bunker == "Emissao NCI" ~ "NCI Emission",
-        emission_removal_bunker == "Remocao NCI" ~ "NCI Removal"
-      )) %>%
-      dplyr::mutate(product = dplyr::case_when(
-        product == "ALIM_BEBIDAS" ~ "Food/Beverages",
-        product == "CAR" ~ "Meat",
-        product == "CAR/LEI" ~ "Meat/Dairy",
-        product == "CAR/LEI/ALIM_BEBIDAS" ~ "Meat/Dairy/Food/Beverages",
-        product == "LEI" ~ "Dairy"
-      ))
-
-    dat <- dat %>%
-      dplyr::relocate(
-        year, city, state, sector, emissions_generating_processes, emissions_sources, emitters, emissions_type, gas, economic_activity, product,
-        value
-      )
-
-    dat <- dat %>%
-      dplyr::mutate(city = dplyr::case_when(
-        city == "NA" ~ NA_character_,
-        TRUE ~ city
-      )) %>%
-      dplyr::mutate(state = dplyr::case_when(
-        state == "NA" ~ NA_character_,
-        TRUE ~ state
-      )) %>%
-      dplyr::mutate(ibge = dplyr::case_when(
-        ibge == "NA" ~ NA_character_,
-        TRUE ~ ibge
-      ))
-  }
-
-  if (param$dataset == "seeg_farming" & param$geo_level %in% c("country", "state") & param$language == "eng") {
-    dat <- dat %>%
-      tidyr::pivot_longer(
-        cols = x2000:x2018,
-        names_to = "year",
-        names_prefix = "x",
-        values_to = "value"
-      )
-    ## Changing column name, filtering by the specific sector and harmonizing variables
-    dat <- dat %>%
-      dplyr::filter(nivel_1 == "Agropecuaria") %>%
-      dplyr::rename(
-        sector = nivel_1, emissions_generating_processes = nivel_2,
-        emissions_type = nivel_4,
-        direct_indirect_emitters = nivel_3,
-        emissions_sources = nivel_5,
-        emitters = nivel_6,
-        economic_activity = atividade_economica,
-        product = produto,
-        emission_removal_bunker = tipo_de_emissao,
-        state = estado
-      ) %>%
-      dplyr::mutate(economic_activity = dplyr::case_when(
-        economic_activity == "PEC" ~ "Farming",
-        economic_activity == "AGR" ~ "Agriculture"
-      )) %>%
-      dplyr::mutate(sector = dplyr::case_when(sector == "Agropecuaria" ~ "Farming")) %>%
-      dplyr::mutate(emissions_generating_processes = dplyr::case_when(
-        emissions_generating_processes == "Cultivo do Arroz" ~ "Rice Cultivation",
-        emissions_generating_processes == "Fermentacao Enterica" ~ "Enteric Fermentation",
-        emissions_generating_processes == "Manejo de Dejetos Animais" ~ "Animal Waste Management",
-        emissions_generating_processes == "Queima de Residuos Agricolas" ~ "Agricultural Waste Burning",
-        emissions_generating_processes == "Solos Manejados" ~ "Managed Soils"
-      )) %>%
-      dplyr::mutate(emissions_sources = dplyr::case_when(
-        emissions_sources == "Animal" ~ "Animal",
-        emissions_sources == "Vegetal" ~ "Plant",
-        emissions_sources == "Outros" ~ "Others"
-      )) %>%
-      dplyr::mutate(emitters = dplyr::case_when(
-        emitters == "Algodao" ~ "Cottage",
-        emitters == "Arroz" ~ "Rice",
-        emitters == "Aves" ~ "Birds",
-        emitters == "Cana de Acucar" ~ "Sugar Cane",
-        emitters == "Equino" ~ "Equine",
-        emitters == "Fertilizantes Sinteticos" ~ "Synthetic Fertilizers",
-        emitters == "Gado de Corte" ~ "Beef Cattle",
-        emitters == "Lavouras Cultivadas sob Sistema Convencional" ~ "Crops Cultivated under Conventional System",
-        emitters == "Mandioca" ~ "Cassava",
-        emitters == "Muar" ~ "Mule",
-        emitters == "Outros" ~ "Others",
-        emitters == "Pastagem" ~ "Pasture",
-        emitters == "Pastagem Degradada" ~ "Degraded Pasture",
-        emitters == "Soja" ~ "Soil",
-        emitters == "Suinos" ~ "Swine",
-        emitters == "Trigo" ~ "Wheat",
-        emitters == "Vinhaca" ~ "Vinasse",
-        emitters == "Uso de Calcario" ~ "Limestone Usage",
-        emitters == "Torta de Filtro" ~ "Filter Cake",
-        emitters == "Solos organicos" ~ "Organic Soils",
-        emitters == "Sistemas Integrados Lavoura-Pecuaria-Floresta" ~ "Integrated Crop-Livestock-Forestry Systems",
-        emitters == "Pastagem Bem Manejada" ~ "Well Managed Pasture",
-        emitters == "Ovino" ~ "Sheep",
-        emitters == "Outras Culturas" ~ "Other Cultures",
-        emitters == "Milho" ~ "Corn",
-        emitters == "Lavouras Cultivadas sob Sistema Plantio Direto" ~ "Crops Cultivated under no-till System",
-        emitters == "Gado de Leite" ~ "Dairy Cattle",
-        emitters == "Florestas Plantadas" ~ "Planted Forests",
-        emitters == "Feijao" ~ "Beans",
-        emitters == "Caprino" ~ "Goat",
-        emitters == "Bubalino" ~ "Buffalo",
-        emitters == "Asinino" ~ "Asinine",
-        emitters == "Aplicacao de Ureia" ~ "Urea Application"
-      )) %>%
-      dplyr::mutate(direct_indirect_emitters = dplyr::case_when(
-        direct_indirect_emitters == "Diretas" ~ "Direct",
-        direct_indirect_emitters == "Indiretas" ~ "Indirect"
-      )) %>%
-      dplyr::mutate(emissions_type = dplyr::case_when(
-        emissions_type == "Aplicacao de residuos organicos" ~ "Application of Organic Waste",
-        emissions_type == "Deposicao de dejetos em pastagem" ~ "Pasture Waste Disposal",
-        emissions_type == "Lixiviacao" ~ "Leaching",
-        emissions_type == "Outros" ~ "Others",
-        emissions_type == "Solos organicos" ~ "Organic Soils",
-        emissions_type == "Deposicao Atmosferica" ~ "Atmospheric Deposition",
-        emissions_type == "Fertilizantes Sinteticos" ~ "Synthetic Fertilizers",
-        emissions_type == "Mineralizacao de N associado a perda de C no solo" ~ "Mineralization of N Associated with Loss of C in the Soil",
-        emissions_type == "Residuos Agricolas" ~ "Agricultural Waste",
-        emissions_type == "Variacao dos Estoques de Carbono no Solo" ~ "Changes in Carbon Soil Stocks"
-      )) %>%
-      dplyr::mutate(emission_removal_bunker = dplyr::case_when(
-        emission_removal_bunker == "Emissao" ~ "Emission",
-        emission_removal_bunker == "Emissao NCI" ~ "NCI Emission",
-        emission_removal_bunker == "Remocao NCI" ~ "NCI Removal"
-      )) %>%
-      dplyr::mutate(product = dplyr::case_when(
-        product == "ALIM_BEBIDAS" ~ "Food/Beverages",
-        product == "CAR" ~ "Meat",
-        product == "CAR/LEI" ~ "Meat/Dairy",
-        product == "CAR/LEI/ALIM_BEBIDAS" ~ "Meat/Dairy/Food/Beverages",
-        product == "LEI" ~ "Dairy"
-      ))
-
-    dat <- dat %>%
-      dplyr::relocate(
-        year, state, sector, emissions_generating_processes, emissions_sources, emitters, emissions_type, gas, economic_activity, product,
-        value
-      )
-
-    dat <- dat %>%
-      dplyr::mutate(state = dplyr::case_when(
-        state == "NA" ~ NA_character_,
-        TRUE ~ state
-      ))
-  }
-
-
-  if (geo_level == "state" | geo_level == "municipality") {
-
-    if (language == "pt") {
-      # Manter apenas "estado" no retorno final
+    if (param$geo_level == "state") {
       dat <- dat %>%
-        dplyr::select(
-          -dplyr::any_of(c("territorio", "state"))
+        dplyr::mutate(state = estado) %>%
+        dplyr::select(-estado) %>%
+        dplyr::relocate(
+          year, state, sector, emission_category, emission_subcategory,
+          waste_stream, general_activity, emission_type, value
         )
-
-    } else if (language == "eng") {
-      # Manter apenas "state" no retorno final
+    } else {
       dat <- dat %>%
-        dplyr::select(
-          -dplyr::any_of(c("territorio", "estado"))
+        dplyr::relocate(
+          year, sector, emission_category, emission_subcategory,
+          waste_stream, general_activity, emission_type, value
         )
     }
   }
 
+  # -------------------------------------------------------------------------
+  # seeg_farming ("Agropecuaria" sector)
+  #
+  # Verified live against the real v13.0 file (128,272 farming rows) cross-
+  # tabulated against the pre-v13.0 file's equivalent "Agropecuaria" rows
+  # (473,078 rows). What was confirmed:
+  #
+  #   - categoria_emissora (5 values) is a clean 1:1 relabel of the old
+  #     NIVEL 2 (Cultivo de Arroz, Fermentacao Enterica, Manejo de Dejetos
+  #     Animais, Queima de Residuos Agricolas, Solos Manejados).
+  #   - sub_categoria_emissora (14 values) is a near-1:1 relabel of the old
+  #     NIVEL 4 for the values old NIVEL 4 actually named (e.g. "Deposicao
+  #     de dejetos em pastagem", "Mineralizacao de N associado a perda de C
+  #     no solo" match verbatim) -- 4 categories that only ever had the
+  #     generic placeholder NIVEL 4 value "Outros" in the old file
+  #     (Cultivo de Arroz, Fermentacao Enterica, Manejo de Dejetos Animais,
+  #     Queima de Residuos Agricolas) now get a real, specific
+  #     sub_categoria_emissora instead -- a genuine improvement, not a loss.
+  #   - recorte (3 values: Diretas/Indiretas (deposicao atmosferica)/
+  #     Indiretas (lixiviacao/escorrimento superficial)) folds old NIVEL 3
+  #     (Diretas/Indiretas) together with old NIVEL 4's own further split of
+  #     "Indiretas" into "Deposicao Atmosferica"/"Lixiviacao" -- kept as one
+  #     new field rather than force-split back into two old-shaped ones.
+  #   - atividade_geral (3 values: Agricultura/Pecuaria/Silvicultura) is the
+  #     closest survivor of old atividade_economica (AGR/PEC) -- confirmed
+  #     to add a genuinely new third value, "Silvicultura" (forestry),
+  #     appearing only under "Solos Manejados" > soil-carbon-stock
+  #     sub-categories (a value old atividade_economica never had).
+  #   - OLD NIVEL 5/NIVEL 6 (the Animal/Vegetal type split and the actual
+  #     livestock species or crop, e.g. "Bubalino", "Soja") are confirmed
+  #     absent from the v13.0 Dados sheet entirely, same as
+  #     atividade_economica/produto/gas -- species/crop-level detail is a
+  #     real, confirmed loss at municipality grain, not reconstructed.
+  #   - Bunker values seen here: Emissao/Emissao NCI/Remocao NCI (no plain
+  #     "Remocao") -- kept as 3 distinct translated values rather than
+  #     merged into old's Emissao/Remocao pair (see this file's Part 2 open
+  #     items: NCI's exact accounting meaning wasn't independently
+  #     confirmed this session, so nothing is silently folded into it).
+  # FRAGILE: every branch below hardcodes the literal filter
+  #     setor_de_emissao == "Agropecuaria". A future rename of this
+  #     sector's label makes every seeg_farming branch silently return
+  #     zero rows instead of erroring.
+  # -------------------------------------------------------------------------
+
+  if (param$dataset == "seeg_farming" & param$geo_level == "municipality" & param$language == "pt") {
+    dat <- dat %>%
+      dplyr::filter(setor_de_emissao == "Agropecuaria") %>%
+      tidyr::pivot_longer(
+        cols = x1970:x2024,
+        names_to = "Ano",
+        names_prefix = "x",
+        values_to = "Valor"
+      ) %>%
+      dplyr::rename(
+        setor = setor_de_emissao,
+        categoria_emissao = categoria_emissora,
+        subcategoria_emissao = sub_categoria_emissora,
+        via_emissao = recorte,
+        tipo_emissao = emissao_remocao_bunker
+      ) %>%
+      dplyr::mutate(
+        ibge = dplyr::if_else(id_territorio == "1BR", NA_character_, substring(id_territorio, 2)),
+        municipio = dplyr::if_else(id_territorio == "1BR", NA_character_, sub(" \\([A-Za-z]{2}\\)$", "", municipio)),
+        estado = dplyr::if_else(id_territorio == "1BR", NA_character_, estado)
+      ) %>%
+      dplyr::select(-id_territorio) %>%
+      dplyr::relocate(
+        Ano, municipio, estado, ibge, setor, categoria_emissao, subcategoria_emissao,
+        via_emissao, atividade_geral, tipo_emissao, Valor
+      )
+  }
+
+  if (param$dataset == "seeg_farming" & param$geo_level %in% c("country", "state") & param$language == "pt") {
+    dat <- dat %>%
+      dplyr::filter(setor_de_emissao == "Agropecuaria") %>%
+      tidyr::pivot_longer(
+        cols = x1970:x2024,
+        names_to = "Ano",
+        names_prefix = "x",
+        values_to = "Valor"
+      ) %>%
+      dplyr::rename(
+        setor = setor_de_emissao,
+        categoria_emissao = categoria_emissora,
+        subcategoria_emissao = sub_categoria_emissora,
+        via_emissao = recorte,
+        tipo_emissao = emissao_remocao_bunker
+      )
+
+    if (param$geo_level == "state") {
+      dat <- dat %>%
+        dplyr::relocate(
+          Ano, estado, setor, categoria_emissao, subcategoria_emissao,
+          via_emissao, atividade_geral, tipo_emissao, Valor
+        )
+    } else {
+      dat <- dat %>%
+        dplyr::relocate(
+          Ano, setor, categoria_emissao, subcategoria_emissao,
+          via_emissao, atividade_geral, tipo_emissao, Valor
+        )
+    }
+  }
+
+  if (param$dataset == "seeg_farming" & param$geo_level == "municipality" & param$language == "eng") {
+    dat <- dat %>%
+      dplyr::filter(setor_de_emissao == "Agropecuaria") %>%
+      tidyr::pivot_longer(
+        cols = x1970:x2024,
+        names_to = "year",
+        names_prefix = "x",
+        values_to = "value"
+      ) %>%
+      dplyr::rename(
+        sector = setor_de_emissao,
+        emission_category = categoria_emissora,
+        emission_subcategory = sub_categoria_emissora,
+        emission_pathway = recorte,
+        general_activity = atividade_geral,
+        emission_type = emissao_remocao_bunker
+      ) %>%
+      dplyr::mutate(
+        ibge = dplyr::if_else(id_territorio == "1BR", NA_character_, substring(id_territorio, 2)),
+        city = dplyr::if_else(id_territorio == "1BR", NA_character_, sub(" \\([A-Za-z]{2}\\)$", "", municipio)),
+        state = dplyr::if_else(id_territorio == "1BR", NA_character_, estado)
+      ) %>%
+      dplyr::select(-id_territorio, -municipio, -estado) %>%
+      seeg_farming_translate() %>%
+      dplyr::relocate(
+        year, city, state, ibge, sector, emission_category, emission_subcategory,
+        emission_pathway, general_activity, emission_type, value
+      )
+  }
+
+  if (param$dataset == "seeg_farming" & param$geo_level %in% c("country", "state") & param$language == "eng") {
+    dat <- dat %>%
+      dplyr::filter(setor_de_emissao == "Agropecuaria") %>%
+      tidyr::pivot_longer(
+        cols = x1970:x2024,
+        names_to = "year",
+        names_prefix = "x",
+        values_to = "value"
+      ) %>%
+      dplyr::rename(
+        sector = setor_de_emissao,
+        emission_category = categoria_emissora,
+        emission_subcategory = sub_categoria_emissora,
+        emission_pathway = recorte,
+        general_activity = atividade_geral,
+        emission_type = emissao_remocao_bunker
+      ) %>%
+      seeg_farming_translate()
+
+    if (param$geo_level == "state") {
+      dat <- dat %>%
+        dplyr::mutate(state = estado) %>%
+        dplyr::select(-estado) %>%
+        dplyr::relocate(
+          year, state, sector, emission_category, emission_subcategory,
+          emission_pathway, general_activity, emission_type, value
+        )
+    } else {
+      dat <- dat %>%
+        dplyr::relocate(
+          year, sector, emission_category, emission_subcategory,
+          emission_pathway, general_activity, emission_type, value
+        )
+    }
+  }
+
+  # -------------------------------------------------------------------------
+  # seeg_industry ("Processos Industriais" sector)
+  #
+  # Verified live against the real v13.0 file (5,683 industry rows) cross-
+  # tabulated against the pre-v13.0 file's equivalent "Processos Industriais"
+  # rows (only 165 rows -- this sector is genuinely sparse, a handful of real
+  # facilities per category). What was confirmed:
+  #
+  #   - categoria_emissora (7 values) is a near-1:1 relabel of the old
+  #     NIVEL 2 (Industria Quimica, Produtos Minerais, Producao de Metais,
+  #     Uso Nao-Energetico de Combustiveis e Uso de Solventes, and old
+  #     "Uso de SF6"/"Emissoes de HFCs" split into their own better-named
+  #     categories: "Uso de SF6 em equipamentos eletricos", "Producao e uso
+  #     de HFCs") -- PLUS one genuinely new category, "Producao e uso de
+  #     CFs", with no old-schema equivalent at all -- see the FRAGILE tag on
+  #     SEEG_INDUSTRY_CATEGORY_EN below for what's uncertain about it.
+  #   - sub_categoria_emissora is a near-1:1 relabel of the old NIVEL 3
+  #     (e.g. "Producao de Amonia" -> "Producao de amonia" verbatim).
+  #   - recorte (Emissao efetiva/Emissao potencial -- "actual"/"potential"
+  #     emission) is a GENUINELY NEW field: the old schema had no equivalent
+  #     dimension for this sector at all (NIVEL 3 was already the finest
+  #     category level, no further actual/potential split existed).
+  #   - atividade_geral (7 values: Quimica, Cimento, Metalurgia, Edificacoes,
+  #     Transporte de carga, Transporte de passageiros, Outras materias
+  #     primas e industrias) is a real ENHANCEMENT over old
+  #     atividade_economica (CIM/MET/ENE_ELET/Outra_IND/HFC, 5 codes) -- old
+  #     lumped every HFC use into one "HFC" bucket; the new file breaks it
+  #     out by the actual END-USE sector (buildings/freight/passenger
+  #     transport), confirmed via real co-occurring rows, not assumed from
+  #     field names.
+  #   - OLD NIVEL 4 (input/technology detail -- e.g. "Cal Calcitica"/"Cal
+  #     Dolomitica"/"Cal Magnesiana" lime types, "Tecnologia Soderberg"/
+  #     "Tecnologia Prebaked Anode" aluminum smelting tech) and
+  #     atividade_economica/produto/gas are confirmed absent from the v13.0
+  #     Dados sheet entirely -- dropped, not reconstructed, same treatment
+  #     as every other migrated sector's confirmed real losses.
+  #   - Bunker: only "Emissao" appears for this sector (no NCI values,
+  #     unlike farming/land).
+  # FRAGILE: every branch below hardcodes the literal filter
+  #     setor_de_emissao == "Processos Industriais". A future rename of
+  #     this sector's label makes every seeg_industry branch silently
+  #     return zero rows instead of erroring.
+  # -------------------------------------------------------------------------
+
+  if (param$dataset == "seeg_industry" & param$geo_level == "municipality" & param$language == "pt") {
+    dat <- dat %>%
+      dplyr::filter(setor_de_emissao == "Processos Industriais") %>%
+      tidyr::pivot_longer(
+        cols = x1970:x2024,
+        names_to = "Ano",
+        names_prefix = "x",
+        values_to = "Valor"
+      ) %>%
+      dplyr::rename(
+        setor = setor_de_emissao,
+        categoria_emissao = categoria_emissora,
+        subcategoria_emissao = sub_categoria_emissora,
+        tipo_emissao = emissao_remocao_bunker
+      ) %>%
+      dplyr::mutate(
+        ibge = dplyr::if_else(id_territorio == "1BR", NA_character_, substring(id_territorio, 2)),
+        municipio = dplyr::if_else(id_territorio == "1BR", NA_character_, sub(" \\([A-Za-z]{2}\\)$", "", municipio)),
+        estado = dplyr::if_else(id_territorio == "1BR", NA_character_, estado)
+      ) %>%
+      dplyr::select(-id_territorio) %>%
+      dplyr::relocate(
+        Ano, municipio, estado, ibge, setor, categoria_emissao, subcategoria_emissao,
+        recorte, atividade_geral, tipo_emissao, Valor
+      )
+  }
+
+  if (param$dataset == "seeg_industry" & param$geo_level %in% c("country", "state") & param$language == "pt") {
+    dat <- dat %>%
+      dplyr::filter(setor_de_emissao == "Processos Industriais") %>%
+      tidyr::pivot_longer(
+        cols = x1970:x2024,
+        names_to = "Ano",
+        names_prefix = "x",
+        values_to = "Valor"
+      ) %>%
+      dplyr::rename(
+        setor = setor_de_emissao,
+        categoria_emissao = categoria_emissora,
+        subcategoria_emissao = sub_categoria_emissora,
+        tipo_emissao = emissao_remocao_bunker
+      )
+
+    if (param$geo_level == "state") {
+      dat <- dat %>%
+        dplyr::relocate(
+          Ano, estado, setor, categoria_emissao, subcategoria_emissao,
+          recorte, atividade_geral, tipo_emissao, Valor
+        )
+    } else {
+      dat <- dat %>%
+        dplyr::relocate(
+          Ano, setor, categoria_emissao, subcategoria_emissao,
+          recorte, atividade_geral, tipo_emissao, Valor
+        )
+    }
+  }
+
+  if (param$dataset == "seeg_industry" & param$geo_level == "municipality" & param$language == "eng") {
+    dat <- dat %>%
+      dplyr::filter(setor_de_emissao == "Processos Industriais") %>%
+      tidyr::pivot_longer(
+        cols = x1970:x2024,
+        names_to = "year",
+        names_prefix = "x",
+        values_to = "value"
+      ) %>%
+      dplyr::rename(
+        sector = setor_de_emissao,
+        emission_category = categoria_emissora,
+        emission_subcategory = sub_categoria_emissora,
+        emission_scope = recorte,
+        general_activity = atividade_geral,
+        emission_type = emissao_remocao_bunker
+      ) %>%
+      dplyr::mutate(
+        ibge = dplyr::if_else(id_territorio == "1BR", NA_character_, substring(id_territorio, 2)),
+        city = dplyr::if_else(id_territorio == "1BR", NA_character_, sub(" \\([A-Za-z]{2}\\)$", "", municipio)),
+        state = dplyr::if_else(id_territorio == "1BR", NA_character_, estado)
+      ) %>%
+      dplyr::select(-id_territorio, -municipio, -estado) %>%
+      seeg_industry_translate() %>%
+      dplyr::relocate(
+        year, city, state, ibge, sector, emission_category, emission_subcategory,
+        emission_scope, general_activity, emission_type, value
+      )
+  }
+
+  if (param$dataset == "seeg_industry" & param$geo_level %in% c("country", "state") & param$language == "eng") {
+    dat <- dat %>%
+      dplyr::filter(setor_de_emissao == "Processos Industriais") %>%
+      tidyr::pivot_longer(
+        cols = x1970:x2024,
+        names_to = "year",
+        names_prefix = "x",
+        values_to = "value"
+      ) %>%
+      dplyr::rename(
+        sector = setor_de_emissao,
+        emission_category = categoria_emissora,
+        emission_subcategory = sub_categoria_emissora,
+        emission_scope = recorte,
+        general_activity = atividade_geral,
+        emission_type = emissao_remocao_bunker
+      ) %>%
+      seeg_industry_translate()
+
+    if (param$geo_level == "state") {
+      dat <- dat %>%
+        dplyr::mutate(state = estado) %>%
+        dplyr::select(-estado) %>%
+        dplyr::relocate(
+          year, state, sector, emission_category, emission_subcategory,
+          emission_scope, general_activity, emission_type, value
+        )
+    } else {
+      dat <- dat %>%
+        dplyr::relocate(
+          year, sector, emission_category, emission_subcategory,
+          emission_scope, general_activity, emission_type, value
+        )
+    }
+  }
+
+  # -------------------------------------------------------------------------
+  # seeg_energy -- confirmed live against the real v13.0 "Dados" sheet
+  # (52,771 rows for setor_de_emissao == "Energia") cross-tabulated against
+  # the OLD file's NIVEL 1..6 for the same sector (85,793 rows):
+  #   - categoria_emissora (8 values: Comercial, Industrial, Publico,
+  #     Residencial, Transportes, Agropecuaria, Geracao de eletricidade
+  #     (servico publico), Producao de combustiveis) is a clean 1:1 relabel
+  #     of the old NIVEL 3 (the end-use sector).
+  #   - sub_categoria_emissora (26 values, e.g. Rodoviario, Aereo, Cimento,
+  #     Quimica, Refino de petroleo) is a clean 1:1 relabel of the old
+  #     NIVEL 4 (the subsector).
+  #   - recorte (2 values: "Emissoes pela queima de combustiveis" / "Emissoes
+  #     fugitivas") is a clean 1:1 relabel of the old NIVEL 2 (combustion vs
+  #     fugitive emissions) -- a DIFFERENT meaning of "recorte" than
+  #     seeg_industry's actual/potential split; this field is sector-scoped,
+  #     not a global vocabulary.
+  #   - atividade_geral (10 values) is a coarser, cross-cutting grouping that
+  #     does not map 1:1 to any single old level: e.g. "Transporte de carga"/
+  #     "Transporte de passageiros" both pull from categoria == "Transportes"
+  #     + subcategoria == "Rodoviario" alike (every municipality has BOTH an
+  #     atividade_geral == "Transporte de carga" AND a "Transporte de
+  #     passageiros" row for the same Rodoviario subcategoria -- confirmed
+  #     live, not a duplicate).
+  #   - OLD NIVEL 5 (fuel type -- e.g. Gasolina/Diesel/GLP/Gas natural/Lenha)
+  #     and NIVEL 6 (further sub-detail, e.g. "Consumo Final Energetico" vs
+  #     "Centrais Eletricas de Servico Publico"), plus atividade_economica
+  #     and produto, are confirmed absent from the v13.0 Dados sheet
+  #     entirely.
+  # FRAGILE: this is a real loss of the fuel-type dimension for this sector
+  # specifically (the old file let you split energy emissions by fuel
+  # burned; the new one does not) -- same treatment as every other migrated
+  # sector's confirmed real losses, documented rather than reconstructed.
+  #   - Bunker: both "Emissao" and "Bunker" appear for this sector (2 rows
+  #     total tagged "Bunker", both under categoria == "Transportes" --
+  #     confirmed live, passed through via the shared tipo_emissao/
+  #     emission_type translation like every other sector).
+  # FRAGILE: every branch below hardcodes the literal filter
+  #     setor_de_emissao == "Energia". A future rename of this sector's
+  #     label makes every seeg_energy branch silently return zero rows
+  #     instead of erroring.
+  # -------------------------------------------------------------------------
+
+  if (param$dataset == "seeg_energy" & param$geo_level == "municipality" & param$language == "pt") {
+    dat <- dat %>%
+      dplyr::filter(setor_de_emissao == "Energia") %>%
+      tidyr::pivot_longer(
+        cols = x1970:x2024,
+        names_to = "Ano",
+        names_prefix = "x",
+        values_to = "Valor"
+      ) %>%
+      dplyr::rename(
+        setor = setor_de_emissao,
+        categoria_emissao = categoria_emissora,
+        subcategoria_emissao = sub_categoria_emissora,
+        tipo_emissao = emissao_remocao_bunker
+      ) %>%
+      dplyr::mutate(
+        ibge = dplyr::if_else(id_territorio == "1BR", NA_character_, substring(id_territorio, 2)),
+        municipio = dplyr::if_else(id_territorio == "1BR", NA_character_, sub(" \\([A-Za-z]{2}\\)$", "", municipio)),
+        estado = dplyr::if_else(id_territorio == "1BR", NA_character_, estado)
+      ) %>%
+      dplyr::select(-id_territorio) %>%
+      dplyr::relocate(
+        Ano, municipio, estado, ibge, setor, categoria_emissao, subcategoria_emissao,
+        recorte, atividade_geral, tipo_emissao, Valor
+      )
+  }
+
+  if (param$dataset == "seeg_energy" & param$geo_level %in% c("country", "state") & param$language == "pt") {
+    dat <- dat %>%
+      dplyr::filter(setor_de_emissao == "Energia") %>%
+      tidyr::pivot_longer(
+        cols = x1970:x2024,
+        names_to = "Ano",
+        names_prefix = "x",
+        values_to = "Valor"
+      ) %>%
+      dplyr::rename(
+        setor = setor_de_emissao,
+        categoria_emissao = categoria_emissora,
+        subcategoria_emissao = sub_categoria_emissora,
+        tipo_emissao = emissao_remocao_bunker
+      )
+
+    if (param$geo_level == "state") {
+      dat <- dat %>%
+        dplyr::relocate(
+          Ano, estado, setor, categoria_emissao, subcategoria_emissao,
+          recorte, atividade_geral, tipo_emissao, Valor
+        )
+    } else {
+      dat <- dat %>%
+        dplyr::relocate(
+          Ano, setor, categoria_emissao, subcategoria_emissao,
+          recorte, atividade_geral, tipo_emissao, Valor
+        )
+    }
+  }
+
+  if (param$dataset == "seeg_energy" & param$geo_level == "municipality" & param$language == "eng") {
+    dat <- dat %>%
+      dplyr::filter(setor_de_emissao == "Energia") %>%
+      tidyr::pivot_longer(
+        cols = x1970:x2024,
+        names_to = "year",
+        names_prefix = "x",
+        values_to = "value"
+      ) %>%
+      dplyr::rename(
+        sector = setor_de_emissao,
+        emission_category = categoria_emissora,
+        emission_subcategory = sub_categoria_emissora,
+        emission_scope = recorte,
+        general_activity = atividade_geral,
+        emission_type = emissao_remocao_bunker
+      ) %>%
+      dplyr::mutate(
+        ibge = dplyr::if_else(id_territorio == "1BR", NA_character_, substring(id_territorio, 2)),
+        city = dplyr::if_else(id_territorio == "1BR", NA_character_, sub(" \\([A-Za-z]{2}\\)$", "", municipio)),
+        state = dplyr::if_else(id_territorio == "1BR", NA_character_, estado)
+      ) %>%
+      dplyr::select(-id_territorio, -municipio, -estado) %>%
+      seeg_energy_translate() %>%
+      dplyr::relocate(
+        year, city, state, ibge, sector, emission_category, emission_subcategory,
+        emission_scope, general_activity, emission_type, value
+      )
+  }
+
+  if (param$dataset == "seeg_energy" & param$geo_level %in% c("country", "state") & param$language == "eng") {
+    dat <- dat %>%
+      dplyr::filter(setor_de_emissao == "Energia") %>%
+      tidyr::pivot_longer(
+        cols = x1970:x2024,
+        names_to = "year",
+        names_prefix = "x",
+        values_to = "value"
+      ) %>%
+      dplyr::rename(
+        sector = setor_de_emissao,
+        emission_category = categoria_emissora,
+        emission_subcategory = sub_categoria_emissora,
+        emission_scope = recorte,
+        general_activity = atividade_geral,
+        emission_type = emissao_remocao_bunker
+      ) %>%
+      seeg_energy_translate()
+
+    if (param$geo_level == "state") {
+      dat <- dat %>%
+        dplyr::mutate(state = estado) %>%
+        dplyr::select(-estado) %>%
+        dplyr::relocate(
+          year, state, sector, emission_category, emission_subcategory,
+          emission_scope, general_activity, emission_type, value
+        )
+    } else {
+      dat <- dat %>%
+        dplyr::relocate(
+          year, sector, emission_category, emission_subcategory,
+          emission_scope, general_activity, emission_type, value
+        )
+    }
+  }
+
+  # -------------------------------------------------------------------------
+  # seeg_land -- confirmed live against the real v13.0 "Dados" sheet
+  # (104,205 rows for setor_de_emissao == "Mudanca de Uso da Terra e
+  # Floresta") cross-tabulated against the OLD file's NIVEL 1..6 for the
+  # same sector (129,993 rows):
+  #   - categoria_emissora (7 values: Alteracoes de uso da terra, Carbono
+  #     organico no solo, Queimadas nao associadas a desmatamento, Remocao
+  #     em areas protegidas, Remocao por mudanca de uso da terra, Remocao
+  #     por vegetacao secundaria, Residuos florestais) is a relabel of the
+  #     old NIVEL 2.
+  #   - sub_categoria_emissora (5 values: Desmatamento, Outras mudancas de
+  #     uso da terra, Queimadas nao associadas a desmatamento, Regeneracao,
+  #     Vegetacao nativa estavel) corresponds to the old NIVEL 5.
+  #   - recorte (Em area protegida / Fora de area protegida / a literal
+  #     "NA" string for Residuos florestais rows, where the old file's
+  #     equivalent NIVEL 4 split simply doesn't apply) corresponds to the
+  #     old NIVEL 4 protected-area split; the literal "NA" is translated to
+  #     "Not applicable" in English rather than a real NA, so no valid row
+  #     is ever left with a missing value post-translation.
+  #   - atividade_geral (4 values: Agricultura, Outros (geral), Pecuaria,
+  #     Vegetacao nativa) is a coarse new grouping with no direct old-schema
+  #     equivalent.
+  # FRAGILE: the largest confirmed loss across every migrated sector -- OLD
+  # NIVEL 3 (BIOME -- Amazonia/Cerrado/Mata Atlantica/etc.) is confirmed
+  # absent from the v13.0 Dados sheet entirely, and OLD NIVEL 6 (the full
+  # origin->destination land-cover TRANSITION MATRIX, e.g. "Floresta
+  # primaria -- Silvicultura") collapses into the four coarser fields
+  # above. Both are dropped, not reconstructed -- called out explicitly to
+  # the user at migration time, not just documented here (see 2026-09-15
+  # session).
+  #   - Bunker: "Emissao", "Emissao NCI", and (unlike every other migrated
+  #     sector) plain "Remocao" all appear for this sector -- confirmed the
+  #     shared SEEG_EMISSION_TYPE_EN dictionary needed a "Remocao" ->
+  #     "Removal" entry added (it previously only had "Remocao NCI").
+  # FRAGILE: every branch below hardcodes the literal filter
+  #     setor_de_emissao == "Mudanca de Uso da Terra e Floresta". A future
+  #     rename of this sector's label makes every seeg_land branch
+  #     silently return zero rows instead of erroring.
+  # -------------------------------------------------------------------------
+
+  if (param$dataset == "seeg_land" & param$geo_level == "municipality" & param$language == "pt") {
+    dat <- dat %>%
+      dplyr::filter(setor_de_emissao == "Mudanca de Uso da Terra e Floresta") %>%
+      tidyr::pivot_longer(
+        cols = x1970:x2024,
+        names_to = "Ano",
+        names_prefix = "x",
+        values_to = "Valor"
+      ) %>%
+      dplyr::rename(
+        setor = setor_de_emissao,
+        categoria_emissao = categoria_emissora,
+        subcategoria_emissao = sub_categoria_emissora,
+        tipo_emissao = emissao_remocao_bunker
+      ) %>%
+      dplyr::mutate(
+        ibge = dplyr::if_else(id_territorio == "1BR", NA_character_, substring(id_territorio, 2)),
+        municipio = dplyr::if_else(id_territorio == "1BR", NA_character_, sub(" \\([A-Za-z]{2}\\)$", "", municipio)),
+        estado = dplyr::if_else(id_territorio == "1BR", NA_character_, estado)
+      ) %>%
+      dplyr::select(-id_territorio) %>%
+      dplyr::relocate(
+        Ano, municipio, estado, ibge, setor, categoria_emissao, subcategoria_emissao,
+        recorte, atividade_geral, tipo_emissao, Valor
+      )
+  }
+
+  if (param$dataset == "seeg_land" & param$geo_level %in% c("country", "state") & param$language == "pt") {
+    dat <- dat %>%
+      dplyr::filter(setor_de_emissao == "Mudanca de Uso da Terra e Floresta") %>%
+      tidyr::pivot_longer(
+        cols = x1970:x2024,
+        names_to = "Ano",
+        names_prefix = "x",
+        values_to = "Valor"
+      ) %>%
+      dplyr::rename(
+        setor = setor_de_emissao,
+        categoria_emissao = categoria_emissora,
+        subcategoria_emissao = sub_categoria_emissora,
+        tipo_emissao = emissao_remocao_bunker
+      )
+
+    if (param$geo_level == "state") {
+      dat <- dat %>%
+        dplyr::relocate(
+          Ano, estado, setor, categoria_emissao, subcategoria_emissao,
+          recorte, atividade_geral, tipo_emissao, Valor
+        )
+    } else {
+      dat <- dat %>%
+        dplyr::relocate(
+          Ano, setor, categoria_emissao, subcategoria_emissao,
+          recorte, atividade_geral, tipo_emissao, Valor
+        )
+    }
+  }
+
+  if (param$dataset == "seeg_land" & param$geo_level == "municipality" & param$language == "eng") {
+    dat <- dat %>%
+      dplyr::filter(setor_de_emissao == "Mudanca de Uso da Terra e Floresta") %>%
+      tidyr::pivot_longer(
+        cols = x1970:x2024,
+        names_to = "year",
+        names_prefix = "x",
+        values_to = "value"
+      ) %>%
+      dplyr::rename(
+        sector = setor_de_emissao,
+        emission_category = categoria_emissora,
+        emission_subcategory = sub_categoria_emissora,
+        emission_scope = recorte,
+        general_activity = atividade_geral,
+        emission_type = emissao_remocao_bunker
+      ) %>%
+      dplyr::mutate(
+        ibge = dplyr::if_else(id_territorio == "1BR", NA_character_, substring(id_territorio, 2)),
+        city = dplyr::if_else(id_territorio == "1BR", NA_character_, sub(" \\([A-Za-z]{2}\\)$", "", municipio)),
+        state = dplyr::if_else(id_territorio == "1BR", NA_character_, estado)
+      ) %>%
+      dplyr::select(-id_territorio, -municipio, -estado) %>%
+      seeg_land_translate() %>%
+      dplyr::relocate(
+        year, city, state, ibge, sector, emission_category, emission_subcategory,
+        emission_scope, general_activity, emission_type, value
+      )
+  }
+
+  if (param$dataset == "seeg_land" & param$geo_level %in% c("country", "state") & param$language == "eng") {
+    dat <- dat %>%
+      dplyr::filter(setor_de_emissao == "Mudanca de Uso da Terra e Floresta") %>%
+      tidyr::pivot_longer(
+        cols = x1970:x2024,
+        names_to = "year",
+        names_prefix = "x",
+        values_to = "value"
+      ) %>%
+      dplyr::rename(
+        sector = setor_de_emissao,
+        emission_category = categoria_emissora,
+        emission_subcategory = sub_categoria_emissora,
+        emission_scope = recorte,
+        general_activity = atividade_geral,
+        emission_type = emissao_remocao_bunker
+      ) %>%
+      seeg_land_translate()
+
+    if (param$geo_level == "state") {
+      dat <- dat %>%
+        dplyr::mutate(state = estado) %>%
+        dplyr::select(-estado) %>%
+        dplyr::relocate(
+          year, state, sector, emission_category, emission_subcategory,
+          emission_scope, general_activity, emission_type, value
+        )
+    } else {
+      dat <- dat %>%
+        dplyr::relocate(
+          year, sector, emission_category, emission_subcategory,
+          emission_scope, general_activity, emission_type, value
+        )
+    }
+  }
 
   return(dat)
+}
+
+# -----------------------------------------------------------------------
+# PT -> EN value translation, shared machinery for every seeg_* sector.
+#
+# One hashed named-vector lookup per field instead of a dplyr::case_when()
+# chain: case_when() evaluates every `==` branch (N string comparisons per
+# row, for a field with N known values); a named-vector lookup resolves
+# each row in one hash lookup regardless of N. Matters more as sectors with
+# larger vocabularies get migrated (e.g. seeg_industry's ~35-value
+# emitters_production field) than it does for residuals' small ones, so
+# this is the shared shape every later sector's own dictionary plugs into,
+# not just a residuals-only tweak.
+#
+# seeg_translate(x, dict): dict is a named character vector, PT value =
+# name, EN value = value (e.g. c("Emissao" = "Emission")). Any x value NOT
+# a name in dict passes through unchanged (mirrors case_when()'s old
+# `TRUE ~ x` fallback) -- this matters because a handful of fields (setor,
+# tipo_emissao) have exactly one confirmed real value today but could see
+# more added upstream before this code is revisited.
+#
+# FRAGILE: that same passthrough-on-unmatched behavior means every
+# SEEG_*_EN dictionary below is a closed list, silently. If a future SEEG
+# upload adds a new category/subcategory/activity value, language = "eng"
+# output does NOT error -- it just shows the untranslated Portuguese string
+# for that one value, mixed in with otherwise-English output, easy to miss
+# in a quick look at the data.
+# -----------------------------------------------------------------------
+
+seeg_translate <- function(x, dict) {
+  out <- unname(dict[x])
+  unmatched <- is.na(out) & !is.na(x)
+  out[unmatched] <- x[unmatched]
+  out
+}
+
+# Every dictionary below was confirmed live against the real v13.0 file's
+# actual distinct "Residuos"-sector values (see load_seeg()'s header
+# comment on seeg_residuals) -- not guessed from field names.
+
+SEEG_SECTOR_EN <- c(
+  "Residuos" = "Waste",
+  "Agropecuaria" = "Agriculture and Livestock",
+  "Processos Industriais" = "Industrial Processes",
+  "Energia" = "Energy",
+  "Mudanca de Uso da Terra e Floresta" = "Land Use Change and Forestry"
+)
+
+SEEG_EMISSION_TYPE_EN <- c(
+  "Emissao" = "Emission",
+  "Emissao NCI" = "Emission NCI",
+  "Remocao" = "Removal",
+  "Remocao NCI" = "Removal NCI"
+)
+
+SEEG_STATE_EN <- c(
+  "Nao Alocado" = "Not Allocated"
+)
+
+SEEG_RESIDUALS_CATEGORY_EN <- c(
+  "Disposicao final" = "Final disposal",
+  "Efluentes domesticos" = "Domestic effluents",
+  "Efluentes liquidos industriais" = "Industrial liquid effluents",
+  "Incineracao ou queima a ceu aberto" = "Incineration or open-air burning",
+  "Tratamento biologico de residuos solidos" = "Biological treatment of solid waste"
+)
+
+SEEG_RESIDUALS_SUBCATEGORY_EN <- c(
+  "Compostagem" = "Composting",
+  "Disposicao em aterros controlados ou lixoes" = "Disposal in controlled landfills or open dumps",
+  "Disposicao final em aterros sanitarios" = "Final disposal in sanitary landfills",
+  "Incineracao" = "Incineration",
+  "Producao de carne avicola" = "Poultry meat production",
+  "Producao de carne bovina" = "Beef production",
+  "Producao de carne suina" = "Pork production",
+  "Producao de Celulose" = "Pulp production",
+  "Producao de Cerveja" = "Beer production",
+  "Producao de leite cru" = "Raw milk production",
+  "Producao de leite pasteurizado" = "Pasteurized milk production",
+  "Queima de residuos a ceu aberto" = "Open-air waste burning",
+  "Tratamento e despejo de efluentes domesticos" = "Domestic effluent treatment and disposal"
+)
+
+SEEG_RESIDUALS_WASTE_STREAM_EN <- c(
+  "Diretas" = "Direct",
+  "Efluentes Liquidos" = "Liquid effluents",
+  "Residuos solidos" = "Solid waste"
+)
+
+SEEG_RESIDUALS_GENERAL_ACTIVITY_EN <- c(
+  "Producao Industrial" = "Industrial Production",
+  "Saneamento Basico" = "Basic Sanitation"
+)
+
+# English value translations for seeg_residuals, shared by the municipality
+# and country/state branches above.
+seeg_residuals_translate <- function(dat) {
+  sector <- emission_category <- emission_subcategory <- NULL
+  waste_stream <- general_activity <- emission_type <- estado <- NULL
+
+  dat %>%
+    dplyr::mutate(
+      sector = seeg_translate(sector, SEEG_SECTOR_EN),
+      emission_category = seeg_translate(emission_category, SEEG_RESIDUALS_CATEGORY_EN),
+      emission_subcategory = seeg_translate(emission_subcategory, SEEG_RESIDUALS_SUBCATEGORY_EN),
+      waste_stream = seeg_translate(waste_stream, SEEG_RESIDUALS_WASTE_STREAM_EN),
+      general_activity = seeg_translate(general_activity, SEEG_RESIDUALS_GENERAL_ACTIVITY_EN),
+      emission_type = seeg_translate(emission_type, SEEG_EMISSION_TYPE_EN)
+    ) %>%
+    dplyr::mutate(dplyr::across(
+      dplyr::any_of("estado"),
+      ~ seeg_translate(., SEEG_STATE_EN)
+    ))
+}
+
+# Every dictionary below was confirmed live against the real v13.0 file's
+# actual distinct "Agropecuaria"-sector values (see load_seeg()'s header
+# comment on seeg_farming) -- not guessed from field names.
+
+SEEG_FARMING_CATEGORY_EN <- c(
+  "Cultivo de arroz" = "Rice cultivation",
+  "Fermentacao enterica" = "Enteric fermentation",
+  "Manejo de dejetos animais" = "Animal waste management",
+  "Queima de residuos agricolas" = "Agricultural residue burning",
+  "Solos manejados" = "Managed soils"
+)
+
+SEEG_FARMING_SUBCATEGORY_EN <- c(
+  "Cultivo em sistema irrigado inundado" = "Flooded irrigated rice cultivation",
+  "Processo de digestao de animais ruminantes" = "Ruminant animal digestion process",
+  "Tratamento e disposicao de dejetos animais" = "Animal waste treatment and disposal",
+  "Pratica de queima dos residuos agricolas" = "Agricultural residue burning practice",
+  "Aplicacao de residuos organicos" = "Application of organic residues",
+  "Aumento do estoque de C no solo" = "Increase in soil carbon stock",
+  "Corretivo agricola" = "Agricultural soil amendment",
+  "Deposicao de dejetos em pastagem" = "Manure deposition on pasture",
+  "Fertilizantes sinteticos nitrogenados" = "Synthetic nitrogen fertilizers",
+  "Mineralizacao de N associado a perda de C no solo" = "N mineralization associated with soil carbon loss",
+  "Ocorrencia de queima de pasto" = "Pasture burning occurrence",
+  "Reducao do estoque de C no solo" = "Decrease in soil carbon stock",
+  "Residuos agricolas" = "Agricultural residues",
+  "Solos organicos" = "Organic soils"
+)
+
+SEEG_FARMING_PATHWAY_EN <- c(
+  "Diretas" = "Direct",
+  "Indiretas (deposicao atmosferica)" = "Indirect (atmospheric deposition)",
+  "Indiretas (lixiviacao/escorrimento superficial)" = "Indirect (leaching/runoff)"
+)
+
+SEEG_FARMING_GENERAL_ACTIVITY_EN <- c(
+  "Agricultura" = "Agriculture",
+  "Pecuaria" = "Livestock",
+  "Silvicultura" = "Forestry"
+)
+
+# English value translations for seeg_farming, shared by the municipality
+# and country/state branches above.
+seeg_farming_translate <- function(dat) {
+  sector <- emission_category <- emission_subcategory <- NULL
+  emission_pathway <- general_activity <- emission_type <- estado <- NULL
+
+  dat %>%
+    dplyr::mutate(
+      sector = seeg_translate(sector, SEEG_SECTOR_EN),
+      emission_category = seeg_translate(emission_category, SEEG_FARMING_CATEGORY_EN),
+      emission_subcategory = seeg_translate(emission_subcategory, SEEG_FARMING_SUBCATEGORY_EN),
+      emission_pathway = seeg_translate(emission_pathway, SEEG_FARMING_PATHWAY_EN),
+      general_activity = seeg_translate(general_activity, SEEG_FARMING_GENERAL_ACTIVITY_EN),
+      emission_type = seeg_translate(emission_type, SEEG_EMISSION_TYPE_EN)
+    ) %>%
+    dplyr::mutate(dplyr::across(
+      dplyr::any_of("estado"),
+      ~ seeg_translate(., SEEG_STATE_EN)
+    ))
+}
+
+# Every dictionary below was confirmed live against the real v13.0 file's
+# actual distinct "Processos Industriais"-sector values (see load_seeg()'s
+# header comment on seeg_industry) -- not guessed from field names.
+
+SEEG_INDUSTRY_CATEGORY_EN <- c(
+  "Industria quimica" = "Chemical industry",
+  "Produtos minerais" = "Mineral products",
+  "Producao de metais" = "Metal production",
+  # FRAGILE: exactly which compounds "CFs" covers was not independently
+  # confirmed this session -- translated literally, not expanded.
+  "Producao e uso de CFs" = "Production and use of CFs",
+  "Producao e uso de HFCs" = "Production and use of HFCs",
+  "Uso de SF6 em equipamentos eletricos" = "SF6 use in electrical equipment",
+  "Uso nao-energetico de combustiveis e solventes em outros setores" = "Non-energy use of fuels and solvents in other sectors"
+)
+
+SEEG_INDUSTRY_SUBCATEGORY_EN <- c(
+  "Producao de acrilonitrila" = "Acrylonitrile production",
+  "Producao de amonia" = "Ammonia production",
+  "Producao de caprolactama" = "Caprolactam production",
+  "Producao de carbureto de calcio" = "Calcium carbide production",
+  "Producao de cloreto de vinila" = "Vinyl chloride production",
+  "Producao de coque de petroleo calcinado" = "Calcined petroleum coke production",
+  "Producao de eteno" = "Ethylene production",
+  "Producao de metanol" = "Methanol production",
+  "Producao de negro-de-fumo" = "Carbon black production",
+  "Producao de acido adipico" = "Adipic acid production",
+  "Producao de acido fosforico" = "Phosphoric acid production",
+  "Producao de acido nitrico" = "Nitric acid production",
+  "Producao de oxido de eteno" = "Ethylene oxide production",
+  "Consumo de barrilha" = "Soda ash consumption",
+  "Producao de cal" = "Lime production",
+  "Producao de ceramica" = "Ceramics production",
+  "Producao de cimento" = "Cement production",
+  "Producao de magnesia nao metalurgica" = "Non-metallurgical magnesia production",
+  "Producao de vidro" = "Glass production",
+  "Producao de aluminio" = "Aluminum production",
+  "Producao de ferro gusa e aco" = "Pig iron and steel production",
+  "Producao de ferroligas" = "Ferroalloy production",
+  "Producao de magnesio" = "Magnesium production",
+  "Producao de outros nao-ferrosos" = "Production of other non-ferrous metals",
+  "Setor eletronico" = "Electronics sector",
+  "Montagem de equipamento ou produto" = "Equipment or product assembly",
+  "Sucateamento de equipamento ou produto" = "Equipment or product scrapping",
+  "Uso em equipamento ou produto" = "Use in equipment or product",
+  "Setor eletrico" = "Electrical sector",
+  "Uso nao-energetico de combustiveis e solventes em outros setores" = "Non-energy use of fuels and solvents in other sectors"
+)
+
+SEEG_INDUSTRY_SCOPE_EN <- c(
+  "Emissao efetiva" = "Actual emission",
+  "Emissao potencial" = "Potential emission"
+)
+
+SEEG_INDUSTRY_GENERAL_ACTIVITY_EN <- c(
+  "Quimica" = "Chemical",
+  "Outras materias primas e industrias" = "Other raw materials and industries",
+  "Cimento" = "Cement",
+  "Metalurgia" = "Metallurgy",
+  "Edificacoes" = "Buildings",
+  "Transporte de carga" = "Freight transport",
+  "Transporte de passageiros" = "Passenger transport"
+)
+
+# English value translations for seeg_industry, shared by the municipality
+# and country/state branches above.
+seeg_industry_translate <- function(dat) {
+  sector <- emission_category <- emission_subcategory <- NULL
+  emission_scope <- general_activity <- emission_type <- estado <- NULL
+
+  dat %>%
+    dplyr::mutate(
+      sector = seeg_translate(sector, SEEG_SECTOR_EN),
+      emission_category = seeg_translate(emission_category, SEEG_INDUSTRY_CATEGORY_EN),
+      emission_subcategory = seeg_translate(emission_subcategory, SEEG_INDUSTRY_SUBCATEGORY_EN),
+      emission_scope = seeg_translate(emission_scope, SEEG_INDUSTRY_SCOPE_EN),
+      general_activity = seeg_translate(general_activity, SEEG_INDUSTRY_GENERAL_ACTIVITY_EN),
+      emission_type = seeg_translate(emission_type, SEEG_EMISSION_TYPE_EN)
+    ) %>%
+    dplyr::mutate(dplyr::across(
+      dplyr::any_of("estado"),
+      ~ seeg_translate(., SEEG_STATE_EN)
+    ))
+}
+
+SEEG_ENERGY_CATEGORY_EN <- c(
+  "Comercial" = "Commercial",
+  "Industrial" = "Industrial",
+  "Publico" = "Public",
+  "Residencial" = "Residential",
+  "Transportes" = "Transport",
+  "Agropecuaria" = "Agriculture and Livestock",
+  "Geracao de eletricidade (servico publico)" = "Electricity generation (public utility)",
+  "Producao de combustiveis" = "Fuel production"
+)
+
+SEEG_ENERGY_SUBCATEGORY_EN <- c(
+  "Aereo" = "Air",
+  "Agropecuaria" = "Agriculture and Livestock",
+  "Alimentos e bebidas" = "Food and beverages",
+  "Ceramica" = "Ceramics",
+  "Cimento" = "Cement",
+  "Comercial" = "Commercial",
+  "Exploracao de petroleo e gas natural" = "Oil and natural gas exploration",
+  "Ferro gusa e aco" = "Pig iron and steel",
+  "Ferro ligas" = "Ferroalloys",
+  "Ferroviario" = "Rail",
+  "Geracao de eletricidade (servico publico)" = "Electricity generation (public utility)",
+  "Hidroviario" = "Waterway",
+  "Mineracao e pelotizacao" = "Mining and pelletizing",
+  "Nao ferrosos e outros da metalurgia" = "Non-ferrous and other metallurgy",
+  "Outras industrias" = "Other industries",
+  "Papel e celulose" = "Pulp and paper",
+  "Producao de alcool" = "Alcohol production",
+  "Producao de carvao mineral e outros" = "Coal and other mineral production",
+  "Producao de carvao vegetal" = "Charcoal production",
+  "Publico" = "Public",
+  "Quimica" = "Chemical",
+  "Refino de petroleo" = "Oil refining",
+  "Residencial" = "Residential",
+  "Rodoviario" = "Road",
+  "Textil" = "Textile",
+  "Transporte de petroleo e gas natural" = "Oil and natural gas transport"
+)
+
+SEEG_ENERGY_SCOPE_EN <- c(
+  "Emissoes pela queima de combustiveis" = "Fuel combustion emissions",
+  "Emissoes fugitivas" = "Fugitive emissions"
+)
+
+SEEG_ENERGY_GENERAL_ACTIVITY_EN <- c(
+  "Edificacoes" = "Buildings",
+  "Geracao de eletricidade" = "Electricity generation",
+  "Outras materias primas e industrias" = "Other raw materials and industries",
+  "Transporte de carga" = "Freight transport",
+  "Transporte de passageiros" = "Passenger transport",
+  "Agropecuaria (finalidade nao identificada)" = "Agriculture and Livestock (unidentified purpose)",
+  "Cimento" = "Cement",
+  "Metalurgia" = "Metallurgy",
+  "Quimica" = "Chemical",
+  "Producao de combustiveis" = "Fuel production"
+)
+
+# English value translations for seeg_energy, shared by the municipality
+# and country/state branches above.
+seeg_energy_translate <- function(dat) {
+  sector <- emission_category <- emission_subcategory <- NULL
+  emission_scope <- general_activity <- emission_type <- estado <- NULL
+
+  dat %>%
+    dplyr::mutate(
+      sector = seeg_translate(sector, SEEG_SECTOR_EN),
+      emission_category = seeg_translate(emission_category, SEEG_ENERGY_CATEGORY_EN),
+      emission_subcategory = seeg_translate(emission_subcategory, SEEG_ENERGY_SUBCATEGORY_EN),
+      emission_scope = seeg_translate(emission_scope, SEEG_ENERGY_SCOPE_EN),
+      general_activity = seeg_translate(general_activity, SEEG_ENERGY_GENERAL_ACTIVITY_EN),
+      emission_type = seeg_translate(emission_type, SEEG_EMISSION_TYPE_EN)
+    ) %>%
+    dplyr::mutate(dplyr::across(
+      dplyr::any_of("estado"),
+      ~ seeg_translate(., SEEG_STATE_EN)
+    ))
+}
+
+SEEG_LAND_CATEGORY_EN <- c(
+  "Alteracoes de uso da terra" = "Land use change",
+  "Carbono organico no solo" = "Soil organic carbon",
+  "Queimadas nao associadas a desmatamento" = "Fires not associated with deforestation",
+  "Remocao em areas protegidas" = "Removal in protected areas",
+  "Remocao por mudanca de uso da terra" = "Removal due to land use change",
+  "Remocao por vegetacao secundaria" = "Removal by secondary vegetation",
+  "Residuos florestais" = "Forest residues"
+)
+
+SEEG_LAND_SUBCATEGORY_EN <- c(
+  "Desmatamento" = "Deforestation",
+  "Outras mudancas de uso da terra" = "Other land use changes",
+  "Queimadas nao associadas a desmatamento" = "Fires not associated with deforestation",
+  "Regeneracao" = "Regeneration",
+  "Vegetacao nativa estavel" = "Stable native vegetation"
+)
+
+# NB: the literal "NA" string (not a missing value -- see R/seeg.R's
+# seeg_land header comment) is translated to "Not applicable" rather than
+# a real NA, so no valid row is ever left with a missing emission_scope.
+SEEG_LAND_SCOPE_EN <- c(
+  "Em area protegida" = "In protected area",
+  "Fora de area protegida" = "Outside protected area",
+  "NA" = "Not applicable"
+)
+
+SEEG_LAND_GENERAL_ACTIVITY_EN <- c(
+  "Agricultura" = "Agriculture",
+  "Outros (geral)" = "Other (general)",
+  "Pecuaria" = "Livestock",
+  "Vegetacao nativa" = "Native vegetation"
+)
+
+# English value translations for seeg_land, shared by the municipality
+# and country/state branches above.
+seeg_land_translate <- function(dat) {
+  sector <- emission_category <- emission_subcategory <- NULL
+  emission_scope <- general_activity <- emission_type <- estado <- NULL
+
+  dat %>%
+    dplyr::mutate(
+      sector = seeg_translate(sector, SEEG_SECTOR_EN),
+      emission_category = seeg_translate(emission_category, SEEG_LAND_CATEGORY_EN),
+      emission_subcategory = seeg_translate(emission_subcategory, SEEG_LAND_SUBCATEGORY_EN),
+      emission_scope = seeg_translate(emission_scope, SEEG_LAND_SCOPE_EN),
+      general_activity = seeg_translate(general_activity, SEEG_LAND_GENERAL_ACTIVITY_EN),
+      emission_type = seeg_translate(emission_type, SEEG_EMISSION_TYPE_EN)
+    ) %>%
+    dplyr::mutate(dplyr::across(
+      dplyr::any_of("estado"),
+      ~ seeg_translate(., SEEG_STATE_EN)
+    ))
 }

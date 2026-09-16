@@ -39,10 +39,12 @@
 # available_time, migrated to the BEN dashboard's Chapter 8 table -- see
 # test-datasets_link.R), PLUS 8 more from delta #12 (2026-09-14: all 8 IPS
 # rows' url, resolve_ips.R stopped being detect-only -- see
-# test-datasets_link.R). 16 total, also enumerated explicitly below rather
-# than assumed. This file only asserts the row/column shape stays
-# consistent and the delta count; test-datasets_link.R is the canonical
-# place the specific cells are pinned.
+# test-datasets_link.R), PLUS 12 more from delta #13 (2026-09-15: all 6
+# SEEG rows' url AND available_time, resolve_seeg.R stopped being
+# detect-only -- see test-datasets_link.R). 28 total, also enumerated
+# explicitly below rather than assumed. This file only asserts the
+# row/column shape stays consistent and the delta count; test-datasets_link.R
+# is the canonical place the specific cells are pinned.
 #
 # Two other things changed the same general period but are deliberately NOT
 # part of the "16 cells" count below: (a) 2026-09-08 (PRODES/BACI resolver
@@ -149,7 +151,37 @@ KNOWN_POST_CAPTURE_DELTAS <- c(
   "ips\rsanit_habit\rNA\rNA\rurl",
   "ips\rsanit_habit\rNA\rNA\rversion",
   "ips\rviolence\rNA\rNA\rurl",
-  "ips\rviolence\rNA\rNA\rversion"
+  "ips\rviolence\rNA\rNA\rversion",
+  # 2026-09-15: resolve_seeg.R stopped being detect-only -- all 6 SEEG rows'
+  # url moved off the manifest's old Google Drive link onto seeg.eco.br's
+  # own live v13.0 file (verified live: a genuine schema restructuring, not
+  # just a version bump -- see R/seeg.R's header and test-datasets_link.R's
+  # delta #13). available_time widens from 2000-2018 to 1970-2024, and
+  # version/docs_url are now populated (both were NA before).
+  "seeg\rseeg\rNA\rNA\rurl",
+  "seeg\rseeg\rNA\rNA\rdocs_url",
+  "seeg\rseeg\rNA\rNA\ravailable_time",
+  "seeg\rseeg\rNA\rNA\rversion",
+  "seeg\rseeg_energy\rNA\rNA\rurl",
+  "seeg\rseeg_energy\rNA\rNA\rdocs_url",
+  "seeg\rseeg_energy\rNA\rNA\ravailable_time",
+  "seeg\rseeg_energy\rNA\rNA\rversion",
+  "seeg\rseeg_farming\rNA\rNA\rurl",
+  "seeg\rseeg_farming\rNA\rNA\rdocs_url",
+  "seeg\rseeg_farming\rNA\rNA\ravailable_time",
+  "seeg\rseeg_farming\rNA\rNA\rversion",
+  "seeg\rseeg_industry\rNA\rNA\rurl",
+  "seeg\rseeg_industry\rNA\rNA\rdocs_url",
+  "seeg\rseeg_industry\rNA\rNA\ravailable_time",
+  "seeg\rseeg_industry\rNA\rNA\rversion",
+  "seeg\rseeg_land\rNA\rNA\rurl",
+  "seeg\rseeg_land\rNA\rNA\rdocs_url",
+  "seeg\rseeg_land\rNA\rNA\ravailable_time",
+  "seeg\rseeg_land\rNA\rNA\rversion",
+  "seeg\rseeg_residuals\rNA\rNA\rurl",
+  "seeg\rseeg_residuals\rNA\rNA\rdocs_url",
+  "seeg\rseeg_residuals\rNA\rNA\ravailable_time",
+  "seeg\rseeg_residuals\rNA\rNA\rversion"
 )
 post_capture_key <- function(s, d, g, y, f) {
   paste(s, d, ifelse(is.na(g), "NA", g), ifelse(is.na(y), "NA", y), f, sep = "\r")
@@ -199,20 +231,21 @@ test_that("every former base-row query now stops -- the guard has no gap", {
   expect_equal(still_works, character(0))
 })
 
-test_that("datasets_link() keeps the same rows/columns and differs in exactly 16 cells (see test-datasets_link.R deltas #8-#12)", {
+test_that("datasets_link() keeps the same rows/columns and differs in exactly 28 cells (see test-datasets_link.R deltas #8-#13)", {
   # 5 cells from delta #8 (the base-row-deletion migration this fixture was
   # captured to verify) + 1 more from delta #9 (2026-08-24,
   # mapbiomas_deforestation_regeneration's available_time corrected from
   # "1985-2024" to "1987-2024") + 2 more from delta #10 (2026-09-08,
   # epe/energy_state_panel's url and available_time -- see NEWS.md and
   # test-datasets_link.R) + 8 more from delta #12 (2026-09-14, all 8 IPS
-  # rows' url -- see test-datasets_link.R). cover's url stays NA either
-  # way (its rows still disagree, just on a different pair of URLs now),
-  # so that doesn't add another cell here -- and the docs_url-only
-  # EPE/PRODES changes (delta #10's sibling hand-edits, delta #11's PRODES
-  # fix) don't count in THIS test either, since docs_url isn't one of
-  # datasets_link()'s 6 output columns (nor is version, IPS's other
-  # changed field).
+  # rows' url -- see test-datasets_link.R) + 12 more from delta #13
+  # (2026-09-15, all 6 SEEG rows' url AND available_time -- see
+  # test-datasets_link.R). cover's url stays NA either way (its rows still
+  # disagree, just on a different pair of URLs now), so that doesn't add
+  # another cell here -- and the docs_url-only EPE/PRODES changes (delta
+  # #10's sibling hand-edits, delta #11's PRODES fix) don't count in THIS
+  # test either, since docs_url isn't one of datasets_link()'s 6 output
+  # columns (nor is version, IPS's and SEEG's other changed field).
   old_snap <- readRDS(test_path("fixtures", "datasets_link_pre_baserow_deletion.rds"))
   new_snap <- datasets_link()
 
@@ -247,5 +280,5 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 16
     }
   }
 
-  expect_equal(delta, 16)
+  expect_equal(delta, 28)
 })
