@@ -210,6 +210,7 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
     # there's no base row to silently keep agreeing with one of them, plus
     # mapbiomas_transition's available_time.
     url = dplyr::case_when(
+      survey == "aneel" & dataset == "energy_generation" ~ "https://dadosabertos.aneel.gov.br/dataset/6d90b77c-c5f5-4d81-bdec-7bc619494bb9/resource/11ec447d-698d-4ab8-977f-b424d5deee6a/download/siga-empreendimentos-geracao.csv",
       survey == "mapbiomas" & dataset %in% c(
         "mapbiomas_cover", "mapbiomas_mining", "mapbiomas_transition", "mapbiomas_water"
       ) ~ NA_character_,

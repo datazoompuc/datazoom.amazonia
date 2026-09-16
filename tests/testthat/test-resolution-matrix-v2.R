@@ -149,7 +149,12 @@ KNOWN_POST_CAPTURE_DELTAS <- c(
   "ips\rsanit_habit\rNA\rNA\rurl",
   "ips\rsanit_habit\rNA\rNA\rversion",
   "ips\rviolence\rNA\rNA\rurl",
-  "ips\rviolence\rNA\rNA\rversion"
+  "ips\rviolence\rNA\rNA\rversion",
+  # 2026-09-15: aneel/energy_generation (SIGA) migrated from dead GitLab
+  # URL (403 Forbidden) to official ANEEL CKAN Open Data CSV.
+  "aneel\renergy_generation\rNA\rNA\rdocs_url",
+  "aneel\renergy_generation\rNA\rNA\rurl",
+  "aneel\renergy_generation\rNA\rNA\rresolver"
 )
 post_capture_key <- function(s, d, g, y, f) {
   paste(s, d, ifelse(is.na(g), "NA", g), ifelse(is.na(y), "NA", y), f, sep = "\r")
@@ -247,5 +252,5 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 16
     }
   }
 
-  expect_equal(delta, 16)
+  expect_equal(delta, 17)
 })

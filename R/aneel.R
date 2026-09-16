@@ -76,10 +76,7 @@ if (param$dataset == "energy_development_budget") {
   }
 }
 
-  if (param$dataset == "energy_generation") {
-    skip <- 1
-    # skips first row of excel sheet for this dataset
-  }
+
 
   # check if dataset is valid
 

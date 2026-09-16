@@ -468,15 +468,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     file_extension <- ".rds"
   }
   if (source == "aneel") {
-    if (dataset == "energy_development_budget") {
-      file_extension <- ".csv"
-    }
-    if (dataset == "energy_generation") {
-      file_extension <- ".xlsx"
-    }
-    if (dataset == "energy_enterprises_distributed") {
-      file_extension <- ".csv"
-    }
+    file_extension <- ".csv"
   }
 
   ## Define Empty Directory and Files For Download
@@ -601,15 +593,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
 
   } else if (param$source == "aneel") {
-    if (param$dataset %in% c("energy_enterprises_distributed", "energy_development_budget")) {
+    if (param$dataset == "energy_generation") {
+      dat <- data.table::fread(temp, encoding = "UTF-8")
+    } else if (param$dataset %in% c("energy_enterprises_distributed", "energy_development_budget")) {
       dat <- data.table::fread(temp, encoding = "Latin-1")
-    } else if (param$dataset == "energy_generation") {
-      dat <- readxl::read_xlsx(
-        temp,
-        sheet = param$sheet,
-        skip = param$skip_rows,
-        na = c("-", "")
-      )
     }
 
   } else if (param$source == "ips") {
