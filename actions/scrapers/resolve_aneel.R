@@ -1,13 +1,9 @@
 # actions/scrapers/resolve_aneel.R
 #
-# Resolves ANEEL's two CKAN-backed datasets through the CKAN JSON API at
+# Resolves ANEEL's three CKAN-backed datasets through the CKAN JSON API at
 # dadosabertos.aneel.gov.br -- NOT HTML scraping. CKAN's `package_show`
 # action returns every resource (file) attached to a dataset as JSON; we
 # just filter and pattern-match on resource metadata, never parse a page.
-#
-# `energy_generation` (SIGA, served from a GitLab raw URL) is version-free
-# and is intentionally NOT resolved here -- it keeps resolver = NA in the
-# manifest and is only covered by the HTTP-check in the validation gate.
 #
 # Contract (see actions/scripts/build_manifest.R): resolve_aneel(rows)
 # receives the manifest rows currently tagged resolver == "aneel" (not used
@@ -83,6 +79,22 @@ resolve_aneel <- function(rows) {
     survey = "aneel", dataset = "energy_enterprises_distributed",
     geo_level = NA_character_, year = NA_character_,
     url = urls2[match_idx[1]]
+  )
+
+  ## -- energy_generation (SIGA): single CSV resource, no year in URL -----
+
+  resources3 <- ckan_package_show("6d90b77c-c5f5-4d81-bdec-7bc619494bb9")
+  urls3 <- vapply(resources3, resource_url, character(1))
+  match_idx3 <- which(!is.na(urls3) & grepl("siga-empreendimentos-geracao.csv", urls3, fixed = TRUE))
+
+  if (length(match_idx3) == 0) {
+    stop("resolve_aneel(): 'siga-empreendimentos-geracao.csv' resource not found in ANEEL SIGA package.")
+  }
+
+  out$generation <- tibble::tibble(
+    survey = "aneel", dataset = "energy_generation",
+    geo_level = NA_character_, year = NA_character_,
+    url = urls3[match_idx3[1]]
   )
 
   dplyr::bind_rows(out)

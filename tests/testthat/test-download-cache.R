@@ -42,11 +42,9 @@ test_that("parsed_cache_eligible() allowlists only the xlsx read branches", {
   expect_true(parsed_cache_eligible("mapbiomas", ".xlsx"))
   expect_true(parsed_cache_eligible("iema", ".xlsx"))
 
-  # aneel has both an xlsx dataset (energy_generation) and fread-based ones
-  # (energy_enterprises_distributed/energy_development_budget) -- extension
-  # alone already tells them apart, since only the xlsx one ever reaches
-  # here with file_extension == ".xlsx".
-  expect_true(parsed_cache_eligible("aneel", ".xlsx"))
+  # aneel datasets are now 100% CSV (including energy_generation) and read
+  # via fread(), so aneel is never eligible for the parsed cache.
+  expect_false(parsed_cache_eligible("aneel", ".xlsx"))
   expect_false(parsed_cache_eligible("aneel", ".csv"))
 
   # SpatRaster (prodes/terraclimate) and data.table (baci/csv sources) are

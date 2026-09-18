@@ -152,6 +152,11 @@ KNOWN_POST_CAPTURE_DELTAS <- c(
   "ips\rsanit_habit\rNA\rNA\rversion",
   "ips\rviolence\rNA\rNA\rurl",
   "ips\rviolence\rNA\rNA\rversion",
+  # 2026-09-15: aneel/energy_generation (SIGA) migrated from dead GitLab
+  # URL (403 Forbidden) to official ANEEL CKAN Open Data CSV.
+  "aneel\renergy_generation\rNA\rNA\rdocs_url",
+  "aneel\renergy_generation\rNA\rNA\rurl",
+  "aneel\renergy_generation\rNA\rNA\rresolver",
   # 2026-09-15: resolve_seeg.R stopped being detect-only -- all 6 SEEG rows'
   # url moved off the manifest's old Google Drive link onto seeg.eco.br's
   # own live v13.0 file (verified live: a genuine schema restructuring, not
@@ -280,5 +285,5 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 28
     }
   }
 
-  expect_equal(delta, 28)
+  expect_equal(delta, 29)
 })

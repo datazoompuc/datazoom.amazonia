@@ -358,16 +358,16 @@ file_cache_set <- function(key, dir, temp) {
 }
 
 # Which reads are cheap to keep a single parsed copy of: the .xlsx branches
-# only (aneel/energy_generation, ips, epe, and the generic branch covering
-# seeg/mapbiomas/iema -- see the dispatch below). Deliberately excludes
-# terra::rast() results (a SpatRaster wraps a C++ pointer tied to a file on
-# disk, and the prodes branch calls terra::tmpFiles(remove = TRUE), which
-# can invalidate a cached one) and data.table::fread() results (aneel/baci
-# hand these straight to the user under raw_data = TRUE, and a user's
-# dt[, x := 1] would mutate a shared cache entry in place). file_extension
-# == ".xlsx" already excludes aneel's non-xlsx datasets on its own.
+# only (ips, epe, and the generic branch covering seeg/mapbiomas/iema --
+# see the dispatch below). Deliberately excludes terra::rast() results (a
+# SpatRaster wraps a C++ pointer tied to a file on disk, and the prodes branch
+# calls terra::tmpFiles(remove = TRUE), which can invalidate a cached one)
+# and data.table::fread() results (aneel/baci hand these straight to the user
+# under raw_data = TRUE, and a user's dt[, x := 1] would mutate a shared
+# cache entry in place). aneel is 100% CSV across all datasets and explicitly
+# excluded.
 parsed_cache_eligible <- function(source, file_extension) {
-  file_extension == ".xlsx" && source %in% c("seeg", "ips", "epe", "aneel", "mapbiomas", "iema")
+  file_extension == ".xlsx" && source %in% c("seeg", "ips", "epe", "mapbiomas", "iema")
 }
 
 #' Perform the actual file transfer for external_download(). Extracted as a
@@ -585,26 +585,19 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     file_extension <- ".rds"
   }
   if (source == "aneel") {
-    if (dataset == "energy_development_budget") {
-      file_extension <- ".csv"
-    }
-    if (dataset == "energy_generation") {
-      file_extension <- ".xlsx"
-    }
-    if (dataset == "energy_enterprises_distributed") {
-      file_extension <- ".csv"
-    }
+    file_extension <- ".csv"
   }
 
-  ## Define Directory and File For Download (session cache aware)
+  # Define Directory and File For Download (session cache aware)
   #
   # A second external_download() call resolving to the same (path,
   # file_extension) -- e.g. any of the 6 SEEG datasets, or 2 back-to-back
   # PRODES datasets -- reuses what an earlier call already downloaded (and,
   # for a zip, already extracted) instead of doing it again. See the cache
-  # helpers defined above external_download().
+  # helpers defined above external_download(). aneel is explicitly excluded
+  # from file caching per maintainer decision.
 
-  use_cache <- download_cache_enabled()
+  use_cache <- download_cache_enabled() && source != "aneel"
   cache_key <- file_cache_key(path, file_extension)
   cached_file <- if (use_cache) file_cache_get(cache_key) else NULL
   file_cache_hit <- !is.null(cached_file)
@@ -766,15 +759,10 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
 
   } else if (param$source == "aneel") {
-    if (param$dataset %in% c("energy_enterprises_distributed", "energy_development_budget")) {
+    if (param$dataset == "energy_generation") {
+      dat <- data.table::fread(temp, encoding = "UTF-8")
+    } else if (param$dataset %in% c("energy_enterprises_distributed", "energy_development_budget")) {
       dat <- data.table::fread(temp, encoding = "Latin-1")
-    } else if (param$dataset == "energy_generation") {
-      dat <- readxl::read_xlsx(
-        temp,
-        sheet = param$sheet,
-        skip = param$skip_rows,
-        na = c("-", "")
-      )
     }
 
   } else if (param$source == "ips") {
