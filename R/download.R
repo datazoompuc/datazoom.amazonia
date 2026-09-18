@@ -290,6 +290,118 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
   } # End of If - Download at the Municipality Level
 }
 
+# ---------------------------------------------------------------------------
+# Session-scoped download + parse cache
+#
+# external_download() is the single download helper for every load_*()
+# except load_epe()'s two datasets (R/epe.R, a deliberate bypass because
+# readxl chokes on that workbook's sharedStrings.xml). Several sources serve
+# more than one dataset off one identical file -- SEEG (6 datasets, one
+# 250MB+ xlsx), IPS (8 datasets, one xlsx), PRODES (6 datasets, one zip) --
+# so loading more than one dataset from the same source used to pay for the
+# download, and for xlsx sources the readxl::read_xlsx() parse, once per
+# dataset. This cache fixes that for the lifetime of one R session; it never
+# persists across sessions and needs no user consent (CRAN's restriction is
+# on writing into the user's home/library, not into tempdir() subdirectories).
+#
+# Mirrors the .dz_manifest_cache precedent (R/manifest.R): a namespace-local
+# environment, an options() escape hatch, and an internal clear_*() for tests.
+# ---------------------------------------------------------------------------
+
+# .dz_download_cache$files      : an environment, key string -> list(dir, temp)
+# .dz_download_cache$parsed_key : the key of the one cached parsed object, or NULL
+# .dz_download_cache$parsed_val : the cached parsed object itself
+.dz_download_cache <- new.env(parent = emptyenv())
+
+download_cache_enabled <- function() {
+  !isFALSE(getOption("datazoom.amazonia.cache", TRUE))
+}
+
+#' Drop every cached download and parsed object. Internal only -- used by
+#' tests to isolate cache state between test_that() blocks.
+#' @noRd
+clear_download_cache <- function() {
+  .dz_download_cache$files <- NULL
+  .dz_download_cache$parsed_key <- NULL
+  .dz_download_cache$parsed_val <- NULL
+  invisible(NULL)
+}
+
+download_cache_files_env <- function() {
+  if (is.null(.dz_download_cache$files)) {
+    .dz_download_cache$files <- new.env(parent = emptyenv())
+  }
+  .dz_download_cache$files
+}
+
+file_cache_key <- function(path, file_extension) {
+  paste(file_extension, path, sep = "||")
+}
+
+# NULL on a miss, or when a previously cached dir/file has since been
+# removed from under us (e.g. by a stale-tempdir cleanup) -- treated the
+# same as a miss rather than erroring.
+file_cache_get <- function(key) {
+  env <- download_cache_files_env()
+  if (!exists(key, envir = env, inherits = FALSE)) {
+    return(NULL)
+  }
+  entry <- get(key, envir = env, inherits = FALSE)
+  if (!dir.exists(entry$dir) || !file.exists(entry$temp)) {
+    return(NULL)
+  }
+  entry
+}
+
+file_cache_set <- function(key, dir, temp) {
+  assign(key, list(dir = dir, temp = temp), envir = download_cache_files_env())
+}
+
+# Which reads are cheap to keep a single parsed copy of: the .xlsx branches
+# only (ips, epe, and the generic branch covering seeg/mapbiomas/iema --
+# see the dispatch below). Deliberately excludes terra::rast() results (a
+# SpatRaster wraps a C++ pointer tied to a file on disk, and the prodes branch
+# calls terra::tmpFiles(remove = TRUE), which can invalidate a cached one)
+# and data.table::fread() results (aneel/baci hand these straight to the user
+# under raw_data = TRUE, and a user's dt[, x := 1] would mutate a shared
+# cache entry in place). aneel is 100% CSV across all datasets and explicitly
+# excluded.
+parsed_cache_eligible <- function(source, file_extension) {
+  file_extension == ".xlsx" && source %in% c("seeg", "ips", "epe", "mapbiomas", "iema")
+}
+
+#' Perform the actual file transfer for external_download(). Extracted as a
+#' seam so tests can intercept it with testthat::local_mocked_bindings() --
+#' utils::download.file()/googledrive::drive_download() are namespaced calls
+#' in other packages and cannot otherwise be mocked or counted.
+#' @noRd
+perform_download <- function(path, temp, download_method, source, quiet = TRUE) {
+  if (download_method == "standard") {
+    utils::download.file(url = path, destfile = temp, mode = "wb")
+  }
+  if (download_method == "curl") {
+    if (source == "deter") {
+      options(download.file.method = "curl", download.file.extra = "-L")
+    }
+    if (source == "baci") {
+      options(download.file.extra = "--ssl-no-revoke")
+    }
+    utils::download.file(url = path, destfile = temp, method = "curl", quiet = quiet)
+  }
+  if (download_method == "googledrive") {
+    message("Please follow the steps from `googledrive` package to download the data. This may take a while.\nIn case of authentication errors, run vignette(\"GOOGLEDRIVE\").")
+    googledrive::drive_download(path, path = temp, overwrite = TRUE)
+  }
+  invisible(NULL)
+}
+
+# Must match the UA string actions/scrapers/resolve_seeg.R uses to verify
+# this same seeg.eco.br URL live -- see the "seeg" branch above.
+SEEG_USER_AGENT <- paste(
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+  "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+)
+
 external_download <- function(dataset = NULL, source = NULL, year = NULL,
                               geo_level = NULL, coords = NULL, dataset_code = NULL,
                               sheet = NULL, skip_rows = NULL, file_name = NULL,
@@ -303,7 +415,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   old_options <- list(
     timeout = getOption("timeout"),
     download.file.method = getOption("download.file.method"),
-    download.file.extra = getOption("download.file.extra")
+    download.file.extra = getOption("download.file.extra"),
+    HTTPUserAgent = getOption("HTTPUserAgent")
   )
   on.exit(options(old_options), add = TRUE)
 
@@ -436,7 +549,11 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   # Only manually input the file_extension if the download_path does
   # not end in ".ext", where .ext is any file extension
 
-  # googledrive links do not contain the file extension, for example
+  # googledrive links do not contain the file extension, for example. seeg no
+  # longer needs this override (its URL, resolved live by resolve_seeg.R,
+  # already ends in ".xlsx" -- auto-detected correctly above) but is kept
+  # here too, harmlessly, so a future manifest URL shape change can't
+  # silently break extension detection for it.
 
   if (source %in% c("seeg", "iema", "ips")) {
     file_extension <- ".xlsx"
@@ -471,76 +588,125 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     file_extension <- ".csv"
   }
 
-  ## Define Empty Directory and Files For Download
+  # Define Directory and File For Download (session cache aware)
+  #
+  # A second external_download() call resolving to the same (path,
+  # file_extension) -- e.g. any of the 6 SEEG datasets, or 2 back-to-back
+  # PRODES datasets -- reuses what an earlier call already downloaded (and,
+  # for a zip, already extracted) instead of doing it again. See the cache
+  # helpers defined above external_download(). aneel is explicitly excluded
+  # from file caching per maintainer decision.
 
-  dir <- tempdir()
-  temp <- tempfile(fileext = file_extension, tmpdir = dir)
+  use_cache <- download_cache_enabled() && source != "aneel"
+  cache_key <- file_cache_key(path, file_extension)
+  cached_file <- if (use_cache) file_cache_get(cache_key) else NULL
+  file_cache_hit <- !is.null(cached_file)
 
-  ## Picking the way to download the file
-
-  download_method <- "standard" # works for most functions
-
-  if (source %in% c("iema", "imazon")) {
-    download_method <- "googledrive"
+  if (file_cache_hit) {
+    dir <- cached_file$dir
+    temp <- cached_file$temp
+  } else if (use_cache) {
+    dir <- file.path(tempdir(check = TRUE), "datazoom-cache", rlang::hash(cache_key))
+    dir.create(dir, recursive = TRUE, showWarnings = FALSE)
+    temp <- tempfile(fileext = file_extension, tmpdir = dir)
+  } else {
+    dir <- tempdir()
+    temp <- tempfile(fileext = file_extension, tmpdir = dir)
   }
-  if (source == "aneel") {
-    if (dataset == "energy_enterprises_distributed") {
-      message("This may take a while.\n")
-      options(timeout = 1000) # increase timeout limit
+
+  ## Downloading file by the selected method (skipped entirely on a cache hit)
+
+  if (!file_cache_hit) {
+    # A half-downloaded/half-extracted per-key dir left behind on failure
+    # would be picked up by a later list.files(dir, ...) call just like a
+    # real cache hit -- clean it up unless the download+unzip below both
+    # complete and get registered.
+    if (use_cache) {
+      registered <- FALSE
+      on.exit(if (!registered) unlink(dir, recursive = TRUE, force = TRUE), add = TRUE)
     }
-  }
-  if (source == "prodes") {
-    message("This may take a while.\n")
-    options(timeout = max(1000, getOption("timeout")))
-  }
-  if (source %in% c("deter", "terraclimate", "baci", "mapbiomas")) {
-    download_method <- "curl"
-    quiet <- FALSE
-  }
-  if (source == "sigmine") {
-    options(timeout = max(1000, getOption("timeout")))
-  }
-  if (source == "ibama") {
-    download_method <- "curl"
-    options(download.file.method = "curl", download.file.extra = "-L") # https://stackoverflow.com/questions/69716835/turning-ssl-verification-off-inside-download-file
+
+    download_method <- "standard" # works for most functions
     quiet <- TRUE
-  }
-  if (source == "seeg") {
-    download_method <- "googledrive"
-  }
 
-  ## Downloading file by the selected method
-
-  if (download_method == "standard") {
-    utils::download.file(url = path, destfile = temp, mode = "wb")
-  }
-  if (download_method == "curl") {
-    if (source == "deter") {
-      options(download.file.method = "curl", download.file.extra = "-L")
+    if (source %in% c("iema", "imazon")) {
+      download_method <- "googledrive"
     }
-    if (source == "baci") {
-      options(download.file.extra = "--ssl-no-revoke")
+    if (source == "aneel") {
+      if (dataset == "energy_enterprises_distributed") {
+        message("This may take a while.\n")
+        options(timeout = 1000) # increase timeout limit
+      }
     }
-    utils::download.file(url = path, destfile = temp, method = "curl", quiet = quiet)
-  }
-  if (download_method == "googledrive") {
-    message("Please follow the steps from `googledrive` package to download the data. This may take a while.\nIn case of authentication errors, run vignette(\"GOOGLEDRIVE\").")
+    if (source == "prodes") {
+      message("This may take a while.\n")
+      options(timeout = max(1000, getOption("timeout")))
+    }
+    if (source %in% c("deter", "terraclimate", "baci", "mapbiomas")) {
+      download_method <- "curl"
+      quiet <- FALSE
+    }
+    if (source == "sigmine") {
+      options(timeout = max(1000, getOption("timeout")))
+    }
+    if (source == "ibama") {
+      download_method <- "curl"
+      options(download.file.method = "curl", download.file.extra = "-L") # https://stackoverflow.com/questions/69716835/turning-ssl-verification-off-inside-download-file
+      quiet <- TRUE
+    }
     if (source == "seeg") {
-      googledrive::drive_deauth()
+      # 2026-09-15: the resolver used to point at a Google Drive share link
+      # (hence "googledrive" here); it now emits the real seeg.eco.br URL
+      # directly (see resolve_seeg.R), a plain HTTPS download -- EXCEPT
+      # seeg.eco.br 403s any request without a browser-like User-Agent
+      # (confirmed live), hence HTTPUserAgent here rather than the plain
+      # "standard" download_method every other https source uses.
+      # SEEG_USER_AGENT must match the UA string actions/scrapers/
+      # resolve_seeg.R uses to verify this same URL live.
+      options(HTTPUserAgent = SEEG_USER_AGENT)
+      # The file is 250MB+ -- R's default 60s download.file() timeout
+      # (confirmed live: hit it on a real run) is nowhere near enough on an
+      # ordinary connection. Same fix as prodes/sigmine above.
+      message("This may take a while.\n")
+      options(timeout = max(1000, getOption("timeout")))
     }
-    googledrive::drive_download(path, path = temp, overwrite = TRUE)
-  }
 
-  ## Unzipping if the file is zipped
+    perform_download(path = path, temp = temp, download_method = download_method, source = source, quiet = quiet)
 
-  if (file_extension == ".zip") {
-    utils::unzip(temp, exdir = dir)
+    ## Unzipping if the file is zipped
+
+    if (file_extension == ".zip") {
+      utils::unzip(temp, exdir = dir)
+    }
+
+    if (use_cache) {
+      file_cache_set(cache_key, dir = dir, temp = temp)
+      registered <- TRUE
+    }
   }
 
   ###############
   ## Load Data ##
   ###############
 
+  # A single 1-slot cache for the expensive-to-reparse xlsx reads -- see
+  # parsed_cache_eligible() above. Keyed on exactly the inputs those read
+  # branches consult (path/file_extension/source/sheet/skip_rows), NOT the
+  # full param list: dataset/geo_level must NOT be part of this key, or
+  # every one of SEEG's 6 datasets would miss and the cache would do
+  # nothing for the case it exists for.
+  parsed_key <- list(
+    path = path, file_extension = file_extension, source = source,
+    sheet = param$sheet, skip_rows = param$skip_rows
+  )
+  parsed_eligible <- use_cache && parsed_cache_eligible(source, file_extension)
+  parsed_hit <- parsed_eligible &&
+    !is.null(.dz_download_cache$parsed_key) &&
+    identical(.dz_download_cache$parsed_key, parsed_key)
+
+  if (parsed_hit) {
+    dat <- .dz_download_cache$parsed_val
+  } else {
 
   ##### Exceptions only #####
 
@@ -638,16 +804,21 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
   }
 
+  if (parsed_eligible) {
+    .dz_download_cache$parsed_key <- parsed_key
+    .dz_download_cache$parsed_val <- dat
+  }
 
-
+  } # end parsed_hit / else
 
   ##############################
   ## Excluding Temporary File ##
   ##############################
 
-  # Folder is kept
+  # Folder is kept. The temp file itself is also kept when caching is on --
+  # it is what a later cache hit re-reads/re-extracts from.
 
-  if (!file_extension %in% c(".nc")) {
+  if (!file_extension %in% c(".nc") && !use_cache) {
     unlink(temp)
   }
 

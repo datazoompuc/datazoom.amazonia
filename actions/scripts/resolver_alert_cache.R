@@ -43,7 +43,7 @@
 ## merge loop.                                                   ##
 ## ============================================================ ##
 
-RESOLVER_ALERT_SOURCES <- c("prodes", "epe", "ips")
+RESOLVER_ALERT_SOURCES <- c("prodes", "epe", "ips", "seeg")
 
 ## ============================================================ ##
 ## Schema                                                       ##
