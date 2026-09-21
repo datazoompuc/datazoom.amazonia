@@ -63,5 +63,6 @@ FRAGILITY_SOURCES <- list(
   list(changed_prefix = "prodes", r_path = file.path("R", "prodes.R"), label = "R/prodes.R", treat_fn = "load_prodes()"),
   list(changed_prefix = "baci", r_path = file.path("R", "baci.R"), label = "R/baci.R", treat_fn = "load_baci()"),
   list(changed_prefix = "ips", r_path = file.path("R", "ips.R"), label = "R/ips.R", treat_fn = "load_ips()"),
-  list(changed_prefix = "seeg", r_path = file.path("R", "seeg.R"), label = "R/seeg.R", treat_fn = "load_seeg()")
+  list(changed_prefix = "seeg", r_path = file.path("R", "seeg.R"), label = "R/seeg.R", treat_fn = "load_seeg()"),
+  list(changed_prefix = "aneel", r_path = file.path("R", "aneel.R"), label = "R/aneel.R", treat_fn = "load_aneel()")
 )

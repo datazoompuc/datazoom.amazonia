@@ -43,7 +43,12 @@ tagged_sources <- list(
   list(r_path = file.path(pkg_root, "R", "mapbiomas.R"), label = "R/mapbiomas.R", min_tags = 8),
   list(r_path = file.path(pkg_root, "R", "epe.R"), label = "R/epe.R", min_tags = 3),
   list(r_path = file.path(pkg_root, "R", "prodes.R"), label = "R/prodes.R", min_tags = 4),
-  list(r_path = file.path(pkg_root, "R", "baci.R"), label = "R/baci.R", min_tags = 3)
+  list(r_path = file.path(pkg_root, "R", "baci.R"), label = "R/baci.R", min_tags = 3),
+  # 2026-09-21: dropped from 5 to 4 -- the removed tag covered a dead
+  # as.Date(operation_start, ...) step (never matched a real column in any
+  # of the three aneel datasets, verified live) that was deleted rather
+  # than kept as a tagged-but-inert assumption. See NEWS.md.
+  list(r_path = file.path(pkg_root, "R", "aneel.R"), label = "R/aneel.R", min_tags = 4)
 )
 
 for (src in tagged_sources) {
