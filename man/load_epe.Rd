@@ -20,9 +20,9 @@ Petroleo"), not a synthetic reconstruction; a "tipo"/"type" column
 }}
 
 \item{geo_level}{Geographical level: "state" or "subsystem". Only applies to
-"consumer_energy_consumption" and "industrial_energy_consumption". The manifest also lists
-"region" as a supported level for both datasets, but no sheet is currently mapped for it --
-passing \code{geo_level = "region"} will fail during download, not at validation time.}
+"consumer_energy_consumption" and "industrial_energy_consumption". "region" is not
+currently supported for either dataset -- passing \code{geo_level = "region"} will fail
+during download, not at validation time.}
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 

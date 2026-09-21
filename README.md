@@ -148,6 +148,8 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 
 </table>
 
+> **A note on coverage:** the years, versions and collections listed for each dataset follow what the data provider currently publishes, so they can change as new releases come out. If a `time_period` or `year` you request is not accepted, check the provider's website for the latest coverage, or the package's dataset table at [`datasets_link.csv`](https://github.com/datazoompuc/datazoom.amazonia/blob/master/inst/extdata/manifest/v1/datasets_link.csv).
+
 # Environmental Data
 
 ## PRODES
@@ -1357,11 +1359,7 @@ impacts, fire management
   `"indigenous_land"` row is one collection behind its `"municipality"`
   row – verified live; MapBiomas dropped that sheet from the newer
   file). Don’t assume one row’s collection or year range applies to
-  another row of the same dataset. Check
-  `datasets_link(source = "mapbiomas")` or
-  `inst/extdata/manifest/v1/datasets_link.csv` for the exact collection
-  (`version`) and year range (`available_time`) backing any specific
-  `(dataset, geo_level)` pair.
+  another row of the same dataset.
 
 ------------------------------------------------------------------------
 
@@ -1690,10 +1688,7 @@ The package reads SEEG’s **v13.0** municipal summary workbook
 (`seeg.eco.br`). Categories are organized as `Setor de emissão` /
 `Categoria emissora` / `Sub-categoria emissora` / `Recorte` /
 `Atividade geral`. There is no `time_period` argument – every call
-returns the full series. Exact coverage always tracks the manifest
-(`datasets_link(source = "seeg")` or
-`inst/extdata/manifest/v1/datasets_link.csv`); check there before
-assuming this has changed.
+returns the full series.
 
 ### Detail not included
 
@@ -3064,9 +3059,7 @@ version of the Harmonized System nomenclature.
 - **Coverage**: Bilateral trade flows for 5,000+ products (HS 6-digit
   level)
 - **Countries**: 200+ countries and territories
-- **Time period**: 1995-2024 (current release version `202601`;
-  re-verified live on every scheduled manifest run, not a hardcoded
-  range – see `datasets_link(source = "baci")`)
+- **Time period**: 1995-2024 (current release version `202601`)
 - **Variables**: Trade value (USD), quantity (where available),
   exporter, importer, product code
 - **Use cases**:
@@ -3193,8 +3186,7 @@ available)
 - Product classifications may change over time as the HS is updated
 - `load_baci()` internally downloads a companion Brazilian COMEX
   product-code dictionary (`NCM_SH.csv`) to translate HS codes to
-  product names in Portuguese. Its source is tracked separately in the
-  manifest, under its own `baci_dic` survey.
+  product names in Portuguese.
 
 ### Quality Notes
 

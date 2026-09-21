@@ -153,7 +153,7 @@ Areas affected by wildfires:
 - **1 hectare**: Approximately 2.47 acres
 - **Validation**: MapBiomas uses field validation and visual interpretation to ensure accuracy
 - **Updates**: Historical data may be revised with new collections and improved algorithms
-- **Collections differ across datasets, and even across `geo_level`s of the same dataset.** MapBiomas does not release every dataset on the same collection at the same time, and this package sometimes deliberately pins one `geo_level` behind its siblings when a newer collection is missing a sheet it needs (e.g. `"mapbiomas_mining"`'s `"indigenous_land"` row is one collection behind its `"municipality"` row -- verified live; MapBiomas dropped that sheet from the newer file). Don't assume one row's collection or year range applies to another row of the same dataset. Check `datasets_link(source = "mapbiomas")` or `inst/extdata/manifest/v1/datasets_link.csv` for the exact collection (`version`) and year range (`available_time`) backing any specific `(dataset, geo_level)` pair.
+- **Collections differ across datasets, and even across `geo_level`s of the same dataset.** MapBiomas does not release every dataset on the same collection at the same time, and this package sometimes deliberately pins one `geo_level` behind its siblings when a newer collection is missing a sheet it needs (e.g. `"mapbiomas_mining"`'s `"indigenous_land"` row is one collection behind its `"municipality"` row -- verified live; MapBiomas dropped that sheet from the newer file). Don't assume one row's collection or year range applies to another row of the same dataset.
 
 ***
 

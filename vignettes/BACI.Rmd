@@ -48,8 +48,7 @@ The HS92 classification provides trade data organized under the 1992 version of 
 
 - **Coverage**: Bilateral trade flows for 5,000+ products (HS 6-digit level)
 - **Countries**: 200+ countries and territories
-- **Time period**: 1995-2024 (current release version `202601`; re-verified live on every
-  scheduled manifest run, not a hardcoded range -- see `datasets_link(source = "baci")`)
+- **Time period**: 1995-2024 (current release version `202601`)
 - **Variables**: Trade value (USD), quantity (where available), exporter, importer, product code
 - **Use cases**: 
   - Analyzing trade specialization and comparative advantage
@@ -159,8 +158,7 @@ Each row typically represents a trade flow with:
 - HS 6-digit codes ensure consistency with international standards
 - Product classifications may change over time as the HS is updated
 - `load_baci()` internally downloads a companion Brazilian COMEX product-code dictionary
-  (`NCM_SH.csv`) to translate HS codes to product names in Portuguese. Its source is tracked
-  separately in the manifest, under its own `baci_dic` survey.
+  (`NCM_SH.csv`) to translate HS codes to product names in Portuguese.
 
 ### Quality Notes
 

@@ -10,13 +10,10 @@
 #'   * For dataset "mapbiomas_deforestation_regeneration", can only be "municipality"
 #'   * For dataset "mapbiomas_secondary_vegetation", can only be "municipality"
 #'   * For dataset "mapbiomas_mining", can be "indigenous_land" or "municipality"
-#'   * For dataset "mapbiomas_irrigation" (temporarily unavailable -- the manifest's S3 link
-#'   404s and no equivalent file exists on MapBiomas's Dataverse archive at any collection,
-#'   checked live; see `vignette("MAPBIOMAS")`), can be "state" or "biome"
+#'   * For dataset "mapbiomas_irrigation" (temporarily unavailable -- MapBiomas no longer
+#'   publishes this file; see `vignette("MAPBIOMAS")`), can be "state" or "biome"
 #'   * For dataset "mapbiomas_water", can be "municipality" or "biome" ("state" is currently
-#'   unavailable -- no MapBiomas collection publishes a state-level water sheet upstream, checked
-#'   live; check the manifest, `inst/extdata/manifest/v1/datasets_link.csv`, before assuming this
-#'   has changed)
+#'   unavailable -- no MapBiomas collection publishes a state-level water sheet)
 #'   * For dataset "mapbiomas_fire", can only be "state"
 #'
 #' @return A \code{tibble}.

@@ -104,9 +104,9 @@ epe_energy_state_panel_treat <- function(raw) {
 #'   * "consumer_energy_consumption" and "industrial_energy_consumption" cover 2004-2025
 #'   (monthly).
 #' @param geo_level Geographical level: "state" or "subsystem". Only applies to
-#'   "consumer_energy_consumption" and "industrial_energy_consumption". The manifest also lists
-#'   "region" as a supported level for both datasets, but no sheet is currently mapped for it --
-#'   passing \code{geo_level = "region"} will fail during download, not at validation time.
+#'   "consumer_energy_consumption" and "industrial_energy_consumption". "region" is not
+#'   currently supported for either dataset -- passing \code{geo_level = "region"} will fail
+#'   during download, not at validation time.
 #' @inheritParams load_baci
 #'
 #' @return A \code{list} of tibbles (if \code{raw_data} = \code{TRUE}) or a tibble (if \code{raw_data} = \code{FALSE}).
