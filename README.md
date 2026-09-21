@@ -49,7 +49,9 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 **[1 - Environmental data](#environmental-data)**
 
 <table>
+
 <tr>
+
 <td>
 
 |                       |                                        |
@@ -60,6 +62,7 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 | **[Imazon](#imazon)** | *Deforestation pressure in the Amazon* |
 
 </td>
+
 <td>
 
 |                                   |                                     |
@@ -71,29 +74,37 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 | **[CENSOAGRO](#censoagro)**       | *Agriculture activities*            |
 
 </td>
+
 </tr>
+
 </table>
 
 **[2 - Social data](#social-data)**
 
 <table>
+
 <tr>
+
 <td>
 
-|                               |                                              |
-|-------------------------------|----------------------------------------------|
-| **[IPS](#ips)**               | *Amazon Social Progress Index*               |
-| **[IEMA](#iema)**             | *Access to electricity in the Amazon region* |
-| **[Population](#population)** | *Population*                                 |
+|  |  |
+|----|----|
+| **[IPS](#ips)** | *Amazon Social Progress Index* |
+| **[IEMA](#iema)** | *Access to electricity in the Amazon region* |
+| **[Population](#population)** | *Population* |
 
 </td>
+
 </tr>
+
 </table>
 
 **[3 - Economic data](#economic-data)**
 
 <table>
+
 <tr>
+
 <td>
 
 |                             |                                 |
@@ -105,6 +116,7 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 | **[PAM](#pam)**             | *Agricultural production*       |
 
 </td>
+
 <td>
 
 |                         |                           |
@@ -116,19 +128,23 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 | **[EPE](#epe)**         | *Energy consumption*      |
 
 </td>
+
 </tr>
+
 </table>
 
 **[4 - Other tools](#other-tools)**
 
 <table>
+
 <tr>
+
 <td>
 
-|                                                                 |                                                                             |
-|-----------------------------------------------------------------|-----------------------------------------------------------------------------|
+|  |  |
+|----|----|
 | **[Legal Amazon Municipalities](#legal-amazon-municipalities)** | *Dataset with Brazilian cities and whether they belong to the Legal Amazon* |
-| **[The ‘googledrive’ package](#googledrive)**                   | *Troubleshooting and information for downloads from Google Drive*           |
+| **[The ‘googledrive’ package](#googledrive)** | *Troubleshooting and information for downloads from Google Drive* |
 
 </table>
 
@@ -1434,22 +1450,22 @@ Project](https://www.climatologylab.org/terraclimate.html).
 
 TerraClimate provides 13 main climate and water balance variables:
 
-| Dataset                       | Code | Description                           | Units    |
-|-------------------------------|------|---------------------------------------|----------|
-| max_temperature               | tmax | Maximum 2-m Temperature               | °C       |
-| min_temperature               | tmin | Minimum 2-m Temperature               | °C       |
-| wind_speed                    | ws   | Wind Speed at 10-m                    | m/s      |
-| vapor_pressure_deficit        | vpd  | Vapor Pressure Deficit                | kPa      |
-| vapor_pressure                | vap  | 2-m Vapor Pressure                    | kPa      |
-| snow_water_equivalent         | swe  | Snow Water Equivalent at End of Month | mm       |
-| shortwave_radiation_flux      | srad | Downward Shortwave Radiation Flux     | W/m²     |
-| soil_moisture                 | soil | Soil Moisture at End of Month         | mm       |
-| runoff                        | q    | Runoff                                | mm       |
-| precipitation                 | ppt  | Accumulated Precipitation             | mm       |
-| potential_evaporation         | pet  | Reference Evapotranspiration          | mm       |
-| climatic_water_deficit        | def  | Climatic Water Deficit                | mm       |
-| water_evaporation             | aet  | Actual Evapotranspiration             | mm       |
-| palmer_drought_severity_index | PDSI | Palmer Drought Severity Index         | unitless |
+| Dataset | Code | Description | Units |
+|----|----|----|----|
+| max_temperature | tmax | Maximum 2-m Temperature | °C |
+| min_temperature | tmin | Minimum 2-m Temperature | °C |
+| wind_speed | ws | Wind Speed at 10-m | m/s |
+| vapor_pressure_deficit | vpd | Vapor Pressure Deficit | kPa |
+| vapor_pressure | vap | 2-m Vapor Pressure | kPa |
+| snow_water_equivalent | swe | Snow Water Equivalent at End of Month | mm |
+| shortwave_radiation_flux | srad | Downward Shortwave Radiation Flux | W/m² |
+| soil_moisture | soil | Soil Moisture at End of Month | mm |
+| runoff | q | Runoff | mm |
+| precipitation | ppt | Accumulated Precipitation | mm |
+| potential_evaporation | pet | Reference Evapotranspiration | mm |
+| climatic_water_deficit | def | Climatic Water Deficit | mm |
+| water_evaporation | aet | Actual Evapotranspiration | mm |
+| palmer_drought_severity_index | PDSI | Palmer Drought Severity Index | unitless |
 
 ------------------------------------------------------------------------
 
@@ -1759,11 +1775,11 @@ category combination and year, with a single `value` (eng) / `Valor`
 (pt) column. The columns available depend on `geo_level` and on which
 4th categorical dimension that sector carries:
 
-| geo_level    | eng columns                                                                                                                       | pt columns                                                                                                                          |
-|--------------|-----------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| geo_level | eng columns | pt columns |
+|----|----|----|
 | municipality | year, city, state, ibge, sector, emission_category, emission_subcategory, **\<4th dim\>**, general_activity, emission_type, value | Ano, municipio, estado, ibge, setor, categoria_emissao, subcategoria_emissao, **\<4th dim\>**, atividade_geral, tipo_emissao, Valor |
-| state        | (drops city, ibge)                                                                                                                | (drops municipio, ibge)                                                                                                             |
-| country      | (also drops state)                                                                                                                | (also drops estado)                                                                                                                 |
+| state | (drops city, ibge) | (drops municipio, ibge) |
+| country | (also drops state) | (also drops estado) |
 
 The 4th dimension’s name (and whether it is translated in `pt`) differs
 by sector:
@@ -2123,18 +2139,18 @@ geo_level = "state"  # character string
 
 Defines which year(s) to download. Availability varies by dataset:
 
-| Dataset                           | Available Years                                              |
-|-----------------------------------|--------------------------------------------------------------|
-| `agricultural_land_area`          | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006` |
-| `agricultural_area_use`           | `1970, 1975, 1980, 1985, 1995, 2006`                         |
-| `agricultural_employees_tractors` | `1970, 1975, 1980, 1985, 1995, 2006`                         |
+| Dataset | Available Years |
+|----|----|
+| `agricultural_land_area` | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006` |
+| `agricultural_area_use` | `1970, 1975, 1980, 1985, 1995, 2006` |
+| `agricultural_employees_tractors` | `1970, 1975, 1980, 1985, 1995, 2006` |
 | `agricultural_producer_condition` | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006` |
-| `animal_production`               | `1970, 1975, 1980, 1985, 1995, 2006`                         |
-| `animal_products`                 | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006` |
-| `vegetable_production_area`       | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006` |
-| `vegetable_production_temporary`  | `1970, 1975, 1980, 1985, 1995, 2006`                         |
-| `vegetable_production_permanent`  | `1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006`       |
-| `livestock_production`            | `2017` (municipality only)                                   |
+| `animal_production` | `1970, 1975, 1980, 1985, 1995, 2006` |
+| `animal_products` | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006` |
+| `vegetable_production_area` | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006` |
+| `vegetable_production_temporary` | `1970, 1975, 1980, 1985, 1995, 2006` |
+| `vegetable_production_permanent` | `1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006` |
+| `livestock_production` | `2017` (municipality only) |
 
 You can request a single year or a range of years:
 
@@ -3571,7 +3587,9 @@ the original databases and their narrower subsets. Note that downloading
 only specific crops is considerably faster.
 
 <details>
+
 <summary>
+
 Full datasets provided by IBGE:
 </summary>
 
@@ -3586,93 +3604,99 @@ Full datasets provided by IBGE:
 | beans           |
 
 </details>
+
 <details>
+
 <summary>
+
 Datasets generated from Temporary Crops:
 </summary>
 
-| dataset            |          Name (pt)           |          Name (eng)           |
-|:-------------------|:----------------------------:|:-----------------------------:|
-| total_temporary    |            Total             |             Total             |
-| abacaxi            |           Abacaxi            |           Pineapple           |
-| alfafa             |        Alfafa Fenada         |         Alfafa Fenada         |
-| alho               |             Alho             |            Garlic             |
-| algodao_herbaceo   | Algodao Herbaceo (em Caroco) | Herbaceous Cotton (in Caroco) |
-| amendoim_temporary |     Amendoim (em Casca)      |      Peanuts (in Shell)       |
-| arroz              |       Arroz (em Casca)       |        Rice (in husk)         |
-| aveia              |       Aveia (em Grao)        |        Oats (in grain)        |
-| batata_doce        |         Batata Doce          |         Sweet potato          |
-| batata_inglesa     |        Batata Inglesa        |        English potato         |
-| cana_de_acucar     |        Cana de Acucar        |          Sugar cane           |
-| cana_para_forragem |      Cana para Forragem      |          Forage cane          |
-| castor_bean        |        Mamona (Baga)         |      Castor bean (Berry)      |
-| cebola             |            Cebola            |             Onion             |
-| cevada             |       Cevada (em Grao)       |       Barley (in Grain)       |
-| ervilha            |      Ervilha (em Grao)       |        Pea (in Grain)         |
-| fava               |        Fava (em Grao)        |     Broad Bean (in Grain)     |
-| feijao_temporary   |       Feijao (em Grao)       |       Beans (in Grain)        |
-| fumo               |       Fumo (em Folha)        |       Smoke (in Sheet)        |
-| girassol_sementes  |      Girassol (em Grao)      |     Sunflower (in Grain)      |
-| juta_fibra         |         Juta (Fibra)         |         Jute (Fiber)          |
-| linho_sementes     |       Linho (Semente)        |         Linen (Seed)          |
-| malva_fibra        |        Malva (Fibra)         |         Malva (Fiber)         |
-| mandioca           |           Mandioca           |            Cassava            |
-| melancia           |           Melancia           |          watermelon           |
-| melao              |            Melao             |             Melon             |
-| milho_temporary    |       Milho (em Grao)        |        corn (in grain)        |
-| rami_fibra         |         Rami (Fibra)         |         Ramie (Fiber)         |
-| rye                |      Centeio (em Grao)       |        Rye (in grain)         |
-| soja               |        Soja (em Grao)        |      Soybean (in grain)       |
-| sorgo              |       Sorgo (em Grao)        |      Sorghum (in Grain)       |
-| tomate             |            Tomate            |            Tomato             |
-| trigo              |       Trigo (em Grao)        |        Wheat in grain)        |
-| triticale          |     Triticale (em Grao)      |     Triticale (in grain)      |
+| dataset | Name (pt) | Name (eng) |
+|:---|:--:|:--:|
+| total_temporary | Total | Total |
+| abacaxi | Abacaxi | Pineapple |
+| alfafa | Alfafa Fenada | Alfafa Fenada |
+| alho | Alho | Garlic |
+| algodao_herbaceo | Algodao Herbaceo (em Caroco) | Herbaceous Cotton (in Caroco) |
+| amendoim_temporary | Amendoim (em Casca) | Peanuts (in Shell) |
+| arroz | Arroz (em Casca) | Rice (in husk) |
+| aveia | Aveia (em Grao) | Oats (in grain) |
+| batata_doce | Batata Doce | Sweet potato |
+| batata_inglesa | Batata Inglesa | English potato |
+| cana_de_acucar | Cana de Acucar | Sugar cane |
+| cana_para_forragem | Cana para Forragem | Forage cane |
+| castor_bean | Mamona (Baga) | Castor bean (Berry) |
+| cebola | Cebola | Onion |
+| cevada | Cevada (em Grao) | Barley (in Grain) |
+| ervilha | Ervilha (em Grao) | Pea (in Grain) |
+| fava | Fava (em Grao) | Broad Bean (in Grain) |
+| feijao_temporary | Feijao (em Grao) | Beans (in Grain) |
+| fumo | Fumo (em Folha) | Smoke (in Sheet) |
+| girassol_sementes | Girassol (em Grao) | Sunflower (in Grain) |
+| juta_fibra | Juta (Fibra) | Jute (Fiber) |
+| linho_sementes | Linho (Semente) | Linen (Seed) |
+| malva_fibra | Malva (Fibra) | Malva (Fiber) |
+| mandioca | Mandioca | Cassava |
+| melancia | Melancia | watermelon |
+| melao | Melao | Melon |
+| milho_temporary | Milho (em Grao) | corn (in grain) |
+| rami_fibra | Rami (Fibra) | Ramie (Fiber) |
+| rye | Centeio (em Grao) | Rye (in grain) |
+| soja | Soja (em Grao) | Soybean (in grain) |
+| sorgo | Sorgo (em Grao) | Sorghum (in Grain) |
+| tomate | Tomate | Tomato |
+| trigo | Trigo (em Grao) | Wheat in grain) |
+| triticale | Triticale (em Grao) | Triticale (in grain) |
 
 </details>
+
 <details>
+
 <summary>
+
 Datasets generated from Permanent Crops:
 </summary>
 
-| dataset                 |          Name (pt)          |         Name (eng)         |
-|:------------------------|:---------------------------:|:--------------------------:|
-| acai                    |            Acai             |            Acai            |
-| annatto_seeds           |      Urucum (Semente)       |       Annatto (Seed)       |
-| apple                   |            Maca             |           Apple            |
-| avocado                 |           Abacate           |          Avocado           |
-| banana                  |       Banana (Cacho)        |       Banana (Bunch)       |
-| black_pepper            |      Pimenta do Reino       |        Black pepper        |
-| cashew                  |            Caju             |           Cashew           |
-| cashew_nut              |      Castanha de Caju       |        Cashew Nuts         |
-| cocoa_beans             |     Cacau (em Amendoa)      |     Cocoa (in Almonds)     |
-| coffee_arabica          |   Cafe (em Grao) Arabica    |   Cafe (in Grao) Arabica   |
-| coffee_canephora        |  Cafe (em Grao) Canephora   | Cafe (in Grain) Canephora  |
-| coffee_total            |    Cafe (em Grao) Total     |  Coffee (in Grain) Total   |
-| coconut                 |        Coco da Baia         |          Coconut           |
-| coconut_bunch           |    Dende (Cacho de Coco)    |       Coconut Bunch        |
-| cotton_arboreo          | Algodao Arboreo (em Caroco) | Arboreo cotton (in Caroco) |
-| fig                     |            Figo             |            Fig             |
-| grape                   |             Uva             |           Grape            |
-| guarana_seeds           |      Guarana (Semente)      |       Guarana (Seed)       |
-| guava                   |           Goiaba            |           Guava            |
-| heart_of_palm           |           Palmito           |         Palm heart         |
-| india_tea               | Cha da India (Folha Verde)  |      India Tea (Leaf)      |
-| khaki                   |            Caqui            |           Khaki            |
-| lemon                   |            Limao            |           Lemon            |
-| mango                   |            Manga            |           Mango            |
-| papaya                  |            Mamao            |           Papaya           |
-| passion_fruit           |          Maracuja           |       Passion fruit        |
-| peach                   |           Pessego           |           Peach            |
-| pear                    |            Pera             |            Pear            |
-| permanent_total         |            Total            |           Total            |
-| quince                  |           Marmelo           |           Quince           |
-| rubber_coagulated_latex | Borracha (Latex Coagulado)  | Rubber (Coagulated Latex)  |
-| rubber_liquid_latex     |  Borracha (Latex Liquido)   |   Rubber (Liquid Latex)    |
-| sisal_or_agave          |   Sisal ou Agave (Fibra)    |   Sisal or Agave (Fiber)   |
-| tangerine               |          Tangerina          |         Tangerine          |
-| tung                    |     Tungue (Fruto Seco)     |      Tung (Dry Fruit)      |
-| walnut                  |      Noz (Fruto Seco)       |     Walnut (Dry Fruit)     |
-| yerba_mate              |   Erva Mate (Folha Verde)   |      Mate Herb (Leaf)      |
+| dataset | Name (pt) | Name (eng) |
+|:---|:--:|:--:|
+| acai | Acai | Acai |
+| annatto_seeds | Urucum (Semente) | Annatto (Seed) |
+| apple | Maca | Apple |
+| avocado | Abacate | Avocado |
+| banana | Banana (Cacho) | Banana (Bunch) |
+| black_pepper | Pimenta do Reino | Black pepper |
+| cashew | Caju | Cashew |
+| cashew_nut | Castanha de Caju | Cashew Nuts |
+| cocoa_beans | Cacau (em Amendoa) | Cocoa (in Almonds) |
+| coffee_arabica | Cafe (em Grao) Arabica | Cafe (in Grao) Arabica |
+| coffee_canephora | Cafe (em Grao) Canephora | Cafe (in Grain) Canephora |
+| coffee_total | Cafe (em Grao) Total | Coffee (in Grain) Total |
+| coconut | Coco da Baia | Coconut |
+| coconut_bunch | Dende (Cacho de Coco) | Coconut Bunch |
+| cotton_arboreo | Algodao Arboreo (em Caroco) | Arboreo cotton (in Caroco) |
+| fig | Figo | Fig |
+| grape | Uva | Grape |
+| guarana_seeds | Guarana (Semente) | Guarana (Seed) |
+| guava | Goiaba | Guava |
+| heart_of_palm | Palmito | Palm heart |
+| india_tea | Cha da India (Folha Verde) | India Tea (Leaf) |
+| khaki | Caqui | Khaki |
+| lemon | Limao | Lemon |
+| mango | Manga | Mango |
+| papaya | Mamao | Papaya |
+| passion_fruit | Maracuja | Passion fruit |
+| peach | Pessego | Peach |
+| pear | Pera | Pear |
+| permanent_total | Total | Total |
+| quince | Marmelo | Quince |
+| rubber_coagulated_latex | Borracha (Latex Coagulado) | Rubber (Coagulated Latex) |
+| rubber_liquid_latex | Borracha (Latex Liquido) | Rubber (Liquid Latex) |
+| sisal_or_agave | Sisal ou Agave (Fibra) | Sisal or Agave (Fiber) |
+| tangerine | Tangerina | Tangerine |
+| tung | Tungue (Fruto Seco) | Tung (Dry Fruit) |
+| walnut | Noz (Fruto Seco) | Walnut (Dry Fruit) |
+| yerba_mate | Erva Mate (Folha Verde) | Mate Herb (Leaf) |
 
 </details>
 
