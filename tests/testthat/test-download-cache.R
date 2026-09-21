@@ -175,12 +175,13 @@ test_that("external_download() caches an aneel download too -- the file-level ca
   clear_download_cache()
   withr::local_options(datazoom.amazonia.cache = TRUE)
 
-  # Real ANEEL CDE files are ";"-delimited, quoted fields (verified live) --
-  # matching that shape here avoids the decimal comma in "1,00" being
-  # misread as a field separator.
+  # Real ANEEL CDE files are ";"-delimited, quoted fields (verified live).
+  # The value column is plain text on purpose: newer data.table versions
+  # auto-detect a decimal comma under ";" and would parse "1,00" as the
+  # number 1, making the assertion below depend on the installed version.
   fixture_dir <- withr::local_tempdir()
   fixture <- file.path(fixture_dir, "fixture.csv")
-  writeLines(c('"NomAgente";"VlrDesconto"', '"A";"1,00"'), fixture)
+  writeLines(c('"NomAgente";"VlrDesconto"', '"A";"ORIGINAL"'), fixture)
   fixture_url <- paste0("file://", fixture)
 
   testthat::local_mocked_bindings(dataset_url = function(...) fixture_url)
@@ -190,10 +191,10 @@ test_that("external_download() caches an aneel download too -- the file-level ca
   # Mutate the source after the first call -- if the cache is working, the
   # second call must NOT see this change (same proof pattern as the .csv
   # end-to-end test above).
-  writeLines(c('"NomAgente";"VlrDesconto"', '"A";"999,00"'), fixture)
+  writeLines(c('"NomAgente";"VlrDesconto"', '"A";"CHANGED"'), fixture)
 
   dat2 <- external_download(source = "aneel", dataset = "energy_development_budget", year = 2023)
 
   expect_equal(dat1, dat2)
-  expect_equal(as.character(dat1$VlrDesconto), "1,00")
+  expect_equal(as.character(dat1$VlrDesconto), "ORIGINAL")
 })
