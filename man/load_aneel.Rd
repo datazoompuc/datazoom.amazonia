@@ -13,7 +13,10 @@ load_aneel(dataset, raw_data = FALSE, language = "eng", year = NULL)
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.}
 
-\item{year}{A numeric value or vector of years (2017-2022).
+\item{year}{A numeric value or vector of years (2017-2024; tracks the manifest's
+\code{available_time} for "energy_development_budget" -- see
+\code{inst/extdata/manifest/v1/datasets_link.csv} -- and widens automatically as ANEEL
+publishes new years, so re-check this range here if it goes stale again).
 Required for the "energy_development_budget" dataset.
 Ignored for the other datasets.}
 }

@@ -37,7 +37,7 @@
 #'   time_period = 2020,
 #'   language = "eng"
 #' )
-
+#'
 #' @importFrom rlang :=
 #'
 #' @export

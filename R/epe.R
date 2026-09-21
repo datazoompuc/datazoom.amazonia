@@ -1,30 +1,3 @@
-#' @title EPE
-#'
-#' @description Electrical Energy Monthly Consumption per Class or Industrial Sector
-#'
-#' @param dataset Dataset name: "consumer_energy_consumption", "industrial_energy_consumption", "national_energy_balance", or "energy_state_panel"
-#' @param geo_level Geographical level: "state" or "subsystem". Only applies to consumer or industrial datasets.
-#' @inheritParams load_baci
-#'
-#' @return A \code{list} of tibbles (if \code{raw_data} = \code{TRUE}) or a tibble (if \code{raw_data} = \code{FALSE}).
-#'
-#' @examplesIf interactive()
-#' ### DO NOT RUN ###
-#' # download treated (raw_data = FALSE) data about
-#' # consumer energy consumption (dataset = "consumer_energy_consumption")
-#' # at the state level (geo_level = "state")
-#' data <- load_epe(
-#'   dataset = "consumer_energy_consumption",
-#'   geo_level = "state",
-#'   raw_data = FALSE
-#' )
-#' # download treated (raw_data = FALSE) data
-#' # from the National Energy Balance (dataset = "national_energy_balance")
-#' balance <- load_epe(
-#'   dataset = "national_energy_balance",
-#'   raw_data = FALSE
-#' )
-#'
 #' @noRd
 epe_energy_state_panel_treat <- function(raw) {
   # Extracted out of load_epe() so it can be unit-tested against a small
@@ -51,23 +24,26 @@ epe_energy_state_panel_treat <- function(raw) {
   # actual values). A user's load_epe() call breaks with a clear error the
   # moment EPE adds/renames a fonte; a PR reviewer merging the resolver's
   # auto-refresh has no earlier signal that this map needs a matching edit.
+  # Keys are ASCII  escapes of the source's real pt-BR fonte labels (CRAN
+  # requires portable packages to use only ASCII characters in R code); see
+  # the comment values below for the literal accented spelling each maps.
   fonte_map <- c(
-    "Geração total"              = "total_produzido",
-    "Hidro"                      = "hidro",
-    "Eólica"                     = "eolica",
-    "Solar"                      = "solar",
-    "Nuclear"                    = "nuclear",
-    "Termo"                      = "termo",
-    "Bagaço de cana"             = "cana",
-    "Lenha"                      = "lenha",
-    "Lixívia"                    = "lixivia",
-    "Out. Fontes renováveis"     = "outras_fontes_renovaveis",
-    "Carvão vapor"               = "carvao_vapor",
-    "Gás natural"                = "gas_natural",
-    "Gás de coqueria"            = "gas_de_coqueira",
-    "Óleo combustível"           = "combustivel",
-    "Óleo diesel"                = "diesel",
-    "Out. Fontes não renováveis" = "outras_fontes_nao_renovaveis"
+    "Gera\u00e7\u00e3o total"              = "total_produzido", # "Geracao total"
+    "Hidro"                                  = "hidro",
+    "E\u00f3lica"                           = "eolica", # "Eolica"
+    "Solar"                                  = "solar",
+    "Nuclear"                                = "nuclear",
+    "Termo"                                  = "termo",
+    "Baga\u00e7o de cana"                   = "cana", # "Bagaco de cana"
+    "Lenha"                                  = "lenha",
+    "Lix\u00edvia"                          = "lixivia", # "Lixivia"
+    "Out. Fontes renov\u00e1veis"           = "outras_fontes_renovaveis", # "Out. Fontes renovaveis"
+    "Carv\u00e3o vapor"                     = "carvao_vapor", # "Carvao vapor"
+    "G\u00e1s natural"                      = "gas_natural", # "Gas natural"
+    "G\u00e1s de coqueria"                  = "gas_de_coqueira", # "Gas de coqueria"
+    "\u00d3leo combust\u00edvel"           = "combustivel", # "Oleo combustivel"
+    "\u00d3leo diesel"                      = "diesel", # "Oleo diesel"
+    "Out. Fontes n\u00e3o renov\u00e1veis" = "outras_fontes_nao_renovaveis" # "Out. Fontes nao renovaveis"
   )
 
   unmapped <- setdiff(unique(raw$fonte), names(fonte_map))
@@ -114,6 +90,50 @@ epe_energy_state_panel_treat <- function(raw) {
     dplyr::mutate(dplyr::across(-c(uf, amz_legal), as.numeric))
 }
 
+#' @title EPE
+#'
+#' @description Electrical Energy Monthly Consumption per Class or Industrial Sector
+#'
+#' @param dataset Dataset name: "consumer_energy_consumption", "industrial_energy_consumption",
+#'   "national_energy_balance", or "energy_state_panel".
+#'   * "national_energy_balance" covers 1970-2025 (yearly), reading EPE's consolidated BEN
+#'   dashboard table -- account labels are the source's own wording (e.g. "Refinarias de
+#'   Petroleo"), not a synthetic reconstruction; a "tipo"/"type" column
+#'   (Fontes de Energia Primaria/Secundaria/Total) is included.
+#'   * "energy_state_panel" covers 2011-2025 (yearly), one row per state.
+#'   * "consumer_energy_consumption" and "industrial_energy_consumption" cover 2004-2025
+#'   (monthly).
+#' @param geo_level Geographical level: "state" or "subsystem". Only applies to
+#'   "consumer_energy_consumption" and "industrial_energy_consumption". The manifest also lists
+#'   "region" as a supported level for both datasets, but no sheet is currently mapped for it --
+#'   passing \code{geo_level = "region"} will fail during download, not at validation time.
+#' @inheritParams load_baci
+#'
+#' @return A \code{list} of tibbles (if \code{raw_data} = \code{TRUE}) or a tibble (if \code{raw_data} = \code{FALSE}).
+#'
+#' @examplesIf interactive()
+#' ### DO NOT RUN ###
+#' # download treated (raw_data = FALSE) data about
+#' # consumer energy consumption (dataset = "consumer_energy_consumption")
+#' # at the state level (geo_level = "state")
+#' data <- load_epe(
+#'   dataset = "consumer_energy_consumption",
+#'   geo_level = "state",
+#'   raw_data = FALSE
+#' )
+#' # download treated (raw_data = FALSE) data
+#' # from the National Energy Balance (dataset = "national_energy_balance")
+#' balance <- load_epe(
+#'   dataset = "national_energy_balance",
+#'   raw_data = FALSE
+#' )
+#' # download treated (raw_data = FALSE) data
+#' # from the State Energy Production Panel (dataset = "energy_state_panel")
+#' panel <- load_epe(
+#'   dataset = "energy_state_panel",
+#'   raw_data = FALSE
+#' )
+#'
 #' @export
 load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = "eng") {
   ##############################

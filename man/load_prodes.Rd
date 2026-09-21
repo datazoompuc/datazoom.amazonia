@@ -18,9 +18,10 @@ load_prodes(
 
 \item{time_period}{A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.
 \itemize{
-\item Between 2007 - 2023 for dataset "deforestation". Deforestation for 2007 includes all cumulative deforestation up to 2007. For other years, deforestation is incremental
-\item Between 2010 - 2023 for dataset "residual_deforestation"
-\item Only 2023 for all other datasets
+\item Between 2007 - 2025 for dataset "deforestation". Deforestation for 2007 includes all cumulative deforestation up to 2007. For other years, deforestation is incremental
+\item Between 2010 - 2025 for dataset "residual_deforestation"
+\item Only 2025 for all other datasets
+(these ranges track the manifest's available_time -- see inst/extdata/manifest/v1/datasets_link.csv -- and move forward every time resolve_prodes.R picks up a new PRODES release; re-check them here if this doc goes stale again)
 }}
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.}

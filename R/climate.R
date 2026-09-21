@@ -24,6 +24,8 @@
 #'   legal_amazon_only = TRUE,
 #'   language = "eng"
 #' )
+#'
+#' @export
 
 load_climate <- function(dataset, raw_data = FALSE,
                          time_period,

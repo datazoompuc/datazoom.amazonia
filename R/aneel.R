@@ -3,7 +3,10 @@
 #' @description National Electric Energy Agency - ANEEL
 #'
 #' @param dataset A dataset name ("energy_development_budget", "energy_generation" or "energy_enterprises_distributed")
-#' @param year A numeric value or vector of years (2017-2022).
+#' @param year A numeric value or vector of years (2017-2024; tracks the manifest's
+#'   \code{available_time} for "energy_development_budget" -- see
+#'   \code{inst/extdata/manifest/v1/datasets_link.csv} -- and widens automatically as ANEEL
+#'   publishes new years, so re-check this range here if it goes stale again).
 #'   Required for the "energy_development_budget" dataset.
 #'   Ignored for the other datasets.
 #' @inheritParams load_baci

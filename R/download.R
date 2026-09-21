@@ -380,6 +380,13 @@ perform_download <- function(path, temp, download_method, source, quiet = TRUE) 
     utils::download.file(url = path, destfile = temp, mode = "wb")
   }
   if (download_method == "curl") {
+    # This function's own caller (external_download()) already restores
+    # every option it touches on exit, but perform_download() shouldn't
+    # depend on that to stay behavior-preserving on its own -- guard locally
+    # too, in case this is ever called directly (as the tests' mocking seam
+    # does) without that caller's on.exit() wrapping it.
+    old_options <- options()[c("download.file.method", "download.file.extra")]
+    on.exit(options(old_options), add = TRUE)
     if (source == "deter") {
       options(download.file.method = "curl", download.file.extra = "-L")
     }

@@ -20,7 +20,7 @@ As for now, there are four different datasets available for download: Consumer E
 
 #### Consumer Energy Consumption
 
-The Consumer Energy Consumption dataset provides monthly data from 2004 to 2025 about energy consumption and number of consumers. The data is organized by State, Region, or Electric Subsystem, and is broken down by class of service and type of consumer.
+The Consumer Energy Consumption dataset provides monthly data from 2004 to 2025 about energy consumption and number of consumers. The source workbook organizes the data by State, Region, or Electric Subsystem, but this package currently reads only the State and Subsystem levels (see **geo_level** below); the data is broken down by class of service and type of consumer.
 
 The available classes are: Residential, Commercial, Industrial, Rural, and Others. For each observation, the dataset reports the type of consumer (Captive or Free), total consumption in megawatt-hours (MWh), and the number of consumers.
 
@@ -34,14 +34,25 @@ The Industrial Energy Consumption dataset provides monthly data from 2004 to 202
 
 The National Energy Balance is a thorough and extensive research developed and published by EPE that contains useful data about energy production, consumption, imports, exports, transformation, and final use.
 
-The processed dataset provides yearly data from 2003 to 2023. It covers all Brazilian energy sources (such as petróleo, gás natural, carvão, eletricidade, lenha, solar and others) and distinguishes between different types of energy flow: production, transformation, final consumption, losses, and adjustments.
+The processed dataset provides yearly data from **1970 to 2025**, read from EPE's consolidated BEN
+dashboard table rather than the old one-sheet-per-year workbook. It covers all Brazilian energy
+sources (such as petróleo, gás natural, carvão, eletricidade, lenha, solar and others) and
+distinguishes between different types of energy flow: production, transformation, final
+consumption, losses, and adjustments.
 
-Each energy source appears as a separate column in the original spreadsheets. The cleaned data is returned in long format, with one row per combination of year, energy source, and account type. The account type is labeled to indicate whether it refers to production, transformation (for example, “TRANSFORMAÇÃO – REFINARIAS DE PETRÓLEO”), or consumption (for example, “CONSUMO – RESIDENCIAL”).
+The cleaned data is returned in long format, with one row per combination of year, account,
+energy source (`fonte`/`source`), and a `tipo`/`type` column (Fontes de Energia
+Primária/Secundária/Total) the old one-sheet-per-year workbook never exposed. Account labels are
+the source's own wording (for example, "Refinarias de Petróleo" or "Residencial"), not a
+synthetic uppercase reconstruction like the old data used
+("TRANSFORMAÇÃO – REFINARIAS DE PETRÓLEO"). **This is a breaking change** from earlier package
+versions: `raw_data = TRUE` now returns one already-tidy table instead of one table per year, and
+account labels have changed wording.
 
 
 #### State Energy Production Panel
 
-The State Energy Production Panel provides yearly data from 2011 to 2024 on electricity
+The State Energy Production Panel provides yearly data from **2011 to 2025** on electricity
 generation by energy source and Brazilian state. The data is sourced from EPE's BEN Chapter 8
 (Dados Estaduais) and covers all 27 states, including the Federal District.
 
@@ -64,9 +75,12 @@ production, and an indicator of whether the state belongs to the Legal Amazon.
     `TRUE`: if you want the data as it is originally.  
     `FALSE`: if you want the treated version of the data.
 
-3.  **geo_level**: only applies to `"consumer_energy_consumption"` and `"industrial_energy_consumption"` datasets.  
-    `"state"`  
+3.  **geo_level**: only applies to `"consumer_energy_consumption"` and `"industrial_energy_consumption"` datasets.
+    `"state"`
     `"subsystem"`
+    `"region"` is also listed as a supported level by the source, but no sheet is currently mapped
+    for it in this package -- passing `geo_level = "region"` will fail during download rather than
+    at parameter validation. Use `"state"` or `"subsystem"`.
 
 4.  **language**: you can choose between Portuguese `("pt")` and English `("eng")`
 

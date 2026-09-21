@@ -2,7 +2,12 @@
 #'
 #' @description Loads data of estimates of emission of greenhouse gases
 #'
-#' @param dataset A dataset name ("seeg", seeg_farming", "seeg_industry", "seeg_energy", "seeg_land", "seeg_residuals"). On which "seeg" contains all five sectors (only works with raw_data = TRUE) and the others are filtered specifically by a main source of emission.
+#' @param dataset A dataset name ("seeg", "seeg_farming", "seeg_industry", "seeg_energy",
+#'   "seeg_land", "seeg_residuals"). "seeg" contains all five sectors and only works with
+#'   \code{raw_data = TRUE}; each \code{seeg_*} sector dataset only works with
+#'   \code{raw_data = FALSE} (the reverse constraint) and is filtered to that sector's own
+#'   emissions. Covers 1970-2024 (SEEG v13.0); there is no \code{time_period} argument -- every
+#'   call returns the full series.
 #' @inheritParams load_baci
 #' @param geo_level A \code{string} that defines the geographic level of the data. Can be one of "country", "state" or "municipality".
 #'

@@ -7,9 +7,22 @@
 load_epe(dataset, geo_level = "state", raw_data = FALSE, language = "eng")
 }
 \arguments{
-\item{dataset}{Dataset name: "consumer_energy_consumption", "industrial_energy_consumption", "national_energy_balance", or "energy_state_panel"}
+\item{dataset}{Dataset name: "consumer_energy_consumption", "industrial_energy_consumption",
+"national_energy_balance", or "energy_state_panel".
+\itemize{
+\item "national_energy_balance" covers 1970-2025 (yearly), reading EPE's consolidated BEN
+dashboard table -- account labels are the source's own wording (e.g. "Refinarias de
+Petroleo"), not a synthetic reconstruction; a "tipo"/"type" column
+(Fontes de Energia Primaria/Secundaria/Total) is included.
+\item "energy_state_panel" covers 2011-2025 (yearly), one row per state.
+\item "consumer_energy_consumption" and "industrial_energy_consumption" cover 2004-2025
+(monthly).
+}}
 
-\item{geo_level}{Geographical level: "state" or "subsystem". Only applies to consumer or industrial datasets.}
+\item{geo_level}{Geographical level: "state" or "subsystem". Only applies to
+"consumer_energy_consumption" and "industrial_energy_consumption". The manifest also lists
+"region" as a supported level for both datasets, but no sheet is currently mapped for it --
+passing \code{geo_level = "region"} will fail during download, not at validation time.}
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
@@ -36,6 +49,12 @@ data <- load_epe(
 # from the National Energy Balance (dataset = "national_energy_balance")
 balance <- load_epe(
   dataset = "national_energy_balance",
+  raw_data = FALSE
+)
+# download treated (raw_data = FALSE) data
+# from the State Energy Production Panel (dataset = "energy_state_panel")
+panel <- load_epe(
+  dataset = "energy_state_panel",
   raw_data = FALSE
 )
 \dontshow{\}) # examplesIf}

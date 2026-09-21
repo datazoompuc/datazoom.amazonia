@@ -23,8 +23,13 @@ load_mapbiomas(
 \item For dataset "mapbiomas_deforestation_regeneration", can only be "municipality"
 \item For dataset "mapbiomas_secondary_vegetation", can only be "municipality"
 \item For dataset "mapbiomas_mining", can be "indigenous_land" or "municipality"
-\item For dataset "mapbiomas_irrigation" (temporarily unavailable, a new collection will be soon delivered), can be "state" or "biome"
-\item For dataset "mapbiomas_water", can be "municipality" or "biome" ("state" is currently unavailable -- the upstream source link is dead; check the manifest, \code{inst/extdata/manifest/v1/datasets_link.csv}, before assuming this has changed)
+\item For dataset "mapbiomas_irrigation" (temporarily unavailable -- the manifest's S3 link
+404s and no equivalent file exists on MapBiomas's Dataverse archive at any collection,
+checked live; see \code{vignette("MAPBIOMAS")}), can be "state" or "biome"
+\item For dataset "mapbiomas_water", can be "municipality" or "biome" ("state" is currently
+unavailable -- no MapBiomas collection publishes a state-level water sheet upstream, checked
+live; check the manifest, \code{inst/extdata/manifest/v1/datasets_link.csv}, before assuming this
+has changed)
 \item For dataset "mapbiomas_fire", can only be "state"
 }}
 

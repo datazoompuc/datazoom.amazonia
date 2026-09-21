@@ -14,10 +14,10 @@
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
-^R/zzz\\.R$
 ^logo\.png$
 ^data-raw/geo_municipalities\.rds$
 ^cran-comments\.md$
 ^CRAN-SUBMISSION$
 ^revdep$
 ^actions$
+^\.claude$

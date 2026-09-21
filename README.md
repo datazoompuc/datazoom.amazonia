@@ -49,9 +49,7 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 **[1 - Environmental data](#environmental-data)**
 
 <table>
-
 <tr>
-
 <td>
 
 |                       |                                        |
@@ -62,7 +60,6 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 | **[Imazon](#imazon)** | *Deforestation pressure in the Amazon* |
 
 </td>
-
 <td>
 
 |                                   |                                     |
@@ -74,37 +71,29 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 | **[CENSOAGRO](#censoagro)**       | *Agriculture activities*            |
 
 </td>
-
 </tr>
-
 </table>
 
 **[2 - Social data](#social-data)**
 
 <table>
-
 <tr>
-
 <td>
 
-|  |  |
-|----|----|
-| **[IPS](#ips)** | *Amazon Social Progress Index* |
-| **[IEMA](#iema)** | *Access to electricity in the Amazon region* |
-| **[Population](#population)** | *Population* |
+|                               |                                              |
+|-------------------------------|----------------------------------------------|
+| **[IPS](#ips)**               | *Amazon Social Progress Index*               |
+| **[IEMA](#iema)**             | *Access to electricity in the Amazon region* |
+| **[Population](#population)** | *Population*                                 |
 
 </td>
-
 </tr>
-
 </table>
 
 **[3 - Economic data](#economic-data)**
 
 <table>
-
 <tr>
-
 <td>
 
 |                             |                                 |
@@ -116,7 +105,6 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 | **[PAM](#pam)**             | *Agricultural production*       |
 
 </td>
-
 <td>
 
 |                         |                           |
@@ -128,23 +116,19 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 | **[EPE](#epe)**         | *Energy consumption*      |
 
 </td>
-
 </tr>
-
 </table>
 
 **[4 - Other tools](#other-tools)**
 
 <table>
-
 <tr>
-
 <td>
 
-|  |  |
-|----|----|
+|                                                                 |                                                                             |
+|-----------------------------------------------------------------|-----------------------------------------------------------------------------|
 | **[Legal Amazon Municipalities](#legal-amazon-municipalities)** | *Dataset with Brazilian cities and whether they belong to the Legal Amazon* |
-| **[The ‘googledrive’ package](#googledrive)** | *Troubleshooting and information for downloads from Google Drive* |
+| **[The ‘googledrive’ package](#googledrive)**                   | *Troubleshooting and information for downloads from Google Drive*           |
 
 </table>
 
@@ -173,7 +157,7 @@ This dataset provides:
 - **Cumulative and incremental data**: Total deforestation since 1988
   and year-by-year changes
 - **Long time series**: Available from 2007 onwards (cumulative) and
-  incrementally by year
+  incrementally by year, currently through 2025
 - **Official baseline**: Used by Brazilian government for forest policy
   and enforcement
 
@@ -203,9 +187,9 @@ Project](https://www.gov.br/inpe/pt-br) and
 Clear-cut deforestation areas (complete forest loss).
 
 - **Coverage**: Entire Legal Amazon region
-- **Time period**:
+- **Time period**: 2007-2025
   - 2007: Cumulative deforestation from 1988 to 2007
-  - 2008-2023: Annual incremental deforestation (year-specific)
+  - 2008-2025: Annual incremental deforestation (year-specific)
 - **Data types**:
   - Raw: Raster/grid data (SpatRaster format)
   - Treated: Municipality-level area aggregates
@@ -222,7 +206,7 @@ Deforestation that was not captured in previous surveys (detected
 through improved methodology).
 
 - **Coverage**: Legal Amazon
-- **Time period**: 2010-2023
+- **Time period**: 2010-2025
 - **Data types**: Raster or municipality aggregates
 - **Variables**: Additional detected deforestation (hectares)
 - **Use cases**:
@@ -235,7 +219,7 @@ through improved methodology).
 Remaining native forest and natural vegetation areas.
 
 - **Coverage**: All vegetation in Legal Amazon
-- **Time period**: 2023 (snapshot of current state)
+- **Time period**: 2025 (snapshot of current state)
 - **Data types**: Raster only
 - **Variables**: Forest and vegetation extent
 - **Use cases**:
@@ -248,7 +232,7 @@ Remaining native forest and natural vegetation areas.
 Water bodies and hydrographic features.
 
 - **Coverage**: All water features in Amazon
-- **Time period**: 2023
+- **Time period**: 2025
 - **Data types**: Raster only
 - **Variables**: Water body extent
 - **Use cases**:
@@ -261,7 +245,7 @@ Non-forest areas including savanna, grasslands, and other vegetation
 types.
 
 - **Coverage**: Legal Amazon region
-- **Time period**: 2023
+- **Time period**: 2025
 - **Data types**: Raster only
 - **Variables**: Non-forest vegetation extent
 - **Use cases**:
@@ -274,7 +258,7 @@ types.
 Cloud cover in satellite imagery (data quality indicator).
 
 - **Coverage**: Legal Amazon
-- **Time period**: 2023
+- **Time period**: 2025
 - **Data types**: Raster only
 - **Variables**: Cloud-covered areas where analysis is uncertain
 - **Use cases**:
@@ -300,7 +284,7 @@ Cloud cover in satellite imagery (data quality indicator).
 | Year      | Type        | Definition                                   |
 |-----------|-------------|----------------------------------------------|
 | 2007      | Cumulative  | All deforestation from 1988-2007             |
-| 2008-2023 | Incremental | Deforestation detected in that specific year |
+| 2008-2025 | Incremental | Deforestation detected in that specific year |
 
 When analyzing time trends, be aware that 2007 includes 19 years of
 accumulated loss.
@@ -325,10 +309,10 @@ Selects which landscape classification to download.
 ``` r
 dataset = "deforestation"             # Clear-cut deforestation (main product)
 dataset = "residual_deforestation"    # Previously undetected deforestation
-dataset = "native_vegetation"         # Remaining forests and vegetation (2023 only)
-dataset = "hydrography"               # Water bodies (2023 only)
-dataset = "non_forest"                # Savanna and other non-forest (2023 only)
-dataset = "clouds"                    # Cloud cover (2023 only)
+dataset = "native_vegetation"         # Remaining forests and vegetation (2025 only)
+dataset = "hydrography"               # Water bodies (2025 only)
+dataset = "non_forest"                # Savanna and other non-forest (2025 only)
+dataset = "clouds"                    # Cloud cover (2025 only)
 ```
 
 ### 2. **raw_data**
@@ -353,12 +337,17 @@ Specifies which year(s) to download.
 
 | Dataset                  | Available Years                            |
 |--------------------------|--------------------------------------------|
-| `deforestation`          | 2007 (cumulative), 2008-2023 (incremental) |
-| `residual_deforestation` | 2010-2023                                  |
-| `native_vegetation`      | 2023 only                                  |
-| `hydrography`            | 2023 only                                  |
-| `non_forest`             | 2023 only                                  |
-| `clouds`                 | 2023 only                                  |
+| `deforestation`          | 2007 (cumulative), 2008-2025 (incremental) |
+| `residual_deforestation` | 2010-2025                                  |
+| `native_vegetation`      | 2025 only                                  |
+| `hydrography`            | 2025 only                                  |
+| `non_forest`             | 2025 only                                  |
+| `clouds`                 | 2025 only                                  |
+
+(these ranges track the manifest’s `available_time` – see
+`inst/extdata/manifest/v1/datasets_link.csv` – and move forward every
+time `resolve_prodes.R` picks up a new PRODES release; re-check them
+here if this doc goes stale again)
 
 ``` r
 time_period = 2020              # single year
@@ -396,11 +385,11 @@ deforestation <- load_prodes(
 ### Example 2: Deforestation data over multiple years
 
 ``` r
-# download treated deforestation data for 2008 to 2023
+# download treated deforestation data for 2008 to 2025
 deforestation_series <- load_prodes(
   dataset = "deforestation",
   raw_data = FALSE,
-  time_period = 2008:2023,
+  time_period = 2008:2025,
   language = "eng"
 )
 ```
@@ -408,11 +397,11 @@ deforestation_series <- load_prodes(
 ### Example 3: Cumulative forest loss since 1988
 
 ``` r
-# download 2007 (cumulative 1988-2007) plus all years up to 2023
+# download 2007 (cumulative 1988-2007) plus all years up to 2025
 all_deforestation <- load_prodes(
   dataset = "deforestation",
   raw_data = FALSE,
-  time_period = c(2007, 2008:2023),
+  time_period = c(2007, 2008:2025),
   language = "eng"
 )
 ```
@@ -467,8 +456,8 @@ residual <- load_prodes(
     significant computing resources
 4.  **Historical changes**: INPE occasionally revises historical
     estimates as methodology improves
-5.  **Recent data provisional**: 2023 data may be subject to revision as
-    final processing completes
+5.  **Recent data provisional**: the most recent year’s data may be
+    subject to revision as final processing completes
 
 ------------------------------------------------------------------------
 
@@ -1445,22 +1434,22 @@ Project](https://www.climatologylab.org/terraclimate.html).
 
 TerraClimate provides 13 main climate and water balance variables:
 
-| Dataset | Code | Description | Units |
-|----|----|----|----|
-| max_temperature | tmax | Maximum 2-m Temperature | °C |
-| min_temperature | tmin | Minimum 2-m Temperature | °C |
-| wind_speed | ws | Wind Speed at 10-m | m/s |
-| vapor_pressure_deficit | vpd | Vapor Pressure Deficit | kPa |
-| vapor_pressure | vap | 2-m Vapor Pressure | kPa |
-| snow_water_equivalent | swe | Snow Water Equivalent at End of Month | mm |
-| shortwave_radiation_flux | srad | Downward Shortwave Radiation Flux | W/m² |
-| soil_moisture | soil | Soil Moisture at End of Month | mm |
-| runoff | q | Runoff | mm |
-| precipitation | ppt | Accumulated Precipitation | mm |
-| potential_evaporation | pet | Reference Evapotranspiration | mm |
-| climatic_water_deficit | def | Climatic Water Deficit | mm |
-| water_evaporation | aet | Actual Evapotranspiration | mm |
-| palmer_drought_severity_index | PDSI | Palmer Drought Severity Index | unitless |
+| Dataset                       | Code | Description                           | Units    |
+|-------------------------------|------|---------------------------------------|----------|
+| max_temperature               | tmax | Maximum 2-m Temperature               | °C       |
+| min_temperature               | tmin | Minimum 2-m Temperature               | °C       |
+| wind_speed                    | ws   | Wind Speed at 10-m                    | m/s      |
+| vapor_pressure_deficit        | vpd  | Vapor Pressure Deficit                | kPa      |
+| vapor_pressure                | vap  | 2-m Vapor Pressure                    | kPa      |
+| snow_water_equivalent         | swe  | Snow Water Equivalent at End of Month | mm       |
+| shortwave_radiation_flux      | srad | Downward Shortwave Radiation Flux     | W/m²     |
+| soil_moisture                 | soil | Soil Moisture at End of Month         | mm       |
+| runoff                        | q    | Runoff                                | mm       |
+| precipitation                 | ppt  | Accumulated Precipitation             | mm       |
+| potential_evaporation         | pet  | Reference Evapotranspiration          | mm       |
+| climatic_water_deficit        | def  | Climatic Water Deficit                | mm       |
+| water_evaporation             | aet  | Actual Evapotranspiration             | mm       |
+| palmer_drought_severity_index | PDSI | Palmer Drought Severity Index         | unitless |
 
 ------------------------------------------------------------------------
 
@@ -1670,41 +1659,57 @@ for very large analyses
 
 SEEG (Sistema de Estimativa de Emissões e Remoções de Gases de Efeito
 Estufa - System of Estimates of Emissions and Removals of Greenhouse
-Gases) is Brazil’s most comprehensive greenhouse gas emissions database
+Gases) is Brazil’s most comprehensive greenhouse gas emissions database,
 developed by [Observatório do Clima](https://oc.eco.br/) (Climate
 Observatory).
 
 This dataset provides:
 
-- **Greenhouse gas emissions**: Complete estimates of all major
-  climate-relevant gases
-- **Multi-sector coverage**: Agriculture, energy, land use, industry,
-  waste
-- **Sub-sectoral detail**: Detailed breakdowns within each sector
-- **Municipality and state levels**: Geographic disaggregation for
-  regional analysis
-- **Time series**: Historical data from 2000 onwards
-- **Removal accounting**: Also includes carbon sequestration and
-  removals
-- **Comprehensive methodology**: Based on Brazilian national inventory
-  standards
-- **Transparent assumptions**: Well-documented methodology and data
-  sources
-
-SEEG is the primary tool for understanding Brazil’s greenhouse gas
-emissions profile, tracking progress toward climate goals, identifying
-emission hotspots, and supporting climate policy.
-
-### Data Source and Methodology
-
-SEEG emissions estimates are compiled using: - Government data from
-multiple agencies (MAPA, IBGE, ANP, etc.) - Satellite monitoring of
-deforestation and land use - International IPCC methodology standards -
-Peer-reviewed scientific research - Regular updates as new government
-data becomes available
+- **Greenhouse gas emissions**: estimates covering emissions and
+  removals across all major sectors
+- **Multi-sector coverage**: agriculture, energy, land use change,
+  industrial processes, waste
+- **Municipality, state, and country levels**: geographic disaggregation
+  for regional analysis
+- **Time series**: 1970-2024
 
 For more information, visit [SEEG Project](https://www.seeg.org.br/) and
 [Observatório do Clima](https://oc.eco.br/).
+
+------------------------------------------------------------------------
+
+## Data Version
+
+The package reads SEEG’s **v13.0** municipal summary workbook
+(`seeg.eco.br`), which restructured the previous “Collection 9” release
+(2000-2018) into a new schema and a wider time series (**1970-2024**).
+There is no `time_period` argument – every call returns the full series.
+Exact coverage always tracks the manifest
+(`datasets_link(source = "seeg")` or
+`inst/extdata/manifest/v1/datasets_link.csv`); check there before
+assuming this has changed.
+
+### What changed from the pre-v13.0 schema
+
+The old `NIVEL 1`..`NIVEL 6` hierarchy is gone, replaced by
+`Setor de emissão` / `Categoria emissora` / `Sub-categoria emissora` /
+`Recorte` / `Atividade geral`. Some detail the old schema carried has no
+equivalent in the new one and is **dropped, not reconstructed**:
+
+- `gas`/`produto` (a redundant constant column) is gone across every
+  sector – no real loss.
+- **seeg_farming** loses its species/crop-level detail.
+- **seeg_industry** loses its input/technology-level detail, partly
+  offset by a genuinely new actual/potential emission split and a finer
+  end-use breakdown the old schema never had.
+- **seeg_energy** loses its entire fuel-type breakdown (gasoline,
+  diesel, LPG, etc.).
+- **seeg_land** loses the most: its entire **biome** dimension and its
+  full origin-to-destination **land-cover transition matrix**, both
+  collapsed into four coarser categorical fields.
+
+Every one of these is tagged `# FRAGILE:` in `R/seeg.R` with the
+specific column-level detail.
 
 ------------------------------------------------------------------------
 
@@ -1713,143 +1718,69 @@ For more information, visit [SEEG Project](https://www.seeg.org.br/) and
 ### **1. seeg (All Sectors Combined)**
 
 Complete greenhouse gas emissions across all sectors in one dataset.
+**Only available with `raw_data = TRUE`** – it cannot be requested
+treated (`raw_data = FALSE`).
 
-- **Coverage**: All emission sources in Brazil
-- **Sectors included**: All five (agriculture, energy, land use,
-  industry, waste)
-- **Time period**: 2000-2018
-- **Geographic levels**: Country, State, Municipality
-- **Key variables**: Total emissions (CO₂e), by sector and sub-sector
-- **Format**: Comprehensive view of Brazil’s total emissions profile
-- **Note**: Only available with `raw_data = TRUE`
-- **Use cases**:
-  - Understand overall emissions landscape
-  - Identify dominant emission sources
-  - Track total emissions trends over time
+- **Coverage**: all sectors, 1970-2024
+- **Geographic levels**: country, state, municipality
+- **Format**: the cleaned source sheet – one row per municipality x
+  category path, with one numeric column per year (`x1970`…`x2024`)
 
 ### **2. seeg_farming (Agricultural and Livestock Emissions)**
 
-Greenhouse gas emissions from agriculture and livestock activities.
-
-- **Coverage**: All agricultural and livestock production
-- **Time period**: 2000-2018
-- **Geographic levels**: Country, State, Municipality
-- **Key variables**: Emissions from cattle, crop production, soil
-  management, manure
-- **Dominant source**: Usually the largest single emissions sector in
-  Brazil
-- **Components**:
-  - Livestock (enteric fermentation, manure)
-  - Crop production and soil management
-  - Agricultural land preparation
-- **Use cases**:
-  - Assess agricultural emission contributions
-  - Identify highest-emission municipalities
-  - Evaluate livestock and farming intensity
-  - Policy targets for agricultural emissions reduction
+Sector: `Agropecuaria`. **Only available with `raw_data = FALSE`.**
 
 ### **3. seeg_energy (Energy Sector Emissions)**
 
-Emissions from energy production and consumption.
-
-- **Coverage**: All energy-related emissions
-- **Time period**: 2000-2018
-- **Geographic levels**: Country, State, Municipality
-- **Key variables**: Emissions from electricity, transport, heating,
-  fuel production
-- **Components**:
-  - Energy generation and distribution
-  - Transportation fuels
-  - Energy consumption
-  - Industrial energy use
-- **Use cases**:
-  - Understand energy sector contribution to climate change
-  - Track renewable vs. fossil fuel impacts
-  - Identify regional energy emission patterns
+Sector: `Energia`. **Only available with `raw_data = FALSE`.** Lost its
+fuel-type breakdown in the v13.0 migration (see above).
 
 ### **4. seeg_land (Land Use Change Emissions)**
 
-Emissions and removals from changes in forest cover and land use.
-
-- **Coverage**: Deforestation, forest degradation, reforestation effects
-- **Time period**: 2000-2018
-- **Geographic levels**: Country, State, Municipality
-- **Key variables**: Net emissions/removals from land use change
-- **Components**:
-  - Deforestation and forest loss
-  - Forest degradation
-  - Reforestation and afforestation
-  - Vegetation conversion
-- **Importance**: Often largest single contributor to Brazil’s emissions
-- **Use cases**:
-  - Analyze deforestation climate impact
-  - Identify reforestation opportunities
-  - Assess forest conservation value
-  - Link with PRODES and DETER deforestation data
+Sector: `Mudanca de Uso da Terra e Floresta`. **Only available with
+`raw_data = FALSE`.** The sector with the largest documented loss: biome
+and the transition matrix (see above).
 
 ### **5. seeg_industry (Industrial Process Emissions)**
 
-Emissions from manufacturing and industrial processes.
-
-- **Coverage**: All industrial sectors
-- **Time period**: 2000-2018
-- **Geographic levels**: Country, State, Municipality
-- **Key variables**: Emissions from cement, chemicals, metals, minerals,
-  other manufacturing
-- **Components**:
-  - Chemical production (ammonia, soda ash, etc.)
-  - Metal production (iron, aluminum, others)
-  - Mineral processing (cement, lime, glass)
-  - Other industrial processes
-- **Use cases**:
-  - Identify industrial emission hotspots
-  - Regional manufacturing impacts
-  - Process-specific emission reduction opportunities
+Sector: `Processos Industriais`. **Only available with
+`raw_data = FALSE`.**
 
 ### **6. seeg_residuals (Waste and Residuals Emissions)**
 
-Emissions from waste management, landfills, and waste treatment.
-
-- **Coverage**: All waste-related emissions
-- **Time period**: 2000-2018
-- **Geographic levels**: Country, State, Municipality
-- **Key variables**: Emissions from solid waste, wastewater treatment,
-  waste treatment
-- **Components**:
-  - Landfill methane emissions
-  - Wastewater treatment
-  - Waste disposal and treatment
-  - Municipal solid waste management
-- **Use cases**:
-  - Assess waste sector contributions
-  - Identify waste management improvement opportunities
-  - Evaluate circular economy potential
+Sector: `Residuos`. **Only available with `raw_data = FALSE`.**
 
 ------------------------------------------------------------------------
 
-## Important Data Characteristics
+## Output Columns (`raw_data = FALSE`)
 
-### Collection 9 Data
+Every `seeg_*` sector dataset returns long-format data, one row per
+category combination and year, with a single `value` (eng) / `Valor`
+(pt) column. The columns available depend on `geo_level` and on which
+4th categorical dimension that sector carries:
 
-The data provided is from SEEG’s Collection 9: - **Time period**:
-2000-2018 - **Methodology**: Latest available when data was compiled -
-**Quality**: Peer-reviewed and validated - **Revisions**: May be updated
-in future SEEG collections as better data becomes available
+| geo_level    | eng columns                                                                                                                       | pt columns                                                                                                                          |
+|--------------|-----------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| municipality | year, city, state, ibge, sector, emission_category, emission_subcategory, **\<4th dim\>**, general_activity, emission_type, value | Ano, municipio, estado, ibge, setor, categoria_emissao, subcategoria_emissao, **\<4th dim\>**, atividade_geral, tipo_emissao, Valor |
+| state        | (drops city, ibge)                                                                                                                | (drops municipio, ibge)                                                                                                             |
+| country      | (also drops state)                                                                                                                | (also drops estado)                                                                                                                 |
 
-### Emissions Units
+The 4th dimension’s name (and whether it is translated in `pt`) differs
+by sector:
 
-- **Standard unit**: Gigatonnes CO₂ equivalent (Gt CO₂e)
-- **CO₂e equivalence**: Uses global warming potentials (GWP) to convert
-  CH₄ and N₂O to CO₂ equivalent
-- **Consistency**: Allows comparison across different gases and sectors
+| Dataset        | eng name         | pt name      | pt renamed?              |
+|----------------|------------------|--------------|--------------------------|
+| seeg_residuals | waste_stream     | tipo_residuo | yes                      |
+| seeg_farming   | emission_pathway | via_emissao  | yes                      |
+| seeg_industry  | emission_scope   | recorte      | **no – stays `recorte`** |
+| seeg_energy    | emission_scope   | recorte      | **no – stays `recorte`** |
+| seeg_land      | emission_scope   | recorte      | **no – stays `recorte`** |
 
-### Download Considerations
-
-**Important**: The complete SEEG dataset is quite large. When
-downloading: - Entire datasets are downloaded as single files; year
-selection is limited - A stable, high-speed internet connection is
-recommended - Downloads may take time depending on connection speed -
-Ensure sufficient disk space for storage
+**`language = "pt"` output is never value-translated** – only
+`language = "eng"` runs SEEG’s PT-\>EN value dictionaries
+(`SEEG_SECTOR_EN`, `SEEG_EMISSION_TYPE_EN`, and one
+category/subcategory/dimension/activity dictionary per sector, in
+`R/seeg.R`). A PT call returns the source’s own Portuguese values as-is.
 
 ------------------------------------------------------------------------
 
@@ -1857,54 +1788,43 @@ Ensure sufficient disk space for storage
 
 ### 1. **dataset**
 
-Selects which emission sector(s) to download.
+Selects which emission sector to download.
 
 ``` r
 dataset = "seeg"              # All sectors (raw_data = TRUE only)
-dataset = "seeg_farming"      # Agriculture and livestock
-dataset = "seeg_energy"       # Energy sector
-dataset = "seeg_land"         # Land use changes
-dataset = "seeg_industry"     # Industrial processes
-dataset = "seeg_residuals"    # Waste and residuals
+dataset = "seeg_farming"      # Agriculture and livestock (raw_data = FALSE only)
+dataset = "seeg_energy"       # Energy sector (raw_data = FALSE only)
+dataset = "seeg_land"         # Land use changes (raw_data = FALSE only)
+dataset = "seeg_industry"     # Industrial processes (raw_data = FALSE only)
+dataset = "seeg_residuals"    # Waste and residuals (raw_data = FALSE only)
 ```
 
 ### 2. **raw_data**
 
-Controls whether to download original or processed data.
-
-- `TRUE`: Returns raw SEEG data format (more detailed)
-- `FALSE`: Returns treated data with English variable names and
-  standardized format
-
-``` r
-raw_data = FALSE  # logical
-```
+Controls whether to download the original or the treated data. **Each
+dataset only works with one value** (see above): `"seeg"` requires
+`TRUE`; every `seeg_*` sector requires `FALSE`.
 
 ### 3. **geo_level**
 
 Specifies geographic aggregation level.
 
-- `"country"`: National total
-- `"state"`: State-level emissions (27 units)
-- `"municipality"`: All 5,570+ municipalities
-
-``` r
-geo_level = "state"  # character string
-```
+- `"country"`: national total
+- `"state"`: state-level emissions (27 units)
+- `"municipality"`: all 5,570+ municipalities
 
 ### 4. **language**
 
-Output language for variable names and labels.
+Output language for column names and, for `eng` only, translated values.
 
-- `"pt"`: Portuguese
-- `"eng"`: English
+- `"pt"`: Portuguese column names, source’s own Portuguese values
+  (untranslated)
+- `"eng"`: English column names and translated values
 
-``` r
-language = "eng"  # character string
-```
-
-**Note on timing**: Downloads may take considerable time due to file
-size.
+**Note on timing**: the source workbook is 250MB+; downloads may take
+time. A session-scoped download+parse cache (`R/download.R`) avoids
+re-downloading it if you load more than one SEEG dataset in the same
+session.
 
 ------------------------------------------------------------------------
 
@@ -1913,7 +1833,6 @@ size.
 ### Example 1: All sectors combined (raw data) at the country level
 
 ``` r
-# download raw SEEG data (all sectors) at the country level
 # note: dataset = "seeg" only works with raw_data = TRUE
 all_emissions <- load_seeg(
   dataset = "seeg",
@@ -1926,7 +1845,6 @@ all_emissions <- load_seeg(
 ### Example 2: Agricultural emissions by state
 
 ``` r
-# download treated agricultural emissions at the state level
 farming <- load_seeg(
   dataset = "seeg_farming",
   raw_data = FALSE,
@@ -1938,7 +1856,6 @@ farming <- load_seeg(
 ### Example 3: Land use change emissions by state
 
 ``` r
-# download treated land use change emissions at the state level
 land_use <- load_seeg(
   dataset = "seeg_land",
   raw_data = FALSE,
@@ -1950,7 +1867,6 @@ land_use <- load_seeg(
 ### Example 4: Energy emissions by municipality
 
 ``` r
-# download treated energy emissions at the municipality level
 energy <- load_seeg(
   dataset = "seeg_energy",
   raw_data = FALSE,
@@ -1962,7 +1878,6 @@ energy <- load_seeg(
 ### Example 5: Industrial process emissions by state
 
 ``` r
-# download treated industrial process emissions at the state level
 industry <- load_seeg(
   dataset = "seeg_industry",
   raw_data = FALSE,
@@ -1974,7 +1889,6 @@ industry <- load_seeg(
 ### Example 6: Waste emissions by state
 
 ``` r
-# download treated waste emissions at the state level
 residuals <- load_seeg(
   dataset = "seeg_residuals",
   raw_data = FALSE,
@@ -1983,37 +1897,18 @@ residuals <- load_seeg(
 )
 ```
 
-## Data Notes
+## Limitations
 
-### Emission Sources Included
-
-SEEG includes all major anthropogenic emission sources: - Agriculture
-(livestock, crops, soil) - Energy (electricity, transport, heating) -
-Land use change (deforestation, afforestation) - Industrial processes
-(cement, chemicals, metals) - Waste (landfills, wastewater)
-
-### Methodology
-
-Estimates follow: - IPCC guidelines for national greenhouse gas
-inventories - Brazilian national inventory standards - International
-best practices - Transparent, documented assumptions
-
-### Data Quality
-
-- Peer-reviewed methodology
-- Validated against government data
-- Uncertainty ranges available in detailed products
-- Regular methodology updates
-
-### Limitations
-
-1.  **Fixed time period**: Collection 9 covers 2000-2018 only
-2.  **File size**: Large downloads; requires good internet
-3.  **Year aggregation**: Cannot select individual years; entire dataset
-    downloaded
-4.  **Revisions**: Methodology may change in future SEEG releases
-5.  **Sub-national uncertainty**: Municipal and state estimates have
-    higher uncertainty than national
+1.  **No year selection**: entire series (1970-2024) is downloaded;
+    there is no `time_period` argument.
+2.  **File size**: the source workbook is 250MB+; a stable connection is
+    recommended.
+3.  **Dropped detail**: see “What changed from the pre-v13.0 schema”
+    above – several dimensions the older data carried (fuel type,
+    species/crop detail, biome, the land-cover transition matrix) have
+    no equivalent in the current source and are not reconstructed.
+4.  **`pt` output is untranslated**: only `language = "eng"` runs SEEG’s
+    value dictionaries.
 
 ------------------------------------------------------------------------
 
@@ -2064,7 +1959,7 @@ number of agricultural properties.
 
 - **Key metrics**: Total land area (hectares), number of properties
 - **Time period**: 1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995,
-  2006, 2017
+  2006
 - **Geographic levels**: Country, State
 - **Use case**: Track long-term trends in farm consolidation and total
   agricultural land expansion
@@ -2077,8 +1972,7 @@ pasture, forests, etc.).
 - **Key metrics**: Area by use category (temporary crops, permanent
   crops, natural pastures, planted pastures, forest for forest
   production, protected natural vegetation, other areas)
-- **Time period**: 1970 onwards (1970, 1975, 1980, 1985, 1995, 2006,
-  2017)
+- **Time period**: 1970 onwards (1970, 1975, 1980, 1985, 1995, 2006)
 - **Geographic levels**: Country, State
 - **Use case**: Analyze land use transitions, deforestation patterns,
   and agricultural intensification
@@ -2090,8 +1984,7 @@ levels.
 
 - **Key metrics**: Number of employees, number of tractors, employed
   persons
-- **Time period**: 1970 onwards (1970, 1975, 1980, 1985, 1995, 2006,
-  2017)
+- **Time period**: 1970 onwards (1970, 1975, 1980, 1985, 1995, 2006)
 - **Geographic levels**: Country, State
 - **Use case**: Study agricultural mechanization trends and rural
   employment dynamics
@@ -2104,7 +1997,7 @@ partnership, etc.).
 - **Key metrics**: Number of properties by producer condition (owner,
   tenant, partner, occupant)
 - **Time period**: 1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995,
-  2006, 2017
+  2006
 - **Geographic levels**: Country, State
 - **Use case**: Understand land tenure structures and changes in
   property ownership patterns
@@ -2115,8 +2008,7 @@ Details the number of livestock animals farmed by species and type.
 
 - **Key metrics**: Number of animals by species (cattle, pigs, poultry,
   sheep, horses, goats, water buffalo, etc.), number of establishments
-- **Time period**: 1970 onwards (1970, 1975, 1980, 1985, 1995, 2006,
-  2017)
+- **Time period**: 1970 onwards (1970, 1975, 1980, 1985, 1995, 2006)
 - **Geographic levels**: Country, State
 - **Use case**: Monitor livestock herd sizes and sectoral changes in
   animal agriculture
@@ -2128,7 +2020,7 @@ Quantifies production volumes of animal-based products.
 - **Key metrics**: Production quantities (eggs, milk, honey, wool, hide,
   etc.)
 - **Time period**: 1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995,
-  2006, 2017
+  2006
 - **Geographic levels**: Country, State
 - **Use case**: Track historical trends in dairy, poultry, and other
   animal product sectors
@@ -2141,7 +2033,7 @@ produced.
 - **Key metrics**: Area planted (hectares), quantity produced
   (kilograms), number of establishments by crop type
 - **Time period**: 1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995,
-  2006, 2017
+  2006
 - **Geographic levels**: Country, State
 - **Use case**: Comprehensive analysis of crop production patterns and
   agricultural productivity
@@ -2153,8 +2045,7 @@ replanted each season).
 
 - **Key metrics**: Area planted, quantity produced for crops like
   soybeans, corn, beans, cassava
-- **Time period**: 1970 onwards (1970, 1975, 1980, 1985, 1995, 2006,
-  2017)
+- **Time period**: 1970 onwards (1970, 1975, 1980, 1985, 1995, 2006)
 - **Geographic levels**: Country, State
 - **Use case**: Study annual crop production cycles and seasonal
   variations
@@ -2167,7 +2058,7 @@ years).
 - **Key metrics**: Area planted, quantity produced for crops like
   coffee, sugarcane, cocoa, oranges
 - **Time period**: 1940 onwards (1940, 1950, 1960, 1970, 1975, 1980,
-  1985, 1995, 2006, 2017)
+  1985, 1995, 2006)
 - **Geographic levels**: Country, State
 - **Use case**: Analyze long-cycle crop production and regional
   specialization
@@ -2180,8 +2071,9 @@ establishments.
 - **Key metrics**: Number of cattle establishments, herd size, number of
   properties
 - **Time period**: 2017 (most recent census year)
-- **Geographic levels**: Country, State, **Municipality** (unique to
-  this dataset)
+- **Geographic levels**: **Municipality only** – unlike every other
+  dataset in this vignette, `livestock_production` is not available at
+  the country or state level
 - **Use case**: Detailed regional analysis of cattle ranching, including
   municipality-level data
 
@@ -2219,7 +2111,9 @@ Specifies the geographic aggregation level.
 
 - `"country"`: National aggregate
 - `"state"`: Disaggregated by Brazilian state
-- `"municipality"`: Available only for `"livestock_production"` dataset
+- `"municipality"`: Available only for `"livestock_production"`, and the
+  *only* level that dataset supports – `"country"`/`"state"` are not
+  available for `livestock_production`
 
 ``` r
 geo_level = "state"  # character string
@@ -2229,18 +2123,18 @@ geo_level = "state"  # character string
 
 Defines which year(s) to download. Availability varies by dataset:
 
-| Dataset | Available Years |
-|----|----|
-| `agricultural_land_area` | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017` |
-| `agricultural_area_use` | `1970, 1975, 1980, 1985, 1995, 2006, 2017` |
-| `agricultural_employees_tractors` | `1970, 1975, 1980, 1985, 1995, 2006, 2017` |
-| `agricultural_producer_condition` | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017` |
-| `animal_production` | `1970, 1975, 1980, 1985, 1995, 2006, 2017` |
-| `animal_products` | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017` |
-| `vegetable_production_area` | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017` |
-| `vegetable_production_temporary` | `1970, 1975, 1980, 1985, 1995, 2006, 2017` |
-| `vegetable_production_permanent` | `1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017` |
-| `livestock_production` | `2017` |
+| Dataset                           | Available Years                                              |
+|-----------------------------------|--------------------------------------------------------------|
+| `agricultural_land_area`          | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006` |
+| `agricultural_area_use`           | `1970, 1975, 1980, 1985, 1995, 2006`                         |
+| `agricultural_employees_tractors` | `1970, 1975, 1980, 1985, 1995, 2006`                         |
+| `agricultural_producer_condition` | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006` |
+| `animal_production`               | `1970, 1975, 1980, 1985, 1995, 2006`                         |
+| `animal_products`                 | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006` |
+| `vegetable_production_area`       | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006` |
+| `vegetable_production_temporary`  | `1970, 1975, 1980, 1985, 1995, 2006`                         |
+| `vegetable_production_permanent`  | `1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006`       |
+| `livestock_production`            | `2017` (municipality only)                                   |
 
 You can request a single year or a range of years:
 
@@ -2266,12 +2160,12 @@ language = "eng"  # character string
 ## Examples
 
 ``` r
-# download treated land area data at the country level in 2017
+# download treated land area data at the country level in 2006
 data <- load_censoagro(
   dataset = "agricultural_land_area",
   raw_data = FALSE,
   geo_level = "country",
-  time_period = 2017,
+  time_period = 2006,
   language = "eng"
 )
 
@@ -3173,8 +3067,9 @@ version of the Harmonized System nomenclature.
 - **Coverage**: Bilateral trade flows for 5,000+ products (HS 6-digit
   level)
 - **Countries**: 200+ countries and territories
-- **Time period**: 1995 onwards (varies by country; most comprehensive
-  from 2000 onwards)
+- **Time period**: 1995-2024 (current release version `202601`;
+  re-verified live on every scheduled manifest run, not a hardcoded
+  range – see `datasets_link(source = "baci")`)
 - **Variables**: Trade value (USD), quantity (where available),
   exporter, importer, product code
 - **Use cases**:
@@ -3235,9 +3130,8 @@ raw_data = FALSE  # logical
 Specifies which year(s) to download. You can request single or multiple
 years.
 
-- **Available**: Generally 1995 onwards, though coverage varies by
-  country
-- **Most complete**: 2000 onwards for the majority of countries
+- **Available**: 1995-2024 (current release; widens as CEPII publishes
+  new years)
 - **Note**: Specifying years helps with filtering but still requires
   downloading the full dataset
 
@@ -3296,10 +3190,14 @@ available)
 
 ### Country and Product Coverage
 
-- Most countries covered from 2000 onwards
-- Coverage varies by country; some countries have earlier data available
+- Coverage spans 1995-2024 in the current release; some countries have
+  gaps in earlier years
 - HS 6-digit codes ensure consistency with international standards
 - Product classifications may change over time as the HS is updated
+- `load_baci()` internally downloads a companion Brazilian COMEX
+  product-code dictionary (`NCM_SH.csv`) to translate HS codes to
+  product names in Portuguese. Its source is tracked separately in the
+  manifest, under its own `baci_dic` survey.
 
 ### Quality Notes
 
@@ -3673,9 +3571,7 @@ the original databases and their narrower subsets. Note that downloading
 only specific crops is considerably faster.
 
 <details>
-
 <summary>
-
 Full datasets provided by IBGE:
 </summary>
 
@@ -3690,99 +3586,93 @@ Full datasets provided by IBGE:
 | beans           |
 
 </details>
-
 <details>
-
 <summary>
-
 Datasets generated from Temporary Crops:
 </summary>
 
-| dataset | Name (pt) | Name (eng) |
-|:---|:--:|:--:|
-| total_temporary | Total | Total |
-| abacaxi | Abacaxi | Pineapple |
-| alfafa | Alfafa Fenada | Alfafa Fenada |
-| alho | Alho | Garlic |
-| algodao_herbaceo | Algodao Herbaceo (em Caroco) | Herbaceous Cotton (in Caroco) |
-| amendoim_temporary | Amendoim (em Casca) | Peanuts (in Shell) |
-| arroz | Arroz (em Casca) | Rice (in husk) |
-| aveia | Aveia (em Grao) | Oats (in grain) |
-| batata_doce | Batata Doce | Sweet potato |
-| batata_inglesa | Batata Inglesa | English potato |
-| cana_de_acucar | Cana de Acucar | Sugar cane |
-| cana_para_forragem | Cana para Forragem | Forage cane |
-| castor_bean | Mamona (Baga) | Castor bean (Berry) |
-| cebola | Cebola | Onion |
-| cevada | Cevada (em Grao) | Barley (in Grain) |
-| ervilha | Ervilha (em Grao) | Pea (in Grain) |
-| fava | Fava (em Grao) | Broad Bean (in Grain) |
-| feijao_temporary | Feijao (em Grao) | Beans (in Grain) |
-| fumo | Fumo (em Folha) | Smoke (in Sheet) |
-| girassol_sementes | Girassol (em Grao) | Sunflower (in Grain) |
-| juta_fibra | Juta (Fibra) | Jute (Fiber) |
-| linho_sementes | Linho (Semente) | Linen (Seed) |
-| malva_fibra | Malva (Fibra) | Malva (Fiber) |
-| mandioca | Mandioca | Cassava |
-| melancia | Melancia | watermelon |
-| melao | Melao | Melon |
-| milho_temporary | Milho (em Grao) | corn (in grain) |
-| rami_fibra | Rami (Fibra) | Ramie (Fiber) |
-| rye | Centeio (em Grao) | Rye (in grain) |
-| soja | Soja (em Grao) | Soybean (in grain) |
-| sorgo | Sorgo (em Grao) | Sorghum (in Grain) |
-| tomate | Tomate | Tomato |
-| trigo | Trigo (em Grao) | Wheat in grain) |
-| triticale | Triticale (em Grao) | Triticale (in grain) |
+| dataset            |          Name (pt)           |          Name (eng)           |
+|:-------------------|:----------------------------:|:-----------------------------:|
+| total_temporary    |            Total             |             Total             |
+| abacaxi            |           Abacaxi            |           Pineapple           |
+| alfafa             |        Alfafa Fenada         |         Alfafa Fenada         |
+| alho               |             Alho             |            Garlic             |
+| algodao_herbaceo   | Algodao Herbaceo (em Caroco) | Herbaceous Cotton (in Caroco) |
+| amendoim_temporary |     Amendoim (em Casca)      |      Peanuts (in Shell)       |
+| arroz              |       Arroz (em Casca)       |        Rice (in husk)         |
+| aveia              |       Aveia (em Grao)        |        Oats (in grain)        |
+| batata_doce        |         Batata Doce          |         Sweet potato          |
+| batata_inglesa     |        Batata Inglesa        |        English potato         |
+| cana_de_acucar     |        Cana de Acucar        |          Sugar cane           |
+| cana_para_forragem |      Cana para Forragem      |          Forage cane          |
+| castor_bean        |        Mamona (Baga)         |      Castor bean (Berry)      |
+| cebola             |            Cebola            |             Onion             |
+| cevada             |       Cevada (em Grao)       |       Barley (in Grain)       |
+| ervilha            |      Ervilha (em Grao)       |        Pea (in Grain)         |
+| fava               |        Fava (em Grao)        |     Broad Bean (in Grain)     |
+| feijao_temporary   |       Feijao (em Grao)       |       Beans (in Grain)        |
+| fumo               |       Fumo (em Folha)        |       Smoke (in Sheet)        |
+| girassol_sementes  |      Girassol (em Grao)      |     Sunflower (in Grain)      |
+| juta_fibra         |         Juta (Fibra)         |         Jute (Fiber)          |
+| linho_sementes     |       Linho (Semente)        |         Linen (Seed)          |
+| malva_fibra        |        Malva (Fibra)         |         Malva (Fiber)         |
+| mandioca           |           Mandioca           |            Cassava            |
+| melancia           |           Melancia           |          watermelon           |
+| melao              |            Melao             |             Melon             |
+| milho_temporary    |       Milho (em Grao)        |        corn (in grain)        |
+| rami_fibra         |         Rami (Fibra)         |         Ramie (Fiber)         |
+| rye                |      Centeio (em Grao)       |        Rye (in grain)         |
+| soja               |        Soja (em Grao)        |      Soybean (in grain)       |
+| sorgo              |       Sorgo (em Grao)        |      Sorghum (in Grain)       |
+| tomate             |            Tomate            |            Tomato             |
+| trigo              |       Trigo (em Grao)        |        Wheat in grain)        |
+| triticale          |     Triticale (em Grao)      |     Triticale (in grain)      |
 
 </details>
-
 <details>
-
 <summary>
-
 Datasets generated from Permanent Crops:
 </summary>
 
-| dataset | Name (pt) | Name (eng) |
-|:---|:--:|:--:|
-| acai | Acai | Acai |
-| annatto_seeds | Urucum (Semente) | Annatto (Seed) |
-| apple | Maca | Apple |
-| avocado | Abacate | Avocado |
-| banana | Banana (Cacho) | Banana (Bunch) |
-| black_pepper | Pimenta do Reino | Black pepper |
-| cashew | Caju | Cashew |
-| cashew_nut | Castanha de Caju | Cashew Nuts |
-| cocoa_beans | Cacau (em Amendoa) | Cocoa (in Almonds) |
-| coffee_arabica | Cafe (em Grao) Arabica | Cafe (in Grao) Arabica |
-| coffee_canephora | Cafe (em Grao) Canephora | Cafe (in Grain) Canephora |
-| coffee_total | Cafe (em Grao) Total | Coffee (in Grain) Total |
-| coconut | Coco da Baia | Coconut |
-| coconut_bunch | Dende (Cacho de Coco) | Coconut Bunch |
-| cotton_arboreo | Algodao Arboreo (em Caroco) | Arboreo cotton (in Caroco) |
-| fig | Figo | Fig |
-| grape | Uva | Grape |
-| guarana_seeds | Guarana (Semente) | Guarana (Seed) |
-| guava | Goiaba | Guava |
-| heart_of_palm | Palmito | Palm heart |
-| india_tea | Cha da India (Folha Verde) | India Tea (Leaf) |
-| khaki | Caqui | Khaki |
-| lemon | Limao | Lemon |
-| mango | Manga | Mango |
-| papaya | Mamao | Papaya |
-| passion_fruit | Maracuja | Passion fruit |
-| peach | Pessego | Peach |
-| pear | Pera | Pear |
-| permanent_total | Total | Total |
-| quince | Marmelo | Quince |
-| rubber_coagulated_latex | Borracha (Latex Coagulado) | Rubber (Coagulated Latex) |
-| rubber_liquid_latex | Borracha (Latex Liquido) | Rubber (Liquid Latex) |
-| sisal_or_agave | Sisal ou Agave (Fibra) | Sisal or Agave (Fiber) |
-| tangerine | Tangerina | Tangerine |
-| tung | Tungue (Fruto Seco) | Tung (Dry Fruit) |
-| walnut | Noz (Fruto Seco) | Walnut (Dry Fruit) |
-| yerba_mate | Erva Mate (Folha Verde) | Mate Herb (Leaf) |
+| dataset                 |          Name (pt)          |         Name (eng)         |
+|:------------------------|:---------------------------:|:--------------------------:|
+| acai                    |            Acai             |            Acai            |
+| annatto_seeds           |      Urucum (Semente)       |       Annatto (Seed)       |
+| apple                   |            Maca             |           Apple            |
+| avocado                 |           Abacate           |          Avocado           |
+| banana                  |       Banana (Cacho)        |       Banana (Bunch)       |
+| black_pepper            |      Pimenta do Reino       |        Black pepper        |
+| cashew                  |            Caju             |           Cashew           |
+| cashew_nut              |      Castanha de Caju       |        Cashew Nuts         |
+| cocoa_beans             |     Cacau (em Amendoa)      |     Cocoa (in Almonds)     |
+| coffee_arabica          |   Cafe (em Grao) Arabica    |   Cafe (in Grao) Arabica   |
+| coffee_canephora        |  Cafe (em Grao) Canephora   | Cafe (in Grain) Canephora  |
+| coffee_total            |    Cafe (em Grao) Total     |  Coffee (in Grain) Total   |
+| coconut                 |        Coco da Baia         |          Coconut           |
+| coconut_bunch           |    Dende (Cacho de Coco)    |       Coconut Bunch        |
+| cotton_arboreo          | Algodao Arboreo (em Caroco) | Arboreo cotton (in Caroco) |
+| fig                     |            Figo             |            Fig             |
+| grape                   |             Uva             |           Grape            |
+| guarana_seeds           |      Guarana (Semente)      |       Guarana (Seed)       |
+| guava                   |           Goiaba            |           Guava            |
+| heart_of_palm           |           Palmito           |         Palm heart         |
+| india_tea               | Cha da India (Folha Verde)  |      India Tea (Leaf)      |
+| khaki                   |            Caqui            |           Khaki            |
+| lemon                   |            Limao            |           Lemon            |
+| mango                   |            Manga            |           Mango            |
+| papaya                  |            Mamao            |           Papaya           |
+| passion_fruit           |          Maracuja           |       Passion fruit        |
+| peach                   |           Pessego           |           Peach            |
+| pear                    |            Pera             |            Pear            |
+| permanent_total         |            Total            |           Total            |
+| quince                  |           Marmelo           |           Quince           |
+| rubber_coagulated_latex | Borracha (Latex Coagulado)  | Rubber (Coagulated Latex)  |
+| rubber_liquid_latex     |  Borracha (Latex Liquido)   |   Rubber (Liquid Latex)    |
+| sisal_or_agave          |   Sisal ou Agave (Fibra)    |   Sisal or Agave (Fiber)   |
+| tangerine               |          Tangerina          |         Tangerine          |
+| tung                    |     Tungue (Fruto Seco)     |      Tung (Dry Fruit)      |
+| walnut                  |      Noz (Fruto Seco)       |     Walnut (Dry Fruit)     |
+| yerba_mate              |   Erva Mate (Folha Verde)   |      Mate Herb (Leaf)      |
 
 </details>
 
@@ -4547,7 +4437,7 @@ Account’s (CDE) annual budget expenses. The CDE is designed to promote
 the Brazilian energy development and is managed by the Electrical Energy
 Commercialization Chamber (CCEE).
 
-In the current implementation, data is available from 2017 to 2022 and
+In the current implementation, data is available from 2017 to 2024 and
 must be downloaded by year. The year argument can be a single year or a
 vector of years. The dataset includes the type of expense, its value in
 R\$ (Reais), and its share over the total amount of CDE budget expenses
@@ -4566,11 +4456,21 @@ It contains information about the power, source, stage, type of
 permission, origin and final fuel with which each venture/entity
 operates, as well as other legal, technical and geographical
 information.\* Operation start dates contained in the dataset go as far
-back as 1924 up to 2022.
+back as 1908 up to 2021.
 
-\* For more details on each variable, access [This
-link](https://app.powerbi.com/view?r=eyJrIjoiNjc4OGYyYjQtYWM2ZC00YjllLWJlYmEtYzdkNTQ1MTc1NjM2IiwidCI6IjQwZDZmOWI4LWVjYTctNDZhMi05MmQ0LWVhNGU5YzAxNzBlMSIsImMiOjR9)
-and select “Manual do Usuario”.
+The source is ANEEL’s own CKAN Open Data catalogue
+(`siga-empreendimentos-geracao.csv`) – this dataset used to be a
+GitLab-hosted xlsx file, now discontinued; the package moved to the CKAN
+CSV in 2026-09. Because it is a CSV rather than an xlsx, power and
+coordinate columns (`mda_*`/`num_coord_*`) arrive from the source as
+Brazilian-locale strings (comma decimals, dot thousand separators,
+e.g. `"1400,00"`, `"-20,12479858"`) the same way
+`energy_enterprises_distributed`’s CSV always has – `load_aneel()`
+converts these to numeric automatically.
+
+\* For more details on each variable, access [ANEEL’s SIGA dataset
+page](https://dadosabertos.aneel.gov.br/dataset/siga-sistema-de-informacoes-de-geracao-da-aneel)
+and select “Dicionário de dados”.
 
 #### Energy Enterprises
 
@@ -4609,7 +4509,7 @@ and select “Dicionário de dados”.
 3.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`
 4.  **year**: only used for “energy_development_budget”. It can be a
-    single year or a vector of years from 2017:2022. This argument is
+    single year or a vector of years from 2017:2024. This argument is
     required for “energy_development_budget” and can be omitted for the
     other datasets.
 
@@ -4658,9 +4558,11 @@ website](https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/)
 #### Consumer Energy Consumption
 
 The Consumer Energy Consumption dataset provides monthly data from 2004
-to 2025 about energy consumption and number of consumers. The data is
-organized by State, Region, or Electric Subsystem, and is broken down by
-class of service and type of consumer.
+to 2025 about energy consumption and number of consumers. The source
+workbook organizes the data by State, Region, or Electric Subsystem, but
+this package currently reads only the State and Subsystem levels (see
+**geo_level** below); the data is broken down by class of service and
+type of consumer.
 
 The available classes are: Residential, Commercial, Industrial, Rural,
 and Others. For each observation, the dataset reports the type of
@@ -4685,25 +4587,30 @@ developed and published by EPE that contains useful data about energy
 production, consumption, imports, exports, transformation, and final
 use.
 
-The processed dataset provides yearly data from 2003 to 2023. It covers
-all Brazilian energy sources (such as petróleo, gás natural, carvão,
-eletricidade, lenha, solar and others) and distinguishes between
-different types of energy flow: production, transformation, final
-consumption, losses, and adjustments.
+The processed dataset provides yearly data from **1970 to 2025**, read
+from EPE’s consolidated BEN dashboard table rather than the old
+one-sheet-per-year workbook. It covers all Brazilian energy sources
+(such as petróleo, gás natural, carvão, eletricidade, lenha, solar and
+others) and distinguishes between different types of energy flow:
+production, transformation, final consumption, losses, and adjustments.
 
-Each energy source appears as a separate column in the original
-spreadsheets. The cleaned data is returned in long format, with one row
-per combination of year, energy source, and account type. The account
-type is labeled to indicate whether it refers to production,
-transformation (for example, “TRANSFORMAÇÃO – REFINARIAS DE PETRÓLEO”),
-or consumption (for example, “CONSUMO – RESIDENCIAL”).
+The cleaned data is returned in long format, with one row per
+combination of year, account, energy source (`fonte`/`source`), and a
+`tipo`/`type` column (Fontes de Energia Primária/Secundária/Total) the
+old one-sheet-per-year workbook never exposed. Account labels are the
+source’s own wording (for example, “Refinarias de Petróleo” or
+“Residencial”), not a synthetic uppercase reconstruction like the old
+data used (“TRANSFORMAÇÃO – REFINARIAS DE PETRÓLEO”). **This is a
+breaking change** from earlier package versions: `raw_data = TRUE` now
+returns one already-tidy table instead of one table per year, and
+account labels have changed wording.
 
 #### State Energy Production Panel
 
-The State Energy Production Panel provides yearly data from 2011 to 2024
-on electricity generation by energy source and Brazilian state. The data
-is sourced from EPE’s BEN Chapter 8 (Dados Estaduais) and covers all 27
-states, including the Federal District.
+The State Energy Production Panel provides yearly data from **2011 to
+2025** on electricity generation by energy source and Brazilian state.
+The data is sourced from EPE’s BEN Chapter 8 (Dados Estaduais) and
+covers all 27 states, including the Federal District.
 
 Each row corresponds to one state-year combination. The dataset includes
 production by source (hydro, wind, solar, nuclear, thermal, sugar cane,
@@ -4729,9 +4636,11 @@ and an indicator of whether the state belongs to the Legal Amazon.
     `FALSE`: if you want the treated version of the data.
 
 3.  **geo_level**: only applies to `"consumer_energy_consumption"` and
-    `"industrial_energy_consumption"` datasets.  
-    `"state"`  
-    `"subsystem"`
+    `"industrial_energy_consumption"` datasets. `"state"` `"subsystem"`
+    `"region"` is also listed as a supported level by the source, but no
+    sheet is currently mapped for it in this package – passing
+    `geo_level = "region"` will fail during download rather than at
+    parameter validation. Use `"state"` or `"subsystem"`.
 
 4.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`
