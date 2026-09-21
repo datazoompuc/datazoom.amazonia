@@ -7,26 +7,25 @@
 #'    * Between 2007 - 2025 for dataset "deforestation". Deforestation for 2007 includes all cumulative deforestation up to 2007. For other years, deforestation is incremental
 #'    * Between 2010 - 2025 for dataset "residual_deforestation"
 #'    * Only 2025 for all other datasets
-#'    (these ranges track the manifest's available_time -- see inst/extdata/manifest/v1/datasets_link.csv -- and move forward every time resolve_prodes.R picks up a new PRODES release; re-check them here if this doc goes stale again)
 #' @inheritParams load_baci
 #'
 #' @return A \code{tibble} with the selected data if raw_data is \code{FALSE}, and a \code{SpatRaster} is \code{TRUE}.
 #'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
-#' # download treated deforestation data for 2023
+#' # download treated deforestation data for 2025
 #' deforestation <- load_prodes(
 #'   dataset = "deforestation",
 #'   raw_data = FALSE,
-#'   time_period = 2023,
+#'   time_period = 2025,
 #'   language = "eng"
 #' )
 #'
-#' # download treated deforestation data for 2008 to 2023
+#' # download treated deforestation data for 2008 to 2025
 #' deforestation_series <- load_prodes(
 #'   dataset = "deforestation",
 #'   raw_data = FALSE,
-#'   time_period = 2008:2023,
+#'   time_period = 2008:2025,
 #'   language = "eng"
 #' )
 #'
@@ -43,7 +42,7 @@
 #' @export
 
 load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
-                        time_period = 2023, language = "eng") {
+                        time_period = 2025, language = "eng") {
   if (!requireNamespace("terra", quietly = TRUE)) {
     stop(
       "Package \"terra\" must be installed to use this function.",

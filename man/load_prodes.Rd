@@ -7,7 +7,7 @@
 load_prodes(
   dataset = "deforestation",
   raw_data = FALSE,
-  time_period = 2023,
+  time_period = 2025,
   language = "eng"
 )
 }
@@ -21,7 +21,6 @@ load_prodes(
 \item Between 2007 - 2025 for dataset "deforestation". Deforestation for 2007 includes all cumulative deforestation up to 2007. For other years, deforestation is incremental
 \item Between 2010 - 2025 for dataset "residual_deforestation"
 \item Only 2025 for all other datasets
-(these ranges track the manifest's available_time -- see inst/extdata/manifest/v1/datasets_link.csv -- and move forward every time resolve_prodes.R picks up a new PRODES release; re-check them here if this doc goes stale again)
 }}
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.}
@@ -35,19 +34,19 @@ Loads data on deforestation in the Legal Amazon region.
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
-# download treated deforestation data for 2023
+# download treated deforestation data for 2025
 deforestation <- load_prodes(
   dataset = "deforestation",
   raw_data = FALSE,
-  time_period = 2023,
+  time_period = 2025,
   language = "eng"
 )
 
-# download treated deforestation data for 2008 to 2023
+# download treated deforestation data for 2008 to 2025
 deforestation_series <- load_prodes(
   dataset = "deforestation",
   raw_data = FALSE,
-  time_period = 2008:2023,
+  time_period = 2008:2025,
   language = "eng"
 )
 

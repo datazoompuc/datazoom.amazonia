@@ -198,10 +198,6 @@ Specifies which year(s) to download.
 | `non_forest` | 2025 only |
 | `clouds` | 2025 only |
 
-(these ranges track the manifest's `available_time` -- see
-`inst/extdata/manifest/v1/datasets_link.csv` -- and move forward every time `resolve_prodes.R`
-picks up a new PRODES release; re-check them here if this doc goes stale again)
-
 ```r
 time_period = 2020              # single year
 time_period = c(2015, 2020)     # multiple years
@@ -226,11 +222,11 @@ language = "eng"  # character string
 ### Example 1: Deforestation data for a single year
 
 ```{r eval=FALSE}
-# download treated deforestation data for 2023
+# download treated deforestation data for 2025
 deforestation <- load_prodes(
   dataset = "deforestation",
   raw_data = FALSE,
-  time_period = 2023,
+  time_period = 2025,
   language = "eng"
 )
 ```
