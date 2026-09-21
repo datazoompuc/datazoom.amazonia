@@ -148,7 +148,12 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 
 </table>
 
-> **A note on coverage:** the years, versions and collections listed for each dataset follow what the data provider currently publishes, so they can change as new releases come out. If a `time_period` or `year` you request is not accepted, check the provider's website for the latest coverage, or the package's dataset table at [`datasets_link.csv`](https://github.com/datazoompuc/datazoom.amazonia/blob/master/inst/extdata/manifest/v1/datasets_link.csv).
+> **A note on coverage:** the years, versions and collections listed for
+> each dataset follow what the data provider currently publishes, so
+> they can change as new releases come out. If a `time_period` or `year`
+> you request is not accepted, check the provider’s website for the
+> latest coverage, or the package’s dataset table at
+> [`datasets_link.csv`](https://github.com/datazoompuc/datazoom.amazonia/blob/master/inst/extdata/manifest/v1/datasets_link.csv).
 
 # Environmental Data
 
