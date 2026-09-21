@@ -13,13 +13,13 @@ load_censoagro(
 )
 }
 \arguments{
-\item{dataset}{A dataset name ("agricultural_land_area", "agricultural_area_use", "agricultural_employees_tractors", "agricultural_producer_condition", "animal_species", "animal_products", "vegetable_production_area", "vegetable_production_permanent", "vegetable_production_temporary", "livestock_production").}
+\item{dataset}{A dataset name ("agricultural_land_area", "agricultural_area_use", "agricultural_employees_tractors", "agricultural_producer_condition", "animal_production", "animal_products", "vegetable_production_area", "vegetable_production_permanent", "vegetable_production_temporary", "livestock_production").}
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
 \item{geo_level}{A \code{string} that defines the geographic level of the data. Can be of "country" or "state".
 \itemize{
-\item For dataset "livestock_production", can be one of "country", "state", or "municipality"
+\item For dataset "livestock_production", can only be "municipality"
 }}
 
 \item{time_period}{A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.}
@@ -35,12 +35,12 @@ Loads information on agricultural establishments and activities
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
-# download treated land area data at the country level in 2017
+# download treated land area data at the country level in 2006
 data <- load_censoagro(
   dataset = "agricultural_land_area",
   raw_data = FALSE,
   geo_level = "country",
-  time_period = 2017,
+  time_period = 2006,
   language = "eng"
 )
 

@@ -830,35 +830,65 @@ load_dictionary <- function(dataset) {
   }
 
   if (dataset == "energy_development_budget") {
+    # The 17 "tipo_de_despesa" rows this block used to have (CAFT CCEE,
+    # Programa Luz para Todos, Subsidio Baixa Renda, ...) never matched any
+    # real column in the manifest's current resource
+    # (cde-beneficiarios-rede-basica-*.csv, a per-agent "Rede Basica"
+    # subsidy beneficiary listing) -- "tipo_de_despesa" doesn't exist as a
+    # column, and the resource has no expense-by-category breakdown at all.
+    # Dropped rather than kept as dead weight; see NEWS.md/the manifest
+    # skill's "never collapse categories" rule -- this isn't a category
+    # merge, the whole dimension these rows described isn't present in
+    # today's data. If ANEEL's catalogue turns out to still carry a
+    # separate expense-by-category CDE resource, re-add it there with its
+    # own dataset/variable, not folded back into this one.
+    #
+    # dsc_grupo_tarifario is the one real column with an unambiguous,
+    # verified value (100% "Rede Basica" across the current resource, live
+    # 2026-09-21 and in a locally saved copy -- a tariff-group label, not
+    # an expense category). idc_classe_consumidor (real values: 9, 10) and
+    # idc_tipo (real values: 7, 8) are left untranslated -- these are bare
+    # ANEEL indicator codes with no verified meaning (ANEEL's site was
+    # unreachable to check their glossary at investigation time); the eng
+    # rename map still gives their COLUMN names (not values)
+    # consumer_class_indicator/type_indicator (see R/aneel.R).
     harmonization_dat <- tibble::tribble(
       ~variable, ~var_code, ~label_pt, ~label_eng,
-      "tipo_de_despesa", "CAFT CCEE", "Custos Administrativos e Financeiros e os Encargos Tributarios CCEE", "Administrative and Financial Costs and Tax Charges CCEE - CAFT CCEE",
-      "tipo_de_despesa", "Carvao  Mineral", "Carvao Mineral", "Mineral Coal",
-      "tipo_de_despesa", "CCC", "Conta de Consumo de Combustiveis", "Fuel Consumption Account",
-      "tipo_de_despesa", "Indenizacao das Concessoes", "Indenizacao das Concessoes", "Concessions Indemnity",
-      "tipo_de_despesa", "Programa Luz para Todos - PLPT", "Programa Luz para Todos", "Light For All Program",
-      "tipo_de_despesa", "Restos a Pagar", "Restos a Pagar", "Left to Pay",
-      "tipo_de_despesa", "Subsidio Agua-esgoto-saneamento", "Subsidio Agua-esgoto-saneamento", "Water-sewer-sanitation Aid",
-      "tipo_de_despesa", "Subsidio Baixa Renda", "Subsidio Baixa Renda", "Low Income Aid",
-      "tipo_de_despesa", "Subsidio Consumidor Fonte Incentivada", "Subsidio Consumidor Fonte Incentivada", "Incentivized Source Consumer Aid",
-      "tipo_de_despesa", "Subsidio Distribuidora", "Subsidio Distribuidora", "Distributor Aid",
-      "tipo_de_despesa", "Subsidio Fonte Incentivada  (Transmissoras)", "Subsidio Fonte Incentivada  (Transmissoras)", "Incentivized Source Aid (Transmitters)",
-      "tipo_de_despesa", "Subsidio Geracao Fonte Incentivada", "Subsidio Geracao Fonte Incentivada", "Incentivized Source Generation Aid",
-      "tipo_de_despesa", "Subsidio Irrigacao e Aquicultura", "Subsidio Irrigacao e Aquicultura", "Irrigation and Aquaculture Aid",
-      "tipo_de_despesa", "Subsidio Rural", "Subsidio Rural", "Rural Subvention",
-      "tipo_de_despesa", "Subvencao Cooperativa", "Subvencao Cooperativa", "Cooperative Subvention",
-      "tipo_de_despesa", "Subvencao RTE", "Subvencao Revisao Tarifaria Extraordinaria", "Extraordinary Tariff Review Subvention",
-      "tipo_de_despesa", "Verba MME", "Verba Ministerio de Minas e Energia", "Ministry of Mines and Energy Budget"
+      "dsc_grupo_tarifario", "Rede Basica", "rede_basica", "basic_network"
     )
   }
 
   if (dataset == "energy_enterprises_distributed") {
+    # Checked live 2026-09-21 against the real, full empreendimento-geracao-
+    # distribuida.csv (~4.66M rows, downloaded fresh -- dadosabertos.aneel.
+    # gov.br had been briefly unreachable earlier the same day, confirmed
+    # back up before this check). dsc_classe_consumo and dsc_fonte_geracao
+    # were correct as far as they went but incomplete against today's real
+    # distinct values -- added the missing ones below. dsc_modalidade_
+    # habilitado was completely stale: all 4 of its old var_codes ("Com
+    # Microgeracao ou Minigeracao distribuida", "Caracterizada como
+    # Autoconsumo remoto", ...) were long descriptive strings that don't
+    # match ANY real value -- the source now uses the same short codes
+    # (Geracao na propria UC/Auto consumo remoto/Compartilhada/Condominio)
+    # R/aneel.R's separate case_when() block already expects for its own
+    # (different) sig_modalidade_empreendimento/business_type column.
+    # Replaced with those 4 real values.
+    #
+    # dsc_classe_consumo's real distinct values also include "REBR" and
+    # "REBR " (note: two variants, one with a trailing space -- ANEEL's own
+    # data, not a typo introduced here) with no documented meaning found --
+    # left untranslated, same "don't guess an unverified code" discipline
+    # as energy_development_budget's idc_classe_consumidor/idc_tipo.
     harmonization_dat <- tibble::tribble(
       ~variable, ~var_code, ~label_pt, ~label_eng,
       "dsc_classe_consumo", "Residencial", "Residencial", "Residential",
       "dsc_classe_consumo", "Poder Publico", "Poder Publico", "Public Sector",
       "dsc_classe_consumo", "Servico Publico", "Servico Publico", "Public Service",
       "dsc_classe_consumo", "Iluminacao publica", "Iluminacao publica", "Public lighting",
+      "dsc_classe_consumo", "Comercial", "Comercial", "Commercial",
+      "dsc_classe_consumo", "Consumo Proprio", "Consumo Proprio", "Own Consumption",
+      "dsc_classe_consumo", "Industrial", "Industrial", "Industrial",
+      "dsc_classe_consumo", "Rural", "Rural", "Rural",
       "dsc_fonte_geracao", "Radiacao solar", "Radiacao solar", "Solar radiation",
       "dsc_fonte_geracao", "Gas de Alto Forno - Biomassa", "Gas de Alto Forno - Biomassa", "Blast Furnace Gas - Biomass",
       "dsc_fonte_geracao", "Cinetica do vento", "Cinetica do vento", "Wind Kinetics",
@@ -873,84 +903,98 @@ load_dictionary <- function(dataset) {
       "dsc_fonte_geracao", "Lenha", "Lenha", "Firewood",
       "dsc_fonte_geracao", "Residuos Florestais", "Residuos Florestais", "Forest Residues",
       "dsc_fonte_geracao", "Casca de Arroz", "Casca de Arroz", "Rice Husk",
+      "dsc_fonte_geracao", "Etanol", "Etanol", "Ethanol",
+      "dsc_fonte_geracao", "Oleo Diesel", "Oleo Diesel", "Diesel Oil",
+      "dsc_fonte_geracao", "Oleos vegetais", "Oleos vegetais", "Vegetable Oils",
       "dsc_porte", "Microgeracao", "Microgeracao", "Micro generation",
       "dsc_porte", "Minigeracao", "Minigeracao", "Mini generation",
-      "dsc_modalidade_habilitado", "Com Microgeracao ou Minigeracao distribuida", "Com Microgeracao ou Minigeracao distribuida", "With Distributed Microgeneration or Minigeneration",
-      "dsc_modalidade_habilitado", "Caracterizada como Autoconsumo remoto", "Caracterizada como Autoconsumo remoto", "Characterized as Remote Self-Consumption",
-      "dsc_modalidade_habilitado", "Caracterizada como Geracao compartilhada", "Caracterizada como Geracao compartilhada", "Characterized as Shared Generation",
-      "dsc_modalidade_habilitado", "Integrante de empreendimento de Multiplas UC", "Integrante de empreendimento de Multiplas UC", "Part of Multiple UC Enterprise"
+      "dsc_modalidade_habilitado", "Geracao na propria UC", "Geracao na propria UC", "Generation at Own Consumer Unit",
+      "dsc_modalidade_habilitado", "Auto consumo remoto", "Auto consumo remoto", "Remote Self-Consumption",
+      "dsc_modalidade_habilitado", "Compartilhada", "Compartilhada", "Shared Generation",
+      "dsc_modalidade_habilitado", "Condominio", "Condominio", "Condominium"
     )
   }
 
   if (dataset == "energy_generation") {
+    # FRAGILE: the ~variable column here must match the REAL post-
+    # janitor::clean_names() column name in R/aneel.R's treated
+    # energy_generation output, not a short/generic label -- the original
+    # names ("fonte", "fase", "origem", "tipo", "tipo_de_atuacao",
+    # "combustivel_final", "geracao_qualificada") never matched any real
+    # column (real names are sig_tipo_geracao/dsc_fase_usina/etc.), so this
+    # whole PT/EN recode step was silently a no-op since the dataset was
+    # added. Verified live against the real siga-empreendimentos-geracao.csv
+    # (2026-09-21): every var_code below now matches the named column's real
+    # distinct values, in both directions, except geracao_qualificada's "-"
+    # sentinel (the live data uses "" for that case instead).
     harmonization_dat <- tibble::tribble(
       ~variable, ~var_code, ~label_pt, ~label_eng,
-      "fonte", "UFV", "solar", "solar_power",
-      "fonte", "UHE", "usina_hidreletrica", "hydroelectric_power_plant",
-      "fonte", "UTE", "termoeletrica", "thermal_power",
-      "fonte", "PCH", "pequena_central_hidreletrica", "small_hydroelectric_center",
-      "fonte", "CGH", "central_geradora_hidreletrica", "hydroelectric_generating_center",
-      "fonte", "EOL", "eolica", "wind_power",
-      "fonte", "UTN", "termonuclear", "thermonuclear_power",
-      "fase", "Operacao", "em_operacao", "in_operation",
-      "fase", "Construcao nao iniciada", "construcao_nao_iniciada", "construction_not_started",
-      "fase", "Construcao", "em_construcao", "in_construction",
-      "origem", "Solar", "solar", "solar",
-      "origem", "Hidrica", "hidrica", "hydric",
-      "origem", "Fossil", "fossil", "fossil",
-      "origem", "Biomassa", "biomassa", "biomass",
-      "origem", "Eolica", "eolica", "wind",
-      "origem", "Nuclear", "nuclear", "nuclear",
-      "tipo", "Radiacao solar", "radiacao_solar", "solar_radiation",
-      "tipo", "Potencial hidraulico", "potencial_hidraulico", "hydraulic_potential",
-      "tipo", "Petroleo", "petroleo", "oil",
-      "tipo", "Floresta", "floresta", "forest",
-      "tipo", "Cinetica do vento", "cinetica_do_vento", "wind_kinetics",
-      "tipo", "Carvao mineral", "carvao_mineral", "mineral_coal",
-      "tipo", "Agroindustriais", "agroindustriais", "agroindustrial",
-      "tipo", "Gas natural", "gas_natural", "natural_gas",
-      "tipo", "Residuos animais", "residuos_animais", "animal_residue",
-      "tipo", "Uranio", "uranio", "uranium",
-      "tipo", "Residuos solidos urbanos", "residuos_solidos_urbanos", "solid_urban_residue",
-      "tipo", "Biocombustiveis liquidos", "biocombustiveis_liquidos", "liquid_biofuels",
-      "tipo", "Outros Fosseis", "outros_fosseis", "other_fossil",
-      "tipo_de_atuacao", "Registro", "registro", "registration",
-      "tipo_de_atuacao", "Concessao", "concessao", "concession",
-      "tipo_de_atuacao", "Autorizacao", "autorizacao", "authorization",
-      "combustivel_final", "Radiacao solar", "radiacao_solar", "solar_radiation",
-      "combustivel_final", "Potencial hidraulico", "potecial_hidraulico", "hydraulic_potential",
-      "combustivel_final", "Oleo Diesel", "oleo_diesel", "diesel",
-      "combustivel_final", "Residuos Florestais", "residuos_florestais", "forest_residue",
-      "combustivel_final", "Cinetica do vento", "cinetica_do_vento", "wind_kinetics",
-      "combustivel_final", "Gas de Alto Forno - CM", "gas_de_alto_forno", "blast_furnace_gas",
-      "combustivel_final", "Biogas-AGR", "biogas_agroindustriais", "biogas_agroindustrial",
-      "combustivel_final", "Gas Natural", "gas_natural", "natural_gas",
-      "combustivel_final", "Bagaco de Cana de Acucar", "bagaco_de_cana", "sugar_cane_bagasse",
-      "combustivel_final", "Biogas - RA", "biogas_residuo_animal", "biogas_animal_residue",
-      "combustivel_final", "Lenha", "lenha", "firewood",
-      "combustivel_final", "Uranio", "uranio", "uranium",
-      "combustivel_final", "Carvao Mineral", "carvao_mineral", "mineral_coal",
-      "combustivel_final", "Biogas - RU", "biogas_residuos_urbanos", "biogas_urban_residue",
-      "combustivel_final", "Oleo Combustivel", "oleo_combustivel", "fuel_oil",
-      "combustivel_final", "Licor Negro", "licor_negro", "black_liquor",
-      "combustivel_final", "Casca de Arroz", "casca_de_arroz", "rice_husk",
-      "combustivel_final", "Carvao Vegetal", "carvao_vegetal", "charcoal",
-      "combustivel_final", "Oleos vegetais", "oleos_vegetais", "vegetable_oils",
-      "combustivel_final", "Capim Elefante", "capim_elefante", "elephant_grass",
-      "combustivel_final", "Residuos Solidos Urbanos - RU", "residuos_solidos_urbanos", "solid_urban_residue",
-      "combustivel_final", "Outros Energeticos de Petroleo", "outros_energeticos_de_petroleo", "other_oil_energetics",
-      "combustivel_final", "Gas de Alto Forno - Biomassa", "gas_de_alto_forno_biomassa", "blast_furnace_gas_biomass",
-      "combustivel_final", "Gas de Refinaria", "gas_de_refinaria", "refinery_gas",
-      "combustivel_final", "Calor de Processo - OF", "calor_de_processo_of", "process_heat_of",
-      "combustivel_final", "Carvao - RU", "carvao_ru", "ru_coal",
-      "combustivel_final", "Calor de Processo - GN", "calor_de_processo_gn", "process_heat_gn",
-      "combustivel_final", "Calor de Processo - CM", "calor_de_processo_cm", "process_heat_cm",
-      "combustivel_final", "Biogas - Floresta", "biogas_floresta", "biogas_forest",
-      "combustivel_final", "Gas de Alto Forno - PE", "gas_de_alto_forno_pe", "blast_funace_gas_pe",
-      "combustivel_final", "Etanol", "etanol", "ethanol",
-      "geracao_qualificada", "-", NA, NA,
-      "geracao_qualificada", "Nao", "0", "0",
-      "geracao_qualificada", "Sim", "1", "1"
+      "sig_tipo_geracao", "UFV", "solar", "solar_power",
+      "sig_tipo_geracao", "UHE", "usina_hidreletrica", "hydroelectric_power_plant",
+      "sig_tipo_geracao", "UTE", "termoeletrica", "thermal_power",
+      "sig_tipo_geracao", "PCH", "pequena_central_hidreletrica", "small_hydroelectric_center",
+      "sig_tipo_geracao", "CGH", "central_geradora_hidreletrica", "hydroelectric_generating_center",
+      "sig_tipo_geracao", "EOL", "eolica", "wind_power",
+      "sig_tipo_geracao", "UTN", "termonuclear", "thermonuclear_power",
+      "dsc_fase_usina", "Operacao", "em_operacao", "in_operation",
+      "dsc_fase_usina", "Construcao nao iniciada", "construcao_nao_iniciada", "construction_not_started",
+      "dsc_fase_usina", "Construcao", "em_construcao", "in_construction",
+      "dsc_origem_combustivel", "Solar", "solar", "solar",
+      "dsc_origem_combustivel", "Hidrica", "hidrica", "hydric",
+      "dsc_origem_combustivel", "Fossil", "fossil", "fossil",
+      "dsc_origem_combustivel", "Biomassa", "biomassa", "biomass",
+      "dsc_origem_combustivel", "Eolica", "eolica", "wind",
+      "dsc_origem_combustivel", "Nuclear", "nuclear", "nuclear",
+      "dsc_fonte_combustivel", "Radiacao solar", "radiacao_solar", "solar_radiation",
+      "dsc_fonte_combustivel", "Potencial hidraulico", "potencial_hidraulico", "hydraulic_potential",
+      "dsc_fonte_combustivel", "Petroleo", "petroleo", "oil",
+      "dsc_fonte_combustivel", "Floresta", "floresta", "forest",
+      "dsc_fonte_combustivel", "Cinetica do vento", "cinetica_do_vento", "wind_kinetics",
+      "dsc_fonte_combustivel", "Carvao mineral", "carvao_mineral", "mineral_coal",
+      "dsc_fonte_combustivel", "Agroindustriais", "agroindustriais", "agroindustrial",
+      "dsc_fonte_combustivel", "Gas natural", "gas_natural", "natural_gas",
+      "dsc_fonte_combustivel", "Residuos animais", "residuos_animais", "animal_residue",
+      "dsc_fonte_combustivel", "Uranio", "uranio", "uranium",
+      "dsc_fonte_combustivel", "Residuos solidos urbanos", "residuos_solidos_urbanos", "solid_urban_residue",
+      "dsc_fonte_combustivel", "Biocombustiveis liquidos", "biocombustiveis_liquidos", "liquid_biofuels",
+      "dsc_fonte_combustivel", "Outros Fosseis", "outros_fosseis", "other_fossil",
+      "dsc_tipo_outorga", "Registro", "registro", "registration",
+      "dsc_tipo_outorga", "Concessao", "concessao", "concession",
+      "dsc_tipo_outorga", "Autorizacao", "autorizacao", "authorization",
+      "nom_fonte_combustivel", "Radiacao solar", "radiacao_solar", "solar_radiation",
+      "nom_fonte_combustivel", "Potencial hidraulico", "potecial_hidraulico", "hydraulic_potential",
+      "nom_fonte_combustivel", "Oleo Diesel", "oleo_diesel", "diesel",
+      "nom_fonte_combustivel", "Residuos Florestais", "residuos_florestais", "forest_residue",
+      "nom_fonte_combustivel", "Cinetica do vento", "cinetica_do_vento", "wind_kinetics",
+      "nom_fonte_combustivel", "Gas de Alto Forno - CM", "gas_de_alto_forno", "blast_furnace_gas",
+      "nom_fonte_combustivel", "Biogas-AGR", "biogas_agroindustriais", "biogas_agroindustrial",
+      "nom_fonte_combustivel", "Gas Natural", "gas_natural", "natural_gas",
+      "nom_fonte_combustivel", "Bagaco de Cana de Acucar", "bagaco_de_cana", "sugar_cane_bagasse",
+      "nom_fonte_combustivel", "Biogas - RA", "biogas_residuo_animal", "biogas_animal_residue",
+      "nom_fonte_combustivel", "Lenha", "lenha", "firewood",
+      "nom_fonte_combustivel", "Uranio", "uranio", "uranium",
+      "nom_fonte_combustivel", "Carvao Mineral", "carvao_mineral", "mineral_coal",
+      "nom_fonte_combustivel", "Biogas - RU", "biogas_residuos_urbanos", "biogas_urban_residue",
+      "nom_fonte_combustivel", "Oleo Combustivel", "oleo_combustivel", "fuel_oil",
+      "nom_fonte_combustivel", "Licor Negro", "licor_negro", "black_liquor",
+      "nom_fonte_combustivel", "Casca de Arroz", "casca_de_arroz", "rice_husk",
+      "nom_fonte_combustivel", "Carvao Vegetal", "carvao_vegetal", "charcoal",
+      "nom_fonte_combustivel", "Oleos vegetais", "oleos_vegetais", "vegetable_oils",
+      "nom_fonte_combustivel", "Capim Elefante", "capim_elefante", "elephant_grass",
+      "nom_fonte_combustivel", "Residuos Solidos Urbanos - RU", "residuos_solidos_urbanos", "solid_urban_residue",
+      "nom_fonte_combustivel", "Outros Energeticos de Petroleo", "outros_energeticos_de_petroleo", "other_oil_energetics",
+      "nom_fonte_combustivel", "Gas de Alto Forno - Biomassa", "gas_de_alto_forno_biomassa", "blast_furnace_gas_biomass",
+      "nom_fonte_combustivel", "Gas de Refinaria", "gas_de_refinaria", "refinery_gas",
+      "nom_fonte_combustivel", "Calor de Processo - OF", "calor_de_processo_of", "process_heat_of",
+      "nom_fonte_combustivel", "Carvao - RU", "carvao_ru", "ru_coal",
+      "nom_fonte_combustivel", "Calor de Processo - GN", "calor_de_processo_gn", "process_heat_gn",
+      "nom_fonte_combustivel", "Calor de Processo - CM", "calor_de_processo_cm", "process_heat_cm",
+      "nom_fonte_combustivel", "Biogas - Floresta", "biogas_floresta", "biogas_forest",
+      "nom_fonte_combustivel", "Gas de Alto Forno - PE", "gas_de_alto_forno_pe", "blast_funace_gas_pe",
+      "nom_fonte_combustivel", "Etanol", "etanol", "ethanol",
+      "idc_geracao_qualificada", "-", NA, NA,
+      "idc_geracao_qualificada", "Nao", "0", "0",
+      "idc_geracao_qualificada", "Sim", "1", "1"
     )
   }
 

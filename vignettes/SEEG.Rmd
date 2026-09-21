@@ -15,31 +15,36 @@ knitr::opts_chunk$set(
 ```
 ## Overview
 
-SEEG (Sistema de Estimativa de Emissões e Remoções de Gases de Efeito Estufa - System of Estimates of Emissions and Removals of Greenhouse Gases) is Brazil's most comprehensive greenhouse gas emissions database developed by [Observatório do Clima](https://oc.eco.br/) (Climate Observatory).
+SEEG (Sistema de Estimativa de Emissões e Remoções de Gases de Efeito Estufa - System of Estimates of Emissions and Removals of Greenhouse Gases) is Brazil's most comprehensive greenhouse gas emissions database, developed by [Observatório do Clima](https://oc.eco.br/) (Climate Observatory).
 
 This dataset provides:
 
-- **Greenhouse gas emissions**: Complete estimates of all major climate-relevant gases
-- **Multi-sector coverage**: Agriculture, energy, land use, industry, waste
-- **Sub-sectoral detail**: Detailed breakdowns within each sector
-- **Municipality and state levels**: Geographic disaggregation for regional analysis
-- **Time series**: Historical data from 2000 onwards
-- **Removal accounting**: Also includes carbon sequestration and removals
-- **Comprehensive methodology**: Based on Brazilian national inventory standards
-- **Transparent assumptions**: Well-documented methodology and data sources
-
-SEEG is the primary tool for understanding Brazil's greenhouse gas emissions profile, tracking progress toward climate goals, identifying emission hotspots, and supporting climate policy.
-
-### Data Source and Methodology
-
-SEEG emissions estimates are compiled using:
-- Government data from multiple agencies (MAPA, IBGE, ANP, etc.)
-- Satellite monitoring of deforestation and land use
-- International IPCC methodology standards
-- Peer-reviewed scientific research
-- Regular updates as new government data becomes available
+- **Greenhouse gas emissions**: estimates covering emissions and removals across all major sectors
+- **Multi-sector coverage**: agriculture, energy, land use change, industrial processes, waste
+- **Municipality, state, and country levels**: geographic disaggregation for regional analysis
+- **Time series**: 1970-2024
 
 For more information, visit [SEEG Project](https://www.seeg.org.br/) and [Observatório do Clima](https://oc.eco.br/).
+
+***
+
+## Data Version
+
+The package reads SEEG's **v13.0** municipal summary workbook (`seeg.eco.br`). Categories are
+organized as `Setor de emissão` / `Categoria emissora` / `Sub-categoria emissora` / `Recorte` /
+`Atividade geral`. There is no `time_period` argument -- every call returns the full series.
+
+### Detail not included
+
+A few dimensions are not available in the current data:
+
+- No `gas`/`produto` breakdown -- emissions are not split by individual gas.
+- **seeg_farming**: no species/crop-level detail.
+- **seeg_industry**: no input/technology-level detail (partly offset by an actual/potential
+  emission split and a finer end-use breakdown).
+- **seeg_energy**: no fuel-type breakdown (gasoline, diesel, LPG, etc.).
+- **seeg_land**: no **biome** dimension and no origin-to-destination **land-cover transition
+  matrix** -- only four coarser categorical fields.
 
 ***
 
@@ -47,138 +52,64 @@ For more information, visit [SEEG Project](https://www.seeg.org.br/) and [Observ
 
 ### **1. seeg (All Sectors Combined)**
 
-Complete greenhouse gas emissions across all sectors in one dataset.
+Complete greenhouse gas emissions across all sectors in one dataset. **Only available with
+`raw_data = TRUE`** -- it cannot be requested treated (`raw_data = FALSE`).
 
-- **Coverage**: All emission sources in Brazil
-- **Sectors included**: All five (agriculture, energy, land use, industry, waste)
-- **Time period**: 2000-2018
-- **Geographic levels**: Country, State, Municipality
-- **Key variables**: Total emissions (CO₂e), by sector and sub-sector
-- **Format**: Comprehensive view of Brazil's total emissions profile
-- **Note**: Only available with `raw_data = TRUE`
-- **Use cases**:
-  - Understand overall emissions landscape
-  - Identify dominant emission sources
-  - Track total emissions trends over time
+- **Coverage**: all sectors, 1970-2024
+- **Geographic levels**: country, state, municipality
+- **Format**: the cleaned source sheet -- one row per municipality x category path, with one
+  numeric column per year (`x1970`...`x2024`)
 
 ### **2. seeg_farming (Agricultural and Livestock Emissions)**
 
-Greenhouse gas emissions from agriculture and livestock activities.
-
-- **Coverage**: All agricultural and livestock production
-- **Time period**: 2000-2018
-- **Geographic levels**: Country, State, Municipality
-- **Key variables**: Emissions from cattle, crop production, soil management, manure
-- **Dominant source**: Usually the largest single emissions sector in Brazil
-- **Components**: 
-  - Livestock (enteric fermentation, manure)
-  - Crop production and soil management
-  - Agricultural land preparation
-- **Use cases**:
-  - Assess agricultural emission contributions
-  - Identify highest-emission municipalities
-  - Evaluate livestock and farming intensity
-  - Policy targets for agricultural emissions reduction
+Sector: `Agropecuaria`. **Only available with `raw_data = FALSE`.**
 
 ### **3. seeg_energy (Energy Sector Emissions)**
 
-Emissions from energy production and consumption.
-
-- **Coverage**: All energy-related emissions
-- **Time period**: 2000-2018
-- **Geographic levels**: Country, State, Municipality
-- **Key variables**: Emissions from electricity, transport, heating, fuel production
-- **Components**:
-  - Energy generation and distribution
-  - Transportation fuels
-  - Energy consumption
-  - Industrial energy use
-- **Use cases**:
-  - Understand energy sector contribution to climate change
-  - Track renewable vs. fossil fuel impacts
-  - Identify regional energy emission patterns
+Sector: `Energia`. **Only available with `raw_data = FALSE`.** No fuel-type breakdown (see
+"Detail not included" above).
 
 ### **4. seeg_land (Land Use Change Emissions)**
 
-Emissions and removals from changes in forest cover and land use.
-
-- **Coverage**: Deforestation, forest degradation, reforestation effects
-- **Time period**: 2000-2018
-- **Geographic levels**: Country, State, Municipality
-- **Key variables**: Net emissions/removals from land use change
-- **Components**:
-  - Deforestation and forest loss
-  - Forest degradation
-  - Reforestation and afforestation
-  - Vegetation conversion
-- **Importance**: Often largest single contributor to Brazil's emissions
-- **Use cases**:
-  - Analyze deforestation climate impact
-  - Identify reforestation opportunities
-  - Assess forest conservation value
-  - Link with PRODES and DETER deforestation data
+Sector: `Mudanca de Uso da Terra e Floresta`. **Only available with `raw_data = FALSE`.** No
+biome dimension and no land-cover transition matrix (see "Detail not included" above).
 
 ### **5. seeg_industry (Industrial Process Emissions)**
 
-Emissions from manufacturing and industrial processes.
-
-- **Coverage**: All industrial sectors
-- **Time period**: 2000-2018
-- **Geographic levels**: Country, State, Municipality
-- **Key variables**: Emissions from cement, chemicals, metals, minerals, other manufacturing
-- **Components**:
-  - Chemical production (ammonia, soda ash, etc.)
-  - Metal production (iron, aluminum, others)
-  - Mineral processing (cement, lime, glass)
-  - Other industrial processes
-- **Use cases**:
-  - Identify industrial emission hotspots
-  - Regional manufacturing impacts
-  - Process-specific emission reduction opportunities
+Sector: `Processos Industriais`. **Only available with `raw_data = FALSE`.**
 
 ### **6. seeg_residuals (Waste and Residuals Emissions)**
 
-Emissions from waste management, landfills, and waste treatment.
-
-- **Coverage**: All waste-related emissions
-- **Time period**: 2000-2018
-- **Geographic levels**: Country, State, Municipality
-- **Key variables**: Emissions from solid waste, wastewater treatment, waste treatment
-- **Components**:
-  - Landfill methane emissions
-  - Wastewater treatment
-  - Waste disposal and treatment
-  - Municipal solid waste management
-- **Use cases**:
-  - Assess waste sector contributions
-  - Identify waste management improvement opportunities
-  - Evaluate circular economy potential
+Sector: `Residuos`. **Only available with `raw_data = FALSE`.**
 
 ***
 
-## Important Data Characteristics
+## Output Columns (`raw_data = FALSE`)
 
-### Collection 9 Data
+Every `seeg_*` sector dataset returns long-format data, one row per category combination and
+year, with a single `value` (eng) / `Valor` (pt) column. The columns available depend on
+`geo_level` and on which 4th categorical dimension that sector carries:
 
-The data provided is from SEEG's Collection 9:
-- **Time period**: 2000-2018
-- **Methodology**: Latest available when data was compiled
-- **Quality**: Peer-reviewed and validated
-- **Revisions**: May be updated in future SEEG collections as better data becomes available
+| geo_level | eng columns | pt columns |
+|---|---|---|
+| municipality | year, city, state, ibge, sector, emission_category, emission_subcategory, **&lt;4th dim&gt;**, general_activity, emission_type, value | Ano, municipio, estado, ibge, setor, categoria_emissao, subcategoria_emissao, **&lt;4th dim&gt;**, atividade_geral, tipo_emissao, Valor |
+| state | (drops city, ibge) | (drops municipio, ibge) |
+| country | (also drops state) | (also drops estado) |
 
-### Emissions Units
+The 4th dimension's name (and whether it is translated in `pt`) differs by sector:
 
-- **Standard unit**: Gigatonnes CO₂ equivalent (Gt CO₂e)
-- **CO₂e equivalence**: Uses global warming potentials (GWP) to convert CH₄ and N₂O to CO₂ equivalent
-- **Consistency**: Allows comparison across different gases and sectors
+| Dataset | eng name | pt name | pt renamed? |
+|---|---|---|---|
+| seeg_residuals | waste_stream | tipo_residuo | yes |
+| seeg_farming | emission_pathway | via_emissao | yes |
+| seeg_industry | emission_scope | recorte | **no -- stays `recorte`** |
+| seeg_energy | emission_scope | recorte | **no -- stays `recorte`** |
+| seeg_land | emission_scope | recorte | **no -- stays `recorte`** |
 
-### Download Considerations
-
- **Important**: The complete SEEG dataset is quite large. When downloading:
-- Entire datasets are downloaded as single files; year selection is limited
-- A stable, high-speed internet connection is recommended
-- Downloads may take time depending on connection speed
-- Ensure sufficient disk space for storage
+**`language = "pt"` output is never value-translated** -- only `language = "eng"` runs SEEG's
+PT->EN value dictionaries (`SEEG_SECTOR_EN`, `SEEG_EMISSION_TYPE_EN`, and one
+category/subcategory/dimension/activity dictionary per sector, in `R/seeg.R`). A PT call returns
+the source's own Portuguese values as-is.
 
 ***
 
@@ -186,52 +117,40 @@ The data provided is from SEEG's Collection 9:
 
 ### 1. **dataset**
 
-Selects which emission sector(s) to download.
+Selects which emission sector to download.
 
 ```r
 dataset = "seeg"              # All sectors (raw_data = TRUE only)
-dataset = "seeg_farming"      # Agriculture and livestock
-dataset = "seeg_energy"       # Energy sector
-dataset = "seeg_land"         # Land use changes
-dataset = "seeg_industry"     # Industrial processes
-dataset = "seeg_residuals"    # Waste and residuals
+dataset = "seeg_farming"      # Agriculture and livestock (raw_data = FALSE only)
+dataset = "seeg_energy"       # Energy sector (raw_data = FALSE only)
+dataset = "seeg_land"         # Land use changes (raw_data = FALSE only)
+dataset = "seeg_industry"     # Industrial processes (raw_data = FALSE only)
+dataset = "seeg_residuals"    # Waste and residuals (raw_data = FALSE only)
 ```
 
 ### 2. **raw_data**
 
-Controls whether to download original or processed data.
-
-- `TRUE`: Returns raw SEEG data format (more detailed)
-- `FALSE`: Returns treated data with English variable names and standardized format
-
-```r
-raw_data = FALSE  # logical
-```
+Controls whether to download the original or the treated data. **Each dataset only works with one
+value** (see above): `"seeg"` requires `TRUE`; every `seeg_*` sector requires `FALSE`.
 
 ### 3. **geo_level**
 
 Specifies geographic aggregation level.
 
-- `"country"`: National total
-- `"state"`: State-level emissions (27 units)
-- `"municipality"`: All 5,570+ municipalities
-
-```r
-geo_level = "state"  # character string
-```
+- `"country"`: national total
+- `"state"`: state-level emissions (27 units)
+- `"municipality"`: all 5,570+ municipalities
 
 ### 4. **language**
 
-Output language for variable names and labels.
+Output language for column names and, for `eng` only, translated values.
 
-- `"pt"`: Portuguese
-- `"eng"`: English
+- `"pt"`: Portuguese column names, source's own Portuguese values (untranslated)
+- `"eng"`: English column names and translated values
 
-```r
-language = "eng"  # character string
-```
-
-**Note on timing**: Downloads may take considerable time due to file size.
+**Note on timing**: the source workbook is 250MB+; downloads may take time. A session-scoped
+download+parse cache (`R/download.R`) avoids re-downloading it if you load more than one SEEG
+dataset in the same session.
 
 ***
 
@@ -240,7 +159,6 @@ language = "eng"  # character string
 ### Example 1: All sectors combined (raw data) at the country level
 
 ```{r eval=FALSE}
-# download raw SEEG data (all sectors) at the country level
 # note: dataset = "seeg" only works with raw_data = TRUE
 all_emissions <- load_seeg(
   dataset = "seeg",
@@ -253,7 +171,6 @@ all_emissions <- load_seeg(
 ### Example 2: Agricultural emissions by state
 
 ```{r eval=FALSE}
-# download treated agricultural emissions at the state level
 farming <- load_seeg(
   dataset = "seeg_farming",
   raw_data = FALSE,
@@ -265,7 +182,6 @@ farming <- load_seeg(
 ### Example 3: Land use change emissions by state
 
 ```{r eval=FALSE}
-# download treated land use change emissions at the state level
 land_use <- load_seeg(
   dataset = "seeg_land",
   raw_data = FALSE,
@@ -277,7 +193,6 @@ land_use <- load_seeg(
 ### Example 4: Energy emissions by municipality
 
 ```{r eval=FALSE}
-# download treated energy emissions at the municipality level
 energy <- load_seeg(
   dataset = "seeg_energy",
   raw_data = FALSE,
@@ -289,7 +204,6 @@ energy <- load_seeg(
 ### Example 5: Industrial process emissions by state
 
 ```{r eval=FALSE}
-# download treated industrial process emissions at the state level
 industry <- load_seeg(
   dataset = "seeg_industry",
   raw_data = FALSE,
@@ -301,7 +215,6 @@ industry <- load_seeg(
 ### Example 6: Waste emissions by state
 
 ```{r eval=FALSE}
-# download treated waste emissions at the state level
 residuals <- load_seeg(
   dataset = "seeg_residuals",
   raw_data = FALSE,
@@ -310,38 +223,13 @@ residuals <- load_seeg(
 )
 ```
 
-## Data Notes
+## Limitations
 
-### Emission Sources Included
-
-SEEG includes all major anthropogenic emission sources:
-- Agriculture (livestock, crops, soil)
-- Energy (electricity, transport, heating)
-- Land use change (deforestation, afforestation)
-- Industrial processes (cement, chemicals, metals)
-- Waste (landfills, wastewater)
-
-### Methodology
-
-Estimates follow:
-- IPCC guidelines for national greenhouse gas inventories
-- Brazilian national inventory standards
-- International best practices
-- Transparent, documented assumptions
-
-### Data Quality
-
-- Peer-reviewed methodology
-- Validated against government data
-- Uncertainty ranges available in detailed products
-- Regular methodology updates
-
-### Limitations
-
-1. **Fixed time period**: Collection 9 covers 2000-2018 only
-2. **File size**: Large downloads; requires good internet
-3. **Year aggregation**: Cannot select individual years; entire dataset downloaded
-4. **Revisions**: Methodology may change in future SEEG releases
-5. **Sub-national uncertainty**: Municipal and state estimates have higher uncertainty than national
+1. **No year selection**: entire series (1970-2024) is downloaded; there is no `time_period`
+   argument.
+2. **File size**: the source workbook is 250MB+; a stable connection is recommended.
+3. **Missing detail**: see "Detail not included" above -- fuel type, species/crop detail,
+   biome, and the land-cover transition matrix are not available in the current data.
+4. **`pt` output is untranslated**: only `language = "eng"` runs SEEG's value dictionaries.
 
 ***

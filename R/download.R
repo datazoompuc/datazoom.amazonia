@@ -290,6 +290,125 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
   } # End of If - Download at the Municipality Level
 }
 
+# ---------------------------------------------------------------------------
+# Session-scoped download + parse cache
+#
+# external_download() is the single download helper for every load_*()
+# except load_epe()'s two datasets (R/epe.R, a deliberate bypass because
+# readxl chokes on that workbook's sharedStrings.xml). Several sources serve
+# more than one dataset off one identical file -- SEEG (6 datasets, one
+# 250MB+ xlsx), IPS (8 datasets, one xlsx), PRODES (6 datasets, one zip) --
+# so loading more than one dataset from the same source used to pay for the
+# download, and for xlsx sources the readxl::read_xlsx() parse, once per
+# dataset. This cache fixes that for the lifetime of one R session; it never
+# persists across sessions and needs no user consent (CRAN's restriction is
+# on writing into the user's home/library, not into tempdir() subdirectories).
+#
+# Mirrors the .dz_manifest_cache precedent (R/manifest.R): a namespace-local
+# environment, an options() escape hatch, and an internal clear_*() for tests.
+# ---------------------------------------------------------------------------
+
+# .dz_download_cache$files      : an environment, key string -> list(dir, temp)
+# .dz_download_cache$parsed_key : the key of the one cached parsed object, or NULL
+# .dz_download_cache$parsed_val : the cached parsed object itself
+.dz_download_cache <- new.env(parent = emptyenv())
+
+download_cache_enabled <- function() {
+  !isFALSE(getOption("datazoom.amazonia.cache", TRUE))
+}
+
+#' Drop every cached download and parsed object. Internal only -- used by
+#' tests to isolate cache state between test_that() blocks.
+#' @noRd
+clear_download_cache <- function() {
+  .dz_download_cache$files <- NULL
+  .dz_download_cache$parsed_key <- NULL
+  .dz_download_cache$parsed_val <- NULL
+  invisible(NULL)
+}
+
+download_cache_files_env <- function() {
+  if (is.null(.dz_download_cache$files)) {
+    .dz_download_cache$files <- new.env(parent = emptyenv())
+  }
+  .dz_download_cache$files
+}
+
+file_cache_key <- function(path, file_extension) {
+  paste(file_extension, path, sep = "||")
+}
+
+# NULL on a miss, or when a previously cached dir/file has since been
+# removed from under us (e.g. by a stale-tempdir cleanup) -- treated the
+# same as a miss rather than erroring.
+file_cache_get <- function(key) {
+  env <- download_cache_files_env()
+  if (!exists(key, envir = env, inherits = FALSE)) {
+    return(NULL)
+  }
+  entry <- get(key, envir = env, inherits = FALSE)
+  if (!dir.exists(entry$dir) || !file.exists(entry$temp)) {
+    return(NULL)
+  }
+  entry
+}
+
+file_cache_set <- function(key, dir, temp) {
+  assign(key, list(dir = dir, temp = temp), envir = download_cache_files_env())
+}
+
+# Which reads are cheap to keep a single parsed copy of: the .xlsx branches
+# only (ips, epe, and the generic branch covering seeg/mapbiomas/iema --
+# see the dispatch below). Deliberately excludes terra::rast() results (a
+# SpatRaster wraps a C++ pointer tied to a file on disk, and the prodes branch
+# calls terra::tmpFiles(remove = TRUE), which can invalidate a cached one)
+# and data.table::fread() results (aneel/baci hand these straight to the user
+# under raw_data = TRUE, and a user's dt[, x := 1] would mutate a shared
+# cache entry in place). aneel is 100% CSV across all datasets and explicitly
+# excluded.
+parsed_cache_eligible <- function(source, file_extension) {
+  file_extension == ".xlsx" && source %in% c("seeg", "ips", "epe", "mapbiomas", "iema")
+}
+
+#' Perform the actual file transfer for external_download(). Extracted as a
+#' seam so tests can intercept it with testthat::local_mocked_bindings() --
+#' utils::download.file()/googledrive::drive_download() are namespaced calls
+#' in other packages and cannot otherwise be mocked or counted.
+#' @noRd
+perform_download <- function(path, temp, download_method, source, quiet = TRUE) {
+  if (download_method == "standard") {
+    utils::download.file(url = path, destfile = temp, mode = "wb")
+  }
+  if (download_method == "curl") {
+    # This function's own caller (external_download()) already restores
+    # every option it touches on exit, but perform_download() shouldn't
+    # depend on that to stay behavior-preserving on its own -- guard locally
+    # too, in case this is ever called directly (as the tests' mocking seam
+    # does) without that caller's on.exit() wrapping it.
+    old_options <- options()[c("download.file.method", "download.file.extra")]
+    on.exit(options(old_options), add = TRUE)
+    if (source == "deter") {
+      options(download.file.method = "curl", download.file.extra = "-L")
+    }
+    if (source == "baci") {
+      options(download.file.extra = "--ssl-no-revoke")
+    }
+    utils::download.file(url = path, destfile = temp, method = "curl", quiet = quiet)
+  }
+  if (download_method == "googledrive") {
+    message("Please follow the steps from `googledrive` package to download the data. This may take a while.\nIn case of authentication errors, run vignette(\"GOOGLEDRIVE\").")
+    googledrive::drive_download(path, path = temp, overwrite = TRUE)
+  }
+  invisible(NULL)
+}
+
+# Must match the UA string actions/scrapers/resolve_seeg.R uses to verify
+# this same seeg.eco.br URL live -- see the "seeg" branch above.
+SEEG_USER_AGENT <- paste(
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+  "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+)
+
 external_download <- function(dataset = NULL, source = NULL, year = NULL,
                               geo_level = NULL, coords = NULL, dataset_code = NULL,
                               sheet = NULL, skip_rows = NULL, file_name = NULL,
@@ -303,7 +422,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   old_options <- list(
     timeout = getOption("timeout"),
     download.file.method = getOption("download.file.method"),
-    download.file.extra = getOption("download.file.extra")
+    download.file.extra = getOption("download.file.extra"),
+    HTTPUserAgent = getOption("HTTPUserAgent")
   )
   on.exit(options(old_options), add = TRUE)
 
@@ -330,39 +450,33 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   ## Construct Links ##
   #####################
 
-  ## Pull URL from datasets_link
+  ## Pull URL from the manifest
+  #
+  # dataset_url() resolves the most specific matching row for
+  # (source, dataset, geo_level, year), so geo_level/year-dependent URLs
+  # (MapBiomas overrides, ANEEL CDE per-year links, ...) no longer need a
+  # dedicated branch here -- they are just more specific rows in the
+  # manifest (inst/extdata/manifest/v1/datasets_link.csv).
 
-  param$url <- datasets_link(
+  param$url <- dataset_url(
     source = param$source,
     dataset = param$dataset,
-    url = TRUE
+    geo_level = param$geo_level,
+    year = param$year
   )
 
-  # For most sources, the URL in datasets_link is already the URL needed for the download
+  if (is.na(param$url)) {
+    stop(
+      "No download URL found for source '", param$source, "', dataset '", param$dataset, "'",
+      if (!is.null(param$year)) paste0(", year ", paste(param$year, collapse = ", ")) else "",
+      if (!is.null(param$geo_level)) paste0(", geo_level '", param$geo_level, "'") else "",
+      "."
+    )
+  }
+
+  # For most sources, the URL in the manifest is already the URL needed for the download
 
   path <- param$url
-
-
-  if (identical(path, "aneel_cde_$year$")) {
-    cde_urls <- c(
-      "2017" = "https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/684a68fd-4278-4af1-bcf2-c02810dd7c0c/download/cde-beneficiarios-rede-basica-2017.csv",
-      "2018" = "https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/237f3f67-4795-4bd7-a4d2-5f6071ef39af/download/cde-beneficiarios-rede-basica-2018.csv",
-      "2019" = "https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/0bd1f129-39c5-4edc-b272-3f1d11181cca/download/cde-beneficiarios-rede-basica-2019.csv",
-      "2020" = "https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/f77bb713-cc06-406a-baa8-246acc357ff5/download/cde-beneficiarios-rede-basica-2020.csv",
-      "2021" = "https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/cdf1b068-7c76-462a-ab57-d6619ad290fa/download/cde-beneficiarios-rede-basica-2021.csv",
-      "2022" = "https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/e390baae-5304-4a94-854f-0905094b3357/download/cde-beneficiarios-rede-basica-2022.csv"
-    )
-
-    if (is.null(param$year)) {
-      stop("For 'energy_development_budget', please provide 'year'.")
-    }
-
-    if (!as.character(param$year) %in% names(cde_urls)) {
-      stop("Year not available for 'energy_development_budget'.")
-    }
-
-    path <- unname(cde_urls[as.character(param$year)])
-  }
 
   ## Filling in URLs
 
@@ -387,38 +501,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   ##### Exceptions only #####
 
-  # If the datasets_link URL is the download path you need,
+  # If the manifest URL is the download path you need,
   # do not change this section for a new function
-
-  ## MapBiomas
-
-  # Download path depends on dataset and geo_level
-
-  if (source == "mapbiomas") {
-    if (dataset == "mapbiomas_cover") {
-      if (param$geo_level == "indigenous_land") {
-        path <- "https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2024/08/MAPBIOMAS_BRAZIL-COL.9-INDIGENOUS_LANDS-1.xlsx"
-      }
-    }
-    if (dataset == "mapbiomas_transition") {
-      if (param$geo_level == "biome") {
-        path <- "https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2024/08/MAPBIOMAS_BRAZIL-COL.9-BIOMES.xlsx"
-      }
-      if (param$geo_level == "municipality") {
-        path <- "https://storage.googleapis.com/mapbiomas-public/initiatives/brasil/collection_9/downloads/mapbiomas_brasil_col9_state_municipality.xlsx"
-      }
-    }
-  }
-
-  ## SEEG
-
-  # Download path depends on geo_level
-
-  if (source == "seeg") {
-    if (geo_level == "municipality") {
-      path <- "https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd"
-    }
-  }
 
   ## TerraClimate
 
@@ -472,9 +556,23 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   # Only manually input the file_extension if the download_path does
   # not end in ".ext", where .ext is any file extension
 
-  # googledrive links do not contain the file extension, for example
+  # googledrive links do not contain the file extension, for example. seeg no
+  # longer needs this override (its URL, resolved live by resolve_seeg.R,
+  # already ends in ".xlsx" -- auto-detected correctly above) but is kept
+  # here too, harmlessly, so a future manifest URL shape change can't
+  # silently break extension detection for it.
 
   if (source %in% c("seeg", "iema", "ips")) {
+    file_extension <- ".xlsx"
+  }
+  if (source == "mapbiomas") {
+    # Dataverse-hosted urls (inst/extdata/manifest/v1/datasets_link.csv,
+    # see actions/scrapers/resolve_mapbiomas.R) end in
+    # ".../api/access/datafile/{id}?format=original" -- no ".xlsx" at the
+    # end for the extension-sniffing above to find, same shape of problem
+    # as the googledrive-hosted sources above. Every mapbiomas source
+    # (Dataverse or the couple of rows still pointing at a legacy .xlsx
+    # url) is genuinely an xlsx file.
     file_extension <- ".xlsx"
   }
   if (source == "terraclimate") {
@@ -494,88 +592,151 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     file_extension <- ".rds"
   }
   if (source == "aneel") {
-    if (dataset == "energy_development_budget") {
+    if (dataset == "energy_enterprises_distributed") {
+      # empreendimento-geracao-distribuida.zip is a real zip archive -- unlike
+      # this dataset's siblings, which are bare CSVs. Without ".zip" here,
+      # the unzip step below (keyed on file_extension == ".zip") never runs
+      # and fread() is handed the raw zip bytes directly, which hard-errors
+      # ("string with embedded nul: 'PK\003\004...'" -- the zip magic number).
+      # Verified live 2026-09-21: this crashed on every real download before
+      # this fix, unrelated to the encoding/numeric-parsing bugs fixed
+      # alongside it in R/aneel.R.
+      file_extension <- ".zip"
+    } else {
       file_extension <- ".csv"
     }
-    if (dataset == "energy_generation") {
-      file_extension <- ".xlsx"
+  }
+
+  # Define Directory and File For Download (session cache aware)
+  #
+  # A second external_download() call resolving to the same (path,
+  # file_extension) -- e.g. any of the 6 SEEG datasets, or 2 back-to-back
+  # PRODES datasets -- reuses what an earlier call already downloaded (and,
+  # for a zip, already extracted) instead of doing it again. See the cache
+  # helpers defined above external_download(). aneel used to be excluded
+  # here too (a 2026-09-18 merge commit's "per maintainer decision"), but
+  # that reasoning belongs to the SEPARATE parsed-object cache below
+  # (parsed_cache_eligible() -- fread()'s data.table result is mutable by
+  # reference, so sharing one across calls under raw_data = TRUE is a real
+  # risk) and was mistakenly applied to this file-level cache too, which
+  # only remembers a download's disk location -- no shared object, no
+  # mutation risk. aneel's cache key (path = its resolved manifest URL,
+  # already unique per dataset/year) has no collision risk either. Verified
+  # live 2026-09-21: re-enabling this stopped a second load_aneel() call
+  # for the same dataset in one session from re-downloading the ~106MB
+  # energy_enterprises_distributed zip (or any other aneel file) a second
+  # time.
+
+  use_cache <- download_cache_enabled()
+  cache_key <- file_cache_key(path, file_extension)
+  cached_file <- if (use_cache) file_cache_get(cache_key) else NULL
+  file_cache_hit <- !is.null(cached_file)
+
+  if (file_cache_hit) {
+    dir <- cached_file$dir
+    temp <- cached_file$temp
+  } else if (use_cache) {
+    dir <- file.path(tempdir(check = TRUE), "datazoom-cache", rlang::hash(cache_key))
+    dir.create(dir, recursive = TRUE, showWarnings = FALSE)
+    temp <- tempfile(fileext = file_extension, tmpdir = dir)
+  } else {
+    dir <- tempdir()
+    temp <- tempfile(fileext = file_extension, tmpdir = dir)
+  }
+
+  ## Downloading file by the selected method (skipped entirely on a cache hit)
+
+  if (!file_cache_hit) {
+    # A half-downloaded/half-extracted per-key dir left behind on failure
+    # would be picked up by a later list.files(dir, ...) call just like a
+    # real cache hit -- clean it up unless the download+unzip below both
+    # complete and get registered.
+    if (use_cache) {
+      registered <- FALSE
+      on.exit(if (!registered) unlink(dir, recursive = TRUE, force = TRUE), add = TRUE)
     }
-    if (dataset == "energy_enterprises_distributed") {
-      file_extension <- ".csv"
-    }
-  }
 
-  ## Define Empty Directory and Files For Download
-
-  dir <- tempdir()
-  temp <- tempfile(fileext = file_extension, tmpdir = dir)
-
-  ## Picking the way to download the file
-
-  download_method <- "standard" # works for most functions
-
-  if (source %in% c("iema", "imazon")) {
-    download_method <- "googledrive"
-  }
-  if (source == "aneel") {
-    if (dataset == "energy_enterprises_distributed") {
-      message("This may take a while.\n")
-      options(timeout = 1000) # increase timeout limit
-    }
-  }
-  if (source == "prodes") {
-    message("This may take a while.\n")
-    a <- TRUE
-    options(timeout = max(1000, getOption("timeout")))
-  }
-  if (source %in% c("deter", "terraclimate", "baci", "mapbiomas")) {
-    download_method <- "curl"
-    quiet <- FALSE
-  }
-  if (source == "sigmine") {
-    options(timeout = max(1000, getOption("timeout")))
-  }
-  if (source == "ibama") {
-    download_method <- "curl"
-    options(download.file.method = "curl", download.file.extra = "-L") # https://stackoverflow.com/questions/69716835/turning-ssl-verification-off-inside-download-file
+    download_method <- "standard" # works for most functions
     quiet <- TRUE
-  }
-  if (source == "seeg") {
-    download_method <- "googledrive"
-  }
 
-  ## Downloading file by the selected method
-
-  if (download_method == "standard") {
-    utils::download.file(url = path, destfile = temp, mode = "wb")
-  }
-  if (download_method == "curl") {
-    if (source == "deter") {
-      options(download.file.method = "curl", download.file.extra = "-L")
+    if (source %in% c("iema", "imazon")) {
+      download_method <- "googledrive"
     }
-    if (source == "baci") {
-      options(download.file.extra = "--ssl-no-revoke")
+    if (source == "aneel") {
+      if (dataset == "energy_enterprises_distributed") {
+        message("This may take a while.\n")
+        options(timeout = 1000) # increase timeout limit
+      }
     }
-    utils::download.file(url = path, destfile = temp, method = "curl", quiet = quiet)
-  }
-  if (download_method == "googledrive") {
-    message("Please follow the steps from `googledrive` package to download the data. This may take a while.\nIn case of authentication errors, run vignette(\"GOOGLEDRIVE\").")
+    if (source == "prodes") {
+      message("This may take a while.\n")
+      options(timeout = max(1000, getOption("timeout")))
+    }
+    if (source %in% c("deter", "terraclimate", "baci", "mapbiomas")) {
+      download_method <- "curl"
+      quiet <- FALSE
+    }
+    if (source == "sigmine") {
+      options(timeout = max(1000, getOption("timeout")))
+    }
+    if (source == "ibama") {
+      download_method <- "curl"
+      options(download.file.method = "curl", download.file.extra = "-L") # https://stackoverflow.com/questions/69716835/turning-ssl-verification-off-inside-download-file
+      quiet <- TRUE
+    }
     if (source == "seeg") {
-      googledrive::drive_deauth()
+      # 2026-09-15: the resolver used to point at a Google Drive share link
+      # (hence "googledrive" here); it now emits the real seeg.eco.br URL
+      # directly (see resolve_seeg.R), a plain HTTPS download -- EXCEPT
+      # seeg.eco.br 403s any request without a browser-like User-Agent
+      # (confirmed live), hence HTTPUserAgent here rather than the plain
+      # "standard" download_method every other https source uses.
+      # SEEG_USER_AGENT must match the UA string actions/scrapers/
+      # resolve_seeg.R uses to verify this same URL live.
+      options(HTTPUserAgent = SEEG_USER_AGENT)
+      # The file is 250MB+ -- R's default 60s download.file() timeout
+      # (confirmed live: hit it on a real run) is nowhere near enough on an
+      # ordinary connection. Same fix as prodes/sigmine above.
+      message("This may take a while.\n")
+      options(timeout = max(1000, getOption("timeout")))
     }
-    googledrive::drive_download(path, path = temp, overwrite = TRUE)
-  }
 
-  ## Unzipping if the file is zipped
+    perform_download(path = path, temp = temp, download_method = download_method, source = source, quiet = quiet)
 
-  if (file_extension == ".zip") {
-    utils::unzip(temp, exdir = dir)
+    ## Unzipping if the file is zipped
+
+    if (file_extension == ".zip") {
+      utils::unzip(temp, exdir = dir)
+    }
+
+    if (use_cache) {
+      file_cache_set(cache_key, dir = dir, temp = temp)
+      registered <- TRUE
+    }
   }
 
   ###############
   ## Load Data ##
   ###############
 
+  # A single 1-slot cache for the expensive-to-reparse xlsx reads -- see
+  # parsed_cache_eligible() above. Keyed on exactly the inputs those read
+  # branches consult (path/file_extension/source/sheet/skip_rows), NOT the
+  # full param list: dataset/geo_level must NOT be part of this key, or
+  # every one of SEEG's 6 datasets would miss and the cache would do
+  # nothing for the case it exists for.
+  parsed_key <- list(
+    path = path, file_extension = file_extension, source = source,
+    sheet = param$sheet, skip_rows = param$skip_rows
+  )
+  parsed_eligible <- use_cache && parsed_cache_eligible(source, file_extension)
+  parsed_hit <- parsed_eligible &&
+    !is.null(.dz_download_cache$parsed_key) &&
+    identical(.dz_download_cache$parsed_key, parsed_key)
+
+  if (parsed_hit) {
+    dat <- .dz_download_cache$parsed_val
+  } else {
 
   ##### Exceptions only #####
 
@@ -585,12 +746,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       dat$year <- param$year
     }
     if (param$source == "deter") {
-      if (param$dataset == "deter_amz") {
-        dat <- sf::read_sf(file.path(dir, "deter-amz-deter-public.shp"))
-      }
-      if (param$dataset == "deter_cerrado") {
-        dat <- sf::read_sf(file.path(dir, "deter_public.shp"))
-      }
+      shp_name <- dataset_field(param$source, param$dataset, "archive_file")
+      dat <- sf::read_sf(file.path(dir, shp_name))
     }
     if (param$source == "sigmine") {
       shp <- list.files(dir, pattern = "\\.shp$", full.names = TRUE, recursive = TRUE)
@@ -605,9 +762,12 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       dat <- tibble::as_tibble(dat_sf)
     }
     if (param$source == "baci") {
-      # as year can be a vector, sets up expressions of the form "*YYYY_V202401b.csv" for each year to match file names
-      file_expression <- paste0("*", param$year, "_V202601.csv")
-      # now turning into *XXXX_V202401b.csv|YYYY_V202401b.csv|ZZZZ_V202401b.csv" to match as regex
+      # archive_file carries the same version stamp as the URL (e.g.
+      # "*$year$_V202601.csv"), so the two never drift apart -- as year can
+      # be a vector, str_replace() recycles it into one expression per year
+      archive_file <- dataset_field(param$source, param$dataset, "archive_file")
+      file_expression <- stringr::str_replace(archive_file, "\\$year\\$", as.character(param$year))
+      # now turning into *XXXX_V202601.csv|YYYY_V202601.csv|ZZZZ_V202601.csv" to match as regex
       file_expression <- paste0(file_expression, collapse = "|")
 
       file <- list.files(dir, pattern = file_expression, full.names = TRUE) %>%
@@ -627,21 +787,42 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       file <- list.files(dir, pattern = "*.tif", full.names = TRUE)
       dat <- terra::rast(file)
     }
+    if (param$source == "aneel") {
+      # energy_enterprises_distributed is the one aneel dataset that's a real
+      # zip (empreendimento-geracao-distribuida.zip, ~1.5GB uncompressed) --
+      # its siblings are bare CSVs handled in the non-zip aneel branch below.
+      # temp is the zip itself here, not the extracted CSV, so find the real
+      # file by pattern rather than assuming a fixed name. encoding = "UTF-8"
+      # verified live 2026-09-21 by inspecting the extracted file's raw bytes
+      # (e.g. "Condomínio" is the real 2-byte UTF-8 sequence 0xC3 0xAD for
+      # "í", not a single Latin-1 byte) -- fread(encoding = "Latin-1") had
+      # been misreading this file's real UTF-8 bytes as single-byte Latin-1
+      # characters since this dataset was added (2023), producing mojibake
+      # like "Ã­" that no amount of post-hoc iconv() can cleanly reverse.
+      csv <- list.files(dir, pattern = "\\.csv$", full.names = TRUE, recursive = TRUE)
+      if (length(csv) == 0) {
+        stop("No CSV found in the downloaded energy_enterprises_distributed archive.")
+      }
+      dat <- data.table::fread(csv[1], encoding = "UTF-8")
+    }
 
   } else if (param$source == "aneel") {
-    if (param$dataset %in% c("energy_enterprises_distributed", "energy_development_budget")) {
-      dat <- data.table::fread(temp, encoding = "Latin-1")
-    } else if (param$dataset == "energy_generation") {
-      dat <- readxl::read_xlsx(
-        temp,
-        sheet = param$sheet,
-        skip = param$skip_rows,
-        na = c("-", "")
-      )
+    if (param$dataset == "energy_generation") {
+      dat <- data.table::fread(temp, encoding = "UTF-8")
+    } else if (param$dataset == "energy_development_budget") {
+      # encoding = "UTF-8": same root-cause fix and same live verification
+      # (raw bytes for "Rede Básica" are 0xC3 0xA1, real UTF-8 for "á") as
+      # energy_enterprises_distributed above -- see that branch's comment.
+      dat <- data.table::fread(temp, encoding = "UTF-8")
     }
 
   } else if (param$source == "ips") {
-    dat <- param$sheet %>%
+    # param$sheet carries the requested YEARS (see load_ips()), not raw tab
+    # names -- resolved against the workbook's own tabs here so a whitespace
+    # quirk (IPS Amazônia's "2018 " tab, verified live) can't break an exact
+    # readxl::read_xlsx(sheet = ...) match. See ips_match_sheets() (R/ips.R).
+    sheets <- ips_match_sheets(readxl::excel_sheets(temp), param$sheet)
+    dat <- sheets %>%
       purrr::map(
         ~ readxl::read_xlsx(temp, sheet = .)
       )
@@ -674,16 +855,21 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
   }
 
+  if (parsed_eligible) {
+    .dz_download_cache$parsed_key <- parsed_key
+    .dz_download_cache$parsed_val <- dat
+  }
 
-
+  } # end parsed_hit / else
 
   ##############################
   ## Excluding Temporary File ##
   ##############################
 
-  # Folder is kept
+  # Folder is kept. The temp file itself is also kept when caching is on --
+  # it is what a later cache hit re-reads/re-extracts from.
 
-  if (!file_extension %in% c(".nc")) {
+  if (!file_extension %in% c(".nc") && !use_cache) {
     unlink(temp)
   }
 
@@ -695,279 +881,24 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 }
 
 datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
-  survey <- NULL
+  # The URL table used to be a hardcoded tibble::tribble() here (~280 lines).
+  # It now lives in inst/extdata/manifest/v1/datasets_link.csv (see
+  # R/manifest.R), refreshed by a scheduled GitHub Action and fetched at
+  # runtime with a silent fallback to the packaged snapshot. This function
+  # keeps its original signature and return shape -- effective_table() drops
+  # every geo_level/year override row, so exactly one row per (survey,
+  # dataset) -- its own self-sufficient base row -- is ever visible here, in
+  # the original 6 columns and order (with "link" now named "url" -- no call
+  # site ever depended on that literal name; see R/manifest.R). Every
+  # existing call site is unaffected.
 
-  link <- tibble::tribble(
-    ~survey, ~dataset, ~sidra_code, ~available_time, ~available_geo, ~link,
+  survey <- geo_level <- year <- NULL
+  sidra_code <- available_time <- available_geo <- NULL
 
-    ########################
-    ## Environmental data ##
-    ########################
-
-    ## PRODES
-    #
-    # TEMPORARY FIX (see this branch, prodes_update): the committed 2023
-    # file 404s live. TerraBrasilis' filenames now carry a publish-date
-    # stamp on top of the data year -- verified live against the public
-    # download-listing API TerraBrasilis' own downloads page calls
-    # (https://terrabrasilis.dpi.inpe.br/business/api/v1/download/all),
-    # and the zip's internal .tif/.qml/.txt basenames confirmed via a
-    # ranged request against the archive's own central directory (no need
-    # to pull the full ~133MB file). This is a manual, hardcoded patch in
-    # the old pattern -- it is NOT meant to be the long-term fix. A
-    # CSV-manifest + scheduled-resolver system that automates exactly this
-    # class of update already exists on another branch and is not yet
-    # merged; once it is, this hardcoded row (and the matching literal in
-    # R/prodes.R) should be removed in favor of it, not extended further.
-
-    "prodes", "deforestation", NA, "2007-2025", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip",
-    "prodes", "residual_deforestation", NA, "2010-2025", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip",
-    "prodes", "native_vegetation", NA, "2025", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip",
-    "prodes", "non_forest", NA, "2025", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip",
-    "prodes", "hydrography", NA, "2025", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip",
-    "prodes", "clouds", NA, "2025", "Municipality", "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip",
-
-    ## DETER
-
-    "deter", "deter_amz", NA, "2016-2022", "Municipality", "http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-amz/shape",
-    "deter", "deter_cerrado", NA, "2018-2022", "Municipality", "http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-cerrado/shape",
-
-    ## DEGRAD
-
-    "degrad", "degrad", NA, "2007-2016", NA, "http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip",
-
-    ## Imazon
-
-    "imazon", "imazon_shp", NA, "2020", "Municipality", "https://docs.google.com/uc?export=download&id=1JHc2J_U8VXHVuWVsi8wVBnNzZ37y1ehv",
-
-    ## IBAMA
-
-    "ibama", "embargoed_areas", NA, NA, "Municipality", "https://pamgia.ibama.gov.br/geoservicos/arquivos/adm_embargo_ibama_a.shp.zip",
-    "ibama", "distributed_fines", NA, NA, "Municipality", "https://dadosabertos.ibama.gov.br/dados/SICAFI/$state$/Quantidade/multasDistribuidasBensTutelados.csv",
-    "ibama", "collected_fines", NA, NA, "Municipality", "https://dadosabertos.ibama.gov.br/dados/SICAFI/$state$/Arrecadacao/arrecadacaobenstutelados.csv",
-
-    ## MapBiomas
-
-    "mapbiomas", "mapbiomas_cover", NA, "1985-2023", "Municipality, indigenous_land", "https://storage.googleapis.com/mapbiomas-public/initiatives/brasil/collection_9/statistics/mapbiomas_brazil_col_coverage_biome_state_municipality.xlsx",
-    "mapbiomas", "mapbiomas_transition", NA, "1985-2023", "Municipality, Biome", "https://brasil.mapbiomas.org/estatisticas/",
-    "mapbiomas", "mapbiomas_deforestation_regeneration", NA, "1985-2023", "Municipality", "https://storage.googleapis.com/mapbiomas-public/initiatives/brasil/collection_9/downloads/mapbiomas_brasil_col9_deforestation_and_secondary_vegetation_state_municipality.xlsx",
-    "mapbiomas", "mapbiomas_irrigation", NA, "2000-2019", "State, Biome", "https://mapbiomas-br-site.s3.amazonaws.com/downloads/Estatisticas%20/Colecao_7_Irrigacao_Biomes_UF.xlsx",
-    "mapbiomas", "mapbiomas_mining", NA, "1985-2022", "Municipality, indigenous_land", "https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2023/09/TABELA-MINERACAO-MAPBIOMAS-COL8.0.xlsx",
-    "mapbiomas", "mapbiomas_fire", NA, "1985-2023", "State", "https://storage.googleapis.com/mapbiomas-public/brasil/fire/collection_3_stats/MB-Fogo-3-Biome-State.xlsx",
-    "mapbiomas", "mapbiomas_water", NA, "1985-2022", "State, Municipality, Biome", "https://mapbiomas-br-site.s3.amazonaws.com/Estat%C3%ADsticas/Estatisticas_Superficie%C3%81gua_Col2_SITE.xlsx",
-
-    ## TerraClimate
-
-    "terraclimate", "max_temperature", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "terraclimate", "min_temperature", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "terraclimate", "wind_speed", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "terraclimate", "vapor_pressure_deficit", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "terraclimate", "vapor_pressure", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "terraclimate", "snow_water_equivalent", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "terraclimate", "shortwave_radiation_flux", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "terraclimate", "soil_moisture", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "terraclimate", "runoff", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "terraclimate", "precipitation", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "terraclimate", "potential_evaporation", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "terraclimate", "climatic_water_deficit", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "terraclimate", "water_evaporation", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-    "terraclimate", "palmer_drought_severity_index", NA, "1958-2022", "Municipality", "http://thredds.northwestknowledge.net:8080/thredds/ncss",
-
-    ## SEEG
-
-    "seeg", "seeg", NA, "2000-2018", "Country, State, Municipality", "https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd",
-    "seeg", "seeg_farming", NA, "2000-2018", "Country, State, Municipality", "https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd",
-    "seeg", "seeg_industry", NA, "2000-2018", "Country, State, Municipality", "https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd",
-    "seeg", "seeg_energy", NA, "2000-2018", "Country, State, Municipality", "https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd",
-    "seeg", "seeg_land", NA, "2000-2018", "Country, State, Municipality", "https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd",
-    "seeg", "seeg_residuals", NA, "2000-2018", "Country, State, Municipality", "https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd",
-
-    ## Censo Agro
-
-    "censoagro", "agricultural_land_area", "263", "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006", "Country, State", "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais",
-    "censoagro", "agricultural_area_use", "264", "1970, 1975, 1980, 1985, 1995, 2006", "Country, State", "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais",
-    "censoagro", "agricultural_employees_tractors", "265", "1970, 1975, 1980, 1985, 1995, 2006", "Country, State", "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais",
-    "censoagro", "agricultural_producer_condition", "280", "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006", "Country, State", "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais",
-    "censoagro", "animal_production", "281", "1970, 1975, 1980, 1985, 1995, 2006", "Country, State", "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais",
-    "censoagro", "animal_products", "282", "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006", "Country, State", "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais",
-    "censoagro", "vegetable_production_area", "283", "1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006", "Country, State", "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais",
-    "censoagro", "vegetable_production_permanent", "1730", "1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006", "Country, State", "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais",
-    "censoagro", "vegetable_production_temporary", "1731", "1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006", "Country, State", "https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais",
-    "censoagro", "livestock_production", "6907", "2017", "Municipality", "https://sidra.ibge.gov.br/tabela/6907",
-
-    #################
-    ## Social data ##
-    #################
-
-    ## IPS
-
-    "ips", "all", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
-    "ips", "life_quality", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
-    "ips", "sanit_habit", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
-    "ips", "violence", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
-    "ips", "educ", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
-    "ips", "communic", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
-    "ips", "mortality", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
-    "ips", "deforest", NA, "2014, 2018, 2021, 2023", NA, "https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx",
-
-    ## IEMA
-
-    "iema", "iema", NA, "2018", "Municipality", "https://drive.google.com/uc?export=download&id=10JMRtzu3k95vl8cQmHkVMQ9nJovvIeNl",
-
-    ## Population
-
-    "population", "population", "6579", "2001-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/estimapop/tabelas",
-
-    ###################
-    ## Economic data ##
-    ###################
-
-    ## Comex
-
-    "comex", "export_prod", NA, "1997-2023", NA, "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm/EXP_$year$.csv",
-    "comex", "import_prod", NA, "1997-2023", NA, "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm/IMP_$year$.csv",
-    "comex", "export_mun", NA, "1997-2023", NA, "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/EXP_$year$_MUN.csv",
-    "comex", "import_mun", NA, "1997-2023", NA, "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/IMP_$year$_MUN.csv",
-
-    ## BACI
-
-    "baci", "HS92", NA, "1995-2024", "Country", "https://www.cepii.fr/DATA_DOWNLOAD/baci/data/BACI_HS92_V202601.zip",
-
-    ## PIB-Munic
-
-    "pibmunic", "pibmunic", "5938", "2002-2021", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pib-munic/tabelas",
-
-    ## CEMPRE
-
-    "cempre", "cempre", "6449", "2006-2020", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/cempre/tabelas",
-
-    ## PAM
-
-    "pam", "all_crops", "5457/all/all", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "permanent_crops", "1613/all/all", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "temporary_crops", "1612/all/all", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "beans", "1002/all/all", "2003-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "corn", "839/all/all", "2003-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "peanut", "1000/all/all", "2003-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "potato", "1001/all/all", "2003-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-
-    # Categories within temporary crops
-
-    "pam", "temporary_total", "1612/c81/0", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "alfafa", "1612/c81/40471", "1974-1987", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "barley", "1612/c81/2699", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "beans_temporary", "1612/c81/2702", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "broad_bean", "1612/c81/2701", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "cassava", "1612/c81/2708", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "castor_bean", "1612/c81/2707", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "corn_temporary", "1612/c81/2711", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "cotton_herbaceous", "1612/c81/2689", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "forage_cane", "1612/c81/40470", "1974-1987", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "garlic", "1612/c81/2690", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "jute_fiber", "1612/c81/2704", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "linen_seeds", "1612/c81/2705", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "malva_fiber", "1612/c81/2706", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "melon", "1612/c81/2710", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "oats", "1612/c81/2693", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "onion", "1612/c81/2697", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "pea", "1612/c81/2700", "1988-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "peanut_temporary", "1612/c81/2691", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "pineapple", "1612/c81/2688", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "potato_temporary", "1612/c81/2695", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "ramie_fiber", "1612/c81/2712", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "rice", "1612/c81/2692", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "rye", "1612/c81/2698", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "sorghum", "1612/c81/2714", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "soybean", "1612/c81/2713", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "sugar_cane", "1612/c81/2696", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "sunflower_seeds", "1612/c81/109179", "2005-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "sweet_potato", "1612/c81/2694", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "tobacco", "1612/c81/2703", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "tomato", "1612/c81/2715", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "triticale", "1612/c81/109180", "2005-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "watermelon", "1612/c81/2709", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "wheat", "1612/c81/2716", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-
-    # Categories within permanent crops
-
-    "pam", "acai", "1613/c82/45981", "2015-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "annatto_seeds", "1613/c82/2747", "1981-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "apple", "1613/c82/2735", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "avocado", "1613/c82/2717", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "banana", "1613/c82/2720", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "black_pepper", "1613/c82/2743", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "cashew", "1613/c82/40473", "1974-1987", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "cashew_nut", "1613/c82/2725", "1988-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "cocoa_beans", "1613/c82/2722", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "coconut", "1613/c82/2727", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "coconut_bunch", "1613/c82/2728", "1988-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "coffee_arabica", "1613/c82/31619", "2012-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "coffee_canephora", "1613/c82/31620", "2012-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "coffee_total", "1613/c82/2723", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "cotton_arboreo", "1613/c82/2718", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "fig", "1613/c82/2730", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "grape", "1613/c82/2748", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "guarana_seeds", "1613/c82/2732", "1981-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "guava", "1613/c82/2731", "1988-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "india_tea", "1613/c82/2726", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "khaki", "1613/c82/2724", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "lemon", "1613/c82/2734", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "mango", "1613/c82/2737", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "olive", "1613/c82/2719", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "orange", "1613/c82/2733", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "papaya", "1613/c82/2736", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "passion_fruit", "1613/c82/2738", "1988-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "peach", "1613/c82/2742", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "pear", "1613/c82/2741", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "permanent_crops", "1613/all/all", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "permanent_total", "1613/c82/0", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "quince", "1613/c82/2739", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "rubber_coagulated_latex", "1613/c82/2721", "1981-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "rubber_liquid_latex", "1613/c82/40472", "1981-1987", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "sisal_or_agave", "1613/c82/2744", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "tangerine", "1613/c82/2745", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "tung", "1613/c82/2746", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "walnut", "1613/c82/2740", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-    "pam", "yerba_mate", "1613/c82/2729", "1981-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/pam/tabelas",
-
-    ## PEVS
-
-    "pevs", "pevs_forest_crops", "289", "1986-2023", "Country, State, Municipality, Region", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
-    "pevs", "pevs_silviculture", "291", "1986-2023", "Country, State, Municipality, Region", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
-    "pevs", "pevs_silviculture_area", "5930", "2013-2023", "Country, State, Municipality, Region", "https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019",
-
-    ## PPM
-
-    "ppm", "ppm_livestock_inventory", "3939", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021",
-    "ppm", "ppm_sheep_farming", "95", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021",
-    "ppm", "ppm_animal_origin_production", "74", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021",
-    "ppm", "ppm_cow_farming", "94", "1974-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021",
-    "ppm", "ppm_aquaculture", "3940", "2013-2023", "Country, State, Municipality", "https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021",
-
-    ## SIGMINE
-
-    "sigmine", "sigmine_active", NA, NA, NA, "https://dadosabertos.anm.gov.br/SIGMINE/BRASIL.zip",
-
-    ## ANEEL
-
-    "aneel", "energy_development_budget", NA, "2017-2022", NA, "aneel_cde_$year$",
-    "aneel", "energy_generation", NA, "1908-2021", "Municipality", "https://git.aneel.gov.br/publico/centralconteudo/-/raw/main/relatorioseindicadores/geracao/BD_SIGA.xlsx?inline=false",
-    "aneel", "energy_enterprises_distributed", NA, NA, NA, "https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/b1bd71e7-d0ad-4214-9053-cbd58e9564a7/download/empreendimento-geracao-distribuida.csv",
-
-    ## EPE
-
-    "epe", "industrial_energy_consumption", NA, "2004-2025", "Region, Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx",
-    "epe", "consumer_energy_consumption", NA, "2004-2025", "Region, Subsystem, State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx",
-    "epe", "national_energy_balance", NA, "2003-2023", NA, "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/PublicacoesArquivos/publicacao-819/topico-716/Anexo%20IX%20-%20Balan%C3%A7os%20Consolidados%20(em%20tep)%201970%20a%202023.xlsx",
-    "epe", "energy_state_panel", NA, "2011-2024", "State", "https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/PublicacoesArquivos/publicacao-145/topico-515/Cap%C3%ADtulo%208%20(Dados%20Estaduais).xlsx",
-
-    ## Shapefile from github repository
-
-
-    "internal", "geo_municipalities", NA, "2020", "Municipality", "https://raw.github.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds",
-  )
-
-  # returns only the desired rows
+  link <- effective_table() %>%
+    dplyr::select(
+      survey, dataset, sidra_code, available_time, available_geo, url
+    )
 
   if (!is.null(source)) {
     link <- link %>%
@@ -981,7 +912,7 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
 
   if (url) {
     link <- link %>%
-      purrr::pluck("link")
+      purrr::pluck("url")
   }
 
   return(link)

@@ -25,7 +25,7 @@ This dataset provides:
 - **Raster data**: High-resolution spatial data covering entire Legal Amazon
 - **Municipality aggregates**: Affected areas per municipality for non-spatial analysis
 - **Cumulative and incremental data**: Total deforestation since 1988 and year-by-year changes
-- **Long time series**: Available from 2007 onwards (cumulative) and incrementally by year
+- **Long time series**: Available from 2007 onwards (cumulative) and incrementally by year, currently through 2025
 - **Official baseline**: Used by Brazilian government for forest policy and enforcement
 
 PRODES is the authoritative source for Amazon deforestation statistics, used for environmental monitoring, policy evaluation, and international reporting on Brazilian forest protection.
@@ -50,7 +50,7 @@ For more information, visit [INPE PRODES Project](https://www.gov.br/inpe/pt-br)
 Clear-cut deforestation areas (complete forest loss).
 
 - **Coverage**: Entire Legal Amazon region
-- **Time period**: 
+- **Time period**: 2007-2025
   - 2007: Cumulative deforestation from 1988 to 2007
   - 2008-2025: Annual incremental deforestation (year-specific)
 - **Data types**: 
@@ -297,7 +297,7 @@ residual <- load_prodes(
 2. **Legal Amazon only**: Data limited to Legal Amazon definition; doesn't cover all forest regions
 3. **Raster data very large**: May require specialized tools and significant computing resources
 4. **Historical changes**: INPE occasionally revises historical estimates as methodology improves
-5. **Recent data provisional**: 2025 data may be subject to revision as final processing completes
+5. **Recent data provisional**: the most recent year's data may be subject to revision as final processing completes
 
 ***
 

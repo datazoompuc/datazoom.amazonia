@@ -1,0 +1,297 @@
+name: Update dataset URL manifest
+
+# Keeps inst/extdata/manifest/v1/datasets_link.csv fresh so that broken
+# source URLs (MapBiomas collection bumps, PRODES year rollovers, BACI
+# version stamps, ANEEL CDE years, EPE publication IDs) can be fixed in
+# minutes instead of waiting for a CRAN release.
+#
+# NOTE (as of the webscrapping_beta branch): this workflow is written to be
+# fully operational, but it has never been pushed to GitHub, so it has never
+# run. Activating it is a separate, explicit decision -- see the activation
+# checklist in WEBSCRAPING_BETA_REPORT.pdf. Until that happens this file is
+# documentation of the intended production behavior, exercised locally via
+# `Rscript actions/scripts/build_manifest.R --dry-run` (same code path,
+# writes only to tempdir()).
+
+on:
+  schedule:
+    # Monday 05:00 UTC -- clear of the existing monthly check-dz-amazonia.yaml
+    # (1st of the month, 03:00 UTC), so the two never compete for runners.
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: update-manifest
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  refresh-manifest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # sf (a DESCRIPTION Import, per devtools::install_deps() below) needs
+      # these system libraries to actually load on Ubuntu, even from an RSPM
+      # binary -- same fix already applied in render-readme.yaml.
+      - name: Install Spatial System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgdal-dev libgeos-dev libproj-dev libudunits2-dev
+
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: "release"
+          use-public-rspm: true
+
+      - name: Install resolver + package dependencies
+        run: |
+          # jsonlite/curl are CI-only (used by the resolver scripts under
+          # actions/, which are .Rbuildignore'd -- they are deliberately NOT
+          # in DESCRIPTION's Imports, see each resolver's own header comment).
+          # devtools installs the smoke-test step's own tool; remotes is
+          # devtools::install_deps()'s own dependency, not bundled with it.
+          Rscript -e 'install.packages(c("jsonlite", "curl", "devtools", "remotes"))'
+          # Everything the PACKAGE itself needs (dplyr, sf, sidrar, tidyr,
+          # googledrive, ...) comes straight from DESCRIPTION's Imports via
+          # install_deps(), instead of a second hand-maintained list here --
+          # a hardcoded duplicate is exactly what went stale and broke the
+          # smoke-test step the first time it ever actually ran (2026-08-10).
+          Rscript -e 'devtools::install_deps(dependencies = TRUE)'
+
+      - name: Run build_manifest.R
+        id: build
+        run: |
+          set +e
+          # seeg was previously skipped here: its resolver returned HTTP 403
+          # specifically from GitHub Actions runners (likely IP-range/WAF
+          # blocking on SEEG's side), confirmed by a live manual run of this
+          # workflow. Re-enabled -- if that block is still in place, this
+          # resolver alone failing does not block the other resolvers' PR
+          # (exit code 11/30 handling, see actions/scripts/build_manifest.R),
+          # it only opens an issue for seeg specifically. Re-add --skip seeg
+          # if that turns out to still be a weekly occurrence.
+          Rscript --vanilla actions/scripts/build_manifest.R
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Stage candidates onto the committed paths
+        if: steps.build.outputs.exit_code == '10' || steps.build.outputs.exit_code == '11'
+        run: |
+          cp "${{ steps.build.outputs.candidate_path }}" inst/extdata/manifest/v1/datasets_link.csv
+          # An inventory-only run re-copies an identical manifest file here --
+          # harmless (git sees no diff on that path) and keeps this step
+          # free of a second branch of conditions. See build_manifest.R's
+          # header for why the manifest and the inventory are separate files.
+          mkdir -p actions/watch
+          cp "${{ steps.build.outputs.inventory_path }}" actions/watch/site_links.csv
+          # mapbiomas_cache_path is only set (non-empty) when
+          # resolve_mapbiomas() actually recorded a new verdict this run --
+          # see mapbiomas_resolver_cache.R's header. A run where the cache
+          # was already fully warm (nothing new checked) leaves this empty;
+          # skip the copy entirely rather than staging a blank/missing file.
+          if [ -n "${{ steps.build.outputs.mapbiomas_cache_path }}" ]; then
+            mkdir -p actions/cache
+            cp "${{ steps.build.outputs.mapbiomas_cache_path }}" actions/cache/mapbiomas_resolver_cache.csv
+          fi
+          # resolver_alerts_path is only set (non-empty) when resolve_prodes()
+          # or resolve_epe() actually recorded a new verdict this run -- see
+          # actions/scripts/resolver_alert_cache.R's header. Same empty-skip
+          # posture as the MapBiomas cache copy directly above.
+          if [ -n "${{ steps.build.outputs.resolver_alerts_path }}" ]; then
+            mkdir -p actions/cache
+            cp "${{ steps.build.outputs.resolver_alerts_path }}" actions/cache/resolver_alerts.csv
+          fi
+
+      # Smoke-tested BEFORE opening the PR, not after merging it -- every
+      # change (however small) goes through review now, so this is the
+      # only remaining chance to catch a candidate that would break
+      # link_table()/dataset_field() before a human ever looks at the diff.
+      - name: Smoke test staged candidate manifest
+        if: steps.build.outputs.exit_code == '10' || steps.build.outputs.exit_code == '11'
+        run: |
+          Rscript -e 'options(datazoom.amazonia.use_remote_manifest = FALSE)' \
+                  -e 'devtools::load_all("."); datazoom.amazonia:::clear_manifest_cache(); print(nrow(datazoom.amazonia:::link_table()))'
+
+      # exit_code 11 = changes present AND a resolver also failed -- open
+      # the PR for the real changes from whichever resolvers succeeded;
+      # the separate "Open issue" step below (now also triggered on 11)
+      # covers the failure, instead of it silently blocking this PR.
+      # Body composed by build_manifest.R itself (pr_body_path), not inlined
+      # here -- that's what lets it append a MapBiomas-specific fragility
+      # section (which R/mapbiomas.R lines to re-check, by line number) only
+      # on runs where a mapbiomas row actually changed, instead of a generic
+      # reminder on every PR regardless of what changed.
+      - name: Open PR for review
+        id: pr
+        if: steps.build.outputs.exit_code == '10' || steps.build.outputs.exit_code == '11'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "chore(manifest): candidate refresh needs review"
+          title: "Manifest refresh: review needed"
+          body-path: ${{ steps.build.outputs.pr_body_path }}
+          branch: manifest-refresh-review
+          labels: manifest
+          add-paths: |
+            inst/extdata/manifest/v1/datasets_link.csv
+            actions/watch/site_links.csv
+            actions/cache/mapbiomas_resolver_cache.csv
+            actions/cache/resolver_alerts.csv
+
+      # ---- Informational Slack side-channel -------------------------------
+      # Failures NEVER come here -- resolver/watcher/validation failures keep
+      # going to the "Open issue" step below, unchanged. These two steps only
+      # ever report things that SUCCEEDED and found something.
+      #
+      # !cancelled() rather than the default success(): a red smoke-test or
+      # a create-pull-request hiccup should not swallow the news that the
+      # MapBiomas site changed. When the build step never got far enough to
+      # write the output, the boolean is empty/absent and the step no-ops.
+      #
+      # continue-on-error: a missing/revoked SLACK_WEBHOOK_URL secret must
+      # never turn a healthy manifest run red -- the final "Fail the run"
+      # step is driven by build_manifest.R's exit code and nothing else,
+      # and that must stay true regardless of Slack delivery succeeding.
+      #
+      # Message text is composed in build_manifest.R and arrives here as ONE
+      # already-JSON-escaped line (see that file's "Slack notification
+      # payloads" section) -- no bash re-parsing of the report or the CSVs.
+      #
+      # Prerequisite: a SLACK_WEBHOOK_URL secret must exist on this repo (or
+      # be inherited from an org-level secret) for these to actually deliver
+      # anything -- continue-on-error means the pipeline stays healthy
+      # either way, but no message arrives until the secret is set.
+      - name: Notify Slack -- MapBiomas site inventory changed
+        if: ${{ !cancelled() && steps.build.outputs.watch_notify == 'true' }}
+        continue-on-error: true
+        uses: slackapi/slack-github-action@v2.1.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": ":satellite: *MapBiomas site inventory changed* — ${{ steps.build.outputs.watch_n_added }} added / ${{ steps.build.outputs.watch_n_removed }} removed / ${{ steps.build.outputs.watch_n_changed }} changed\n\n${{ steps.build.outputs.watch_slack_text }}\n\n_<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow run>_${{ steps.pr.outputs.pull-request-url && format(' · <{0}|Review PR>', steps.pr.outputs.pull-request-url) || '' }}"
+            }
+
+      - name: Notify Slack -- new Dataverse file rejected by the resolver
+        if: ${{ !cancelled() && steps.build.outputs.new_fail_notify == 'true' }}
+        continue-on-error: true
+        uses: slackapi/slack-github-action@v2.1.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": ":mag: *New MapBiomas Dataverse file(s) spotted — none usable* (${{ steps.build.outputs.new_fail_n }})\nThe resolver inspected file content it had never seen before and rejected it. The manifest itself is untouched -- a file that had PASSED would show up as a manifest PR instead -- but recording the rejection still updates the resolver cache, so the routine cache-only PR may still open for that; this ping is just faster than digging through its diff.\n\n${{ steps.build.outputs.new_fail_slack_text }}\n\n_<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow run>_"
+            }
+
+      - name: Notify Slack -- PRODES/EPE/IPS new candidate failed content verification
+        if: ${{ !cancelled() && steps.build.outputs.resolver_alert_notify == 'true' }}
+        continue-on-error: true
+        uses: slackapi/slack-github-action@v2.1.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            {
+              "text": ":mag: *New PRODES/EPE/IPS content-check failure(s) spotted* (${{ steps.build.outputs.resolver_alert_n }})\nA resolver found a candidate it hadn't checked before (a new PRODES release, a new EPE page failure mode, or a new IPS Amazônia workbook upload) and its content didn't match what R/prodes.R, R/epe.R or R/ips.R expects. The manifest itself is untouched -- this is a faster heads-up than digging through the resolver's own failure trail, and won't repeat for the same known cause on later runs.\n\n${{ steps.build.outputs.resolver_alert_slack_text }}\n\n_<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow run>_"
+            }
+
+      - name: Open issue on validation/resolver/watcher failure
+        if: steps.build.outputs.exit_code == '11' || steps.build.outputs.exit_code == '20' || steps.build.outputs.exit_code == '30'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const exitCode = "${{ steps.build.outputs.exit_code }}";
+            const title = exitCode === "20"
+              ? "Manifest refresh: validation failed"
+              : "Manifest refresh: one or more resolvers/watchers failed";
+
+            // Pull the actual failure messages out of the report so the
+            // issue itself says what broke, instead of only pointing at
+            // the step log (see actions/scripts/build_manifest.R's
+            // resolvers_failed/watchers_failed/validation_errors fields).
+            let bodyLines = [
+              "See the `Run build_manifest.R` step log in this workflow run for the full report.",
+              ""
+            ];
+            try {
+              const report = JSON.parse(fs.readFileSync("${{ steps.build.outputs.report_path }}", "utf8"));
+              const fmtFailures = (obj, label) => {
+                const entries = Object.entries(obj || {});
+                if (entries.length === 0) return [];
+                // A value can be a single string (resolvers_failed/
+                // watchers_failed: one message per source) or an array of
+                // strings (resolvers_partial_failed: a resolver covering
+                // several sub-sources, e.g. resolve_epe.R, can report more
+                // than one reason for the same source) -- flatten either
+                // shape to one line per reason instead of letting Array's
+                // default toString() join them with a bare comma.
+                return [
+                  `**${label}:**`,
+                  ...entries.flatMap(([k, v]) =>
+                    (Array.isArray(v) ? v : [v]).map(msg => `- \`${k}\`: ${msg}`)
+                  ),
+                  ""
+                ];
+              };
+              bodyLines = bodyLines.concat(
+                fmtFailures(report.resolvers_failed, "Resolvers failed"),
+                fmtFailures(report.resolvers_partial_failed, "Resolvers partially failed (some rows still updated)"),
+                fmtFailures(report.watchers_failed, "Watchers failed"),
+              );
+              if ((report.validation_errors || []).length > 0) {
+                bodyLines = bodyLines.concat(
+                  "**Validation errors:**",
+                  report.validation_errors.map(e => `- ${e}`),
+                  ""
+                );
+              }
+            } catch (e) {
+              bodyLines.push(`(could not read the report file: ${e.message})`);
+            }
+
+            const { data: existing } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "open",
+              labels: "manifest"
+            });
+            if (existing.some(i => i.title === title)) {
+              console.log("An open issue with this title already exists; skipping.");
+              return;
+            }
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              labels: ["manifest"],
+              body: bodyLines.join("\n")
+            });
+
+      - name: Upload report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: manifest-report
+          path: |
+            ${{ steps.build.outputs.report_path }}
+            ${{ steps.build.outputs.candidate_path }}
+            ${{ steps.build.outputs.inventory_path }}
+            ${{ steps.build.outputs.pr_body_path }}
+            ${{ steps.build.outputs.mapbiomas_cache_path }}
+          if-no-files-found: ignore
+
+      - name: Fail the run if build_manifest.R signaled a problem
+        if: steps.build.outputs.exit_code != '0' && steps.build.outputs.exit_code != '10'
+        run: exit 1

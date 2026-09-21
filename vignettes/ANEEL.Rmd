@@ -22,7 +22,7 @@ As for now, there are three different datasets available for download: Energy De
 
 The Energy Development Budget dataset showcases the Energy Development Account's (CDE) annual budget expenses. The CDE is designed to promote the Brazilian energy development and is managed by the Electrical Energy Commercialization Chamber (CCEE).
 
-In the current implementation, data is available from 2017 to 2022 and must be downloaded by year. The year argument can be a single year or a vector of years.
+In the current implementation, data is available from 2017 to 2024 and must be downloaded by year. The year argument can be a single year or a vector of years.
 The dataset includes the type of expense, its value in R$ (Reais), and its share over the total amount of CDE budget expenses in each year.\*.
 
 \*Note that 'share_of_total' values sum to 1 for each year available.
@@ -30,9 +30,11 @@ The dataset includes the type of expense, its value in R$ (Reais), and its share
 #### Energy Generation
 The Energy Generation dataset showcases information about ANEEL's Generation Informations System (SIGA). SIGA provides information about the Brazilian electrical energy generation installed capacity.
 
-The dataset provides information at the individual venture/entity level. It contains information about the power, source, stage, type of permission, origin and final fuel with which each venture/entity operates, as well as other legal, technical and geographical information.* Operation start dates contained in the dataset go as far back as 1924 up to 2022.
+The dataset provides information at the individual venture/entity level. It contains information about the power, source, stage, type of permission, origin and final fuel with which each venture/entity operates, as well as other legal, technical and geographical information.* Operation start dates contained in the dataset go as far back as 1908 up to 2021.
 
-\* For more details on each variable, access [This link](https://app.powerbi.com/view?r=eyJrIjoiNjc4OGYyYjQtYWM2ZC00YjllLWJlYmEtYzdkNTQ1MTc1NjM2IiwidCI6IjQwZDZmOWI4LWVjYTctNDZhMi05MmQ0LWVhNGU5YzAxNzBlMSIsImMiOjR9) and select "Manual do Usuario".
+The source is ANEEL's own CKAN Open Data catalogue (`siga-empreendimentos-geracao.csv`). Power and coordinate columns (`mda_*`/`num_coord_*`) are automatically converted to numeric values.
+
+\* For more details on each variable, access [ANEEL's SIGA dataset page](https://dadosabertos.aneel.gov.br/dataset/siga-sistema-de-informacoes-de-geracao-da-aneel) and select "Dicionário de dados".
 
 
 #### Energy Enterprises
@@ -57,7 +59,7 @@ The data is expressed in quantities and installed power in kW (kilowatt). The qu
 
   3. **language**: you can choose between Portuguese `("pt")` and English `("eng")`
   4. **year**: only used for "energy_development_budget".
-It can be a single year or a vector of years from 2017:2022.
+It can be a single year or a vector of years from 2017:2024.
 This argument is required for "energy_development_budget" and can be
 omitted for the other datasets.
   

@@ -13,7 +13,7 @@ load_aneel(dataset, raw_data = FALSE, language = "eng", year = NULL)
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.}
 
-\item{year}{A numeric value or vector of years (2017-2022).
+\item{year}{A numeric value or vector of years (2017-2024).
 Required for the "energy_development_budget" dataset.
 Ignored for the other datasets.}
 }

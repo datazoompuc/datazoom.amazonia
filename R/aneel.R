@@ -3,7 +3,7 @@
 #' @description National Electric Energy Agency - ANEEL
 #'
 #' @param dataset A dataset name ("energy_development_budget", "energy_generation" or "energy_enterprises_distributed")
-#' @param year A numeric value or vector of years (2017-2022).
+#' @param year A numeric value or vector of years (2017-2024).
 #'   Required for the "energy_development_budget" dataset.
 #'   Ignored for the other datasets.
 #' @inheritParams load_baci
@@ -35,7 +35,7 @@ load_aneel <- function(dataset,
   ## Bind Global Variables ##
   ###########################
 
-  ano <- variable <- label <- var_code <- operation_start <- NULL
+  ano <- variable <- label <- var_code <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -55,21 +55,28 @@ if (param$dataset == "energy_development_budget") {
     stop("For 'energy_development_budget', you must provide 'year'.")
   }
 
-  invalid_years <- setdiff(as.integer(param$year), 2017:2022)
+  # valid years come from the manifest's available_time -- one row per year
+  # (see inst/extdata/manifest/v1/datasets_link.csv) -- instead of a
+  # hardcoded range that must be edited in R code whenever ANEEL adds a year.
+  # available_time is the same across all of this dataset's year rows (a
+  # dataset-wide fact, not a per-row one), so this is the one legitimate
+  # cross-row read -- dataset_meta(), not dataset_field() with no key (see
+  # R/manifest.R).
+  available <- dataset_meta(param$source, param$dataset, "available_time")
+  valid_years <- parse_years(available)
+
+  invalid_years <- setdiff(as.integer(param$year), valid_years)
 
   if (length(invalid_years) > 0) {
     stop(
       "Year(s) not available for 'energy_development_budget': ",
       paste(invalid_years, collapse = ", "),
-      ". Valid years: 2017-2022."
+      ". Valid years: ", available, "."
     )
   }
 }
 
-  if (param$dataset == "energy_generation") {
-    skip <- 1
-    # skips first row of excel sheet for this dataset
-  }
+
 
   # check if dataset is valid
 
@@ -116,26 +123,29 @@ if (param$dataset == "energy_development_budget") {
 
   ######################
   ## Data Engineering ##
-  ######################
+
+  # All three aneel datasets are now read with fread(encoding = "UTF-8")
+  # (see R/download.R's aneel branch) -- verified live 2026-09-21 by
+  # inspecting each source file's raw bytes. No iconv() re-decoding is
+  # needed for any of them; an ISO-8859-1 -> UTF-8 iconv() step used to run
+  # here for energy_enterprises_distributed/energy_development_budget on
+  # the assumption those files were Latin-1, which was wrong (their real
+  # bytes are UTF-8) and produced mojibake like "Ã­" for "í" -- removed
+  # along with switching those two fread() calls to encoding = "UTF-8".
+  dat <- dat %>%
+    janitor::clean_names() %>%
+    dplyr::mutate_if(is.character, function(var) {
+      stringi::stri_trans_general(str = var, id = "Latin-ASCII")
+    })
 
   if (param$dataset == "energy_enterprises_distributed") {
     dat <- dat %>%
-      janitor::clean_names() %>%
-      dplyr::mutate_if(is.character, function(var) {
-        iconv(var, from = "ISO-8859-1", to = "UTF-8")
-      }) %>%
-      dplyr::mutate_if(is.character, function(var) {
-        stringi::stri_trans_general(str = var, id = "Latin-ASCII")
-      }) %>%
       dplyr::mutate(
-        dplyr::across(dplyr::where(is.character), ~ dplyr::na_if(.x, "")),
-        dplyr::across(dplyr::starts_with("mda"), .fns = ~ gsub("[.]", "", .x)),
-        dplyr::across(dplyr::starts_with("num_coord"), .fns = ~ gsub("[.]", "", .x))
+        dplyr::across(dplyr::where(is.character), ~ dplyr::na_if(.x, ""))
       ) %>%
-      dplyr::mutate(
-        dplyr::across(dplyr::starts_with("mda"), ~ gsub("[,]", ".", .x) %>% as.numeric()),
-        dplyr::across(dplyr::starts_with("num_coord"), ~ gsub("[,]", ".", .x) %>% as.numeric())
-      ) %>%
+      # FRAGILE: exact string match on dsc_modalidade_habilitado categories.
+      # If ANEEL alters or introduces new modality labels, case_when() silently
+      # assigns 'Indefinido' to all unmapped rows.
       dplyr::mutate(
         sig_modalidade_empreendimento = dplyr::case_when(
           dsc_modalidade_habilitado == "Geracao na propria UC" ~ "Microgera\u00e7\u00e3o ou Minigera\u00e7\u00e3o distribu\u00edda",
@@ -145,12 +155,24 @@ if (param$dataset == "energy_development_budget") {
           TRUE                                                 ~ "Indefinido"
         )
       )
-  } else {
+  }
+
+  if (param$dataset %in% c("energy_enterprises_distributed", "energy_generation", "energy_development_budget")) {
+    # FRAGILE: assumes numeric coordinate/power/value columns (mda_*/
+    # num_coord_*/vlr_*) use Brazilian thousand separators (.) and decimal
+    # commas (,) to strip/convert. If ANEEL changes formatting or exports
+    # clean numerics directly, gsub() may alter valid values. Guarded on
+    # is.character() because fread() can already auto-parse a comma-free
+    # column (e.g. energy_generation's mda_potencia_fiscalizada_kw) as
+    # numeric on its own -- gsub()ing a numeric column would coerce it
+    # through as.character() unnecessarily.
     dat <- dat %>%
-      janitor::clean_names() %>%
-      dplyr::mutate_if(is.character, function(var) {
-        stringi::stri_trans_general(str = var, id = "Latin-ASCII")
-      })
+      dplyr::mutate(
+        dplyr::across(dplyr::starts_with(c("mda", "num_coord", "vlr")) & dplyr::where(is.character), .fns = ~ gsub("[.]", "", .x))
+      ) %>%
+      dplyr::mutate(
+        dplyr::across(dplyr::starts_with(c("mda", "num_coord", "vlr")) & dplyr::where(is.character), ~ gsub("[,]", ".", .x) %>% as.numeric())
+      )
   }
 
   # Loading dictionary to recode variable values
@@ -198,17 +220,23 @@ if (param$dataset == "energy_development_budget") {
       }
     )
 
-  # changing operation_start to date format
-
-  dat <- dat %>%
-    dplyr::mutate(
-      dplyr::across(operation_start, \(x) as.Date(x, format = "%d/%m/%Y", origin = "1970-01-01"))
-    )
+  # Dead code, removed: this used to across(operation_start, as.Date(...,
+  # format = "%d/%m/%Y")) here, before any rename runs -- but no column is
+  # ever literally named "operation_start" pre-rename in any of the three
+  # aneel datasets (that's the ENG rename target, see below), so
+  # across(operation_start, ...) always matched zero columns and this step
+  # was a permanent no-op. Verified live 2026-09-21: energy_generation's
+  # real date column (dat_entrada_operacao) is already IDate/Date straight
+  # out of fread() -- data.table auto-detects its ISO YYYY-MM-DD values --
+  # so no manual as.Date() conversion is needed for it anyway, and the
+  # "%d/%m/%Y" format this block assumed was also wrong for that column.
 
   ################################
   ## Harmonizing Variable Names ##
   ################################
 
+  # FRAGILE: exact upstream column names expected in Portuguese harmonization.
+  # If ANEEL renames any of these columns, recode silently leaves them untouched.
   if (param$language == "pt") {
     dat_mod <- dat %>%
       dplyr::rename_with(dplyr::recode,
@@ -222,38 +250,63 @@ if (param$dataset == "energy_development_budget") {
       )
   }
 
+  # FRAGILE: exact upstream column names expected in English harmonization.
+  # If ANEEL changes database attribute names, recode silently leaves columns in Portuguese.
+  #
+  # Several keys below used to be short/generic names ("fonte", "fase",
+  # "origem", "tipo", "tipo_de_atuacao", "combustivel_final",
+  # "geracao_qualificada", "inicio_vigencia", "fim_vigencia",
+  # "proprietario_regime_de_exploracao", "sub_bacia", "municipio_s",
+  # "entrada_em_operacao") that never matched any real column name after
+  # janitor::clean_names() -- same root cause, and largely the same wrong
+  # names, as R/dictionary.R's energy_generation ~variable mismatch fixed
+  # 2026-09-21 (see NEWS.md). Fixed here by pointing each key at the real
+  # column, keeping the original target name where one was already chosen.
+  # "fonte" = "source" had no real column to reassign to (sig_tipo_geracao
+  # is already "generation_type" below) and is left as dead weight.
+  # "tipo_de_despesa" = "type_of_expense" used to be here too, for the same
+  # reason -- removed 2026-09-21 alongside R/dictionary.R's matching
+  # ~variable rows once it was confirmed (live, and against a locally saved
+  # copy of the current resource) that energy_development_budget's real
+  # data has no expense-by-category dimension at all; see NEWS.md.
   if (param$language == "eng") {
     dat_mod <- dat %>%
       dplyr::rename_with(dplyr::recode,
         "ano" = "year",
-        "tipo_de_despesa" = "type_of_expense",
         "soma_de_valor" = "value",
         "participacao" = "share_of_total",
         "empreendimento" = "venture",
         "uf" = "state",
         "fonte" = "source",
-        "fase" = "stage",
-        "origem" = "origin",
-        "tipo" = "type",
-        "tipo_de_atuacao" = "type_of_permission",
-        "combustivel_final" = "final_fuel",
-        "entrada_em_operacao" = "operation_start",
+        "dsc_fase_usina" = "stage",
+        "dsc_origem_combustivel" = "origin",
+        "dsc_fonte_combustivel" = "type",
+        "dsc_tipo_outorga" = "type_of_permission",
+        "nom_fonte_combustivel" = "final_fuel",
+        "dat_entrada_operacao" = "operation_start",
         "potencia_outorgada_k_w" = "granted_power_kw",
         "potencia_fiscalizada_k_w" = "fiscalized_power_kw",
         "garantia_fisica_k_w" = "physical_guarantee_kw",
-        "geracao_qualificada" = "qualified_generation",
+        "mda_potencia_outorgada_kw" = "granted_power_kw",
+        "mda_potencia_fiscalizada_kw" = "fiscalized_power_kw",
+        "mda_garantia_fisica_kw" = "physical_guarantee_kw",
+        "idc_geracao_qualificada" = "qualified_generation",
         "latitude_decimal" = "latitude_dd",
         "longitude_decimal" = "longitude_dd",
-        "inicio_vigencia" = "validity_start",
-        "fim_vigencia" = "validity_end",
-        "proprietario_regime_de_exploracao" = "owner_or_exploration_regime",
-        "sub_bacia" = "sub_basin",
-        "municipio_s" = "municipalities",
+        "dat_inicio_vigencia" = "validity_start",
+        "dat_fim_vigencia" = "validity_end",
+        "dsc_propri_regime_pariticipacao" = "owner_or_exploration_regime",
+        "dsc_sub_bacia" = "sub_basin",
+        "dsc_muninicpios" = "municipalities",
         "dat_geracao_conjunto_dados" = "generation_date",
         "anm_periodo_referencia" = "reference_period",
         "num_cnpj_distribuidora" = "distributor_cnpj",
         "sig_agente" = "sig_agent",
         "nom_agente" = "agent_name",
+        "nom_empreendimento" = "venture_name",
+        "ide_nucleo_ceg" = "ceg_core_id",
+        "cod_ceg" = "ceg_code",
+        "sig_uf_principal" = "main_state",
         "cod_classe_consumo" = "consumption_class_code",
         "dsc_classe_consumo" = "consumption_class_description",
         "cod_sub_grupo_tarifario" = "tariff_subgroup_code",
@@ -280,6 +333,14 @@ if (param$dataset == "energy_development_budget") {
         "num_coord_n_empreendimento" = "business_north_coordinate",
         "num_coord_e_empreendimento" = "business_east_coordinate",
         "nom_sub_estacao" = "substation_name",
+        "num_ano" = "reference_year",
+        "nom_mes" = "reference_month",
+        "num_cnpj" = "agent_cnpj",
+        "dsc_grupo_tarifario" = "tariff_group_description",
+        "idc_classe_consumidor" = "consumer_class_indicator",
+        "idc_tipo" = "type_indicator",
+        "vlr_desconto" = "discount_value",
+        "vlr_cobranca" = "charge_value",
         "num_coord_e_sub" = "substation_east_coordinate",
         "num_coord_n_sub" = "substation_north_coordinate"
       )

@@ -148,6 +148,13 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 
 </table>
 
+> **A note on coverage:** the years, versions and collections listed for
+> each dataset follow what the data provider currently publishes, so
+> they can change as new releases come out. If a `time_period` or `year`
+> you request is not accepted, check the provider’s website for the
+> latest coverage, or the package’s dataset table at
+> [`datasets_link.csv`](https://github.com/datazoompuc/datazoom.amazonia/blob/master/inst/extdata/manifest/v1/datasets_link.csv).
+
 # Environmental Data
 
 ## PRODES
@@ -173,7 +180,7 @@ This dataset provides:
 - **Cumulative and incremental data**: Total deforestation since 1988
   and year-by-year changes
 - **Long time series**: Available from 2007 onwards (cumulative) and
-  incrementally by year
+  incrementally by year, currently through 2025
 - **Official baseline**: Used by Brazilian government for forest policy
   and enforcement
 
@@ -203,7 +210,7 @@ Project](https://www.gov.br/inpe/pt-br) and
 Clear-cut deforestation areas (complete forest loss).
 
 - **Coverage**: Entire Legal Amazon region
-- **Time period**:
+- **Time period**: 2007-2025
   - 2007: Cumulative deforestation from 1988 to 2007
   - 2008-2025: Annual incremental deforestation (year-specific)
 - **Data types**:
@@ -467,8 +474,8 @@ residual <- load_prodes(
     significant computing resources
 4.  **Historical changes**: INPE occasionally revises historical
     estimates as methodology improves
-5.  **Recent data provisional**: 2025 data may be subject to revision as
-    final processing completes
+5.  **Recent data provisional**: the most recent year’s data may be
+    subject to revision as final processing completes
 
 ------------------------------------------------------------------------
 
@@ -1192,8 +1199,12 @@ coverage spanning from 1985 to present and annual updates.
 
 The MapBiomas dataset includes:
 
-- **Time Period**: Annual data from 1985 to 2023 (with updates
-  continuing)
+- **Time Period**: Annual data from 1985 onwards; the exact final year
+  varies by dataset and even by `geo_level` within the same dataset
+  (most run through 2024, a few still stop at 2023 or earlier) – see
+  **Measurement Units and Notes** below for how to check the year range
+  for a specific `(dataset, geo_level)` pair before assuming it matches
+  another
 - **Geographic Coverage**: All Brazilian biomes (Amazon, Cerrado,
   Atlantic Forest, Caatinga, Pampa, Pantanal)
 - **Spatial Resolution**: 30 meters (Landsat resolution)
@@ -1231,18 +1242,30 @@ to vegetation
 **Key Applications**: Deforestation tracking, regeneration assessment,
 agricultural dynamics, conservation effectiveness
 
-### 3. Deforestation and Regeneration (`"mapbiomas_deforestation_regeneration"`)
+### 3. Deforestation (`"mapbiomas_deforestation_regeneration"`)
 
-Specific focus on forest cover changes: - **Deforestation**: Permanent
-loss of forest cover - **Forest Regeneration**: Secondary forest
-regrowth and natural recovery - **Degradation Signals**: Forest areas
-showing stress indicators - **Cumulative Deforestation**: Total forest
-loss since baseline
+Specific focus on forest loss: - **Deforestation**: Permanent loss of
+forest cover - **Degradation Signals**: Forest areas showing stress
+indicators - **Cumulative Deforestation**: Total forest loss since
+baseline
+
+**Note**: despite the name, this dataset covers deforestation only.
+Regeneration is a separate dataset, `"mapbiomas_secondary_vegetation"`
+(below).
 
 **Key Applications**: Amazon monitoring, conservation evaluation,
-regeneration potential, climate impact studies
+climate impact studies
 
-### 4. Mining Activities (`"mapbiomas_mining"`)
+### 4. Secondary Vegetation (`"mapbiomas_secondary_vegetation"`)
+
+Forest regrowth and natural recovery on previously deforested land: -
+**Forest Regeneration**: Secondary forest regrowth and natural
+recovery - **Regeneration Extent**: Total area of returning vegetation
+
+**Key Applications**: Regeneration assessment, conservation evaluation,
+climate impact studies
+
+### 5. Mining Activities (`"mapbiomas_mining"`)
 
 Areas used for mining operations: - **Active Mining**: Currently
 operational extraction sites - **Abandoned Mining**: Previous mining
@@ -1253,24 +1276,28 @@ mining, artisanal mining, infrastructure
 **Key Applications**: Environmental impact assessment, land degradation,
 restoration planning, environmental compliance
 
-### 5. Irrigation (`"mapbiomas_irrigation"`)
+### 6. Irrigation (`"mapbiomas_irrigation"`)
 
-**Note**: Temporarily unavailable - new collection coming soon
+**Note**: Temporarily unavailable – no irrigation statistics file exists
+on MapBiomas’s Dataverse archive at any collection. `docs_url` is left
+pointing at MapBiomas’s documentation for whoever investigates a
+replacement.
 
-Previously included: - **Irrigated Areas**: Extent of irrigation in
-agricultural systems - **Irrigation Type**: Drip, center-pivot, flood
-irrigation - **Crop Types Under Irrigation**: Which crops receive
-irrigation
+Provides: - **Irrigated Areas**: Extent of irrigation in agricultural
+systems - **Irrigation Type**: Drip, center-pivot, flood irrigation -
+**Crop Types Under Irrigation**: Which crops receive irrigation
 
-### 6. Water Bodies (`"mapbiomas_water"`)
+### 7. Water Bodies (`"mapbiomas_water"`)
 
-**Note**: Temporarily unavailable - new collection coming soon
+`"municipality"` and `"biome"` work. **`"state"` is unavailable**: no
+MapBiomas collection publishes a state-level water sheet upstream.
 
-Previously included: - **Surface Water Extent**: Permanent and seasonal
-water bodies - **Water Type**: Natural rivers/lakes vs. artificial
-reservoirs - **Seasonal Variation**: Dry vs. wet season water extent
+- **Surface Water Extent**: Permanent and seasonal water bodies, by
+  municipality or biome
+- **Seasonal Variation**: Not broken out at annual granularity in the
+  current source
 
-### 7. Wildfire Burn Scars (`"mapbiomas_fire"`)
+### 8. Wildfire Burn Scars (`"mapbiomas_fire"`)
 
 Areas affected by wildfires: - **Burn Scars**: Areas burned in recent
 fires - **Fire Extent**: Total area impacted per year - **Fire
@@ -1286,14 +1313,18 @@ impacts, fire management
 
 **Options:**
 
-1.  **dataset**: Seven possible choices (two temporarily unavailable)
+1.  **dataset**: Eight possible choices (irrigation temporarily
+    unavailable)
     - `"mapbiomas_cover"`: Land cover types
     - `"mapbiomas_transition"`: Changes in land cover
-    - `"mapbiomas_deforestation_regeneration"`: Forest cover changes
+    - `"mapbiomas_deforestation_regeneration"`: Deforestation only (see
+      note above – regeneration is a separate dataset)
+    - `"mapbiomas_secondary_vegetation"`: Forest regeneration/regrowth
     - `"mapbiomas_mining"`: Mining areas
     - `"mapbiomas_irrigation"`: Irrigated areas (temporarily
       unavailable)
-    - `"mapbiomas_water"`: Water bodies (temporarily unavailable)
+    - `"mapbiomas_water"`: Water bodies (`"state"` unavailable;
+      municipality/biome work)
     - `"mapbiomas_fire"`: Wildfire burn scars
 2.  **raw_data**:
     - `TRUE`: Data in original format from MapBiomas
@@ -1305,9 +1336,11 @@ impacts, fire management
       (faster)
     - For `"mapbiomas_deforestation_regeneration"`: `"municipality"`
       only
+    - For `"mapbiomas_secondary_vegetation"`: `"municipality"` only
     - For `"mapbiomas_mining"`: `"indigenous_land"` or `"municipality"`
     - For `"mapbiomas_irrigation"`: `"state"` or `"biome"`
-    - For `"mapbiomas_water"`: `"municipality"`, `"state"`, or `"biome"`
+    - For `"mapbiomas_water"`: `"municipality"` or `"biome"` (`"state"`
+      currently unavailable)
     - For `"mapbiomas_fire"`: `"state"` only
 4.  **language**:
     - `"pt"`: Portuguese language labels
@@ -1323,6 +1356,15 @@ impacts, fire management
   interpretation to ensure accuracy
 - **Updates**: Historical data may be revised with new collections and
   improved algorithms
+- **Collections differ across datasets, and even across `geo_level`s of
+  the same dataset.** MapBiomas does not release every dataset on the
+  same collection at the same time, and this package sometimes
+  deliberately pins one `geo_level` behind its siblings when a newer
+  collection is missing a sheet it needs (e.g. `"mapbiomas_mining"`’s
+  `"indigenous_land"` row is one collection behind its `"municipality"`
+  row – verified live; MapBiomas dropped that sheet from the newer
+  file). Don’t assume one row’s collection or year range applies to
+  another row of the same dataset.
 
 ------------------------------------------------------------------------
 
@@ -1626,41 +1668,46 @@ for very large analyses
 
 SEEG (Sistema de Estimativa de Emissões e Remoções de Gases de Efeito
 Estufa - System of Estimates of Emissions and Removals of Greenhouse
-Gases) is Brazil’s most comprehensive greenhouse gas emissions database
+Gases) is Brazil’s most comprehensive greenhouse gas emissions database,
 developed by [Observatório do Clima](https://oc.eco.br/) (Climate
 Observatory).
 
 This dataset provides:
 
-- **Greenhouse gas emissions**: Complete estimates of all major
-  climate-relevant gases
-- **Multi-sector coverage**: Agriculture, energy, land use, industry,
-  waste
-- **Sub-sectoral detail**: Detailed breakdowns within each sector
-- **Municipality and state levels**: Geographic disaggregation for
-  regional analysis
-- **Time series**: Historical data from 2000 onwards
-- **Removal accounting**: Also includes carbon sequestration and
-  removals
-- **Comprehensive methodology**: Based on Brazilian national inventory
-  standards
-- **Transparent assumptions**: Well-documented methodology and data
-  sources
-
-SEEG is the primary tool for understanding Brazil’s greenhouse gas
-emissions profile, tracking progress toward climate goals, identifying
-emission hotspots, and supporting climate policy.
-
-### Data Source and Methodology
-
-SEEG emissions estimates are compiled using: - Government data from
-multiple agencies (MAPA, IBGE, ANP, etc.) - Satellite monitoring of
-deforestation and land use - International IPCC methodology standards -
-Peer-reviewed scientific research - Regular updates as new government
-data becomes available
+- **Greenhouse gas emissions**: estimates covering emissions and
+  removals across all major sectors
+- **Multi-sector coverage**: agriculture, energy, land use change,
+  industrial processes, waste
+- **Municipality, state, and country levels**: geographic disaggregation
+  for regional analysis
+- **Time series**: 1970-2024
 
 For more information, visit [SEEG Project](https://www.seeg.org.br/) and
 [Observatório do Clima](https://oc.eco.br/).
+
+------------------------------------------------------------------------
+
+## Data Version
+
+The package reads SEEG’s **v13.0** municipal summary workbook
+(`seeg.eco.br`). Categories are organized as `Setor de emissão` /
+`Categoria emissora` / `Sub-categoria emissora` / `Recorte` /
+`Atividade geral`. There is no `time_period` argument – every call
+returns the full series.
+
+### Detail not included
+
+A few dimensions are not available in the current data:
+
+- No `gas`/`produto` breakdown – emissions are not split by individual
+  gas.
+- **seeg_farming**: no species/crop-level detail.
+- **seeg_industry**: no input/technology-level detail (partly offset by
+  an actual/potential emission split and a finer end-use breakdown).
+- **seeg_energy**: no fuel-type breakdown (gasoline, diesel, LPG, etc.).
+- **seeg_land**: no **biome** dimension and no origin-to-destination
+  **land-cover transition matrix** – only four coarser categorical
+  fields.
 
 ------------------------------------------------------------------------
 
@@ -1669,143 +1716,69 @@ For more information, visit [SEEG Project](https://www.seeg.org.br/) and
 ### **1. seeg (All Sectors Combined)**
 
 Complete greenhouse gas emissions across all sectors in one dataset.
+**Only available with `raw_data = TRUE`** – it cannot be requested
+treated (`raw_data = FALSE`).
 
-- **Coverage**: All emission sources in Brazil
-- **Sectors included**: All five (agriculture, energy, land use,
-  industry, waste)
-- **Time period**: 2000-2018
-- **Geographic levels**: Country, State, Municipality
-- **Key variables**: Total emissions (CO₂e), by sector and sub-sector
-- **Format**: Comprehensive view of Brazil’s total emissions profile
-- **Note**: Only available with `raw_data = TRUE`
-- **Use cases**:
-  - Understand overall emissions landscape
-  - Identify dominant emission sources
-  - Track total emissions trends over time
+- **Coverage**: all sectors, 1970-2024
+- **Geographic levels**: country, state, municipality
+- **Format**: the cleaned source sheet – one row per municipality x
+  category path, with one numeric column per year (`x1970`…`x2024`)
 
 ### **2. seeg_farming (Agricultural and Livestock Emissions)**
 
-Greenhouse gas emissions from agriculture and livestock activities.
-
-- **Coverage**: All agricultural and livestock production
-- **Time period**: 2000-2018
-- **Geographic levels**: Country, State, Municipality
-- **Key variables**: Emissions from cattle, crop production, soil
-  management, manure
-- **Dominant source**: Usually the largest single emissions sector in
-  Brazil
-- **Components**:
-  - Livestock (enteric fermentation, manure)
-  - Crop production and soil management
-  - Agricultural land preparation
-- **Use cases**:
-  - Assess agricultural emission contributions
-  - Identify highest-emission municipalities
-  - Evaluate livestock and farming intensity
-  - Policy targets for agricultural emissions reduction
+Sector: `Agropecuaria`. **Only available with `raw_data = FALSE`.**
 
 ### **3. seeg_energy (Energy Sector Emissions)**
 
-Emissions from energy production and consumption.
-
-- **Coverage**: All energy-related emissions
-- **Time period**: 2000-2018
-- **Geographic levels**: Country, State, Municipality
-- **Key variables**: Emissions from electricity, transport, heating,
-  fuel production
-- **Components**:
-  - Energy generation and distribution
-  - Transportation fuels
-  - Energy consumption
-  - Industrial energy use
-- **Use cases**:
-  - Understand energy sector contribution to climate change
-  - Track renewable vs. fossil fuel impacts
-  - Identify regional energy emission patterns
+Sector: `Energia`. **Only available with `raw_data = FALSE`.** No
+fuel-type breakdown (see “Detail not included” above).
 
 ### **4. seeg_land (Land Use Change Emissions)**
 
-Emissions and removals from changes in forest cover and land use.
-
-- **Coverage**: Deforestation, forest degradation, reforestation effects
-- **Time period**: 2000-2018
-- **Geographic levels**: Country, State, Municipality
-- **Key variables**: Net emissions/removals from land use change
-- **Components**:
-  - Deforestation and forest loss
-  - Forest degradation
-  - Reforestation and afforestation
-  - Vegetation conversion
-- **Importance**: Often largest single contributor to Brazil’s emissions
-- **Use cases**:
-  - Analyze deforestation climate impact
-  - Identify reforestation opportunities
-  - Assess forest conservation value
-  - Link with PRODES and DETER deforestation data
+Sector: `Mudanca de Uso da Terra e Floresta`. **Only available with
+`raw_data = FALSE`.** No biome dimension and no land-cover transition
+matrix (see “Detail not included” above).
 
 ### **5. seeg_industry (Industrial Process Emissions)**
 
-Emissions from manufacturing and industrial processes.
-
-- **Coverage**: All industrial sectors
-- **Time period**: 2000-2018
-- **Geographic levels**: Country, State, Municipality
-- **Key variables**: Emissions from cement, chemicals, metals, minerals,
-  other manufacturing
-- **Components**:
-  - Chemical production (ammonia, soda ash, etc.)
-  - Metal production (iron, aluminum, others)
-  - Mineral processing (cement, lime, glass)
-  - Other industrial processes
-- **Use cases**:
-  - Identify industrial emission hotspots
-  - Regional manufacturing impacts
-  - Process-specific emission reduction opportunities
+Sector: `Processos Industriais`. **Only available with
+`raw_data = FALSE`.**
 
 ### **6. seeg_residuals (Waste and Residuals Emissions)**
 
-Emissions from waste management, landfills, and waste treatment.
-
-- **Coverage**: All waste-related emissions
-- **Time period**: 2000-2018
-- **Geographic levels**: Country, State, Municipality
-- **Key variables**: Emissions from solid waste, wastewater treatment,
-  waste treatment
-- **Components**:
-  - Landfill methane emissions
-  - Wastewater treatment
-  - Waste disposal and treatment
-  - Municipal solid waste management
-- **Use cases**:
-  - Assess waste sector contributions
-  - Identify waste management improvement opportunities
-  - Evaluate circular economy potential
+Sector: `Residuos`. **Only available with `raw_data = FALSE`.**
 
 ------------------------------------------------------------------------
 
-## Important Data Characteristics
+## Output Columns (`raw_data = FALSE`)
 
-### Collection 9 Data
+Every `seeg_*` sector dataset returns long-format data, one row per
+category combination and year, with a single `value` (eng) / `Valor`
+(pt) column. The columns available depend on `geo_level` and on which
+4th categorical dimension that sector carries:
 
-The data provided is from SEEG’s Collection 9: - **Time period**:
-2000-2018 - **Methodology**: Latest available when data was compiled -
-**Quality**: Peer-reviewed and validated - **Revisions**: May be updated
-in future SEEG collections as better data becomes available
+| geo_level | eng columns | pt columns |
+|----|----|----|
+| municipality | year, city, state, ibge, sector, emission_category, emission_subcategory, **\<4th dim\>**, general_activity, emission_type, value | Ano, municipio, estado, ibge, setor, categoria_emissao, subcategoria_emissao, **\<4th dim\>**, atividade_geral, tipo_emissao, Valor |
+| state | (drops city, ibge) | (drops municipio, ibge) |
+| country | (also drops state) | (also drops estado) |
 
-### Emissions Units
+The 4th dimension’s name (and whether it is translated in `pt`) differs
+by sector:
 
-- **Standard unit**: Gigatonnes CO₂ equivalent (Gt CO₂e)
-- **CO₂e equivalence**: Uses global warming potentials (GWP) to convert
-  CH₄ and N₂O to CO₂ equivalent
-- **Consistency**: Allows comparison across different gases and sectors
+| Dataset        | eng name         | pt name      | pt renamed?              |
+|----------------|------------------|--------------|--------------------------|
+| seeg_residuals | waste_stream     | tipo_residuo | yes                      |
+| seeg_farming   | emission_pathway | via_emissao  | yes                      |
+| seeg_industry  | emission_scope   | recorte      | **no – stays `recorte`** |
+| seeg_energy    | emission_scope   | recorte      | **no – stays `recorte`** |
+| seeg_land      | emission_scope   | recorte      | **no – stays `recorte`** |
 
-### Download Considerations
-
-**Important**: The complete SEEG dataset is quite large. When
-downloading: - Entire datasets are downloaded as single files; year
-selection is limited - A stable, high-speed internet connection is
-recommended - Downloads may take time depending on connection speed -
-Ensure sufficient disk space for storage
+**`language = "pt"` output is never value-translated** – only
+`language = "eng"` runs SEEG’s PT-\>EN value dictionaries
+(`SEEG_SECTOR_EN`, `SEEG_EMISSION_TYPE_EN`, and one
+category/subcategory/dimension/activity dictionary per sector, in
+`R/seeg.R`). A PT call returns the source’s own Portuguese values as-is.
 
 ------------------------------------------------------------------------
 
@@ -1813,54 +1786,43 @@ Ensure sufficient disk space for storage
 
 ### 1. **dataset**
 
-Selects which emission sector(s) to download.
+Selects which emission sector to download.
 
 ``` r
 dataset = "seeg"              # All sectors (raw_data = TRUE only)
-dataset = "seeg_farming"      # Agriculture and livestock
-dataset = "seeg_energy"       # Energy sector
-dataset = "seeg_land"         # Land use changes
-dataset = "seeg_industry"     # Industrial processes
-dataset = "seeg_residuals"    # Waste and residuals
+dataset = "seeg_farming"      # Agriculture and livestock (raw_data = FALSE only)
+dataset = "seeg_energy"       # Energy sector (raw_data = FALSE only)
+dataset = "seeg_land"         # Land use changes (raw_data = FALSE only)
+dataset = "seeg_industry"     # Industrial processes (raw_data = FALSE only)
+dataset = "seeg_residuals"    # Waste and residuals (raw_data = FALSE only)
 ```
 
 ### 2. **raw_data**
 
-Controls whether to download original or processed data.
-
-- `TRUE`: Returns raw SEEG data format (more detailed)
-- `FALSE`: Returns treated data with English variable names and
-  standardized format
-
-``` r
-raw_data = FALSE  # logical
-```
+Controls whether to download the original or the treated data. **Each
+dataset only works with one value** (see above): `"seeg"` requires
+`TRUE`; every `seeg_*` sector requires `FALSE`.
 
 ### 3. **geo_level**
 
 Specifies geographic aggregation level.
 
-- `"country"`: National total
-- `"state"`: State-level emissions (27 units)
-- `"municipality"`: All 5,570+ municipalities
-
-``` r
-geo_level = "state"  # character string
-```
+- `"country"`: national total
+- `"state"`: state-level emissions (27 units)
+- `"municipality"`: all 5,570+ municipalities
 
 ### 4. **language**
 
-Output language for variable names and labels.
+Output language for column names and, for `eng` only, translated values.
 
-- `"pt"`: Portuguese
-- `"eng"`: English
+- `"pt"`: Portuguese column names, source’s own Portuguese values
+  (untranslated)
+- `"eng"`: English column names and translated values
 
-``` r
-language = "eng"  # character string
-```
-
-**Note on timing**: Downloads may take considerable time due to file
-size.
+**Note on timing**: the source workbook is 250MB+; downloads may take
+time. A session-scoped download+parse cache (`R/download.R`) avoids
+re-downloading it if you load more than one SEEG dataset in the same
+session.
 
 ------------------------------------------------------------------------
 
@@ -1869,7 +1831,6 @@ size.
 ### Example 1: All sectors combined (raw data) at the country level
 
 ``` r
-# download raw SEEG data (all sectors) at the country level
 # note: dataset = "seeg" only works with raw_data = TRUE
 all_emissions <- load_seeg(
   dataset = "seeg",
@@ -1882,7 +1843,6 @@ all_emissions <- load_seeg(
 ### Example 2: Agricultural emissions by state
 
 ``` r
-# download treated agricultural emissions at the state level
 farming <- load_seeg(
   dataset = "seeg_farming",
   raw_data = FALSE,
@@ -1894,7 +1854,6 @@ farming <- load_seeg(
 ### Example 3: Land use change emissions by state
 
 ``` r
-# download treated land use change emissions at the state level
 land_use <- load_seeg(
   dataset = "seeg_land",
   raw_data = FALSE,
@@ -1906,7 +1865,6 @@ land_use <- load_seeg(
 ### Example 4: Energy emissions by municipality
 
 ``` r
-# download treated energy emissions at the municipality level
 energy <- load_seeg(
   dataset = "seeg_energy",
   raw_data = FALSE,
@@ -1918,7 +1876,6 @@ energy <- load_seeg(
 ### Example 5: Industrial process emissions by state
 
 ``` r
-# download treated industrial process emissions at the state level
 industry <- load_seeg(
   dataset = "seeg_industry",
   raw_data = FALSE,
@@ -1930,7 +1887,6 @@ industry <- load_seeg(
 ### Example 6: Waste emissions by state
 
 ``` r
-# download treated waste emissions at the state level
 residuals <- load_seeg(
   dataset = "seeg_residuals",
   raw_data = FALSE,
@@ -1939,37 +1895,17 @@ residuals <- load_seeg(
 )
 ```
 
-## Data Notes
+## Limitations
 
-### Emission Sources Included
-
-SEEG includes all major anthropogenic emission sources: - Agriculture
-(livestock, crops, soil) - Energy (electricity, transport, heating) -
-Land use change (deforestation, afforestation) - Industrial processes
-(cement, chemicals, metals) - Waste (landfills, wastewater)
-
-### Methodology
-
-Estimates follow: - IPCC guidelines for national greenhouse gas
-inventories - Brazilian national inventory standards - International
-best practices - Transparent, documented assumptions
-
-### Data Quality
-
-- Peer-reviewed methodology
-- Validated against government data
-- Uncertainty ranges available in detailed products
-- Regular methodology updates
-
-### Limitations
-
-1.  **Fixed time period**: Collection 9 covers 2000-2018 only
-2.  **File size**: Large downloads; requires good internet
-3.  **Year aggregation**: Cannot select individual years; entire dataset
-    downloaded
-4.  **Revisions**: Methodology may change in future SEEG releases
-5.  **Sub-national uncertainty**: Municipal and state estimates have
-    higher uncertainty than national
+1.  **No year selection**: entire series (1970-2024) is downloaded;
+    there is no `time_period` argument.
+2.  **File size**: the source workbook is 250MB+; a stable connection is
+    recommended.
+3.  **Missing detail**: see “Detail not included” above – fuel type,
+    species/crop detail, biome, and the land-cover transition matrix are
+    not available in the current data.
+4.  **`pt` output is untranslated**: only `language = "eng"` runs SEEG’s
+    value dictionaries.
 
 ------------------------------------------------------------------------
 
@@ -2020,7 +1956,7 @@ number of agricultural properties.
 
 - **Key metrics**: Total land area (hectares), number of properties
 - **Time period**: 1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995,
-  2006, 2017
+  2006
 - **Geographic levels**: Country, State
 - **Use case**: Track long-term trends in farm consolidation and total
   agricultural land expansion
@@ -2033,8 +1969,7 @@ pasture, forests, etc.).
 - **Key metrics**: Area by use category (temporary crops, permanent
   crops, natural pastures, planted pastures, forest for forest
   production, protected natural vegetation, other areas)
-- **Time period**: 1970 onwards (1970, 1975, 1980, 1985, 1995, 2006,
-  2017)
+- **Time period**: 1970 onwards (1970, 1975, 1980, 1985, 1995, 2006)
 - **Geographic levels**: Country, State
 - **Use case**: Analyze land use transitions, deforestation patterns,
   and agricultural intensification
@@ -2046,8 +1981,7 @@ levels.
 
 - **Key metrics**: Number of employees, number of tractors, employed
   persons
-- **Time period**: 1970 onwards (1970, 1975, 1980, 1985, 1995, 2006,
-  2017)
+- **Time period**: 1970 onwards (1970, 1975, 1980, 1985, 1995, 2006)
 - **Geographic levels**: Country, State
 - **Use case**: Study agricultural mechanization trends and rural
   employment dynamics
@@ -2060,7 +1994,7 @@ partnership, etc.).
 - **Key metrics**: Number of properties by producer condition (owner,
   tenant, partner, occupant)
 - **Time period**: 1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995,
-  2006, 2017
+  2006
 - **Geographic levels**: Country, State
 - **Use case**: Understand land tenure structures and changes in
   property ownership patterns
@@ -2071,8 +2005,7 @@ Details the number of livestock animals farmed by species and type.
 
 - **Key metrics**: Number of animals by species (cattle, pigs, poultry,
   sheep, horses, goats, water buffalo, etc.), number of establishments
-- **Time period**: 1970 onwards (1970, 1975, 1980, 1985, 1995, 2006,
-  2017)
+- **Time period**: 1970 onwards (1970, 1975, 1980, 1985, 1995, 2006)
 - **Geographic levels**: Country, State
 - **Use case**: Monitor livestock herd sizes and sectoral changes in
   animal agriculture
@@ -2084,7 +2017,7 @@ Quantifies production volumes of animal-based products.
 - **Key metrics**: Production quantities (eggs, milk, honey, wool, hide,
   etc.)
 - **Time period**: 1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995,
-  2006, 2017
+  2006
 - **Geographic levels**: Country, State
 - **Use case**: Track historical trends in dairy, poultry, and other
   animal product sectors
@@ -2097,7 +2030,7 @@ produced.
 - **Key metrics**: Area planted (hectares), quantity produced
   (kilograms), number of establishments by crop type
 - **Time period**: 1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995,
-  2006, 2017
+  2006
 - **Geographic levels**: Country, State
 - **Use case**: Comprehensive analysis of crop production patterns and
   agricultural productivity
@@ -2109,8 +2042,7 @@ replanted each season).
 
 - **Key metrics**: Area planted, quantity produced for crops like
   soybeans, corn, beans, cassava
-- **Time period**: 1970 onwards (1970, 1975, 1980, 1985, 1995, 2006,
-  2017)
+- **Time period**: 1970 onwards (1970, 1975, 1980, 1985, 1995, 2006)
 - **Geographic levels**: Country, State
 - **Use case**: Study annual crop production cycles and seasonal
   variations
@@ -2123,7 +2055,7 @@ years).
 - **Key metrics**: Area planted, quantity produced for crops like
   coffee, sugarcane, cocoa, oranges
 - **Time period**: 1940 onwards (1940, 1950, 1960, 1970, 1975, 1980,
-  1985, 1995, 2006, 2017)
+  1985, 1995, 2006)
 - **Geographic levels**: Country, State
 - **Use case**: Analyze long-cycle crop production and regional
   specialization
@@ -2136,8 +2068,9 @@ establishments.
 - **Key metrics**: Number of cattle establishments, herd size, number of
   properties
 - **Time period**: 2017 (most recent census year)
-- **Geographic levels**: Country, State, **Municipality** (unique to
-  this dataset)
+- **Geographic levels**: **Municipality only** – unlike every other
+  dataset in this vignette, `livestock_production` is not available at
+  the country or state level
 - **Use case**: Detailed regional analysis of cattle ranching, including
   municipality-level data
 
@@ -2175,7 +2108,9 @@ Specifies the geographic aggregation level.
 
 - `"country"`: National aggregate
 - `"state"`: Disaggregated by Brazilian state
-- `"municipality"`: Available only for `"livestock_production"` dataset
+- `"municipality"`: Available only for `"livestock_production"`, and the
+  *only* level that dataset supports – `"country"`/`"state"` are not
+  available for `livestock_production`
 
 ``` r
 geo_level = "state"  # character string
@@ -2187,16 +2122,16 @@ Defines which year(s) to download. Availability varies by dataset:
 
 | Dataset | Available Years |
 |----|----|
-| `agricultural_land_area` | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017` |
-| `agricultural_area_use` | `1970, 1975, 1980, 1985, 1995, 2006, 2017` |
-| `agricultural_employees_tractors` | `1970, 1975, 1980, 1985, 1995, 2006, 2017` |
-| `agricultural_producer_condition` | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017` |
-| `animal_production` | `1970, 1975, 1980, 1985, 1995, 2006, 2017` |
-| `animal_products` | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017` |
-| `vegetable_production_area` | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017` |
-| `vegetable_production_temporary` | `1970, 1975, 1980, 1985, 1995, 2006, 2017` |
-| `vegetable_production_permanent` | `1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006, 2017` |
-| `livestock_production` | `2017` |
+| `agricultural_land_area` | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006` |
+| `agricultural_area_use` | `1970, 1975, 1980, 1985, 1995, 2006` |
+| `agricultural_employees_tractors` | `1970, 1975, 1980, 1985, 1995, 2006` |
+| `agricultural_producer_condition` | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006` |
+| `animal_production` | `1970, 1975, 1980, 1985, 1995, 2006` |
+| `animal_products` | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006` |
+| `vegetable_production_area` | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006` |
+| `vegetable_production_temporary` | `1970, 1975, 1980, 1985, 1995, 2006` |
+| `vegetable_production_permanent` | `1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006` |
+| `livestock_production` | `2017` (municipality only) |
 
 You can request a single year or a range of years:
 
@@ -2222,12 +2157,12 @@ language = "eng"  # character string
 ## Examples
 
 ``` r
-# download treated land area data at the country level in 2017
+# download treated land area data at the country level in 2006
 data <- load_censoagro(
   dataset = "agricultural_land_area",
   raw_data = FALSE,
   geo_level = "country",
-  time_period = 2017,
+  time_period = 2006,
   language = "eng"
 )
 
@@ -3129,8 +3064,7 @@ version of the Harmonized System nomenclature.
 - **Coverage**: Bilateral trade flows for 5,000+ products (HS 6-digit
   level)
 - **Countries**: 200+ countries and territories
-- **Time period**: 1995 onwards (varies by country; most comprehensive
-  from 2000 onwards)
+- **Time period**: 1995-2024 (current release version `202601`)
 - **Variables**: Trade value (USD), quantity (where available),
   exporter, importer, product code
 - **Use cases**:
@@ -3191,9 +3125,8 @@ raw_data = FALSE  # logical
 Specifies which year(s) to download. You can request single or multiple
 years.
 
-- **Available**: Generally 1995 onwards, though coverage varies by
-  country
-- **Most complete**: 2000 onwards for the majority of countries
+- **Available**: 1995-2024 (current release; widens as CEPII publishes
+  new years)
 - **Note**: Specifying years helps with filtering but still requires
   downloading the full dataset
 
@@ -3252,10 +3185,13 @@ available)
 
 ### Country and Product Coverage
 
-- Most countries covered from 2000 onwards
-- Coverage varies by country; some countries have earlier data available
+- Coverage spans 1995-2024 in the current release; some countries have
+  gaps in earlier years
 - HS 6-digit codes ensure consistency with international standards
 - Product classifications may change over time as the HS is updated
+- `load_baci()` internally downloads a companion Brazilian COMEX
+  product-code dictionary (`NCM_SH.csv`) to translate HS codes to
+  product names in Portuguese.
 
 ### Quality Notes
 
@@ -4503,7 +4439,7 @@ Account’s (CDE) annual budget expenses. The CDE is designed to promote
 the Brazilian energy development and is managed by the Electrical Energy
 Commercialization Chamber (CCEE).
 
-In the current implementation, data is available from 2017 to 2022 and
+In the current implementation, data is available from 2017 to 2024 and
 must be downloaded by year. The year argument can be a single year or a
 vector of years. The dataset includes the type of expense, its value in
 R\$ (Reais), and its share over the total amount of CDE budget expenses
@@ -4522,11 +4458,15 @@ It contains information about the power, source, stage, type of
 permission, origin and final fuel with which each venture/entity
 operates, as well as other legal, technical and geographical
 information.\* Operation start dates contained in the dataset go as far
-back as 1924 up to 2022.
+back as 1908 up to 2021.
 
-\* For more details on each variable, access [This
-link](https://app.powerbi.com/view?r=eyJrIjoiNjc4OGYyYjQtYWM2ZC00YjllLWJlYmEtYzdkNTQ1MTc1NjM2IiwidCI6IjQwZDZmOWI4LWVjYTctNDZhMi05MmQ0LWVhNGU5YzAxNzBlMSIsImMiOjR9)
-and select “Manual do Usuario”.
+The source is ANEEL’s own CKAN Open Data catalogue
+(`siga-empreendimentos-geracao.csv`). Power and coordinate columns
+(`mda_*`/`num_coord_*`) are automatically converted to numeric values.
+
+\* For more details on each variable, access [ANEEL’s SIGA dataset
+page](https://dadosabertos.aneel.gov.br/dataset/siga-sistema-de-informacoes-de-geracao-da-aneel)
+and select “Dicionário de dados”.
 
 #### Energy Enterprises
 
@@ -4565,7 +4505,7 @@ and select “Dicionário de dados”.
 3.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`
 4.  **year**: only used for “energy_development_budget”. It can be a
-    single year or a vector of years from 2017:2022. This argument is
+    single year or a vector of years from 2017:2024. This argument is
     required for “energy_development_budget” and can be omitted for the
     other datasets.
 
@@ -4614,9 +4554,11 @@ website](https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/)
 #### Consumer Energy Consumption
 
 The Consumer Energy Consumption dataset provides monthly data from 2004
-to 2025 about energy consumption and number of consumers. The data is
-organized by State, Region, or Electric Subsystem, and is broken down by
-class of service and type of consumer.
+to 2025 about energy consumption and number of consumers. The source
+workbook organizes the data by State, Region, or Electric Subsystem, but
+this package currently reads only the State and Subsystem levels (see
+**geo_level** below); the data is broken down by class of service and
+type of consumer.
 
 The available classes are: Residential, Commercial, Industrial, Rural,
 and Others. For each observation, the dataset reports the type of
@@ -4641,25 +4583,26 @@ developed and published by EPE that contains useful data about energy
 production, consumption, imports, exports, transformation, and final
 use.
 
-The processed dataset provides yearly data from 2003 to 2023. It covers
-all Brazilian energy sources (such as petróleo, gás natural, carvão,
-eletricidade, lenha, solar and others) and distinguishes between
-different types of energy flow: production, transformation, final
-consumption, losses, and adjustments.
+The processed dataset provides yearly data from **1970 to 2025**, read
+from EPE’s consolidated BEN dashboard table. It covers all Brazilian
+energy sources (such as petróleo, gás natural, carvão, eletricidade,
+lenha, solar and others) and distinguishes between different types of
+energy flow: production, transformation, final consumption, losses, and
+adjustments.
 
-Each energy source appears as a separate column in the original
-spreadsheets. The cleaned data is returned in long format, with one row
-per combination of year, energy source, and account type. The account
-type is labeled to indicate whether it refers to production,
-transformation (for example, “TRANSFORMAÇÃO – REFINARIAS DE PETRÓLEO”),
-or consumption (for example, “CONSUMO – RESIDENCIAL”).
+The cleaned data is returned in long format, with one row per
+combination of year, account, energy source (`fonte`/`source`), and a
+`tipo`/`type` column (Fontes de Energia Primária/Secundária/Total).
+Account labels are the source’s own wording (for example, “Refinarias de
+Petróleo” or “Residencial”). `raw_data = TRUE` returns a single
+already-tidy table.
 
 #### State Energy Production Panel
 
-The State Energy Production Panel provides yearly data from 2011 to 2024
-on electricity generation by energy source and Brazilian state. The data
-is sourced from EPE’s BEN Chapter 8 (Dados Estaduais) and covers all 27
-states, including the Federal District.
+The State Energy Production Panel provides yearly data from **2011 to
+2025** on electricity generation by energy source and Brazilian state.
+The data is sourced from EPE’s BEN Chapter 8 (Dados Estaduais) and
+covers all 27 states, including the Federal District.
 
 Each row corresponds to one state-year combination. The dataset includes
 production by source (hydro, wind, solar, nuclear, thermal, sugar cane,
@@ -4685,9 +4628,11 @@ and an indicator of whether the state belongs to the Legal Amazon.
     `FALSE`: if you want the treated version of the data.
 
 3.  **geo_level**: only applies to `"consumer_energy_consumption"` and
-    `"industrial_energy_consumption"` datasets.  
-    `"state"`  
-    `"subsystem"`
+    `"industrial_energy_consumption"` datasets. `"state"` `"subsystem"`
+    `"region"` is also listed as a supported level by the source, but no
+    sheet is currently mapped for it in this package – passing
+    `geo_level = "region"` will fail during download rather than at
+    parameter validation. Use `"state"` or `"subsystem"`.
 
 4.  **language**: you can choose between Portuguese `("pt")` and English
     `("eng")`

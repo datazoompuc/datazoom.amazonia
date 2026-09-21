@@ -1,9 +1,112 @@
+#' @noRd
+epe_energy_state_panel_treat <- function(raw) {
+  # Extracted out of load_epe() so it can be unit-tested against a small
+  # hand-built tibble without a network download -- see
+  # tests/testthat/test-epe-schema.R and the "closures can't be
+  # unit-tested" gotcha in the manifest-maintenance skill (mapbiomas_treat()
+  # is the precedent this follows).
+
+  uf <- grupo <- fonte <- ano <- valor <- amz_legal <- NULL
+
+  amz_legal_estados <- c("Amapa", "Acre", "Amazonas", "Mato Grosso",
+                         "Tocantins", "Maranhao", "Rondonia", "Roraima", "Para")
+
+  # `fonte`'s 16 real values (verified against the live file) map 1:1 onto
+  # the 16 columns the rest of this function -- and load_epe()'s English
+  # rename -- already expect. This map is the only thing standing in for
+  # the old sheet's fixed column order; if EPE ever adds or renames a
+  # fonte, the stop() below surfaces it instead of silently dropping the
+  # new category.
+  # FRAGILE: a hardcoded 16-entry lookup with a stop() guard for anything
+  # unmapped -- good defensively, but this is the LOADER catching a shape
+  # change, not the resolver (resolve_epe.R's verify_table_columns() only
+  # checks grupo/fonte/ano/valor/macro_grupo are present, not fonte's
+  # actual values). A user's load_epe() call breaks with a clear error the
+  # moment EPE adds/renames a fonte; a PR reviewer merging the resolver's
+  # auto-refresh has no earlier signal that this map needs a matching edit.
+  # Keys are ASCII  escapes of the source's real pt-BR fonte labels (CRAN
+  # requires portable packages to use only ASCII characters in R code); see
+  # the comment values below for the literal accented spelling each maps.
+  fonte_map <- c(
+    "Gera\u00e7\u00e3o total"              = "total_produzido", # "Geracao total"
+    "Hidro"                                  = "hidro",
+    "E\u00f3lica"                           = "eolica", # "Eolica"
+    "Solar"                                  = "solar",
+    "Nuclear"                                = "nuclear",
+    "Termo"                                  = "termo",
+    "Baga\u00e7o de cana"                   = "cana", # "Bagaco de cana"
+    "Lenha"                                  = "lenha",
+    "Lix\u00edvia"                          = "lixivia", # "Lixivia"
+    "Out. Fontes renov\u00e1veis"           = "outras_fontes_renovaveis", # "Out. Fontes renovaveis"
+    "Carv\u00e3o vapor"                     = "carvao_vapor", # "Carvao vapor"
+    "G\u00e1s natural"                      = "gas_natural", # "Gas natural"
+    "G\u00e1s de coqueria"                  = "gas_de_coqueira", # "Gas de coqueria"
+    "\u00d3leo combust\u00edvel"           = "combustivel", # "Oleo combustivel"
+    "\u00d3leo diesel"                      = "diesel", # "Oleo diesel"
+    "Out. Fontes n\u00e3o renov\u00e1veis" = "outras_fontes_nao_renovaveis" # "Out. Fontes nao renovaveis"
+  )
+
+  unmapped <- setdiff(unique(raw$fonte), names(fonte_map))
+  if (length(unmapped) > 0) {
+    stop(
+      "load_epe(): energy_state_panel's source has new/changed `fonte` ",
+      "values this fonte_map doesn't know about: ",
+      paste(unmapped, collapse = ", "),
+      " -- update the map in R/epe.R before trusting this dataset."
+    )
+  }
+
+  raw %>%
+    # FRAGILE: assumes "Brasil" is the only aggregate value `grupo` ever
+    # carries in this source. If EPE ever adds macro-region rows into
+    # `grupo` itself (today regions only live in the separate macro_grupo
+    # column, already dropped upstream), they'd silently be treated as a
+    # 28th/29th "state" instead of being filtered out here -- no error,
+    # just a wrong row count nothing currently asserts against.
+    dplyr::filter(grupo != "Brasil") %>%
+    dplyr::mutate(fonte = fonte_map[fonte]) %>%
+    tidyr::pivot_wider(
+      id_cols = c(grupo, ano),
+      names_from = fonte,
+      values_from = valor
+    ) %>%
+    dplyr::rename(uf = grupo) %>%
+    dplyr::mutate(
+      # source capitalizes the connector as "Do"/"De" on 3 multi-word
+      # names (e.g. "Mato Grosso Do Sul") -- normalize to the standard
+      # lowercase connector before transliterating, matching the
+      # convention the old hand-parsed sheet already used.
+      # FRAGILE: assumes exactly these two connector words, exactly this
+      # casing bug, on exactly today's 3 affected state names. A 4th state
+      # appearing with different capitalization, or EPE fixing/breaking
+      # the casing differently, would silently mis-normalize or leave a
+      # name uncorrected -- no error either way, no test currently checks
+      # every uf value's exact spelling.
+      uf = stringr::str_replace_all(uf, " Do ", " do "),
+      uf = stringr::str_replace_all(uf, " De ", " de "),
+      uf = stringi::stri_trans_general(uf, "Latin-ASCII"),
+      amz_legal = dplyr::if_else(uf %in% amz_legal_estados, 1L, 0L)
+    ) %>%
+    dplyr::mutate(dplyr::across(-c(uf, amz_legal), as.numeric))
+}
+
 #' @title EPE
 #'
 #' @description Electrical Energy Monthly Consumption per Class or Industrial Sector
 #'
-#' @param dataset Dataset name: "consumer_energy_consumption", "industrial_energy_consumption", "national_energy_balance", or "energy_state_panel"
-#' @param geo_level Geographical level: "state" or "subsystem". Only applies to consumer or industrial datasets.
+#' @param dataset Dataset name: "consumer_energy_consumption", "industrial_energy_consumption",
+#'   "national_energy_balance", or "energy_state_panel".
+#'   * "national_energy_balance" covers 1970-2025 (yearly), reading EPE's consolidated BEN
+#'   dashboard table -- account labels are the source's own wording (e.g. "Refinarias de
+#'   Petroleo"), not a synthetic reconstruction; a "tipo"/"type" column
+#'   (Fontes de Energia Primaria/Secundaria/Total) is included.
+#'   * "energy_state_panel" covers 2011-2025 (yearly), one row per state.
+#'   * "consumer_energy_consumption" and "industrial_energy_consumption" cover 2004-2025
+#'   (monthly).
+#' @param geo_level Geographical level: "state" or "subsystem". Only applies to
+#'   "consumer_energy_consumption" and "industrial_energy_consumption". "region" is not
+#'   currently supported for either dataset -- passing \code{geo_level = "region"} will fail
+#'   during download, not at validation time.
 #' @inheritParams load_baci
 #'
 #' @return A \code{list} of tibbles (if \code{raw_data} = \code{TRUE}) or a tibble (if \code{raw_data} = \code{FALSE}).
@@ -24,6 +127,12 @@
 #'   dataset = "national_energy_balance",
 #'   raw_data = FALSE
 #' )
+#' # download treated (raw_data = FALSE) data
+#' # from the State Energy Production Panel (dataset = "energy_state_panel")
+#' panel <- load_epe(
+#'   dataset = "energy_state_panel",
+#'   raw_data = FALSE
+#' )
 #'
 #' @export
 load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = "eng") {
@@ -34,7 +143,7 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
 
   uf <- regiao <- sistema <- classe <- tipo_consumidor <- consumo <- consumidores <- setor_industrial <- data_excel <- NULL
 
-  . <- ano_tag <- conta <- bloco <- fonte <- valor <- ano <- account <- year <- value <- data <- total_produzido <- hidro <- eolica <- solar <- nuclear <- termo <- cana <- lenha <- lixivia <- outras_fontes_renovaveis <- carvao_vapor <- gas_natural <- gas_de_coqueira <- combustivel <- diesel <- outras_fontes_nao_renovaveis <- amz_legal <- state <- legal_amazon <- total_produced <- hydro <- wind <- other_renewable_sources <- steam_coal <- natural_gas <- coke_oven_gas <- fuel_oil <- diesel_oil <- other_non_renewable_sources <- NULL
+  . <- ano_tag <- conta <- grupo <- tipo <- bloco <- fonte <- valor <- ano <- account <- year <- value <- data <- total_produzido <- hidro <- eolica <- solar <- nuclear <- termo <- cana <- lenha <- lixivia <- outras_fontes_renovaveis <- carvao_vapor <- gas_natural <- gas_de_coqueira <- combustivel <- diesel <- outras_fontes_nao_renovaveis <- amz_legal <- state <- legal_amazon <- total_produced <- hydro <- wind <- other_renewable_sources <- steam_coal <- natural_gas <- coke_oven_gas <- fuel_oil <- diesel_oil <- other_non_renewable_sources <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -57,27 +166,21 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
   # defining sheet names for each dataset
 
   if (param$dataset == "national_energy_balance") {
-    sheets <- as.character(2003:2023)
+    # single sheet: the manifest points at EPE's consolidated BEN table
+    # (grupo/tipo/fonte/ano/valor, already long-format, 1970-current) instead
+    # of the old one-sheet-per-year workbook -- see the Data Engineering
+    # section below for why that removed most of this dataset's cleaning code
+    sheets <- dataset_field(param$source, param$dataset, "sheet")
   }
-  if (param$dataset == "consumer_energy_consumption") {
-    if (param$geo_level == "state") {
-      sheets <- "CONSUMO E NUMCONS SAM UF"
-    }
-    if (param$geo_level == "subsystem") {
-      sheets <- "CONSUMO E NUMCONS SAM"
-    }
-  }
-  if (param$dataset == "industrial_energy_consumption") {
-    if (param$geo_level == "state") {
-      sheets <- "SETOR INDUSTRIAL POR UF"
-    }
-    if (param$geo_level == "subsystem") {
-      sheets <- "SETOR INDUSTRIAL POR RG"
-    }
+  if (param$dataset %in% c("consumer_energy_consumption", "industrial_energy_consumption")) {
+    # sheet name per geo_level -- one manifest override row per (dataset,
+    # geo_level), the same pattern already used for MapBiomas (see
+    # inst/extdata/manifest/v1/datasets_link.csv)
+    sheets <- dataset_field(param$source, param$dataset, "sheet", geo_level = param$geo_level)
   }
 
   if (param$dataset == "energy_state_panel") {
-    sheets <- "8.1 part 3"
+    sheets <- dataset_field(param$source, param$dataset, "sheet")
   }
 
   if (param$dataset %in% c("consumer_energy_consumption", "industrial_energy_consumption")) {
@@ -90,7 +193,12 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
     on.exit(unlink(temp), add = TRUE)
 
     utils::download.file(
-      url = datasets_link(source = param$source, dataset = param$dataset, url = TRUE),
+      # geo_level passed explicitly -- consumer/industrial_energy_consumption
+      # are keyed by geo_level (see inst/extdata/manifest/v1/datasets_link.csv),
+      # and there is no base row left to silently fall back to (see
+      # R/manifest.R). This matches the "sheets" lookup right above, which
+      # already keyed on param$geo_level.
+      url = dataset_url(source = param$source, dataset = param$dataset, geo_level = param$geo_level),
       destfile = temp,
       mode = "wb"
     )
@@ -123,58 +231,19 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
   ######################
 
   if (param$dataset == "national_energy_balance") {
-    # clean each sheet separately
+    # the consolidated table (see this file's header) already comes
+    # long-format, one row per (grupo, tipo, fonte, ano) -- unlike the old
+    # one-sheet-per-year workbook, there is no header-row surgery or
+    # pivot_longer() left to do; only rename "grupo" to match this
+    # dataset's existing account-column name and coerce types (readxl
+    # leaves ano/valor as character/numeric depending on cell formatting).
 
-    dat <- dat %>%
-      purrr::imap(
-        function(df, year) {
-          names(df) <- as.character(unlist(df[3, ]))
-
-          names(df)[1] <- "conta"
-
-          # remove initial 3 rows
-
-          df <- df[-(1:3), ]
-
-          # reshaping into long format
-
-          df <- df %>%
-            tidyr::pivot_longer(
-              cols = -conta,
-              names_to = "fonte",
-              values_to = "valor"
-            ) %>%
-            dplyr::mutate(
-              bloco = dplyr::case_when(
-                conta == "TOTAL TRANSFORMACAO" ~ "TRANSFORMACAO",
-                conta == "CONSUMO FINAL" ~ "CONSUMO",
-                conta == "AJUSTES" ~ "CONSUMO",
-                .default = NA_character_
-              )
-            ) %>%
-            tidyr::fill(bloco, .direction = "down") %>%
-            dplyr::mutate(
-              conta = dplyr::case_when(
-                bloco == "TRANSFORMACAO" & !stringr::str_detect(conta, "^TRANSFORMACAO") ~ paste0("TRANSFORMACAO - ", conta),
-                bloco == "CONSUMO" & !stringr::str_detect(conta, "^CONSUMO") ~ paste0("CONSUMO - ", conta),
-                is.na(bloco) & !stringr::str_detect(conta, "^CONTA") ~ paste0("CONTA - ", conta),
-                .default = conta
-              )
-            ) %>%
-            dplyr::select(-bloco)
-
-          df <- df %>%
-            dplyr::mutate(
-              valor = suppressWarnings(as.numeric(valor)),
-              ano = year
-            )
-        }
+    dat <- dat[[1]] %>%
+      dplyr::rename(conta = grupo) %>%
+      dplyr::mutate(
+        ano = as.integer(ano),
+        valor = suppressWarnings(as.numeric(valor))
       )
-
-    # combine them
-
-    dat <- dat %>%
-      dplyr::bind_rows()
   }
 
   if (param$dataset %in% c("consumer_energy_consumption", "industrial_energy_consumption")) {
@@ -191,55 +260,16 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
 
 
   if (param$dataset == "energy_state_panel") {
-    raw <- dat[[1]]
-
-    amz_legal_estados <- c("Amapa", "Acre", "Amazonas", "Mato Grosso",
-                           "Tocantins", "Maranhao", "Rondonia", "Roraima", "Para")
-
-    # Cada bloco de ano começa com "ANO BASE XXXX" na col 1
-    ano_rows <- which(grepl("ANO BASE", as.character(raw[[1]]), ignore.case = TRUE))
-    anos     <- as.integer(stringr::str_extract(as.character(raw[[1]][ano_rows]), "\\d{4}"))
-    raw$ano_tag <- NA_integer_
-    for (i in seq_along(ano_rows)) {
-      end_row <- if (i < length(ano_rows)) ano_rows[i + 1] - 1 else nrow(raw)
-      raw$ano_tag[ano_rows[i]:end_row] <- anos[i]
-    }
-
-    dat_mod <- raw %>%
-      dplyr::filter(!is.na(ano_tag)) %>%
-      dplyr::filter(!is.na(suppressWarnings(as.numeric(as.character(.[[2]]))))) %>%
-      dplyr::filter(stringr::str_detect(as.character(.[[1]]), "[:lower:]")) %>%
-      dplyr::select(
-        uf                             = 1,
-        total_produzido                = 2,
-        hidro                          = 3,
-        eolica                         = 4,
-        solar                          = 5,
-        nuclear                        = 6,
-        termo                          = 7,
-        cana                           = 8,
-        lenha                          = 9,
-        lixivia                        = 10,
-        outras_fontes_renovaveis       = 11,
-        carvao_vapor                   = 12,
-        gas_natural                    = 13,
-        gas_de_coqueira                = 14,
-        combustivel                    = 15,
-        diesel                         = 16,
-        outras_fontes_nao_renovaveis   = 17,
-        ano                            = ano_tag
-      ) %>%
-      dplyr::mutate(
-        uf = dplyr::case_when(
-          uf == "Mato G. do Sul"  ~ "Mato Grosso do Sul",
-          uf == "Rio G. do Sul"   ~ "Rio Grande do Sul",
-          uf == "Rio G. do Norte" ~ "Rio Grande do Norte",
-          TRUE ~ uf
-        ),
-        uf = stringi::stri_trans_general(uf, "Latin-ASCII"),
-        amz_legal = dplyr::if_else(uf %in% amz_legal_estados, 1L, 0L)
-      ) %>%
-      dplyr::mutate(dplyr::across(-c(uf, amz_legal), as.numeric))
+    # SOURCE SHAPE (verified live 2026-09-08, see resolve_epe.R's own header
+    # for the investigation): a long-format table -- macro_grupo, grupo,
+    # fonte, ano, valor -- one row per (region, state-or-"Brasil", source,
+    # year), 6721 rows. `grupo` carries "Brasil" as a national total
+    # alongside the 26 states + DF; this dataset is state-level only (there
+    # was no national row in the old hand-parsed sheet either), so the
+    # "Brasil" rows are dropped rather than pivoted in as a 28th state.
+    # See epe_energy_state_panel_treat() above for the actual transform --
+    # extracted so it's unit-testable without a network download.
+    dat_mod <- epe_energy_state_panel_treat(dat[[1]])
   }
   ################################
   ## Harmonizing Variable Names ##
@@ -250,6 +280,7 @@ load_epe <- function(dataset, geo_level = "state", raw_data = FALSE, language = 
       dat_mod <- dat %>%
         dplyr::rename(
           "account" = conta,
+          "type" = tipo,
           "source" = fonte,
           "value" = valor,
           "year" = ano
