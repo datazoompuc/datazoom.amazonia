@@ -9,9 +9,10 @@
 # dataset_field()/dataset_meta() reproduce every value here EXACTLY, zero
 # patches -- any mismatch is a real regression.
 #
-# Unlike the ORIGINAL capture_resolution_matrix.R (kept for provenance, see
-# its own header + test-resolution-matrix.R's retirement note), this script
-# deliberately does NOT query the blank-key (geo_level=NULL, year=NULL)
+# Unlike the ORIGINAL capture_resolution_matrix.R (deleted -- it captured
+# blank-key queries the base-row-deletion migration made illegal; see
+# test-resolution-matrix-v2.R's own header for that retirement note), this
+# script deliberately does NOT query the blank-key (geo_level=NULL, year=NULL)
 # combination for a dataset that has real override rows -- that query is
 # exactly what the migration makes illegal (dataset_field() now stop()s on
 # it instead of silently falling through to a base row that no longer

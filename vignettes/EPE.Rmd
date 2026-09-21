@@ -35,19 +35,14 @@ The Industrial Energy Consumption dataset provides monthly data from 2004 to 202
 The National Energy Balance is a thorough and extensive research developed and published by EPE that contains useful data about energy production, consumption, imports, exports, transformation, and final use.
 
 The processed dataset provides yearly data from **1970 to 2025**, read from EPE's consolidated BEN
-dashboard table rather than the old one-sheet-per-year workbook. It covers all Brazilian energy
-sources (such as petróleo, gás natural, carvão, eletricidade, lenha, solar and others) and
-distinguishes between different types of energy flow: production, transformation, final
-consumption, losses, and adjustments.
+dashboard table. It covers all Brazilian energy sources (such as petróleo, gás natural, carvão,
+eletricidade, lenha, solar and others) and distinguishes between different types of energy flow:
+production, transformation, final consumption, losses, and adjustments.
 
 The cleaned data is returned in long format, with one row per combination of year, account,
 energy source (`fonte`/`source`), and a `tipo`/`type` column (Fontes de Energia
-Primária/Secundária/Total) the old one-sheet-per-year workbook never exposed. Account labels are
-the source's own wording (for example, "Refinarias de Petróleo" or "Residencial"), not a
-synthetic uppercase reconstruction like the old data used
-("TRANSFORMAÇÃO – REFINARIAS DE PETRÓLEO"). **This is a breaking change** from earlier package
-versions: `raw_data = TRUE` now returns one already-tidy table instead of one table per year, and
-account labels have changed wording.
+Primária/Secundária/Total). Account labels are the source's own wording (for example, "Refinarias
+de Petróleo" or "Residencial"). `raw_data = TRUE` returns a single already-tidy table.
 
 
 #### State Energy Production Panel

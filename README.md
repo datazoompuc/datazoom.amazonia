@@ -49,9 +49,7 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 **[1 - Environmental data](#environmental-data)**
 
 <table>
-
 <tr>
-
 <td>
 
 |                       |                                        |
@@ -62,7 +60,6 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 | **[Imazon](#imazon)** | *Deforestation pressure in the Amazon* |
 
 </td>
-
 <td>
 
 |                                   |                                     |
@@ -74,37 +71,29 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 | **[CENSOAGRO](#censoagro)**       | *Agriculture activities*            |
 
 </td>
-
 </tr>
-
 </table>
 
 **[2 - Social data](#social-data)**
 
 <table>
-
 <tr>
-
 <td>
 
-|  |  |
-|----|----|
-| **[IPS](#ips)** | *Amazon Social Progress Index* |
-| **[IEMA](#iema)** | *Access to electricity in the Amazon region* |
-| **[Population](#population)** | *Population* |
+|                               |                                              |
+|-------------------------------|----------------------------------------------|
+| **[IPS](#ips)**               | *Amazon Social Progress Index*               |
+| **[IEMA](#iema)**             | *Access to electricity in the Amazon region* |
+| **[Population](#population)** | *Population*                                 |
 
 </td>
-
 </tr>
-
 </table>
 
 **[3 - Economic data](#economic-data)**
 
 <table>
-
 <tr>
-
 <td>
 
 |                             |                                 |
@@ -116,7 +105,6 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 | **[PAM](#pam)**             | *Agricultural production*       |
 
 </td>
-
 <td>
 
 |                         |                           |
@@ -128,23 +116,19 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 | **[EPE](#epe)**         | *Energy consumption*      |
 
 </td>
-
 </tr>
-
 </table>
 
 **[4 - Other tools](#other-tools)**
 
 <table>
-
 <tr>
-
 <td>
 
-|  |  |
-|----|----|
+|                                                                 |                                                                             |
+|-----------------------------------------------------------------|-----------------------------------------------------------------------------|
 | **[Legal Amazon Municipalities](#legal-amazon-municipalities)** | *Dataset with Brazilian cities and whether they belong to the Legal Amazon* |
-| **[The ‘googledrive’ package](#googledrive)** | *Troubleshooting and information for downloads from Google Drive* |
+| **[The ‘googledrive’ package](#googledrive)**                   | *Troubleshooting and information for downloads from Google Drive*           |
 
 </table>
 
@@ -1248,9 +1232,8 @@ indicators - **Cumulative Deforestation**: Total forest loss since
 baseline
 
 **Note**: despite the name, this dataset covers deforestation only.
-Starting with Collection 10, MapBiomas splits what used to be one
-combined file into two separate ones – the regeneration half is now its
-own dataset, `"mapbiomas_secondary_vegetation"` (below).
+Regeneration is a separate dataset, `"mapbiomas_secondary_vegetation"`
+(below).
 
 **Key Applications**: Amazon monitoring, conservation evaluation,
 climate impact studies
@@ -1278,22 +1261,18 @@ restoration planning, environmental compliance
 ### 6. Irrigation (`"mapbiomas_irrigation"`)
 
 **Note**: Temporarily unavailable – no irrigation statistics file exists
-on MapBiomas’s Dataverse archive at any collection (checked live; only
-ATBD methodology handbooks and an unrelated agriculture-statistics
-dataset). Left in place pointing at documentation for whoever
-investigates a replacement.
+on MapBiomas’s Dataverse archive at any collection. `docs_url` is left
+pointing at MapBiomas’s documentation for whoever investigates a
+replacement.
 
-Previously included: - **Irrigated Areas**: Extent of irrigation in
-agricultural systems - **Irrigation Type**: Drip, center-pivot, flood
-irrigation - **Crop Types Under Irrigation**: Which crops receive
-irrigation
+Provides: - **Irrigated Areas**: Extent of irrigation in agricultural
+systems - **Irrigation Type**: Drip, center-pivot, flood irrigation -
+**Crop Types Under Irrigation**: Which crops receive irrigation
 
 ### 7. Water Bodies (`"mapbiomas_water"`)
 
 `"municipality"` and `"biome"` work. **`"state"` is unavailable**: no
-MapBiomas collection publishes a state-level water sheet upstream
-(checked live). Previously all three geo_levels were dead; municipality
-and biome now point at working links.
+MapBiomas collection publishes a state-level water sheet upstream.
 
 - **Surface Water Extent**: Permanent and seasonal water bodies, by
   municipality or biome
@@ -1321,7 +1300,7 @@ impacts, fire management
     - `"mapbiomas_cover"`: Land cover types
     - `"mapbiomas_transition"`: Changes in land cover
     - `"mapbiomas_deforestation_regeneration"`: Deforestation only (see
-      note above – regeneration moved to its own dataset)
+      note above – regeneration is a separate dataset)
     - `"mapbiomas_secondary_vegetation"`: Forest regeneration/regrowth
     - `"mapbiomas_mining"`: Mining areas
     - `"mapbiomas_irrigation"`: Irrigated areas (temporarily
@@ -1450,22 +1429,22 @@ Project](https://www.climatologylab.org/terraclimate.html).
 
 TerraClimate provides 13 main climate and water balance variables:
 
-| Dataset | Code | Description | Units |
-|----|----|----|----|
-| max_temperature | tmax | Maximum 2-m Temperature | °C |
-| min_temperature | tmin | Minimum 2-m Temperature | °C |
-| wind_speed | ws | Wind Speed at 10-m | m/s |
-| vapor_pressure_deficit | vpd | Vapor Pressure Deficit | kPa |
-| vapor_pressure | vap | 2-m Vapor Pressure | kPa |
-| snow_water_equivalent | swe | Snow Water Equivalent at End of Month | mm |
-| shortwave_radiation_flux | srad | Downward Shortwave Radiation Flux | W/m² |
-| soil_moisture | soil | Soil Moisture at End of Month | mm |
-| runoff | q | Runoff | mm |
-| precipitation | ppt | Accumulated Precipitation | mm |
-| potential_evaporation | pet | Reference Evapotranspiration | mm |
-| climatic_water_deficit | def | Climatic Water Deficit | mm |
-| water_evaporation | aet | Actual Evapotranspiration | mm |
-| palmer_drought_severity_index | PDSI | Palmer Drought Severity Index | unitless |
+| Dataset                       | Code | Description                           | Units    |
+|-------------------------------|------|---------------------------------------|----------|
+| max_temperature               | tmax | Maximum 2-m Temperature               | °C       |
+| min_temperature               | tmin | Minimum 2-m Temperature               | °C       |
+| wind_speed                    | ws   | Wind Speed at 10-m                    | m/s      |
+| vapor_pressure_deficit        | vpd  | Vapor Pressure Deficit                | kPa      |
+| vapor_pressure                | vap  | 2-m Vapor Pressure                    | kPa      |
+| snow_water_equivalent         | swe  | Snow Water Equivalent at End of Month | mm       |
+| shortwave_radiation_flux      | srad | Downward Shortwave Radiation Flux     | W/m²     |
+| soil_moisture                 | soil | Soil Moisture at End of Month         | mm       |
+| runoff                        | q    | Runoff                                | mm       |
+| precipitation                 | ppt  | Accumulated Precipitation             | mm       |
+| potential_evaporation         | pet  | Reference Evapotranspiration          | mm       |
+| climatic_water_deficit        | def  | Climatic Water Deficit                | mm       |
+| water_evaporation             | aet  | Actual Evapotranspiration             | mm       |
+| palmer_drought_severity_index | PDSI | Palmer Drought Severity Index         | unitless |
 
 ------------------------------------------------------------------------
 
@@ -1697,35 +1676,27 @@ For more information, visit [SEEG Project](https://www.seeg.org.br/) and
 ## Data Version
 
 The package reads SEEG’s **v13.0** municipal summary workbook
-(`seeg.eco.br`), which restructured the previous “Collection 9” release
-(2000-2018) into a new schema and a wider time series (**1970-2024**).
-There is no `time_period` argument – every call returns the full series.
-Exact coverage always tracks the manifest
+(`seeg.eco.br`). Categories are organized as `Setor de emissão` /
+`Categoria emissora` / `Sub-categoria emissora` / `Recorte` /
+`Atividade geral`. There is no `time_period` argument – every call
+returns the full series. Exact coverage always tracks the manifest
 (`datasets_link(source = "seeg")` or
 `inst/extdata/manifest/v1/datasets_link.csv`); check there before
 assuming this has changed.
 
-### What changed from the pre-v13.0 schema
+### Detail not included
 
-The old `NIVEL 1`..`NIVEL 6` hierarchy is gone, replaced by
-`Setor de emissão` / `Categoria emissora` / `Sub-categoria emissora` /
-`Recorte` / `Atividade geral`. Some detail the old schema carried has no
-equivalent in the new one and is **dropped, not reconstructed**:
+A few dimensions are not available in the current data:
 
-- `gas`/`produto` (a redundant constant column) is gone across every
-  sector – no real loss.
-- **seeg_farming** loses its species/crop-level detail.
-- **seeg_industry** loses its input/technology-level detail, partly
-  offset by a genuinely new actual/potential emission split and a finer
-  end-use breakdown the old schema never had.
-- **seeg_energy** loses its entire fuel-type breakdown (gasoline,
-  diesel, LPG, etc.).
-- **seeg_land** loses the most: its entire **biome** dimension and its
-  full origin-to-destination **land-cover transition matrix**, both
-  collapsed into four coarser categorical fields.
-
-Every one of these is tagged `# FRAGILE:` in `R/seeg.R` with the
-specific column-level detail.
+- No `gas`/`produto` breakdown – emissions are not split by individual
+  gas.
+- **seeg_farming**: no species/crop-level detail.
+- **seeg_industry**: no input/technology-level detail (partly offset by
+  an actual/potential emission split and a finer end-use breakdown).
+- **seeg_energy**: no fuel-type breakdown (gasoline, diesel, LPG, etc.).
+- **seeg_land**: no **biome** dimension and no origin-to-destination
+  **land-cover transition matrix** – only four coarser categorical
+  fields.
 
 ------------------------------------------------------------------------
 
@@ -1748,14 +1719,14 @@ Sector: `Agropecuaria`. **Only available with `raw_data = FALSE`.**
 
 ### **3. seeg_energy (Energy Sector Emissions)**
 
-Sector: `Energia`. **Only available with `raw_data = FALSE`.** Lost its
-fuel-type breakdown in the v13.0 migration (see above).
+Sector: `Energia`. **Only available with `raw_data = FALSE`.** No
+fuel-type breakdown (see “Detail not included” above).
 
 ### **4. seeg_land (Land Use Change Emissions)**
 
 Sector: `Mudanca de Uso da Terra e Floresta`. **Only available with
-`raw_data = FALSE`.** The sector with the largest documented loss: biome
-and the transition matrix (see above).
+`raw_data = FALSE`.** No biome dimension and no land-cover transition
+matrix (see “Detail not included” above).
 
 ### **5. seeg_industry (Industrial Process Emissions)**
 
@@ -1775,11 +1746,11 @@ category combination and year, with a single `value` (eng) / `Valor`
 (pt) column. The columns available depend on `geo_level` and on which
 4th categorical dimension that sector carries:
 
-| geo_level | eng columns | pt columns |
-|----|----|----|
+| geo_level    | eng columns                                                                                                                       | pt columns                                                                                                                          |
+|--------------|-----------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
 | municipality | year, city, state, ibge, sector, emission_category, emission_subcategory, **\<4th dim\>**, general_activity, emission_type, value | Ano, municipio, estado, ibge, setor, categoria_emissao, subcategoria_emissao, **\<4th dim\>**, atividade_geral, tipo_emissao, Valor |
-| state | (drops city, ibge) | (drops municipio, ibge) |
-| country | (also drops state) | (also drops estado) |
+| state        | (drops city, ibge)                                                                                                                | (drops municipio, ibge)                                                                                                             |
+| country      | (also drops state)                                                                                                                | (also drops estado)                                                                                                                 |
 
 The 4th dimension’s name (and whether it is translated in `pt`) differs
 by sector:
@@ -1919,10 +1890,9 @@ residuals <- load_seeg(
     there is no `time_period` argument.
 2.  **File size**: the source workbook is 250MB+; a stable connection is
     recommended.
-3.  **Dropped detail**: see “What changed from the pre-v13.0 schema”
-    above – several dimensions the older data carried (fuel type,
-    species/crop detail, biome, the land-cover transition matrix) have
-    no equivalent in the current source and are not reconstructed.
+3.  **Missing detail**: see “Detail not included” above – fuel type,
+    species/crop detail, biome, and the land-cover transition matrix are
+    not available in the current data.
 4.  **`pt` output is untranslated**: only `language = "eng"` runs SEEG’s
     value dictionaries.
 
@@ -2139,18 +2109,18 @@ geo_level = "state"  # character string
 
 Defines which year(s) to download. Availability varies by dataset:
 
-| Dataset | Available Years |
-|----|----|
-| `agricultural_land_area` | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006` |
-| `agricultural_area_use` | `1970, 1975, 1980, 1985, 1995, 2006` |
-| `agricultural_employees_tractors` | `1970, 1975, 1980, 1985, 1995, 2006` |
+| Dataset                           | Available Years                                              |
+|-----------------------------------|--------------------------------------------------------------|
+| `agricultural_land_area`          | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006` |
+| `agricultural_area_use`           | `1970, 1975, 1980, 1985, 1995, 2006`                         |
+| `agricultural_employees_tractors` | `1970, 1975, 1980, 1985, 1995, 2006`                         |
 | `agricultural_producer_condition` | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006` |
-| `animal_production` | `1970, 1975, 1980, 1985, 1995, 2006` |
-| `animal_products` | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006` |
-| `vegetable_production_area` | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006` |
-| `vegetable_production_temporary` | `1970, 1975, 1980, 1985, 1995, 2006` |
-| `vegetable_production_permanent` | `1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006` |
-| `livestock_production` | `2017` (municipality only) |
+| `animal_production`               | `1970, 1975, 1980, 1985, 1995, 2006`                         |
+| `animal_products`                 | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006` |
+| `vegetable_production_area`       | `1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006` |
+| `vegetable_production_temporary`  | `1970, 1975, 1980, 1985, 1995, 2006`                         |
+| `vegetable_production_permanent`  | `1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006`       |
+| `livestock_production`            | `2017` (municipality only)                                   |
 
 You can request a single year or a range of years:
 
@@ -3587,9 +3557,7 @@ the original databases and their narrower subsets. Note that downloading
 only specific crops is considerably faster.
 
 <details>
-
 <summary>
-
 Full datasets provided by IBGE:
 </summary>
 
@@ -3604,99 +3572,93 @@ Full datasets provided by IBGE:
 | beans           |
 
 </details>
-
 <details>
-
 <summary>
-
 Datasets generated from Temporary Crops:
 </summary>
 
-| dataset | Name (pt) | Name (eng) |
-|:---|:--:|:--:|
-| total_temporary | Total | Total |
-| abacaxi | Abacaxi | Pineapple |
-| alfafa | Alfafa Fenada | Alfafa Fenada |
-| alho | Alho | Garlic |
-| algodao_herbaceo | Algodao Herbaceo (em Caroco) | Herbaceous Cotton (in Caroco) |
-| amendoim_temporary | Amendoim (em Casca) | Peanuts (in Shell) |
-| arroz | Arroz (em Casca) | Rice (in husk) |
-| aveia | Aveia (em Grao) | Oats (in grain) |
-| batata_doce | Batata Doce | Sweet potato |
-| batata_inglesa | Batata Inglesa | English potato |
-| cana_de_acucar | Cana de Acucar | Sugar cane |
-| cana_para_forragem | Cana para Forragem | Forage cane |
-| castor_bean | Mamona (Baga) | Castor bean (Berry) |
-| cebola | Cebola | Onion |
-| cevada | Cevada (em Grao) | Barley (in Grain) |
-| ervilha | Ervilha (em Grao) | Pea (in Grain) |
-| fava | Fava (em Grao) | Broad Bean (in Grain) |
-| feijao_temporary | Feijao (em Grao) | Beans (in Grain) |
-| fumo | Fumo (em Folha) | Smoke (in Sheet) |
-| girassol_sementes | Girassol (em Grao) | Sunflower (in Grain) |
-| juta_fibra | Juta (Fibra) | Jute (Fiber) |
-| linho_sementes | Linho (Semente) | Linen (Seed) |
-| malva_fibra | Malva (Fibra) | Malva (Fiber) |
-| mandioca | Mandioca | Cassava |
-| melancia | Melancia | watermelon |
-| melao | Melao | Melon |
-| milho_temporary | Milho (em Grao) | corn (in grain) |
-| rami_fibra | Rami (Fibra) | Ramie (Fiber) |
-| rye | Centeio (em Grao) | Rye (in grain) |
-| soja | Soja (em Grao) | Soybean (in grain) |
-| sorgo | Sorgo (em Grao) | Sorghum (in Grain) |
-| tomate | Tomate | Tomato |
-| trigo | Trigo (em Grao) | Wheat in grain) |
-| triticale | Triticale (em Grao) | Triticale (in grain) |
+| dataset            |          Name (pt)           |          Name (eng)           |
+|:-------------------|:----------------------------:|:-----------------------------:|
+| total_temporary    |            Total             |             Total             |
+| abacaxi            |           Abacaxi            |           Pineapple           |
+| alfafa             |        Alfafa Fenada         |         Alfafa Fenada         |
+| alho               |             Alho             |            Garlic             |
+| algodao_herbaceo   | Algodao Herbaceo (em Caroco) | Herbaceous Cotton (in Caroco) |
+| amendoim_temporary |     Amendoim (em Casca)      |      Peanuts (in Shell)       |
+| arroz              |       Arroz (em Casca)       |        Rice (in husk)         |
+| aveia              |       Aveia (em Grao)        |        Oats (in grain)        |
+| batata_doce        |         Batata Doce          |         Sweet potato          |
+| batata_inglesa     |        Batata Inglesa        |        English potato         |
+| cana_de_acucar     |        Cana de Acucar        |          Sugar cane           |
+| cana_para_forragem |      Cana para Forragem      |          Forage cane          |
+| castor_bean        |        Mamona (Baga)         |      Castor bean (Berry)      |
+| cebola             |            Cebola            |             Onion             |
+| cevada             |       Cevada (em Grao)       |       Barley (in Grain)       |
+| ervilha            |      Ervilha (em Grao)       |        Pea (in Grain)         |
+| fava               |        Fava (em Grao)        |     Broad Bean (in Grain)     |
+| feijao_temporary   |       Feijao (em Grao)       |       Beans (in Grain)        |
+| fumo               |       Fumo (em Folha)        |       Smoke (in Sheet)        |
+| girassol_sementes  |      Girassol (em Grao)      |     Sunflower (in Grain)      |
+| juta_fibra         |         Juta (Fibra)         |         Jute (Fiber)          |
+| linho_sementes     |       Linho (Semente)        |         Linen (Seed)          |
+| malva_fibra        |        Malva (Fibra)         |         Malva (Fiber)         |
+| mandioca           |           Mandioca           |            Cassava            |
+| melancia           |           Melancia           |          watermelon           |
+| melao              |            Melao             |             Melon             |
+| milho_temporary    |       Milho (em Grao)        |        corn (in grain)        |
+| rami_fibra         |         Rami (Fibra)         |         Ramie (Fiber)         |
+| rye                |      Centeio (em Grao)       |        Rye (in grain)         |
+| soja               |        Soja (em Grao)        |      Soybean (in grain)       |
+| sorgo              |       Sorgo (em Grao)        |      Sorghum (in Grain)       |
+| tomate             |            Tomate            |            Tomato             |
+| trigo              |       Trigo (em Grao)        |        Wheat in grain)        |
+| triticale          |     Triticale (em Grao)      |     Triticale (in grain)      |
 
 </details>
-
 <details>
-
 <summary>
-
 Datasets generated from Permanent Crops:
 </summary>
 
-| dataset | Name (pt) | Name (eng) |
-|:---|:--:|:--:|
-| acai | Acai | Acai |
-| annatto_seeds | Urucum (Semente) | Annatto (Seed) |
-| apple | Maca | Apple |
-| avocado | Abacate | Avocado |
-| banana | Banana (Cacho) | Banana (Bunch) |
-| black_pepper | Pimenta do Reino | Black pepper |
-| cashew | Caju | Cashew |
-| cashew_nut | Castanha de Caju | Cashew Nuts |
-| cocoa_beans | Cacau (em Amendoa) | Cocoa (in Almonds) |
-| coffee_arabica | Cafe (em Grao) Arabica | Cafe (in Grao) Arabica |
-| coffee_canephora | Cafe (em Grao) Canephora | Cafe (in Grain) Canephora |
-| coffee_total | Cafe (em Grao) Total | Coffee (in Grain) Total |
-| coconut | Coco da Baia | Coconut |
-| coconut_bunch | Dende (Cacho de Coco) | Coconut Bunch |
-| cotton_arboreo | Algodao Arboreo (em Caroco) | Arboreo cotton (in Caroco) |
-| fig | Figo | Fig |
-| grape | Uva | Grape |
-| guarana_seeds | Guarana (Semente) | Guarana (Seed) |
-| guava | Goiaba | Guava |
-| heart_of_palm | Palmito | Palm heart |
-| india_tea | Cha da India (Folha Verde) | India Tea (Leaf) |
-| khaki | Caqui | Khaki |
-| lemon | Limao | Lemon |
-| mango | Manga | Mango |
-| papaya | Mamao | Papaya |
-| passion_fruit | Maracuja | Passion fruit |
-| peach | Pessego | Peach |
-| pear | Pera | Pear |
-| permanent_total | Total | Total |
-| quince | Marmelo | Quince |
-| rubber_coagulated_latex | Borracha (Latex Coagulado) | Rubber (Coagulated Latex) |
-| rubber_liquid_latex | Borracha (Latex Liquido) | Rubber (Liquid Latex) |
-| sisal_or_agave | Sisal ou Agave (Fibra) | Sisal or Agave (Fiber) |
-| tangerine | Tangerina | Tangerine |
-| tung | Tungue (Fruto Seco) | Tung (Dry Fruit) |
-| walnut | Noz (Fruto Seco) | Walnut (Dry Fruit) |
-| yerba_mate | Erva Mate (Folha Verde) | Mate Herb (Leaf) |
+| dataset                 |          Name (pt)          |         Name (eng)         |
+|:------------------------|:---------------------------:|:--------------------------:|
+| acai                    |            Acai             |            Acai            |
+| annatto_seeds           |      Urucum (Semente)       |       Annatto (Seed)       |
+| apple                   |            Maca             |           Apple            |
+| avocado                 |           Abacate           |          Avocado           |
+| banana                  |       Banana (Cacho)        |       Banana (Bunch)       |
+| black_pepper            |      Pimenta do Reino       |        Black pepper        |
+| cashew                  |            Caju             |           Cashew           |
+| cashew_nut              |      Castanha de Caju       |        Cashew Nuts         |
+| cocoa_beans             |     Cacau (em Amendoa)      |     Cocoa (in Almonds)     |
+| coffee_arabica          |   Cafe (em Grao) Arabica    |   Cafe (in Grao) Arabica   |
+| coffee_canephora        |  Cafe (em Grao) Canephora   | Cafe (in Grain) Canephora  |
+| coffee_total            |    Cafe (em Grao) Total     |  Coffee (in Grain) Total   |
+| coconut                 |        Coco da Baia         |          Coconut           |
+| coconut_bunch           |    Dende (Cacho de Coco)    |       Coconut Bunch        |
+| cotton_arboreo          | Algodao Arboreo (em Caroco) | Arboreo cotton (in Caroco) |
+| fig                     |            Figo             |            Fig             |
+| grape                   |             Uva             |           Grape            |
+| guarana_seeds           |      Guarana (Semente)      |       Guarana (Seed)       |
+| guava                   |           Goiaba            |           Guava            |
+| heart_of_palm           |           Palmito           |         Palm heart         |
+| india_tea               | Cha da India (Folha Verde)  |      India Tea (Leaf)      |
+| khaki                   |            Caqui            |           Khaki            |
+| lemon                   |            Limao            |           Lemon            |
+| mango                   |            Manga            |           Mango            |
+| papaya                  |            Mamao            |           Papaya           |
+| passion_fruit           |          Maracuja           |       Passion fruit        |
+| peach                   |           Pessego           |           Peach            |
+| pear                    |            Pera             |            Pear            |
+| permanent_total         |            Total            |           Total            |
+| quince                  |           Marmelo           |           Quince           |
+| rubber_coagulated_latex | Borracha (Latex Coagulado)  | Rubber (Coagulated Latex)  |
+| rubber_liquid_latex     |  Borracha (Latex Liquido)   |   Rubber (Liquid Latex)    |
+| sisal_or_agave          |   Sisal ou Agave (Fibra)    |   Sisal or Agave (Fiber)   |
+| tangerine               |          Tangerina          |         Tangerine          |
+| tung                    |     Tungue (Fruto Seco)     |      Tung (Dry Fruit)      |
+| walnut                  |      Noz (Fruto Seco)       |     Walnut (Dry Fruit)     |
+| yerba_mate              |   Erva Mate (Folha Verde)   |      Mate Herb (Leaf)      |
 
 </details>
 
@@ -4483,14 +4445,8 @@ information.\* Operation start dates contained in the dataset go as far
 back as 1908 up to 2021.
 
 The source is ANEEL’s own CKAN Open Data catalogue
-(`siga-empreendimentos-geracao.csv`) – this dataset used to be a
-GitLab-hosted xlsx file, now discontinued; the package moved to the CKAN
-CSV in 2026-09. Because it is a CSV rather than an xlsx, power and
-coordinate columns (`mda_*`/`num_coord_*`) arrive from the source as
-Brazilian-locale strings (comma decimals, dot thousand separators,
-e.g. `"1400,00"`, `"-20,12479858"`) the same way
-`energy_enterprises_distributed`’s CSV always has – `load_aneel()`
-converts these to numeric automatically.
+(`siga-empreendimentos-geracao.csv`). Power and coordinate columns
+(`mda_*`/`num_coord_*`) are automatically converted to numeric values.
 
 \* For more details on each variable, access [ANEEL’s SIGA dataset
 page](https://dadosabertos.aneel.gov.br/dataset/siga-sistema-de-informacoes-de-geracao-da-aneel)
@@ -4612,22 +4568,18 @@ production, consumption, imports, exports, transformation, and final
 use.
 
 The processed dataset provides yearly data from **1970 to 2025**, read
-from EPE’s consolidated BEN dashboard table rather than the old
-one-sheet-per-year workbook. It covers all Brazilian energy sources
-(such as petróleo, gás natural, carvão, eletricidade, lenha, solar and
-others) and distinguishes between different types of energy flow:
-production, transformation, final consumption, losses, and adjustments.
+from EPE’s consolidated BEN dashboard table. It covers all Brazilian
+energy sources (such as petróleo, gás natural, carvão, eletricidade,
+lenha, solar and others) and distinguishes between different types of
+energy flow: production, transformation, final consumption, losses, and
+adjustments.
 
 The cleaned data is returned in long format, with one row per
 combination of year, account, energy source (`fonte`/`source`), and a
-`tipo`/`type` column (Fontes de Energia Primária/Secundária/Total) the
-old one-sheet-per-year workbook never exposed. Account labels are the
-source’s own wording (for example, “Refinarias de Petróleo” or
-“Residencial”), not a synthetic uppercase reconstruction like the old
-data used (“TRANSFORMAÇÃO – REFINARIAS DE PETRÓLEO”). **This is a
-breaking change** from earlier package versions: `raw_data = TRUE` now
-returns one already-tidy table instead of one table per year, and
-account labels have changed wording.
+`tipo`/`type` column (Fontes de Energia Primária/Secundária/Total).
+Account labels are the source’s own wording (for example, “Refinarias de
+Petróleo” or “Residencial”). `raw_data = TRUE` returns a single
+already-tidy table.
 
 #### State Energy Production Panel
 

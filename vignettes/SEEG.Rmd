@@ -30,27 +30,23 @@ For more information, visit [SEEG Project](https://www.seeg.org.br/) and [Observ
 
 ## Data Version
 
-The package reads SEEG's **v13.0** municipal summary workbook (`seeg.eco.br`), which restructured
-the previous "Collection 9" release (2000-2018) into a new schema and a wider time series
-(**1970-2024**). There is no `time_period` argument -- every call returns the full series. Exact
-coverage always tracks the manifest (`datasets_link(source = "seeg")` or
+The package reads SEEG's **v13.0** municipal summary workbook (`seeg.eco.br`). Categories are
+organized as `Setor de emissão` / `Categoria emissora` / `Sub-categoria emissora` / `Recorte` /
+`Atividade geral`. There is no `time_period` argument -- every call returns the full series.
+Exact coverage always tracks the manifest (`datasets_link(source = "seeg")` or
 `inst/extdata/manifest/v1/datasets_link.csv`); check there before assuming this has changed.
 
-### What changed from the pre-v13.0 schema
+### Detail not included
 
-The old `NIVEL 1`..`NIVEL 6` hierarchy is gone, replaced by `Setor de emissão` / `Categoria
-emissora` / `Sub-categoria emissora` / `Recorte` / `Atividade geral`. Some detail the old schema
-carried has no equivalent in the new one and is **dropped, not reconstructed**:
+A few dimensions are not available in the current data:
 
-- `gas`/`produto` (a redundant constant column) is gone across every sector -- no real loss.
-- **seeg_farming** loses its species/crop-level detail.
-- **seeg_industry** loses its input/technology-level detail, partly offset by a genuinely new
-  actual/potential emission split and a finer end-use breakdown the old schema never had.
-- **seeg_energy** loses its entire fuel-type breakdown (gasoline, diesel, LPG, etc.).
-- **seeg_land** loses the most: its entire **biome** dimension and its full origin-to-destination
-  **land-cover transition matrix**, both collapsed into four coarser categorical fields.
-
-Every one of these is tagged `# FRAGILE:` in `R/seeg.R` with the specific column-level detail.
+- No `gas`/`produto` breakdown -- emissions are not split by individual gas.
+- **seeg_farming**: no species/crop-level detail.
+- **seeg_industry**: no input/technology-level detail (partly offset by an actual/potential
+  emission split and a finer end-use breakdown).
+- **seeg_energy**: no fuel-type breakdown (gasoline, diesel, LPG, etc.).
+- **seeg_land**: no **biome** dimension and no origin-to-destination **land-cover transition
+  matrix** -- only four coarser categorical fields.
 
 ***
 
@@ -72,13 +68,13 @@ Sector: `Agropecuaria`. **Only available with `raw_data = FALSE`.**
 
 ### **3. seeg_energy (Energy Sector Emissions)**
 
-Sector: `Energia`. **Only available with `raw_data = FALSE`.** Lost its fuel-type breakdown in the
-v13.0 migration (see above).
+Sector: `Energia`. **Only available with `raw_data = FALSE`.** No fuel-type breakdown (see
+"Detail not included" above).
 
 ### **4. seeg_land (Land Use Change Emissions)**
 
-Sector: `Mudanca de Uso da Terra e Floresta`. **Only available with `raw_data = FALSE`.** The
-sector with the largest documented loss: biome and the transition matrix (see above).
+Sector: `Mudanca de Uso da Terra e Floresta`. **Only available with `raw_data = FALSE`.** No
+biome dimension and no land-cover transition matrix (see "Detail not included" above).
 
 ### **5. seeg_industry (Industrial Process Emissions)**
 
@@ -234,9 +230,8 @@ residuals <- load_seeg(
 1. **No year selection**: entire series (1970-2024) is downloaded; there is no `time_period`
    argument.
 2. **File size**: the source workbook is 250MB+; a stable connection is recommended.
-3. **Dropped detail**: see "What changed from the pre-v13.0 schema" above -- several dimensions
-   the older data carried (fuel type, species/crop detail, biome, the land-cover transition
-   matrix) have no equivalent in the current source and are not reconstructed.
+3. **Missing detail**: see "Detail not included" above -- fuel type, species/crop detail,
+   biome, and the land-cover transition matrix are not available in the current data.
 4. **`pt` output is untranslated**: only `language = "eng"` runs SEEG's value dictionaries.
 
 ***

@@ -22,14 +22,13 @@
 #      consolidated BEN table (1970-2025), verified live to be a strict
 #      superset covering the same accounts.
 #   5. All 6 PRODES dataset rows' url now resolves to TerraBrasilis' live,
-#      year + publish-date stamped filename (see resolve_prodes.R and
-#      test-resolution-matrix.R item 6) instead of the stale committed
-#      2023 file -- the manifest was regenerated for real 2026-08-07. Their
-#      available_time moves the same way (2023 -> 2025 release year).
+#      year + publish-date stamped filename (see resolve_prodes.R) instead
+#      of the stale committed 2023 file -- the manifest was regenerated for
+#      real 2026-08-07. Their available_time moves the same way (2023 ->
+#      2025 release year).
 #   6. ANEEL: energy_development_budget's available_time widens to
 #      2017-2024 (new years published), and energy_enterprises_distributed's
-#      resource changed extension from .csv to .zip on ANEEL's own server
-#      -- see test-resolution-matrix.R item 7 for the same two changes.
+#      resource changed extension from .csv to .zip on ANEEL's own server.
 #   7. MapBiomas moved from a mix of GCS/WordPress links to the MapBiomas
 #      Dataverse archive (data.mapbiomas.org), 2026-08-19 -- see
 #      resolve_mapbiomas.R's header for what was investigated and why.

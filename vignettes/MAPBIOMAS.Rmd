@@ -63,7 +63,7 @@ Specific focus on forest loss:
 - **Degradation Signals**: Forest areas showing stress indicators
 - **Cumulative Deforestation**: Total forest loss since baseline
 
-**Note**: despite the name, this dataset covers deforestation only. Starting with Collection 10, MapBiomas splits what used to be one combined file into two separate ones -- the regeneration half is now its own dataset, `"mapbiomas_secondary_vegetation"` (below).
+**Note**: despite the name, this dataset covers deforestation only. Regeneration is a separate dataset, `"mapbiomas_secondary_vegetation"` (below).
 
 **Key Applications**: Amazon monitoring, conservation evaluation, climate impact studies
 
@@ -87,16 +87,16 @@ Areas used for mining operations:
 
 ### 6. Irrigation (`"mapbiomas_irrigation"`)
 
-**Note**: Temporarily unavailable -- no irrigation statistics file exists on MapBiomas's Dataverse archive at any collection (checked live; only ATBD methodology handbooks and an unrelated agriculture-statistics dataset). Left in place pointing at documentation for whoever investigates a replacement.
+**Note**: Temporarily unavailable -- no irrigation statistics file exists on MapBiomas's Dataverse archive at any collection. `docs_url` is left pointing at MapBiomas's documentation for whoever investigates a replacement.
 
-Previously included:
+Provides:
 - **Irrigated Areas**: Extent of irrigation in agricultural systems
 - **Irrigation Type**: Drip, center-pivot, flood irrigation
 - **Crop Types Under Irrigation**: Which crops receive irrigation
 
 ### 7. Water Bodies (`"mapbiomas_water"`)
 
-`"municipality"` and `"biome"` work. **`"state"` is unavailable**: no MapBiomas collection publishes a state-level water sheet upstream (checked live). Previously all three geo_levels were dead; municipality and biome now point at working links.
+`"municipality"` and `"biome"` work. **`"state"` is unavailable**: no MapBiomas collection publishes a state-level water sheet upstream.
 
 - **Surface Water Extent**: Permanent and seasonal water bodies, by municipality or biome
 - **Seasonal Variation**: Not broken out at annual granularity in the current source
@@ -120,7 +120,7 @@ Areas affected by wildfires:
 1. **dataset**: Eight possible choices (irrigation temporarily unavailable)
    - `"mapbiomas_cover"`: Land cover types
    - `"mapbiomas_transition"`: Changes in land cover
-   - `"mapbiomas_deforestation_regeneration"`: Deforestation only (see note above -- regeneration moved to its own dataset)
+   - `"mapbiomas_deforestation_regeneration"`: Deforestation only (see note above -- regeneration is a separate dataset)
    - `"mapbiomas_secondary_vegetation"`: Forest regeneration/regrowth
    - `"mapbiomas_mining"`: Mining areas
    - `"mapbiomas_irrigation"`: Irrigated areas (temporarily unavailable)
