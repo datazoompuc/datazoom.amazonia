@@ -585,7 +585,19 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     file_extension <- ".rds"
   }
   if (source == "aneel") {
-    file_extension <- ".csv"
+    if (dataset == "energy_enterprises_distributed") {
+      # empreendimento-geracao-distribuida.zip is a real zip archive -- unlike
+      # this dataset's siblings, which are bare CSVs. Without ".zip" here,
+      # the unzip step below (keyed on file_extension == ".zip") never runs
+      # and fread() is handed the raw zip bytes directly, which hard-errors
+      # ("string with embedded nul: 'PK\003\004...'" -- the zip magic number).
+      # Verified live 2026-09-21: this crashed on every real download before
+      # this fix, unrelated to the encoding/numeric-parsing bugs fixed
+      # alongside it in R/aneel.R.
+      file_extension <- ".zip"
+    } else {
+      file_extension <- ".csv"
+    }
   }
 
   # Define Directory and File For Download (session cache aware)
@@ -594,10 +606,21 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   # file_extension) -- e.g. any of the 6 SEEG datasets, or 2 back-to-back
   # PRODES datasets -- reuses what an earlier call already downloaded (and,
   # for a zip, already extracted) instead of doing it again. See the cache
-  # helpers defined above external_download(). aneel is explicitly excluded
-  # from file caching per maintainer decision.
+  # helpers defined above external_download(). aneel used to be excluded
+  # here too (a 2026-09-18 merge commit's "per maintainer decision"), but
+  # that reasoning belongs to the SEPARATE parsed-object cache below
+  # (parsed_cache_eligible() -- fread()'s data.table result is mutable by
+  # reference, so sharing one across calls under raw_data = TRUE is a real
+  # risk) and was mistakenly applied to this file-level cache too, which
+  # only remembers a download's disk location -- no shared object, no
+  # mutation risk. aneel's cache key (path = its resolved manifest URL,
+  # already unique per dataset/year) has no collision risk either. Verified
+  # live 2026-09-21: re-enabling this stopped a second load_aneel() call
+  # for the same dataset in one session from re-downloading the ~106MB
+  # energy_enterprises_distributed zip (or any other aneel file) a second
+  # time.
 
-  use_cache <- download_cache_enabled() && source != "aneel"
+  use_cache <- download_cache_enabled()
   cache_key <- file_cache_key(path, file_extension)
   cached_file <- if (use_cache) file_cache_get(cache_key) else NULL
   file_cache_hit <- !is.null(cached_file)
@@ -757,12 +780,33 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       file <- list.files(dir, pattern = "*.tif", full.names = TRUE)
       dat <- terra::rast(file)
     }
+    if (param$source == "aneel") {
+      # energy_enterprises_distributed is the one aneel dataset that's a real
+      # zip (empreendimento-geracao-distribuida.zip, ~1.5GB uncompressed) --
+      # its siblings are bare CSVs handled in the non-zip aneel branch below.
+      # temp is the zip itself here, not the extracted CSV, so find the real
+      # file by pattern rather than assuming a fixed name. encoding = "UTF-8"
+      # verified live 2026-09-21 by inspecting the extracted file's raw bytes
+      # (e.g. "Condomínio" is the real 2-byte UTF-8 sequence 0xC3 0xAD for
+      # "í", not a single Latin-1 byte) -- fread(encoding = "Latin-1") had
+      # been misreading this file's real UTF-8 bytes as single-byte Latin-1
+      # characters since this dataset was added (2023), producing mojibake
+      # like "Ã­" that no amount of post-hoc iconv() can cleanly reverse.
+      csv <- list.files(dir, pattern = "\\.csv$", full.names = TRUE, recursive = TRUE)
+      if (length(csv) == 0) {
+        stop("No CSV found in the downloaded energy_enterprises_distributed archive.")
+      }
+      dat <- data.table::fread(csv[1], encoding = "UTF-8")
+    }
 
   } else if (param$source == "aneel") {
     if (param$dataset == "energy_generation") {
       dat <- data.table::fread(temp, encoding = "UTF-8")
-    } else if (param$dataset %in% c("energy_enterprises_distributed", "energy_development_budget")) {
-      dat <- data.table::fread(temp, encoding = "Latin-1")
+    } else if (param$dataset == "energy_development_budget") {
+      # encoding = "UTF-8": same root-cause fix and same live verification
+      # (raw bytes for "Rede Básica" are 0xC3 0xA1, real UTF-8 for "á") as
+      # energy_enterprises_distributed above -- see that branch's comment.
+      dat <- data.table::fread(temp, encoding = "UTF-8")
     }
 
   } else if (param$source == "ips") {

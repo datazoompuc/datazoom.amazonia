@@ -162,3 +162,38 @@ test_that("a failed download leaves no residual per-key cache directory", {
   key <- file_cache_key(missing_url, ".csv")
   expect_null(file_cache_get(key))
 })
+
+# aneel used to be excluded from this FILE-level cache too (a 2026-09-18
+# merge commit's "per maintainer decision"), on reasoning that actually only
+# applies to the separate parsed-object cache above (parsed_cache_eligible()
+# -- a shared, mutable-by-reference fread() result is a real risk under
+# raw_data = TRUE). The file-level cache just remembers a download's disk
+# location, with no shared object -- there's nothing for a mutation to
+# corrupt. Verified live 2026-09-21 against the real ANEEL source that a
+# second load_aneel() call in one session no longer re-downloads the file.
+test_that("external_download() caches an aneel download too -- the file-level cache has no mutation risk, unlike the parsed-object cache", {
+  clear_download_cache()
+  withr::local_options(datazoom.amazonia.cache = TRUE)
+
+  # Real ANEEL CDE files are ";"-delimited, quoted fields (verified live) --
+  # matching that shape here avoids the decimal comma in "1,00" being
+  # misread as a field separator.
+  fixture_dir <- withr::local_tempdir()
+  fixture <- file.path(fixture_dir, "fixture.csv")
+  writeLines(c('"NomAgente";"VlrDesconto"', '"A";"1,00"'), fixture)
+  fixture_url <- paste0("file://", fixture)
+
+  testthat::local_mocked_bindings(dataset_url = function(...) fixture_url)
+
+  dat1 <- external_download(source = "aneel", dataset = "energy_development_budget", year = 2023)
+
+  # Mutate the source after the first call -- if the cache is working, the
+  # second call must NOT see this change (same proof pattern as the .csv
+  # end-to-end test above).
+  writeLines(c('"NomAgente";"VlrDesconto"', '"A";"999,00"'), fixture)
+
+  dat2 <- external_download(source = "aneel", dataset = "energy_development_budget", year = 2023)
+
+  expect_equal(dat1, dat2)
+  expect_equal(as.character(dat1$VlrDesconto), "1,00")
+})
