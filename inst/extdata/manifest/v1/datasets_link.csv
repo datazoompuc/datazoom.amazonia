@@ -175,7 +175,7 @@ seeg,seeg_farming,,,,https://seeg.eco.br/wp-content/uploads/2025/12/Dados-munici
 seeg,seeg_industry,,,,https://seeg.eco.br/wp-content/uploads/2025/12/Dados-municipais-resumido-CO2e-GWP-AR5-13.0.xlsx,https://seeg.eco.br/dados/,1970-2024,"country, state, municipality",,,,13.0,seeg
 seeg,seeg_land,,,,https://seeg.eco.br/wp-content/uploads/2025/12/Dados-municipais-resumido-CO2e-GWP-AR5-13.0.xlsx,https://seeg.eco.br/dados/,1970-2024,"country, state, municipality",,,,13.0,seeg
 seeg,seeg_residuals,,,,https://seeg.eco.br/wp-content/uploads/2025/12/Dados-municipais-resumido-CO2e-GWP-AR5-13.0.xlsx,https://seeg.eco.br/dados/,1970-2024,"country, state, municipality",,,,13.0,seeg
-sigmine,sigmine_active,,,,https://dadosabertos.anm.gov.br/SIGMINE/BRASIL.zip,,,"state, municipality",,,,,
+sigmine,sigmine_active,,,,https://dadosabertos.anm.gov.br/SIGMINE/BRASIL.zip,,,,,,,,
 terraclimate,climatic_water_deficit,,,,http://thredds.northwestknowledge.net:8080/thredds/ncss,,1958-2022,municipality,,,,,
 terraclimate,max_temperature,,,,http://thredds.northwestknowledge.net:8080/thredds/ncss,,1958-2022,municipality,,,,,
 terraclimate,min_temperature,,,,http://thredds.northwestknowledge.net:8080/thredds/ncss,,1958-2022,municipality,,,,,
@@ -190,5 +190,3 @@ terraclimate,vapor_pressure,,,,http://thredds.northwestknowledge.net:8080/thredd
 terraclimate,vapor_pressure_deficit,,,,http://thredds.northwestknowledge.net:8080/thredds/ncss,,1958-2022,municipality,,,,,
 terraclimate,water_evaporation,,,,http://thredds.northwestknowledge.net:8080/thredds/ncss,,1958-2022,municipality,,,,,
 terraclimate,wind_speed,,,,http://thredds.northwestknowledge.net:8080/thredds/ncss,,1958-2022,municipality,,,,,
-sigmine,sigmine_inactive,,,,https://dadosabertos.anm.gov.br/SIGMINE/PROCESSOS_MINERARIOS/PROCESSOS_INATIVOS.zip,,,"state, municipality",,,,,
-sigmine,sigmine_inactive,,,,https://dadosabertos.anm.gov.br/SIGMINE/PROCESSOS_MINERARIOS/PROCESSOS_INATIVOS.zip,,,"state, municipality",,,,,
