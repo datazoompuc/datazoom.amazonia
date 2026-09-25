@@ -4484,6 +4484,14 @@ minerals**: Coal, uranium - **Gemstones**: Diamonds, emeralds, others -
 
 ------------------------------------------------------------------------
 
+\#A função `load_sigmine()` permite carregar dados \#georreferenciados
+dos processos minerários da Agência \#Nacional de Mineração (ANM):
+
+\#\* **`dataset = "sigmine_active"`**: Retorna os \#processos minerários
+ativos no Brasil. \#\* **`dataset = "sigmine_inactive"`**: Retorna o
+\#histórico de processos minerários inativos (com \#remoção de colunas
+duplicadas de UF e padronização dos \#atributos).
+
 ## ANEEL
 
 Loads data from the National Electrical Energy Agency (ANEEL), a
