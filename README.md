@@ -154,6 +154,7 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 > you request is not accepted, check the provider’s website for the
 > latest coverage, or the package’s dataset table at
 > [`datasets_link.csv`](https://github.com/datazoompuc/datazoom.amazonia/blob/master/inst/extdata/manifest/v1/datasets_link.csv).
+> **A note on caching:** To optimize download times and avoid redundant network traffic during the same R session, large datasets are automatically cached in temporary files (`tempfile`). Once downloaded, raw data files remain stored for the duration of your session, ensuring subsequent function calls reuse the local copy without re-downloading.
 
 # Environmental Data
 
