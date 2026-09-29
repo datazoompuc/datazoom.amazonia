@@ -37,7 +37,9 @@ degrad,degrad,,2014,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degr
 degrad,degrad,,2015,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,,2007-2016,,DEGRAD_2015.shp,,,,
 degrad,degrad,,2016,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,,2007-2016,,DEGRAD_2016_pol.shp,,,,
 deter,deter_amz,,,,http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-amz/shape,,2016-2022,municipality,deter-amz-deter-public.shp,,,,
-deter,deter_cerrado,,,,http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-cerrado/shape,,2018-2022,municipality,deter_public.shp,,,,
+deter,deter_cerrado,,,,http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-cerrado-nb/shape,,2018-2022,municipality,deter_public.shp,,,,
+deter,deter_pantanal,,,,http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-pantanal/shape,,,municipality,,,,,
+deter,deter_non_forest,,,,http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-nf/shape,,,municipality,,,,,
 epe,consumer_energy_consumption,region,,,https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx,https://www.epe.gov.br/pt/publicacoes-dados-abertos/dados-abertos/dados-do-consumo-mensal-de-energia-eletrica,2004-2025,"region, subsystem, state",,,,,epe
 epe,consumer_energy_consumption,state,,,https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx,https://www.epe.gov.br/pt/publicacoes-dados-abertos/dados-abertos/dados-do-consumo-mensal-de-energia-eletrica,2004-2025,"region, subsystem, state",,CONSUMO E NUMCONS SAM UF,,,epe
 epe,consumer_energy_consumption,subsystem,,,https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx,https://www.epe.gov.br/pt/publicacoes-dados-abertos/dados-abertos/dados-do-consumo-mensal-de-energia-eletrica,2004-2025,"region, subsystem, state",,CONSUMO E NUMCONS SAM,,,epe
