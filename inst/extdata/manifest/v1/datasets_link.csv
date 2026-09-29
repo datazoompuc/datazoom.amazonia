@@ -8,9 +8,8 @@ aneel,energy_development_budget,,2022,,https://dadosabertos.aneel.gov.br/dataset
 aneel,energy_development_budget,,2023,,https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/4fae7803-c71e-4c52-a221-112eea7135ab/download/cde-beneficiarios-rede-basica-2023.csv,https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c,2017-2024,,,,,,aneel
 aneel,energy_development_budget,,2024,,https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c/resource/e5231715-4245-4c18-9e67-f52ea56816be/download/cde-beneficiarios-rede-basica-2024.csv,https://dadosabertos.aneel.gov.br/dataset/a7191647-b187-4893-b20a-8954d57ff89c,2017-2024,,,,,,aneel
 aneel,energy_enterprises_distributed,,,,https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2/resource/b1bd71e7-d0ad-4214-9053-cbd58e9564a7/download/empreendimento-geracao-distribuida.zip,https://dadosabertos.aneel.gov.br/dataset/5e0fafd2-21b9-4d5b-b622-40438d40aba2,,,,,,,aneel
-aneel,energy_generation,,,,https://dadosabertos.aneel.gov.br/dataset/6d90b77c-c5f5-4d81-bdec-7bc619494bb9/resource/11ec447d-698d-4ab8-977f-b424d5deee6a/download/siga-empreendimentos-geracao.csv,https://dadosabertos.aneel.gov.br/dataset/siga-sistema-de-informacoes-de-geracao-da-aneel,1908-2021,municipality,,,,,aneel
+aneel,energy_generation,,,,https://git.aneel.gov.br/publico/centralconteudo/-/raw/main/relatorioseindicadores/geracao/BD_SIGA.xlsx?inline=false,,1908-2021,municipality,,,,,
 baci,HS92,,,,https://www.cepii.fr/DATA_DOWNLOAD/baci/data/BACI_HS92_V202601.zip,https://www.cepii.fr/DATA_DOWNLOAD/baci/doc/baci_webpage.html,1995-2024,country,*$year$_V202601.csv,,,202601,baci
-baci_dic,product_codes,,,,https://balanca.economia.gov.br/balanca/bd/tabelas/NCM_SH.csv,https://balanca.economia.gov.br/,,,,,,,
 cempre,cempre,,,6449,,https://sidra.ibge.gov.br/pesquisa/cempre/tabelas,2006-2020,"country, state, municipality",,,,,
 censoagro,agricultural_area_use,,,264,,https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais,"1970, 1975, 1980, 1985, 1995, 2006","country, state",,,,,
 censoagro,agricultural_employees_tractors,,,265,,https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais,"1970, 1975, 1980, 1985, 1995, 2006","country, state",,,,,
@@ -38,31 +37,31 @@ degrad,degrad,,2015,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degr
 degrad,degrad,,2016,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,,2007-2016,,DEGRAD_2016_pol.shp,,,,
 deter,deter_amz,,,,http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-amz/shape,,2016-2022,municipality,deter-amz-deter-public.shp,,,,
 deter,deter_cerrado,,,,http://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-cerrado/shape,,2018-2022,municipality,deter_public.shp,,,,
-epe,consumer_energy_consumption,region,,,https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx,https://www.epe.gov.br/pt/publicacoes-dados-abertos/dados-abertos/dados-do-consumo-mensal-de-energia-eletrica,2004-2025,"region, subsystem, state",,,,,epe
-epe,consumer_energy_consumption,state,,,https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx,https://www.epe.gov.br/pt/publicacoes-dados-abertos/dados-abertos/dados-do-consumo-mensal-de-energia-eletrica,2004-2025,"region, subsystem, state",,CONSUMO E NUMCONS SAM UF,,,epe
-epe,consumer_energy_consumption,subsystem,,,https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx,https://www.epe.gov.br/pt/publicacoes-dados-abertos/dados-abertos/dados-do-consumo-mensal-de-energia-eletrica,2004-2025,"region, subsystem, state",,CONSUMO E NUMCONS SAM,,,epe
-epe,energy_state_panel,,,,https://dashboard.epe.gov.br/apps/livro-ben/livro/pt/dados/tabela_geracao_eletricidade_por_fonte.xlsx,https://dashboard.epe.gov.br/apps/livro-ben/livro/pt/capitulo_8.html,2011-2025,state,,Sheet1,,,epe
-epe,industrial_energy_consumption,region,,,https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx,https://www.epe.gov.br/pt/publicacoes-dados-abertos/dados-abertos/dados-do-consumo-mensal-de-energia-eletrica,2004-2025,"region, subsystem, state",,,,,epe
-epe,industrial_energy_consumption,state,,,https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx,https://www.epe.gov.br/pt/publicacoes-dados-abertos/dados-abertos/dados-do-consumo-mensal-de-energia-eletrica,2004-2025,"region, subsystem, state",,SETOR INDUSTRIAL POR UF,,,epe
-epe,industrial_energy_consumption,subsystem,,,https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx,https://www.epe.gov.br/pt/publicacoes-dados-abertos/dados-abertos/dados-do-consumo-mensal-de-energia-eletrica,2004-2025,"region, subsystem, state",,SETOR INDUSTRIAL POR RG,,,epe
-epe,national_energy_balance,,,,https://dashboard.epe.gov.br/apps/livro-ben/livro/pt/dados/tabela_balanco_energitico_consolidado.xlsx,https://dashboard.epe.gov.br/apps/livro-ben/livro,1970-2025,,,Sheet1,,,epe
+epe,consumer_energy_consumption,region,,,https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx,,2004-2025,"region, subsystem, state",,,,,epe
+epe,consumer_energy_consumption,state,,,https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx,,2004-2025,"region, subsystem, state",,CONSUMO E NUMCONS SAM UF,,,epe
+epe,consumer_energy_consumption,subsystem,,,https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx,,2004-2025,"region, subsystem, state",,CONSUMO E NUMCONS SAM,,,epe
+epe,energy_state_panel,,,,https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/publicacoes/PublicacoesArquivos/publicacao-145/topico-515/Cap%C3%ADtulo%208%20(Dados%20Estaduais).xlsx,https://www.epe.gov.br/pt/publicacoes-dados-abertos/publicacoes/anuario-estatistico-de-energia-eletrica,2011-2024,state,,8.1 part 3,,,
+epe,industrial_energy_consumption,region,,,https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx,,2004-2025,"region, subsystem, state",,,,,epe
+epe,industrial_energy_consumption,state,,,https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx,,2004-2025,"region, subsystem, state",,SETOR INDUSTRIAL POR UF,,,epe
+epe,industrial_energy_consumption,subsystem,,,https://www.epe.gov.br/sites-pt/publicacoes-dados-abertos/dados-abertos/Documents/Dados_abertos_Consumo_Mensal.xlsx,,2004-2025,"region, subsystem, state",,SETOR INDUSTRIAL POR RG,,,epe
+epe,national_energy_balance,,,,https://dashboard.epe.gov.br/apps/livro-ben/livro/pt/dados/tabela_balanco_energitico_consolidado.xlsx,,1970-2025,,,Sheet1,,,epe
 ibama,collected_fines,,,,https://dadosabertos.ibama.gov.br/dados/SICAFI/$state$/Arrecadacao/arrecadacaobenstutelados.csv,,,municipality,,,,,
 ibama,distributed_fines,,,,https://dadosabertos.ibama.gov.br/dados/SICAFI/$state$/Quantidade/multasDistribuidasBensTutelados.csv,,,municipality,,,,,
 ibama,embargoed_areas,,,,https://pamgia.ibama.gov.br/geoservicos/arquivos/adm_embargo_ibama_a.shp.zip,,,municipality,,,,,
 iema,iema,,,,https://drive.google.com/uc?export=download&id=10JMRtzu3k95vl8cQmHkVMQ9nJovvIeNl,,2018,municipality,,,,,
 imazon,imazon_shp,,,,https://docs.google.com/uc?export=download&id=1JHc2J_U8VXHVuWVsi8wVBnNzZ37y1ehv,,2020,municipality,,,,,
 internal,geo_municipalities,,,,https://raw.githubusercontent.com/datazoompuc/datazoom.amazonia/master/data-raw/geo_municipalities.rds,,2020,municipality,,,,,
-ips,all,,,,https://painel.ipsamazonia.org.br/uploads/IPS_Amazonia_2023_dc7f4721ef.xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,2023_dc7f4721ef,ips
-ips,communic,,,,https://painel.ipsamazonia.org.br/uploads/IPS_Amazonia_2023_dc7f4721ef.xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,2023_dc7f4721ef,ips
-ips,deforest,,,,https://painel.ipsamazonia.org.br/uploads/IPS_Amazonia_2023_dc7f4721ef.xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,2023_dc7f4721ef,ips
-ips,educ,,,,https://painel.ipsamazonia.org.br/uploads/IPS_Amazonia_2023_dc7f4721ef.xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,2023_dc7f4721ef,ips
-ips,life_quality,,,,https://painel.ipsamazonia.org.br/uploads/IPS_Amazonia_2023_dc7f4721ef.xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,2023_dc7f4721ef,ips
-ips,mortality,,,,https://painel.ipsamazonia.org.br/uploads/IPS_Amazonia_2023_dc7f4721ef.xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,2023_dc7f4721ef,ips
-ips,sanit_habit,,,,https://painel.ipsamazonia.org.br/uploads/IPS_Amazonia_2023_dc7f4721ef.xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,2023_dc7f4721ef,ips
-ips,violence,,,,https://painel.ipsamazonia.org.br/uploads/IPS_Amazonia_2023_dc7f4721ef.xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,2023_dc7f4721ef,ips
-mapbiomas,mapbiomas_cover,indigenous_land,,,https://data.mapbiomas.org/api/access/datafile/523?format=original,https://doi.org/10.58053/MapBiomas/1F2TLA,1985-2024,"municipality, indigenous_land",,COVERAGE_INDIGENOUS_TERRITORIES,,10.1,mapbiomas
-mapbiomas,mapbiomas_cover,municipality,,,https://data.mapbiomas.org/api/access/datafile/254?format=original,https://doi.org/10.58053/MapBiomas/IBQPF6,1985-2024,"municipality, indigenous_land",,COVERAGE_10,,10,mapbiomas
-mapbiomas,mapbiomas_deforestation_regeneration,,,,https://data.mapbiomas.org/api/access/datafile/485?format=original,https://doi.org/10.58053/MapBiomas/ZUTHSX,1987-2024,municipality,,DEFORESTATION,,10,mapbiomas
+ips,all,,,,https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,,ips
+ips,communic,,,,https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,,ips
+ips,deforest,,,,https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,,ips
+ips,educ,,,,https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,,ips
+ips,life_quality,,,,https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,,ips
+ips,mortality,,,,https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,,ips
+ips,sanit_habit,,,,https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,,ips
+ips,violence,,,,https://docs.google.com/uc?export=download&id=1ABcLZFraSd6kELHW-pZgpy7ITzs1JagN&format=xlsx,https://ipsamazonia.org.br/,"2014, 2018, 2021, 2023",,,,,,ips
+mapbiomas,mapbiomas_cover,indigenous_land,,,https://data.mapbiomas.org/api/access/datafile/266?format=original,https://doi.org/10.58053/MapBiomas/8RGIOR,1985-2024,"municipality, indigenous_land",,COVERAGE_INDIGENOUS_TERRITORIES,,10,mapbiomas
+mapbiomas,mapbiomas_cover,municipality,,,https://data.mapbiomas.org/api/access/datafile/535?format=original,https://doi.org/10.58053/MapBiomas/SJZOLT,1985-2024,"municipality, indigenous_land",,COVERAGE_10.1,,10.1,mapbiomas
+mapbiomas,mapbiomas_deforestation_regeneration,,,,https://data.mapbiomas.org/api/access/datafile/485?format=original,https://doi.org/10.58053/MapBiomas/ZUTHSX,1985-2024,municipality,,DEFORESTATION,,10,mapbiomas
 mapbiomas,mapbiomas_fire,,,,https://data.mapbiomas.org/api/access/datafile/230?format=original,https://doi.org/10.58053/MapBiomas/W2KSHU,1985-2023,state,,a_ANNUAL,,3,mapbiomas
 mapbiomas,mapbiomas_irrigation,biome,,,https://mapbiomas-br-site.s3.amazonaws.com/downloads/Estatisticas%20/Colecao_7_Irrigacao_Biomes_UF.xlsx,,2000-2019,"state, biome",,BIOME,,7,
 mapbiomas,mapbiomas_irrigation,state,,,https://mapbiomas-br-site.s3.amazonaws.com/downloads/Estatisticas%20/Colecao_7_Irrigacao_Biomes_UF.xlsx,,2000-2019,"state, biome",,UF,,7,
@@ -163,19 +162,18 @@ ppm,ppm_aquaculture,,,3940,,https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasi
 ppm,ppm_cow_farming,,,94,,https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021,1974-2023,"country, state, municipality",,,,,
 ppm,ppm_livestock_inventory,,,3939,,https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021,1974-2023,"country, state, municipality",,,,,
 ppm,ppm_sheep_farming,,,95,,https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021,1974-2023,"country, state, municipality",,,,,
-prodes,clouds,,,,https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip,https://terrabrasilis.dpi.inpe.br/downloads/,2025,municipality,,,prodes_amazonia_legal_2025_v20260408,20260408,prodes
-prodes,deforestation,,,,https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip,https://terrabrasilis.dpi.inpe.br/downloads/,2007-2025,municipality,,,prodes_amazonia_legal_2025_v20260408,20260408,prodes
-prodes,hydrography,,,,https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip,https://terrabrasilis.dpi.inpe.br/downloads/,2025,municipality,,,prodes_amazonia_legal_2025_v20260408,20260408,prodes
-prodes,native_vegetation,,,,https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip,https://terrabrasilis.dpi.inpe.br/downloads/,2025,municipality,,,prodes_amazonia_legal_2025_v20260408,20260408,prodes
-prodes,non_forest,,,,https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip,https://terrabrasilis.dpi.inpe.br/downloads/,2025,municipality,,,prodes_amazonia_legal_2025_v20260408,20260408,prodes
-prodes,residual_deforestation,,,,https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip,https://terrabrasilis.dpi.inpe.br/downloads/,2010-2025,municipality,,,prodes_amazonia_legal_2025_v20260408,20260408,prodes
-seeg,seeg,,,,https://seeg.eco.br/wp-content/uploads/2025/12/Dados-municipais-resumido-CO2e-GWP-AR5-13.0.xlsx,https://seeg.eco.br/dados/,1970-2024,"country, state, municipality",,,,13.0,seeg
-seeg,seeg_energy,,,,https://seeg.eco.br/wp-content/uploads/2025/12/Dados-municipais-resumido-CO2e-GWP-AR5-13.0.xlsx,https://seeg.eco.br/dados/,1970-2024,"country, state, municipality",,,,13.0,seeg
-seeg,seeg_farming,,,,https://seeg.eco.br/wp-content/uploads/2025/12/Dados-municipais-resumido-CO2e-GWP-AR5-13.0.xlsx,https://seeg.eco.br/dados/,1970-2024,"country, state, municipality",,,,13.0,seeg
-seeg,seeg_industry,,,,https://seeg.eco.br/wp-content/uploads/2025/12/Dados-municipais-resumido-CO2e-GWP-AR5-13.0.xlsx,https://seeg.eco.br/dados/,1970-2024,"country, state, municipality",,,,13.0,seeg
-seeg,seeg_land,,,,https://seeg.eco.br/wp-content/uploads/2025/12/Dados-municipais-resumido-CO2e-GWP-AR5-13.0.xlsx,https://seeg.eco.br/dados/,1970-2024,"country, state, municipality",,,,13.0,seeg
-seeg,seeg_residuals,,,,https://seeg.eco.br/wp-content/uploads/2025/12/Dados-municipais-resumido-CO2e-GWP-AR5-13.0.xlsx,https://seeg.eco.br/dados/,1970-2024,"country, state, municipality",,,,13.0,seeg
-sigmine,sigmine_active,,,,https://dadosabertos.anm.gov.br/SIGMINE/BRASIL.zip,,,,,,,,
+prodes,clouds,,,,https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip,https://terrabrasilis.dpi.inpe.br/app/dashboard/deforestation/biomes/legal_amazon/rates,2025,municipality,,,prodes_amazonia_legal_2025_v20260408,20260408,prodes
+prodes,deforestation,,,,https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip,https://terrabrasilis.dpi.inpe.br/app/dashboard/deforestation/biomes/legal_amazon/rates,2007-2025,municipality,,,prodes_amazonia_legal_2025_v20260408,20260408,prodes
+prodes,hydrography,,,,https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip,https://terrabrasilis.dpi.inpe.br/app/dashboard/deforestation/biomes/legal_amazon/rates,2025,municipality,,,prodes_amazonia_legal_2025_v20260408,20260408,prodes
+prodes,native_vegetation,,,,https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip,https://terrabrasilis.dpi.inpe.br/app/dashboard/deforestation/biomes/legal_amazon/rates,2025,municipality,,,prodes_amazonia_legal_2025_v20260408,20260408,prodes
+prodes,non_forest,,,,https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip,https://terrabrasilis.dpi.inpe.br/app/dashboard/deforestation/biomes/legal_amazon/rates,2025,municipality,,,prodes_amazonia_legal_2025_v20260408,20260408,prodes
+prodes,residual_deforestation,,,,https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip,https://terrabrasilis.dpi.inpe.br/app/dashboard/deforestation/biomes/legal_amazon/rates,2010-2025,municipality,,,prodes_amazonia_legal_2025_v20260408,20260408,prodes
+seeg,seeg,,,,https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd,,2000-2018,"country, state, municipality",,,,,seeg
+seeg,seeg_energy,,,,https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd,,2000-2018,"country, state, municipality",,,,,seeg
+seeg,seeg_farming,,,,https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd,,2000-2018,"country, state, municipality",,,,,seeg
+seeg,seeg_industry,,,,https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd,,2000-2018,"country, state, municipality",,,,,seeg
+seeg,seeg_land,,,,https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd,,2000-2018,"country, state, municipality",,,,,seeg
+seeg,seeg_residuals,,,,https://drive.google.com/u/0/uc?confirm=bhfS&id=1rUc6H8BVKT9TH-ri6obzHVt7WI1eGUzd,,2000-2018,"country, state, municipality",,,,,seeg
 terraclimate,climatic_water_deficit,,,,http://thredds.northwestknowledge.net:8080/thredds/ncss,,1958-2022,municipality,,,,,
 terraclimate,max_temperature,,,,http://thredds.northwestknowledge.net:8080/thredds/ncss,,1958-2022,municipality,,,,,
 terraclimate,min_temperature,,,,http://thredds.northwestknowledge.net:8080/thredds/ncss,,1958-2022,municipality,,,,,
@@ -190,3 +188,5 @@ terraclimate,vapor_pressure,,,,http://thredds.northwestknowledge.net:8080/thredd
 terraclimate,vapor_pressure_deficit,,,,http://thredds.northwestknowledge.net:8080/thredds/ncss,,1958-2022,municipality,,,,,
 terraclimate,water_evaporation,,,,http://thredds.northwestknowledge.net:8080/thredds/ncss,,1958-2022,municipality,,,,,
 terraclimate,wind_speed,,,,http://thredds.northwestknowledge.net:8080/thredds/ncss,,1958-2022,municipality,,,,,
+sigmine,sigmine_active,,,,https://dadosabertos.anm.gov.br/SIGMINE/BRASIL.zip,,,"state, municipality",,,,,
+sigmine,sigmine_inactive,,,,https://dadosabertos.anm.gov.br/SIGMINE/PROCESSOS_MINERARIOS/PROCESSOS_INATIVOS.zip,,,"state, municipality",,,,,

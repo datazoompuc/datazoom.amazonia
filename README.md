@@ -4280,16 +4280,25 @@ For more information, visit the [National Mining Agency
 
 ------------------------------------------------------------------------
 
-## Available Dataset
+## Available Datasets
 
 ### **sigmine_active (Active Mining Operations)**
 
 Comprehensive registry of legally operating mining projects in Brazil.
 
-- **Coverage**: All active, legally authorized mining operations
-- **Status**: Currently operating, suspended, or in recovery phases
+- **Coverage**: All active, legally authorized mining operations.
+- **Status**: Currently operating, suspended, or in recovery phases.
 - **Geographic levels**: National coverage with state and municipality
-  identification
+  identification.
+
+### **sigmine_inactive (Inactive Mining Operations)**
+
+Registry of inactive mining processes across Brazil.
+
+- **Coverage**: Includes all mining processes opened throughout history
+  in Brazil that are no longer active.
+- **Geographic levels**: National coverage with state and municipality
+  identification.
 - **Key variables**: Mine name, operator, location, mineral type, area,
   authorization status
 - **Mineral types**: Precious metals, industrial minerals, energy
@@ -4312,10 +4321,13 @@ Comprehensive registry of legally operating mining projects in Brazil.
 
 ### 1. **dataset**
 
-Only one dataset is available:
+Select the mining registry dataset to download:
+
+- `"sigmine_active"`: Active mining operations
+- `"sigmine_inactive"`: Inactive mining operations
 
 ``` r
-dataset = "sigmine_active"  # Active mining operations
+dataset = "sigmine_active"
 ```
 
 ### 2. **raw_data**
