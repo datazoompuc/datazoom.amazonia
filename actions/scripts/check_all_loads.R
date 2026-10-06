@@ -95,7 +95,9 @@ datasets_by_fn <- list(
   ),
   load_degrad = "degrad",
   load_deter = c("deter_amz",
-                 "deter_cerrado"
+                 "deter_cerrado",
+                 "deter_pantanal",
+                 "deter_non_forest"
   ),
   load_epe = c(
     "consumer_energy_consumption",

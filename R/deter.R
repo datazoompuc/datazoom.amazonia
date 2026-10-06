@@ -45,7 +45,7 @@ load_deter <- function(dataset, raw_data = FALSE,
   param$raw_data <- raw_data
 
   # check if dataset is valid
-
+  check_params(param)
 
   #################
   ## Downloading ##
