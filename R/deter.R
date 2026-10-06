@@ -1,8 +1,17 @@
-#' @title DETER - Forest Degradation in the Brazilian Amazon
+#' @title DETER - Forest Degradation in the Brazilian Amazon, Cerrado and Pantanal
 #'
-#' @description Loads data on changes in forest cover in the Legal Amazon and the Cerrado biome.
+#' @description Loads data on changes in forest cover and vegetation detected by DETER,
+#' across four biome/coverage products: the Legal Amazon, the Cerrado biome, the Pantanal
+#' biome, and non-forest areas within the Legal Amazon.
 #'
-#' @param dataset A dataset name ("deter_amz", "deter_cerrado") with information about the Legal Amazon and Cerrado, respectively
+#' @param dataset A dataset name ("deter_amz", "deter_cerrado", "deter_pantanal",
+#' "deter_non_forest") with information about the Legal Amazon, Cerrado, Pantanal, and
+#' non-forest areas within the Legal Amazon, respectively. Note that the raw source data
+#' uses different class-name vocabularies across these four products (upper-snake-case
+#' codes for deter_amz/deter_cerrado, e.g. "DESMATAMENTO_CR"; lowercase Portuguese labels
+#' for deter_pantanal/deter_non_forest, e.g. "cicatriz de queimada") -- this is not
+#' normalized by \code{load_deter()}, the returned \code{alert_type} column keeps
+#' whichever vocabulary the source used for that biome.
 #' @inheritParams load_baci
 #'
 #' @return A \code{sf} object.
@@ -19,6 +28,20 @@
 #' # download treated DETER Cerrado data
 #' deter_cerrado <- load_deter(
 #'   dataset = "deter_cerrado",
+#'   raw_data = FALSE,
+#'   language = "eng"
+#' )
+#'
+#' # download treated DETER Pantanal data
+#' deter_pantanal <- load_deter(
+#'   dataset = "deter_pantanal",
+#'   raw_data = FALSE,
+#'   language = "eng"
+#' )
+#'
+#' # download treated DETER non-forest (Legal Amazon) data
+#' deter_non_forest <- load_deter(
+#'   dataset = "deter_non_forest",
 #'   raw_data = FALSE,
 #'   language = "eng"
 #' )

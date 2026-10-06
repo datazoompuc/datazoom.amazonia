@@ -118,7 +118,10 @@
 #      301-redirects http to https), so deter_amz's url changes scheme too.
 #      Two genuinely new datasets, deter_pantanal and deter_non_forest, were
 #      added. archive_file and resolver also changed/were populated (not one
-#      of this fixture's columns).
+#      of this fixture's columns). available_time was re-derived from the
+#      real data (min/max year of the raw shapefile's view_date, checked
+#      2026-10-06): deter_amz 2016-2022 -> 2016-2026, deter_cerrado
+#      2018-2022 -> 2018-2026, and the two new datasets 2023-2026.
 #
 # The fixture was captured right before normalization. Row order is not
 # significant (both sides sorted by (survey, dataset) before comparing).
@@ -195,6 +198,10 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
       url
     ),
     available_time = ifelse(
+      survey == "deter" & dataset == "deter_amz", "2016-2026",
+      ifelse(survey == "deter" & dataset == "deter_cerrado", "2018-2026", available_time)
+    ),
+    available_time = ifelse(
       survey == "prodes" & dataset == "deforestation", "2007-2025",
       ifelse(
         survey == "prodes" & dataset == "residual_deforestation", "2010-2025",
@@ -242,7 +249,7 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
     # Delta #14 -- see file header. Genuinely new rows, not value changes.
     tibble::tibble(
       survey = "deter", dataset = c("deter_pantanal", "deter_non_forest"),
-      sidra_code = NA_character_, available_time = NA_character_,
+      sidra_code = NA_character_, available_time = "2023-2026",
       available_geo = "municipality",
       url = c(
         "https://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-pantanal/shape",

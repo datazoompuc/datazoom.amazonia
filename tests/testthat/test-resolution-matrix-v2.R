@@ -191,10 +191,13 @@ KNOWN_POST_CAPTURE_DELTAS <- c(
   # resolve_deter.R's header). deter_cerrado moved to the live
   # "deter-cerrado-nb" slug (url + the shapefile name inside the package);
   # resolve_deter.R emits https links, so deter_amz's url changes scheme;
-  # both rows are now owned by the deter resolver.
+  # both rows are now owned by the deter resolver; available_time of both
+  # was re-derived from the real data (see test-datasets_link.R's delta #14).
   "deter\rdeter_amz\rNA\rNA\rurl",
+  "deter\rdeter_amz\rNA\rNA\ravailable_time",
   "deter\rdeter_amz\rNA\rNA\rresolver",
   "deter\rdeter_cerrado\rNA\rNA\rurl",
+  "deter\rdeter_cerrado\rNA\rNA\ravailable_time",
   "deter\rdeter_cerrado\rNA\rNA\rarchive_file",
   "deter\rdeter_cerrado\rNA\rNA\rresolver"
 )
@@ -246,13 +249,13 @@ test_that("every former base-row query now stops -- the guard has no gap", {
   expect_equal(still_works, character(0))
 })
 
-test_that("datasets_link() keeps the same rows/columns and differs in exactly 31 cells (see test-datasets_link.R deltas #8-#14)", {
+test_that("datasets_link() keeps the same rows/columns and differs in exactly 33 cells (see test-datasets_link.R deltas #8-#14)", {
   # Cell count, enumerated by replay (not assumed): 5 (delta #8) + 1 (#9) +
   # 2 (#10) + 8 (#12) + 12 (#13) = 28, + 1 for aneel/energy_generation's url
   # (2026-09-15, same migration as the KNOWN_POST_CAPTURE_DELTAS entry above;
   # it was previously counted in the assertion but not in this comment)
-  # + 2 from delta #14 (2026-10, DETER: deter_amz's and deter_cerrado's
-  # url) = 31.
+  # + 4 from delta #14 (2026-10, DETER: deter_amz's and deter_cerrado's
+  # url, plus both of their available_time cells) = 33.
   # 5 cells from delta #8 (the base-row-deletion migration this fixture was
   # captured to verify) + 1 more from delta #9 (2026-08-24,
   # mapbiomas_deforestation_regeneration's available_time corrected from
@@ -314,5 +317,5 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 31
     }
   }
 
-  expect_equal(delta, 31)
+  expect_equal(delta, 33)
 })
