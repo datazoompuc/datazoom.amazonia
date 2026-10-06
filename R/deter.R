@@ -75,6 +75,15 @@ load_deter <- function(dataset, raw_data = FALSE,
       )
     )
 
+  # deter_pantanal and deter_non_forest ship the class column as CLASS_NAME
+  # (class_name after clean_names()), not CLASSNAME like deter_amz and
+  # deter_cerrado do. Without this rename the select() below silently drops
+  # alert_type for those two: classname is bound to NULL above, which
+  # tidyselect reads as "select nothing" rather than as a missing column.
+  if ("class_name" %in% names(dat) && !("classname" %in% names(dat))) {
+    dat <- dplyr::rename(dat, classname = "class_name")
+  }
+
   # Loading municipal map data
   geo_br <- external_download(
     dataset = "geo_municipalities",
