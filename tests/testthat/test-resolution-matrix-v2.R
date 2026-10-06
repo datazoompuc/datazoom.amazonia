@@ -186,7 +186,24 @@ KNOWN_POST_CAPTURE_DELTAS <- c(
   "seeg\rseeg_residuals\rNA\rNA\rurl",
   "seeg\rseeg_residuals\rNA\rNA\rdocs_url",
   "seeg\rseeg_residuals\rNA\rNA\ravailable_time",
-  "seeg\rseeg_residuals\rNA\rNA\rversion"
+  "seeg\rseeg_residuals\rNA\rNA\rversion",
+  # 2026-10: DEGRAD onboarded onto the manifest pipeline (see
+  # actions/scrapers/resolve_degrad.R's header). A verify-only resolver: it
+  # changes no url/archive_file/available_time -- the ONLY thing that moved
+  # is that all 10 year rows now declare resolver = "degrad" (blank before).
+  # No effect on datasets_link()'s 6 output columns (resolver isn't one of
+  # them), so test-datasets_link.R and the datasets_link() cell-count test
+  # further down are untouched.
+  "degrad\rdegrad\rNA\r2007\rresolver",
+  "degrad\rdegrad\rNA\r2008\rresolver",
+  "degrad\rdegrad\rNA\r2009\rresolver",
+  "degrad\rdegrad\rNA\r2010\rresolver",
+  "degrad\rdegrad\rNA\r2011\rresolver",
+  "degrad\rdegrad\rNA\r2012\rresolver",
+  "degrad\rdegrad\rNA\r2013\rresolver",
+  "degrad\rdegrad\rNA\r2014\rresolver",
+  "degrad\rdegrad\rNA\r2015\rresolver",
+  "degrad\rdegrad\rNA\r2016\rresolver"
 )
 post_capture_key <- function(s, d, g, y, f) {
   paste(s, d, ifelse(is.na(g), "NA", g), ifelse(is.na(y), "NA", y), f, sep = "\r")
