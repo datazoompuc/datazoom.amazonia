@@ -186,7 +186,10 @@ KNOWN_POST_CAPTURE_DELTAS <- c(
   "seeg\rseeg_residuals\rNA\rNA\rurl",
   "seeg\rseeg_residuals\rNA\rNA\rdocs_url",
   "seeg\rseeg_residuals\rNA\rNA\ravailable_time",
-  "seeg\rseeg_residuals\rNA\rNA\rversion"
+  "seeg\rseeg_residuals\rNA\rNA\rversion",
+  # 2026-10: sigmine_active now declares available_geo "state, municipality"
+  # (it was NA); see test-datasets_link.R delta #14.
+  "sigmine\rsigmine_active\rNA\rNA\ravailable_geo"
 )
 post_capture_key <- function(s, d, g, y, f) {
   paste(s, d, ifelse(is.na(g), "NA", g), ifelse(is.na(y), "NA", y), f, sep = "\r")
@@ -265,6 +268,14 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 28
   expect_equal(new_baci_dic$url, "https://balanca.economia.gov.br/balanca/bd/tabelas/NCM_SH.csv")
   new_snap <- new_snap[new_snap$survey != "baci_dic", ]
 
+  # sigmine/sigmine_inactive is a genuinely NEW row (delta #14,
+  # test-datasets_link.R) -- same treatment as baci_dic above: assert it
+  # separately, then exclude it from the row-for-row comparison.
+  new_sig_inactive <- new_snap[new_snap$survey == "sigmine" & new_snap$dataset == "sigmine_inactive", ]
+  expect_equal(nrow(new_sig_inactive), 1)
+  expect_equal(new_sig_inactive$url, "https://dadosabertos.anm.gov.br/SIGMINE/PROCESSOS_MINERARIOS/PROCESSOS_INATIVOS.zip")
+  new_snap <- new_snap[!(new_snap$survey == "sigmine" & new_snap$dataset == "sigmine_inactive"), ]
+
   expect_equal(nrow(old_snap), nrow(new_snap))
   expect_setequal(names(old_snap), names(new_snap))
 
@@ -285,5 +296,5 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 28
     }
   }
 
-  expect_equal(delta, 29)
+  expect_equal(delta, 30) # 29 + 1 from delta #14 (sigmine_active available_geo, 2026-10)
 })
