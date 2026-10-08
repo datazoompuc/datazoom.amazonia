@@ -51,6 +51,41 @@
 # resolver should start reading available_time from it instead of leaving
 # it as a manually-maintained value.
 
+# 2026-10-08 (hardening, requested by Antonio): the primary slug match above
+# is exactly what let deter_cerrado's 2021 hardcoded URL go stale silently
+# for years -- it's precise when the slug is still what we last saw, but by
+# itself it can only ever stop() loudly on a NEW rename, not recover from
+# one. Added a keyword fallback (see keyword_by_dataset + the resolution
+# loop below): when the known slug isn't found, look for a single
+# unambiguous DETER-namespaced entry whose human-readable `name` field
+# contains the dataset's biome keyword, and trust it if (and only if)
+# exactly one distinct link matches. This turns a future rename into a
+# normal manifest PR for a human to review (same as any other resolver
+# success) instead of just another silent-forever failure -- it still
+# never guesses when the result would be ambiguous.
+#
+# KEYWORDS VERIFIED LIVE (2026-10-08, all 231 entries of the API response; the
+# 8 entries whose link contains "/deter" are exactly the 4 products x 2
+# languages, all enabled). Real `name` text (PT / EN; the PT originals carry
+# accents -- Amazonia, areas, Nao -- dropped here only to keep this file ASCII):
+#   deter_amz         "Avisos no Bioma Amazonia" / "Amazon Biome notices"
+#   deter_cerrado     "Deter Cerrado" / "Cerrado Deter"
+#   deter_pantanal    "Avisos DETER no Pantanal" / "Pantanal Notices of vegetal suppression"
+#   deter_non_forest  "Avisos em areas de Nao Floresta" / "Amazon Biome notices for non-forest areas"
+# Every keyword in keyword_by_dataset matches its own entries (the accented
+# "Nao Floresta" included, which the regex handles). BUT "amaz" alone is NOT
+# unique: the English non-forest entry is called "Amazon Biome notices for
+# non-forest areas", so it also matches deter_amz's keyword and drags the
+# deter-nf link into deter_amz's candidate set. Left as is, a renamed
+# deter_amz slug would fail the fallback (2 candidates) -- and, worse, if the
+# Amazon entries were ever REMOVED instead of renamed, deter-nf would be the
+# only "amaz" candidate left and be accepted as deter_amz's URL, silently
+# giving two datasets the same download (reproduced with the real data).
+# Hence two rules in the fallback below: (1) a link that ANOTHER dataset's
+# primary slug still matches is that dataset's, never a candidate here;
+# (2) two datasets may never resolve to the same URL. The category field is
+# deliberately not used: it is "... - DETER (Avisos)" for every product.
+
 resolve_deter <- function(rows) {
   if (is.null(rows) || nrow(rows) == 0) {
     stop(
@@ -74,6 +109,7 @@ resolve_deter <- function(rows) {
   entries <- jsonlite::fromJSON(rawToChar(resp$content), simplifyVector = FALSE)
   links <- vapply(entries, function(e) if (is.null(e$link)) NA_character_ else e$link, character(1))
   enabled <- vapply(entries, function(e) isTRUE(e$enabled), logical(1))
+  names_field <- vapply(entries, function(e) if (is.null(e$name)) NA_character_ else e$name, character(1))
 
   # dataset -> fixed substring expected in `link`. Update this table (not
   # the matching logic below) if TerraBrasilis renames a slug again -- that
@@ -86,6 +122,17 @@ resolve_deter <- function(rows) {
     deter_non_forest  = "/file-delivery/download/deter-nf/shape"
   )
 
+  # dataset -> keyword expected (case-insensitive) in a /deter-namespaced
+  # entry's `name` field, used only as the fallback below when the slug
+  # above isn't found. All four verified live against the real `name` text
+  # on 2026-10-08 -- see the header note (and why "amaz" alone isn't unique).
+  keyword_by_dataset <- c(
+    deter_amz         = "amaz",
+    deter_cerrado     = "cerrado",
+    deter_pantanal    = "pantanal",
+    deter_non_forest  = "n[a\u00e3]o.?florest|non-?forest"
+  )
+
   unknown <- setdiff(rows$dataset, names(slug_by_dataset))
   if (length(unknown) > 0) {
     stop(
@@ -96,25 +143,100 @@ resolve_deter <- function(rows) {
     )
   }
 
+  # Collected (via <<- from inside the closure below, same pattern already
+  # used elsewhere in this codebase for resolver-internal bookkeeping -- see
+  # the Slack-notification section of the shared SKILL.md) whenever the
+  # keyword fallback actually fires. Purely informational: attached to the
+  # returned tibble as a "fallback_notes" attribute so build_manifest.R can
+  # surface it in the PR body for a human reviewer -- unlike
+  # "partial_failures" (a sibling attribute some other resolvers use), this
+  # never counts as a failure and never affects the exit code, because
+  # nothing actually failed: the fallback succeeding IS the resolver working
+  # as designed. Added 2026-10-08 per Antonio's request: without this, a
+  # fallback-sourced URL change looks identical to any other URL change in
+  # the PR diff -- the message() below only ever reached the CI log, never
+  # the PR a human actually reviews.
+  fallback_notes <- character(0)
+
   resolved_url <- vapply(rows$dataset, function(ds) {
     slug <- slug_by_dataset[[ds]]
     hit <- which(enabled & grepl(slug, links, fixed = TRUE))
-    if (length(hit) == 0) {
-      stop(
-        "resolve_deter(): no enabled entry with link containing '", slug,
-        "' found in the TerraBrasilis download API response for dataset '",
-        ds, "' -- the slug may have changed again. Check the API response ",
-        "by hand before updating slug_by_dataset."
-      )
+    if (length(hit) > 0) {
+      # Cerrado (and possibly others) list the same link twice, once per
+      # language -- that's fine, any match gives the identical link.
+      return(paste0("https://terrabrasilis.dpi.inpe.br", links[[hit[1]]]))
     }
-    # Cerrado (and possibly others) list the same link twice, once per
-    # language -- that's fine, any match gives the identical link.
-    paste0("https://terrabrasilis.dpi.inpe.br", links[[hit[1]]])
+
+    # Primary slug match failed -- the slug may have been renamed again
+    # (exactly what happened to deter_cerrado in the past). Try the keyword
+    # fallback before giving up -- see the 2026-10-08 header note above.
+    keyword <- keyword_by_dataset[[ds]]
+    in_deter_namespace <- enabled & grepl("/deter", links, fixed = TRUE)
+
+    # Links that ANOTHER dataset's known slug still matches belong to that
+    # dataset -- never candidates for this one (see the header note: the
+    # non-forest entry's English name contains "Amazon").
+    claimed_links <- unique(unlist(lapply(
+      setdiff(names(slug_by_dataset), ds),
+      function(other) links[enabled & grepl(slug_by_dataset[[other]], links, fixed = TRUE)]
+    )))
+    keyword_hit <- which(
+      in_deter_namespace &
+        grepl(keyword, names_field, ignore.case = TRUE) &
+        !(links %in% claimed_links)
+    )
+    distinct_links <- unique(links[keyword_hit])
+
+    if (length(distinct_links) == 1) {
+      note <- sprintf(
+        paste(
+          "%s: primary slug '%s' not found -- matched instead via the",
+          "keyword fallback ('%s' in the entry name) to a single",
+          "unambiguous candidate: %s. This likely means TerraBrasilis",
+          "renamed the slug again -- once confirmed, update slug_by_dataset",
+          "in actions/scrapers/resolve_deter.R."
+        ),
+        ds, slug, keyword, distinct_links
+      )
+      message("resolve_deter(): ", note)
+      fallback_notes <<- c(fallback_notes, note)
+      return(paste0("https://terrabrasilis.dpi.inpe.br", distinct_links))
+    }
+
+    stop(
+      "resolve_deter(): no enabled entry with link containing '", slug,
+      "' found for dataset '", ds, "', and the keyword fallback ('", keyword,
+      "' in the entry name, scoped to /deter links, ignoring links another ",
+      "dataset's known slug still matches) found ",
+      length(distinct_links), " distinct candidate(s) instead of exactly 1 -- ",
+      if (length(distinct_links) == 0) "nothing matches" else paste(distinct_links, collapse = " | "),
+      ". The slug may have changed to something this resolver can't guess ",
+      "safely. Check the API response by hand before updating ",
+      "slug_by_dataset or keyword_by_dataset above."
+    )
   }, character(1), USE.NAMES = FALSE)
 
-  tibble::tibble(
+  # Last line of defence, whichever path produced the URLs: each DETER dataset
+  # is a different download, so two of them sharing one URL means something
+  # above resolved wrongly (rows of the same dataset legitimately share it).
+  per_dataset <- unique(data.frame(dataset = rows$dataset, url = resolved_url, stringsAsFactors = FALSE))
+  dup_urls <- unique(per_dataset$url[duplicated(per_dataset$url)])
+  if (length(dup_urls) > 0) {
+    stop(
+      "resolve_deter(): more than one dataset resolved to the same URL (",
+      paste(dup_urls, collapse = ", "), ": ",
+      paste(per_dataset$dataset[per_dataset$url %in% dup_urls], collapse = ", "),
+      ") -- refusing to write that. Check the API response by hand."
+    )
+  }
+
+  out <- tibble::tibble(
     survey = "deter", dataset = rows$dataset,
     geo_level = rows$geo_level, year = rows$year,
     url = resolved_url, resolver = "deter"
   )
+  if (length(fallback_notes) > 0) {
+    attr(out, "fallback_notes") <- fallback_notes
+  }
+  out
 }
