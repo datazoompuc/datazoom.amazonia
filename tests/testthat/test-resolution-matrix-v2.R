@@ -192,13 +192,18 @@ KNOWN_POST_CAPTURE_DELTAS <- c(
   # "deter-cerrado-nb" slug (url + the shapefile name inside the package);
   # resolve_deter.R emits https links, so deter_amz's url changes scheme;
   # both rows are now owned by the deter resolver; available_time of both
-  # was re-derived from the real data (see test-datasets_link.R's delta #14).
+  # was re-derived from the real data (see test-datasets_link.R's delta #14);
+  # docs_url of both was filled in with TerraBrasilis' downloads landing page
+  # ("Adding parent url" -- docs_url isn't a datasets_link() column, so only
+  # this per-field matrix sees it).
   "deter\rdeter_amz\rNA\rNA\rurl",
   "deter\rdeter_amz\rNA\rNA\ravailable_time",
+  "deter\rdeter_amz\rNA\rNA\rdocs_url",
   "deter\rdeter_amz\rNA\rNA\rresolver",
   "deter\rdeter_cerrado\rNA\rNA\rurl",
   "deter\rdeter_cerrado\rNA\rNA\ravailable_time",
   "deter\rdeter_cerrado\rNA\rNA\rarchive_file",
+  "deter\rdeter_cerrado\rNA\rNA\rdocs_url",
   "deter\rdeter_cerrado\rNA\rNA\rresolver"
 )
 post_capture_key <- function(s, d, g, y, f) {

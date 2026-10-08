@@ -98,11 +98,16 @@ load_deter <- function(dataset, raw_data = FALSE,
       )
     )
 
-  # deter_pantanal and deter_non_forest ship the class column as CLASS_NAME
-  # (class_name after clean_names()), not CLASSNAME like deter_amz and
-  # deter_cerrado do. Without this rename the select() below silently drops
+  # FRAGILE: deter_pantanal and deter_non_forest ship the class column as
+  # CLASS_NAME (class_name after clean_names()), not CLASSNAME like
+  # deter_amz and deter_cerrado do -- confirmed live during the 2026-10
+  # onboarding (without this rename the select() below silently drops
   # alert_type for those two: classname is bound to NULL above, which
-  # tidyselect reads as "select nothing" rather than as a missing column.
+  # tidyselect reads as "select nothing" rather than as a missing column,
+  # so the output looked fine except for one vanished column). If
+  # TerraBrasilis ever renames the column again, or a fifth DETER product
+  # ships yet another spelling, this check doesn't widen itself -- it only
+  # recognizes exactly "class_name" vs "classname".
   if ("class_name" %in% names(dat) && !("classname" %in% names(dat))) {
     dat <- dplyr::rename(dat, classname = "class_name")
   }
@@ -123,6 +128,21 @@ load_deter <- function(dataset, raw_data = FALSE,
   ###################
 
   # The crs that will be used to overlap maps below
+
+  # FRAGILE: hardcoded proj4 string (polyconic projection on the South
+  # American 1969 ellipsoid, with no datum and no towgs84 shift -- PROJ reads
+  # it as "Unknown based on Australian Natl & S. Amer. 1969 ellipsoid")
+  # rather than a named/EPSG CRS or IBGE's own published one; nothing checks
+  # it against its inputs (geo_municipalities and the raw DETER shapefiles
+  # were both SIRGAS 2000, EPSG:4674, in 2026-10). Both inputs go through
+  # this same st_transform(), so a wrong choice would not misalign alerts
+  # and municipalities. What it changes, silently, is the `area` column: the
+  # st_area() below is a planar area in a polyconic (not equal-area)
+  # projection centred on lon -54, and it drifts upward from an Albers
+  # equal-area reference the further west an alert sits. Measured 2026-10 on
+  # the treated output: +0.14% in total for deter_pantanal, +0.51% for
+  # deter_non_forest, by alert longitude +0.1% near -52, +0.7% near -62,
+  # +1.9% near -67 and +5% west of -70.
   operation_crs <- sf::st_crs("+proj=poly +lat_0=0 +lon_0=-54 +x_0=5000000 +y_0=10000000 +ellps=aust_SA +units=m +no_defs")
 
   # Changing crs of both data to the common crs chosen above
@@ -133,6 +153,19 @@ load_deter <- function(dataset, raw_data = FALSE,
   sf::st_geometry(dat) <- dat$geometry
   sf::st_geometry(geo_br) <- geo_br$geom
 
+  # FRAGILE: sf::st_intersection() against municipality polygons can split
+  # a single DETER alert into more than one output row whenever that
+  # alert's polygon straddles a municipality boundary -- id_alerta (set
+  # above, before this join) is the only thing that lets a consumer
+  # reconstruct "how many distinct alerts" from "how many rows", and
+  # row-counting this output without grouping by alert_id will silently
+  # overcount alerts. Some alerts also vanish here altogether: measured
+  # 2026-10, 16 of deter_amz's 461,081 raw alerts, 7 of deter_cerrado's
+  # 134,165 and 2 of deter_pantanal's 24,155 have no row at all in the
+  # output (none lost for deter_non_forest; cause not investigated).
+  # suppressWarnings() also hides any CRS/topology warning
+  # st_intersection() would otherwise raise here, not just the expected
+  # "attributes are assumed to be constant" one.
   dat <- suppressWarnings(sf::st_intersection(dat, geo_br)) %>%
     dplyr::mutate(area = sf::st_area(.data$geometry))
 
