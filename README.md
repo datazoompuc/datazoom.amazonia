@@ -744,8 +744,12 @@ Brazilian state - **Metadata**: Satellite source, confidence level
     continuously updated
 3.  **Minimum detection size**: Varies by sensor; typically 25 hectares
     for Amazon, larger for Cerrado
-4.  **CRS metadata**: Verify coordinate system after loading; typically
-    UTM zones for Brazil
+4.  **CRS metadata**: `load_deter()` reprojects internally to IBGE’s
+    official equal-area projection for area calculations (Albers, SIRGAS
+    2000/GRS80, central meridian -54) before computing `area` and
+    overlaying municipality boundaries – not UTM zones. See
+    `R/deter.R`’s `# FRAGILE:` comment above `operation_crs` for the
+    exact parameters and source.
 5.  **Overlapping municipalities**: Enhanced version accounts for alerts
     crossing municipality boundaries
 6.  **False positives possible**: Satellite detection can occasionally
