@@ -221,7 +221,7 @@ Each alert/row typically contains:
 1. **Alert types vary**: "Deforestation" is permanent forest loss; "degradation" is forest damage but not clear-cut
 2. **Near real-time data**: Alerts are issued frequently; data is continuously updated
 3. **Minimum detection size**: Varies by sensor; typically 25 hectares for Amazon, larger for Cerrado
-4. **CRS metadata**: Verify coordinate system after loading; typically UTM zones for Brazil
+4. **CRS metadata**: `load_deter()` reprojects internally to IBGE's official equal-area projection for area calculations (Albers, SIRGAS 2000/GRS80, central meridian -54) before computing `area` and overlaying municipality boundaries -- not UTM zones. See `R/deter.R`'s `# FRAGILE:` comment above `operation_crs` for the exact parameters and source.
 5. **Overlapping municipalities**: Enhanced version accounts for alerts crossing municipality boundaries
 6. **False positives possible**: Satellite detection can occasionally misclassify cloud shadows or other features as forest loss
 

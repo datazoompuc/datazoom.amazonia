@@ -127,23 +127,43 @@ load_deter <- function(dataset, raw_data = FALSE,
   ## Harmonize CRS ##
   ###################
 
-  # The crs that will be used to overlap maps below
-
-  # FRAGILE: hardcoded proj4 string (polyconic projection on the South
-  # American 1969 ellipsoid, with no datum and no towgs84 shift -- PROJ reads
-  # it as "Unknown based on Australian Natl & S. Amer. 1969 ellipsoid")
-  # rather than a named/EPSG CRS or IBGE's own published one; nothing checks
-  # it against its inputs (geo_municipalities and the raw DETER shapefiles
-  # were both SIRGAS 2000, EPSG:4674, in 2026-10). Both inputs go through
-  # this same st_transform(), so a wrong choice would not misalign alerts
-  # and municipalities. What it changes, silently, is the `area` column: the
-  # st_area() below is a planar area in a polyconic (not equal-area)
-  # projection centred on lon -54, and it drifts upward from an Albers
-  # equal-area reference the further west an alert sits. Measured 2026-10 on
-  # the treated output: +0.14% in total for deter_pantanal, +0.51% for
-  # deter_non_forest, by alert longitude +0.1% near -52, +0.7% near -62,
-  # +1.9% near -67 and +5% west of -70.
-  operation_crs <- sf::st_crs("+proj=poly +lat_0=0 +lon_0=-54 +x_0=5000000 +y_0=10000000 +ellps=aust_SA +units=m +no_defs")
+  # The crs that will be used to overlap maps below -- IBGE's own official
+  # equal-area projection for computing municipal/territorial areas
+  # ("Projecao Conica Equivalente de Albers, definida pelo IBGE"), confirmed
+  # 2026-10-08 against IBGE, "Malha Municipal Digital e Areas Territoriais
+  # 2024" (Notas metodologicas 01/2025, Rio de Janeiro, 2025), the Appendix B
+  # proj4 definition: central meridian -54, latitude of origin -12, standard
+  # parallels -2/-22, false easting/northing 5,000,000/10,000,000, SIRGAS
+  # 2000 datum on the GRS80 ellipsoid.
+  #
+  # Replaces the previous hardcoded string, which turned out to be IBGE's
+  # OTHER published Brazil-wide projection -- the non-equal-area "SIRGAS
+  # 2000 / Brazil Polyconic" (EPSG:5880, meant for general small-scale
+  # mapping, not area calculations) -- with its ellipsoid typo'd on top of
+  # that, to a legacy/unrelated PROJ preset ("aust_SA", which PROJ reads as
+  # "Unknown based on Australian Natl & S. Amer. 1969 ellipsoid") instead of
+  # GRS80/SIRGAS 2000. That wrong combination measurably biased the `area`
+  # column -- see NEWS.md and this file's git history for the confirmed
+  # numbers (up to +5% west of -70 degrees) -- without ever erroring, since
+  # both inputs (geo_municipalities and the raw DETER shapefiles, both
+  # SIRGAS 2000/EPSG:4674) went through the same wrong transform and stayed
+  # mutually aligned regardless. The identical wrong string is still used by
+  # R/degrad.R's own operation_crs -- out of scope for this change, flagged
+  # separately rather than fixed silently alongside this one.
+  #
+  # FRAGILE: hand-transcribed from IBGE's PDF rather than a named EPSG code
+  # -- IBGE's own document notes this projection "has no standard EPSG
+  # code" as of its writing; EPSG:10857 ("SIRGAS 2000 / Brazil Albers")
+  # was registered later (revision date 2025-05-16) encoding the identical
+  # parameters, but isn't used here to avoid depending on a PROJ/EPSG
+  # database recent enough to recognize it -- worth switching to
+  # `sf::st_crs(10857)` once that's confirmed safe on every environment this
+  # package runs in. If IBGE ever revises these parameters in a future
+  # "Malha Municipal" edition, this string needs updating by hand; nothing
+  # here re-checks it against a live IBGE source.
+  operation_crs <- sf::st_crs(
+    "+proj=aea +lat_0=-12 +lon_0=-54 +lat_1=-2 +lat_2=-22 +x_0=5000000 +y_0=10000000 +ellps=GRS80 +units=m +no_defs"
+  )
 
   # Changing crs of both data to the common crs chosen above
   dat$geometry <- sf::st_make_valid(sf::st_transform(dat$geometry, operation_crs))
@@ -160,9 +180,13 @@ load_deter <- function(dataset, raw_data = FALSE,
   # reconstruct "how many distinct alerts" from "how many rows", and
   # row-counting this output without grouping by alert_id will silently
   # overcount alerts. Some alerts also vanish here altogether: measured
-  # 2026-10, 16 of deter_amz's 461,081 raw alerts, 7 of deter_cerrado's
-  # 134,165 and 2 of deter_pantanal's 24,155 have no row at all in the
-  # output (none lost for deter_non_forest; cause not investigated).
+  # 2026-10-08 with the Albers CRS above, 16 of deter_amz's 461,071 raw
+  # alerts, 6 of deter_cerrado's 134,165 and 2 of deter_pantanal's 24,155
+  # have no row at all in the output (none lost for deter_non_forest; cause
+  # not investigated). Boundary slivers differ between projections, so the
+  # counts can move by one or two (the old polyconic CRS gave 7 for
+  # deter_cerrado) and the number of output rows by a few dozen (under 2
+  # km2 of area in total) -- compare alert counts via alert_id, not rows.
   # suppressWarnings() also hides any CRS/topology warning
   # st_intersection() would otherwise raise here, not just the expected
   # "attributes are assumed to be constant" one.
