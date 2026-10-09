@@ -186,7 +186,25 @@ KNOWN_POST_CAPTURE_DELTAS <- c(
   "seeg\rseeg_residuals\rNA\rNA\rurl",
   "seeg\rseeg_residuals\rNA\rNA\rdocs_url",
   "seeg\rseeg_residuals\rNA\rNA\ravailable_time",
-  "seeg\rseeg_residuals\rNA\rNA\rversion"
+  "seeg\rseeg_residuals\rNA\rNA\rversion",
+  # 2026-10: DETER migration (see test-datasets_link.R's delta #14 and
+  # resolve_deter.R's header). deter_cerrado moved to the live
+  # "deter-cerrado-nb" slug (url + the shapefile name inside the package);
+  # resolve_deter.R emits https links, so deter_amz's url changes scheme;
+  # both rows are now owned by the deter resolver; available_time of both
+  # was re-derived from the real data (see test-datasets_link.R's delta #14);
+  # docs_url of both was filled in with TerraBrasilis' downloads landing page
+  # ("Adding parent url" -- docs_url isn't a datasets_link() column, so only
+  # this per-field matrix sees it).
+  "deter\rdeter_amz\rNA\rNA\rurl",
+  "deter\rdeter_amz\rNA\rNA\ravailable_time",
+  "deter\rdeter_amz\rNA\rNA\rdocs_url",
+  "deter\rdeter_amz\rNA\rNA\rresolver",
+  "deter\rdeter_cerrado\rNA\rNA\rurl",
+  "deter\rdeter_cerrado\rNA\rNA\ravailable_time",
+  "deter\rdeter_cerrado\rNA\rNA\rarchive_file",
+  "deter\rdeter_cerrado\rNA\rNA\rdocs_url",
+  "deter\rdeter_cerrado\rNA\rNA\rresolver"
 )
 post_capture_key <- function(s, d, g, y, f) {
   paste(s, d, ifelse(is.na(g), "NA", g), ifelse(is.na(y), "NA", y), f, sep = "\r")
@@ -236,7 +254,13 @@ test_that("every former base-row query now stops -- the guard has no gap", {
   expect_equal(still_works, character(0))
 })
 
-test_that("datasets_link() keeps the same rows/columns and differs in exactly 28 cells (see test-datasets_link.R deltas #8-#13)", {
+test_that("datasets_link() keeps the same rows/columns and differs in exactly 33 cells (see test-datasets_link.R deltas #8-#14)", {
+  # Cell count, enumerated by replay (not assumed): 5 (delta #8) + 1 (#9) +
+  # 2 (#10) + 8 (#12) + 12 (#13) = 28, + 1 for aneel/energy_generation's url
+  # (2026-09-15, same migration as the KNOWN_POST_CAPTURE_DELTAS entry above;
+  # it was previously counted in the assertion but not in this comment)
+  # + 4 from delta #14 (2026-10, DETER: deter_amz's and deter_cerrado's
+  # url, plus both of their available_time cells) = 33.
   # 5 cells from delta #8 (the base-row-deletion migration this fixture was
   # captured to verify) + 1 more from delta #9 (2026-08-24,
   # mapbiomas_deforestation_regeneration's available_time corrected from
@@ -265,6 +289,19 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 28
   expect_equal(new_baci_dic$url, "https://balanca.economia.gov.br/balanca/bd/tabelas/NCM_SH.csv")
   new_snap <- new_snap[new_snap$survey != "baci_dic", ]
 
+  # deter_pantanal and deter_non_forest are genuinely NEW rows too (delta
+  # #14, test-datasets_link.R) -- same treatment as baci_dic above.
+  new_deter <- new_snap[new_snap$survey == "deter" & new_snap$dataset %in% c("deter_pantanal", "deter_non_forest"), ]
+  expect_setequal(new_deter$dataset, c("deter_pantanal", "deter_non_forest"))
+  expect_equal(
+    sort(new_deter$url),
+    sort(c(
+      "https://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-pantanal/shape",
+      "https://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-nf/shape"
+    ))
+  )
+  new_snap <- new_snap[!(new_snap$survey == "deter" & new_snap$dataset %in% c("deter_pantanal", "deter_non_forest")), ]
+
   expect_equal(nrow(old_snap), nrow(new_snap))
   expect_setequal(names(old_snap), names(new_snap))
 
@@ -285,5 +322,5 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 28
     }
   }
 
-  expect_equal(delta, 29)
+  expect_equal(delta, 33)
 })

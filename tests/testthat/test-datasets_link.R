@@ -111,6 +111,17 @@
 #      available_time widens from 2000-2018 to 1970-2024 (the new file's
 #      real year-column span). version and docs_url (not one of this
 #      fixture's columns) are now populated too.
+#  14. 2026-10: DETER migration (see resolve_deter.R's header). deter_cerrado's
+#      url moved to the live "deter-cerrado-nb" slug (the old "deter-cerrado"
+#      slug is gone from TerraBrasilis' download API; it kept serving a frozen
+#      2018-2021 copy). resolve_deter.R emits https:// links (the API host
+#      301-redirects http to https), so deter_amz's url changes scheme too.
+#      Two genuinely new datasets, deter_pantanal and deter_non_forest, were
+#      added. archive_file and resolver also changed/were populated (not one
+#      of this fixture's columns). available_time was re-derived from the
+#      real data (min/max year of the raw shapefile's view_date, checked
+#      2026-10-06): deter_amz 2016-2022 -> 2016-2026, deter_cerrado
+#      2018-2022 -> 2018-2026, and the two new datasets 2023-2026.
 #
 # The fixture was captured right before normalization. Row order is not
 # significant (both sides sorted by (survey, dataset) before comparing).
@@ -175,6 +186,21 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
       "1970-2024",
       available_time
     ),
+    # Delta #14 -- see file header.
+    url = ifelse(
+      survey == "deter" & dataset == "deter_amz",
+      "https://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-amz/shape",
+      url
+    ),
+    url = ifelse(
+      survey == "deter" & dataset == "deter_cerrado",
+      "https://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-cerrado-nb/shape",
+      url
+    ),
+    available_time = ifelse(
+      survey == "deter" & dataset == "deter_amz", "2016-2026",
+      ifelse(survey == "deter" & dataset == "deter_cerrado", "2018-2026", available_time)
+    ),
     available_time = ifelse(
       survey == "prodes" & dataset == "deforestation", "2007-2025",
       ifelse(
@@ -219,6 +245,16 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
       sidra_code = NA_character_, available_time = NA_character_,
       available_geo = NA_character_,
       url = "https://balanca.economia.gov.br/balanca/bd/tabelas/NCM_SH.csv"
+    ),
+    # Delta #14 -- see file header. Genuinely new rows, not value changes.
+    tibble::tibble(
+      survey = "deter", dataset = c("deter_pantanal", "deter_non_forest"),
+      sidra_code = NA_character_, available_time = "2023-2026",
+      available_geo = "municipality",
+      url = c(
+        "https://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-pantanal/shape",
+        "https://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-nf/shape"
+      )
     )
   ) %>%
   dplyr::mutate(
