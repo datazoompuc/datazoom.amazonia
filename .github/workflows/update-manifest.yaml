@@ -221,8 +221,9 @@ jobs:
             // issue itself says what broke, instead of only pointing at
             // the step log (see actions/scripts/build_manifest.R's
             // resolvers_failed/watchers_failed/validation_errors fields).
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
             let bodyLines = [
-              "See the `Run build_manifest.R` step log in this workflow run for the full report.",
+              `See the \`Run build_manifest.R\` step log in [this workflow run](${runUrl}) for the full report.`,
               ""
             ];
             try {
@@ -267,8 +268,22 @@ jobs:
               state: "open",
               labels: "manifest"
             });
-            if (existing.some(i => i.title === title)) {
-              console.log("An open issue with this title already exists; skipping.");
+            // One open issue per title, but every failing run still reports
+            // into it: comment with THIS run's failures instead of skipping.
+            // Skipping used to hide new failures behind an older one --
+            // live incident 2026-10-12: all of MapBiomas timed out, but
+            // issue #344 (opened 2026-09-28 for SEEG's 403) already had the
+            // same title, so the run logged "skipping" and nothing anyone
+            // reads mentioned MapBiomas at all.
+            const match = existing.find(i => i.title === title);
+            if (match) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: match.number,
+                body: [`**Still failing -- run of ${new Date().toISOString().slice(0, 10)}**`, "", ...bodyLines].join("\n")
+              });
+              console.log(`Open issue #${match.number} has this title; commented with this run's failures.`);
               return;
             }
             await github.rest.issues.create({
