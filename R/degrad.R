@@ -104,8 +104,12 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
   # are therefore overlaid on SIRGAS 2000 municipalities unshifted. Areas do
   # not care; municipality attribution near boundaries does. Measured with
   # IBGE's own WKT (it names D_SIRGAS2000) as operation_crs: 2012 total area
-  # -0.0001%, +2 rows, per-municipality area median 0.03% (max 13% on one
-  # tiny municipality, 0.72 km2 at most); 2016, already SIRGAS, unchanged.
+  # -0.0001%, +2 rows, per-municipality area median 0.03%. The two largest
+  # individual moves found are from DIFFERENT municipalities, both small in
+  # area (a fixed metric shift reads as a large percentage there): Santa
+  # Maria das Barreiras (PA), +13.2%, DEGRAD polygon area there only
+  # 1.97 km2; Barra do Corda (MA), -0.15%, at a similar scale, 0.72 km2.
+  # 2016, already SIRGAS, unchanged.
   # (3) None of this is re-checked per download.
   if (is.na(sf::st_crs(dat$geometry))) {
     dat$geometry <- sf::st_set_crs(
