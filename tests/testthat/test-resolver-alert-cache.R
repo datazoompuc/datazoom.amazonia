@@ -50,8 +50,8 @@ test_that("alert_cache_upsert() keeps rows for different sources with the same i
 ## ============================================================ ##
 
 test_that("new_resolver_alerts(): a re-confirmed known fail is NOT reported (anti-noise)", {
-  old <- alert_cache_upsert(empty_cache(), source = "epe", item_key = "energy_state_panel|page 404", verdict = "fail", reason = "page 404")
-  new <- alert_cache_upsert(old, source = "epe", item_key = "energy_state_panel|page 404", verdict = "fail", reason = "page 404")
+  old <- alert_cache_upsert(empty_cache(), source = "epe", item_key = "energy_state_panel", verdict = "fail", reason = "page 404")
+  new <- alert_cache_upsert(old, source = "epe", item_key = "energy_state_panel", verdict = "fail", reason = "page 404")
 
   hits <- new_resolver_alerts(old, new)
   expect_equal(nrow(hits), 0)
@@ -77,19 +77,36 @@ test_that("new_resolver_alerts(): a new item that PASSES is NOT reported", {
 
 test_that("new_resolver_alerts(): a cold/empty committed cache is a bootstrap, not news", {
   old <- empty_cache()
-  new <- alert_cache_upsert(old, source = "epe", item_key = "national_energy_balance|broken", verdict = "fail", reason = "broken")
+  new <- alert_cache_upsert(old, source = "epe", item_key = "national_energy_balance", verdict = "fail", reason = "broken")
 
   hits <- new_resolver_alerts(old, new)
   expect_equal(nrow(hits), 0)
 })
 
-test_that("new_resolver_alerts(): a DIFFERENT new reason on the same block IS reported (not deduped by block alone)", {
-  old <- alert_cache_upsert(empty_cache(), source = "epe", item_key = "energy_state_panel|page 404", verdict = "fail", reason = "page 404")
-  new <- alert_cache_upsert(old, source = "epe", item_key = "energy_state_panel|columns missing", verdict = "fail", reason = "columns missing")
+test_that("new_resolver_alerts(): a block that stays broken for a DIFFERENT reason does not re-alert", {
+  # Since 2026-10-12 EPE keys on the block label alone (like PRODES/IPS/SEEG
+  # key on their release), so a changed reason on an already-failing block
+  # is the same key, still failing. The issue carries the current reason.
+  old <- alert_cache_upsert(empty_cache(), source = "epe", item_key = "energy_state_panel", verdict = "fail", reason = "link not found")
+  new <- alert_cache_upsert(old, source = "epe", item_key = "energy_state_panel", verdict = "fail", reason = "columns missing")
 
-  hits <- new_resolver_alerts(old, new)
-  expect_equal(nrow(hits), 1)
-  expect_equal(hits$reason, "columns missing")
+  expect_equal(nrow(new), 1)
+  expect_equal(nrow(new_resolver_alerts(old, new)), 0)
+})
+
+test_that("new_resolver_alerts(): fail -> pass -> fail on the same block alerts BOTH times", {
+  # The bug the 2026-10-12 EPE re-keying fixed: with fail keyed on
+  # label + reason and pass on the label alone, the pass never overwrote the
+  # fail row, so the second failure read as already-known and stayed silent.
+  committed0 <- alert_cache_upsert(empty_cache(), source = "epe", item_key = "national_energy_balance", verdict = "pass")
+  run1 <- alert_cache_upsert(committed0, source = "epe", item_key = "national_energy_balance", verdict = "fail", reason = "columns missing")
+  run2 <- alert_cache_upsert(run1, source = "epe", item_key = "national_energy_balance", verdict = "pass")
+  run3 <- alert_cache_upsert(run2, source = "epe", item_key = "national_energy_balance", verdict = "fail", reason = "columns missing")
+
+  expect_equal(nrow(new_resolver_alerts(committed0, run1)), 1)
+  expect_equal(nrow(new_resolver_alerts(run1, run2)), 0)
+  expect_equal(nrow(new_resolver_alerts(run2, run3)), 1)
+  expect_equal(nrow(run3), 1)
 })
 
 test_that("new_resolver_alerts(): a key that FLIPS from pass to fail IS reported (regression on previously-good content)", {
@@ -109,9 +126,9 @@ test_that("new_resolver_alerts(): a key that FLIPS from pass to fail IS reported
 })
 
 test_that("new_resolver_alerts(): a key that stays fail across 3 generations only alerts once", {
-  gen1 <- alert_cache_upsert(empty_cache(), source = "epe", item_key = "energy_state_panel|broken", verdict = "fail", reason = "broken")
-  gen2 <- alert_cache_upsert(gen1, source = "epe", item_key = "energy_state_panel|broken", verdict = "fail", reason = "broken")
-  gen3 <- alert_cache_upsert(gen2, source = "epe", item_key = "energy_state_panel|broken", verdict = "fail", reason = "broken")
+  gen1 <- alert_cache_upsert(empty_cache(), source = "epe", item_key = "energy_state_panel", verdict = "fail", reason = "broken")
+  gen2 <- alert_cache_upsert(gen1, source = "epe", item_key = "energy_state_panel", verdict = "fail", reason = "broken")
+  gen3 <- alert_cache_upsert(gen2, source = "epe", item_key = "energy_state_panel", verdict = "fail", reason = "broken")
 
   expect_equal(nrow(new_resolver_alerts(gen1, gen2)), 0)
   expect_equal(nrow(new_resolver_alerts(gen2, gen3)), 0)
@@ -161,7 +178,7 @@ test_that("merging both sources in sequence combines both sources' fresh updates
   committed <- alert_cache_upsert(committed, source = "epe", item_key = "national_energy_balance", verdict = "pass")
 
   prodes_candidate <- alert_cache_upsert(committed, source = "prodes", item_key = "new_stamp", verdict = "fail", reason = "prodes broke")
-  epe_candidate <- alert_cache_upsert(committed, source = "epe", item_key = "energy_state_panel|broke", verdict = "fail", reason = "epe broke too")
+  epe_candidate <- alert_cache_upsert(committed, source = "epe", item_key = "energy_state_panel", verdict = "fail", reason = "epe broke too")
 
   merged <- committed
   merged <- merge_resolver_alert_source(merged, "prodes", prodes_candidate)
