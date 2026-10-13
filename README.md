@@ -743,8 +743,10 @@ spatial polygons with IBGE municipality boundaries (2019 version) -
 Providing municipality identification for each degradation event -
 Converting to Simple Features (SF) objects for spatial analysis
 
-**Note on CRS**: Coordinate system metadata should be verified after
-loading, as original INPE data sometimes has unclear CRS information.
+**Note on CRS**: `load_degrad()` reprojects internally to IBGE’s
+official equal-area projection for area calculations (Albers, SIRGAS
+2000/GRS80, central meridian -54) before computing `area` and overlaying
+municipality boundaries – not UTM zones.
 
 ------------------------------------------------------------------------
 
@@ -881,7 +883,10 @@ degradation causes
     single location point
 2.  **Municipality intersection**: Treated data identifies all
     municipalities polygon overlaps
-3.  **CRS verification**: Check coordinate system after loading
+3.  **CRS handling**: `load_degrad()` reprojects internally to IBGE’s
+    official equal-area Albers projection before computing area and
+    overlaying municipality boundaries (see the CRS note above) – not
+    something the user needs to check manually
 4.  **Geometry validity**: Some polygons may have validity issues; use
     `st_is_valid()` to check
 
