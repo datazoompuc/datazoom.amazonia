@@ -33,7 +33,15 @@ api <- jsonlite::fromJSON(test_path("fixtures", "terrabrasilis_download_api_dete
 deter_rows <- tibble::tibble(
   survey = "deter",
   dataset = c("deter_amz", "deter_cerrado", "deter_pantanal", "deter_non_forest"),
-  geo_level = NA_character_, year = NA_character_
+  geo_level = NA_character_, year = NA_character_,
+  # real committed values (2026-10-13) -- the fallback-note test below checks
+  # one of these is echoed back, since resolve_deter() can't verify or
+  # update archive_file itself (see its header) and the note exists so a
+  # human reviewer knows to check it when a slug renames.
+  archive_file = c(
+    "deter-amz-deter-public.shp", "deter-cerrado-nb-deter-public.shp",
+    "deter-pantanal-deter-public.shp", "deter-nf-deter-public.shp"
+  )
 )
 host <- "https://terrabrasilis.dpi.inpe.br/file-delivery/download/"
 expected_url <- stats::setNames(
@@ -42,10 +50,10 @@ expected_url <- stats::setNames(
 )
 
 # Run resolve_deter() against a fake API response.
-run_with_api <- function(entries, status = 200L) {
+run_with_api <- function(entries, status = 200L, rows = deter_rows) {
   body <- charToRaw(enc2utf8(as.character(jsonlite::toJSON(entries, auto_unbox = TRUE))))
   testthat::with_mocked_bindings(
-    resolve_deter(deter_rows),
+    resolve_deter(rows),
     curl_fetch_memory = function(url, handle = NULL, ...) list(status_code = status, content = body),
     .package = "curl"
   )
@@ -97,11 +105,34 @@ test_that("a renamed slug is recovered by the keyword fallback, with a warning m
     expect_length(notes, 1)
     expect_match(notes, ds, fixed = TRUE, info = ds)
     expect_match(notes, paste0("/", slug, "-v2/shape"), fixed = TRUE, info = ds)
+    # the note also echoes the dataset's current archive_file, so a reviewer
+    # knows to check it too -- resolve_deter() has no way to verify it itself
+    expect_match(
+      notes, deter_rows$archive_file[deter_rows$dataset == ds],
+      fixed = TRUE, info = ds
+    )
     expect_false(grepl("\n", notes, fixed = TRUE), info = ds)
     # informational only: a fallback is a success, never a "partial failure"
     # (that attribute would trip exit code 11 and open an issue)
     expect_null(attr(res, "partial_failures"), info = ds)
   }
+})
+
+test_that("the fallback note survives a missing or NA archive_file in the manifest rows", {
+  # sprintf() with a zero-length argument returns character(0), so without the
+  # paste() guard around archive_file the whole note would silently vanish.
+  renamed <- rename_link(api, "/deter-cerrado-nb/", "/deter-cerrado-nb-v2/")
+
+  no_col <- deter_rows[, setdiff(names(deter_rows), "archive_file")]
+  expect_message(res <- run_with_api(renamed, rows = no_col), "keyword fallback")
+  expect_length(attr(res, "fallback_notes"), 1)
+  expect_match(attr(res, "fallback_notes"), "^deter_cerrado:")
+
+  with_na <- deter_rows
+  with_na$archive_file[with_na$dataset == "deter_cerrado"] <- NA_character_
+  expect_message(res <- run_with_api(renamed, rows = with_na), "keyword fallback")
+  expect_length(attr(res, "fallback_notes"), 1)
+  expect_match(attr(res, "fallback_notes"), "^deter_cerrado:")
 })
 
 test_that("each dataset that falls back gets its own note", {

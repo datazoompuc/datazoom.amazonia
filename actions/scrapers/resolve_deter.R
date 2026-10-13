@@ -20,8 +20,13 @@
 # datazoom.amazonia never supported -- "deter-pantanal" (Pantanal biome)
 # and "deter-nf" (Amazonia, non-forest areas). Manifest rows for both
 # (deter_pantanal, deter_non_forest) were added by hand in commit 34bd4b5,
-# with resolver left blank per the onboarding playbook (SKILL.md sec. 10)
-# -- this resolver is what fills that column in once it runs clean.
+# with resolver left blank per the onboarding playbook (SKILL.md sec. 10).
+# Updated 2026-10-13: all 4 DETER manifest rows (deter_amz, deter_cerrado,
+# deter_pantanal, deter_non_forest) are now tagged resolver == "deter" --
+# set by hand in the manifest (commit ffaa153, 2026-10-05), not by this
+# resolver: build_manifest.R only hands a resolver the rows already tagged
+# with its own name, so with the column blank resolve_deter() simply stops
+# ("no manifest rows tagged resolver == 'deter'").
 #
 # Each dataset is identified by a fixed substring expected inside its
 # entry's `link` field -- NOT by `category`/`name`, which come in both
@@ -38,11 +43,17 @@
 # this resolver does not do. archive_file is therefore never touched here
 # -- it is simply absent from the returned tibble, which per the manifest
 # schema means "leave the existing value alone" (same convention
-# resolve_prodes.R already uses for the columns it doesn't set). For
-# deter_pantanal and deter_non_forest, archive_file is still blank in the
-# manifest as of this writing; filling it in requires downloading the real
-# package by hand once and reading off the shapefile's name -- see
-# R/deter.R and the onboarding playbook, step 5.
+# resolve_prodes.R already uses for the columns it doesn't set).
+#
+# archive_file is filled in for all 4 rows as of 2026-10-13 (it was done
+# by hand for deter_pantanal/deter_non_forest the same way deter_amz/
+# deter_cerrado's always were -- downloading the real package once and
+# reading off the shapefile's name; see R/deter.R and the onboarding
+# playbook, step 5) -- but note this resolver still never re-verifies it:
+# if a slug renames and the keyword fallback below fires, archive_file can
+# silently go stale again. R/download.R's deter branch now falls back to
+# finding the real .shp by pattern if the committed name isn't there,
+# rather than hard-failing -- see that file's own comment.
 #
 # available_time is for the same reason left untouched -- DETER's download
 # links carry no date/version stamp to read a coverage window off of,
@@ -188,15 +199,29 @@ resolve_deter <- function(rows) {
     distinct_links <- unique(links[keyword_hit])
 
     if (length(distinct_links) == 1) {
+      # 2026-10-13 (requested by Antonio): the dataset's committed
+      # archive_file is a filename snapshot tied to the OLD slug (e.g.
+      # "deter-cerrado-nb-deter-public.shp") -- this resolver has no way to
+      # verify or update it (see the header note on why), so a renamed slug
+      # almost always means archive_file is now wrong too, silently, until
+      # someone downloads the new package and checks. Name the dataset's
+      # current archive_file value here so a reviewer knows to check it,
+      # not just slug_by_dataset. (R/download.R's deter branch also no
+      # longer hard-fails on a stale archive_file -- see its own comment.)
+      # paste(unique(...), collapse = ", ") rather than a bare vector: sprintf()
+      # on a zero-length argument returns character(0), which would make the
+      # whole note vanish if `rows` ever came without an archive_file column.
+      current_archive_file <- paste(unique(rows[["archive_file"]][rows$dataset == ds]), collapse = ", ")
       note <- sprintf(
         paste(
           "%s: primary slug '%s' not found -- matched instead via the",
           "keyword fallback ('%s' in the entry name) to a single",
           "unambiguous candidate: %s. This likely means TerraBrasilis",
           "renamed the slug again -- once confirmed, update slug_by_dataset",
-          "in actions/scrapers/resolve_deter.R."
+          "in actions/scrapers/resolve_deter.R, and check whether",
+          "archive_file (currently '%s') needs updating too."
         ),
-        ds, slug, keyword, distinct_links
+        ds, slug, keyword, distinct_links, current_archive_file
       )
       message("resolve_deter(): ", note)
       fallback_notes <<- c(fallback_notes, note)
