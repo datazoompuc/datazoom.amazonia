@@ -366,8 +366,11 @@ file_cache_set <- function(key, dir, temp) {
 # under raw_data = TRUE, and a user's dt[, x := 1] would mutate a shared
 # cache entry in place). aneel is 100% CSV across all datasets and explicitly
 # excluded.
+# sigmine (.zip with a shapefile) is read into an sf object, which R copies on
+# modify, so sharing one parsed copy is safe and spares re-reading the shapefile.
 parsed_cache_eligible <- function(source, file_extension) {
-  file_extension == ".xlsx" && source %in% c("seeg", "ips", "epe", "mapbiomas", "iema")
+  (file_extension == ".xlsx" && source %in% c("seeg", "ips", "epe", "mapbiomas", "iema")) ||
+    (file_extension == ".zip" && source == "sigmine")
 }
 
 #' Perform the actual file transfer for external_download(). Extracted as a

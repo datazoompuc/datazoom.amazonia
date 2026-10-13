@@ -240,6 +240,25 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
     )
   )
 
+# Delta #14 -- sigmine (2026-10). sigmine_inactive is a genuinely new row, and
+# both sigmine rows now declare available_geo "state, municipality" (the
+# geo_level choices load_sigmine() actually supports). See R/sigmine.R.
+fixture <- fixture %>%
+  dplyr::mutate(
+    available_geo = dplyr::if_else(
+      survey == "sigmine" & dataset == "sigmine_active",
+      "state, municipality", available_geo
+    )
+  ) %>%
+  dplyr::bind_rows(
+    tibble::tibble(
+      survey = "sigmine", dataset = "sigmine_inactive",
+      sidra_code = NA_character_, available_time = NA_character_,
+      available_geo = "state, municipality",
+      url = "https://dadosabertos.anm.gov.br/SIGMINE/PROCESSOS_MINERARIOS/PROCESSOS_INATIVOS.zip"
+    )
+  )
+
 test_that("datasets_link() returns the exact pre-normalization column set and order", {
   expect_equal(
     names(datasets_link()),
