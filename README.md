@@ -634,9 +634,11 @@ with IBGE municipality geometries** (2019 version) to identify ALL
 municipalities that each DETER alert overlaps with. This creates a more
 complete and accurate geographic picture than the original raw data.
 
-**Important note on CRS metadata**: The CRS (Coordinate Reference
-System) information may need verification after loading, as coordinate
-system metadata can sometimes be unclear in the original INPE data.
+**Important note on CRS metadata**: `load_deter()` reprojects internally
+to IBGE’s official equal-area projection for area calculations (Albers,
+SIRGAS 2000/GRS80, central meridian -54) before computing `area` and
+overlaying municipality boundaries – not UTM zones (see “Important
+Considerations” below for the exact parameters).
 
 ------------------------------------------------------------------------
 
@@ -746,10 +748,10 @@ Brazilian state - **Metadata**: Satellite source, confidence level
     for Amazon, larger for Cerrado
 4.  **CRS metadata**: `load_deter()` reprojects internally to IBGE’s
     official equal-area projection for area calculations (Albers, SIRGAS
-    2000/GRS80, central meridian -54) before computing `area` and
-    overlaying municipality boundaries – not UTM zones. See
-    `R/deter.R`’s `# FRAGILE:` comment above `operation_crs` for the
-    exact parameters and source.
+    2000/GRS80, central meridian -54, latitude of origin -12, standard
+    parallels -2 and -22, false easting/northing 5,000,000/10,000,000)
+    before computing `area` and overlaying municipality boundaries – not
+    UTM zones.
 5.  **Overlapping municipalities**: Enhanced version accounts for alerts
     crossing municipality boundaries
 6.  **False positives possible**: Satellite detection can occasionally
