@@ -48,7 +48,11 @@ tagged_sources <- list(
   # as.Date(operation_start, ...) step (never matched a real column in any
   # of the three aneel datasets, verified live) that was deleted rather
   # than kept as a tagged-but-inert assumption. See NEWS.md.
-  list(r_path = file.path(pkg_root, "R", "aneel.R"), label = "R/aneel.R", min_tags = 4)
+  list(r_path = file.path(pkg_root, "R", "aneel.R"), label = "R/aneel.R", min_tags = 4),
+  # Added 2026-10-08 alongside DETER's FRAGILITY_SOURCES row: 3 tags as of
+  # that date (class_name/classname rename, the hardcoded CRS, and the
+  # municipality st_intersection() alert-splitting behavior).
+  list(r_path = file.path(pkg_root, "R", "deter.R"), label = "R/deter.R", min_tags = 3)
 )
 
 for (src in tagged_sources) {

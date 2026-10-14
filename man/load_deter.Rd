@@ -2,12 +2,19 @@
 % Please edit documentation in R/deter.R
 \name{load_deter}
 \alias{load_deter}
-\title{DETER - Forest Degradation in the Brazilian Amazon}
+\title{DETER - Forest Degradation in the Brazilian Amazon, Cerrado and Pantanal}
 \usage{
 load_deter(dataset, raw_data = FALSE, language = "eng")
 }
 \arguments{
-\item{dataset}{A dataset name ("deter_amz", "deter_cerrado") with information about the Legal Amazon and Cerrado, respectively}
+\item{dataset}{A dataset name ("deter_amz", "deter_cerrado", "deter_pantanal",
+"deter_non_forest") with information about the Legal Amazon, Cerrado, Pantanal, and
+non-forest areas within the Legal Amazon, respectively. Note that the raw source data
+uses different class-name vocabularies across these four products (upper-snake-case
+codes for deter_amz/deter_cerrado, e.g. "DESMATAMENTO_CR"; lowercase Portuguese labels
+for deter_pantanal/deter_non_forest, e.g. "cicatriz de queimada") -- this is not
+normalized by \code{load_deter()}, the returned \code{alert_type} column keeps
+whichever vocabulary the source used for that biome.}
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
@@ -17,7 +24,9 @@ load_deter(dataset, raw_data = FALSE, language = "eng")
 A \code{sf} object.
 }
 \description{
-Loads data on changes in forest cover in the Legal Amazon and the Cerrado biome.
+Loads data on changes in forest cover and vegetation detected by DETER,
+across four biome/coverage products: the Legal Amazon, the Cerrado biome, the Pantanal
+biome, and non-forest areas within the Legal Amazon.
 }
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
@@ -32,6 +41,20 @@ deter_amz <- load_deter(
 # download treated DETER Cerrado data
 deter_cerrado <- load_deter(
   dataset = "deter_cerrado",
+  raw_data = FALSE,
+  language = "eng"
+)
+
+# download treated DETER Pantanal data
+deter_pantanal <- load_deter(
+  dataset = "deter_pantanal",
+  raw_data = FALSE,
+  language = "eng"
+)
+
+# download treated DETER non-forest (Legal Amazon) data
+deter_non_forest <- load_deter(
+  dataset = "deter_non_forest",
   raw_data = FALSE,
   language = "eng"
 )

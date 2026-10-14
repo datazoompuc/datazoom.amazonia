@@ -1,0 +1,106 @@
+[
+  {
+    "id": "64e5081b9d372effcf2b10e6",
+    "name": "Avisos DETER no Pantanal",
+    "link": "/file-delivery/download/deter-pantanal/shape",
+    "category": "Bioma Pantanal - DETER (Avisos)",
+    "enabled": true,
+    "lang": "pt-br"
+  },
+  {
+    "id": "64e3bfe4a7f5dcb5bd5f36f0",
+    "name": "Avisos em áreas de Não Floresta",
+    "link": "/file-delivery/download/deter-nf/shape",
+    "category": "Bioma Amazônia - DETER (Avisos)",
+    "enabled": true,
+    "lang": "pt-br"
+  },
+  {
+    "id": "5c811d6b0cf423000144ebdd",
+    "name": "Avisos no Bioma Amazônia",
+    "link": "/file-delivery/download/deter-amz/shape",
+    "category": "Bioma Amazônia - DETER (Avisos)",
+    "enabled": true,
+    "lang": "pt-br"
+  },
+  {
+    "id": "5ccc942befe56f71d28a59d0",
+    "name": "Cerrado Deter",
+    "link": "/file-delivery/download/deter-cerrado-nb/shape",
+    "category": "Cerrado Biome - DETER (Notices)",
+    "enabled": true,
+    "lang": "en"
+  },
+  {
+    "id": "5c76ca0f169e6c00010cf00e",
+    "name": "Deter Cerrado",
+    "link": "/file-delivery/download/deter-cerrado-nb/shape",
+    "category": "Bioma Cerrado - DETER (Avisos)",
+    "enabled": true,
+    "lang": "pt-br"
+  },
+  {
+    "id": "5ccc9526efe56f71d28a59d2",
+    "name": "Amazon Biome notices",
+    "link": "/file-delivery/download/deter-amz/shape",
+    "category": "Amazon Biome - DETER (Notices)",
+    "enabled": true,
+    "lang": "en"
+  },
+  {
+    "id": "64e3d115a7f5dcb5bd5f36f1",
+    "name": "Amazon Biome notices for non-forest areas",
+    "link": "/file-delivery/download/deter-nf/shape",
+    "category": "Amazon Biome - DETER (Notices)",
+    "enabled": true,
+    "lang": "en"
+  },
+  {
+    "id": "64e508c39d372effcf2b10e7",
+    "name": "Pantanal Notices of vegetal suppression",
+    "link": "/file-delivery/download/deter-pantanal/shape",
+    "category": "Pantanal Biome - DETER (Notices)",
+    "enabled": true,
+    "lang": "en"
+  },
+  {
+    "id": "64024528961fdcb241f13e6c",
+    "name": "Amazon TerraClass",
+    "link": "/download/dataset/amz-terraclass/raster/terraclass_amazonia_2020_matricial.zip",
+    "category": "Amazon Biome - TerraClass",
+    "enabled": true,
+    "lang": "en"
+  },
+  {
+    "id": "64511bdba82f1e9d9a316067",
+    "name": "Complete Amazon PRODES",
+    "link": "/download/dataset/legal-amz-prodes/vector/prodes_amazonia_legal_v20260717.gpkg.zip",
+    "category": "Legal Amazon - PRODES (Deforestation)",
+    "enabled": true,
+    "lang": "en"
+  },
+  {
+    "id": "663bbd37b038fc3111f7a1d4",
+    "name": "Acumulado de supressão de fitofisionomias não florestais - Bioma Amazônia",
+    "link": "/download/dataset/amz-prodes/vector/accumulated_deforestation_2000_nf_biome_amazonia_v20260717.zip",
+    "category": "Bioma Amazônia - PRODES (Desmatamento)",
+    "enabled": true,
+    "lang": "pt-br"
+  },
+  {
+    "id": "5ccc939befe56f71d28a59ce",
+    "name": "Cerrado Biome States",
+    "link": "/download/dataset/cerrado-aux/vector/states_cerrado_biome.zip",
+    "category": "Cerrado Biome - Ancillary",
+    "enabled": true,
+    "lang": "en"
+  },
+  {
+    "id": "5de94961f2aa7121187912b4",
+    "name": "Cloud in Pantanal Biome",
+    "link": "/download/dataset/pantanal-prodes/vector/cloud_biome_pantanal_v20260717.zip",
+    "category": "Pantanal Biome - PRODES (Deforestation)",
+    "enabled": true,
+    "lang": "en"
+  }
+]
