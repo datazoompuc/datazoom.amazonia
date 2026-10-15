@@ -189,7 +189,9 @@ KNOWN_POST_CAPTURE_DELTAS <- c(
   "seeg\rseeg_residuals\rNA\rNA\rversion",
   # 2026-10: sigmine_active now declares available_geo "state, municipality"
   # (it was NA); see test-datasets_link.R delta #14.
-  "sigmine\rsigmine_active\rNA\rNA\ravailable_geo"
+  "sigmine\rsigmine_active\rNA\rNA\ravailable_geo",
+  # 2026-10: sigmine_active now declares its parent page in docs_url (it was NA).
+  "sigmine\rsigmine_active\rNA\rNA\rdocs_url"
 )
 post_capture_key <- function(s, d, g, y, f) {
   paste(s, d, ifelse(is.na(g), "NA", g), ifelse(is.na(y), "NA", y), f, sep = "\r")

@@ -155,6 +155,16 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 > latest coverage, or the package’s dataset table at
 > [`datasets_link.csv`](https://github.com/datazoompuc/datazoom.amazonia/blob/master/inst/extdata/manifest/v1/datasets_link.csv).
 
+> **A note on caching:** within a single R session, the package keeps
+> the files it downloads, so asking for another dataset that comes from
+> the same source file (for example, several SEEG sectors, or calling
+> `sigmine_active` twice) does not download it again. For some sources
+> (large Excel files and the SIGMINE zip), the parsed result of the last
+> read is also kept. This cache lives only in the current session, in
+> R’s temporary folder, and disappears when you restart R. To turn it
+> off, run `options(datazoom.amazonia.cache = FALSE)` before calling the
+> function.
+
 # Environmental Data
 
 ## PRODES
@@ -4421,6 +4431,33 @@ minerals**: Coal, uranium - **Gemstones**: Diamonds, emeralds, others -
 - **Polygons**: Spatial boundaries of mining concessions (when
   available)
 - **Accuracy**: Depends on government survey quality
+
+### How municipality-level data is built
+
+SIGMINE is published by the ANM as polygons (one per mining process),
+not as municipality totals. To return `geo_level = "municipality"`, each
+process is assigned to a single municipality in these steps:
+
+1.  The polygons are made valid and their Z/M dimensions are dropped.
+2.  Both the mining polygons and the municipal boundaries (the package’s
+    internal `geo_municipalities` layer) are projected to an equal-area
+    Albers conic projection (SIRGAS 2000 / Brazil Albers,
+    [EPSG:10857](https://epsg.io/10857)): standard parallels 2°S and
+    22°S, central meridian 54°W, latitude of origin 12°S, false easting
+    5,000,000 m, false northing 10,000,000 m, GRS80 ellipsoid. Centroids
+    are computed in meters, because centroids computed on
+    longitude/latitude are distorted.
+3.  The centroid of each polygon is computed.
+4.  Each centroid is matched to the municipality that contains it, and
+    each `processo` is kept only once.
+
+The result is **one municipality per process**: a mining area that
+crosses municipal borders is not split, and it is counted in the
+municipality where its centroid falls. For very irregular polygons, the
+centroid can fall outside the polygon itself, and then the process may
+be assigned to a neighboring municipality, or to none if the centroid
+falls outside every municipal polygon. The same method is used for
+active (`sigmine_active`) and inactive (`sigmine_inactive`) processes.
 
 ### Important Limitations
 
