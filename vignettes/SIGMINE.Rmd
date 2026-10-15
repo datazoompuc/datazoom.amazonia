@@ -198,6 +198,14 @@ assigned to a single municipality in these steps:
 4. Each centroid is matched to the municipality that contains it, and each
    `processo` is kept only once.
 
+The projection follows IBGE's recommendation for area calculations (equal-area
+Albers projection, standard parallels 2°S and 22°S, origin at 12°S and
+54°W), described in the
+[BC250 technical documentation](https://geoftp.ibge.gov.br/cartas_e_mapas/bases_cartograficas_continuas/bc250/versao2023/informacoes_tecnicas/documentacao_tecnica__bc250_2023.pdf)
+(section "Cálculo de áreas e extensões"). The false easting and northing
+(5,000,000 m and 10,000,000 m) only shift the coordinates and do not affect
+areas or centroid positions.
+
 The result is **one municipality per process**: a mining area that crosses
 municipal borders is not split, and it is counted in the municipality where
 its centroid falls. For very irregular polygons, the centroid can fall outside
