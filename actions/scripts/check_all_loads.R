@@ -24,11 +24,15 @@ RAW_DATA    <- FALSE
 GEO_LEVEL   <- "state"
 
 # Overrides de time_period para funções com cadência não-anual ou anos válidos restritos
-# load_degrad: programa descontinuado, dados apenas até 2016
+# load_degrad: programa descontinuado, dados apenas até 2016; um único ano não
+#   exercita o harmonize_degrad_year_crs() de R/degrad.R -- os shapefiles brutos
+#   têm 3 grupos de CRS (2007-2009 sem CRS, 2010-2014 SAD69, 2015-2016 SIRGAS 2000),
+#   então c(2009, 2010, 2016) cruza os dois limites entre grupos numa só chamada
+#   (issue #350; sem a correção, esta chamada falha com "arguments have different crs")
 # load_ips: anos válidos são 2014, 2018, 2021, 2023 — usar o mais recente
 # load_censoagro: Censo Agropecuário; anos disponíveis 1995, 2006, 2017 — usar o mais recente
 TIME_PERIOD_BY_FN <- list(
-  load_degrad    = 2016,
+  load_degrad    = c(2009, 2010, 2016),
   load_ips       = 2023,
   load_censoagro = 2017,
   load_pibmunic  = 2021   # max disponível no SIDRA é 2021
