@@ -80,43 +80,60 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
     return(dat)
   }
 
-  # Join all tables while preserving sf objects
+  # FRAGILE: the raw DEGRAD files do NOT all share a CRS. Verified live
+  # 2026-10-12: 2007-2009 carry none at all; 2010-2014 embed SAD69
+  # (EPSG:4618, with its own TOWGS84); 2015-2016 embed SIRGAS 2000. Binding
+  # years from different groups directly used to fail with "arguments have
+  # different crs" (2009:2010, 2014:2015, 2007:2016 all crashed; 2010:2012
+  # and 2010:2014 happened to stay inside one group and worked, by luck of
+  # the request, not because anything was actually correct).
+  #
+  # Fixed 2026-10-16 by harmonizing CRS PER YEAR here, right after download,
+  # before bind_rows() -- every year is transformed to one common target,
+  # SIRGAS 2000 geographic (EPSG:4674; the 2015-2016 files already carry an
+  # equivalent SIRGAS 2000 CRS and move by exactly 0.0 m), via a real
+  # sf::st_transform(), not a label swap. Years with no CRS at all
+  # (2007-2009) get the pre-existing SAD69 longlat approximation assigned
+  # first (aust_SA + this towgs84 string -- unchanged, not reverified here,
+  # same as before), then transformed onward like every other year.
+  #
+  # This incidentally also closes the separate datum-shift bug documented at
+  # operation_crs below. The shift comes from the TOWGS84 that the 2010-2014
+  # .prj files carry and that the 2007-2009 fallback string above spells out
+  # (plain EPSG:4618 would give almost the same, 0.3 m apart). Before this
+  # fix, operation_crs's missing datum made that shift 0 m. Measured
+  # 2026-10-16 on the real data through this step: SAD69-era polygons end up
+  # 59.5 to 75.0 m (median 65-69 m) from where the raw file's coordinates
+  # would sit if read as SIRGAS 2000; 2016, exactly 0.0 m. Effect on the
+  # output of moving them (vs the committed code without this step, same
+  # target CRS): total area under 0.003% a year; per-municipality area median
+  # 0.004-0.1% and 95th percentile 1.2-2.2% in the SAD69 years, exactly
+  # unchanged for 2015-2016, the largest moves (4-15%) being on municipalities
+  # that carry only 1.5-4 km2 of DEGRAD that year; output rows -14 to +3 per
+  # year (-36 over the 10 years); 7 municipality-years appear or disappear,
+  # slivers of 0.03 km2 in total. So this changes real output
+  # coordinates/municipality attribution for 2007-2014, not just the
+  # previously-crashing cross-group combinations.
+  harmonize_degrad_year_crs <- function(d) {
+    if (is.na(sf::st_crs(d$geometry))) {
+      d$geometry <- sf::st_set_crs(
+        d$geometry,
+        "+proj=longlat +ellps=aust_SA +towgs84=-66.8700,4.3700,-38.5200,0.0,0.0,0.0,0.0 +no_defs"
+      )
+    }
+    d$geometry <- sf::st_transform(d$geometry, sf::st_crs(4674))
+    d
+  }
+  dat <- purrr::map(dat, harmonize_degrad_year_crs)
+
+  # Join all tables while preserving sf objects -- every year is now in the
+  # same CRS (EPSG:4674), so this can no longer fail on a cross-group
+  # time_period.
   dat <- dplyr::bind_rows(dat)
 
   # Remove useless column
   dat <- dat %>%
     dplyr::select(-dplyr::any_of(c("nome", "codigouf", "area")))
-
-
-  # Clean geometry
-  # FRAGILE: the raw DEGRAD files do NOT all lack a CRS. Read live 2026-10-12:
-  # 2007-2009 have none (the st_set_crs() below only ever applies to a load
-  # made of those years, and assumes SAD69 like their neighbours -- not
-  # verified); 2010-2014 embed SAD69 (EPSG:4618, with a TOWGS84); 2015-2016
-  # embed SIRGAS 2000. Three consequences. (1) The three groups have
-  # different CRSs, so a time_period that crosses a group boundary (2009:2010,
-  # 2014:2015, 2007:2016) already fails in the bind_rows() above with
-  # "arguments have different crs"; 2010:2012 and 2010:2014 work. (2) The
-  # datum is never applied: operation_crs below names no datum, so PROJ does
-  # a zero-shift ballpark transform and ignores the +towgs84 of this block and
-  # of the embedded CRSs alike (0.000 m, measured), whereas a datum-aware
-  # transform moves SAD69 points by 65-75 m. SAD69-era polygons (2007-2014)
-  # are therefore overlaid on SIRGAS 2000 municipalities unshifted. Areas do
-  # not care; municipality attribution near boundaries does. Measured with
-  # IBGE's own WKT (it names D_SIRGAS2000) as operation_crs: 2012 total area
-  # -0.0001%, +2 rows, per-municipality area median 0.03%. The two largest
-  # individual moves found are from DIFFERENT municipalities, both small in
-  # area (a fixed metric shift reads as a large percentage there): Santa
-  # Maria das Barreiras (PA), +13.2%, DEGRAD polygon area there only
-  # 1.97 km2; Barra do Corda (MA), -0.15%, at a similar scale, 0.72 km2.
-  # 2016, already SIRGAS, unchanged.
-  # (3) None of this is re-checked per download.
-  if (is.na(sf::st_crs(dat$geometry))) {
-    dat$geometry <- sf::st_set_crs(
-      dat$geometry,
-      "+proj=longlat +ellps=aust_SA +towgs84=-66.8700,4.3700,-38.5200,0.0,0.0,0.0,0.0 +no_defs"
-    )
-  }
 
   dat$geometry <- dat$geometry %>%
     sf::st_make_valid()
@@ -163,21 +180,30 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
   # (IBGE, "Malha Municipal Digital e Areas Territoriais 2024," Notas
   # metodologicas 01/2025, Apendice B, p. 21): central meridian -54, standard
   # parallels -2/-22, GRS80. It names no datum (PROJ reads "Unknown based on
-  # GRS 1980 ellipsoid"), which is why the datum shifts in the tag above are a
-  # no-op. Until 2026-10-12 this was a near-copy of EPSG:5880 ("SIRGAS 2000 /
-  # Brazil Polyconic," not equal-area) with its ellipsoid mistyped to the
-  # legacy preset "aust_SA"; R/deter.R carried the same string until
-  # 2026-10-08 (commit 5aa2a22, see NEWS.md). The old string inflated `area`
-  # the further a polygon sits from longitude -54. Measured 2026-10-12, old vs
-  # new CRS, all 10 years: +0.41% in total (+0.30% to +0.74% by year); by
-  # longitude, +4.7% west of -70, +2.5% in (-70,-65], +1.0% in (-65,-60],
-  # +0.2% in (-60,-55], +0.06% in (-55,-50], +0.7% in (-50,-45] and +1.4% east
-  # of -45. The new `area` matches an ellipsoidal geodesic area (lwgeom,
-  # GRS80) and a Lambert equal-area one to within 0.001% (1st-99th
-  # percentile) in every year. The named EPSG codes for this projection
-  # (10856/10857, "SIRGAS 2000 / Brazil Albers," registered 2025-05-16)
-  # silently resolve to NA on PROJ 9.3.1 / sf 1.0.19 -- hence the proj4
-  # string; re-test before ever switching.
+  # GRS 1980 ellipsoid"). Until 2026-10-16 this mattered: `dat` could still
+  # arrive here in SAD69 (2010-2014) and this string's missing datum made
+  # PROJ do a zero-shift transform instead of a real one (see the tag above
+  # the download loop). Since 2026-10-16, every year is harmonized to SIRGAS
+  # 2000 (EPSG:4674) before it ever reaches this point, so this transform's
+  # input is always already in the right datum -- the same situation
+  # R/deter.R's own data is always in (its raw files are already SIRGAS 2000
+  # throughout) -- and the missing datum tag here is no longer consequential
+  # for DEGRAD either. Until 2026-10-12 this was a near-copy of EPSG:5880
+  # ("SIRGAS 2000 / Brazil Polyconic," not equal-area) with its ellipsoid
+  # mistyped to the legacy preset "aust_SA"; R/deter.R carried the same
+  # string until 2026-10-08 (commit 5aa2a22, see NEWS.md). The old string
+  # inflated `area` the further a polygon sits from longitude -54. Measured
+  # 2026-10-16 on the current code, original polyconic string vs current, all
+  # 10 years loaded one at a time: +0.41% in total (+0.30% to +0.74% by year);
+  # by longitude, +4.8% west of -70, +2.5% in (-70,-65], +1.0% in (-65,-60],
+  # +0.2% in (-60,-55], +0.06% in (-55,-50], +0.7% in (-50,-45] and +1.5% east
+  # of -45 (the datum fix above moves the total by under 0.003% a year: a
+  # shift does not change an area). The current `area` matches an ellipsoidal
+  # geodesic area (lwgeom, GRS80) and a Lambert equal-area one to within
+  # 0.001% (1st-99th percentile) in every year. The named EPSG codes for this
+  # projection (10856/10857, "SIRGAS 2000 / Brazil Albers," registered
+  # 2025-05-16) silently resolve to NA on PROJ 9.3.1 / sf 1.0.19 -- hence the
+  # proj4 string; re-test before ever switching.
   operation_crs <- sf::st_crs("+proj=aea +lat_0=-12 +lon_0=-54 +lat_1=-2 +lat_2=-22 +x_0=5000000 +y_0=10000000 +ellps=GRS80 +units=m +no_defs")
 
   # Changing crs of both data to the common crs chosen above
@@ -198,11 +224,14 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
   # (see that file's own FRAGILE tag) -- there's no stable scar/alert id in
   # the raw DEGRAD shapefiles to reassemble these by, and polygons touching
   # no Legal Amazon municipality drop out altogether, so rows cannot be
-  # turned back into a polygon count. Measured 2026-10-12: the 10 years hold
-  # 227,218 raw polygons and 231,489 output rows (+1.9% net; 2007: 44,012 ->
-  # 44,781). Which sliver rows exist depends on the projection: the old and
-  # new operation_crs differ by -1 to +6 rows per year (+6 over the 10 years,
-  # 0.003%), and no municipality appears or disappears.
+  # turned back into a polygon count. Measured 2026-10-16 on the current
+  # code: the 10 years hold 227,218 raw polygons and 231,453 output rows
+  # (+1.9% net; 2007: 44,012 -> 44,773). Which sliver rows exist depends on
+  # the projection and on the datum: against the original polyconic code the
+  # output differs by -14 to +6 rows per year (-30 over the 10 years, 0.013%),
+  # and the real datum shift of the SAD69-era polygons (see the tag above the
+  # download loop) changes it by -14 to +3 rows per year (-36 over the 10
+  # years; exactly 0 for 2015-2016).
   dat <- suppressWarnings(sf::st_intersection(dat, geo_amazon)) %>%
     dplyr::mutate(area = sf::st_area(.data$geometry))
 
