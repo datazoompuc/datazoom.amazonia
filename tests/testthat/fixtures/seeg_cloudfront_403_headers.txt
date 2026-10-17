@@ -1,0 +1,17 @@
+HTTP/1.1 403 Forbidden
+Server: CloudFront
+Date: Sat, 17 Oct 2026 04:43:02 GMT
+Content-Type: text/html
+Content-Length: 919
+Connection: keep-alive
+X-Cache: Error from cloudfront
+Via: 1.1 8014fff5629346502b0efccec8dc80e6.cloudfront.net (CloudFront)
+X-Amz-Cf-Pop: GIG52-P3
+X-Amz-Cf-Id: mesokjU5Xm587WDk0QWaOs5sO4Z3CFBexq0fTBKmiyAkcwUTR1bzgA==
+X-XSS-Protection: 1; mode=block
+X-Frame-Options: SAMEORIGIN
+Referrer-Policy: strict-origin-when-cross-origin
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Permissions-Policy: geolocation=(), microphone=(), camera=()
+

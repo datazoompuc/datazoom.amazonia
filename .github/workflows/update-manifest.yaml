@@ -228,6 +228,26 @@ jobs:
             ];
             try {
               const report = JSON.parse(fs.readFileSync("${{ steps.build.outputs.report_path }}", "utf8"));
+              // One failure message -> markdown lines. Most are a single
+              // line. A message can also be multi-line: resolve_seeg.R puts a
+              // one-line summary first and the HTTP evidence of a refused
+              // request (headers, an HTML excerpt of the block page) after
+              // it. Pasted raw into a list item, that breaks the list, and
+              // GitHub would render the HTML excerpt as markup (a WAF block
+              // page's <title>/<h1> would mostly vanish) instead of showing it.
+              // So the first line stays the list item and everything after
+              // it goes in a fenced block under it. The fence is longer than
+              // any run of backticks inside, so a response body can never
+              // close the block early. Single-line messages are unchanged.
+              const fmtMsg = (k, msg) => {
+                const [first, ...rest] = String(msg).split(/\r?\n/);
+                const detail = rest.join("\n").trim();
+                const head = `- \`${k}\`: ${first}`;
+                if (!detail) return [head];
+                const longestRun = Math.max(0, ...(detail.match(/`+/g) || []).map(r => r.length));
+                const fence = "`".repeat(Math.max(3, longestRun + 1));
+                return [head, ...[fence, ...detail.split("\n"), fence].map(l => `  ${l}`)];
+              };
               const fmtFailures = (obj, label) => {
                 const entries = Object.entries(obj || {});
                 if (entries.length === 0) return [];
@@ -236,12 +256,12 @@ jobs:
                 // strings (resolvers_partial_failed: a resolver covering
                 // several sub-sources, e.g. resolve_epe.R, can report more
                 // than one reason for the same source) -- flatten either
-                // shape to one line per reason instead of letting Array's
+                // shape to one entry per reason instead of letting Array's
                 // default toString() join them with a bare comma.
                 return [
                   `**${label}:**`,
                   ...entries.flatMap(([k, v]) =>
-                    (Array.isArray(v) ? v : [v]).map(msg => `- \`${k}\`: ${msg}`)
+                    (Array.isArray(v) ? v : [v]).flatMap(msg => fmtMsg(k, msg))
                   ),
                   ""
                 ];
