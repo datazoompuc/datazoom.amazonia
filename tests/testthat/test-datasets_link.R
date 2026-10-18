@@ -122,6 +122,16 @@
 #      real data (min/max year of the raw shapefile's view_date, checked
 #      2026-10-06): deter_amz 2016-2022 -> 2016-2026, deter_cerrado
 #      2018-2022 -> 2018-2026, and the two new datasets 2023-2026.
+#  15. 2026-10-17: COMEX onboarding (see resolve_comex.R's header). The
+#      ministry's own open-data page links balanca.mdic.gov.br, not
+#      balanca.economia.gov.br, whose TLS certificate expired 2026-10-03; the
+#      two hosts serve the same files (identical sizes and Last-Modified,
+#      checked live), so all 4 comex rows' url moved to the new host.
+#      available_time was re-derived from the real files (a text/csv for
+#      every year, every header checked): 1997-2023 -> 1997-2026 for all four
+#      datasets (2026 is a partial year, January-September). docs_url (the
+#      ministry's open-data page) and resolver also changed/were populated
+#      (not columns of this fixture).
 #
 # The fixture was captured right before normalization. Row order is not
 # significant (both sides sorted by (survey, dataset) before comparing).
@@ -201,6 +211,15 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
       survey == "deter" & dataset == "deter_amz", "2016-2026",
       ifelse(survey == "deter" & dataset == "deter_cerrado", "2018-2026", available_time)
     ),
+    # Delta #15 -- see file header.
+    url = dplyr::case_when(
+      survey == "comex" & dataset == "export_mun" ~ "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/mun/EXP_$year$_MUN.csv",
+      survey == "comex" & dataset == "export_prod" ~ "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/EXP_$year$.csv",
+      survey == "comex" & dataset == "import_mun" ~ "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/mun/IMP_$year$_MUN.csv",
+      survey == "comex" & dataset == "import_prod" ~ "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/IMP_$year$.csv",
+      TRUE ~ url
+    ),
+    available_time = ifelse(survey == "comex", "1997-2026", available_time),
     available_time = ifelse(
       survey == "prodes" & dataset == "deforestation", "2007-2025",
       ifelse(

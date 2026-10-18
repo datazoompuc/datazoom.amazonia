@@ -63,6 +63,12 @@ load_br_trade <- function(dataset, raw_data = FALSE,
   # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/IMP_2021_MUN.csv
   # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncmv2/IMP_2012_V2.csv
   # https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm/EXP_2010.csv
+  #
+  # These example URLs predate the host move (the manifest rows now use
+  # balanca.mdic.gov.br) and the `ncmv2/` one is dead: checked live
+  # 2026-10-17, every `ncmv2/{EXP,IMP}_<year>_V2.csv` (1995-2027) answers the
+  # server's catch-all placeholder, not a file -- `ncm/` is the real folder
+  # for every year. See actions/scrapers/resolve_comex.R's header.
 
   # check if dataset and time_period are valid
 
@@ -116,8 +122,8 @@ load_br_trade <- function(dataset, raw_data = FALSE,
 
   ## This Needs to Load the Dictionary Depending on param$prod_class
 
-  # HS (2,4,6) - https://balanca.economia.gov.br/balanca/bd/tabelas/NCM_SH.csv
-  # NCM - https://balanca.economia.gov.br/balanca/bd/tabelas/NCM.csv
+  # HS (2,4,6) - https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM_SH.csv
+  # NCM - https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM.csv
 
   if (param$dataset == "export_mun" | param$dataset == "import_mun") {
     dic <- suppressMessages(load_trade_dic(type = "hs"))
@@ -140,6 +146,14 @@ load_br_trade <- function(dataset, raw_data = FALSE,
     ## Add Variable Name ##
     #######################
 
+    # FRAGILE: the raw MUN files' column names are hard-coded here and in the
+    # select() calls below (CO_ANO, CO_MES, SH4, CO_PAIS, SG_UF_MUN, CO_MUN,
+    # KG_LIQUIDO, VL_FOB, lower-cased by clean_names()). Verified live
+    # 2026-10-17: the header of export_mun/import_mun is exactly those 8
+    # columns in 1997, 2025 and 2026, and actions/scrapers/resolve_comex.R
+    # re-checks it for every year before publishing a range. formatC(format
+    # = "d") also needs SH4 read as an integer, which fread() does on those
+    # samples. A renamed column would stop here on the select(), not mismatch.
     dat <- dat %>%
       dplyr::rename(co_sh4 = sh4) %>%
       dplyr::mutate(co_sh4 = formatC(co_sh4, width = 4, format = "d", flag = "0")) %>%
@@ -194,6 +208,17 @@ load_br_trade <- function(dataset, raw_data = FALSE,
     ## Add Variable Name ##
     #######################
 
+    # FRAGILE: same for the NCM files: CO_ANO, CO_MES, CO_NCM, CO_UNID, CO_PAIS,
+    # SG_UF_NCM, CO_VIA, CO_URF, QT_ESTAT, KG_LIQUIDO, VL_FOB. Verified live
+    # 2026-10-17 on the 1997, 2025 and 2026 headers (resolve_comex.R checks
+    # every published year). The IMPORT files carry two more columns,
+    # VL_FRETE and VL_SEGURO, that nothing below selects, so they are dropped
+    # without a word (the ministry's own layout for imports lists them).
+    # formatC(format = "d") needs CO_NCM as an integer: true of fread() on
+    # those samples. QT_ESTAT / KG_LIQUIDO (and, in 2026, VL_FOB) come back as
+    # integer64 whenever a column holds a value above int32 -- seen in the
+    # export samples -- and the as.double step above turns them into doubles
+    # (checked on 1997+2025 loads of the samples, not on a full file).
     dat <- dat %>%
       dplyr::mutate(co_ncm = formatC(co_ncm, width = 8, format = "d", flag = "0")) %>%
       dplyr::left_join(dic, by = "co_ncm")
@@ -241,7 +266,21 @@ load_trade_dic <- function(type) {
   ## Download Dictionary ##
   #########################
 
-  path <- "https://balanca.economia.gov.br/balanca/bd/"
+  # FRAGILE: these two dictionary URLs are hard-coded here, NOT read from the
+  # manifest (NCM_SH.csv is also the manifest's baci_dic/product_codes row,
+  # which still points at the old host; NCM.csv is in no manifest row), so
+  # nothing resolves or probes them: the yearly data URLs move with
+  # resolve_comex.R, this host does not. The host must be the one the
+  # ministry's open-data page links, balanca.mdic.gov.br -- until 2026-10-18
+  # this said balanca.economia.gov.br, whose TLS certificate expired
+  # 2026-10-03, which made load_br_trade() fail at this download even though
+  # the yearly files were fine. Verified live 2026-10-18: both files are
+  # byte-identical on the two hosts (same MD5), are Latin-1, not UTF-8 (so
+  # the Latin1 locale below is right), and carry the columns used here
+  # (co_sh4 / no_sh4_por / no_sh4_ing for NCM_SH.csv; co_ncm / no_ncm_por /
+  # no_ncm_ing for NCM.csv). If resolve_comex.R's COMEX_HOST ever changes
+  # again, change this too (test-comex-resolver.R fails if they disagree).
+  path <- "https://balanca.mdic.gov.br/balanca/bd/"
 
   if (type == "hs") {
     final <- paste(path, "tabelas/NCM_SH.csv", sep = "")

@@ -52,7 +52,12 @@ tagged_sources <- list(
   # Added 2026-10-08 alongside DETER's FRAGILITY_SOURCES row: 3 tags as of
   # that date (class_name/classname rename, the hardcoded CRS, and the
   # municipality st_intersection() alert-splitting behavior).
-  list(r_path = file.path(pkg_root, "R", "deter.R"), label = "R/deter.R", min_tags = 3)
+  list(r_path = file.path(pkg_root, "R", "deter.R"), label = "R/deter.R", min_tags = 3),
+  # Added 2026-10-17 alongside COMEX's FRAGILITY_SOURCES row: 3 tags as of
+  # that date (raw MUN column names, raw NCM column names + integer
+  # assumptions, and the hard-coded dictionary host/encoding in
+  # load_trade_dic()).
+  list(r_path = file.path(pkg_root, "R", "comex.R"), label = "R/comex.R", min_tags = 3)
 )
 
 for (src in tagged_sources) {
