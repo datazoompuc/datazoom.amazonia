@@ -627,7 +627,9 @@ The raw DETER data from INPE reports one alert/detection per row, with
 each row typically associated with a single municipality in the raw
 data. However, **many alerts actually overlap multiple municipalities**
 (typically 2-4 municipalities) that are not all shown in the original
-records. \### Data Processing
+records.
+
+### Data Processing
 
 This package provides an important enhancement: **spatial intersection
 with IBGE municipality geometries** (2019 version) to identify ALL
@@ -2518,7 +2520,7 @@ data <- load_ips(
 ### Dimensions and Indicators
 
 Each dimension contains multiple indicators: - **Life quality**: 4-6
-indicators - **Sanitation/habitat**: 3-5 indicators  
+indicators - **Sanitation/habitat**: 3-5 indicators\
 - **Violence**: 3-4 indicators - **Education**: 3-4 indicators -
 **Communication**: 2-3 indicators - **Mortality**: 3-4 indicators -
 **Deforestation**: 2-3 indicators
@@ -2891,7 +2893,7 @@ This dataset captures:
 - **Export data**: Brazilian goods leaving the country, disaggregated by
   municipality and product
 - **Import data**: Foreign goods entering Brazil, disaggregated by
-  municipality and product  
+  municipality and product\
 - **Monthly frequency**: High-frequency trade data for detailed temporal
   analysis
 - **Product classification**: Detailed product codes and descriptions
@@ -4695,17 +4697,17 @@ and an indicator of whether the state belongs to the Legal Amazon.
 
 **Options:**
 
-1.  **dataset**: there are three choices:  
+1.  **dataset**: there are three choices:\
     `"consumer_energy_consumption"`: monthly energy consumption and
-    consumers by State, Region or Electric Subsystem  
+    consumers by State, Region or Electric Subsystem\
     `"industrial_energy_consumption"`: monthly industrial energy
-    consumption by State or Subsystem  
+    consumption by State or Subsystem\
     `"national_energy_balance"`: yearly energy flow by account and
-    energy source  
+    energy source\
     `"energy_state_panel"`: yearly energy production by source and state
 
-2.  **raw_data**: there are two options:  
-    `TRUE`: if you want the data as it is originally.  
+2.  **raw_data**: there are two options:\
+    `TRUE`: if you want the data as it is originally.\
     `FALSE`: if you want the treated version of the data.
 
 3.  **geo_level**: only applies to `"consumer_energy_consumption"` and
@@ -5069,7 +5071,7 @@ is at: <https://datazoom.com.br/pt/>.
 To cite package `datazoom.amazonia` in publications use:
 
 > Data Zoom (2023). Data Zoom: Simplifying Access To Brazilian
-> Microdata.  
+> Microdata.\
 > <https://datazoom.com.br/en/>
 
 A BibTeX entry for LaTeX users is:
