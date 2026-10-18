@@ -42,8 +42,8 @@ install.packages("datazoom.amazonia")
 And the development version from GitHub with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("datazoompuc/datazoom.amazonia")
+# install.packages("remotes")
+remotes::install_github("datazoompuc/datazoom.amazonia")
 ```
 
 **[1 - Environmental data](#environmental-data)**
