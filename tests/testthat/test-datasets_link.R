@@ -95,6 +95,12 @@
 #      (were pointing at a dashboard app, not the real downloads landing
 #      page) but docs_url isn't one of datasets_link()'s returned columns,
 #      so that change doesn't touch this fixture.
+#      Update 2026-10-19 (issue #353): baci_dic/product_codes' url moved from
+#      balanca.economia.gov.br, whose TLS certificate expired 2026-10-03, to
+#      balanca.mdic.gov.br -- the same file, byte-identical (MD5 checked) --
+#      and the row is now owned by the baci resolver (resolve_baci.R). Still
+#      one new row, only its expected url changes; docs_url and resolver are
+#      not columns of this fixture.
 #  12. 2026-09-14: resolve_ips.R stopped being detect-only -- all 8 IPS
 #      rows' url moved off the manifest's old Google Drive link (confirmed
 #      owned by a personal gmail account, not Datazoom, not in Datazoom's
@@ -244,7 +250,7 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
       survey = "baci_dic", dataset = "product_codes",
       sidra_code = NA_character_, available_time = NA_character_,
       available_geo = NA_character_,
-      url = "https://balanca.economia.gov.br/balanca/bd/tabelas/NCM_SH.csv"
+      url = "https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM_SH.csv"
     ),
     # Delta #14 -- see file header. Genuinely new rows, not value changes.
     tibble::tibble(

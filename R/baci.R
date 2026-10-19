@@ -153,18 +153,25 @@ load_baci_dic <- function(language) {
   ## Download Dictionary ##
   #########################
 
-  # This table is Brazilian COMEX's own product-code dictionary
-  # (balanca.economia.gov.br), not part of CEPII's BACI archive itself --
-  # kept in the manifest under its own survey/dataset ("baci_dic"/
-  # "product_codes") rather than under "baci" so it doesn't pass
-  # check_params()'s dataset validation for load_baci() as if it were an
-  # actual BACI dataset. Reading it via dataset_url() (instead of the
-  # literal URL this used to hardcode) means the manifest's own resolver
-  # pipeline can at least see and HTTP-probe this dependency, even though it
-  # has no dedicated resolver of its own -- see resolve_epe.R's/
-  # resolve_baci.R's headers for what a resolver for it would look like if
-  # this URL ever needs one.
+  # This table is Brazilian COMEX's own product-code dictionary (NCM_SH.csv on
+  # the ministry's balanca host, balanca.mdic.gov.br since 2026-10-19), not
+  # part of CEPII's BACI archive itself -- kept in the manifest under its own
+  # survey/dataset ("baci_dic"/"product_codes") rather than under "baci" so it
+  # doesn't pass check_params()'s dataset validation for load_baci() as if it
+  # were an actual BACI dataset. Reading it via dataset_url() (never a
+  # literal) is what lets a host change be fixed through the manifest alone,
+  # for installed versions too. Its row is owned by resolve_baci.R, which
+  # re-checks it every run (see that file's 2026-10-19 note); until then the
+  # row had no resolver, so nothing noticed the old host's TLS certificate
+  # expire (2026-10-03) and load_baci() stopped here, after the multi-GB
+  # download (issue #353).
   url <- dataset_url(source = "baci_dic", dataset = "product_codes")
+  if (is.na(url)) {
+    stop(
+      "No download URL found for source 'baci_dic', dataset 'product_codes' -- ",
+      "the manifest has no such row (an outdated manifest or package snapshot?)."
+    )
+  }
 
   base::message("Downloading dictionary for product codes")
 
@@ -182,13 +189,23 @@ load_baci_dic <- function(language) {
 
   # Harmonizing names
 
-  # FRAGILE: co_sh6/no_sh6_por/no_sh6_ing are this off-manifest source's
-  # (balanca.economia.gov.br's NCM_SH.csv, a Brazilian COMEX table, not
-  # CEPII) column names after janitor::clean_names() -- if that table's
-  # headers change, this select() errors on a missing column rather than
-  # silently mismatching (dplyr::select() is at least loud about it), but
-  # there's no check anywhere before this point that catches it earlier or
-  # more clearly.
+  # FRAGILE: co_sh6/no_sh6_por/no_sh6_ing are NCM_SH.csv's column names (a
+  # Brazilian COMEX table, not CEPII's) after janitor::clean_names() --
+  # checked on the live header 2026-10-19 ("CO_SH6";"NO_SH6_POR";
+  # "NO_SH6_ESP";"NO_SH6_ING";"CO_SH4";...). This select() is NOT a guard:
+  # the "Bind Global Variables" NULLs at the top of this function make
+  # tidyselect resolve a missing column name to nothing, with only a
+  # deprecation warning, instead of erroring (measured 2026-10-19). So a
+  # renamed co_sh6 or no_sh6_ing vanishes here and fails one select() later
+  # under a misleading name ("Column `product_eng` doesn't exist" -- the same
+  # message the server's placeholder gets, see below), and a renamed
+  # no_sh6_por under language = "eng" would vanish without any error at all.
+  # The real guard is resolve_baci.R's BACI_DIC_REQUIRED check of the live
+  # header, once per run. That resolver also guards two things nothing here
+  # can: the file is Latin-1, not UTF-8 (verified at the byte level
+  # 2026-10-18; hence the Latin1 locale above), and a path that no longer
+  # exists does not 404 -- the host answers 200/206 with a text/plain Joomla
+  # placeholder, which read_delim() parses into a one-column table.
   dic <- dic %>%
     dplyr::select(
       "product_code" = co_sh6,

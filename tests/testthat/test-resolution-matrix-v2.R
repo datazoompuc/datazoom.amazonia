@@ -286,7 +286,9 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 33
   new_baci_dic <- new_snap[new_snap$survey == "baci_dic", ]
   expect_equal(nrow(new_baci_dic), 1)
   expect_equal(new_baci_dic$dataset, "product_codes")
-  expect_equal(new_baci_dic$url, "https://balanca.economia.gov.br/balanca/bd/tabelas/NCM_SH.csv")
+  # url moved to balanca.mdic.gov.br 2026-10-19 (issue #353; the old host's TLS
+  # certificate expired) -- same file, still one new row.
+  expect_equal(new_baci_dic$url, "https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM_SH.csv")
   new_snap <- new_snap[new_snap$survey != "baci_dic", ]
 
   # deter_pantanal and deter_non_forest are genuinely NEW rows too (delta
