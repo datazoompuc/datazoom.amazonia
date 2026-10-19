@@ -38,10 +38,13 @@
 #    verification: on a runner that cannot verify the chain it stop()s with a
 #    message that says why (see comex_transport_error()). Making CI trust the
 #    intermediate is a workflow decision, not something to hide in here:
-#    update-manifest.yaml has a "Trust SERPRO's intermediate CA" step (added
-#    2026-10-18) that downloads it from that AIA URL, refuses it unless it is
-#    the expected CA and chains to a root the runner already trusts, and adds
-#    it to the trust store. A scan of every host the manifest points at (same
+#    the composite action .github/actions/trust-serpro-intermediate (added
+#    2026-10-18; used by update-manifest.yaml, check-load-br-trade.yaml and,
+#    for its load_br_trade job, check-dz-amazonia.yaml) downloads it from
+#    that AIA URL, refuses it unless it is the expected CA and chains to a
+#    root the runner already trusts, and adds it to the trust store. This
+#    fixes CI only: an ordinary Linux user still hits the incomplete chain.
+#    A scan of every host the manifest points at (same
 #    Linux-like libcurl, 2026-10-18) found only the two balanca.* hosts with
 #    this problem; the other 20 verify, or fail for non-TLS reasons.
 #
@@ -129,8 +132,9 @@ comex_transport_error <- function(url, curl_msg) {
       "certificate without the intermediate CA, which Windows and browsers fetch on their own ",
       "but OpenSSL does not (see this file's header, point 2): add the intermediate (",
       "'AC SERPRO AR46 OV TLS CA 2025', http://secure.globalsign.com/cacert/acserproar46ovtlsca2025.crt) ",
-      "to the runner's trust store -- never turn verification off. update-manifest.yaml's ",
-      "\"Trust SERPRO's intermediate CA\" step does exactly that; if this is a CI run, its log says why it did not"
+      "to the runner's trust store -- never turn verification off. The \"Trust SERPRO's ",
+      "intermediate CA\" workflow step (.github/actions/trust-serpro-intermediate) does exactly that; ",
+      "if this is a CI run, its log says why it did not"
     )
   } else {
     "no HTTP response (DNS, connection, timeout or TLS failure)"

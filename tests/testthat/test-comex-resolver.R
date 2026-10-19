@@ -280,3 +280,55 @@ test_that("the committed manifest rows agree with what the resolver owns and emi
   expect_true(all(m$docs_url == COMEX_DOCS_URL))
   expect_true(all(grepl("^1997-[0-9]{4}$", m$available_time)))
 })
+
+test_that("the CI wiring that lets a Linux runner verify balanca.mdic.gov.br is in place and never weakens TLS", {
+  # The host omits its intermediate CA (resolve_comex.R's header, point 2), so
+  # every workflow that downloads from it needs the composite action below.
+  # Nothing fails loudly if someone drops the step -- COMEX just goes red on
+  # Linux again -- hence this guard. .github/ is .Rbuildignore'd: skipped there.
+  skip_if_not_installed("yaml")
+  action_path <- file.path(pkg_root, ".github", "actions", "trust-serpro-intermediate", "action.yml")
+  skip_if_not(file.exists(action_path), ".github/ not present (stripped build)")
+
+  action <- yaml::read_yaml(action_path)
+  expect_equal(action$runs$using, "composite")
+  scripts <- vapply(action$runs$steps, function(s) {
+    expect_equal(s$shell, "bash") # every composite `run` step must name its shell
+    s$run
+  }, character(1))
+  script <- paste(scripts, collapse = "\n")
+  # the safety properties, in the script itself
+  expect_match(script, "AC SERPRO AR46 OV TLS CA 2025", fixed = TRUE) # refuses any other certificate
+  expect_match(script, "openssl verify -CAfile /etc/ssl/certs/ca-certificates.crt", fixed = TRUE) # must chain to a root already trusted
+  expect_false(grepl("--insecure|curl[^\n]* -k |ssl_verifypeer|verify=False|NODE_TLS_REJECT_UNAUTHORIZED|GIT_SSL_NO_VERIFY", script))
+
+  step_ref <- "./.github/actions/trust-serpro-intermediate"
+  wired <- list(
+    "update-manifest.yaml" = list(job = "refresh-manifest", before = "Run build_manifest.R", after = "Install resolver + package dependencies"),
+    "check-load-br-trade.yaml" = list(job = "check", before = "Run checks for load_br_trade", after = "r-lib/actions/setup-r-dependencies@v2"),
+    "check-dz-amazonia.yaml" = list(job = "check-downloads", before = "Run checks for one function", after = "Install package dependencies")
+  )
+  for (wf_name in names(wired)) {
+    wf <- yaml::read_yaml(file.path(pkg_root, ".github", "workflows", wf_name))
+    job <- wf$jobs[[wired[[wf_name]]$job]]
+    expect_equal(job$`runs-on`, "ubuntu-latest", info = wf_name) # the step is Linux-only (sudo, update-ca-certificates)
+    steps <- job$steps
+    label <- function(s) {
+      if (!is.null(s$name)) s$name else if (!is.null(s$uses)) s$uses else ""
+    }
+    labels <- vapply(steps, label, character(1))
+    i_use <- which(vapply(steps, function(s) identical(s$uses, step_ref), logical(1)))
+    expect_length(i_use, 1)
+    expect_true(isTRUE(steps[[i_use]]$`continue-on-error`), info = wf_name) # a failure must not take down the whole job
+    expect_gt(i_use, which(labels == wired[[wf_name]]$after)[1]) # after the dependencies are installed ...
+    expect_lt(i_use, which(labels == wired[[wf_name]]$before)[1]) # ... before the R script that downloads
+    text_of <- function(x) if (is.null(x)) "" else x
+    expect_lt(which(vapply(steps, function(s) grepl("actions/checkout", text_of(s$uses)), logical(1)))[1], i_use) # a local action needs the checkout first
+    # no leftover inline copy of the script next to the action
+    expect_false(any(vapply(steps, function(s) grepl("acserproar46ovtlsca2025", text_of(s$run)), logical(1))), info = wf_name)
+  }
+  # only the load_br_trade job of the matrix workflow gets it: the other 21 are untouched
+  matrix_step <- yaml::read_yaml(file.path(pkg_root, ".github", "workflows", "check-dz-amazonia.yaml"))$jobs[["check-downloads"]]$steps
+  matrix_step <- Filter(function(s) identical(s$uses, step_ref), matrix_step)[[1]]
+  expect_equal(matrix_step$`if`, "matrix.fn == 'load_br_trade'")
+})
