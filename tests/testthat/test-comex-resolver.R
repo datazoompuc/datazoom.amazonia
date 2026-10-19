@@ -34,6 +34,29 @@ comex_rows <- tibble::tibble(
   survey = "comex", dataset = comex_datasets,
   geo_level = NA_character_, year = NA_character_
 )
+# The two dictionaries load_trade_dic() reads: manifest survey "comex_dic".
+comex_dictionaries <- c("hs_codes", "ncm_codes")
+all_rows <- tibble::tibble(
+  survey = c(rep("comex", 4), rep("comex_dic", 2)), dataset = c(comex_datasets, comex_dictionaries),
+  geo_level = NA_character_, year = NA_character_
+)
+dictionary_rows <- all_rows[all_rows$survey == "comex_dic", ]
+
+# The header line the real dictionaries start with (read live 2026-10-19).
+dictionary_header_line <- function(dataset, drop = character(0)) {
+  cols <- switch(dataset,
+    hs_codes = c(
+      "CO_SH6", "NO_SH6_POR", "NO_SH6_ESP", "NO_SH6_ING", "CO_SH4", "NO_SH4_POR", "NO_SH4_ESP",
+      "NO_SH4_ING", "CO_SH2", "NO_SH2_POR", "NO_SH2_ESP", "NO_SH2_ING", "CO_NCM_SECROM",
+      "NO_SEC_POR", "NO_SEC_ESP", "NO_SEC_ING"
+    ),
+    ncm_codes = c(
+      "CO_NCM", "CO_UNID", "CO_SH6", "CO_PPE", "CO_PPI", "CO_FAT_AGREG", "CO_CUCI_ITEM",
+      "CO_CGCE_N3", "CO_SIIT", "CO_ISIC_CLASSE", "CO_EXP_SUBSET", "NO_NCM_POR", "NO_NCM_ESP", "NO_NCM_ING"
+    )
+  )
+  paste0('"', setdiff(cols, drop), '"', collapse = ";")
+}
 
 # The header line each dataset's real files start with (measured live).
 header_line <- function(dataset, drop = character(0)) {
@@ -70,13 +93,32 @@ status_response <- function(status, ctype = "text/html") {
 
 # A fake COMEX server. `years` = which years exist per dataset; `drop` =
 # columns missing from a given dataset's files (optionally only some years);
-# `override` = function(dataset, year) -> a response, or NULL to fall through.
-fake_comex <- function(years = NULL, drop = list(), override = function(dataset, year) NULL, seen = NULL) {
+# `dictionaries` = which of the two dictionaries exist (a missing one answers
+# with the placeholder, like any wrong path); `override` = function(dataset,
+# year) -> a response, or NULL to fall through (year is NA for a dictionary).
+fake_comex <- function(years = NULL, drop = list(), override = function(dataset, year) NULL, seen = NULL,
+                       dictionaries = comex_dictionaries) {
   if (is.null(years)) {
     years <- stats::setNames(rep(list(1997:2026), length(comex_datasets)), comex_datasets)
   }
   function(url, handle = NULL, ...) {
     if (!is.null(seen)) seen$urls <- c(seen$urls, url)
+    d <- regmatches(url, regexec("/balanca/bd/tabelas/(NCM_SH|NCM)\\.csv$", url))[[1]]
+    if (length(d) > 0) {
+      dataset <- c(NCM_SH = "hs_codes", NCM = "ncm_codes")[[d[2]]]
+      o <- override(dataset, NA_integer_)
+      if (!is.null(o)) {
+        return(o)
+      }
+      if (!dataset %in% dictionaries) {
+        return(placeholder_response())
+      }
+      return(list(
+        status_code = 206L,
+        headers = charToRaw("HTTP/1.1 206 Partial Content\r\ncontent-type: text/csv\r\ncontent-range: bytes 0-4095/3356175\r\n\r\n"),
+        content = charToRaw(paste0(dictionary_header_line(dataset, drop[[dataset]]), '\n"49011000";"10"\n'))
+      ))
+    }
     m <- regmatches(url, regexec("/comexstat-bd/(mun|ncm)/(EXP|IMP)_([0-9]{4})(_MUN)?\\.csv$", url))[[1]]
     if (length(m) == 0) {
       return(placeholder_response())
@@ -225,13 +267,74 @@ test_that("any other transport failure is reported as no HTTP response, with cur
 
 test_that("a dataset this resolver does not know, or no rows, stops", {
   rows <- tibble::tibble(survey = "comex", dataset = "export_sh6", geo_level = NA_character_, year = NA_character_)
-  expect_match(error_message(fake_comex(), rows), "only knows export_mun, import_mun, export_prod, import_prod", fixed = TRUE)
+  expect_match(error_message(fake_comex(), rows), "only knows export_mun, import_mun, export_prod, import_prod, hs_codes, ncm_codes", fixed = TRUE)
   expect_match(error_message(fake_comex(), comex_rows[0, ]), "no manifest rows tagged resolver == 'comex'", fixed = TRUE)
+})
+
+test_that("the two dictionaries are verified and emitted under survey comex_dic, with no available_time", {
+  seen <- new.env()
+  out <- run(fake_comex(seen = seen), rows = all_rows)
+
+  # one output row per input row, same order, each under its own survey
+  expect_equal(out$survey, all_rows$survey)
+  expect_equal(out$dataset, all_rows$dataset)
+  expect_equal(out$url[5:6], c(
+    "https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM_SH.csv",
+    "https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM.csv"
+  ))
+  expect_equal(out$docs_url, rep(COMEX_DOCS_URL, 6))
+  # the dictionaries have no years: NA = "leave the cell alone"; the yearly rows are unchanged
+  expect_true(all(is.na(out$available_time[5:6])))
+  expect_equal(out$available_time[1:4], rep("1997-2026", 4))
+  expect_equal(out$url[1:4], run(fake_comex(), rows = comex_rows)$url)
+  # both were really probed, on the current host only
+  expect_true(all(c(
+    "https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM_SH.csv",
+    "https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM.csv"
+  ) %in% seen$urls))
+  expect_true(all(startsWith(seen$urls, COMEX_HOST)))
+})
+
+test_that("dictionary rows alone are resolved without probing any yearly file", {
+  seen <- new.env()
+  out <- run(fake_comex(seen = seen), rows = dictionary_rows)
+  expect_equal(out$dataset, comex_dictionaries)
+  expect_length(seen$urls, 2)
+  expect_false(any(grepl("comexstat-bd", seen$urls, fixed = TRUE)))
+})
+
+test_that("a dictionary that is not a real CSV (the server's 200 text/plain placeholder) stops", {
+  msg <- error_message(fake_comex(dictionaries = "ncm_codes"), rows = dictionary_rows)
+  expect_match(msg, "no real CSV (text/csv) found for dictionary 'hs_codes'", fixed = TRUE)
+  expect_match(msg, "tabelas/NCM_SH.csv", fixed = TRUE)
+  expect_match(msg, "text/plain placeholder", fixed = TRUE)
+})
+
+test_that("a dictionary missing a column load_trade_dic() selects stops, naming it", {
+  msg <- error_message(fake_comex(drop = list(hs_codes = "NO_SH4_ING")), rows = dictionary_rows)
+  expect_match(msg, "dictionary 'hs_codes'", fixed = TRUE)
+  expect_match(msg, "missing NO_SH4_ING", fixed = TRUE)
+
+  msg <- error_message(fake_comex(drop = list(ncm_codes = c("CO_NCM", "NO_NCM_POR"))), rows = dictionary_rows)
+  expect_match(msg, "dictionary 'ncm_codes'", fixed = TRUE)
+  expect_match(msg, "missing CO_NCM, NO_NCM_POR", fixed = TRUE)
+
+  # columns the loader does not read are free to come and go (NCM_SH.csv has 16, NCM.csv 14)
+  expect_equal(run(fake_comex(drop = list(hs_codes = "NO_SEC_ING")), rows = dictionary_rows)$dataset, comex_dictionaries)
+})
+
+test_that("a row under the wrong survey is refused: a dictionary under 'comex' would pass as a dataset of load_br_trade()", {
+  wrong <- all_rows[all_rows$dataset %in% c("export_mun", "hs_codes"), ]
+  wrong$survey <- c("comex_dic", "comex") # swapped
+  msg <- error_message(fake_comex(), rows = wrong)
+  expect_match(msg, "under the wrong survey", fixed = TRUE)
+  expect_match(msg, "comex_dic/export_mun", fixed = TRUE)
+  expect_match(msg, "comex/hs_codes", fixed = TRUE)
 })
 
 test_that("header parsing tolerates a BOM, quotes, case and garbage bytes", {
   expect_equal(
-    comex_header_columns(charToRaw("﻿\"co_ano\";\"CO_MES\";SH4\r\n\"2025\";\"01\"\n")),
+    comex_header_columns(charToRaw(paste0(intToUtf8(0xFEFF), "\"co_ano\";\"CO_MES\";SH4\r\n\"2025\";\"01\"\n"))),
     c("CO_ANO", "CO_MES", "SH4")
   )
   expect_equal(comex_header_columns(raw(0)), character(0))
@@ -250,35 +353,102 @@ test_that("the columns the resolver demands are the ones R/comex.R actually read
       )
     }
   }
+  # the dictionaries' columns, which load_trade_dic()'s callers select
+  for (dataset in comex_dictionaries) {
+    for (col in COMEX_DICTIONARIES[[dataset]]$required) {
+      expect_true(
+        grepl(paste0("\\b", tolower(col), "\\b"), src),
+        info = paste(dataset, col, "is required by resolve_comex.R but R/comex.R never mentions it")
+      )
+    }
+  }
 })
 
-test_that("R/comex.R's hard-coded dictionary host is the one the resolver publishes", {
-  # load_trade_dic() builds NCM.csv / NCM_SH.csv URLs from a literal no
-  # resolver touches; on 2026-10-03 the old host's certificate expired and
-  # that literal broke load_br_trade() while the manifest's data URLs were
-  # fine. Keep them on the same host.
+test_that("the manifest is the single source of truth for the dictionary URLs: R/comex.R hard-codes none", {
+  # Until 2026-10-19 load_trade_dic() built NCM.csv / NCM_SH.csv URLs from a
+  # literal no resolver touched. When the old host's certificate expired
+  # (2026-10-03) the manifest could be fixed for every user at once, but that
+  # literal reached users only with a new package version. They are manifest
+  # rows now (survey "comex_dic"); this keeps a URL from creeping back in.
   comex_src <- file.path(pkg_root, "R", "comex.R")
   skip_if_not(file.exists(comex_src), "R/comex.R not present")
-  lines <- readLines(comex_src, warn = FALSE)
-  lines <- lines[!grepl("^\\s*#", lines)] # code only, not the comments citing old URLs
-  path_line <- grep('path <- "https://', lines, fixed = TRUE, value = TRUE)
-  expect_length(path_line, 1)
-  dictionary_base <- sub('.*path <- "([^"]+)".*', "\\1", path_line)
-  expect_equal(dictionary_base, paste0(COMEX_HOST, "/balanca/bd/"))
-  expect_false(any(grepl("economia.gov.br", lines, fixed = TRUE)))
+
+  # (a) statically: no URL at all in the code (comments may still cite examples)
+  code <- readLines(comex_src, warn = FALSE)
+  code <- code[!grepl("^\\s*#", code)]
+  expect_false(any(grepl("https?://", code)), info = "R/comex.R's code must not contain a URL literal")
+  expect_true(any(grepl('dataset_url(source = "comex_dic"', code, fixed = TRUE)))
+
+  skip_if_not(exists("load_trade_dic", mode = "function"), "package code not loaded")
+
+  # (b) behaviorally: what load_trade_dic() reads is exactly what the manifest
+  # lookup returns, for each dictionary -- a made-up manifest drives it.
+  seen <- character(0)
+  read_spy <- function(file, ...) {
+    seen <<- c(seen, file)
+    tibble::tibble(co_sh4 = "0101", no_sh4_por = "a", no_sh4_ing = "b")
+  }
+  lookup <- function(source, dataset, ...) paste0("manifest://", source, "/", dataset)
+  load_with <- function(type, dataset_url_fn = lookup) {
+    testthat::with_mocked_bindings(
+      testthat::with_mocked_bindings(load_trade_dic(type), read_delim = read_spy, .package = "readr"),
+      dataset_url = dataset_url_fn, .package = "datazoom.amazonia"
+    )
+  }
+  suppressMessages({
+    load_with("hs")
+    load_with("ncm")
+  })
+  expect_equal(seen, c("manifest://comex_dic/hs_codes", "manifest://comex_dic/ncm_codes"))
+
+  # (c) and the committed manifest supplies them (setup.R forces the local snapshot)
+  expect_equal(dataset_url(source = "comex_dic", dataset = "hs_codes"), paste0(COMEX_BD, "tabelas/NCM_SH.csv"))
+  expect_equal(dataset_url(source = "comex_dic", dataset = "ncm_codes"), paste0(COMEX_BD, "tabelas/NCM.csv"))
+
+  # (d) a manifest without the row, or an unknown type, fails with a clear
+  # message instead of handing NA / an undefined variable to read_delim()
+  expect_error(
+    load_with("hs", function(source, dataset, ...) NA_character_),
+    "No download URL found for source 'comex_dic', dataset 'hs_codes'",
+    fixed = TRUE
+  )
+  expect_error(load_with("cuci"), "unknown dictionary type 'cuci'", fixed = TRUE)
 })
 
 test_that("the committed manifest rows agree with what the resolver owns and emits", {
   manifest_path <- file.path(pkg_root, "inst", "extdata", "manifest", "v1", "datasets_link.csv")
   skip_if_not(file.exists(manifest_path), "manifest not present")
-  m <- utils::read.csv(manifest_path, colClasses = "character", na.strings = "")
-  m <- m[m$survey == "comex", ]
+  all_m <- utils::read.csv(manifest_path, colClasses = "character", na.strings = "")
+  m <- all_m[all_m$survey == "comex", ]
   expect_setequal(m$dataset, comex_datasets)
   expect_true(all(m$resolver == "comex"))
   expect_true(all(startsWith(m$url, COMEX_BASE)))
   expect_true(all(grepl("$year$", m$url, fixed = TRUE)))
   expect_true(all(m$docs_url == COMEX_DOCS_URL))
   expect_true(all(grepl("^1997-[0-9]{4}$", m$available_time)))
+
+  # the two dictionaries: own survey, same resolver, plain URL on the same host, no years
+  d <- all_m[all_m$survey == COMEX_DICTIONARY_SURVEY, ]
+  expect_setequal(d$dataset, comex_dictionaries)
+  expect_true(all(d$resolver == "comex"))
+  expect_true(all(d$docs_url == COMEX_DOCS_URL))
+  expect_true(all(is.na(d$available_time) & is.na(d$geo_level) & is.na(d$year)))
+  expect_equal(
+    stats::setNames(d$url, d$dataset)[comex_dictionaries],
+    stats::setNames(paste0(COMEX_BD, vapply(COMEX_DICTIONARIES[comex_dictionaries], function(s) s$path, "")), comex_dictionaries)
+  )
+})
+
+test_that("a dictionary is not a dataset of load_br_trade(): that is why it has its own survey", {
+  skip_if_not(exists("check_params", mode = "function"), "package code not loaded")
+  # check_params() validates a dataset against EVERY row of its survey. Under
+  # "comex" these two would be accepted and then crash inside load_br_trade();
+  # under "comex_dic" the validation rejects them up front.
+  expect_error(
+    check_params(list(source = "comex", dataset = "hs_codes", time_period = 2020)),
+    "Dataset hs_codes not supported"
+  )
+  expect_no_error(check_params(list(source = "comex", dataset = "export_mun", time_period = 2020)))
 })
 
 test_that("the CI wiring that lets a Linux runner verify balanca.mdic.gov.br is in place and never weakens TLS", {

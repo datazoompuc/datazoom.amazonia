@@ -266,35 +266,46 @@ load_trade_dic <- function(type) {
   ## Download Dictionary ##
   #########################
 
-  # FRAGILE: these two dictionary URLs are hard-coded here, NOT read from the
-  # manifest (NCM_SH.csv is also the manifest's baci_dic/product_codes row,
-  # which still points at the old host; NCM.csv is in no manifest row), so
-  # nothing resolves or probes them: the yearly data URLs move with
-  # resolve_comex.R, this host does not. The host must be the one the
-  # ministry's open-data page links, balanca.mdic.gov.br -- until 2026-10-18
-  # this said balanca.economia.gov.br, whose TLS certificate expired
-  # 2026-10-03, which made load_br_trade() fail at this download even though
-  # the yearly files were fine. Verified live 2026-10-18: both files are
-  # byte-identical on the two hosts (same MD5), are Latin-1, not UTF-8 (so
-  # the Latin1 locale below is right), and carry the columns used here
-  # (co_sh4 / no_sh4_por / no_sh4_ing for NCM_SH.csv; co_ncm / no_ncm_por /
-  # no_ncm_ing for NCM.csv). If resolve_comex.R's COMEX_HOST ever changes
-  # again, change this too (test-comex-resolver.R fails if they disagree).
-  path <- "https://balanca.mdic.gov.br/balanca/bd/"
-
-  if (type == "hs") {
-    final <- paste(path, "tabelas/NCM_SH.csv", sep = "")
-  } # Harmonized System
-  if (type == "ncm") {
-    final <- paste(path, "tabelas/NCM.csv", sep = "")
+  # Dictionary type -> the manifest dataset (survey "comex_dic") holding its URL:
+  # "hs" = the Harmonized System table (NCM_SH.csv), "ncm" = NCM.csv. Other
+  # tables exist under tabelas/ (the old commented-out code named NCM_CUCI.csv,
+  # NCM_ISIC.csv, NCM_CGCE.csv, NCM_FAT_AGREG.csv, NCM_PPE.csv, NCM_PPI.csv --
+  # not verified, not used); adding one means a comex_dic manifest row, an entry
+  # in resolve_comex.R's COMEX_DICTIONARIES, and a case here.
+  dic_dataset <- unname(c(hs = "hs_codes", ncm = "ncm_codes")[type])
+  if (length(dic_dataset) != 1 || is.na(dic_dataset)) {
+    stop("load_trade_dic(): unknown dictionary type '", paste(type, collapse = ", "), "' -- expected 'hs' or 'ncm'.")
   }
-  # if (type == 'cuci'){final = paste(path,'tabelas/NCM_CUCI.csv',sep='')}
-  # if (type == 'isic'){final = paste(path,'tabelas/NCM_ISIC.csv',sep='')}
-  # if (type == 'cgce'){final = paste(path,'tabelas/NCM_CGCE.csv',sep='')}
-  # if (type == 'aggreg'){final = paste(path,'tabelas/NCM_FAT_AGREG.csv',sep='')}
-  # if (type == 'ppe'){final = paste(path,'tabelas/NCM_PPE.csv',sep='')}
-  # if (type == 'ppi'){final = paste(path,'tabelas/NCM_PPI.csv',sep='')}
 
+  # FRAGILE: the dictionary URLs come from the manifest (survey "comex_dic",
+  # rows hs_codes = NCM_SH.csv and ncm_codes = NCM.csv, owned by
+  # actions/scrapers/resolve_comex.R, which re-probes them every run) and are
+  # NOT hard-coded here any more: until 2026-10-19 they were literals, so when
+  # the old host's TLS certificate expired (2026-10-03) the manifest could be
+  # fixed for every user at once but this could not, and load_br_trade() stayed
+  # broken for everyone who had not installed a new version. Nothing checks them
+  # at load time, though: a path that no longer exists does not 404 -- this
+  # server answers 200/206 with a text/plain Joomla placeholder, which
+  # read_delim() parses into a one-column table, and the select() further down
+  # then fails with "Column `co_sh4` doesn't exist" (measured 2026-10-19).
+  # resolve_comex.R rejects such a URL before it is ever published; that is the
+  # only guard. NCM_SH.csv is also the manifest's baci_dic/product_codes row
+  # (R/baci.R), which is a separate row and is not covered by that resolver.
+  final <- dataset_url(source = "comex_dic", dataset = dic_dataset)
+  if (is.na(final)) {
+    stop(
+      "No download URL found for source 'comex_dic', dataset '", dic_dataset, "' -- the manifest has no such row ",
+      "(an outdated manifest or package snapshot?)."
+    )
+  }
+
+  # FRAGILE: both files are Latin-1, not UTF-8 -- verified at the byte level
+  # 2026-10-18 (neither is valid UTF-8; the accented names decode correctly as
+  # Latin-1), hence the Latin1 locale below. Downstream, the columns are used by
+  # name after clean_names(): co_sh4 / no_sh4_por / no_sh4_ing (NCM_SH.csv) and
+  # co_ncm / no_ncm_por / no_ncm_ing (NCM.csv), checked on the live headers
+  # 2026-10-19 (e.g. "CO_NCM";...;"NO_NCM_ING") and again by resolve_comex.R's
+  # COMEX_DICTIONARIES$required on every run.
   dic <- readr::read_delim(final, delim = ";", locale = readr::locale(encoding = "Latin1"), progress = TRUE)
 
   #####################

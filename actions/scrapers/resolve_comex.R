@@ -92,17 +92,38 @@
 #    header of 1997, 2025 and 2026 (identical per dataset) and, now, of every
 #    probed year on each run. Extra columns are fine and expected: the NCM
 #    import files also carry VL_FRETE and VL_SEGURO, which the loader ignores.
-#    The loader also downloads two dictionaries (NCM.csv, NCM_SH.csv, Latin-1)
-#    with URLs hard-coded in R/comex.R's load_trade_dic(), which no resolver
-#    touches. They are byte-identical on both hosts (same MD5, 2026-10-18)
-#    and R/comex.R now points them at COMEX_HOST's host; keep the two in step
-#    (test-comex-resolver.R checks it).
+#
+# 8. THE TWO DICTIONARIES ARE MANIFEST ROWS TOO (added 2026-10-19). The loader
+#    joins its data with NCM.csv and NCM_SH.csv (Latin-1, byte-identical on both
+#    hosts, same MD5, 2026-10-18). Their URLs used to be literals in R/comex.R's
+#    load_trade_dic(), which no resolver touched and which reach users only with
+#    a new package version: when the old host's certificate expired, the manifest
+#    could be fixed for everyone at once but the dictionaries could not. They are
+#    now rows of survey "comex_dic" -- a survey of its own, like baci_dic, because
+#    check_params() validates a dataset against every row of its survey, so
+#    dictionary rows under "comex" would pass as datasets of load_br_trade() and
+#    crash later -- named hs_codes (NCM_SH.csv, the Harmonized System table used
+#    by the municipality datasets) and ncm_codes (NCM.csv, used by the NCM
+#    datasets), and are owned by this resolver. Each run it probes them exactly
+#    like a yearly file (real text/csv only: a wrong path is the same 200/206
+#    text/plain placeholder as in point 3, which read_delim() parses into a
+#    one-column table and R/comex.R's select() then rejects with the obscure
+#    "Column `co_sh4` doesn't exist" -- measured 2026-10-19) and checks the raw
+#    columns load_trade_dic() selects (COMEX_DICTIONARIES$required, read from
+#    the live headers 2026-10-19: CO_NCM / NO_NCM_POR / NO_NCM_ING in NCM.csv,
+#    CO_SH4 / NO_SH4_POR / NO_SH4_ING in NCM_SH.csv). They have no years, so
+#    their available_time stays empty. NOT covered: baci_dic, which is the
+#    same NCM_SH.csv file under another survey (R/baci.R reads it), still on
+#    the old host and deliberately left alone here -- tracked in its own issue.
 #
 # Emits one row per manifest row it owns (every real dataset, never NA), with
-# `url` (the `$year$` template on COMEX_HOST), `docs_url` and `available_time`.
+# `url` (the `$year$` template on COMEX_HOST for the yearly datasets, the plain
+# file URL for the dictionaries), `docs_url` and, for the yearly datasets,
+# `available_time`.
 
 COMEX_HOST <- "https://balanca.mdic.gov.br"
-COMEX_BASE <- paste0(COMEX_HOST, "/balanca/bd/comexstat-bd/")
+COMEX_BD <- paste0(COMEX_HOST, "/balanca/bd/") # parent of both comexstat-bd/ (yearly data) and tabelas/ (dictionaries)
+COMEX_BASE <- paste0(COMEX_BD, "comexstat-bd/")
 COMEX_DOCS_URL <- "https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta"
 
 # Raw header columns R/comex.R selects for each dataset (before clean_names()).
@@ -116,6 +137,17 @@ COMEX_DATASETS <- list(
   import_mun = list(path = "mun/IMP_$year$_MUN.csv", required = COMEX_MUN_COLUMNS),
   export_prod = list(path = "ncm/EXP_$year$.csv", required = COMEX_NCM_COLUMNS),
   import_prod = list(path = "ncm/IMP_$year$.csv", required = COMEX_NCM_COLUMNS)
+)
+
+# The two product dictionaries load_br_trade() joins its data with (R/comex.R's
+# load_trade_dic()). One file each, no years, under tabelas/. They live in the
+# manifest as survey "comex_dic" -- its own survey, like baci_dic -- so they
+# cannot pass check_params()'s dataset validation for load_br_trade() as if
+# they were datasets of it. Required: the raw columns load_trade_dic() selects.
+COMEX_DICTIONARY_SURVEY <- "comex_dic"
+COMEX_DICTIONARIES <- list(
+  hs_codes = list(path = "tabelas/NCM_SH.csv", required = c("CO_SH4", "NO_SH4_POR", "NO_SH4_ING")),
+  ncm_codes = list(path = "tabelas/NCM.csv", required = c("CO_NCM", "NO_NCM_POR", "NO_NCM_ING"))
 )
 
 # A transport-level failure (no HTTP response at all) -> a stop() message that
@@ -150,7 +182,7 @@ comex_header_columns <- function(content) {
     return(character(0))
   }
   txt <- iconv(rawToChar(content[content != as.raw(0)]), from = "UTF-8", to = "UTF-8", sub = "?")
-  line <- sub("[\r\n].*$", "", sub("^﻿", "", txt))
+  line <- sub("[\r\n].*$", "", sub("^\ufeff", "", txt))
   toupper(trimws(gsub('"', "", strsplit(line, ";", fixed = TRUE)[[1]], fixed = TRUE)))
 }
 
@@ -164,12 +196,25 @@ resolve_comex <- function(rows) {
   if (!requireNamespace("curl", quietly = TRUE)) {
     stop("resolve_comex() needs the 'curl' package (CI-only; not a package Import).")
   }
-  unknown <- setdiff(unique(rows$dataset), names(COMEX_DATASETS))
+  known <- c(names(COMEX_DATASETS), names(COMEX_DICTIONARIES))
+  unknown <- setdiff(unique(rows$dataset), known)
   if (length(unknown) > 0) {
     stop(
       "resolve_comex(): manifest row(s) for dataset(s) ", paste(unknown, collapse = ", "),
       " are tagged resolver == 'comex' but this resolver only knows ",
-      paste(names(COMEX_DATASETS), collapse = ", "), "."
+      paste(known, collapse = ", "), "."
+    )
+  }
+  # A dictionary row under survey "comex" would pass load_br_trade()'s dataset
+  # validation as if it were one of its datasets (and crash later); a data row
+  # under "comex_dic" would be unreachable. Refuse either, loudly.
+  expected_survey <- ifelse(rows$dataset %in% names(COMEX_DICTIONARIES), COMEX_DICTIONARY_SURVEY, "comex")
+  wrong <- rows$survey != expected_survey
+  if (any(wrong)) {
+    stop(
+      "resolve_comex(): row(s) ", paste0(rows$survey[wrong], "/", rows$dataset[wrong], collapse = ", "),
+      " are under the wrong survey -- the yearly datasets belong to 'comex', the two dictionaries to '",
+      COMEX_DICTIONARY_SURVEY, "'."
     )
   }
 
@@ -207,8 +252,33 @@ resolve_comex <- function(rows) {
   this_year <- as.integer(format(Sys.Date(), "%Y"))
   candidate_years <- 1995:(this_year + 1) # two below the first real year, one past the current one
 
+  # The dictionaries: one file each, same probe (so the same real-Content-Type
+  # check -- a wrong path answers 206/200 text/plain, which read_delim() would
+  # happily parse into a one-column table and R/comex.R's select() then fail
+  # on with "Column `co_sh4` doesn't exist", verified live 2026-10-19) and the
+  # same required-columns check against what load_trade_dic() selects.
+  for (dataset in intersect(unique(rows$dataset), names(COMEX_DICTIONARIES))) {
+    spec <- COMEX_DICTIONARIES[[dataset]]
+    url <- paste0(COMEX_BD, spec$path)
+    p <- probe(url)
+    if (p$kind != "file") {
+      stop(
+        "resolve_comex(): no real CSV (text/csv) found for dictionary '", dataset, "' at ", url,
+        " -- the path or the host may have changed (a missing path answers with a text/plain placeholder, not a 404)."
+      )
+    }
+    missing_cols <- setdiff(spec$required, p$columns)
+    if (length(missing_cols) > 0) {
+      stop(
+        "resolve_comex(): dictionary '", dataset, "' at ", url, " no longer carries the columns ",
+        "R/comex.R's load_trade_dic() selects -- missing ", paste(missing_cols, collapse = ", "),
+        ". Fix R/comex.R's column handling before publishing it."
+      )
+    }
+  }
+
   ranges <- list()
-  for (dataset in unique(rows$dataset)) {
+  for (dataset in intersect(unique(rows$dataset), names(COMEX_DATASETS))) {
     spec <- COMEX_DATASETS[[dataset]]
     template <- paste0(COMEX_BASE, spec$path)
     real <- integer(0)
@@ -249,13 +319,18 @@ resolve_comex <- function(rows) {
     ranges[[dataset]] <- paste(min(real), max(real), sep = "-")
   }
 
+  # One output row per input row, in the same order. The dictionaries have no
+  # years, so their available_time is NA -- "leave it alone" (SKILL.md), same
+  # as the blank cell baci_dic carries.
   tibble::tibble(
-    survey = "comex",
+    survey = rows$survey,
     dataset = rows$dataset,
     geo_level = rows$geo_level,
     year = rows$year,
-    url = paste0(COMEX_BASE, vapply(rows$dataset, function(d) COMEX_DATASETS[[d]]$path, character(1))),
+    url = vapply(rows$dataset, function(d) {
+      if (d %in% names(COMEX_DICTIONARIES)) paste0(COMEX_BD, COMEX_DICTIONARIES[[d]]$path) else paste0(COMEX_BASE, COMEX_DATASETS[[d]]$path)
+    }, character(1), USE.NAMES = FALSE),
     docs_url = COMEX_DOCS_URL,
-    available_time = unname(unlist(ranges[rows$dataset]))
+    available_time = vapply(rows$dataset, function(d) if (d %in% names(ranges)) ranges[[d]] else NA_character_, character(1), USE.NAMES = FALSE)
   )
 }

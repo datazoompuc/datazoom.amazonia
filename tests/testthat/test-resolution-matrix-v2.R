@@ -329,6 +329,21 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 41
   )
   new_snap <- new_snap[!(new_snap$survey == "deter" & new_snap$dataset %in% c("deter_pantanal", "deter_non_forest")), ]
 
+  # comex_dic/hs_codes and comex_dic/ncm_codes are genuinely NEW rows as well
+  # (delta #16, 2026-10-19, test-datasets_link.R): the two product
+  # dictionaries load_br_trade() reads, moved from literals in R/comex.R into
+  # the manifest. A new row adds no changed cell, so the count below stays 41.
+  new_comex_dic <- new_snap[new_snap$survey == "comex_dic", ]
+  expect_setequal(new_comex_dic$dataset, c("hs_codes", "ncm_codes"))
+  expect_equal(
+    sort(new_comex_dic$url),
+    sort(c(
+      "https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM_SH.csv",
+      "https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM.csv"
+    ))
+  )
+  new_snap <- new_snap[new_snap$survey != "comex_dic", ]
+
   expect_equal(nrow(old_snap), nrow(new_snap))
   expect_setequal(names(old_snap), names(new_snap))
 

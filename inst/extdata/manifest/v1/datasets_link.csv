@@ -26,6 +26,8 @@ comex,export_mun,,,,https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/mun/EXP_
 comex,export_prod,,,,https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/EXP_$year$.csv,https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta,1997-2026,,,,,,comex
 comex,import_mun,,,,https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/mun/IMP_$year$_MUN.csv,https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta,1997-2026,,,,,,comex
 comex,import_prod,,,,https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/IMP_$year$.csv,https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta,1997-2026,,,,,,comex
+comex_dic,hs_codes,,,,https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM_SH.csv,https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta,,,,,,,comex
+comex_dic,ncm_codes,,,,https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM.csv,https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta,,,,,,,comex
 degrad,degrad,,2007,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,,2007-2016,,Degrad2007_Final_pol.shp,,,,
 degrad,degrad,,2008,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,,2007-2016,,Degrad2008_Final_pol.shp,,,,
 degrad,degrad,,2009,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,,2007-2016,,Degrad2009_Final_pol.shp,,,,

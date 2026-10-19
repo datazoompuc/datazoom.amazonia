@@ -132,6 +132,17 @@
 #      datasets (2026 is a partial year, January-September). docs_url (the
 #      ministry's open-data page) and resolver also changed/were populated
 #      (not columns of this fixture).
+#  16. 2026-10-19: two genuinely new rows, comex_dic/hs_codes and
+#      comex_dic/ncm_codes -- the two product dictionaries (NCM_SH.csv and
+#      NCM.csv) load_br_trade() joins its data with. Their URLs used to be
+#      literals in R/comex.R's load_trade_dic(), off-manifest, so they could
+#      not be fixed without a package release when the old host's certificate
+#      expired; they now live in the manifest, owned by the comex resolver
+#      (see resolve_comex.R's header, point 8), under their own survey like
+#      baci_dic (delta #11) so check_params() does not accept them as
+#      datasets of load_br_trade(). Same as delta #11 and #14's new rows: a
+#      new row, not a changed cell. available_time stays blank (no years);
+#      docs_url and resolver are not columns of this fixture.
 #
 # The fixture was captured right before normalization. Row order is not
 # significant (both sides sorted by (survey, dataset) before comparing).
@@ -273,6 +284,16 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
       url = c(
         "https://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-pantanal/shape",
         "https://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-nf/shape"
+      )
+    ),
+    # Delta #16 -- see file header. Genuinely new rows, not value changes.
+    tibble::tibble(
+      survey = "comex_dic", dataset = c("hs_codes", "ncm_codes"),
+      sidra_code = NA_character_, available_time = NA_character_,
+      available_geo = NA_character_,
+      url = c(
+        "https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM_SH.csv",
+        "https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM.csv"
       )
     )
   ) %>%

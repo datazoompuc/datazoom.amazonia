@@ -53,11 +53,13 @@ tagged_sources <- list(
   # that date (class_name/classname rename, the hardcoded CRS, and the
   # municipality st_intersection() alert-splitting behavior).
   list(r_path = file.path(pkg_root, "R", "deter.R"), label = "R/deter.R", min_tags = 3),
-  # Added 2026-10-17 alongside COMEX's FRAGILITY_SOURCES row: 3 tags as of
-  # that date (raw MUN column names, raw NCM column names + integer
-  # assumptions, and the hard-coded dictionary host/encoding in
-  # load_trade_dic()).
-  list(r_path = file.path(pkg_root, "R", "comex.R"), label = "R/comex.R", min_tags = 3)
+  # Added 2026-10-17 alongside COMEX's FRAGILITY_SOURCES row: 3 tags that day
+  # (raw MUN column names, raw NCM column names + integer assumptions, and the
+  # dictionary host/encoding in load_trade_dic()). 4 as of 2026-10-19: that
+  # last one was split in two when the dictionary URLs moved into the manifest
+  # (the manifest-sourced URL and its fake-200 failure mode; the Latin-1
+  # encoding and column names).
+  list(r_path = file.path(pkg_root, "R", "comex.R"), label = "R/comex.R", min_tags = 4)
 )
 
 for (src in tagged_sources) {
