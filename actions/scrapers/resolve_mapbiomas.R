@@ -581,21 +581,58 @@ resolve_mapbiomas <- function(rows) {
     }
   }
 
+  # 2026-10-12: the headline used to always open with "This can
+  # legitimately mean 'nothing changed'", even when every config had thrown
+  # a network error and nothing was checked at all -- live incident: the
+  # 2026-10-12 scheduled run timed out on all 10 configs against
+  # data.mapbiomas.org and read, at a glance, like a quiet week. Any real
+  # failure (one config or all of them) now leads the message, with network
+  # errors counted separately since they're the most common cause.
+  n_network <- sum(grepl(": network error: ", config_failures, fixed = TRUE))
+  network_note <- if (n_network > 0) {
+    paste0(
+      " ", n_network, " of these ", if (n_network == 1) "was a network error" else "were network errors",
+      " -- data.mapbiomas.org may have been unreachable."
+    )
+  } else {
+    ""
+  }
+  failure_list <- if (length(config_failures) > 0) {
+    paste0(
+      "\nReal failures, not just 'no match' (", length(config_failures), "):\n- ",
+      paste(config_failures, collapse = "\n- ")
+    )
+  } else {
+    ""
+  }
+
   if (length(out) == 0) {
+    headline <- if (length(config_failures) == length(configs)) {
+      paste0(
+        "resolve_mapbiomas(): EVERY Dataverse lookup failed (", length(config_failures),
+        " of ", length(configs), " configs) -- nothing could be checked this run, ",
+        "so this is NOT 'nothing changed'.", network_note
+      )
+    } else if (length(config_failures) > 0) {
+      paste0(
+        "resolve_mapbiomas(): ", length(config_failures), " of ", length(configs),
+        " Dataverse lookups FAILED and were never checked; the other ",
+        length(configs) - length(config_failures), " found no confidently-matched ",
+        "update.", network_note
+      )
+    } else {
+      paste0(
+        "resolve_mapbiomas(): found no confidently-matched update from ",
+        "Dataverse this run, and no lookup failed. This can legitimately mean ",
+        "'nothing changed' -- check manually before treating it as a scraper break."
+      )
+    }
     stop(
-      "resolve_mapbiomas(): found no confidently-matched update from ",
-      "Dataverse this run. This can legitimately mean 'nothing changed' -- ",
-      "check manually before treating it as a scraper break. (The WordPress ",
-      "statistics page is watched separately -- see watch_mapbiomas.R -- and ",
-      "no longer affects this resolver's own success/failure.)",
-      if (length(config_failures) > 0) {
-        paste0(
-          "\nReal failures, not just 'no match' (", length(config_failures), "):\n- ",
-          paste(config_failures, collapse = "\n- ")
-        )
-      } else {
-        ""
-      }
+      headline,
+      " (The WordPress statistics page is watched separately -- see ",
+      "watch_mapbiomas.R -- and no longer affects this resolver's own ",
+      "success/failure.)",
+      failure_list
     )
   }
 
@@ -606,7 +643,17 @@ resolve_mapbiomas <- function(rows) {
     # also discard the configs that succeeded. Attach the failure(s) as an
     # attribute build_manifest.R already reads generically (see
     # resolve_epe.R's header for the same mechanism, applied there first).
-    attr(result, "partial_failures") <- config_failures
+    # A one-line summary leads the list whenever any of them was a network
+    # error, so the issue says so up front (see the 2026-10-12 note above).
+    attr(result, "partial_failures") <- c(
+      if (n_network > 0) {
+        paste0(
+          length(config_failures), " of ", length(configs), " Dataverse lookups failed ",
+          "(the rest still resolved).", network_note
+        )
+      },
+      config_failures
+    )
   }
   result
 }

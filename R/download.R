@@ -749,8 +749,26 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       dat$year <- param$year
     }
     if (param$source == "deter") {
+      # archive_file is a committed filename snapshot (e.g.
+      # "deter-cerrado-nb-deter-public.shp"), never re-verified by
+      # resolve_deter.R (see that file's header) -- if TerraBrasilis renames
+      # a slug and the resolver's keyword fallback updates `url` without a
+      # matching archive_file update (flagged in the fallback's own note,
+      # but easy to miss), the committed name no longer exists in the
+      # renamed package and this used to hard-fail at sf::read_sf(). Prefer
+      # the committed name when it's actually there (keeps behavior
+      # unchanged in the normal case); otherwise fall back to finding the
+      # one real .shp by pattern, same as the sigmine/ibama branches below.
       shp_name <- dataset_field(param$source, param$dataset, "archive_file")
-      dat <- sf::read_sf(file.path(dir, shp_name))
+      shp_path <- file.path(dir, shp_name)
+      if (!file.exists(shp_path)) {
+        shp <- list.files(dir, pattern = "\\.shp$", full.names = TRUE, recursive = TRUE)
+        if (length(shp) == 0) {
+          stop("No shapefile found in the downloaded DETER archive.")
+        }
+        shp_path <- shp[1]
+      }
+      dat <- sf::read_sf(shp_path)
     }
     if (param$source == "sigmine") {
       shp <- list.files(dir, pattern = "\\.shp$", full.names = TRUE, recursive = TRUE)

@@ -93,9 +93,14 @@ test_that("BACI archive_file carries the same version stamp as the URL", {
   expect_equal(url_stamp, archive_stamp)
 })
 
-test_that("DETER archive_file matches the old hardcoded shapefile names", {
+test_that("DETER archive_file matches the shapefile names inside each live download", {
+  # deter_cerrado's value changed 2026-10 alongside the slug rename
+  # (deter-cerrado -> deter-cerrado-nb, see resolve_deter.R's header) --
+  # verified by hand against the real downloaded package, not guessed.
   expect_equal(dataset_field("deter", "deter_amz", "archive_file"), "deter-amz-deter-public.shp")
-  expect_equal(dataset_field("deter", "deter_cerrado", "archive_file"), "deter_public.shp")
+  expect_equal(dataset_field("deter", "deter_cerrado", "archive_file"), "deter-cerrado-nb-deter-public.shp")
+  expect_equal(dataset_field("deter", "deter_pantanal", "archive_file"), "deter-pantanal-deter-public.shp")
+  expect_equal(dataset_field("deter", "deter_non_forest", "archive_file"), "deter-nf-deter-public.shp")
 })
 
 test_that("DEGRAD archive_file is resolved per year and the link stays $year$-templated", {

@@ -278,6 +278,17 @@ resolver_failed <- list()
 # still trip exit code 11 (changes + a failure) instead of looking like a
 # clean run.
 resolver_partial_failed <- list()
+# 2026-10-08: a sibling of partial_failures, but NOT a failure signal -- a
+# resolver attaches a "fallback_notes" attribute (character vector) to its
+# returned tibble when it recovered a value through a heuristic/fallback
+# path instead of its normal precise match (e.g. resolve_deter.R's keyword
+# fallback when a known slug disappears). The result is still a completely
+# normal success: resolver_ok, a normal PR, no issue, exit code unaffected.
+# Collected here only so the PR body (below) can show a human reviewer
+# WHICH changed URL(s) came from a heuristic and deserve extra scrutiny --
+# before this existed, that distinction only ever reached the CI log via
+# the resolver's own message(), never the PR a human actually reads.
+resolver_fallback_notes <- list()
 
 for (src in names(registry)) {
   cat("Running resolver:", src, "... ")
@@ -362,6 +373,13 @@ for (src in names(registry)) {
   } else {
     cat("OK (", nrow(result), "row(s) touched)\n")
   }
+
+  fallback_notes <- attr(result, "fallback_notes")
+  if (!is.null(fallback_notes) && length(fallback_notes) > 0) {
+    cat("  (used a fallback/heuristic match for", length(fallback_notes), "dataset(s) -- see PR body)\n")
+    resolver_fallback_notes[[src]] <- fallback_notes
+  }
+
   resolver_ok <- c(resolver_ok, src)
 }
 
@@ -638,6 +656,7 @@ report <- list(
   resolvers_ok = resolver_ok,
   resolvers_failed = resolver_failed,
   resolvers_partial_failed = resolver_partial_failed,
+  resolvers_fallback_notes = resolver_fallback_notes,
   watchers_run = names(watch_registry),
   watchers_ok = watcher_ok,
   watchers_failed = watcher_failed,
@@ -694,6 +713,7 @@ cat("Changed keys:", changes$n_changed, "\n")
 cat("Resolvers OK:", if (length(resolver_ok)) paste(resolver_ok, collapse = ", ") else "(none)", "\n")
 cat("Resolvers FAILED:", if (length(resolver_failed)) paste(names(resolver_failed), collapse = ", ") else "(none)", "\n")
 cat("Resolvers PARTIALLY FAILED:", if (length(resolver_partial_failed)) paste(names(resolver_partial_failed), collapse = ", ") else "(none)", "\n")
+cat("Resolvers using a fallback/heuristic match:", if (length(resolver_fallback_notes)) paste(names(resolver_fallback_notes), collapse = ", ") else "(none)", "\n")
 cat("Resolvers SKIPPED (--skip):", if (length(skip_sources)) paste(skip_sources, collapse = ", ") else "(none)", "\n")
 cat("Watchers OK:", if (length(watcher_ok)) paste(watcher_ok, collapse = ", ") else "(none)", "\n")
 cat("Watchers FAILED:", if (length(watcher_failed)) paste(names(watcher_failed), collapse = ", ") else "(none)", "\n")
@@ -736,6 +756,7 @@ if (nzchar(summary_path)) {
     sprintf("- Resolvers OK: %s", if (length(resolver_ok)) paste(resolver_ok, collapse = ", ") else "(none)"),
     sprintf("- Resolvers FAILED: %s", if (length(resolver_failed)) paste(names(resolver_failed), collapse = ", ") else "(none)"),
     sprintf("- Resolvers PARTIALLY FAILED: %s", if (length(resolver_partial_failed)) paste(names(resolver_partial_failed), collapse = ", ") else "(none)"),
+    sprintf("- Resolvers using a fallback/heuristic match: %s", if (length(resolver_fallback_notes)) paste(names(resolver_fallback_notes), collapse = ", ") else "(none)"),
     sprintf("- Resolvers SKIPPED (--skip): %s", if (length(skip_sources)) paste(skip_sources, collapse = ", ") else "(none)"),
     sprintf("- Watchers OK: %s", if (length(watcher_ok)) paste(watcher_ok, collapse = ", ") else "(none)"),
     sprintf("- Watchers FAILED: %s", if (length(watcher_failed)) paste(names(watcher_failed), collapse = ", ") else "(none)"),
@@ -812,6 +833,27 @@ for (fsrc in FRAGILITY_SOURCES) {
       paste0("- ", fragility_notes)
     )
   }
+}
+
+# Fallback/heuristic-match notes (see resolver_fallback_notes above) -- a
+# plain list, not conditioned on FRAGILITY_SOURCES/changed_keys, since it's
+# already only ever populated for a resolver that actually used one this run.
+if (length(resolver_fallback_notes) > 0) {
+  pr_body_lines <- c(
+    pr_body_lines,
+    "",
+    "**Fallback/heuristic match used this run** -- at least one resolver",
+    "could not find its usual precise match and fell back to a looser,",
+    "still-unambiguous heuristic to recover a value. The result still went",
+    "through the same single-candidate-or-stop() discipline every resolver",
+    "uses, but review the specific URL(s) below more carefully before",
+    "merging -- this is exactly the situation that let deter_cerrado's URL",
+    "go stale for years when nothing caught a slug rename automatically:",
+    "",
+    unlist(lapply(names(resolver_fallback_notes), function(src) {
+      c(sprintf("- `%s`:", src), paste0("  - ", resolver_fallback_notes[[src]]))
+    }))
+  )
 }
 
 pr_body_path <- file.path(OUT_DIR, "pr_body.md")
