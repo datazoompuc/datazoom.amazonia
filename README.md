@@ -42,8 +42,8 @@ install.packages("datazoom.amazonia")
 And the development version from GitHub with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("datazoompuc/datazoom.amazonia")
+# install.packages("remotes")
+remotes::install_github("datazoompuc/datazoom.amazonia")
 ```
 
 **[1 - Environmental data](#environmental-data)**
@@ -637,7 +637,9 @@ The raw DETER data from INPE reports one alert/detection per row, with
 each row typically associated with a single municipality in the raw
 data. However, **many alerts actually overlap multiple municipalities**
 (typically 2-4 municipalities) that are not all shown in the original
-records. \### Data Processing
+records.
+
+### Data Processing
 
 This package provides an important enhancement: **spatial intersection
 with IBGE municipality geometries** (2019 version) to identify ALL
