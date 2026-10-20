@@ -49,6 +49,33 @@ test_that("with the cache off, a download never reads another source's extracted
   expect_equal(iba_again$origin, "ibama_layer")
 })
 
+test_that("a download that can't be read is not cached, so the next call downloads again", {
+  clear_download_cache()
+  withr::local_options(datazoom.amazonia.cache = TRUE)
+  work <- withr::local_tempdir()
+  good_zip <- make_shp_zip(work, "sigmine_layer")
+  n <- 0
+  testthat::local_mocked_bindings(
+    perform_download = function(path, temp, ...) {
+      n <<- n + 1
+      # 1st: HTTP 200 with an error page instead of the zip; then the real file
+      if (n == 1) writeLines("<html>Service temporarily unavailable</html>", temp) else file.copy(good_zip, temp, overwrite = TRUE)
+    }
+  )
+
+  # unzip() only warns about the HTML page; the read is what fails
+  expect_error(suppressWarnings(external_download(source = "sigmine", dataset = "sigmine_active")), "No shapefile")
+  expect_length(ls(download_cache_files_env(), all.names = TRUE), 0)
+
+  again <- external_download(source = "sigmine", dataset = "sigmine_active")
+  expect_equal(n, 2)
+  expect_equal(again$origin, "sigmine_layer")
+  # and the good one is cached
+  expect_length(ls(download_cache_files_env(), all.names = TRUE), 1)
+  external_download(source = "sigmine", dataset = "sigmine_active")
+  expect_equal(n, 2)
+})
+
 test_that("a cache miss starts from an empty dir, not the files a dropped entry left", {
   clear_download_cache()
   work <- withr::local_tempdir()

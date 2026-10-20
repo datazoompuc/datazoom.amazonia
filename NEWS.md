@@ -1,5 +1,7 @@
 # datazoom.amazonia (development version)
 
+  * Fixed: when a server answered a download with an error page instead of the file (some do, with a normal "OK" status), the bad file was kept in the session's download cache, so calling the function again in the same session failed the same way without downloading again. A download is now kept only once it has been read successfully; after a failure, the next call downloads again.
+
   * Fixed: with `options(datazoom.amazonia.cache = FALSE)`, every download went into the session's temporary folder itself, and the functions that find their file inside a zip by searching for it (`load_sigmine()`, `load_ibama(dataset = "embargoed_areas")`, `load_aneel(dataset = "energy_enterprises_distributed")`, and `load_deter()`'s fallback) could pick up a file another call had left there -- for instance `load_ibama()` returning `load_sigmine()`'s data, with no error, after both ran in one session. Each download now gets its own folder whether the cache is on or off. With the cache on, a download that has to be repeated now starts from an empty folder, rather than unzipping over the files of the previous one.
 
   * Changed: `load_prodes()` now deletes, when it returns, only the temporary files terra wrote while processing that call (they can be large, as the raster is processed at full resolution). It used to delete all of terra's temporary files at the start of each call (`terra::tmpFiles(remove = TRUE)`), including the ones behind any other `SpatRaster` the user had in the session, which then stopped working.

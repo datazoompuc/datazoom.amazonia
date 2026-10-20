@@ -742,8 +742,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   if (!file_cache_hit) {
     # A half-downloaded/half-extracted per-key dir left behind on failure
     # would be picked up by a later list.files(dir, ...) call just like a
-    # real cache hit -- clean it up unless the download+unzip below both
-    # complete and get registered.
+    # real cache hit -- clean it up unless the download, unzip AND read below
+    # all complete and it gets registered.
     if (use_cache) {
       registered <- FALSE
       on.exit(if (!registered) unlink(dir, recursive = TRUE, force = TRUE), add = TRUE)
@@ -810,10 +810,8 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       utils::unzip(temp, exdir = dir)
     }
 
-    if (use_cache) {
-      file_cache_set(cache_key, dir = dir, temp = temp)
-      registered <- TRUE
-    }
+    # Registered in the session cache only further down, once the file has
+    # actually been read -- see "Register in the session cache".
   }
 
   ###############
@@ -994,6 +992,23 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
   }
 
   } # end parsed_hit / else
+
+  ##################################
+  ## Register in the session cache ##
+  ##################################
+
+  # Only now, after the read above succeeded. A server can answer HTTP 200
+  # with an HTML error page instead of the file: unzip() only warns about
+  # that, and registering right after it cached the bad file, so every retry
+  # in the session re-read it and failed the same way (verified 2026-10-20).
+  # Registered here instead, a read that fails stops before this point, the
+  # on.exit() set at download time deletes the dir, and the next call
+  # downloads again. (A bad file that still reads without an error -- an
+  # HTML page through fread(), say -- is not caught by this.)
+  if (!file_cache_hit && use_cache) {
+    file_cache_set(cache_key, dir = dir, temp = temp)
+    registered <- TRUE
+  }
 
   ##############################
   ## Excluding Temporary File ##
