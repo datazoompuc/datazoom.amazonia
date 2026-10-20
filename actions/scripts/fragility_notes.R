@@ -64,6 +64,12 @@ FRAGILITY_SOURCES <- list(
   list(changed_prefix = "baci", r_path = file.path("R", "baci.R"), label = "R/baci.R", treat_fn = "load_baci()"),
   list(changed_prefix = "ips", r_path = file.path("R", "ips.R"), label = "R/ips.R", treat_fn = "load_ips()"),
   list(changed_prefix = "seeg", r_path = file.path("R", "seeg.R"), label = "R/seeg.R", treat_fn = "load_seeg()"),
+  # terraclimate's treatment code lives in two files: load_climate() (R/climate.R)
+  # and the NCSS request external_download() builds (R/download.R). The loop in
+  # build_manifest.R reads ONE file per row, so there is one row per file; a
+  # changed terraclimate row lists the tags of both.
+  list(changed_prefix = "terraclimate", r_path = file.path("R", "climate.R"), label = "R/climate.R", treat_fn = "load_climate()"),
+  list(changed_prefix = "terraclimate", r_path = file.path("R", "download.R"), label = "R/download.R", treat_fn = "external_download()"),
   list(changed_prefix = "aneel", r_path = file.path("R", "aneel.R"), label = "R/aneel.R", treat_fn = "load_aneel()"),
   list(changed_prefix = "deter", r_path = file.path("R", "deter.R"), label = "R/deter.R", treat_fn = "load_deter()")
 )

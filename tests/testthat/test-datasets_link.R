@@ -276,6 +276,20 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
     )
   )
 
+# Delta #17 -- terraclimate (2026-10-19). The 14 variables' available_time
+# moves from "1958-2022" -- TerraClimate v1.0's span, carried over unchanged
+# from the hard-coded table of the pre-manifest releases; the Climatology Lab
+# replaced v1.0 with v1.1 in February 2025 -- to "1950-2025", the span the
+# server's own dataset.xml reports for the v1.1 aggregate that R/download.R
+# has requested since 2026-08-08 (commit 5284ac8). Verified live for all 14
+# variables, see actions/scrapers/resolve_terraclimate.R's header. url is
+# unchanged; docs_url and resolver were filled in too (not datasets_link()
+# columns, so only the per-field matrix sees them).
+fixture <- fixture %>%
+  dplyr::mutate(
+    available_time = dplyr::if_else(survey == "terraclimate", "1950-2025", available_time)
+  )
+
 # Delta #14 -- sigmine (2026-10). sigmine_inactive is a genuinely new row, and
 # both sigmine rows now declare available_geo "state, municipality" (the
 # geo_level choices load_sigmine() actually supports). See R/sigmine.R.

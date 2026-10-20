@@ -511,6 +511,17 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
 
   # Download path depends on geographical parameters
 
+  # FRAGILE: the file name embeds the START YEAR of the series
+  # ("agg_terraclimate_<code>_1950_CurrentYear_GLOBE.nc") and it changed once
+  # already -- 1958 under TerraClimate v1.0, 1950 under v1.1 (this line said
+  # 1958 until 2026-08-08; the v1.2.0 release still does). A name the server
+  # does not have is NOT an error there: HTTP 200 with an empty body, so
+  # download.file() "succeeds" with a 0-byte file and the failure surfaces
+  # later as terra's "[rast] cannot open this file as a SpatRaster". The code
+  # is case-sensitive too ("PDSI"; "pdsi" gets the same empty 200). Verified
+  # live 2026-10-19 for all 14 codes; actions/scrapers/resolve_terraclimate.R
+  # re-checks the name with a real subset request every run, and keeps its own
+  # copy of this pattern (TERRACLIMATE_FILE_SUFFIX) -- edit both together.
   if (source == "terraclimate") {
     filename <- paste0(
       "agg_terraclimate_",

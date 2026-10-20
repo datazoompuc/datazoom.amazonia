@@ -187,11 +187,26 @@ KNOWN_POST_CAPTURE_DELTAS <- c(
   "seeg\rseeg_residuals\rNA\rNA\rdocs_url",
   "seeg\rseeg_residuals\rNA\rNA\ravailable_time",
   "seeg\rseeg_residuals\rNA\rNA\rversion",
+  # 2026-10-19: TerraClimate onboarded onto the resolver framework
+  # (actions/scrapers/resolve_terraclimate.R). For each of the 14 variables
+  # docs_url is filled in (the Climatology Lab's TerraClimate page), resolver
+  # becomes "terraclimate", and available_time moves from 1958-2022 to the
+  # real v1.1 span, 1950-2025. See test-datasets_link.R's delta #17.
+  as.vector(outer(
+    c(
+      "max_temperature", "min_temperature", "wind_speed", "vapor_pressure_deficit",
+      "vapor_pressure", "snow_water_equivalent", "shortwave_radiation_flux", "soil_moisture",
+      "runoff", "precipitation", "potential_evaporation", "climatic_water_deficit",
+      "water_evaporation", "palmer_drought_severity_index"
+    ),
+    c("docs_url", "available_time", "resolver"),
+    function(d, f) paste("terraclimate", d, "NA", "NA", f, sep = "\r")
+  )),
   # 2026-10: sigmine_active now declares available_geo "state, municipality"
   # (it was NA); see test-datasets_link.R delta #14.
   "sigmine\rsigmine_active\rNA\rNA\ravailable_geo",
   # 2026-10: sigmine_active now declares its parent page in docs_url (it was NA).
-  "sigmine\rsigmine_active\rNA\rNA\rdocs_url"
+  "sigmine\rsigmine_active\rNA\rNA\rdocs_url",
   # 2026-10: DETER migration (see test-datasets_link.R's delta #14 and
   # resolve_deter.R's header). deter_cerrado moved to the live
   # "deter-cerrado-nb" slug (url + the shapefile name inside the package);
@@ -282,6 +297,24 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 33
   # columns (nor is version, IPS's and SEEG's other changed field).
   old_snap <- readRDS(test_path("fixtures", "datasets_link_pre_baserow_deletion.rds"))
   new_snap <- datasets_link()
+
+  # terraclimate: the 14 rows' available_time cells (delta #17, 2026-10-19,
+  # test-datasets_link.R) are asserted on their own and the rows set aside
+  # before the comparison, so the shared cell count below keeps meaning what
+  # its comment says. Everything else about them must be unchanged.
+  tc_new <- new_snap[new_snap$survey == "terraclimate", ]
+  tc_old <- old_snap[old_snap$survey == "terraclimate", ]
+  expect_equal(nrow(tc_new), 14)
+  expect_setequal(tc_new$dataset, tc_old$dataset)
+  expect_equal(unique(tc_old$available_time), "1958-2022")
+  expect_equal(unique(tc_new$available_time), "1950-2025")
+  tc_new <- tc_new[order(tc_new$dataset), ]
+  tc_old <- tc_old[order(tc_old$dataset), ]
+  for (col in setdiff(names(tc_old), "available_time")) {
+    expect_equal(tc_new[[col]], tc_old[[col]], info = paste("terraclimate column", col))
+  }
+  new_snap <- new_snap[new_snap$survey != "terraclimate", ]
+  old_snap <- old_snap[old_snap$survey != "terraclimate", ]
 
   # baci_dic/product_codes is a genuinely NEW row (delta #11,
   # test-datasets_link.R) -- a new row, not a changed cell on an existing
