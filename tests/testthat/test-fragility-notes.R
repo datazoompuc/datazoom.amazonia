@@ -44,6 +44,15 @@ tagged_sources <- list(
   list(r_path = file.path(pkg_root, "R", "epe.R"), label = "R/epe.R", min_tags = 3),
   list(r_path = file.path(pkg_root, "R", "prodes.R"), label = "R/prodes.R", min_tags = 4),
   list(r_path = file.path(pkg_root, "R", "baci.R"), label = "R/baci.R", min_tags = 3),
+  # Added 2026-10-19 alongside TerraClimate's two FRAGILITY_SOURCES rows (its
+  # treatment code spans two files): climate.R has 3 (the hard-coded bounding
+  # boxes, the whole-calendar-year time window, the layer naming the pivot
+  # relies on) and download.R has 1 (the file-name pattern with its embedded
+  # start year). R/download.R is shared by every source: its tags reach a PR
+  # body only through a FRAGILITY_SOURCES row pointing at it, and today that
+  # is TerraClimate's alone.
+  list(r_path = file.path(pkg_root, "R", "climate.R"), label = "R/climate.R", min_tags = 3),
+  list(r_path = file.path(pkg_root, "R", "download.R"), label = "R/download.R", min_tags = 1),
   # 2026-09-21: dropped from 5 to 4 -- the removed tag covered a dead
   # as.Date(operation_start, ...) step (never matched a real column in any
   # of the three aneel datasets, verified live) that was deleted rather

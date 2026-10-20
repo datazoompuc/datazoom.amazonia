@@ -64,6 +64,16 @@ load_climate <- function(dataset, raw_data = FALSE,
   ## Coordinates of rectangle around the Legal Amazon
 
   # latitude bounding box -90.0 to 90.0 (North is positive, South is negative)
+  # FRAGILE: these rectangles are hard-coded strings, not derived from the
+  # municipality map joined below. Measured 2026-10-19 against
+  # data-raw/geo_municipalities.rds: the Brazil one (set a few lines down)
+  # matches the 5,570 municipalities' extent, but this Legal Amazon one stops
+  # at 44 degrees West while 21 Maranhao municipalities (Codo, Icatu, Timbiras,
+  # Pastos Bons, ...) extend to 43.37 West -- they get only the grid cells west
+  # of 44, silently, so a per-municipality summary of them covers part of the
+  # municipality. A boundary update in geo_municipalities that moves an
+  # extreme municipality outside a rectangle would do the same, or leave it
+  # with NA, with no error.
   LAT_MIN <- "-18.04177"
   LAT_MAX <- "5.272225"
 
@@ -120,7 +130,21 @@ load_climate <- function(dataset, raw_data = FALSE,
 
   check_params(param)
 
-  # time range choices - 1958-01 to 2017-01
+  # time range choices: the calendar years in the manifest's available_time
+  # (kept current by actions/scrapers/resolve_terraclimate.R)
+  # FRAGILE: every request spans January 1 of the first year to December 1 of
+  # the final year, whole calendar years only. Verified live 2026-10-19, the
+  # server answers a range that merely STRADDLES the end of its data with
+  # HTTP 200 and whatever months exist (time_period = 2025:2026 returns 2025
+  # only, 12 months, no error; a final year only partly published would
+  # return fewer than 12) and a range entirely outside the data with HTTP 400. The only
+  # signal a user gets about the first case is check_params()'s warning about
+  # a year outside available_time (1950-2025 on that date; the resolver lists
+  # only years with all 12 months). In the second case the 400's text -- which
+  # names the real range -- never becomes an R error: download.file(method =
+  # "curl") has no --fail, so that text is saved as the "netCDF" file and the
+  # user gets the same warning followed by terra's "[rast] cannot open this
+  # file as a SpatRaster" (reproduced 2026-10-19 with time_period = 2026).
   param$initial_time <- ifelse(
     nchar(param$initial_time) == 4,
     paste0(param$initial_time, "-01-01T00%3A00%3A00Z"),
@@ -206,6 +230,14 @@ load_climate <- function(dataset, raw_data = FALSE,
 
   ## Reshaping data
 
+  # FRAGILE: relies on terra naming the NCSS file's layers "<code>_1", ...,
+  # "<code>_<n>" in time order (verified live 2026-10-19: tmax_1..tmax_12,
+  # q_1.., PDSI_1.., def_1..) -- that is what lets names(time) <- seq_along(time)
+  # above and the recode() below turn a layer index back into a date. The
+  # columns are picked with starts_with(<code>), which matches by PREFIX and
+  # ignores case: a column of geo_municipalities that ever starts with the
+  # code (a "q..." or "def..." one, say) would be silently pivoted as if it
+  # were a month, and a different layer naming would leave every date NA.
   dat <- dat %>%
     tidyr::pivot_longer(dplyr::starts_with(param$dataset_code),
       names_prefix = paste0(param$dataset_code, "_"),
