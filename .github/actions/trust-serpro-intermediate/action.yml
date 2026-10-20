@@ -1,0 +1,58 @@
+name: Trust SERPRO's intermediate CA
+description: >
+  Adds the intermediate certificate that balanca.mdic.gov.br (COMEX) fails to
+  send to the runner's TLS trust store, after checking it. TLS verification is
+  never disabled.
+
+# balanca.mdic.gov.br (COMEX) sends only its leaf TLS certificate, not the
+# intermediate CA that issued it ("AC SERPRO AR46 OV TLS CA 2025"). Windows and
+# browsers fetch a missing intermediate themselves (AIA); OpenSSL, which R's
+# curl uses on an Ubuntu runner, does not, so without this step every download
+# from that host stops with "unable to get local issuer certificate".
+# Reproduced 2026-10-17 with libcurl+OpenSSL and a Mozilla CA bundle, and fixed
+# by adding exactly this certificate (actions/scrapers/resolve_comex.R's
+# header, point 2). Of the 22 hosts the manifest points at, only the two
+# balanca.* hosts have this problem (same scan, 2026-10-18) -- SEEG's CI
+# failure is a WAF 403, not TLS, so this step does nothing for it, and it does
+# nothing for balanca.economia.gov.br either (that host's certificate is
+# expired, and it is a different CA).
+#
+# What it does is what a browser does: download the intermediate from the AIA
+# URL in the server's own certificate, REFUSE it unless it is the expected CA
+# and chains to a root the runner already trusts (that signature, not the
+# plain-http download, is what makes it safe), then add it to the trust store.
+# Verification stays ON for everything; nothing is disabled.
+#
+# Callers should set `continue-on-error: true`: if a check or the download
+# fails, only the COMEX downloads are affected, and their own error message
+# names this exact problem. Used by update-manifest.yaml, check-load-br-trade.yaml
+# and check-dz-amazonia.yaml (the last only for the load_br_trade job); add it
+# to a job only when that job's R code downloads from balanca.mdic.gov.br.
+# test-comex-resolver.R checks the wiring.
+
+runs:
+  using: composite
+  steps:
+    - name: Download, check and trust the intermediate certificate
+      shell: bash
+      run: |
+        set -euo pipefail
+        crt_url="http://secure.globalsign.com/cacert/acserproar46ovtlsca2025.crt"
+        workdir="$(mktemp -d)"
+        curl --fail --silent --show-error --location --max-time 30 --output "$workdir/intermediate.der" "$crt_url"
+        openssl x509 -inform DER -in "$workdir/intermediate.der" -out "$workdir/intermediate.pem"
+        subject="$(openssl x509 -in "$workdir/intermediate.pem" -noout -subject)"
+        case "$subject" in
+          *"AC SERPRO AR46 OV TLS CA 2025"*) ;;
+          *) echo "::warning::unexpected certificate at $crt_url ($subject) -- not trusting it"; exit 1 ;;
+        esac
+        openssl verify -CAfile /etc/ssl/certs/ca-certificates.crt "$workdir/intermediate.pem"
+        sudo cp "$workdir/intermediate.pem" /usr/local/share/ca-certificates/serpro-ac-ar46-ov-tls-ca-2025.crt
+        sudo update-ca-certificates
+        # Informational only: after this, the host verifies unless its own
+        # (leaf) certificate has a problem -- which the curl error says.
+        if curl --fail --silent --show-error --head --max-time 30 https://balanca.mdic.gov.br/balanca/manual/Manual.pdf > /dev/null; then
+          echo "balanca.mdic.gov.br now verifies."
+        else
+          echo "::warning::balanca.mdic.gov.br still does not verify after installing the intermediate -- see the curl error above (e.g. an expired leaf certificate)."
+        fi

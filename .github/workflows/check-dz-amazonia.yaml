@@ -69,6 +69,17 @@ jobs:
             local::.
           needs: check
 
+      # Only the load_br_trade job downloads from balanca.mdic.gov.br, which
+      # omits its intermediate CA (OpenSSL on this runner would stop with
+      # "unable to get local issuer certificate"), so only that job gets the
+      # step; the other 21 are untouched. load_baci's dictionary is still on
+      # the dead balanca.economia.gov.br host -- add load_baci here when that
+      # row moves to the new host (baci_dic, tracked in its own issue).
+      - name: Trust SERPRO's intermediate CA (balanca.mdic.gov.br omits it)
+        if: matrix.fn == 'load_br_trade'
+        uses: ./.github/actions/trust-serpro-intermediate
+        continue-on-error: true
+
       - name: Run checks for one function
         run: |
           Rscript --vanilla actions/scripts/check_all_loads.R --fn ${{ matrix.fn }}

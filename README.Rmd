@@ -44,8 +44,8 @@ install.packages("datazoom.amazonia")
 And the development version from GitHub with:
 
 ``` {r, eval=FALSE}
-# install.packages("devtools")
-devtools::install_github("datazoompuc/datazoom.amazonia")
+# install.packages("remotes")
+remotes::install_github("datazoompuc/datazoom.amazonia")
 ```
 
 ```{r, echo=FALSE, message=FALSE}

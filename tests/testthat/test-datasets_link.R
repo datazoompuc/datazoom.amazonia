@@ -95,6 +95,12 @@
 #      (were pointing at a dashboard app, not the real downloads landing
 #      page) but docs_url isn't one of datasets_link()'s returned columns,
 #      so that change doesn't touch this fixture.
+#      Update 2026-10-19 (issue #353): baci_dic/product_codes' url moved from
+#      balanca.economia.gov.br, whose TLS certificate expired 2026-10-03, to
+#      balanca.mdic.gov.br -- the same file, byte-identical (MD5 checked) --
+#      and the row is now owned by the baci resolver (resolve_baci.R). Still
+#      one new row, only its expected url changes; docs_url and resolver are
+#      not columns of this fixture.
 #  12. 2026-09-14: resolve_ips.R stopped being detect-only -- all 8 IPS
 #      rows' url moved off the manifest's old Google Drive link (confirmed
 #      owned by a personal gmail account, not Datazoom, not in Datazoom's
@@ -122,6 +128,27 @@
 #      real data (min/max year of the raw shapefile's view_date, checked
 #      2026-10-06): deter_amz 2016-2022 -> 2016-2026, deter_cerrado
 #      2018-2022 -> 2018-2026, and the two new datasets 2023-2026.
+#  15. 2026-10-17: COMEX onboarding (see resolve_comex.R's header). The
+#      ministry's own open-data page links balanca.mdic.gov.br, not
+#      balanca.economia.gov.br, whose TLS certificate expired 2026-10-03; the
+#      two hosts serve the same files (identical sizes and Last-Modified,
+#      checked live), so all 4 comex rows' url moved to the new host.
+#      available_time was re-derived from the real files (a text/csv for
+#      every year, every header checked): 1997-2023 -> 1997-2026 for all four
+#      datasets (2026 is a partial year, January-September). docs_url (the
+#      ministry's open-data page) and resolver also changed/were populated
+#      (not columns of this fixture).
+#  16. 2026-10-19: two genuinely new rows, comex_dic/hs_codes and
+#      comex_dic/ncm_codes -- the two product dictionaries (NCM_SH.csv and
+#      NCM.csv) load_br_trade() joins its data with. Their URLs used to be
+#      literals in R/comex.R's load_trade_dic(), off-manifest, so they could
+#      not be fixed without a package release when the old host's certificate
+#      expired; they now live in the manifest, owned by the comex resolver
+#      (see resolve_comex.R's header, point 8), under their own survey like
+#      baci_dic (delta #11) so check_params() does not accept them as
+#      datasets of load_br_trade(). Same as delta #11 and #14's new rows: a
+#      new row, not a changed cell. available_time stays blank (no years);
+#      docs_url and resolver are not columns of this fixture.
 #
 # The fixture was captured right before normalization. Row order is not
 # significant (both sides sorted by (survey, dataset) before comparing).
@@ -201,6 +228,15 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
       survey == "deter" & dataset == "deter_amz", "2016-2026",
       ifelse(survey == "deter" & dataset == "deter_cerrado", "2018-2026", available_time)
     ),
+    # Delta #15 -- see file header.
+    url = dplyr::case_when(
+      survey == "comex" & dataset == "export_mun" ~ "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/mun/EXP_$year$_MUN.csv",
+      survey == "comex" & dataset == "export_prod" ~ "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/EXP_$year$.csv",
+      survey == "comex" & dataset == "import_mun" ~ "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/mun/IMP_$year$_MUN.csv",
+      survey == "comex" & dataset == "import_prod" ~ "https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/IMP_$year$.csv",
+      TRUE ~ url
+    ),
+    available_time = ifelse(survey == "comex", "1997-2026", available_time),
     available_time = ifelse(
       survey == "prodes" & dataset == "deforestation", "2007-2025",
       ifelse(
@@ -244,7 +280,7 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
       survey = "baci_dic", dataset = "product_codes",
       sidra_code = NA_character_, available_time = NA_character_,
       available_geo = NA_character_,
-      url = "https://balanca.economia.gov.br/balanca/bd/tabelas/NCM_SH.csv"
+      url = "https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM_SH.csv"
     ),
     # Delta #14 -- see file header. Genuinely new rows, not value changes.
     tibble::tibble(
@@ -254,6 +290,16 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
       url = c(
         "https://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-pantanal/shape",
         "https://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-nf/shape"
+      )
+    ),
+    # Delta #16 -- see file header. Genuinely new rows, not value changes.
+    tibble::tibble(
+      survey = "comex_dic", dataset = c("hs_codes", "ncm_codes"),
+      sidra_code = NA_character_, available_time = NA_character_,
+      available_geo = NA_character_,
+      url = c(
+        "https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM_SH.csv",
+        "https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM.csv"
       )
     )
   ) %>%
