@@ -191,7 +191,7 @@ KNOWN_POST_CAPTURE_DELTAS <- c(
   # (it was NA); see test-datasets_link.R delta #14.
   "sigmine\rsigmine_active\rNA\rNA\ravailable_geo",
   # 2026-10: sigmine_active now declares its parent page in docs_url (it was NA).
-  "sigmine\rsigmine_active\rNA\rNA\rdocs_url"
+  "sigmine\rsigmine_active\rNA\rNA\rdocs_url",
   # 2026-10: DETER migration (see test-datasets_link.R's delta #14 and
   # resolve_deter.R's header). deter_cerrado moved to the live
   # "deter-cerrado-nb" slug (url + the shapefile name inside the package);
