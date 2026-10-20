@@ -381,8 +381,10 @@ test_that("TERRACLIMATE_CODES is exactly R/climate.R's dataset_names", {
 test_that("the file-name pattern and the query keys match what R/download.R builds", {
   lines <- readLines(file.path(pkg_root, "R", "download.R"), warn = FALSE)
   # the request is built right after the `filename <- paste0(` line, whose first
-  # argument is the file-name prefix on a line of its own (anchoring on the
-  # `if (source == "terraclimate")` line would also match perform_download()'s)
+  # argument is the file-name prefix on a line of its own. R/download.R has more
+  # than one `if (source == "terraclimate")` block (the file extension is set in
+  # another), so anchoring on that line would break if one were added above this
+  # one.
   start <- grep('^\\s*"agg_terraclimate_",?\\s*$', lines)[1] - 1
   block <- paste(lines[start:(start + 40)], collapse = "\n")
 
@@ -400,55 +402,6 @@ test_that("the file-name pattern and the query keys match what R/download.R buil
 test_that("terraclimate_filename() builds the same name for every code the package knows", {
   expect_equal(terraclimate_filename("tmax"), "agg_terraclimate_tmax_1950_CurrentYear_GLOBE.nc")
   expect_equal(terraclimate_filename("PDSI"), "agg_terraclimate_PDSI_1950_CurrentYear_GLOBE.nc")
-})
-
-# ---- who the server's logs see ----------------------------------------------
-
-test_that("both the resolver and the package's own download say who they are", {
-  # Measured against a localhost listener (2026-10-19): the resolver sent its
-  # own string, but perform_download()'s external curl sent a bare "curl/8.x".
-  expect_match(TERRACLIMATE_USER_AGENT, "^datazoom\\.amazonia-manifest-resolver \\(\\+https://github\\.com/datazoompuc/datazoom\\.amazonia\\)$")
-  expect_match(DATAZOOM_USER_AGENT, "^datazoom\\.amazonia R package \\(\\+https://github\\.com/datazoompuc/datazoom\\.amazonia\\)$")
-  # different on purpose: the weekly check is distinguishable from users' downloads
-  expect_false(identical(DATAZOOM_USER_AGENT, TERRACLIMATE_USER_AGENT))
-})
-
-test_that("perform_download() hands curl the TerraClimate User-Agent as ONE quoted argument, and puts the option back", {
-  seen <- new.env()
-  fake_download_file <- function(url, destfile, method = "auto", quiet = FALSE, ...) {
-    seen$extra <- getOption("download.file.extra")
-    seen$method <- method
-    0L
-  }
-  run_download <- function(source) {
-    testthat::with_mocked_bindings(
-      perform_download(
-        path = "http://example.invalid/x.nc", temp = tempfile(),
-        download_method = "curl", source = source, quiet = TRUE
-      ),
-      download.file = fake_download_file, .package = "utils"
-    )
-  }
-
-  # A previous value is set on purpose: perform_download()'s local guard
-  # (options()[c(...)]) cannot put back an option that was UNSET to begin with
-  # (it returns an NA-named NULL), which is harmless in practice because
-  # external_download()'s own guard restores it -- but it is not what this test
-  # is about.
-  withr::local_options(download.file.extra = "--previous")
-  run_download("terraclimate")
-  expect_identical(seen$method, "curl")
-  # shQuote() matters: unquoted, curl got only "datazoom.amazonia" and then tried
-  # to resolve "R" and "package" as hostnames (measured)
-  expect_identical(seen$extra, paste("--user-agent", shQuote(DATAZOOM_USER_AGENT)))
-  expect_identical(getOption("download.file.extra"), "--previous")
-
-  # no other curl-method source is touched
-  run_download("baci")
-  expect_identical(seen$extra, "--ssl-no-revoke")
-  run_download("mapbiomas")
-  expect_identical(seen$extra, "--previous")
-  expect_identical(getOption("download.file.extra"), "--previous")
 })
 
 # ---- the committed manifest agrees with the resolver ------------------------

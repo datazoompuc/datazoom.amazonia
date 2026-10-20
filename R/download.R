@@ -396,15 +396,6 @@ perform_download <- function(path, temp, download_method, source, quiet = TRUE) 
     if (source == "baci") {
       options(download.file.extra = "--ssl-no-revoke")
     }
-    if (source == "terraclimate") {
-      # method = "curl" runs the external curl program, which ignores R's
-      # HTTPUserAgent option and would announce itself as a bare "curl/8.x".
-      # Say who is asking instead, so the Climatology Lab's admins can tell
-      # this package's traffic apart from any other curl user and reach us.
-      # shQuote() is required: unquoted, curl receives only the UA's first
-      # word and then tries to resolve the rest as hostnames (measured).
-      options(download.file.extra = paste("--user-agent", shQuote(DATAZOOM_USER_AGENT)))
-    }
     utils::download.file(url = path, destfile = temp, method = "curl", quiet = quiet)
   }
   if (download_method == "googledrive") {
@@ -413,12 +404,6 @@ perform_download <- function(path, temp, download_method, source, quiet = TRUE) 
   }
   invisible(NULL)
 }
-
-# What this package's own TerraClimate downloads (perform_download()) call
-# themselves. Deliberately not the resolver's string
-# (actions/scrapers/resolve_terraclimate.R says "...-manifest-resolver"), so the
-# server's logs can tell the weekly check from users' downloads.
-DATAZOOM_USER_AGENT <- "datazoom.amazonia R package (+https://github.com/datazoompuc/datazoom.amazonia)"
 
 # Must match the UA string actions/scrapers/resolve_seeg.R uses to verify
 # this same seeg.eco.br URL live -- see the "seeg" branch above.
