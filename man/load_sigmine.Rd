@@ -4,12 +4,19 @@
 \alias{load_sigmine}
 \title{SIGMINE - Mining Geographic Information System}
 \usage{
-load_sigmine(dataset = "sigmine_active", raw_data = FALSE, language = "eng")
+load_sigmine(
+  dataset = "sigmine_active",
+  raw_data = FALSE,
+  geo_level = "state",
+  language = "eng"
+)
 }
 \arguments{
-\item{dataset}{A dataset name ("sigmine_active")}
+\item{dataset}{A dataset name ("sigmine_active" or "sigmine_inactive"). Note that "sigmine_inactive" has fewer columns available than "sigmine_active" (no mineral, company, phase, last event, or state information at the source) -- this reflects what ANM publishes for closed/inactive processes, not a limitation of this function.}
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
+
+\item{geo_level}{A \code{string} that defines the geographic level of the data. Can be "state" or "municipality".}
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.}
 }
@@ -22,10 +29,27 @@ Loads information the mines being explored legally in Brazil, including their lo
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
-# download treated active mining data in portuguese
+# download treated active mining data in portuguese, by state
 mining_active <- load_sigmine(
   dataset = "sigmine_active",
   raw_data = FALSE,
+  geo_level = "state",
+  language = "pt"
+)
+
+# download treated active mining data in portuguese, by municipality
+mining_active_munic <- load_sigmine(
+  dataset = "sigmine_active",
+  raw_data = FALSE,
+  geo_level = "municipality",
+  language = "pt"
+)
+
+# download treated inactive (closed) mining data, by municipality
+mining_inactive_munic <- load_sigmine(
+  dataset = "sigmine_inactive",
+  raw_data = FALSE,
+  geo_level = "municipality",
   language = "pt"
 )
 \dontshow{\}) # examplesIf}
