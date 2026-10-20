@@ -229,7 +229,7 @@ KNOWN_POST_CAPTURE_DELTAS <- c(
   "degrad\rdegrad\rNA\r2013\rdocs_url",
   "degrad\rdegrad\rNA\r2014\rdocs_url",
   "degrad\rdegrad\rNA\r2015\rdocs_url",
-  "degrad\rdegrad\rNA\r2016\rdocs_url"
+  "degrad\rdegrad\rNA\r2016\rdocs_url",
   # 2026-10: sigmine_active now declares available_geo "state, municipality"
   # (it was NA); see test-datasets_link.R delta #14.
   "sigmine\rsigmine_active\rNA\rNA\ravailable_geo",
@@ -326,10 +326,13 @@ test_that("every former base-row query now stops -- the guard has no gap", {
   expect_equal(still_works, character(0))
 })
 
-test_that("datasets_link() keeps the same rows/columns and differs in exactly 41 cells (see test-datasets_link.R deltas #8-#15)", {
-  # 33 as of delta #14, + 8 from delta #15 (2026-10-17, COMEX: all 4 rows'
+test_that("datasets_link() keeps the same rows/columns and differs in exactly 42 cells (see test-datasets_link.R deltas #8-#15)", {
+  # 33 as of delta #14, + 1 for sigmine_active's available_geo (2026-10,
+  # NA -> "state, municipality", same delta #14 -- the assertion was bumped to
+  # 34 for it but this comment wasn't, so #354's merge rebuilt 41 off the 33
+  # and dropped it), + 8 from delta #15 (2026-10-17, COMEX: all 4 rows'
   # url AND available_time -- docs_url/resolver aren't datasets_link() columns)
-  # = 41.
+  # = 42.
   # Cell count, enumerated by replay (not assumed): 5 (delta #8) + 1 (#9) +
   # 2 (#10) + 8 (#12) + 12 (#13) = 28, + 1 for aneel/energy_generation's url
   # (2026-09-15, same migration as the KNOWN_POST_CAPTURE_DELTAS entry above;
@@ -407,7 +410,7 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 41
   # comex_dic/hs_codes and comex_dic/ncm_codes are genuinely NEW rows as well
   # (delta #16, 2026-10-19, test-datasets_link.R): the two product
   # dictionaries load_br_trade() reads, moved from literals in R/comex.R into
-  # the manifest. A new row adds no changed cell, so the count below stays 41.
+  # the manifest. A new row adds no changed cell, so the count below stays 42.
   new_comex_dic <- new_snap[new_snap$survey == "comex_dic", ]
   expect_setequal(new_comex_dic$dataset, c("hs_codes", "ncm_codes"))
   expect_equal(
@@ -439,5 +442,5 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 41
     }
   }
 
-  expect_equal(delta, 41)
+  expect_equal(delta, 42)
 })

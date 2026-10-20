@@ -60,7 +60,8 @@ Suggests:
     terra,
     testthat (>= 3.0.0),
     units,
-    withr
+    withr,
+    yaml
 VignetteBuilder:
     knitr
 Config/testthat/edition: 3
