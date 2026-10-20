@@ -187,11 +187,39 @@ KNOWN_POST_CAPTURE_DELTAS <- c(
   "seeg\rseeg_residuals\rNA\rNA\rdocs_url",
   "seeg\rseeg_residuals\rNA\rNA\ravailable_time",
   "seeg\rseeg_residuals\rNA\rNA\rversion",
+  # 2026-10: DEGRAD onboarded onto the manifest pipeline (see
+  # actions/scrapers/resolve_degrad.R's header). A verify-only resolver: it
+  # changes no url/archive_file/available_time -- the only things that moved
+  # are that all 10 year rows now declare resolver = "degrad" (blank before)
+  # and docs_url = the official INPE access page listing the 10 downloads
+  # (blank before). No effect on datasets_link()'s 6 output columns (neither
+  # is one of them), so test-datasets_link.R and the datasets_link()
+  # cell-count test further down are untouched.
+  "degrad\rdegrad\rNA\r2007\rresolver",
+  "degrad\rdegrad\rNA\r2008\rresolver",
+  "degrad\rdegrad\rNA\r2009\rresolver",
+  "degrad\rdegrad\rNA\r2010\rresolver",
+  "degrad\rdegrad\rNA\r2011\rresolver",
+  "degrad\rdegrad\rNA\r2012\rresolver",
+  "degrad\rdegrad\rNA\r2013\rresolver",
+  "degrad\rdegrad\rNA\r2014\rresolver",
+  "degrad\rdegrad\rNA\r2015\rresolver",
+  "degrad\rdegrad\rNA\r2016\rresolver",
+  "degrad\rdegrad\rNA\r2007\rdocs_url",
+  "degrad\rdegrad\rNA\r2008\rdocs_url",
+  "degrad\rdegrad\rNA\r2009\rdocs_url",
+  "degrad\rdegrad\rNA\r2010\rdocs_url",
+  "degrad\rdegrad\rNA\r2011\rdocs_url",
+  "degrad\rdegrad\rNA\r2012\rdocs_url",
+  "degrad\rdegrad\rNA\r2013\rdocs_url",
+  "degrad\rdegrad\rNA\r2014\rdocs_url",
+  "degrad\rdegrad\rNA\r2015\rdocs_url",
+  "degrad\rdegrad\rNA\r2016\rdocs_url"
   # 2026-10: sigmine_active now declares available_geo "state, municipality"
   # (it was NA); see test-datasets_link.R delta #14.
   "sigmine\rsigmine_active\rNA\rNA\ravailable_geo",
   # 2026-10: sigmine_active now declares its parent page in docs_url (it was NA).
-  "sigmine\rsigmine_active\rNA\rNA\rdocs_url"
+  "sigmine\rsigmine_active\rNA\rNA\rdocs_url",
   # 2026-10: DETER migration (see test-datasets_link.R's delta #14 and
   # resolve_deter.R's header). deter_cerrado moved to the live
   # "deter-cerrado-nb" slug (url + the shapefile name inside the package);
@@ -209,7 +237,31 @@ KNOWN_POST_CAPTURE_DELTAS <- c(
   "deter\rdeter_cerrado\rNA\rNA\ravailable_time",
   "deter\rdeter_cerrado\rNA\rNA\rarchive_file",
   "deter\rdeter_cerrado\rNA\rNA\rdocs_url",
-  "deter\rdeter_cerrado\rNA\rNA\rresolver"
+  "deter\rdeter_cerrado\rNA\rNA\rresolver",
+  # 2026-10-17: COMEX onboarding (see test-datasets_link.R's delta #15 and
+  # resolve_comex.R's header). All 4 rows' url moved from
+  # balanca.economia.gov.br (TLS certificate expired 2026-10-03) to the
+  # ministry's current host balanca.mdic.gov.br; available_time was
+  # re-derived from the real files (1997-2023 -> 1997-2026); docs_url was
+  # filled in with the ministry's open-data page and the rows are now owned
+  # by the comex resolver (docs_url/resolver aren't datasets_link() columns,
+  # so only this per-field matrix sees them).
+  "comex\rexport_mun\rNA\rNA\rurl",
+  "comex\rexport_mun\rNA\rNA\ravailable_time",
+  "comex\rexport_mun\rNA\rNA\rdocs_url",
+  "comex\rexport_mun\rNA\rNA\rresolver",
+  "comex\rexport_prod\rNA\rNA\rurl",
+  "comex\rexport_prod\rNA\rNA\ravailable_time",
+  "comex\rexport_prod\rNA\rNA\rdocs_url",
+  "comex\rexport_prod\rNA\rNA\rresolver",
+  "comex\rimport_mun\rNA\rNA\rurl",
+  "comex\rimport_mun\rNA\rNA\ravailable_time",
+  "comex\rimport_mun\rNA\rNA\rdocs_url",
+  "comex\rimport_mun\rNA\rNA\rresolver",
+  "comex\rimport_prod\rNA\rNA\rurl",
+  "comex\rimport_prod\rNA\rNA\ravailable_time",
+  "comex\rimport_prod\rNA\rNA\rdocs_url",
+  "comex\rimport_prod\rNA\rNA\rresolver"
 )
 post_capture_key <- function(s, d, g, y, f) {
   paste(s, d, ifelse(is.na(g), "NA", g), ifelse(is.na(y), "NA", y), f, sep = "\r")
@@ -259,7 +311,10 @@ test_that("every former base-row query now stops -- the guard has no gap", {
   expect_equal(still_works, character(0))
 })
 
-test_that("datasets_link() keeps the same rows/columns and differs in exactly 33 cells (see test-datasets_link.R deltas #8-#14)", {
+test_that("datasets_link() keeps the same rows/columns and differs in exactly 41 cells (see test-datasets_link.R deltas #8-#15)", {
+  # 33 as of delta #14, + 8 from delta #15 (2026-10-17, COMEX: all 4 rows'
+  # url AND available_time -- docs_url/resolver aren't datasets_link() columns)
+  # = 41.
   # Cell count, enumerated by replay (not assumed): 5 (delta #8) + 1 (#9) +
   # 2 (#10) + 8 (#12) + 12 (#13) = 28, + 1 for aneel/energy_generation's url
   # (2026-09-15, same migration as the KNOWN_POST_CAPTURE_DELTAS entry above;
@@ -291,7 +346,9 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 33
   new_baci_dic <- new_snap[new_snap$survey == "baci_dic", ]
   expect_equal(nrow(new_baci_dic), 1)
   expect_equal(new_baci_dic$dataset, "product_codes")
-  expect_equal(new_baci_dic$url, "https://balanca.economia.gov.br/balanca/bd/tabelas/NCM_SH.csv")
+  # url moved to balanca.mdic.gov.br 2026-10-19 (issue #353; the old host's TLS
+  # certificate expired) -- same file, still one new row.
+  expect_equal(new_baci_dic$url, "https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM_SH.csv")
   new_snap <- new_snap[new_snap$survey != "baci_dic", ]
 
   # sigmine/sigmine_inactive is a genuinely NEW row (delta #14,
@@ -314,6 +371,21 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 33
   )
   new_snap <- new_snap[!(new_snap$survey == "deter" & new_snap$dataset %in% c("deter_pantanal", "deter_non_forest")), ]
 
+  # comex_dic/hs_codes and comex_dic/ncm_codes are genuinely NEW rows as well
+  # (delta #16, 2026-10-19, test-datasets_link.R): the two product
+  # dictionaries load_br_trade() reads, moved from literals in R/comex.R into
+  # the manifest. A new row adds no changed cell, so the count below stays 41.
+  new_comex_dic <- new_snap[new_snap$survey == "comex_dic", ]
+  expect_setequal(new_comex_dic$dataset, c("hs_codes", "ncm_codes"))
+  expect_equal(
+    sort(new_comex_dic$url),
+    sort(c(
+      "https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM_SH.csv",
+      "https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM.csv"
+    ))
+  )
+  new_snap <- new_snap[new_snap$survey != "comex_dic", ]
+
   expect_equal(nrow(old_snap), nrow(new_snap))
   expect_setequal(names(old_snap), names(new_snap))
 
@@ -334,5 +406,5 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 33
     }
   }
 
-  expect_equal(delta, 34)
+  expect_equal(delta, 41)
 })
