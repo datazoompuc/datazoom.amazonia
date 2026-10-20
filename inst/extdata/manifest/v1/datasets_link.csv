@@ -22,10 +22,12 @@ censoagro,livestock_production,,,6907,,https://sidra.ibge.gov.br/tabela/6907,201
 censoagro,vegetable_production_area,,,283,,https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais,"1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006","country, state",,,,,
 censoagro,vegetable_production_permanent,,,1730,,https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais,"1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006","country, state",,,,,
 censoagro,vegetable_production_temporary,,,1731,,https://sidra.ibge.gov.br/pesquisa/censo-agropecuario/series-temporais,"1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006","country, state",,,,,
-comex,export_mun,,,,https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/EXP_$year$_MUN.csv,,1997-2023,,,,,,
-comex,export_prod,,,,https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm/EXP_$year$.csv,,1997-2023,,,,,,
-comex,import_mun,,,,https://balanca.economia.gov.br/balanca/bd/comexstat-bd/mun/IMP_$year$_MUN.csv,,1997-2023,,,,,,
-comex,import_prod,,,,https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm/IMP_$year$.csv,,1997-2023,,,,,,
+comex,export_mun,,,,https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/mun/EXP_$year$_MUN.csv,https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta,1997-2026,,,,,,comex
+comex,export_prod,,,,https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/EXP_$year$.csv,https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta,1997-2026,,,,,,comex
+comex,import_mun,,,,https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/mun/IMP_$year$_MUN.csv,https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta,1997-2026,,,,,,comex
+comex,import_prod,,,,https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/IMP_$year$.csv,https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta,1997-2026,,,,,,comex
+comex_dic,hs_codes,,,,https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM_SH.csv,https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta,,,,,,,comex
+comex_dic,ncm_codes,,,,https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM.csv,https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta,,,,,,,comex
 degrad,degrad,,2007,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/acesso-ao-dados-do-degrad,2007-2016,,Degrad2007_Final_pol.shp,,,,degrad
 degrad,degrad,,2008,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/acesso-ao-dados-do-degrad,2007-2016,,Degrad2008_Final_pol.shp,,,,degrad
 degrad,degrad,,2009,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/acesso-ao-dados-do-degrad,2007-2016,,Degrad2009_Final_pol.shp,,,,degrad

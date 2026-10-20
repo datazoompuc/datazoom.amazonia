@@ -69,6 +69,14 @@ FRAGILITY_SOURCES <- list(
   list(changed_prefix = "ips", r_path = file.path("R", "ips.R"), label = "R/ips.R", treat_fn = "load_ips()"),
   list(changed_prefix = "seeg", r_path = file.path("R", "seeg.R"), label = "R/seeg.R", treat_fn = "load_seeg()"),
   list(changed_prefix = "aneel", r_path = file.path("R", "aneel.R"), label = "R/aneel.R", treat_fn = "load_aneel()"),
+  list(changed_prefix = "deter", r_path = file.path("R", "deter.R"), label = "R/deter.R", treat_fn = "load_deter()"),
+  list(changed_prefix = "comex", r_path = file.path("R", "comex.R"), label = "R/comex.R", treat_fn = "load_br_trade()"),
+  # The dictionaries' manifest rows are their own survey ("comex_dic"), and
+  # build_manifest.R matches `survey\r` exactly, so "comex" above never fires
+  # for them -- yet two of R/comex.R's tags are about the dictionaries (the
+  # manifest-sourced URL, and the Latin-1/column assumptions). A run that
+  # changes both a comex and a comex_dic row lists the same notes twice;
+  # harmless, and cheaper than touching build_manifest.R's matching.
+  list(changed_prefix = "comex_dic", r_path = file.path("R", "comex.R"), label = "R/comex.R", treat_fn = "load_br_trade()")
   list(changed_prefix = "degrad", r_path = file.path("R", "degrad.R"), label = "R/degrad.R", treat_fn = "load_degrad()")
-  list(changed_prefix = "deter", r_path = file.path("R", "deter.R"), label = "R/deter.R", treat_fn = "load_deter()")
 )

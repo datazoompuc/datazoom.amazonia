@@ -36,6 +36,13 @@ jobs:
             local::.
           needs: check
 
+      # load_br_trade() downloads from balanca.mdic.gov.br, which omits its
+      # intermediate CA: without this, OpenSSL on this runner stops with
+      # "unable to get local issuer certificate". See the action's header.
+      - name: Trust SERPRO's intermediate CA (balanca.mdic.gov.br omits it)
+        uses: ./.github/actions/trust-serpro-intermediate
+        continue-on-error: true
+
       - name: Run checks for load_br_trade
         run: |
           Rscript --vanilla actions/scripts/check_all_loads.R --fn load_br_trade

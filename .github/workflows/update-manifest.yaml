@@ -69,6 +69,18 @@ jobs:
           # smoke-test step the first time it ever actually ran (2026-08-10).
           Rscript -e 'devtools::install_deps(dependencies = TRUE)'
 
+      # balanca.mdic.gov.br (COMEX) omits its intermediate CA, so on this
+      # runner OpenSSL would stop resolve_comex() every Monday with "unable to
+      # get local issuer certificate". The composite action checks the
+      # certificate and adds it to the trust store (verification stays on);
+      # its header says why, and that only COMEX's downloads need it.
+      # continue-on-error: if it fails, only COMEX is affected -- its resolver
+      # then fails with a message naming this exact problem, like any
+      # single-resolver failure -- and no other resolver depends on this step.
+      - name: Trust SERPRO's intermediate CA (balanca.mdic.gov.br omits it)
+        uses: ./.github/actions/trust-serpro-intermediate
+        continue-on-error: true
+
       - name: Run build_manifest.R
         id: build
         run: |
