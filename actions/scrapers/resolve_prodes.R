@@ -34,7 +34,7 @@
 # the .tif, listing every raster code's meaning as <paletteEntry value=".."
 # label="..">) gets extracted the same way (zip_remote_extract_entry(), one
 # more small ranged GET) and cross-checked against R/prodes.R's hardcoded
-# raster legend (R/prodes.R:130-135) -- that legend used to be "verified by
+# raster legend (prodes_raster_code()) -- that legend used to be "verified by
 # hand once" per that file's own comment; VERIFIED LIVE this session that all
 # 5 checkable codes still match exactly (deforestation = release_year - 2000
 # labelled "d<year>"; residual_deforestation = release_year - 1960 labelled
@@ -47,6 +47,15 @@
 # a code that legitimately isn't there would just make the resolver stop()
 # every single run.
 #
+# 2026-10-20: the check moved out of resolve_prodes() into file-scope
+# functions (prodes_legend_mismatches() and friends, below) so
+# tests/testthat/test-prodes-legend.R can hold them to R/prodes.R's own copy
+# -- the "mirrors R/prodes.R exactly" promise used to be a comment only.
+# Also: a zip with no (or several) .qml now fails the run instead of skipping
+# the check with a message; every d<year>/r<year> entry in the legend is
+# checked, not only the release year's; and clouds fails if code 99 ever
+# appears meaning something else (absent is still just a message).
+#
 # All 6 PRODES dataset rows (clouds/deforestation/hydrography/
 # native_vegetation/non_forest/residual_deforestation) share one url,
 # layer_name and version -- under the self-sufficient-rows schema
@@ -57,6 +66,96 @@
 # is unkeyed) but the correct pattern if PRODES ever gains a keyed row (see
 # resolve_epe.R's consumer/industrial block for the same echo-don't-hardcode
 # pattern already applied there).
+
+# ---- raster legend check ----------------------------------------------------
+#
+# A copy of R/prodes.R's prodes_raster_code()/prodes_legend_label()/
+# prodes_parse_qml(): this script runs without the package loaded, so it
+# can't call them. tests/testthat/test-prodes-legend.R fails if the two
+# copies ever disagree -- change both together. Kept at file scope (not
+# inside resolve_prodes()) so that test can reach them.
+
+# The 5 codes checkable against a release's .qml; clouds (99) is handled
+# apart in prodes_legend_mismatches(), since no release so far lists it.
+prodes_expected_legend <- function(release_year) {
+  d_code <- release_year - 2000L
+  r_code <- release_year - 1960L
+  list(
+    list(dataset = "deforestation", code = d_code, label = sprintf("%d d%d", d_code, release_year)),
+    list(dataset = "residual_deforestation", code = r_code, label = sprintf("%d r%d", r_code, release_year)),
+    list(dataset = "hydrography", code = 91L, label = "91 Hidrografia"),
+    list(dataset = "native_vegetation", code = 100L, label = "100 Vegeta\u00e7\u00e3o nativa florestal"),
+    list(dataset = "non_forest", code = 101L, label = "101 Vegeta\u00e7\u00e3o nativa n\u00e3o florestal")
+  )
+}
+
+# .qml text -> named character vector, label by code. Same parsing as
+# R/prodes.R's prodes_parse_qml() (see there for why a regex, `[^>]*` and the
+# unescaping).
+prodes_qml_palette <- function(qml_txt) {
+  entries <- regmatches(qml_txt, gregexpr("<paletteEntry\\b[^>]*>", qml_txt, perl = TRUE))[[1]]
+  attr_of <- function(name) {
+    m <- regmatches(entries, regexec(sprintf("\\b%s=\"([^\"]*)\"", name), entries, perl = TRUE))
+    vapply(m, function(x) if (length(x) == 2) x[2] else NA_character_, character(1))
+  }
+  values <- suppressWarnings(as.integer(attr_of("value")))
+  labels <- prodes_qml_unescape(attr_of("label"))
+  keep <- !is.na(values) & !is.na(labels)
+  setNames(labels[keep], values[keep])
+}
+
+prodes_qml_unescape <- function(x) {
+  num <- gregexpr("&#(x[0-9A-Fa-f]+|[0-9]+);", x, perl = TRUE)
+  regmatches(x, num) <- lapply(regmatches(x, num), function(ents) {
+    vapply(ents, function(e) {
+      code <- sub("^&#(.*);$", "\\1", e)
+      n <- if (startsWith(code, "x")) strtoi(substring(code, 2), 16L) else as.integer(code)
+      intToUtf8(n)
+    }, character(1), USE.NAMES = FALSE)
+  })
+  x <- gsub("&lt;", "<", x, fixed = TRUE)
+  x <- gsub("&gt;", ">", x, fixed = TRUE)
+  x <- gsub("&quot;", "\"", x, fixed = TRUE)
+  x <- gsub("&apos;", "'", x, fixed = TRUE)
+  gsub("&amp;", "&", x, fixed = TRUE)
+}
+
+# Everything in `pal_map` that contradicts the codes; character(0) if none.
+prodes_legend_mismatches <- function(pal_map, release_year) {
+  mismatches <- character(0)
+  for (item in prodes_expected_legend(release_year)) {
+    actual <- unname(pal_map[as.character(item$code)])
+    if (is.na(actual)) {
+      mismatches <- c(mismatches, sprintf("code %d: expected label '%s', not present in the .qml", item$code, item$label))
+    } else if (!identical(trimws(actual), item$label)) {
+      mismatches <- c(mismatches, sprintf("code %d: expected label '%s', got '%s'", item$code, item$label, actual))
+    }
+  }
+
+  # Every d<year>/r<year> entry, not just release_year's: load_prodes()
+  # accepts every year in available_time, all through the same offsets.
+  labels <- trimws(unname(pal_map))
+  parts <- regmatches(labels, regexec("^([0-9]+) ([dr])([0-9]{4})$", labels))
+  for (i in seq_along(parts)) {
+    p <- parts[[i]]
+    if (length(p) != 4) next
+    yr <- as.integer(p[4])
+    want <- if (p[3] == "d") yr - 2000L else yr - 1960L
+    code <- as.integer(names(pal_map)[i])
+    if (code != want) {
+      mismatches <- c(mismatches, sprintf("code %d is labelled '%s', but %s%d should be code %d", code, labels[i], p[3], yr, want))
+    }
+  }
+
+  # clouds: absent is the known state; present but meaning something else
+  # is not
+  clouds <- unname(pal_map["99"])
+  if (!is.na(clouds) && !grepl("nuvem", clouds, ignore.case = TRUE)) {
+    mismatches <- c(mismatches, sprintf("code 99 (clouds) is labelled '%s', which is not clouds", clouds))
+  }
+
+  unique(mismatches)
+}
 
 resolve_prodes <- function(rows) {
   if (is.null(rows) || nrow(rows) == 0) {
@@ -151,56 +250,43 @@ resolve_prodes <- function(rows) {
     stop("resolve_prodes(): ", tif_reason)
   }
 
+  # A missing legend fails the run like a wrong .tif does: without it nothing
+  # tells us the codes still mean what load_prodes() assumes, and a wrong
+  # code doesn't error, it silently counts the wrong pixels for every user.
   qml_name <- grep("\\.qml$", names(zip_entries), value = TRUE)
-  if (length(qml_name) == 1) {
-    qml_txt <- tryCatch(
-      rawToChar(zip_remote_extract_entry(url, zip_entries[[qml_name]])),
-      error = function(e) stop("resolve_prodes(): could not read the .qml legend: ", conditionMessage(e))
+  if (length(qml_name) != 1) {
+    qml_reason <- paste0(
+      "expected exactly one .qml legend in the zip, found ", length(qml_name),
+      " (", paste(names(zip_entries), collapse = ", "), ") -- the raster codes in ",
+      "R/prodes.R's prodes_raster_code() can't be checked against this release. ",
+      "Open the zip and check them by hand before trusting it."
     )
-    pal_entries <- regmatches(qml_txt, gregexpr('<paletteEntry[^/]*/>', qml_txt))[[1]]
-    pal_values <- as.integer(sub('.*value="([0-9]+)".*', "\\1", pal_entries))
-    pal_labels <- sub('.*label="([^"]*)".*', "\\1", pal_entries)
-    pal_map <- setNames(pal_labels, as.character(pal_values))
+    record_prodes_verdict("fail", qml_reason)
+    stop("resolve_prodes(): ", qml_reason)
+  }
+  qml_txt <- tryCatch(
+    rawToChar(zip_remote_extract_entry(url, zip_entries[[qml_name]])),
+    error = function(e) stop("resolve_prodes(): could not read the .qml legend: ", conditionMessage(e))
+  )
+  Encoding(qml_txt) <- "UTF-8"
+  pal_map <- prodes_qml_palette(qml_txt)
 
-    release_year_int <- as.integer(release_year)
-    d_code <- release_year_int - 2000L
-    r_code <- release_year_int - 1960L
-    # Mirrors R/prodes.R:130-135's hardcoded raster_codes exactly -- if that
-    # map ever changes, this list needs updating alongside it.
-    expected_legend <- list(
-      list(code = d_code, label = sprintf("%d d%d", d_code, release_year_int)),
-      list(code = r_code, label = sprintf("%d r%d", r_code, release_year_int)),
-      list(code = 91L, label = "91 Hidrografia"),
-      list(code = 100L, label = "100 Vegetação nativa florestal"),
-      list(code = 101L, label = "101 Vegetação nativa não florestal")
+  mismatches <- prodes_legend_mismatches(pal_map, as.integer(release_year))
+  if (length(mismatches) > 0) {
+    qml_reason <- paste0(
+      "the .qml legend no longer matches R/prodes.R's hardcoded raster codes ",
+      "(prodes_raster_code()) -- update them, and this file's copy, by hand ",
+      "before trusting this release:\n- ",
+      paste(mismatches, collapse = "\n- ")
     )
-
-    mismatches <- character(0)
-    for (item in expected_legend) {
-      actual <- pal_map[[as.character(item$code)]]
-      if (is.null(actual)) {
-        mismatches <- c(mismatches, sprintf("code %d: expected label '%s', not present in the .qml", item$code, item$label))
-      } else if (!identical(trimws(actual), trimws(item$label))) {
-        mismatches <- c(mismatches, sprintf("code %d: expected label '%s', got '%s'", item$code, item$label, actual))
-      }
-    }
-    if (length(mismatches) > 0) {
-      qml_reason <- paste0(
-        "the .qml legend no longer matches R/prodes.R's hardcoded raster codes ",
-        "(R/prodes.R:130-135) -- update that map by hand before trusting this release:\n- ",
-        paste(mismatches, collapse = "\n- ")
-      )
-      record_prodes_verdict("fail", qml_reason)
-      stop("resolve_prodes(): ", qml_reason)
-    }
-    if (!(99L %in% pal_values)) {
-      message(
-        "resolve_prodes(): clouds (code 99) still has no entry in this release's .qml ",
-        "legend -- matches the documented, currently-unverifiable state noted in R/prodes.R."
-      )
-    }
-  } else {
-    message("resolve_prodes(): expected exactly one .qml sidecar in the zip, found ", length(qml_name), " -- skipping the raster-legend cross-check this run.")
+    record_prodes_verdict("fail", qml_reason)
+    stop("resolve_prodes(): ", qml_reason)
+  }
+  if (!("99" %in% names(pal_map))) {
+    message(
+      "resolve_prodes(): clouds (code 99) still has no entry in this release's .qml ",
+      "legend -- matches the documented, currently-unverifiable state noted in R/prodes.R."
+    )
   }
 
   # deforestation/residual_deforestation are PRODES' two multi-year series;

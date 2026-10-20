@@ -360,8 +360,8 @@ file_cache_set <- function(key, dir, temp) {
 # Which reads are cheap to keep a single parsed copy of: the .xlsx branches
 # only (ips, epe, and the generic branch covering seeg/mapbiomas/iema --
 # see the dispatch below). Deliberately excludes terra::rast() results (a
-# SpatRaster wraps a C++ pointer tied to a file on disk, and the prodes branch
-# calls terra::tmpFiles(remove = TRUE), which can invalidate a cached one)
+# SpatRaster wraps a C++ pointer tied to a file on disk, which a cleanup of
+# terra's temp files would invalidate under a cached one)
 # and data.table::fread() results (aneel/baci hand these straight to the user
 # under raw_data = TRUE, and a user's dt[, x := 1] would mutate a shared
 # cache entry in place). aneel is 100% CSV across all datasets and explicitly
@@ -718,10 +718,22 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     temp <- cached_file$temp
   } else if (use_cache) {
     dir <- file.path(tempdir(check = TRUE), "datazoom-cache", rlang::hash(cache_key))
+    # the path depends on the URL alone, so a miss can land on a dir an
+    # earlier, since-dropped entry left behind -- start from an empty one,
+    # or the new download is unzipped on top of the old files
+    unlink(dir, recursive = TRUE, force = TRUE)
     dir.create(dir, recursive = TRUE, showWarnings = FALSE)
     temp <- tempfile(fileext = file_extension, tmpdir = dir)
   } else {
-    dir <- tempdir()
+    # A fresh dir per call, never tempdir() itself: the readers below find
+    # their file by pattern (several with recursive = TRUE), and in the
+    # shared tempdir() that matched whatever else was there -- terra's temp
+    # rasters (the PRODES "duplicate names" bug, 2026-10-20) or another
+    # source's extracted files, including those in datazoom-cache/ (e.g.
+    # sigmine's .shp read back as ibama's). Not deleted on exit: a SpatRaster
+    # reads its file lazily; R removes tempdir() when the session ends.
+    dir <- tempfile("datazoom-")
+    dir.create(dir)
     temp <- tempfile(fileext = file_extension, tmpdir = dir)
   }
 
@@ -888,10 +900,24 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       names(dat) <- param$year
     }
     if (param$source == "prodes") {
-      # clearing rasters to avoid overlap
-
-      terra::tmpFiles(remove = TRUE)
-      file <- list.files(dir, pattern = "*.tif", full.names = TRUE)
+      # The raster by its exact name (the manifest's layer_name, which
+      # resolve_prodes.R checks against the .tif inside the zip), never a
+      # pattern: `dir` used to be the session's tempdir() when the cache was
+      # off, where terra writes its own spat_*.tif temp rasters. "*.tif"
+      # picked one left over from an earlier call up as a 2nd layer carrying
+      # the same name, and load_prodes() failed with "Can't transform a data
+      # frame with duplicate names" (confirmed 2026-10-20 in a real session).
+      # A terra::tmpFiles(remove = TRUE) used to sit here to clear those; it
+      # didn't (Windows won't delete a file still held open) and it deleted
+      # the temp files behind the user's own unrelated SpatRasters -- removed.
+      file <- file.path(dir, paste0(dataset_meta(param$source, param$dataset, "layer_name"), ".tif"))
+      if (!file.exists(file)) {
+        stop(
+          "The PRODES download does not contain the expected raster '", basename(file),
+          "'. Found: ", paste(list.files(dir, pattern = "\\.tif$"), collapse = ", "),
+          call. = FALSE
+        )
+      }
       dat <- terra::rast(file)
     }
     if (param$source == "aneel") {
