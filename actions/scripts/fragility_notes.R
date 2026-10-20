@@ -66,4 +66,5 @@ FRAGILITY_SOURCES <- list(
   list(changed_prefix = "seeg", r_path = file.path("R", "seeg.R"), label = "R/seeg.R", treat_fn = "load_seeg()"),
   list(changed_prefix = "aneel", r_path = file.path("R", "aneel.R"), label = "R/aneel.R", treat_fn = "load_aneel()"),
   list(changed_prefix = "degrad", r_path = file.path("R", "degrad.R"), label = "R/degrad.R", treat_fn = "load_degrad()")
+  list(changed_prefix = "deter", r_path = file.path("R", "deter.R"), label = "R/deter.R", treat_fn = "load_deter()")
 )

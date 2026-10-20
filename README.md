@@ -42,8 +42,8 @@ install.packages("datazoom.amazonia")
 And the development version from GitHub with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("datazoompuc/datazoom.amazonia")
+# install.packages("remotes")
+remotes::install_github("datazoompuc/datazoom.amazonia")
 ```
 
 **[1 - Environmental data](#environmental-data)**
@@ -154,6 +154,16 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 > you request is not accepted, check the provider’s website for the
 > latest coverage, or the package’s dataset table at
 > [`datasets_link.csv`](https://github.com/datazoompuc/datazoom.amazonia/blob/master/inst/extdata/manifest/v1/datasets_link.csv).
+
+> **A note on caching:** within a single R session, the package keeps
+> the files it downloads, so asking for another dataset that comes from
+> the same source file (for example, several SEEG sectors, or calling
+> `sigmine_active` twice) does not download it again. For some sources
+> (large Excel files and the SIGMINE zip), the parsed result of the last
+> read is also kept. This cache lives only in the current session, in
+> R’s temporary folder, and disappears when you restart R. To turn it
+> off, run `options(datazoom.amazonia.cache = FALSE)` before calling the
+> function.
 
 # Environmental Data
 
@@ -495,7 +505,8 @@ real-time frequency. This system provides:
   weekly)
 - **Spatial precision**: Geolocated detection of disturbances with
   geographic coordinates
-- **Biome coverage**: Monitors Legal Amazon and Cerrado biome regions
+- **Biome coverage**: Monitors the Legal Amazon, the Cerrado and
+  Pantanal biomes, and non-forest areas of the Legal Amazon
 - **Event-based data**: Each detection is a separate record with
   location and date
 - **Historical records**: Accumulated database of past detection events
@@ -507,11 +518,13 @@ compliance with forest conservation goals.
 
 ### Data Source and Methodology
 
-DETER monitoring: - Uses satellite imagery from multiple sources (MODIS,
-Landsat, Sentinel) - Automated and manual analysis to detect recent
-disturbances - Generates “alerts” - polyons representing areas of
-detected change - Updates available regularly (frequency varies by
-satellite availability) - Operated by INPE’s Remote Sensing Division
+DETER monitoring: - Uses imagery from wide-field optical satellites (the
+satellites listed in the raw data are CBERS-4, CBERS-4A and Amazonia-1
+and, for the Amazon product only, Resourcesat-2) - Automated and manual
+analysis to detect recent disturbances - Generates “alerts” - polyons
+representing areas of detected change - Updates available regularly
+(frequency varies by satellite availability) - Operated by INPE’s Remote
+Sensing Division
 
 For technical details, visit [INPE DETER
 System](http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/deter/deter).
@@ -527,12 +540,15 @@ DETER monitoring data for the Legal Amazon biome.
 - **Geographic coverage**: Legal Amazon region (approximately 5 million
   km²)
 - **Biome**: Tropical forest
-- **Time period**: Historical data spanning multiple years with
-  continuing updates
+- **Time period**: Alerts from August 2016 onward, with continuing
+  updates
 - **Spatial unit**: Polyons/spatial geometries with municipality
   identification
 - **Variables**: Detection date, deforestation/degradation type, area,
   municipality, state
+- **Alert types** (`alert_type`): `DESMATAMENTO_CR`, `DESMATAMENTO_VEG`,
+  `DEGRADACAO`, `CICATRIZ_DE_QUEIMADA`, `CORTE_SELETIVO`,
+  `CS_DESORDENADO`, `CS_GEOMETRICO` and `MINERACAO`
 - **Update frequency**: Regular updates (typically daily or weekly)
 - **Use cases**:
   - Monitor recent deforestation hotspots
@@ -547,17 +563,69 @@ DETER monitoring data for the Cerrado biome.
 
 - **Geographic coverage**: Cerrado region (Brazilian tropical savanna)
 - **Biome**: Tropical savanna/grassland
-- **Time period**: Historical data with continuing updates
+- **Time period**: Alerts from May 2018 onward, with continuing updates
 - **Spatial unit**: Polygons/spatial geometries with municipality
   identification
 - **Variables**: Detection date, vegetation loss type, area,
   municipality, state
+- **Alert types** (`alert_type`): only `DESMATAMENTO_CR` (clear-cut
+  deforestation)
 - **Update frequency**: Regular updates
 - **Use cases**:
   - Monitor Cerrado vegetation loss (increasingly threatened biome)
   - Analyze agricultural expansion in Cerrado region
   - Compare forest and savanna degradation patterns
   - Track conservation effectiveness
+
+### **3. deter_pantanal (DETER Pantanal)**
+
+DETER monitoring data for the Pantanal biome.
+
+- **Geographic coverage**: Pantanal region (the world’s largest tropical
+  wetland), in the states of Mato Grosso do Sul and Mato Grosso
+- **Biome**: Tropical wetland
+- **Time period**: Alerts from August 2023 onward, with continuing
+  updates
+- **Spatial unit**: Polygons/spatial geometries with municipality
+  identification
+- **Variables**: Detection date, alert type, area, municipality, state
+- **Alert types** (`alert_type`): lowercase Portuguese labels –
+  `cicatriz de queimada` (burn scar), `mineracao` (mining),
+  `supressao com solo exposto` (suppression with exposed soil) and
+  `supressao com vegetacao` (suppression with vegetation)
+- **Update frequency**: Regular updates
+- **Use cases**:
+  - Monitor fire scars and vegetation removal in the Pantanal
+  - Track pressure on the wetland alongside the Cerrado and Amazon
+    products
+
+### **4. deter_non_forest (DETER Non-Forest, Legal Amazon)**
+
+DETER monitoring data for the non-forest areas of the Legal Amazon,
+published by INPE as a product separate from `deter_amz`.
+
+- **Geographic coverage**: Non-forest areas within the Legal Amazon
+  states (AC, AM, AP, MA, MT, PA, RO, RR, TO)
+- **Biome**: Non-forest areas of the Legal Amazon
+- **Time period**: Alerts from August 2023 onward, with continuing
+  updates
+- **Spatial unit**: Polygons/spatial geometries with municipality
+  identification
+- **Variables**: Detection date, alert type, area, municipality, state
+- **Alert types** (`alert_type`): the same lowercase Portuguese labels
+  as `deter_pantanal`
+- **Update frequency**: Regular updates
+- **Use cases**:
+  - Monitor vegetation loss in the Legal Amazon’s non-forest areas
+  - Complement the Amazon forest alerts (`deter_amz`) with this separate
+    product
+
+**Note on class vocabularies**: the raw source data uses different class
+labels across these products – upper-snake-case codes for `deter_amz`
+and `deter_cerrado`, lowercase Portuguese labels for `deter_pantanal`
+and `deter_non_forest`. `load_deter()` does not normalize them:
+`alert_type` keeps whichever vocabulary the source used, so recode it
+yourself before stacking datasets from different products.
 
 ------------------------------------------------------------------------
 
@@ -569,16 +637,20 @@ The raw DETER data from INPE reports one alert/detection per row, with
 each row typically associated with a single municipality in the raw
 data. However, **many alerts actually overlap multiple municipalities**
 (typically 2-4 municipalities) that are not all shown in the original
-records. \### Data Processing
+records.
+
+### Data Processing
 
 This package provides an important enhancement: **spatial intersection
 with IBGE municipality geometries** (2019 version) to identify ALL
 municipalities that each DETER alert overlaps with. This creates a more
 complete and accurate geographic picture than the original raw data.
 
-**Important note on CRS metadata**: The CRS (Coordinate Reference
-System) information may need verification after loading, as coordinate
-system metadata can sometimes be unclear in the original INPE data.
+**Important note on CRS metadata**: `load_deter()` reprojects internally
+to IBGE’s official equal-area projection for area calculations (Albers,
+SIRGAS 2000/GRS80, central meridian -54) before computing `area` and
+overlaying municipality boundaries – not UTM zones (see “Important
+Considerations” below for the exact parameters).
 
 ------------------------------------------------------------------------
 
@@ -589,8 +661,10 @@ system metadata can sometimes be unclear in the original INPE data.
 Selects which biome’s DETER data to download.
 
 ``` r
-dataset = "deter_amz"      # Legal Amazon monitoring
-dataset = "deter_cerrado"  # Cerrado biome monitoring
+dataset = "deter_amz"         # Legal Amazon monitoring
+dataset = "deter_cerrado"     # Cerrado biome monitoring
+dataset = "deter_pantanal"    # Pantanal biome monitoring
+dataset = "deter_non_forest"  # Non-forest areas of the Legal Amazon
 ```
 
 ### 2. **raw_data**
@@ -638,6 +712,20 @@ deter_cerrado <- load_deter(
   raw_data = FALSE,
   language = "eng"
 )
+
+# download treated DETER Pantanal data
+deter_pantanal <- load_deter(
+  dataset = "deter_pantanal",
+  raw_data = FALSE,
+  language = "eng"
+)
+
+# download treated DETER non-forest (Legal Amazon) data
+deter_non_forest <- load_deter(
+  dataset = "deter_non_forest",
+  raw_data = FALSE,
+  language = "eng"
+)
 ```
 
 ## Data Notes
@@ -656,10 +744,11 @@ deter_cerrado <- load_deter(
 Each alert/row typically contains: - **Spatial geometry**: Polygon
 coordinates (SF object) - **Detection date**: When the alert was
 issued - **Alert type**: Deforestation, forest degradation, or other
-disturbance - **Area**: Size of detected change in hectares -
-**Municipality**: Geographic unit identification - **State**: Brazilian
-state - **Metadata**: Satellite source, confidence level (varies by
-product)
+disturbance (the label vocabulary differs between products, see above) -
+**Area**: Size of detected change in square metres (a `units` object,
+`[m^2]`) - **Municipality**: Geographic unit identification - **State**:
+Brazilian state - **Metadata**: Satellite source, confidence level
+(varies by product)
 
 ### Important Considerations
 
@@ -669,8 +758,12 @@ product)
     continuously updated
 3.  **Minimum detection size**: Varies by sensor; typically 25 hectares
     for Amazon, larger for Cerrado
-4.  **CRS metadata**: Verify coordinate system after loading; typically
-    UTM zones for Brazil
+4.  **CRS metadata**: `load_deter()` reprojects internally to IBGE’s
+    official equal-area projection for area calculations (Albers, SIRGAS
+    2000/GRS80, central meridian -54, latitude of origin -12, standard
+    parallels -2 and -22, false easting/northing 5,000,000/10,000,000)
+    before computing `area` and overlaying municipality boundaries – not
+    UTM zones.
 5.  **Overlapping municipalities**: Enhanced version accounts for alerts
     crossing municipality boundaries
 6.  **False positives possible**: Satellite detection can occasionally
@@ -4285,16 +4378,25 @@ For more information, visit the [National Mining Agency
 
 ------------------------------------------------------------------------
 
-## Available Dataset
+## Available Datasets
 
 ### **sigmine_active (Active Mining Operations)**
 
 Comprehensive registry of legally operating mining projects in Brazil.
 
-- **Coverage**: All active, legally authorized mining operations
-- **Status**: Currently operating, suspended, or in recovery phases
+- **Coverage**: All active, legally authorized mining operations.
+- **Status**: Currently operating, suspended, or in recovery phases.
 - **Geographic levels**: National coverage with state and municipality
-  identification
+  identification.
+
+### **sigmine_inactive (Inactive Mining Operations)**
+
+Registry of inactive mining processes across Brazil.
+
+- **Coverage**: Includes all mining processes opened throughout history
+  in Brazil that are no longer active.
+- **Geographic levels**: National coverage with state and municipality
+  identification.
 - **Key variables**: Mine name, operator, location, mineral type, area,
   authorization status
 - **Mineral types**: Precious metals, industrial minerals, energy
@@ -4317,10 +4419,13 @@ Comprehensive registry of legally operating mining projects in Brazil.
 
 ### 1. **dataset**
 
-Only one dataset is available:
+Select the mining registry dataset to download:
+
+- `"sigmine_active"`: Active mining operations
+- `"sigmine_inactive"`: Inactive mining operations
 
 ``` r
-dataset = "sigmine_active"  # Active mining operations
+dataset = "sigmine_active"
 ```
 
 ### 2. **raw_data**
@@ -4414,6 +4519,41 @@ minerals**: Coal, uranium - **Gemstones**: Diamonds, emeralds, others -
 - **Polygons**: Spatial boundaries of mining concessions (when
   available)
 - **Accuracy**: Depends on government survey quality
+
+### How municipality-level data is built
+
+SIGMINE is published by the ANM as polygons (one per mining process),
+not as municipality totals. To return `geo_level = "municipality"`, each
+process is assigned to a single municipality in these steps:
+
+1.  The polygons are made valid and their Z/M dimensions are dropped.
+2.  Both the mining polygons and the municipal boundaries (the package’s
+    internal `geo_municipalities` layer) are projected to an equal-area
+    Albers conic projection (SIRGAS 2000 / Brazil Albers,
+    [EPSG:10857](https://epsg.io/10857)): standard parallels 2°S and
+    22°S, central meridian 54°W, latitude of origin 12°S, false easting
+    5,000,000 m, false northing 10,000,000 m, GRS80 ellipsoid. Centroids
+    are computed in meters, because centroids computed on
+    longitude/latitude are distorted.
+3.  The centroid of each polygon is computed.
+4.  Each centroid is matched to the municipality that contains it, and
+    each `processo` is kept only once.
+
+The projection follows IBGE’s recommendation for area calculations
+(equal-area Albers projection, standard parallels 2°S and 22°S, origin
+at 12°S and 54°W), described in the [BC250 technical
+documentation](https://geoftp.ibge.gov.br/cartas_e_mapas/bases_cartograficas_continuas/bc250/versao2023/informacoes_tecnicas/documentacao_tecnica__bc250_2023.pdf)
+(section “Cálculo de áreas e extensões”). The false easting and northing
+(5,000,000 m and 10,000,000 m) only shift the coordinates and do not
+affect areas or centroid positions.
+
+The result is **one municipality per process**: a mining area that
+crosses municipal borders is not split, and it is counted in the
+municipality where its centroid falls. For very irregular polygons, the
+centroid can fall outside the polygon itself, and then the process may
+be assigned to a neighboring municipality, or to none if the centroid
+falls outside every municipal polygon. The same method is used for
+active (`sigmine_active`) and inactive (`sigmine_inactive`) processes.
 
 ### Important Limitations
 

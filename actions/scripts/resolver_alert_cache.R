@@ -26,8 +26,16 @@
 #   - PRODES: the release stamp (e.g. "20260910") -- a new INPE release is
 #     inherently a new key; the SAME stamp failing again on a later run is
 #     already in the committed cache and won't re-alert.
-#   - EPE: block label + reason text -- a DIFFERENT new failure mode on the
-#     same block still alerts, the same recurring reason doesn't.
+#   - IPS: the workbook's stamp; SEEG: the file version -- same idea as PRODES.
+#   - EPE: the block label, for both pass and fail (2026-10-12; it used to be
+#     label + reason on fail only, which a later pass never overwrote -- see
+#     resolve_epe.R's alert_rec() loop). EPE has no release identity, so a
+#     block only "resets" by passing again.
+#
+# Every source keys pass and fail on the SAME item_key -- that's what lets a
+# pass overwrite a fail and a later fail alert again. Keep it that way for
+# any new source. Only content failures are recorded (a candidate that was
+# reached but doesn't fit); a fetch/network failure goes to the issue only.
 #
 # Every verdict actually checked (pass AND fail) gets a row, for audit parity
 # with the MapBiomas cache, but new_resolver_alerts() only ever surfaces
@@ -110,7 +118,7 @@ alert_cache_upsert <- function(cache, source, item_key, dataset = NA_character_,
 ## Recorder (per-resolver convenience wrapper)                  ##
 ## ============================================================ ##
 
-# resolve_prodes.R, resolve_epe.R and resolve_ips.R each need the same four
+# resolve_prodes.R, resolve_epe.R, resolve_ips.R and resolve_seeg.R each need the same four
 # steps every time they check a candidate: read the committed cache once,
 # upsert a verdict row, write the accumulated result to a candidate file
 # under OUT_DIR, and assign("<source>_alert_cache_candidate_path", ...,
@@ -194,8 +202,9 @@ new_resolver_alerts <- function(old, new) {
   # any, was not already a fail" -- not just "the key never existed before".
   # A key that flips from pass to fail (e.g. the SAME PRODES stamp -- an
   # unlikely but real INPE-republished-under-the-same-name scenario -- or
-  # more realistically an EPE block whose reason text happens to repeat
-  # verbatim after a different one in between) is a genuine regression and
+  # more realistically an EPE block that recovered and then broke again;
+  # this only works because every source keys pass and fail identically,
+  # see this file's header) is a genuine regression and
   # deserves an alert every bit as much as a brand-new key failing for the
   # first time; a repeat of the SAME already-known fail must not re-alert
   # (the anti-noise property new_failed_files() has for MapBiomas). Found

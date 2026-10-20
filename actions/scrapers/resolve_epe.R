@@ -53,8 +53,10 @@
 # new-Dataverse-file-rejected Slack signal). Purely additive: the
 # block_failures/partial_failures machinery above is completely unchanged --
 # this only lets build_manifest.R ping Slack the first time a block starts
-# failing for a NEW reason, without re-pinging every run it stays broken the
-# same way (see resolve_prodes.R's identical wiring for the same mechanism).
+# failing, without re-pinging every run it stays broken (see
+# resolve_prodes.R's identical wiring for the same mechanism). 2026-10-12:
+# keyed on the block label alone for both verdicts, content failures only --
+# see the note at the alert_rec() loop below.
 
 resolve_epe <- function(rows) {
   if (is.null(rows) || nrow(rows) == 0) {
@@ -313,13 +315,27 @@ resolve_epe <- function(rows) {
     list(label = "national_energy_balance", ok = !is.null(out$ben)),
     list(label = "energy_state_panel", ok = !is.null(out$panel))
   )
+  # 2026-10-12: one item_key per block (its label) for BOTH verdicts, the
+  # reason kept as a value -- mirroring resolve_prodes.R/resolve_ips.R/
+  # resolve_seeg.R. The fail key used to be label + reason while the pass
+  # key was the label alone, so a pass never overwrote the fail row: a block
+  # that failed, recovered, then failed again the same way read as an
+  # already-known fail and never re-alerted. Also mirroring those resolvers,
+  # only CONTENT failures are recorded (link gone from the page, columns
+  # changed, unreadable file); a page or file that couldn't be fetched at all
+  # is left to partial_failures -> the GitHub issue, and records nothing
+  # here -- otherwise a flaky connection would ping Slack every time it
+  # recovered and then dropped again.
+  is_network_failure <- function(reason) grepl("could not fetch|download failed", reason)
   for (blk in epe_blocks) {
     blk_failures <- grep(paste0("^", blk$label, ": "), block_failures, value = TRUE, fixed = FALSE)
-    if (length(blk_failures) > 0) {
-      for (reason in blk_failures) {
-        alert_rec(item_key = paste(blk$label, reason, sep = "\r"), dataset = blk$label, verdict = "fail", reason = reason)
-      }
-    } else if (isTRUE(blk$ok)) {
+    content_failures <- blk_failures[!is_network_failure(blk_failures)]
+    if (length(content_failures) > 0) {
+      alert_rec(
+        item_key = blk$label, dataset = blk$label, verdict = "fail",
+        reason = paste(content_failures, collapse = " | ")
+      )
+    } else if (length(blk_failures) == 0 && isTRUE(blk$ok)) {
       alert_rec(item_key = blk$label, dataset = blk$label, verdict = "pass")
     }
   }

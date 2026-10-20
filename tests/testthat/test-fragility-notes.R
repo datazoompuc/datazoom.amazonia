@@ -54,6 +54,10 @@ tagged_sources <- list(
   # fixed to IBGE's Albers projection, and the st_intersection() splitting
   # caveat).
   list(r_path = file.path(pkg_root, "R", "degrad.R"), label = "R/degrad.R", min_tags = 3)
+  # Added 2026-10-08 alongside DETER's FRAGILITY_SOURCES row: 3 tags as of
+  # that date (class_name/classname rename, the hardcoded CRS, and the
+  # municipality st_intersection() alert-splitting behavior).
+  list(r_path = file.path(pkg_root, "R", "deter.R"), label = "R/deter.R", min_tags = 3)
 )
 
 for (src in tagged_sources) {
