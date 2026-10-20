@@ -405,6 +405,73 @@ perform_download <- function(path, temp, download_method, source, quiet = TRUE) 
   invisible(NULL)
 }
 
+#' Is `path` a netCDF file? Judged by the first bytes only: the classic format
+#' ("CDF" followed by 0x01, or 0x02 for the 64-bit-offset variant) or the HDF5
+#' signature that netCDF-4 files start with. A missing or empty file is not.
+#' @noRd
+is_netcdf_file <- function(path) {
+  if (!file.exists(path)) {
+    return(FALSE)
+  }
+  magic <- readBin(path, what = "raw", n = 8)
+  classic <- length(magic) >= 4 &&
+    identical(magic[1:3], charToRaw("CDF")) &&
+    magic[4] %in% as.raw(1:2)
+  hdf5 <- identical(magic, as.raw(c(0x89, 0x48, 0x44, 0x46, 0x0d, 0x0a, 0x1a, 0x0a)))
+  classic || hdf5
+}
+
+#' The first `width` characters of `bytes` as one line of text (whitespace
+#' runs collapsed), or NULL when they are not text: empty, or holding a control
+#' byte other than tab/LF/CR (a NUL in particular).
+#' @noRd
+text_snippet <- function(bytes, width = 200) {
+  b <- as.integer(bytes)
+  if (length(b) == 0 || any(b == 127L | (b < 32L & !b %in% c(9L, 10L, 13L)))) {
+    return(NULL)
+  }
+  txt <- iconv(rawToChar(bytes), from = "UTF-8", to = "UTF-8", sub = "?")
+  txt <- trimws(gsub("[[:space:]]+", " ", txt))
+  if (!nzchar(txt)) {
+    return(NULL)
+  }
+  if (nchar(txt) > width) txt <- paste0(substr(txt, 1, width), "...")
+  txt
+}
+
+#' Stop with a readable message unless the downloaded file is a netCDF one.
+#' TerraClimate's THREDDS server answers a request it cannot serve with HTTP
+#' 200 and an empty body (a dataset name it does not have), or HTTP 400 and a
+#' plain-text explanation (a time range outside the data) -- and
+#' utils::download.file() saves either as if it were the netCDF, which
+#' terra::rast() then rejects with a message that says nothing about why.
+#' When the file is text, that text is the server's own explanation, so it is
+#' quoted.
+#' @noRd
+assert_netcdf_file <- function(path, label) {
+  if (is_netcdf_file(path)) {
+    return(invisible(path))
+  }
+
+  size <- file.size(path)
+  if (is.na(size) || size == 0) {
+    detail <- paste0(
+      ": the response was empty. The requested dataset is probably not (or no ",
+      "longer) available on the server; please report this at ",
+      "https://github.com/datazoompuc/datazoom.amazonia/issues."
+    )
+  } else {
+    snippet <- text_snippet(readBin(path, what = "raw", n = 1024))
+    detail <- if (is.null(snippet)) {
+      paste0(" (received an unrecognized ", size, "-byte file).")
+    } else {
+      paste0(". Server response: \"", snippet, "\"")
+    }
+  }
+
+  stop(label, " did not return a netCDF file", detail, call. = FALSE)
+}
+
 # Must match the UA string actions/scrapers/resolve_seeg.R uses to verify
 # this same seeg.eco.br URL live -- see the "seeg" branch above.
 SEEG_USER_AGENT <- paste(
@@ -705,6 +772,14 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
 
     perform_download(path = path, temp = temp, download_method = download_method, source = source, quiet = quiet)
+
+    # Checked here, not at the terra::rast() read below, so a file that is not
+    # a netCDF one is never registered in the session cache (the on.exit()
+    # above removes the per-key dir when this stops) -- a retry downloads
+    # again instead of re-reading the same bad file.
+    if (source == "terraclimate") {
+      assert_netcdf_file(temp, "TerraClimate")
+    }
 
     ## Unzipping if the file is zipped
 
