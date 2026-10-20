@@ -28,16 +28,16 @@ comex,import_mun,,,,https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/mun/IMP_
 comex,import_prod,,,,https://balanca.mdic.gov.br/balanca/bd/comexstat-bd/ncm/IMP_$year$.csv,https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta,1997-2026,,,,,,comex
 comex_dic,hs_codes,,,,https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM_SH.csv,https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta,,,,,,,comex
 comex_dic,ncm_codes,,,,https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM.csv,https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta,,,,,,,comex
-degrad,degrad,,2007,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,,2007-2016,,Degrad2007_Final_pol.shp,,,,
-degrad,degrad,,2008,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,,2007-2016,,Degrad2008_Final_pol.shp,,,,
-degrad,degrad,,2009,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,,2007-2016,,Degrad2009_Final_pol.shp,,,,
-degrad,degrad,,2010,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,,2007-2016,,DEGRAD_2010_UF_pol.shp,,,,
-degrad,degrad,,2011,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,,2007-2016,,DEGRAD_2011_INPE_pol.shp,,,,
-degrad,degrad,,2012,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,,2007-2016,,DEGRAD_2012_INPE_pol.shp,,,,
-degrad,degrad,,2013,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,,2007-2016,,DEGRAD_2013_INPE_pol.shp,,,,
-degrad,degrad,,2014,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,,2007-2016,,DEGRAD_2014_pol.shp,,,,
-degrad,degrad,,2015,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,,2007-2016,,DEGRAD_2015.shp,,,,
-degrad,degrad,,2016,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,,2007-2016,,DEGRAD_2016_pol.shp,,,,
+degrad,degrad,,2007,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/acesso-ao-dados-do-degrad,2007-2016,,Degrad2007_Final_pol.shp,,,,degrad
+degrad,degrad,,2008,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/acesso-ao-dados-do-degrad,2007-2016,,Degrad2008_Final_pol.shp,,,,degrad
+degrad,degrad,,2009,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/acesso-ao-dados-do-degrad,2007-2016,,Degrad2009_Final_pol.shp,,,,degrad
+degrad,degrad,,2010,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/acesso-ao-dados-do-degrad,2007-2016,,DEGRAD_2010_UF_pol.shp,,,,degrad
+degrad,degrad,,2011,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/acesso-ao-dados-do-degrad,2007-2016,,DEGRAD_2011_INPE_pol.shp,,,,degrad
+degrad,degrad,,2012,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/acesso-ao-dados-do-degrad,2007-2016,,DEGRAD_2012_INPE_pol.shp,,,,degrad
+degrad,degrad,,2013,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/acesso-ao-dados-do-degrad,2007-2016,,DEGRAD_2013_INPE_pol.shp,,,,degrad
+degrad,degrad,,2014,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/acesso-ao-dados-do-degrad,2007-2016,,DEGRAD_2014_pol.shp,,,,degrad
+degrad,degrad,,2015,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/acesso-ao-dados-do-degrad,2007-2016,,DEGRAD_2015.shp,,,,degrad
+degrad,degrad,,2016,,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/arquivos/degrad$year$_final_shp.zip,http://www.obt.inpe.br/OBT/assuntos/programas/amazonia/degrad/acesso-ao-dados-do-degrad,2007-2016,,DEGRAD_2016_pol.shp,,,,degrad
 deter,deter_amz,,,,https://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-amz/shape,https://terrabrasilis.dpi.inpe.br/downloads/,2016-2026,municipality,deter-amz-deter-public.shp,,,,deter
 deter,deter_cerrado,,,,https://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-cerrado-nb/shape,https://terrabrasilis.dpi.inpe.br/downloads/,2018-2026,municipality,deter-cerrado-nb-deter-public.shp,,,,deter
 deter,deter_non_forest,,,,https://terrabrasilis.dpi.inpe.br/file-delivery/download/deter-nf/shape,https://terrabrasilis.dpi.inpe.br/downloads/,2023-2026,municipality,deter-nf-deter-public.shp,,,,deter
@@ -179,7 +179,8 @@ seeg,seeg_farming,,,,https://seeg.eco.br/wp-content/uploads/2025/12/Dados-munici
 seeg,seeg_industry,,,,https://seeg.eco.br/wp-content/uploads/2025/12/Dados-municipais-resumido-CO2e-GWP-AR5-13.0.xlsx,https://seeg.eco.br/dados/,1970-2024,"country, state, municipality",,,,13.0,seeg
 seeg,seeg_land,,,,https://seeg.eco.br/wp-content/uploads/2025/12/Dados-municipais-resumido-CO2e-GWP-AR5-13.0.xlsx,https://seeg.eco.br/dados/,1970-2024,"country, state, municipality",,,,13.0,seeg
 seeg,seeg_residuals,,,,https://seeg.eco.br/wp-content/uploads/2025/12/Dados-municipais-resumido-CO2e-GWP-AR5-13.0.xlsx,https://seeg.eco.br/dados/,1970-2024,"country, state, municipality",,,,13.0,seeg
-sigmine,sigmine_active,,,,https://dadosabertos.anm.gov.br/SIGMINE/BRASIL.zip,,,,,,,,
+sigmine,sigmine_active,,,,https://dadosabertos.anm.gov.br/SIGMINE/BRASIL.zip,https://dadosabertos.anm.gov.br/,,"state, municipality",,,,,
+sigmine,sigmine_inactive,,,,https://dadosabertos.anm.gov.br/SIGMINE/PROCESSOS_MINERARIOS/PROCESSOS_INATIVOS.zip,https://dadosabertos.anm.gov.br/,,"state, municipality",,,,,
 terraclimate,climatic_water_deficit,,,,http://thredds.northwestknowledge.net:8080/thredds/ncss,,1958-2022,municipality,,,,,
 terraclimate,max_temperature,,,,http://thredds.northwestknowledge.net:8080/thredds/ncss,,1958-2022,municipality,,,,,
 terraclimate,min_temperature,,,,http://thredds.northwestknowledge.net:8080/thredds/ncss,,1958-2022,municipality,,,,,

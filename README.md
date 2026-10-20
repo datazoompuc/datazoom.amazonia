@@ -42,8 +42,8 @@ install.packages("datazoom.amazonia")
 And the development version from GitHub with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("datazoompuc/datazoom.amazonia")
+# install.packages("remotes")
+remotes::install_github("datazoompuc/datazoom.amazonia")
 ```
 
 **[1 - Environmental data](#environmental-data)**
@@ -154,6 +154,16 @@ devtools::install_github("datazoompuc/datazoom.amazonia")
 > you request is not accepted, check the provider’s website for the
 > latest coverage, or the package’s dataset table at
 > [`datasets_link.csv`](https://github.com/datazoompuc/datazoom.amazonia/blob/master/inst/extdata/manifest/v1/datasets_link.csv).
+
+> **A note on caching:** within a single R session, the package keeps
+> the files it downloads, so asking for another dataset that comes from
+> the same source file (for example, several SEEG sectors, or calling
+> `sigmine_active` twice) does not download it again. For some sources
+> (large Excel files and the SIGMINE zip), the parsed result of the last
+> read is also kept. This cache lives only in the current session, in
+> R’s temporary folder, and disappears when you restart R. To turn it
+> off, run `options(datazoom.amazonia.cache = FALSE)` before calling the
+> function.
 
 # Environmental Data
 
@@ -627,7 +637,9 @@ The raw DETER data from INPE reports one alert/detection per row, with
 each row typically associated with a single municipality in the raw
 data. However, **many alerts actually overlap multiple municipalities**
 (typically 2-4 municipalities) that are not all shown in the original
-records. \### Data Processing
+records.
+
+### Data Processing
 
 This package provides an important enhancement: **spatial intersection
 with IBGE municipality geometries** (2019 version) to identify ALL
@@ -824,8 +836,10 @@ spatial polygons with IBGE municipality boundaries (2019 version) -
 Providing municipality identification for each degradation event -
 Converting to Simple Features (SF) objects for spatial analysis
 
-**Note on CRS**: Coordinate system metadata should be verified after
-loading, as original INPE data sometimes has unclear CRS information.
+**Note on CRS**: `load_degrad()` reprojects internally to IBGE’s
+official equal-area projection for area calculations (Albers, SIRGAS
+2000/GRS80, central meridian -54) before computing `area` and overlaying
+municipality boundaries – not UTM zones.
 
 ------------------------------------------------------------------------
 
@@ -962,7 +976,10 @@ degradation causes
     single location point
 2.  **Municipality intersection**: Treated data identifies all
     municipalities polygon overlaps
-3.  **CRS verification**: Check coordinate system after loading
+3.  **CRS handling**: `load_degrad()` reprojects internally to IBGE’s
+    official equal-area Albers projection before computing area and
+    overlaying municipality boundaries (see the CRS note above) – not
+    something the user needs to check manually
 4.  **Geometry validity**: Some polygons may have validity issues; use
     `st_is_valid()` to check
 
@@ -4361,16 +4378,25 @@ For more information, visit the [National Mining Agency
 
 ------------------------------------------------------------------------
 
-## Available Dataset
+## Available Datasets
 
 ### **sigmine_active (Active Mining Operations)**
 
 Comprehensive registry of legally operating mining projects in Brazil.
 
-- **Coverage**: All active, legally authorized mining operations
-- **Status**: Currently operating, suspended, or in recovery phases
+- **Coverage**: All active, legally authorized mining operations.
+- **Status**: Currently operating, suspended, or in recovery phases.
 - **Geographic levels**: National coverage with state and municipality
-  identification
+  identification.
+
+### **sigmine_inactive (Inactive Mining Operations)**
+
+Registry of inactive mining processes across Brazil.
+
+- **Coverage**: Includes all mining processes opened throughout history
+  in Brazil that are no longer active.
+- **Geographic levels**: National coverage with state and municipality
+  identification.
 - **Key variables**: Mine name, operator, location, mineral type, area,
   authorization status
 - **Mineral types**: Precious metals, industrial minerals, energy
@@ -4393,10 +4419,13 @@ Comprehensive registry of legally operating mining projects in Brazil.
 
 ### 1. **dataset**
 
-Only one dataset is available:
+Select the mining registry dataset to download:
+
+- `"sigmine_active"`: Active mining operations
+- `"sigmine_inactive"`: Inactive mining operations
 
 ``` r
-dataset = "sigmine_active"  # Active mining operations
+dataset = "sigmine_active"
 ```
 
 ### 2. **raw_data**
@@ -4490,6 +4519,41 @@ minerals**: Coal, uranium - **Gemstones**: Diamonds, emeralds, others -
 - **Polygons**: Spatial boundaries of mining concessions (when
   available)
 - **Accuracy**: Depends on government survey quality
+
+### How municipality-level data is built
+
+SIGMINE is published by the ANM as polygons (one per mining process),
+not as municipality totals. To return `geo_level = "municipality"`, each
+process is assigned to a single municipality in these steps:
+
+1.  The polygons are made valid and their Z/M dimensions are dropped.
+2.  Both the mining polygons and the municipal boundaries (the package’s
+    internal `geo_municipalities` layer) are projected to an equal-area
+    Albers conic projection (SIRGAS 2000 / Brazil Albers,
+    [EPSG:10857](https://epsg.io/10857)): standard parallels 2°S and
+    22°S, central meridian 54°W, latitude of origin 12°S, false easting
+    5,000,000 m, false northing 10,000,000 m, GRS80 ellipsoid. Centroids
+    are computed in meters, because centroids computed on
+    longitude/latitude are distorted.
+3.  The centroid of each polygon is computed.
+4.  Each centroid is matched to the municipality that contains it, and
+    each `processo` is kept only once.
+
+The projection follows IBGE’s recommendation for area calculations
+(equal-area Albers projection, standard parallels 2°S and 22°S, origin
+at 12°S and 54°W), described in the [BC250 technical
+documentation](https://geoftp.ibge.gov.br/cartas_e_mapas/bases_cartograficas_continuas/bc250/versao2023/informacoes_tecnicas/documentacao_tecnica__bc250_2023.pdf)
+(section “Cálculo de áreas e extensões”). The false easting and northing
+(5,000,000 m and 10,000,000 m) only shift the coordinates and do not
+affect areas or centroid positions.
+
+The result is **one municipality per process**: a mining area that
+crosses municipal borders is not split, and it is counted in the
+municipality where its centroid falls. For very irregular polygons, the
+centroid can fall outside the polygon itself, and then the process may
+be assigned to a neighboring municipality, or to none if the centroid
+falls outside every municipal polygon. The same method is used for
+active (`sigmine_active`) and inactive (`sigmine_inactive`) processes.
 
 ### Important Limitations
 

@@ -49,6 +49,11 @@ tagged_sources <- list(
   # of the three aneel datasets, verified live) that was deleted rather
   # than kept as a tagged-but-inert assumption. See NEWS.md.
   list(r_path = file.path(pkg_root, "R", "aneel.R"), label = "R/aneel.R", min_tags = 4),
+  # Added 2026-10-12 alongside degrad's FRAGILITY_SOURCES row: 3 tags as of
+  # that date (the missing-CRS/SAD69 datum assumption, the operation_crs
+  # fixed to IBGE's Albers projection, and the st_intersection() splitting
+  # caveat).
+  list(r_path = file.path(pkg_root, "R", "degrad.R"), label = "R/degrad.R", min_tags = 3)
   # Added 2026-10-08 alongside DETER's FRAGILITY_SOURCES row: 3 tags as of
   # that date (class_name/classname rename, the hardcoded CRS, and the
   # municipality st_intersection() alert-splitting behavior).

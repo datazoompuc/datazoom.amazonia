@@ -44,8 +44,8 @@ install.packages("datazoom.amazonia")
 And the development version from GitHub with:
 
 ``` {r, eval=FALSE}
-# install.packages("devtools")
-devtools::install_github("datazoompuc/datazoom.amazonia")
+# install.packages("remotes")
+remotes::install_github("datazoompuc/datazoom.amazonia")
 ```
 
 ```{r, echo=FALSE, message=FALSE}
@@ -142,6 +142,8 @@ include_vignette <- function(f) {
 </table>
 
 > **A note on coverage:** the years, versions and collections listed for each dataset follow what the data provider currently publishes, so they can change as new releases come out. If a `time_period` or `year` you request is not accepted, check the provider's website for the latest coverage, or the package's dataset table at [`datasets_link.csv`](https://github.com/datazoompuc/datazoom.amazonia/blob/master/inst/extdata/manifest/v1/datasets_link.csv).
+
+> **A note on caching:** within a single R session, the package keeps the files it downloads, so asking for another dataset that comes from the same source file (for example, several SEEG sectors, or calling `sigmine_active` twice) does not download it again. For some sources (large Excel files and the SIGMINE zip), the parsed result of the last read is also kept. This cache lives only in the current session, in R's temporary folder, and disappears when you restart R. To turn it off, run `options(datazoom.amazonia.cache = FALSE)` before calling the function.
 
 # Environmental Data
 

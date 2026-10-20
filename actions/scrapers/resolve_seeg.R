@@ -56,11 +56,128 @@
 # `rows` (the manifest rows tagged resolver == "seeg"), echoing each row's
 # own geo_level/year rather than hardcoding NA, same pattern resolve_ips.R
 # and resolve_epe.R already use.
+#
+# 2026-10-17 (diagnostics for the CI-only 403): this resolver fails with HTTP
+# 403 from GitHub Actions runners (issue #344) but succeeds from an ordinary
+# connection -- with the very same browser User-Agent already set below, and
+# no other header (re-verified from a home connection 2026-10-17). So a
+# missing User-Agent or Accept header is not what blocks it. The working
+# hypothesis is that SEEG's edge refuses GitHub's datacenter IP ranges, which
+# a headless browser could not fix since it would run from the same IPs --
+# but that is a hypothesis: no response from the blocked side (CI) has ever
+# been captured.
+#
+# What IS known, from one live request made 2026-10-17 WITHOUT the browser
+# User-Agent (the documented bare-UA 403, kept as a real fixture in
+# tests/testthat/fixtures/seeg_cloudfront_403_*): seeg.eco.br is served
+# through Amazon CloudFront (`server: CloudFront`, `via: ... (CloudFront)`,
+# `x-amz-cf-*`), NOT Cloudflare, and the refusal is CloudFront's own
+# "ERROR: The request could not be satisfied ... Request blocked." page with
+# `x-cache: Error from cloudfront` -- as far as AWS's documentation goes, the
+# page CloudFront serves when a rule of an AWS WAF web ACL attached to the
+# distribution blocks the request (not confirmed with SEEG). That page does
+# not name the rule, so it cannot by itself separate an IP/hosting-provider
+# rule from a bot/User-Agent rule; what the CI response can add is whether it
+# is the SAME page. A bare "HTTP 403" cannot tell these apart:
+#   * the same CloudFront "Request blocked" page, no further headers: WAF
+#     block, consistent with an IP/ASN rule (an allowlist request to SEEG or
+#     a non-datacenter runner are the options; a headless browser is not);
+#   * an `x-amzn-waf-action` header or a challenge/CAPTCHA body: a WAF
+#     challenge action -- the one case where a real browser engine might get
+#     through;
+#   * 429/503 or a retry-after header: rate limiting, not an IP block;
+#   * no HTTP response at all (reset, timeout, TLS failure): reported as "no
+#     HTTP response", with curl's own error text.
+# seeg_failed_fetch_evidence() below puts that evidence into the stop()
+# message, so the next failed CI run (the failure comment on the open
+# "Manifest refresh" issue, or the `Run build_manifest.R` step log) carries it
+# instead of just a status code. When a real CI sample is in hand, record what
+# it showed in the shared SKILL.md's "Known limitations".
 
 SEEG_EXPECTED_CACHE_FIELDS <- c(
   "Setor de emissão", "Categoria emissora", "Sub-categoria emissora",
   "Atividade geral", "Recorte", "Estado", "Município", "ID Território"
 )
+
+# Raw response bytes -> ONE valid UTF-8 string. Capping at `max_bytes` can
+# split a multibyte character and a WAF page is not guaranteed to be UTF-8 at
+# all; iconv(sub = "?") turns every invalid byte into "?", so the result is
+# always valid. An invalid string would make jsonlite::write_json() fail on
+# manifest_report.json -- on exactly the run the evidence is wanted from.
+# NUL bytes are dropped because rawToChar() errors on them.
+seeg_raw_to_text <- function(x, max_bytes) {
+  if (is.null(x) || length(x) == 0) {
+    return("")
+  }
+  x <- x[x != as.raw(0)]
+  x <- x[seq_len(min(length(x), max_bytes))]
+  iconv(rawToChar(x), from = "UTF-8", to = "UTF-8", sub = "?")
+}
+
+# Plain-text evidence about a failed GET of seeg.eco.br/dados/, appended to
+# resolve_seeg()'s stop() message (see this file's header, "diagnostics").
+# `resp` is curl::curl_fetch_memory()'s result (or NULL when curl itself
+# errored, in which case `fetch_error` carries curl's message). Returns one
+# multi-line string. Kept to what separates the candidate causes -- it does
+# NOT dump every header (Set-Cookie values are noise) or the whole body.
+# build_manifest.R stores the stop() message verbatim in resolvers_failed, so
+# it reaches the step log as-is and the GitHub issue through update-manifest
+# .yaml's fmtFailures(), which puts everything under the first line in a code
+# block precisely so an HTML excerpt is shown, not rendered.
+seeg_failed_fetch_evidence <- function(resp, fetch_error = NULL, max_body_chars = 600L) {
+  if (is.null(resp)) {
+    return(paste0(
+      "no HTTP response was received -- curl error: ",
+      if (is.null(fetch_error) || !nzchar(fetch_error)) "(none captured)" else fetch_error
+    ))
+  }
+
+  # curl returns one header block per redirect hop; only the last one is the
+  # response that actually refused us.
+  header_text <- seeg_raw_to_text(resp$headers, 16384L)
+  header_blocks <- strsplit(header_text, "\r?\n\r?\n")[[1]]
+  header_blocks <- header_blocks[nzchar(trimws(header_blocks))]
+  header_lines <- if (length(header_blocks) > 0) {
+    trimws(strsplit(header_blocks[length(header_blocks)], "\r?\n")[[1]])
+  } else {
+    character(0)
+  }
+  fields <- header_lines[grepl("^[^:[:space:]]+:", header_lines)]
+  field_names <- tolower(sub(":.*$", "", fields))
+  field_values <- trimws(sub("^[^:]+:", "", fields))
+
+  keep <- grepl("^(server|cf-|x-|content-type|content-length|retry-after|location|via)", field_names)
+  # sprintf (not paste0): with nothing kept, paste0("  ", character(0), ": ")
+  # is the one-element "  : ", sprintf() gives character(0) as wanted.
+  kept <- sprintf("  %s: %s", field_names[keep], substr(field_values[keep], 1, 200))
+  cookie_names <- unique(sub("=.*$", "", field_values[field_names == "set-cookie"]))
+
+  # One line, no markup noise; the first 4096 bytes always include <title>.
+  squish <- function(s) trimws(gsub("[[:space:]]+", " ", gsub("[[:cntrl:]]", " ", s)))
+  body <- squish(seeg_raw_to_text(resp$content, 4096L))
+  title <- regmatches(body, regexpr("<title[^>]*>[^<]*</title>", body, ignore.case = TRUE))
+  title <- if (length(title) > 0) squish(gsub("<[^>]*>", "", title)) else ""
+  shown <- substr(body, 1, max_body_chars)
+
+  paste(c(
+    sprintf(
+      "HTTP %s from %s", resp$status_code,
+      if (is.null(resp$url)) "(unknown url)" else resp$url
+    ),
+    "response headers (only server, cf-*, x-*, content-type/length, retry-after, location, via):",
+    if (length(kept) > 0) kept else "  (none of those headers present)",
+    if (length(cookie_names) > 0) paste0("  set-cookie (names only): ", paste(cookie_names, collapse = ", ")),
+    if (nzchar(title)) paste0("html <title>: ", title),
+    if (length(resp$content) == 0 || !nzchar(shown)) {
+      "body: (empty)"
+    } else {
+      sprintf(
+        "body (%d bytes; first %d chars, whitespace collapsed): %s",
+        length(resp$content), nchar(shown), shown
+      )
+    }
+  ), collapse = "\n")
+}
 
 resolve_seeg <- function(rows) {
   if (is.null(rows) || nrow(rows) == 0) {
@@ -79,15 +196,25 @@ resolve_seeg <- function(rows) {
   )
 
   h <- curl::new_handle(timeout = 30, useragent = ua)
-  resp <- tryCatch(curl::curl_fetch_memory("https://seeg.eco.br/dados/", handle = h), error = function(e) NULL)
+  fetch_error <- NULL
+  resp <- tryCatch(
+    curl::curl_fetch_memory("https://seeg.eco.br/dados/", handle = h),
+    error = function(e) {
+      fetch_error <<- conditionMessage(e)
+      NULL
+    }
+  )
 
   if (is.null(resp) || resp$status_code != 200) {
+    # The first line stays a one-line summary (it becomes the list item in
+    # the GitHub issue); everything after the first "\n" is the evidence.
     stop(
       "resolve_seeg(): could not fetch https://seeg.eco.br/dados/ (",
       if (is.null(resp)) "request failed" else paste("HTTP", resp$status_code), "). ",
-      "This page returns 403 to requests without a browser User-Agent -- ",
-      "confirm the User-Agent set in this resolver still works before ",
-      "assuming the site itself changed."
+      "A browser User-Agent is already sent (a missing one WAS the cause of the ",
+      "403 first seen here, but not of the CI-only one), so read the response ",
+      "evidence below before assuming the site itself changed.\n",
+      seeg_failed_fetch_evidence(resp, fetch_error)
     )
   }
 

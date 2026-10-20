@@ -187,6 +187,39 @@ KNOWN_POST_CAPTURE_DELTAS <- c(
   "seeg\rseeg_residuals\rNA\rNA\rdocs_url",
   "seeg\rseeg_residuals\rNA\rNA\ravailable_time",
   "seeg\rseeg_residuals\rNA\rNA\rversion",
+  # 2026-10: DEGRAD onboarded onto the manifest pipeline (see
+  # actions/scrapers/resolve_degrad.R's header). A verify-only resolver: it
+  # changes no url/archive_file/available_time -- the only things that moved
+  # are that all 10 year rows now declare resolver = "degrad" (blank before)
+  # and docs_url = the official INPE access page listing the 10 downloads
+  # (blank before). No effect on datasets_link()'s 6 output columns (neither
+  # is one of them), so test-datasets_link.R and the datasets_link()
+  # cell-count test further down are untouched.
+  "degrad\rdegrad\rNA\r2007\rresolver",
+  "degrad\rdegrad\rNA\r2008\rresolver",
+  "degrad\rdegrad\rNA\r2009\rresolver",
+  "degrad\rdegrad\rNA\r2010\rresolver",
+  "degrad\rdegrad\rNA\r2011\rresolver",
+  "degrad\rdegrad\rNA\r2012\rresolver",
+  "degrad\rdegrad\rNA\r2013\rresolver",
+  "degrad\rdegrad\rNA\r2014\rresolver",
+  "degrad\rdegrad\rNA\r2015\rresolver",
+  "degrad\rdegrad\rNA\r2016\rresolver",
+  "degrad\rdegrad\rNA\r2007\rdocs_url",
+  "degrad\rdegrad\rNA\r2008\rdocs_url",
+  "degrad\rdegrad\rNA\r2009\rdocs_url",
+  "degrad\rdegrad\rNA\r2010\rdocs_url",
+  "degrad\rdegrad\rNA\r2011\rdocs_url",
+  "degrad\rdegrad\rNA\r2012\rdocs_url",
+  "degrad\rdegrad\rNA\r2013\rdocs_url",
+  "degrad\rdegrad\rNA\r2014\rdocs_url",
+  "degrad\rdegrad\rNA\r2015\rdocs_url",
+  "degrad\rdegrad\rNA\r2016\rdocs_url"
+  # 2026-10: sigmine_active now declares available_geo "state, municipality"
+  # (it was NA); see test-datasets_link.R delta #14.
+  "sigmine\rsigmine_active\rNA\rNA\ravailable_geo",
+  # 2026-10: sigmine_active now declares its parent page in docs_url (it was NA).
+  "sigmine\rsigmine_active\rNA\rNA\rdocs_url",
   # 2026-10: DETER migration (see test-datasets_link.R's delta #14 and
   # resolve_deter.R's header). deter_cerrado moved to the live
   # "deter-cerrado-nb" slug (url + the shapefile name inside the package);
@@ -316,6 +349,13 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 41
   expect_equal(new_baci_dic$url, "https://balanca.economia.gov.br/balanca/bd/tabelas/NCM_SH.csv")
   new_snap <- new_snap[new_snap$survey != "baci_dic", ]
 
+  # sigmine/sigmine_inactive is a genuinely NEW row (delta #14,
+  # test-datasets_link.R) -- same treatment as baci_dic above: assert it
+  # separately, then exclude it from the row-for-row comparison.
+  new_sig_inactive <- new_snap[new_snap$survey == "sigmine" & new_snap$dataset == "sigmine_inactive", ]
+  expect_equal(nrow(new_sig_inactive), 1)
+  expect_equal(new_sig_inactive$url, "https://dadosabertos.anm.gov.br/SIGMINE/PROCESSOS_MINERARIOS/PROCESSOS_INATIVOS.zip")
+  new_snap <- new_snap[!(new_snap$survey == "sigmine" & new_snap$dataset == "sigmine_inactive"), ]
   # deter_pantanal and deter_non_forest are genuinely NEW rows too (delta
   # #14, test-datasets_link.R) -- same treatment as baci_dic above.
   new_deter <- new_snap[new_snap$survey == "deter" & new_snap$dataset %in% c("deter_pantanal", "deter_non_forest"), ]
