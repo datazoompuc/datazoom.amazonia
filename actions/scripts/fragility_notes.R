@@ -74,6 +74,15 @@ FRAGILITY_SOURCES <- list(
   # changed terraclimate row lists the tags of both.
   list(changed_prefix = "terraclimate", r_path = file.path("R", "climate.R"), label = "R/climate.R", treat_fn = "load_climate()"),
   list(changed_prefix = "terraclimate", r_path = file.path("R", "download.R"), label = "R/download.R", treat_fn = "external_download()"),
+  # The certificate fallback for balanca.mdic.gov.br (R/balanca_tls.R) has two
+  # notes: the host name it applies to, and the hard-coded certificates it trusts.
+  # They matter when a row on that host changes, so they ride on the dictionary
+  # rows ("comex_dic", "baci_dic"): those change rarely, and resolve_comex.R
+  # moves the "comex" data rows and these together when the host changes. The
+  # "comex" rows themselves are left out on purpose -- their available_time moves
+  # every month and the note would be noise.
+  list(changed_prefix = "comex_dic", r_path = file.path("R", "balanca_tls.R"), label = "R/balanca_tls.R", treat_fn = "balanca_with_fallback()"),
+  list(changed_prefix = "baci_dic", r_path = file.path("R", "balanca_tls.R"), label = "R/balanca_tls.R", treat_fn = "balanca_with_fallback()"),
   list(changed_prefix = "aneel", r_path = file.path("R", "aneel.R"), label = "R/aneel.R", treat_fn = "load_aneel()"),
   list(changed_prefix = "deter", r_path = file.path("R", "deter.R"), label = "R/deter.R", treat_fn = "load_deter()"),
   list(changed_prefix = "comex", r_path = file.path("R", "comex.R"), label = "R/comex.R", treat_fn = "load_br_trade()"),

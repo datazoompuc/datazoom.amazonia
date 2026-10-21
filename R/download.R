@@ -380,7 +380,9 @@ parsed_cache_eligible <- function(source, file_extension) {
 #' @noRd
 perform_download <- function(path, temp, download_method, source, quiet = TRUE) {
   if (download_method == "standard") {
-    utils::download.file(url = path, destfile = temp, mode = "wb")
+    # Same call as ever for every host; balanca.mdic.gov.br (COMEX) alone gets
+    # a certificate-error fallback -- see R/balanca_tls.R.
+    balanca_download_file(path, temp)
   }
   if (download_method == "curl") {
     # This function's own caller (external_download()) already restores

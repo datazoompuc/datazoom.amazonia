@@ -35,6 +35,7 @@ URL: https://datazoom.com.br/amazonia/en/, https://github.com/datazoompuc/datazo
 Depends: 
     R (>= 4.1.0)
 Imports:
+    curl,
     data.table,
     dplyr,
     googledrive,

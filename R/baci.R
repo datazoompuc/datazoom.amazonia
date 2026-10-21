@@ -175,7 +175,9 @@ load_baci_dic <- function(language) {
 
   base::message("Downloading dictionary for product codes")
 
-  dic <- base::suppressMessages(readr::read_delim(url, delim = ";", locale = readr::locale(encoding = "Latin1"), progress = TRUE))
+  # balanca_read_delim() is readr::read_delim() with a certificate-error
+  # fallback for this host, which omits its intermediate CA -- R/balanca_tls.R.
+  dic <- base::suppressMessages(balanca_read_delim(url, delim = ";", locale = readr::locale(encoding = "Latin1"), progress = TRUE))
 
   #####################
   ## Data Processing ##

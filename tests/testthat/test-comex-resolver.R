@@ -462,15 +462,39 @@ test_that("the CI wiring that lets a Linux runner verify balanca.mdic.gov.br is 
 
   action <- yaml::read_yaml(action_path)
   expect_equal(action$runs$using, "composite")
-  scripts <- vapply(action$runs$steps, function(s) {
+  steps_run <- vapply(action$runs$steps, function(s) {
     expect_equal(s$shell, "bash") # every composite `run` step must name its shell
     s$run
   }, character(1))
-  script <- paste(scripts, collapse = "\n")
-  # the safety properties, in the script itself
-  expect_match(script, "AC SERPRO AR46 OV TLS CA 2025", fixed = TRUE) # refuses any other certificate
-  expect_match(script, "openssl verify -CAfile /etc/ssl/certs/ca-certificates.crt", fixed = TRUE) # must chain to a root already trusted
-  expect_false(grepl("--insecure|curl[^\n]* -k |ssl_verifypeer|verify=False|NODE_TLS_REJECT_UNAUTHORIZED|GIT_SSL_NO_VERIFY", script))
+  # The action is a thin wrapper; the logic (and the safety properties below)
+  # live in trust-intermediate.sh next to it.
+  expect_equal(steps_run, 'bash "${{ github.action_path }}/trust-intermediate.sh"')
+  script_path <- file.path(dirname(action_path), "trust-intermediate.sh")
+  expect_true(file.exists(script_path))
+  script <- paste(readLines(script_path, warn = FALSE), collapse = "\n")
+  # -- the issuer is found from the certificate the server presents, like a browser
+  #    does, not from a URL written in this repository (the rotation-proofing)
+  expect_match(script, "CA Issuers - URI", fixed = TRUE)
+  expect_false(grepl("acserproar46ovtlsca2025|secure.globalsign.com", sub("^(#[^\n]*\n)+", "", script)), info = "no hard-coded issuer URL in the code")
+  expect_match(script, "refusing a non-http(s) AIA URL", fixed = TRUE)
+  # -- THE security boundary: the whole chain must verify against the system's roots only,
+  #    with host name and server purpose, before anything is installed
+  expect_match(script, 'openssl verify -CAfile "$roots" -no-CApath', fixed = TRUE)
+  expect_match(script, "-purpose sslserver -verify_hostname", fixed = TRUE)
+  expect_match(script, "/etc/ssl/certs/ca-certificates.crt", fixed = TRUE)
+  i_check <- regexpr('fail "the certificate chain for', script, fixed = TRUE)[1]
+  i_install <- regexpr("$sudo_cmd cp", script, fixed = TRUE)[1]
+  expect_true(i_check > 0 && i_install > i_check, info = "the verification must come before the install")
+  # -- the issuer's NAME is reported, never enforced: a legitimate rotation must not stop CI
+  name_block <- regmatches(script, regexpr('(?s)case "\\$first_subject" in.*?esac', script, perl = TRUE))
+  expect_length(name_block, 1)
+  expect_match(name_block, "::warning::", fixed = TRUE)
+  expect_false(grepl("exit|fail ", name_block))
+  # -- it also compares what it found with the chain bundled for R users
+  expect_match(script, "inst/extdata/tls/balanca-serpro-chain.pem", fixed = TRUE)
+  # -- and never switches verification off, in the script or the action
+  code_only <- paste(sub("^\\s*#.*$", "", strsplit(paste(script, steps_run, sep = "\n"), "\n")[[1]]), collapse = "\n")
+  expect_false(grepl("--insecure|curl[^\n]* -k |ssl_verifypeer|verify=False|NODE_TLS_REJECT_UNAUTHORIZED|GIT_SSL_NO_VERIFY|-no-verify|verify_return_error.*false", code_only))
 
   step_ref <- "./.github/actions/trust-serpro-intermediate"
   wired <- list(

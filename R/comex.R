@@ -299,6 +299,10 @@ load_trade_dic <- function(type) {
     )
   }
 
+  # The read below goes through balanca_read_delim(): readr::read_delim() plus a
+  # certificate-error fallback for this host, which omits its intermediate CA
+  # (R/balanca_tls.R).
+
   # FRAGILE: both files are Latin-1, not UTF-8 -- verified at the byte level
   # 2026-10-18 (neither is valid UTF-8; the accented names decode correctly as
   # Latin-1), hence the Latin1 locale below. Downstream, the columns are used by
@@ -306,7 +310,7 @@ load_trade_dic <- function(type) {
   # co_ncm / no_ncm_por / no_ncm_ing (NCM.csv), checked on the live headers
   # 2026-10-19 (e.g. "CO_NCM";...;"NO_NCM_ING") and again by resolve_comex.R's
   # COMEX_DICTIONARIES$required on every run.
-  dic <- readr::read_delim(final, delim = ";", locale = readr::locale(encoding = "Latin1"), progress = TRUE)
+  dic <- balanca_read_delim(final, delim = ";", locale = readr::locale(encoding = "Latin1"), progress = TRUE)
 
   #####################
   ## Data Processing ##
