@@ -209,13 +209,21 @@ zip_extract_entry_from_range_fn <- function(get_range, entry, header_pad = 1024L
 #
 # `useragent`, added for resolve_seeg.R: seeg.eco.br 403s any request
 # without a browser-like User-Agent -- confirmed live to apply to the xlsx
-# file URL itself, not just the /dados/ page. Threaded into every
-# curl::new_handle() call only when non-NULL (curl::new_handle(useragent =
-# NULL) is a harmless no-op, verified). PRODES/BACI/IPS keep calling these
-# with no `useragent` and are unaffected.
+# file URL itself, not just the /dados/ page. Set on the handle only when
+# non-NULL, via zip_remote_handle(): passing `useragent = NULL` straight to
+# curl::new_handle() is NOT a no-op on curl 7.1.0 -- verified 2026-10-20,
+# TerraBrasilis answers 404 to both the HEAD and the ranged GET it sends,
+# while the same handle without the argument gets 200/206. (An older curl
+# did treat it as a no-op, which is what this comment used to claim.)
+# PRODES/BACI/IPS keep calling these with no `useragent`.
+zip_remote_handle <- function(useragent, ...) {
+  h <- curl::new_handle(...)
+  if (!is.null(useragent)) curl::handle_setopt(h, useragent = useragent)
+  h
+}
 
 zip_remote_entries <- function(url, timeout_s = 30, initial_tail = 8192L, max_tail = 2L * 1024L * 1024L, useragent = NULL) {
-  head_handle <- curl::new_handle(nobody = TRUE, timeout = timeout_s, followlocation = TRUE, useragent = useragent)
+  head_handle <- zip_remote_handle(useragent, nobody = TRUE, timeout = timeout_s, followlocation = TRUE)
   head_resp <- tryCatch(
     curl::curl_fetch_memory(url, handle = head_handle),
     error = function(e) stop("zip_remote_entries(): HEAD request failed for ", url, ": ", conditionMessage(e))
@@ -231,7 +239,7 @@ zip_remote_entries <- function(url, timeout_s = 30, initial_tail = 8192L, max_ta
   total_size <- as.numeric(sub(".*:\\s*", "", cl_match))
 
   get_range <- function(from, to) {
-    h <- curl::new_handle(timeout = timeout_s, followlocation = TRUE, useragent = useragent)
+    h <- zip_remote_handle(useragent, timeout = timeout_s, followlocation = TRUE)
     curl::handle_setheaders(h, "Range" = sprintf("bytes=%.0f-%.0f", from, to))
     resp <- tryCatch(
       curl::curl_fetch_memory(url, handle = h),
@@ -256,7 +264,7 @@ zip_remote_entries <- function(url, timeout_s = 30, initial_tail = 8192L, max_ta
 # memDecompress().
 zip_remote_extract_entry <- function(url, entry, timeout_s = 30, header_pad = 1024L, useragent = NULL) {
   get_range <- function(from, to) {
-    h <- curl::new_handle(timeout = timeout_s, followlocation = TRUE, useragent = useragent)
+    h <- zip_remote_handle(useragent, timeout = timeout_s, followlocation = TRUE)
     curl::handle_setheaders(h, "Range" = sprintf("bytes=%.0f-%.0f", from, to))
     resp <- tryCatch(
       curl::curl_fetch_memory(url, handle = h),
