@@ -3,8 +3,9 @@
 # load_br_trade() and load_baci().
 #
 # THE PROBLEM. That server sends its leaf certificate but NOT the intermediate
-# CA that issued it ("AC SERPRO AR46 OV TLS CA 2025"). Windows and macOS fetch a
-# missing intermediate themselves (the certificate's AIA field); OpenSSL-based
+# CA that issued it ("AC SERPRO AR46 OV TLS CA 2025"). Windows fetches a missing
+# intermediate itself (from the certificate's AIA field; checked 2026-10-21, as
+# browsers do; macOS was not tested); OpenSSL-based
 # systems -- Linux, i.e. servers, CI and RStudio Server -- do not, so every
 # request there stops with "SSL certificate problem: unable to get local issuer
 # certificate". Measured 2026-10-21 with the package's own code on an OpenSSL
@@ -18,8 +19,9 @@
 # if it fails with a certificate error is it repeated ONCE, with libcurl told to
 # trust inst/extdata/tls/balanca-serpro-chain.pem -- GlobalSign Root R46 plus
 # the SERPRO intermediate -- instead of the system store. Consequences:
-#   * Nothing changes where the first attempt works (Windows, macOS, and any
-#     Linux whose server-side problem is ever fixed): the fallback never runs.
+#   * Nothing changes where the first attempt works (Windows, and any system
+#     whose TLS library looks the intermediate up, or whose server-side problem
+#     is ever fixed): the fallback never runs.
 #   * The fallback applies to balanca.mdic.gov.br only (is_balanca_url()); no
 #     other host's verification is touched, and nothing is set process-wide.
 #   * Verification is NEVER turned off. The handshake must still produce a
@@ -35,22 +37,48 @@
 #     the root, the signatures are checked all the way up on any version. R46 is
 #     also in Mozilla's store (checked: byte-identical).
 #
-# MAINTENANCE. The bundled intermediate is valid until 2030-10-15. If SERPRO
-# rotates it the fallback fails (with the message below), and the package needs
-# the new certificate: tests/testthat/test-balanca-tls.R fails before the old
-# one expires, and the CI action warns when the live intermediate differs from
-# the bundled one. Chosen over fetching the intermediate at run time (from the
-# leaf's AIA URL) because that needs an unverified TLS handshake in R just to
-# read a URL, plus certificate-chain code in R, for a certificate that changes
-# every few years.
+# MAINTENANCE. The bundled certificates are a hard-coded copy; see the two
+# "# FRAGILE:" notes below for what can make them stale (an expiry date is the
+# smaller risk: the intermediate's is 2030-10-15, but SERPRO can replace it
+# sooner) and for the guards that exist. Chosen over fetching the intermediate
+# at run time (from the leaf's AIA URL) because that needs an unverified TLS
+# handshake in R just to read a URL, plus certificate-chain code in R.
 
 # Is `url` an https URL on balanca.mdic.gov.br itself? (Not a look-alike:
 # "balanca.mdic.gov.br.example.com" and "balanca.mdic.gov.br@example.com" are not.)
+# FRAGILE: the fallback applies to the host name written in this pattern and to
+# no other. The manifest already moved this data once (balanca.economia.gov.br
+# to balanca.mdic.gov.br, 2026-10-19). If a manifest row ever points COMEX or its
+# dictionaries at another host, that host gets NO fallback: on Linux, if it also
+# omits its intermediate certificate, it fails with the plain "unable to get
+# local issuer certificate" and nothing here is tried. A manifest change to such
+# a row is the moment to check whether the new host has the same problem and
+# whether this pattern (and the bundled chain) must cover it.
 is_balanca_url <- function(url) {
   is.character(url) && length(url) == 1L && !is.na(url) &&
     grepl("^https://balanca\\.mdic\\.gov\\.br(:443)?([/?#]|$)", url, ignore.case = TRUE)
 }
 
+# FRAGILE: the certificates this fallback trusts are a HARD-CODED COPY, fetched
+# 2026-10-21: GlobalSign Root R46 (valid to 2046) and "AC SERPRO AR46 OV TLS CA
+# 2025" (valid to 2030-10-15). Their expiry is not the main risk: SERPRO can
+# replace its intermediate at any time, and the ministry's own certificate
+# (expires 2026-10-22 19:17 UTC; they last ~200 days) is renewed under whichever
+# intermediate SERPRO then uses. No newer intermediate was visible on
+# 2026-10-21, and the "2025" in the name may mean a new one each year or only
+# the year this CA was created -- unknown. If the server's certificate is signed
+# by a different intermediate that it still does not send, this fallback cannot
+# complete the chain: load_br_trade() and load_baci() fail on Linux again, with
+# the two-reasons error below, until the PEM is replaced (Windows is unaffected,
+# as it looks the intermediate up itself; macOS was not tested). Guards, and
+# their limits: tests/testthat/test-balanca-tls.R fails
+# 90 days BEFORE either certificate expires (it cannot see an early
+# replacement); the CI action .github/actions/trust-serpro-intermediate warns
+# when the live intermediate is not in the PEM (only when update-manifest.yaml
+# runs, weekly, and only if someone reads the warning). To refresh: download the
+# issuer from the "CA Issuers" URL in the live certificate (openssl x509 -noout
+# -text), convert it to PEM, replace the second block of the PEM and update the
+# dates in its header comment.
 balanca_chain_file <- function() {
   system.file("extdata", "tls", "balanca-serpro-chain.pem", package = "datazoom.amazonia")
 }

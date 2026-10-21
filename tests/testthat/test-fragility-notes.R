@@ -53,6 +53,10 @@ tagged_sources <- list(
   # is TerraClimate's alone.
   list(r_path = file.path(pkg_root, "R", "climate.R"), label = "R/climate.R", min_tags = 3),
   list(r_path = file.path(pkg_root, "R", "download.R"), label = "R/download.R", min_tags = 1),
+  # Added 2026-10-21 for the certificate fallback (R/balanca_tls.R): 2 tags, the
+  # host name its pattern accepts and the hard-coded copy of the certificates it
+  # trusts. It is wired to the "comex_dic" and "baci_dic" rows in FRAGILITY_SOURCES.
+  list(r_path = file.path(pkg_root, "R", "balanca_tls.R"), label = "R/balanca_tls.R", min_tags = 2),
   # 2026-09-21: dropped from 5 to 4 -- the removed tag covered a dead
   # as.Date(operation_start, ...) step (never matched a real column in any
   # of the three aneel datasets, verified live) that was deleted rather
