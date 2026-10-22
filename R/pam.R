@@ -36,7 +36,7 @@ load_pam <- function(dataset, raw_data = FALSE,
   produto_das_lavouras_permanentes <- NULL
   produto_das_lavouras_temporarias_codigo <- NULL
   produto_das_lavouras_temporarias <- NULL
-  geo_id <- ano <- variavel <- produto_das_lavouras <- NULL
+  geo_id <- ano <- variavel <- variavel_ibge <- produto_das_lavouras <- NULL
   unidade_de_medida <- available_time <- vars <- NULL
   produto_das_lavouras_codigo <- NULL
 
@@ -213,13 +213,18 @@ load_pam <- function(dataset, raw_data = FALSE,
 
   ## Translation
 
-  # FRAGILE: only these six IBGE variable ids are named (case_when has no
-  # default), so any other id becomes NA and ends up in a column called
-  # na_v<crop>. Table 1613 (permanent crops) reports "Area destinada a
-  # colheita" as 2313, not 8331 (the id table 5457 uses for the same thing),
-  # so every permanent-crop dataset returns that variable as na_v<crop>: 36 of
-  # permanent_crops' 180 columns on 2026-10-21. A variable IBGE adds is
-  # silently the same.
+  # FRAGILE: the seven ids named below (112, 214, 215, 216, 109, 8331, 2313)
+  # are every variable the seven PAM tables report, checked against IBGE's
+  # metadata and the data itself on 2026-10-21. 2313 ("Area destinada a
+  # colheita", table 1613) was missing until then, so every permanent-crop
+  # dataset returned it as an unnamed na_v<crop> column; it carries the same
+  # figure as 8331 for the same crop, so it takes 8331's name. An id not listed
+  # here no longer vanishes: it becomes v<id> and warns (below), but it still
+  # needs a real name added to both lists. Nothing tells us ahead of time that
+  # IBGE added one.
+  dat <- dat %>%
+    dplyr::mutate(variavel_ibge = variavel) # IBGE's own name, for the warning below
+
   if (language == "pt") {
     dat <- dat %>%
       dplyr::mutate(variavel = dplyr::case_when(
@@ -228,7 +233,9 @@ load_pam <- function(dataset, raw_data = FALSE,
         (variavel_codigo == "215") ~ "valor", # Valor da producao
         (variavel_codigo == "216") ~ "area_colhida", # Area colhida
         (variavel_codigo == "8331") ~ "area_plantada_dest_colheita", # Area plantada ou destinada a colheita,
-        (variavel_codigo == "109") ~ "area_plantada" # Area plantada,
+        (variavel_codigo == "2313") ~ "area_plantada_dest_colheita", # Area destinada a colheita (table 1613, same figure as 8331)
+        (variavel_codigo == "109") ~ "area_plantada", # Area plantada,
+        TRUE ~ paste0("v", variavel_codigo)
       ))
   }
 
@@ -240,9 +247,28 @@ load_pam <- function(dataset, raw_data = FALSE,
         (variavel_codigo == "215") ~ "value", # Valor da producao
         (variavel_codigo == "216") ~ "harvested_area", # Area colhida
         (variavel_codigo == "8331") ~ "planted_to_harvest_area", # Area plantada ou destinada a colheita
-        (variavel_codigo == "109") ~ "planted_area" # Area plantada,
+        (variavel_codigo == "2313") ~ "planted_to_harvest_area", # Area destinada a colheita (table 1613, same figure as 8331)
+        (variavel_codigo == "109") ~ "planted_area", # Area plantada,
+        TRUE ~ paste0("v", variavel_codigo)
       ))
   }
+
+  # The fallback names are the only ones that equal "v" + the id.
+  unnamed <- dat %>%
+    dplyr::filter(variavel == paste0("v", variavel_codigo)) %>%
+    dplyr::distinct(variavel_codigo, variavel_ibge)
+
+  if (nrow(unnamed) > 0) {
+    warning(
+      "IBGE variable(s) with no name in load_pam(): ",
+      paste0(unnamed$variavel_codigo, " (", unnamed$variavel_ibge, ")", collapse = ", "),
+      ". Their columns are called v<id>_v<crop code>. Please report it at ",
+      "https://github.com/datazoompuc/datazoom.amazonia/issues so it can be named.",
+      call. = FALSE
+    )
+  }
+
+  dat <- dplyr::select(dat, -variavel_ibge)
 
 
   #############################
