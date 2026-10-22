@@ -124,7 +124,15 @@ datasets_by_fn <- list(
     "mapbiomas_water",
     "mapbiomas_fire"
   ),
-  load_pam = "all_crops",
+  # um dataset por ramo de R/pam.R: all_crops (tabela 5457), soybean (1612, uma
+  # lavoura temporária), banana (1613, permanente) e corn (839, tabela com mais
+  # de uma safra)
+  load_pam = c(
+    "all_crops",
+    "soybean",
+    "banana",
+    "corn"
+  ),
   load_pevs = c(
     "pevs_forest_crops",
     "pevs_silviculture",
