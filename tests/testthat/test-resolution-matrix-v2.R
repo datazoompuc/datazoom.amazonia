@@ -282,6 +282,23 @@ post_capture_key <- function(s, d, g, y, f) {
   paste(s, d, ifelse(is.na(g), "NA", g), ifelse(is.na(y), "NA", y), f, sep = "\r")
 }
 
+# 2026-10-21: PAM onboarding (see test-datasets_link.R's delta #18 and
+# resolve_pam.R's header). Built from the captured matrix itself rather than
+# listed key by key: 161 cells on 79 unkeyed rows -- resolver on every row,
+# sidra_code on the 7 whole-table rows (classific "all" -> the explicit
+# classification id), and available_time on every row except the 4 series that
+# ended in 1987, which IBGE's coverage left exactly as they were. The SET of
+# changed cells does not move when the resolver refreshes available_time again.
+pam_datasets <- unique(matrix$dataset[matrix$survey == "pam"])
+pam_whole_table <- c("all_crops", "temporary_crops", "permanent_crops", "beans", "corn", "peanut", "potato")
+pam_unchanged_time <- c("alfafa", "cashew", "forage_cane", "rubber_liquid_latex")
+KNOWN_POST_CAPTURE_DELTAS <- c(
+  KNOWN_POST_CAPTURE_DELTAS,
+  post_capture_key("pam", pam_datasets, NA, NA, "resolver"),
+  post_capture_key("pam", pam_whole_table, NA, NA, "sidra_code"),
+  post_capture_key("pam", setdiff(pam_datasets, pam_unchanged_time), NA, NA, "available_time")
+)
+
 test_that("every real-key entry in resolution_matrix_keyed.rds resolves byte-identically after the migration, except 5 known post-capture deltas", {
   real_rows <- matrix[!(is.na(matrix$geo_level) & is.na(matrix$year) & mapply(is_known_base_row_dataset, matrix$survey, matrix$dataset)), ]
   expect_gt(nrow(real_rows), 0)
@@ -386,6 +403,23 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 42
   # certificate expired) -- same file, still one new row.
   expect_equal(new_baci_dic$url, "https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM_SH.csv")
   new_snap <- new_snap[new_snap$survey != "baci_dic", ]
+
+  # pam: 7 sidra_code cells and 75 available_time cells (delta #18, 2026-10-21,
+  # test-datasets_link.R) are asserted there and the rows set aside before the
+  # comparison, so the shared cell count below keeps meaning what its comment
+  # says. Everything else about them must be unchanged.
+  pam_new <- new_snap[new_snap$survey == "pam", ]
+  pam_old <- old_snap[old_snap$survey == "pam", ]
+  expect_equal(nrow(pam_new), 79)
+  expect_setequal(pam_new$dataset, pam_old$dataset)
+  pam_new <- pam_new[order(pam_new$dataset), ]
+  pam_old <- pam_old[order(pam_old$dataset), ]
+  for (col in setdiff(names(pam_old), c("sidra_code", "available_time"))) {
+    expect_equal(pam_new[[col]], pam_old[[col]], info = paste("pam column", col))
+  }
+  expect_equal(sum(pam_new$sidra_code != pam_old$sidra_code), 7)
+  new_snap <- new_snap[new_snap$survey != "pam", ]
+  old_snap <- old_snap[old_snap$survey != "pam", ]
 
   # sigmine/sigmine_inactive is a genuinely NEW row (delta #14,
   # test-datasets_link.R) -- same treatment as baci_dic above: assert it

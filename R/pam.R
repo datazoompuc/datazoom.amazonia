@@ -75,6 +75,14 @@ load_pam <- function(dataset, raw_data = FALSE,
 
   ## Dataset
 
+  # FRAGILE: the SIDRA table ids hardcoded here and in the renames below
+  # (1612 temporary crops, 1613 permanent crops, 5457 all crops, 839/1000/
+  # 1001/1002 the four multi-harvest tables) are copies of the table in the
+  # manifest's sidra_code. resolve_pam.R checks that the manifest's code still
+  # exists in IBGE's table, not that it is still one of these ids: a row moved
+  # to another table matches no branch, the renames never run, and the
+  # select(-"produto_das_lavouras") further down fails. 1612 and 1613 also
+  # overwrite param$dataset, which is what load_dictionary() looks up.
   if (param$code == 1612) { ## This is a subset of all crops
     param$data_name <- "Temporary Crops (Lavouras Temporarias)"
     param$dataset <- "temporary_crops"
@@ -172,6 +180,12 @@ load_pam <- function(dataset, raw_data = FALSE,
 
   ## Change Variable Names for Common Across Datasets
 
+  # FRAGILE: these column names are IBGE's classification labels ("Produto das
+  # lavouras temporarias" for c81, "... permanentes" for c82, "... temporarias
+  # e permanentes" for c782) after janitor::clean_names() and the accent
+  # stripping above. If IBGE rewords a label, rename() stops with "Can't
+  # rename columns that don't exist" -- loudly, but only after the whole
+  # download.
   if (param$code == 5457) {
     dat <- dat %>%
       dplyr::rename(
@@ -199,6 +213,13 @@ load_pam <- function(dataset, raw_data = FALSE,
 
   ## Translation
 
+  # FRAGILE: only these six IBGE variable ids are named (case_when has no
+  # default), so any other id becomes NA and ends up in a column called
+  # na_v<crop>. Table 1613 (permanent crops) reports "Area destinada a
+  # colheita" as 2313, not 8331 (the id table 5457 uses for the same thing),
+  # so every permanent-crop dataset returns that variable as na_v<crop>: 36 of
+  # permanent_crops' 180 columns on 2026-10-21. A variable IBGE adds is
+  # silently the same.
   if (language == "pt") {
     dat <- dat %>%
       dplyr::mutate(variavel = dplyr::case_when(

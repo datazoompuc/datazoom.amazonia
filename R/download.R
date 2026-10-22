@@ -27,6 +27,15 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
 
   param$sidra_code <- sidra_code
   param$year <- year
+  # FRAGILE: classific = "all" (the default) makes sidrar::get_sidra() scrape
+  # IBGE's HTML description of the table (apisidra.ibge.gov.br/desctabapi.aspx
+  # ?c=<table>) to learn its classification ids. That page is behind a
+  # Cloudflare bot challenge (HTTP 403) from some networks, and then the caller
+  # gets a bare "Error in Download." (the reason sidrar captured is dropped
+  # below). PAM spells the classification out in the manifest ("5457/c782/all")
+  # for that reason; ppm, pevs, pibmunic, cempre, censoagro and population
+  # still pass "all" and all failed this way, on 2026-10-21, from the machine
+  # PAM was investigated on.
   param$classific <- classific
   param$category <- category
 
