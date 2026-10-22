@@ -6,9 +6,12 @@
 # table 1613, classification c82 "Produto das lavouras permanentes", category
 # 45981 "Acai"; "5457/c782/all" = every category of the table), and
 # R/pam.R's load_pam() hands the three parts to sidrar::get_sidra() through
-# R/download.R's sidra_download(). This is the FIRST resolver for a
-# SIDRA-based source (PPM, PEVS, PIB municipal and the rest are next), so it
-# is written to be copied: see "REUSE" at the end of this header.
+# R/download.R's sidra_download(). This was the FIRST resolver for a
+# SIDRA-based source; the part every SIDRA resolver needs -- the metadata
+# lookup, the coverage query and the value coding -- now lives in
+# actions/scripts/sidra_api.R (point 9), and what is left here is PAM's own:
+# the grammar of its sidra_code, which variable ids load_pam() names, what its
+# rows mean. See "REUSE" at the end of this header.
 #
 # WHY THIS IS A VERIFICATION RESOLVER (resolve_terraclimate.R's model), NOT A
 # DISCOVERY ONE. Nothing needs discovering -- the table ids are fixed and
@@ -100,16 +103,53 @@
 #      checks that every level a row's available_geo names exists in the
 #      table's metadata; it does not rewrite available_geo.
 #
+#   7. docs_url. The manifest pointed all 79 rows at the survey page,
+#      https://sidra.ibge.gov.br/pesquisa/pam/tabelas. Checked 2026-10-22, that
+#      page (and /pesquisa/pam/tabelas/brasil/2023) answers HTTP 403 behind the
+#      same Cloudflare managed challenge as the HTML table page of point 1, so
+#      nothing here can verify it. https://sidra.ibge.gov.br/tabela/<table> --
+#      the `URL` the metadata itself reports -- answers HTTP 200 for all seven
+#      tables, with the table's number in its <title>. docs_url is therefore each
+#      row's table page, fanned across the rows that read the table (7 pages for
+#      79 rows, from the 7 metadata responses already fetched, no extra
+#      request), refreshed on every run and left alone when the metadata
+#      reports anything but a table page.
+#
+#   8. VARIABLE IDS. R/pam.R's Translation step names seven IBGE variable ids --
+#      112, 214, 215, 216, 109, 8331 and 2313 -- and the seven tables declare
+#      exactly those (plus "... - percentual do total geral" twins, unit "%",
+#      which sidrar's "allxp" never requests; 2313 is table 1613's "area
+#      destinada a colheita", the one that used to come back as an unnamed
+#      na_v<crop> column). PAM_NAMED_VARIABLES is a copy of that list, kept
+#      equal to R/pam.R's by tests/testthat/test-pam-resolver.R, and every run
+#      checks that each table still declares nothing else: a variable IBGE adds
+#      is reported, naming it and IBGE's name for it, before it reaches a user as
+#      a v<id>_v<crop> column with a warning. It fails the TABLE (all its rows are
+#      left alone and reported once), the way resolve_ppm.R treats the same
+#      check. R/pam.R, unlike R/ppm.R, has that v<id> fallback, so a note that
+#      did not hold back the refresh would also do; strict was kept so the two
+#      resolvers behave alike.
+#
+#   9. SHARED CODE. The ~150 lines this file and resolve_ppm.R had in common
+#      (the GET, the response excerpt, the metadata and coverage parsers, the
+#      years grammar, the territorial-level check) are in
+#      actions/scripts/sidra_api.R, sourced by build_manifest.R next to
+#      zip_remote_listing.R, the other helper resolvers share. This file calls it
+#      for the PAM tables with PAM_COVERAGE_VARIABLES and keeps its own
+#      pam_parse_code(), pam_check_table(), pam_check_row() and resolve_pam().
+#
 # WHAT EACH RUN DOES (2 requests per distinct TABLE, 14 for the whole source,
 # never per row -- 79 rows share 7 tables):
 #   a. GET the table's metadata; require the table id, the row's classification
-#      and category ids, and the territorial levels the row advertises.
+#      and category ids, the territorial levels the row advertises, and that
+#      no variable is declared that load_pam() does not name (point 8).
 #   b. GET the coverage query of point 2 and compute, per category, the years
 #      with a published value. A category with none at all is a failure (it
 #      resolves, but a user would get nothing). available_time is that set of
 #      years ("1974-2025", or "1974-1990, 1995-2025" if there are gaps -- the
 #      grammar parse_years() reads); for a row that reads a whole table
-#      ("<table>/c<n>/all") it is the union over its categories.
+#      ("<table>/c<n>/all") it is the union over its categories. docs_url is the
+#      table's page (point 7).
 #
 # FAILURE SEMANTICS. A row that fails is left alone (absent from the result) and
 # reported through `partial_failures`, so one retired crop does not stop the
@@ -136,8 +176,9 @@
 # "temporary_crops", "permanent_crops" and "all_crops", which read whole
 # tables; this resolver does not report them.
 #
-# REUSE (PPM, PEVS, PIB municipal, CEMPRE, ...). The shape that carries over to
-# any SIDRA source: (1) one metadata GET and one coverage GET per distinct
+# REUSE (PEVS, PIB municipal, CEMPRE, ...; resolve_ppm.R already follows it). The
+# shape that carries over to any SIDRA source, most of it now in sidra_api.R:
+# (1) one metadata GET and one coverage GET per distinct
 # TABLE, never per row; (2) rows are checked against the metadata's
 # classification/category ids, because the data API accepts a made-up category
 # silently (point 4); (3) available_time comes from the table's own data, not
@@ -153,27 +194,19 @@
 # (or watch_*) as a resolver, so everything else in this file is pam_* or
 # PAM_*.
 
-PAM_METADATA_URL <- "https://servicodados.ibge.gov.br/api/v3/agregados/%s/metadados"
-
-# Brazil level, every year, every category of one classification, one variable.
-# sprintf(PAM_COVERAGE_URL, table, variable, classification id) -- the
-# classification id is the bare number ("81"), the path wants "c81".
-PAM_COVERAGE_URL <- "https://apisidra.ibge.gov.br/values/t/%s/n1/all/v/%s/p/all/c%s/all"
-
 # The variable that decides whether a year is "published", in order of
 # preference: the first one a table declares is used (point 3 of the header).
+# The four multi-harvest tables have no 215, so they fall to 214; a table that
+# declares neither is a failure (sidra_api_check_table()'s fall_back_to_first
+# stays FALSE: these two ids are known to be enough for PAM's 7 tables).
 PAM_COVERAGE_VARIABLES <- c("215", "214")
 
-# What SIDRA prints instead of a number when there is none: "..." not
-# available, ".." not applicable. Everything else ("-" zero, "X" suppressed,
-# a number) is a published value.
-PAM_UNPUBLISHED <- c("...", "..")
-
-# available_geo word -> the IBGE territorial level that must exist in the
-# table's metadata.
-PAM_GEO_LEVELS <- c(country = "N1", region = "N2", state = "N3", municipality = "N6")
-
-PAM_USER_AGENT <- "datazoom.amazonia-manifest-resolver (+https://github.com/datazoompuc/datazoom.amazonia)"
+# The IBGE variable ids R/pam.R's Translation step names (its case_when(), in
+# both languages): 112 yield, 214 quantity, 215 value, 216 harvested area, 109
+# planted area, 8331 planted-or-destined-to-harvest area (table 5457) and 2313
+# destined-to-harvest area (table 1613). A copy of that list:
+# tests/testthat/test-pam-resolver.R fails if the two ever differ.
+PAM_NAMED_VARIABLES <- c("112", "214", "215", "216", "109", "8331", "2313")
 
 # "1613/c82/45981" -> list(table = "1613", classific = "c82", category =
 # "45981"); NULL when it is not <digits>/c<digits>|all/<digits>|all. A
@@ -189,174 +222,32 @@ pam_parse_code <- function(code) {
   list(table = m[2], classific = m[3], category = m[4])
 }
 
-# Pure: sorted integer years -> the manifest's available_time grammar
-# ("2005", "1974-2025", "1974-1990, 1995-2025"), or NA when there are none.
-pam_years_to_available_time <- function(years) {
-  years <- sort(unique(as.integer(years)))
-  if (length(years) == 0) {
-    return(NA_character_)
-  }
-  starts <- c(1L, which(diff(years) > 1L) + 1L)
-  ends <- c(starts[-1] - 1L, length(years))
-  ranges <- ifelse(
-    years[starts] == years[ends],
-    as.character(years[starts]),
-    sprintf("%d-%d", years[starts], years[ends])
-  )
-  paste(ranges, collapse = ", ")
-}
-
-# A short, single-line excerpt of the text of a response body, or "" when it
-# is empty or not text -- IBGE explains its 400s in one plain sentence, and a
-# Cloudflare challenge is an HTML page whose text ("Just a moment...") is what
-# matters, not its markup.
-pam_snippet <- function(content, n = 160) {
-  if (length(content) == 0) {
-    return("")
-  }
-  head_bytes <- content[seq_len(min(length(content), 4000))]
-  if (any(head_bytes == as.raw(0))) {
-    return("")
-  }
-  txt <- rawToChar(head_bytes)
-  Encoding(txt) <- "UTF-8"
-  if (!validUTF8(txt)) {
-    return("")
-  }
-  txt <- gsub("(?s)<(script|style)[^>]*>.*?</\\1>", " ", txt, perl = TRUE)
-  txt <- gsub("<[^>]*>", " ", txt)
-  txt <- trimws(gsub("[[:space:]]+", " ", txt))
-  if (nchar(txt) > n) txt <- paste0(substr(txt, 1, n), "...")
-  txt
-}
-
-# One GET, redirects not followed (a redirect means the API moved -- worth a
-# loud failure, not a silent follow). Returns list(problem = character(0),
-# text = <body>) or list(problem = "<reason>"). Never throws: "could not
-# check" is a reason, never conflated with "checked and fine".
-pam_fetch <- function(url, timeout_s = 120) {
-  h <- curl::new_handle(timeout = timeout_s, followlocation = FALSE, useragent = PAM_USER_AGENT)
-  resp <- tryCatch(
-    curl::curl_fetch_memory(url, handle = h),
-    error = function(e) e
-  )
-  if (inherits(resp, "error")) {
-    return(list(problem = sprintf("could not reach %s (%s)", url, conditionMessage(resp))))
-  }
-  if (resp$status_code != 200L) {
-    snippet <- pam_snippet(resp$content)
-    return(list(problem = sprintf(
-      "%s answered HTTP %d%s", url, resp$status_code,
-      if (nzchar(snippet)) paste0(": ", snippet) else ""
-    )))
-  }
-  text <- rawToChar(resp$content)
-  Encoding(text) <- "UTF-8"
-  list(problem = character(0), text = text)
-}
-
-# Pure: parses one table's /metadados JSON. Returns list(problem, classifications,
-# levels, variables); `problem` is character(0) when the description is usable.
-# classifications is a named list: classification id ("81") -> its category ids.
-pam_parse_metadata <- function(text, table) {
-  fail <- function(msg) list(problem = msg)
-
-  meta <- tryCatch(jsonlite::fromJSON(text, simplifyVector = FALSE), error = function(e) NULL)
-  if (!is.list(meta) || is.null(meta$id) || is.null(meta$classificacoes)) {
-    snippet <- pam_snippet(charToRaw(enc2utf8(text)), n = 80)
-    return(fail(sprintf(
-      "the response is not a SIDRA table description (no id/classificacoes)%s",
-      if (nzchar(snippet)) paste0("; it starts with: ", snippet) else ""
-    )))
-  }
-  if (!identical(as.character(meta$id), as.character(table))) {
-    return(fail(sprintf("the description is for table %s, not %s", meta$id, table)))
-  }
-
-  classifications <- lapply(meta$classificacoes, function(cl) {
-    vapply(cl$categorias, function(ct) as.character(ct$id), character(1))
-  })
-  names(classifications) <- vapply(meta$classificacoes, function(cl) as.character(cl$id), character(1))
-
-  list(
-    problem = character(0),
-    classifications = classifications,
-    levels = as.character(unlist(meta$nivelTerritorial, use.names = FALSE)),
-    variables = vapply(meta$variaveis, function(v) as.character(v$id), character(1))
-  )
-}
-
-# Pure: parses the coverage query. Returns list(problem, years) where years is
-# a named list: category id -> sorted integer years with a published value
-# (categories with none are absent). The first element of IBGE's array is a
-# header row naming each column, which is how the layout is checked.
-pam_parse_coverage <- function(text) {
-  fail <- function(msg) list(problem = msg)
-
-  d <- tryCatch(jsonlite::fromJSON(text), error = function(e) NULL)
-  if (!is.data.frame(d) || !all(c("V", "D3C", "D3N", "D4C") %in% names(d))) {
-    return(fail("the response is not a SIDRA value table (a JSON array with V, D3C, D3N and D4C)"))
-  }
-  if (!identical(d$D3N[1], "Ano")) {
-    return(fail(sprintf("the third dimension is '%s', not 'Ano' -- the layout of the request changed", d$D3N[1])))
-  }
-  d <- d[-1, , drop = FALSE]
-  if (nrow(d) == 0) {
-    return(fail("the table returned no data rows at all"))
-  }
-  if (!all(grepl("^[0-9]{4}$", d$D3C))) {
-    return(fail("the period codes are not four-digit years (the table is not annual)"))
-  }
-  published <- !is.na(d$V) & !(d$V %in% PAM_UNPUBLISHED)
-  years <- lapply(split(as.integer(d$D3C[published]), d$D4C[published]), function(y) sort(unique(y)))
-  list(problem = character(0), years = years)
-}
-
-# Checks ONE table: its metadata, then its coverage. Returns list(problem,
-# classifications, levels, years) with `problem` character(0) when both worked.
-# Never throws.
+# Checks ONE table: its metadata, then its coverage (sidra_api.R), then that
+# every non-percentage variable it declares is one load_pam() names. Returns
+# list(problem, classifications, levels, years, ...) with `problem`
+# character(0) when all worked. Never throws.
 pam_check_table <- function(table) {
-  meta_got <- pam_fetch(sprintf(PAM_METADATA_URL, table))
-  if (length(meta_got$problem) > 0) {
-    return(list(problem = meta_got$problem))
+  tab <- sidra_api_check_table(table, PAM_COVERAGE_VARIABLES)
+  if (length(tab$problem) > 0) {
+    return(tab)
   }
-  meta <- pam_parse_metadata(meta_got$text, table)
-  if (length(meta$problem) > 0) {
-    return(list(problem = sprintf("metadata of table %s: %s", table, meta$problem)))
-  }
-  if (length(meta$classifications) != 1) {
+  unnamed <- tab$variable_info[!(tab$variable_info$id %in% PAM_NAMED_VARIABLES), , drop = FALSE]
+  if (nrow(unnamed) > 0) {
     return(list(problem = sprintf(
-      "table %s has %d classifications (%s); the coverage query here handles exactly one (see REUSE in this file's header)",
-      table, length(meta$classifications), paste0("c", names(meta$classifications), collapse = ", ")
+      paste(
+        "table %s now declares variable(s) %s that load_pam() does not name (R/pam.R's Translation step",
+        "would return them as unnamed v<id>_v<crop> columns, with a warning); name them there and in PAM_NAMED_VARIABLES"
+      ),
+      table, paste0(unnamed$id, " (", unnamed$nome, ")", collapse = ", ")
     )))
   }
-  variable <- PAM_COVERAGE_VARIABLES[PAM_COVERAGE_VARIABLES %in% meta$variables][1]
-  if (is.na(variable)) {
-    return(list(problem = sprintf(
-      "table %s declares none of the variables %s", table, paste(PAM_COVERAGE_VARIABLES, collapse = "/")
-    )))
-  }
-
-  cov_got <- pam_fetch(sprintf(PAM_COVERAGE_URL, table, variable, names(meta$classifications)))
-  if (length(cov_got$problem) > 0) {
-    return(list(problem = cov_got$problem))
-  }
-  cov <- pam_parse_coverage(cov_got$text)
-  if (length(cov$problem) > 0) {
-    return(list(problem = sprintf("coverage of table %s: %s", table, cov$problem)))
-  }
-
-  list(
-    problem = character(0),
-    classifications = meta$classifications,
-    levels = meta$levels,
-    years = cov$years
-  )
+  tab
 }
 
 # Checks ONE manifest row against its (already checked) table. Returns
-# list(problem = character(0), available_time = "1974-2025") or list(problem =
-# "<reason>", table_level = <TRUE when the whole table failed>).
+# list(problem = character(0), available_time = "1974-2025", docs_url = <the
+# table's page or NA>) or list(problem = "<reason>", table_level = <TRUE when
+# the whole table failed>).
 pam_check_row <- function(code, available_geo, checked) {
   parsed <- pam_parse_code(code)
   if (is.null(parsed)) {
@@ -399,26 +290,12 @@ pam_check_row <- function(code, available_geo, checked) {
     )))
   }
 
-  if (!is.na(available_geo)) {
-    wanted <- trimws(strsplit(tolower(available_geo), ",")[[1]])
-    unknown <- setdiff(wanted, names(PAM_GEO_LEVELS))
-    if (length(unknown) > 0) {
-      return(row_fail(sprintf("available_geo names '%s', which has no IBGE territorial level on record in PAM_GEO_LEVELS", paste(unknown, collapse = "', '"))))
-    }
-    missing_levels <- setdiff(PAM_GEO_LEVELS[wanted], tab$levels)
-    if (length(missing_levels) > 0) {
-      return(row_fail(sprintf(
-        "available_geo promises %s, but table %s's metadata has no territorial level %s",
-        available_geo, parsed$table, paste(missing_levels, collapse = ", ")
-      )))
-    }
+  geo_problem <- sidra_api_geo_problem(available_geo, tab$levels, parsed$table)
+  if (length(geo_problem) > 0) {
+    return(row_fail(geo_problem))
   }
 
-  years <- if (parsed$category == "all") {
-    sort(unique(unlist(tab$years, use.names = FALSE)))
-  } else {
-    tab$years[[parsed$category]]
-  }
+  years <- sidra_api_row_years(tab, parsed$category)
   if (length(years) == 0) {
     return(row_fail(sprintf(
       "category %s of table %s resolves, but has no year with a published value at Brazil level",
@@ -426,7 +303,11 @@ pam_check_row <- function(code, available_geo, checked) {
     )))
   }
 
-  list(problem = character(0), available_time = pam_years_to_available_time(years))
+  list(
+    problem = character(0),
+    available_time = sidra_api_years_to_available_time(years),
+    docs_url = sidra_api_docs_url(tab)
+  )
 }
 
 resolve_pam <- function(rows) {
@@ -461,12 +342,13 @@ resolve_pam <- function(rows) {
   for (t in tables) {
     if (length(checked[[t]]$problem) == 0) {
       all_years <- sort(unique(unlist(checked[[t]]$years, use.names = FALSE)))
-      message("resolve_pam(): table ", t, " ok -- ", length(checked[[t]]$years), " categories published, ", pam_years_to_available_time(all_years))
+      message("resolve_pam(): table ", t, " ok -- ", length(checked[[t]]$years), " categories published, ", sidra_api_years_to_available_time(all_years))
     }
   }
 
   n <- nrow(rows)
   available_time <- rep(NA_character_, n)
+  docs_url <- rep(NA_character_, n)
   problems <- rep(NA_character_, n)
   table_level <- rep(FALSE, n)
   for (i in seq_len(n)) {
@@ -476,6 +358,7 @@ resolve_pam <- function(rows) {
       table_level[i] <- isTRUE(res$table_level)
     } else {
       available_time[i] <- res$available_time
+      docs_url[i] <- res$docs_url
     }
   }
 
@@ -517,7 +400,7 @@ resolve_pam <- function(rows) {
   out <- tibble::tibble(
     survey = "pam", dataset = rows$dataset[ok],
     geo_level = rows$geo_level[ok], year = rows$year[ok],
-    available_time = available_time[ok], resolver = "pam"
+    available_time = available_time[ok], docs_url = docs_url[ok], resolver = "pam"
   )
   if (any(failed)) {
     attr(out, "partial_failures") <- failure_lines

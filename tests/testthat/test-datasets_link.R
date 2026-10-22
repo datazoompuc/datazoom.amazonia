@@ -368,7 +368,8 @@ fixture <- fixture %>%
 #     -> 1988, what IBGE publishes), alfafa/cashew/forage_cane/
 #     rubber_liquid_latex still ending in 1987, every other end year >= 2024.
 #     The golden comparison below blanks pam's available_time on both sides.
-# resolver was populated too (not a datasets_link() column).
+# resolver was populated too, and (2026-10-22) docs_url moved from the survey
+# page to each row's own table page (neither is a datasets_link() column).
 fixture <- fixture %>%
   dplyr::mutate(
     sidra_code = dplyr::case_when(

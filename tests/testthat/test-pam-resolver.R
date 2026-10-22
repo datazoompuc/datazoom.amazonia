@@ -27,6 +27,10 @@ skip_if_not_installed("curl")
 skip_if_not_installed("jsonlite")
 
 resolver_env <- new.env()
+# the metadata lookup, coverage query and value coding PAM shares with the other
+# SIDRA resolvers (tested for itself in test-sidra-api.R), as build_manifest.R
+# sources it before the resolvers
+source(file.path(actions_dir, "scripts", "sidra_api.R"), local = resolver_env)
 source(file.path(actions_dir, "scrapers", "resolve_pam.R"), local = resolver_env)
 list2env(as.list(resolver_env), environment())
 
@@ -79,19 +83,24 @@ HEADER_ROW <- list(
 )
 
 metadata_json <- function(table, drop_category = character(0), levels = c("N1", "N2", "N3", "N6", "N8", "N9"),
-                          id = as.integer(table), classifications = NULL) {
+                          id = as.integer(table), classifications = NULL, extra_variables = character(0),
+                          url = paste0("https://sidra.ibge.gov.br/tabela/", table)) {
   spec <- FAKE_TABLES[[table]]
   cats <- setdiff(fake_categories(table), drop_category)
   classifications <- classifications %||% list(list(
     id = as.integer(spec$cl), nome = "Produto das lavouras",
     categorias = lapply(cats, function(ct) list(id = as.integer(ct), nome = paste("categoria", ct), unidade = NULL, nivel = 1L))
   ))
+  variables <- lapply(c(spec$vars, extra_variables), function(v) list(id = as.integer(v), nome = paste("variavel", v), unidade = "Hectares"))
+  # IBGE declares a "... - percentual do total geral" twin (unit "%") for most
+  # variables; sidrar's "allxp" never requests them and load_pam() does not name them
+  percent <- list(list(id = as.integer(paste0("1000", spec$vars[2])), nome = "variavel - percentual do total geral", unidade = "%"))
   as.character(jsonlite::toJSON(list(
-    id = id, nome = paste("Tabela", table), URL = paste0("https://sidra.ibge.gov.br/tabela/", table),
+    id = id, nome = paste("Tabela", table), URL = url,
     pesquisa = "Producao Agricola Municipal",
     periodicidade = list(frequencia = "anual", inicio = 1974L, fim = 2025L),
     nivelTerritorial = list(Administrativo = levels, Especial = list(), IBGE = list()),
-    variaveis = lapply(spec$vars, function(v) list(id = as.integer(v), nome = paste("variavel", v))),
+    variaveis = c(variables, percent),
     classificacoes = classifications
   ), auto_unbox = TRUE, null = "null"))
 }
@@ -161,9 +170,10 @@ test_that("a healthy IBGE resolves all 79 rows, with 2 requests per TABLE (14), 
   expect_setequal(out$dataset, manifest_rows$dataset)
   expect_true(all(out$survey == "pam"))
   expect_true(all(out$resolver == "pam"))
-  # unkeyed rows stay unkeyed; the only value the resolver owns is available_time
+  # unkeyed rows stay unkeyed; the values the resolver owns are available_time
+  # and docs_url, never sidra_code
   expect_true(all(is.na(out$geo_level)) && all(is.na(out$year)))
-  expect_equal(names(out), c("survey", "dataset", "geo_level", "year", "available_time", "resolver"))
+  expect_equal(names(out), c("survey", "dataset", "geo_level", "year", "available_time", "docs_url", "resolver"))
   expect_null(attr(out, "partial_failures"))
 
   expect_length(seen$urls, 14)
@@ -210,8 +220,66 @@ test_that("the Total categories resolve: coverage asks for value of production (
   expect_true(all(grepl("^https://servicodados\\.ibge\\.gov\\.br/api/v3/agregados/[0-9]+/metadados$", grep("metadados", seen$urls, value = TRUE))))
 })
 
+test_that("docs_url is each table's own page, fanned across every row that reads the table", {
+  seen <- new.env()
+  out <- run(fake_ibge(seen = seen))
+
+  tables <- row_table[match(out$dataset, manifest_rows$dataset)]
+  expect_equal(out$docs_url, paste0("https://sidra.ibge.gov.br/tabela/", tables))
+  expect_equal(length(unique(out$docs_url)), 7) # 7 tables for 79 rows ...
+  expect_length(seen$urls, 14) # ... and still 2 requests per table, not per row
+})
+
+test_that("docs_url is taken from the metadata only when it is a SIDRA table page; otherwise the cell is left alone", {
+  out <- run(fake_ibge(metadata = function(table) {
+    metadata_json(table, url = if (table == "1613") "https://example.org/somewhere" else paste0("https://sidra.ibge.gov.br/tabela/", table))
+  }))
+
+  expect_equal(nrow(out), 79) # not a failure
+  expect_true(all(is.na(out$docs_url[out$dataset %in% manifest_rows$dataset[row_table == "1613"]])))
+  expect_equal(out$docs_url[out$dataset == "soybean"], "https://sidra.ibge.gov.br/tabela/1612")
+  expect_null(attr(out, "partial_failures"))
+})
+
 test_that("the resolver defines exactly one resolve_* binding (build_manifest.R registers every one it finds)", {
   expect_equal(ls(resolver_env, pattern = "^(resolve_|watch_)"), "resolve_pam")
+})
+
+# ---- the variable ids load_pam() names ----------------------------------------
+
+test_that("a variable IBGE adds to a table fails that table's rows, naming it; percentage variables never trip the check", {
+  out <- run(fake_ibge(metadata = function(table) {
+    metadata_json(table, extra_variables = if (table == "1613") "9999" else character(0))
+  }))
+
+  n_1613 <- sum(row_table == "1613")
+  expect_equal(nrow(out), 79 - n_1613)
+  expect_false(any(out$dataset %in% manifest_rows$dataset[row_table == "1613"]))
+  failures <- attr(out, "partial_failures")
+  expect_length(failures, 1) # reported once for the table, not once per crop
+  expect_match(failures, sprintf("^pam/table 1613 \\(%d dataset\\(s\\)\\): table 1613 now declares variable\\(s\\) 9999 \\(variavel 9999\\)", n_1613))
+  expect_match(failures, "does not name", fixed = TRUE)
+
+  # every table of the healthy fake also declares a percentage variable (unit "%"), and none of them fails
+  expect_null(attr(run(), "partial_failures"))
+})
+
+test_that("PAM_NAMED_VARIABLES is the list of ids R/pam.R's Translation step names, in both languages", {
+  pam_src <- readLines(file.path(pkg_root, "R", "pam.R"), warn = FALSE)
+  start <- grep("## Translation", pam_src, fixed = TRUE)
+  end <- grep("## Create Long Format Data ##", pam_src, fixed = TRUE)
+  expect_length(start, 1)
+  expect_length(end, 1)
+  section <- pam_src[(start + 1):(end - 1)]
+  section <- section[!grepl("^\\s*#", section)]
+
+  per_language <- list(pt = section[grep("language == \"pt\"", section):(grep("language == \"eng\"", section) - 1)],
+                       eng = section[grep("language == \"eng\"", section):length(section)])
+  for (language in names(per_language)) {
+    ids <- regmatches(per_language[[language]], gregexpr("variavel_codigo == \"[0-9]+\"", per_language[[language]]))
+    ids <- sort(unique(sub(".*\"([0-9]+)\"", "\\1", unlist(ids))))
+    expect_equal(ids, sort(PAM_NAMED_VARIABLES), info = language)
+  }
 })
 
 # ---- per-row failures -------------------------------------------------------
@@ -427,42 +495,6 @@ test_that("pam_parse_code reads <table>/c<n>/<category> and rejects everything e
   expect_null(pam_parse_code(NULL))
 })
 
-test_that("pam_years_to_available_time writes the grammar parse_years() reads, gaps included", {
-  cases <- list(
-    list(c(2005L), "2005"),
-    list(1974:2025, "1974-2025"),
-    list(c(1974:1990, 1995:2025), "1974-1990, 1995-2025"),
-    list(c(2000L, 2002L), "2000, 2002"),
-    list(c(2025L, 1974L, 1974L, 1975L), "1974-1975, 2025"), # unsorted, duplicated
-    list(c(1988:2000, 2003L, 2010:2012), "1988-2000, 2003, 2010-2012")
-  )
-  for (case in cases) {
-    expect_equal(pam_years_to_available_time(case[[1]]), case[[2]])
-    expect_equal(parse_years(pam_years_to_available_time(case[[1]])), sort(unique(case[[1]])))
-  }
-  expect_true(is.na(pam_years_to_available_time(integer(0))))
-})
-
-test_that("pam_parse_coverage: '...' and '..' are unpublished; numbers, '-' and 'X' are published", {
-  rows <- list(HEADER_ROW)
-  values <- c("123", "-", "X", "...", "..", "0")
-  for (i in seq_along(values)) {
-    rows[[i + 1]] <- list(V = values[i], D3C = as.character(2000 + i), D3N = "Ano", D4C = "7")
-  }
-  rows[[length(rows) + 1]] <- list(V = NULL, D3C = "2099", D3N = "Ano", D4C = "7") # null value
-  parsed <- pam_parse_coverage(as.character(jsonlite::toJSON(rows, auto_unbox = TRUE, null = "null")))
-
-  expect_equal(parsed$problem, character(0))
-  expect_equal(parsed$years[["7"]], c(2001L, 2002L, 2003L, 2006L)) # 123, -, X, 0
-})
-
-test_that("pam_snippet shows text, strips markup, and gives up on binary", {
-  expect_equal(pam_snippet(raw(0)), "")
-  expect_equal(pam_snippet(as.raw(c(0x50, 0x4b, 0x03, 0x04, 0x00, 0x01))), "")
-  expect_equal(pam_snippet(charToRaw("<p>Tabela   99999:\nTabela invalida</p>")), "Tabela 99999: Tabela invalida")
-  expect_equal(nchar(pam_snippet(charToRaw(strrep("a", 500)), n = 50)), 53)
-})
-
 test_that("the package's sidra_code_parts() (what load_pam() uses) reads every code the way this resolver does", {
   for (code in manifest_rows$sidra_code) {
     ours <- sidra_code_parts(code)
@@ -472,6 +504,9 @@ test_that("the package's sidra_code_parts() (what load_pam() uses) reads every c
     expect_equal(ours$category, list(theirs$category), info = code)
   }
 })
+
+# (the years grammar, the value coding of the coverage query and the response
+# excerpt are shared with the other SIDRA resolvers and tested in test-sidra-api.R)
 
 # ---- the committed manifest and R/pam.R ------------------------------------------
 
@@ -483,8 +518,10 @@ test_that("every committed PAM row is verifiable: owned by the resolver, explici
   expect_false(any(vapply(parsed_codes, function(p) p$classific == "all", NA)))
   expect_setequal(row_table, names(FAKE_TABLES))
   geo <- unique(trimws(unlist(strsplit(tolower(manifest_rows$available_geo), ","))))
-  expect_true(all(geo %in% names(PAM_GEO_LEVELS)))
+  expect_true(all(geo %in% names(SIDRA_API_GEO_LEVELS)))
   expect_false(anyNA(lapply(manifest_rows$available_time, parse_years)))
+  # each row points at its own table's page (the survey page is bot-challenged)
+  expect_equal(manifest_rows$docs_url, paste0("https://sidra.ibge.gov.br/tabela/", row_table))
 })
 
 test_that("R/pam.R hardcodes every table id the manifest uses (its FRAGILE tags say the two must agree)", {

@@ -289,6 +289,12 @@ post_capture_key <- function(s, d, g, y, f) {
 # classification id), and available_time on every row except the 4 series that
 # ended in 1987, which IBGE's coverage left exactly as they were. The SET of
 # changed cells does not move when the resolver refreshes available_time again.
+# 2026-10-22: + docs_url on every row (79 more cells) -- the survey page
+# https://sidra.ibge.gov.br/pesquisa/pam/tabelas, bot-challenged (HTTP 403) so
+# nothing could verify it, became each row's own table page
+# https://sidra.ibge.gov.br/tabela/<table> (7 pages for 79 rows, HTTP 200, taken
+# from the metadata by resolve_pam.R). 240 cells in all. docs_url is not a
+# datasets_link() column, so only this per-field matrix sees it.
 pam_datasets <- unique(matrix$dataset[matrix$survey == "pam"])
 pam_whole_table <- c("all_crops", "temporary_crops", "permanent_crops", "beans", "corn", "peanut", "potato")
 pam_unchanged_time <- c("alfafa", "cashew", "forage_cane", "rubber_liquid_latex")
@@ -296,7 +302,8 @@ KNOWN_POST_CAPTURE_DELTAS <- c(
   KNOWN_POST_CAPTURE_DELTAS,
   post_capture_key("pam", pam_datasets, NA, NA, "resolver"),
   post_capture_key("pam", pam_whole_table, NA, NA, "sidra_code"),
-  post_capture_key("pam", setdiff(pam_datasets, pam_unchanged_time), NA, NA, "available_time")
+  post_capture_key("pam", setdiff(pam_datasets, pam_unchanged_time), NA, NA, "available_time"),
+  post_capture_key("pam", pam_datasets, NA, NA, "docs_url")
 )
 
 test_that("every real-key entry in resolution_matrix_keyed.rds resolves byte-identically after the migration, except 5 known post-capture deltas", {

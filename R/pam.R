@@ -233,8 +233,10 @@ load_pam <- function(dataset, raw_data = FALSE,
   # dataset returned it as an unnamed na_v<crop> column; it carries the same
   # figure as 8331 for the same crop, so it takes 8331's name. An id not listed
   # here no longer vanishes: it becomes v<id> and warns (below), but it still
-  # needs a real name added to both lists. Nothing tells us ahead of time that
-  # IBGE added one.
+  # needs a real name added to both lists. resolve_pam.R tells us ahead of time
+  # that IBGE added one: it re-checks each table's declared variables against
+  # PAM_NAMED_VARIABLES, a copy of this list that
+  # tests/testthat/test-pam-resolver.R keeps equal to it.
   dat <- dat %>%
     dplyr::mutate(variavel_ibge = variavel) # IBGE's own name, for the warning below
 
