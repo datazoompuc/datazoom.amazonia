@@ -192,3 +192,22 @@ test_that("a fallback name ('v<id>') can never equal a real variable name", {
     expect_false(any(grepl("^v[0-9]+$", labels)))
   }
 })
+
+# ---- a table number is its dataset's name ----------------------------------------
+
+test_that("load_pam(dataset = <table number>) returns exactly what load_pam(dataset = <name>) does, treated and raw", {
+  testthat::local_mocked_bindings(
+    sidra_download = function(sidra_code, ...) fake_sidra(as.character(sidra_code)),
+    .package = "datazoom.amazonia"
+  )
+  for (dataset in c("permanent_crops", "temporary_crops", "all_crops", "corn", "peanut", "potato", "beans")) {
+    table <- as.numeric(PAM_DATASET_TABLE[[dataset]])
+    for (language in c("eng", "pt")) {
+      for (raw in c(FALSE, TRUE)) {
+        by_name <- load_pam(dataset = dataset, geo_level = "country", time_period = 2023, language = language, raw_data = raw)
+        by_number <- load_pam(dataset = table, geo_level = "country", time_period = 2023, language = language, raw_data = raw)
+        expect_identical(by_number, by_name, info = paste(dataset, language, raw))
+      }
+    }
+  }
+})

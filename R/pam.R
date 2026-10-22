@@ -52,6 +52,19 @@ load_pam <- function(dataset, raw_data = FALSE,
   param$language <- language
   param$raw_data <- raw_data
 
+  # A SIDRA table given as a number ("You can also use SIDRA codes") means the
+  # manifest dataset that reads that table whole: load_pam(dataset = 1612) is
+  # load_pam(dataset = "temporary_crops"), 1613 is "permanent_crops", 5457
+  # "all_crops", and 839, 1000, 1001 and 1002 are "corn", "peanut", "potato" and
+  # "beans" -- with the same classification, treatment and checks. Only a
+  # number the manifest does not know keeps the old request below (sidra_download()'s
+  # defaults, raw data only).
+
+  if (is.numeric(param$dataset)) {
+    known <- sidra_dataset_of_table("pam", param$dataset)
+    if (!is.null(known)) param$dataset <- known
+  }
+
   # check if dataset, geo_level, and time_period are supported
 
   check_params(param)
@@ -59,19 +72,19 @@ load_pam <- function(dataset, raw_data = FALSE,
   # Extracting sidra info in the form code/classific/category
 
   if (!is.numeric(param$dataset)) {
-    sidra_info <- datasets_link() %>%
+    parts <- datasets_link() %>%
       dplyr::filter(dataset == param$dataset) %>%
-      dplyr::select(sidra_code) %>%
-      unlist() %>%
-      stringr::str_split("/") %>%
-      unlist()
+      dplyr::pull(sidra_code) %>%
+      sidra_code_parts()
+
+    param$code <- parts$table
+    param$classific <- parts$classific
+    param$category <- parts$category
   } else {
     param$code <- param$dataset
+    param$classific <- "all"
+    param$category <- "all"
   }
-
-  param$code <- sidra_info[1]
-  param$classific <- sidra_info[2]
-  param$category <- sidra_info[3]
 
   ## Dataset
 
@@ -115,7 +128,7 @@ load_pam <- function(dataset, raw_data = FALSE,
       sidra_download(
         sidra_code = param$code,
         classific = param$classific,
-        category = list(param$category),
+        category = param$category,
         year = year_num,
         geo_level = param$geo_level
       )

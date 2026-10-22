@@ -463,6 +463,16 @@ test_that("pam_snippet shows text, strips markup, and gives up on binary", {
   expect_equal(nchar(pam_snippet(charToRaw(strrep("a", 500)), n = 50)), 53)
 })
 
+test_that("the package's sidra_code_parts() (what load_pam() uses) reads every code the way this resolver does", {
+  for (code in manifest_rows$sidra_code) {
+    ours <- sidra_code_parts(code)
+    theirs <- pam_parse_code(code)
+    expect_equal(as.character(ours$table), theirs$table, info = code)
+    expect_equal(ours$classific, theirs$classific, info = code)
+    expect_equal(ours$category, list(theirs$category), info = code)
+  }
+})
+
 # ---- the committed manifest and R/pam.R ------------------------------------------
 
 test_that("every committed PAM row is verifiable: owned by the resolver, explicit classification, known geo levels", {
