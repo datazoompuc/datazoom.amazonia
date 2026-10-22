@@ -86,6 +86,25 @@
 #      table per row, docs_url is per row: each row's own table page, refreshed
 #      from the metadata on every run.
 #
+#   8. THE DICTIONARY. R/dictionary.R's PPM section labels the columns load_ppm()
+#      returns: a column is named by its category id (by the variable id for 94
+#      and 95) and labelled by matching that id against var_code. Compared with
+#      the live classifications of tables 3939, 74 and 3940 and the variables of
+#      94 and 95 on 2026-10-22, it had exactly one gap in the five sections:
+#      category 79366 ("Peixes", Quilogramas) of table 3940, which IBGE
+#      publishes from 2024 as "-" (zero) for every state so far -- load_ppm()
+#      drops non-numbers, so no column was affected yet; the first number IBGE
+#      gives it would have come back unlabelled. The row was added. Because that
+#      can happen again with no change anywhere in this repository, and the
+#      classification is already in hand, every run repeats the comparison from
+#      the committed source of R/dictionary.R (ppm_read_dictionary(): the file is
+#      self-contained, and build_manifest.R never loads the package) and reports
+#      a missing row. It is a NOTE, not a failure of the row: the row's
+#      available_time is still refreshed, but the note travels with the other
+#      partial failures (exit 11, an issue), because it needs a person to write
+#      the IBGE name and an English gloss. Not checked: names, units and
+#      translations of existing rows (nothing reads the units; a few are rough).
+#
 # DIFFERENCES FROM resolve_pam.R
 #   * sidra_code: bare "<table>" or "<table>/c<n>/<category|all>" (PAM: always
 #     the latter). Whether the classification exists is verified both ways.
@@ -95,7 +114,9 @@
 #     failure is reported per row.
 #   * The coverage query has no /c<n>/all part for a table without a
 #     classification; the first of 215 / the first non-percentage variable.
-#   * Also checks the variable ids (point 4) and returns docs_url (point 7).
+#   * Also checks the variable ids (point 4), returns docs_url (point 7) and
+#     compares R/dictionary.R with the classification (point 8; the extra
+#     argument `dictionary` is only there so tests can pass a fake).
 #   * Failure model: the same as PAM's, deliberately. With 5 rows a stop() on any
 #     failure would be tempting, but then one flaky request, or one retired
 #     table, would throw away the four good refreshes of that month's PR and
@@ -104,17 +125,8 @@
 #     row failed" -- IBGE's API moved or challenged -- stops the resolver.
 #
 # WHAT THIS DOES NOT CHECK: municipality- or state-level coverage; that sidrar
-# still parses IBGE's response; R/ppm.R's hardcoded table ids and column
-# references (tagged "# FRAGILE:" there); or R/dictionary.R's PPM section. That
-# last one is a judgment call, not an oversight: the dictionary is R code that
-# labels columns, not a manifest cell, and a stale entry costs a missing label,
-# never a failure -- but it HAS drifted: table 3940 has a category, 79366
-# ("Peixes", 2024 on), that "ppm_aquaculture"'s dictionary does not know. It is
-# "-" (zero) for every state and year so far, which load_ppm() drops along with
-# the other non-numbers, so no column is affected yet; the day IBGE gives it a
-# number it will come back unlabelled. Keeping the dictionary in step is a
-# separate check (it needs the package, which build_manifest.R never loads), not
-# this resolver's contract.
+# still parses IBGE's response; or R/ppm.R's hardcoded table ids and column
+# references (tagged "# FRAGILE:" there).
 #
 # Naming: build_manifest.R registers EVERY top-level binding called resolve_* (or
 # watch_*) as a resolver, so everything else in this file is ppm_* or PPM_*.
@@ -257,18 +269,33 @@ ppm_parse_metadata <- function(text, table) {
   })
   names(classifications) <- vapply(meta$classificacoes, function(cl) as.character(cl$id), character(1))
 
+  # id, IBGE's name and unit, for what a message should say about a category
+  # or variable (the dictionary check, point 8)
+  describe <- function(items) {
+    data.frame(
+      id = vapply(items, function(z) as.character(z$id), character(1)),
+      nome = vapply(items, function(z) if (is.null(z$nome)) NA_character_ else as.character(z$nome), character(1)),
+      unidade = vapply(items, function(z) if (is.null(z$unidade)) NA_character_ else as.character(z$unidade), character(1)),
+      stringsAsFactors = FALSE
+    )
+  }
+  category_info <- lapply(meta$classificacoes, function(cl) describe(cl$categorias))
+  names(category_info) <- names(classifications)
+
   is_percent <- vapply(
     meta$variaveis,
     function(v) identical(v$unidade, "%") || grepl("percentual", if (is.null(v$nome)) "" else v$nome, ignore.case = TRUE),
     logical(1)
   )
-  variables <- vapply(meta$variaveis, function(v) as.character(v$id), character(1))
+  variable_info <- describe(meta$variaveis)[!is_percent, , drop = FALSE]
 
   list(
     problem = character(0),
     classifications = classifications,
+    category_info = category_info,
     levels = as.character(unlist(meta$nivelTerritorial, use.names = FALSE)),
-    variables = variables[!is_percent],
+    variables = variable_info$id,
+    variable_info = variable_info,
     url = if (is.character(meta$URL) && length(meta$URL) == 1) meta$URL else NA_character_
   )
 }
@@ -343,17 +370,73 @@ ppm_check_table <- function(table) {
   list(
     problem = character(0),
     classifications = meta$classifications,
+    category_info = meta$category_info,
     levels = meta$levels,
     variables = meta$variables,
+    variable_info = meta$variable_info,
     url = meta$url,
     years = cov$years
   )
 }
 
+# The shipped load_dictionary() (R/dictionary.R), read from the source file:
+# build_manifest.R never loads the package, and the function is self-contained.
+# `root` is the repository root, build_manifest.R's `repo_root`. Throws when the
+# file is missing or does not define load_dictionary().
+ppm_read_dictionary <- function(root = get0("repo_root", envir = globalenv(), ifnotfound = ".")) {
+  path <- file.path(root, "R", "dictionary.R")
+  if (!file.exists(path)) {
+    stop("there is no ", path)
+  }
+  env <- new.env(parent = globalenv())
+  sys.source(path, envir = env)
+  if (!is.function(env$load_dictionary)) {
+    stop(path, " does not define load_dictionary()")
+  }
+  env$load_dictionary
+}
+
+# What the dictionary lacks for one dataset (point 8): one message per dataset,
+# character(0) when nothing. load_ppm() names a column by the category id of
+# its classification, or by the variable id for a table without one, and labels
+# it by matching that id against the dictionary's var_code; code 0 is the Total,
+# which load_ppm() leaves out of the labelling on purpose. `dictionary` is
+# load_dictionary() or the error that reading it threw.
+ppm_dictionary_gaps <- function(dataset, tab, dictionary, category = NA_character_) {
+  if (inherits(dictionary, "error")) {
+    return(sprintf("R/dictionary.R could not be read (%s), so its %s section was not checked", conditionMessage(dictionary), dataset))
+  }
+  classified <- length(tab$classifications) > 0
+  wanted <- if (classified) tab$category_info[[1]] else tab$variable_info
+  wanted <- wanted[wanted$id != "0", , drop = FALSE]
+  if (!is.na(category) && category != "all") {
+    wanted <- wanted[wanted$id == category, , drop = FALSE] # a single-category row only needs its own label
+  }
+
+  dic <- tryCatch(dictionary(dataset), error = function(e) e)
+  if (inherits(dic, "error") || !is.data.frame(dic)) {
+    return(sprintf("R/dictionary.R has no section for %s (load_dictionary() fails for it), so none of its columns is labelled", dataset))
+  }
+  gaps <- wanted[!(wanted$id %in% as.character(dic$var_code)), , drop = FALSE]
+  if (nrow(gaps) == 0) {
+    return(character(0))
+  }
+  sprintf(
+    paste(
+      "R/dictionary.R's %s section has no row for IBGE %s %s: its columns come back without a label.",
+      "Add one (var_code, var_pt = IBGE's name, var_eng = an English gloss in the section's style, the units)"
+    ),
+    dataset, if (classified) "category" else "variable",
+    paste(sprintf("%s (%s; IBGE unit: %s)", gaps$id, gaps$nome, gaps$unidade), collapse = ", ")
+  )
+}
+
 # Checks ONE manifest row against its (already checked) table. Returns
 # list(problem = character(0), available_time = "1974-2025", docs_url = <page or
-# NA>) or list(problem = "<reason>").
-ppm_check_row <- function(code, dataset, available_geo, checked) {
+# NA>, note = <character(0) or what R/dictionary.R lacks>) or list(problem =
+# "<reason>"). A `problem` leaves the row out of the refresh; a `note` does not
+# (the row is right, something else in the repository needs a follow-up).
+ppm_check_row <- function(code, dataset, available_geo, checked, dictionary) {
   parsed <- ppm_parse_code(code)
   if (is.null(parsed)) {
     return(list(problem = sprintf(
@@ -451,11 +534,12 @@ ppm_check_row <- function(code, dataset, available_geo, checked) {
   list(
     problem = character(0),
     available_time = ppm_years_to_available_time(years),
-    docs_url = if (!is.na(tab$url) && grepl(PPM_TABLE_PAGE, tab$url)) tab$url else NA_character_
+    docs_url = if (!is.na(tab$url) && grepl(PPM_TABLE_PAGE, tab$url)) tab$url else NA_character_,
+    note = ppm_dictionary_gaps(dataset, tab, dictionary, parsed$category)
   )
 }
 
-resolve_ppm <- function(rows) {
+resolve_ppm <- function(rows, dictionary = ppm_read_dictionary()) {
   if (is.null(rows) || nrow(rows) == 0) {
     stop(
       "resolve_ppm(): no manifest rows tagged resolver == 'ppm' -- ",
@@ -493,29 +577,40 @@ resolve_ppm <- function(rows) {
     }
   }
 
+  # forced once here, so a dictionary that cannot be read is a note on every row
+  # rather than an error out of the middle of the loop
+  dictionary <- tryCatch(dictionary, error = function(e) e)
+
   n <- nrow(rows)
   available_time <- rep(NA_character_, n)
   docs_url <- rep(NA_character_, n)
   problems <- rep(NA_character_, n)
+  notes <- rep(NA_character_, n)
   for (i in seq_len(n)) {
-    res <- ppm_check_row(rows$sidra_code[i], rows$dataset[i], rows$available_geo[i], checked)
+    res <- ppm_check_row(rows$sidra_code[i], rows$dataset[i], rows$available_geo[i], checked, dictionary)
     if (length(res$problem) > 0) {
       problems[i] <- res$problem
     } else {
       available_time[i] <- res$available_time
       docs_url[i] <- res$docs_url
+      if (length(res$note) > 0) notes[i] <- res$note
     }
   }
 
   failed <- !is.na(problems)
-  failure_lines <- sprintf("ppm/%s (%s): %s", rows$dataset[failed], rows$sidra_code[failed], problems[failed])
+  # a note is reported like a failure (exit 11, an issue) but does not hold back
+  # the row's refresh: the row is right, a file in the repository needs a follow-up
+  failure_lines <- c(
+    sprintf("ppm/%s (%s): %s", rows$dataset[failed], rows$sidra_code[failed], problems[failed]),
+    sprintf("ppm/%s (%s): %s", rows$dataset[!is.na(notes)], rows$sidra_code[!is.na(notes)], notes[!is.na(notes)])
+  )
 
   if (all(failed)) {
     stop(
       "resolve_ppm(): all ", n, " rows failed verification -- a systemic change, not a flake. The usual cause is ",
       "IBGE's API (metadata at servicodados.ibge.gov.br, values at apisidra.ibge.gov.br) being unreachable, ",
       "challenged or restructured. Reasons:\n- ",
-      paste(failure_lines, collapse = "\n- ")
+      paste(failure_lines[seq_len(sum(failed))], collapse = "\n- ")
     )
   }
 
@@ -527,7 +622,7 @@ resolve_ppm <- function(rows) {
     geo_level = rows$geo_level[ok], year = rows$year[ok],
     available_time = available_time[ok], docs_url = docs_url[ok], resolver = "ppm"
   )
-  if (any(failed)) {
+  if (length(failure_lines) > 0) {
     attr(out, "partial_failures") <- failure_lines
   }
   out
