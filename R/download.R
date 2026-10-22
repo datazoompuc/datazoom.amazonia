@@ -331,6 +331,32 @@ sidra_get_table <- function(x, geo, period, geo.filter = NULL, classific = "all"
   sidrar::get_sidra(api = paste0("/t/", x, "/", path_geo, "/p/", period, "/v/allxp/f/a/h/y/d/s"))
 }
 
+# The parts of a manifest sidra_code for sidra_download(): "74/c80/all" ->
+# table 74, classification "c80", category list("all"); a bare "94" (a table
+# with no classification) -> classific and category NULL, which
+# sidra_get_table() answers without sidrar's table lookup. The grammar is
+# actions/scrapers/resolve_ppm.R's ppm_parse_code() (a copy: those scripts never
+# load the package; tests/testthat/test-ppm-resolver.R fails if they disagree).
+sidra_code_parts <- function(code) {
+  parts <- strsplit(code, "/", fixed = TRUE)[[1]]
+  classified <- length(parts) > 1
+  list(
+    table = as.numeric(parts[1]),
+    classific = if (classified) parts[2] else NULL,
+    category = if (classified) list(parts[3]) else NULL
+  )
+}
+
+# The manifest dataset of `source` that reads SIDRA table `table`, or NULL when
+# there is none or more than one. This is what lets a SIDRA table given as a
+# number (load_ppm(dataset = 94)) mean the same as its dataset name.
+sidra_dataset_of_table <- function(source, table) {
+  rows <- datasets_link(source = source)
+  tables <- vapply(strsplit(rows$sidra_code, "/", fixed = TRUE), function(p) p[1], character(1))
+  hit <- rows$dataset[!is.na(tables) & tables == as.character(table)]
+  if (length(hit) == 1) hit else NULL
+}
+
 # ---------------------------------------------------------------------------
 # Session-scoped download + parse cache
 #

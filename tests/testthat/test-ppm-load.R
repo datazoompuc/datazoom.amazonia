@@ -53,7 +53,31 @@ test_that("load_ppm() passes each table's classification (or none) and the whole
   }
 })
 
-test_that("a SIDRA code given as a number keeps the old request (classific = 'all'), and a bad dataset name still stops in check_params()", {
+test_that("a SIDRA table given as a number is the manifest dataset that reads it: the same request as the dataset's name", {
+  asked <- function(dataset) {
+    seen <- NULL
+    testthat::local_mocked_bindings(
+      sidra_download = function(...) {
+        seen <<- list(...)
+        stop("captured")
+      },
+      .package = "datazoom.amazonia"
+    )
+    expect_error(load_ppm(dataset = dataset, geo_level = "country", time_period = 2023), "captured")
+    seen
+  }
+  for (dataset in names(PPM_EXPECTED)) {
+    by_number <- asked(PPM_EXPECTED[[dataset]]$table)
+    # 94 and 95 used to be sent with classific = "all" here -- the request that fails
+    # where IBGE's table-description page is challenged
+    expect_equal(by_number, asked(dataset), info = dataset)
+    expect_equal(by_number$classific, PPM_EXPECTED[[dataset]]$classific, info = dataset)
+  }
+  expect_null(asked(94)$classific)
+  expect_null(asked(95)$classific)
+})
+
+test_that("a number the manifest does not know keeps the old request (classific = 'all'), and a bad dataset name still stops in check_params()", {
   seen <- NULL
   testthat::local_mocked_bindings(
     sidra_download = function(...) {
@@ -62,12 +86,32 @@ test_that("a SIDRA code given as a number keeps the old request (classific = 'al
     },
     .package = "datazoom.amazonia"
   )
-  expect_error(load_ppm(dataset = 94, geo_level = "country", time_period = 2023), "captured")
-  expect_equal(seen$sidra_code, 94)
+  expect_error(load_ppm(dataset = 1613, geo_level = "country", time_period = 2023, raw_data = TRUE), "captured") # a PAM table
+  expect_equal(seen$sidra_code, 1613)
   expect_equal(seen$classific, "all")
   expect_equal(seen$category, "all")
 
   expect_error(load_ppm(dataset = "ppm_nonexistent", geo_level = "country", time_period = 2023), "not supported")
+})
+
+test_that("sidra_dataset_of_table() finds the dataset by its table, and only when there is exactly one", {
+  expect_equal(sidra_dataset_of_table("ppm", 94), "ppm_cow_farming")
+  expect_equal(sidra_dataset_of_table("ppm", "3940"), "ppm_aquaculture")
+  expect_equal(sidra_dataset_of_table("ppm", 74), "ppm_animal_origin_production")
+  expect_null(sidra_dataset_of_table("ppm", 1613)) # PAM's table
+  expect_null(sidra_dataset_of_table("ppm", 9)) # 9 is not a prefix of 94
+  expect_null(sidra_dataset_of_table("pam", 94))
+  expect_equal(sidra_dataset_of_table("pam", 1613), NULL) # shared by 39 PAM datasets: ambiguous
+})
+
+test_that("sidra_code_parts() splits a manifest code into what sidra_download() takes", {
+  expect_equal(sidra_code_parts("74/c80/all"), list(table = 74, classific = "c80", category = list("all")))
+  expect_equal(sidra_code_parts("3940/c654/79366"), list(table = 3940, classific = "c654", category = list("79366")))
+  parts <- sidra_code_parts("94")
+  expect_equal(parts$table, 94)
+  expect_null(parts$classific)
+  expect_null(parts$category)
+  expect_equal(names(parts), c("table", "classific", "category")) # NULL entries are kept, not dropped
 })
 
 # ---- what load_ppm() calls the result --------------------------------------------
@@ -82,10 +126,10 @@ PPM_FAKE <- list(
   ppm_sheep_farming = list(variables = c("108" = "Ovinos tosquiados nos estabelecimentos agropecuários"), classification = NULL, categories = NULL),
   ppm_animal_origin_production = list(variables = c("106" = "Produção de origem animal", "215" = "Valor da produção"), classification = "tipo_de_produto_de_origem_animal", categories = c("0", "2682")),
   ppm_cow_farming = list(variables = c("107" = "Vacas ordenhadas"), classification = NULL, categories = NULL),
-  ppm_aquaculture = list(variables = c("4146" = "Produção da aquicultura", "215" = "Valor da produção"), classification = "tipo_de_produto_da_aquicultura", categories = c("0", "32861"))
+  ppm_aquaculture = list(variables = c("4146" = "Produção da aquicultura", "215" = "Valor da produção"), classification = "tipo_de_produto_da_aquicultura", categories = c("0", "32861", "79366"))
 )
 
-fake_value <- function(variable, category) as.numeric(variable) %% 1000 + 7 * (match(category, c("0", "2670", "2675", "2682", "32861", "(none)")))
+fake_value <- function(variable, category) as.numeric(variable) %% 1000 + 7 * (match(category, c("0", "2670", "2675", "2682", "32861", "79366", "(none)")))
 
 fake_ppm <- function(dataset) {
   spec <- PPM_FAKE[[dataset]]
@@ -226,4 +270,70 @@ test_that("sidra_download() takes the no-classification route for classific = NU
     suppressMessages(sidra_download(sidra_code = 94, classific = NULL, category = NULL, year = 2023, geo_level = "state")),
     "Error in Download."
   )
+})
+
+# ---- numeric and named calls are one call ---------------------------------------
+
+test_that("load_ppm(dataset = <table number>) returns exactly what load_ppm(dataset = <name>) does, treated and raw", {
+  for (dataset in names(PPM_EXPECTED)) {
+    testthat::local_mocked_bindings(
+      sidra_download = function(...) fake_ppm(dataset),
+      .package = "datazoom.amazonia"
+    )
+    for (language in c("eng", "pt")) {
+      for (raw in c(FALSE, TRUE)) {
+        by_name <- load_ppm(dataset = dataset, geo_level = "country", time_period = 2023, language = language, raw_data = raw)
+        by_number <- load_ppm(dataset = PPM_EXPECTED[[dataset]]$table, geo_level = "country", time_period = 2023, language = language, raw_data = raw)
+        expect_identical(by_number, by_name, info = paste(dataset, language, raw))
+      }
+    }
+  }
+})
+
+# ---- the dictionary labels what load_ppm() returns -------------------------------
+
+for (dataset in names(PPM_FAKE)) {
+  test_that(sprintf("every column load_ppm('%s') returns carries a label, the Total's aside", dataset), {
+    out <- load_fake(dataset, "eng")
+    data_cols <- setdiff(names(out), c("geo_id", "year"))
+    data_cols <- data_cols[!grepl("_v0$", data_cols)] # the Total (code 0) is not labelled by load_ppm() (unlike load_pam())
+    expect_gt(length(data_cols), 0)
+    for (col in data_cols) {
+      label <- attr(out[[col]], "label")
+      expect_true(length(label) == 1 && nzchar(label), info = paste(dataset, col))
+    }
+  })
+}
+
+test_that("the aquaculture category IBGE added in 2024 (79366, 'Peixes') comes back labelled", {
+  out <- load_fake("ppm_aquaculture", "eng")
+  expect_equal(attr(out$quant_v79366, "label"), "Fish")
+  expect_equal(attr(out$value_v79366, "label"), "Fish")
+  out_pt <- load_fake("ppm_aquaculture", "pt")
+  expect_equal(attr(out_pt$quant_v79366, "label"), "Peixes")
+})
+
+# ---- the periodic check covers every PPM branch ----------------------------------
+
+test_that("check_all_loads.R checks all five PPM datasets, and the municipality branch of the no-classification route", {
+  script <- file.path(normalizePath(test_path("..", ".."), mustWork = FALSE), "actions", "scripts", "check_all_loads.R")
+  skip_if_not(file.exists(script), "actions/ not present (stripped build)")
+
+  # evaluate only the two tables of settings, not the script (it loads the package and downloads)
+  exprs <- parse(script, keep.source = FALSE)
+  settings <- new.env()
+  for (e in exprs) {
+    if (is.call(e) && identical(e[[1]], as.name("<-")) && as.character(e[[2]]) %in% c("datasets_by_fn", "GEO_LEVEL_BY_DS", "GEO_LEVEL", "TIME_PERIOD")) eval(e, settings)
+  }
+  committed <- link_table()[link_table()$survey == "ppm", ]
+  expect_setequal(settings$datasets_by_fn$load_ppm, committed$dataset)
+
+  # a table with no classification takes sidra_get_table()'s route; at state level
+  # table 95 covers it, and table 94 is checked at municipality level, which is the
+  # route's other branch (n6/in n3 <uf>)
+  no_classification <- committed$dataset[!grepl("/", committed$sidra_code, fixed = TRUE)]
+  expect_setequal(no_classification, c("ppm_cow_farming", "ppm_sheep_farming"))
+  level_of <- function(ds) if (is.null(settings$GEO_LEVEL_BY_DS[[ds]])) settings$GEO_LEVEL else settings$GEO_LEVEL_BY_DS[[ds]]
+  expect_setequal(vapply(no_classification, level_of, ""), c("state", "municipality"))
+  expect_equal(level_of("ppm_cow_farming"), "municipality")
 })

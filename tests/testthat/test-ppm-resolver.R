@@ -132,8 +132,20 @@ fake_ibge <- function(override = function(kind, table, url) NULL, seen = NULL,
 with_ibge <- function(server, expr) {
   testthat::with_mocked_bindings(expr, curl_fetch_memory = server, .package = "curl")
 }
-run <- function(server = fake_ibge(), rows = manifest_rows) {
-  with_ibge(server, suppressMessages(resolve_ppm(rows)))
+# The dictionary the resolver compares with the classifications is the REAL one,
+# R/dictionary.R's load_dictionary() read from source -- the same way
+# build_manifest.R reads it (ppm_read_dictionary(), tested below).
+real_dictionary <- ppm_read_dictionary(pkg_root)
+run <- function(server = fake_ibge(), rows = manifest_rows, dictionary = real_dictionary) {
+  with_ibge(server, suppressMessages(resolve_ppm(rows, dictionary = dictionary)))
+}
+# the real dictionary minus the rows with these codes
+dictionary_without <- function(...) {
+  drop <- as.character(c(...))
+  function(dataset) {
+    d <- real_dictionary(dataset)
+    d[!(as.character(d$var_code) %in% drop), ]
+  }
 }
 # the committed rows with one dataset's sidra_code replaced
 with_code <- function(dataset, code) {
@@ -286,6 +298,102 @@ test_that("an available_geo level the table's metadata does not have fails the r
   expect_match(attr(out, "partial_failures"), "available_geo names 'galaxy'")
 })
 
+# ---- the dictionary (point 8 of the header) ------------------------------------
+
+test_that("a category the dictionary has no row for is a NOTE: the row is still refreshed, and the note is reported", {
+  # 79366 ("Peixes") is what R/dictionary.R lacked until 2026-10-22
+  out <- run(dictionary = dictionary_without(79366))
+
+  expect_equal(nrow(out), 5) # nothing held back
+  expect_equal(out$available_time[out$dataset == "ppm_aquaculture"], "2013-2025")
+  notes <- attr(out, "partial_failures")
+  expect_length(notes, 1)
+  expect_match(notes, "^ppm/ppm_aquaculture \\(3940/c654/all\\): R/dictionary.R's ppm_aquaculture section has no row for IBGE category 79366 \\(categoria 79366; IBGE unit: NA\\)")
+  expect_match(notes, "come back without a label", fixed = TRUE)
+  expect_match(notes, "an English gloss", fixed = TRUE)
+})
+
+test_that("with the dictionary as committed there is nothing to report, and the Total (code 0) is never asked for", {
+  expect_null(attr(run(), "partial_failures"))
+  # the fake classification lists 0 for tables 74 and 3940; a dictionary without it is still complete
+  expect_null(attr(run(dictionary = dictionary_without(0)), "partial_failures"))
+})
+
+test_that("a table without a classification needs its VARIABLE in the dictionary", {
+  notes <- attr(run(dictionary = dictionary_without(107)), "partial_failures")
+
+  expect_length(notes, 1)
+  expect_match(notes, "^ppm/ppm_cow_farming \\(94\\): R/dictionary.R's ppm_cow_farming section has no row for IBGE variable 107 ")
+})
+
+test_that("a single-category row only needs its own category labelled", {
+  rows <- with_code("ppm_aquaculture", "3940/c654/32861")
+  # 79366 missing is irrelevant to a row that reads only 32861 ...
+  expect_null(attr(run(rows = rows, dictionary = dictionary_without(79366)), "partial_failures"))
+  # ... but 32861 itself is not
+  expect_match(attr(run(rows = rows, dictionary = dictionary_without(32861)), "partial_failures"), "category 32861 ")
+})
+
+test_that("a dictionary with no section for the dataset, or one that cannot be read, is a note on the rows -- never an exception", {
+  no_section <- function(dataset) stop("object 'harmonization_dat' not found")
+  out <- run(dictionary = no_section)
+  expect_equal(nrow(out), 5)
+  expect_length(attr(out, "partial_failures"), 5)
+  expect_match(attr(out, "partial_failures")[1], "has no section for ppm_animal_origin_production (load_dictionary() fails for it)", fixed = TRUE)
+
+  unreadable <- simpleError("there is no /nowhere/R/dictionary.R")
+  out <- with_ibge(fake_ibge(), suppressMessages(resolve_ppm(manifest_rows, dictionary = unreadable)))
+  expect_equal(nrow(out), 5)
+  expect_match(attr(out, "partial_failures")[1], "R/dictionary.R could not be read (there is no /nowhere/R/dictionary.R)", fixed = TRUE)
+
+  # and the default argument, evaluated inside resolve_ppm(), is caught the same way
+  withr::with_dir(tempdir(), {
+    out <- with_ibge(fake_ibge(), suppressMessages(resolve_ppm(manifest_rows)))
+    expect_equal(nrow(out), 5)
+    expect_match(attr(out, "partial_failures")[1], "R/dictionary.R could not be read")
+  })
+})
+
+test_that("a hard failure and a note are both reported, and only the hard one holds the row back", {
+  out <- run(
+    rows = with_code("ppm_cow_farming", "94/c80/all"), # refused: table 94 has no classification
+    dictionary = dictionary_without(79366)
+  )
+  expect_false("ppm_cow_farming" %in% out$dataset)
+  expect_true("ppm_aquaculture" %in% out$dataset)
+  expect_length(attr(out, "partial_failures"), 2)
+  expect_match(attr(out, "partial_failures")[1], "^ppm/ppm_cow_farming ")
+  expect_match(attr(out, "partial_failures")[2], "^ppm/ppm_aquaculture ")
+})
+
+test_that("ppm_read_dictionary() reads the shipped load_dictionary() from source: the same codes, dataset by dataset", {
+  from_source <- ppm_read_dictionary(pkg_root)
+  for (dataset in manifest_rows$dataset) {
+    expect_equal(as.character(from_source(dataset)$var_code), as.character(load_dictionary(dataset)$var_code), info = dataset)
+  }
+  expect_error(ppm_read_dictionary(file.path(tempdir(), "no-such-checkout")), "there is no")
+})
+
+test_that("R/dictionary.R covers the categories IBGE listed for tables 3939, 74 and 3940 on 2026-10-22, and the variables of 94 and 95", {
+  # a snapshot, so a deleted row is caught offline; a NEW category is what the
+  # resolver (live) is for
+  snapshot <- list(
+    ppm_livestock_inventory = c(2670, 2672, 2675, 2677, 2680, 2681, 32793, 32794, 32795, 32796),
+    ppm_animal_origin_production = c(2682, 2683, 2684, 2685, 2686, 2687),
+    ppm_aquaculture = c(
+      32861, 32865:32881, 32886:32891, 79366
+    ),
+    ppm_cow_farming = 107,
+    ppm_sheep_farming = 108
+  )
+  for (dataset in names(snapshot)) {
+    expect_true(all(snapshot[[dataset]] %in% load_dictionary(dataset)$var_code), info = dataset)
+  }
+  fish <- load_dictionary("ppm_aquaculture")
+  expect_equal(fish$var_pt[fish$var_code == 79366], "Peixes")
+  expect_equal(fish$var_eng[fish$var_code == 79366], "Fish")
+})
+
 # ---- docs_url ---------------------------------------------------------------
 
 test_that("docs_url is taken from the metadata only when it is a SIDRA table page; otherwise the cell is left alone", {
@@ -416,6 +524,20 @@ test_that("ppm_parse_code reads <table> and <table>/c<n>/<category> and rejects 
   }
   expect_null(ppm_parse_code(NA_character_))
   expect_null(ppm_parse_code(NULL))
+})
+
+test_that("the package's sidra_code_parts() (what load_ppm() uses) reads every code the way this resolver does", {
+  for (code in c("74/c80/all", "3940/c654/all", "3939/c79/all", "94", "95", "3940/c654/79366")) {
+    ours <- sidra_code_parts(code)
+    theirs <- ppm_parse_code(code)
+    expect_equal(as.character(ours$table), theirs$table, info = code)
+    expect_equal(ours$classific, if (is.na(theirs$classific)) NULL else theirs$classific, info = code)
+    expect_equal(ours$category, if (is.na(theirs$category)) NULL else list(theirs$category), info = code)
+  }
+  # and the committed manifest's own codes
+  for (code in manifest_rows$sidra_code) {
+    expect_equal(as.character(sidra_code_parts(code)$table), ppm_parse_code(code)$table, info = code)
+  }
 })
 
 test_that("ppm_years_to_available_time writes the grammar parse_years() reads, gaps included", {

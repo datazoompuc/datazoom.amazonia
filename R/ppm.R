@@ -56,31 +56,39 @@ load_ppm <- function(dataset, raw_data = FALSE,
   param$language <- language
   param$raw_data <- raw_data
 
-  # The manifest's sidra_code is "<table>" for a table with no classification
-  # (94, 95) and "<table>/c<classification>/all" for the others
-  # (e.g. "74/c80/all"); see actions/scrapers/resolve_ppm.R. A SIDRA code given
-  # as a number keeps the old behaviour (sidra_download()'s defaults).
+  # A SIDRA table given as a number ("You can also use SIDRA codes") means the
+  # manifest dataset that reads that table: load_ppm(dataset = 94) is
+  # load_ppm(dataset = "ppm_cow_farming"), with the same classification, the
+  # same treatment and the same checks. Only a number the manifest does not know
+  # keeps the old behaviour below (sidra_download()'s defaults, raw data only).
 
-  if (!is.numeric(param$dataset)) {
-    sidra_info <- datasets_link() %>%
-      dplyr::filter(dataset == param$dataset) %>%
-      dplyr::select(sidra_code) %>%
-      unlist() %>%
-      stringr::str_split("/") %>%
-      unlist()
-
-    param$code <- as.numeric(sidra_info[1])
-    param$classific <- if (length(sidra_info) > 1) sidra_info[2] else NULL
-    param$category <- if (length(sidra_info) > 1) list(sidra_info[3]) else NULL
-  } else {
-    param$code <- param$dataset
-    param$classific <- "all"
-    param$category <- "all"
+  if (is.numeric(param$dataset)) {
+    known <- sidra_dataset_of_table("ppm", param$dataset)
+    if (!is.null(known)) param$dataset <- known
   }
 
   # check if dataset, geo_level, and time_period are supported
 
   check_params(param)
+
+  # The manifest's sidra_code is "<table>" for a table with no classification
+  # (94, 95) and "<table>/c<classification>/all" for the others
+  # (e.g. "74/c80/all"); see actions/scrapers/resolve_ppm.R.
+
+  if (!is.numeric(param$dataset)) {
+    parts <- datasets_link() %>%
+      dplyr::filter(dataset == param$dataset) %>%
+      dplyr::pull(sidra_code) %>%
+      sidra_code_parts()
+
+    param$code <- parts$table
+    param$classific <- parts$classific
+    param$category <- parts$category
+  } else {
+    param$code <- param$dataset
+    param$classific <- "all"
+    param$category <- "all"
+  }
 
   ## Dataset
 
