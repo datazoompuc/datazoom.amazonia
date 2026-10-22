@@ -56,14 +56,26 @@ load_ppm <- function(dataset, raw_data = FALSE,
   param$language <- language
   param$raw_data <- raw_data
 
+  # The manifest's sidra_code is "<table>" for a table with no classification
+  # (94, 95) and "<table>/c<classification>/all" for the others
+  # (e.g. "74/c80/all"); see actions/scrapers/resolve_ppm.R. A SIDRA code given
+  # as a number keeps the old behaviour (sidra_download()'s defaults).
+
   if (!is.numeric(param$dataset)) {
-    param$code <- datasets_link() %>%
+    sidra_info <- datasets_link() %>%
       dplyr::filter(dataset == param$dataset) %>%
       dplyr::select(sidra_code) %>%
       unlist() %>%
-      as.numeric()
+      stringr::str_split("/") %>%
+      unlist()
+
+    param$code <- as.numeric(sidra_info[1])
+    param$classific <- if (length(sidra_info) > 1) sidra_info[2] else NULL
+    param$category <- if (length(sidra_info) > 1) list(sidra_info[3]) else NULL
   } else {
     param$code <- param$dataset
+    param$classific <- "all"
+    param$category <- "all"
   }
 
   # check if dataset, geo_level, and time_period are supported
@@ -72,6 +84,11 @@ load_ppm <- function(dataset, raw_data = FALSE,
 
   ## Dataset
 
+  # FRAGILE: the SIDRA table ids hardcoded here (94, 95, 3939, 74, 3940) are
+  # copies of the table in the manifest's sidra_code; resolve_ppm.R checks that
+  # the manifest's code still exists in IBGE's table and has the classification
+  # it says (none for 94 and 95), not that it is still one of these ids. The
+  # datasets are told apart below by name, not by table.
   if (param$code == 94) {
     param$data_name <- "Cow Farming (Vacas ordenhadas - Cabecas)"
   }
@@ -98,7 +115,13 @@ load_ppm <- function(dataset, raw_data = FALSE,
   dat <- as.list(as.character(param$time_period)) %>%
     purrr::map(function(year_num) {
       # suppressMessages(
-      sidra_download(sidra_code = param$code, year = year_num, geo_level = param$geo_level)
+      sidra_download(
+        sidra_code = param$code,
+        classific = param$classific,
+        category = param$category,
+        year = year_num,
+        geo_level = param$geo_level
+      )
       # )
     }) %>%
     dplyr::bind_rows() %>%
@@ -158,6 +181,14 @@ load_ppm <- function(dataset, raw_data = FALSE,
 
   ## Cattle Number
 
+  # FRAGILE: each dataset names only the IBGE variable ids its table reports --
+  # 105 (3939), 108 (95), 107 (94), 106 and 215 (74), 4146 and 215 (3940) -- and
+  # case_when() has no default, so any other id would become NA and end up in a
+  # column called na_v<category code> (the bug load_pam() had with 2313 until
+  # 2026-10-21). Checked against IBGE's metadata and the data itself on
+  # 2026-10-22: these are every variable the five tables report.
+  # resolve_ppm.R re-checks that on every run (PPM_NAMED_VARIABLES there is a
+  # copy of this list; tests/testthat/test-ppm-resolver.R fails if they differ).
   if (param$dataset == "ppm_livestock_inventory") {
     if (language == "pt") {
       dat <- dat %>% dplyr::mutate(
@@ -275,6 +306,14 @@ load_ppm <- function(dataset, raw_data = FALSE,
 
   ## Cattle Number
 
+  # FRAGILE: names_from uses columns that are IBGE's classification labels after
+  # janitor::clean_names() ("Tipo de rebanho (Codigo)" -> tipo_de_rebanho_codigo,
+  # "Tipo de produto de origem animal (Codigo)", "Tipo de produto da
+  # aquicultura (Codigo)"); the origin-animal pivot also selects the column RANGE
+  # variavel:tipo_de_produto_de_origem_animal_codigo, so it depends on sidrar's
+  # column order. If IBGE rewords a label or sidrar reorders columns, pivot_wider()
+  # stops with a missing-column error (loud) or, for the range, pivots on the
+  # wrong columns (not).
   if (param$dataset == "ppm_livestock_inventory") {
     dat <- dat %>%
       dplyr::select(-"unidade_de_medida") %>%

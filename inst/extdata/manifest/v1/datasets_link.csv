@@ -162,11 +162,11 @@ pevs,pevs_silviculture,,,291,,https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/br
 pevs,pevs_silviculture_area,,,5930,,https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019,2013-2023,"country, state, municipality, region",,,,,
 pibmunic,pibmunic,,,5938,,https://sidra.ibge.gov.br/pesquisa/pib-munic/tabelas,2002-2021,"country, state, municipality",,,,,
 population,population,,,6579,,https://sidra.ibge.gov.br/pesquisa/estimapop/tabelas,2001-2021,"country, state, municipality",,,,,
-ppm,ppm_animal_origin_production,,,74,,https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021,1974-2023,"country, state, municipality",,,,,
-ppm,ppm_aquaculture,,,3940,,https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021,2013-2023,"country, state, municipality",,,,,
-ppm,ppm_cow_farming,,,94,,https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021,1974-2023,"country, state, municipality",,,,,
-ppm,ppm_livestock_inventory,,,3939,,https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021,1974-2023,"country, state, municipality",,,,,
-ppm,ppm_sheep_farming,,,95,,https://sidra.ibge.gov.br/pesquisa/ppm/tabelas/brasil/2021,1974-2023,"country, state, municipality",,,,,
+ppm,ppm_animal_origin_production,,,74/c80/all,,https://sidra.ibge.gov.br/tabela/74,1974-2025,"country, state, municipality",,,,,ppm
+ppm,ppm_aquaculture,,,3940/c654/all,,https://sidra.ibge.gov.br/tabela/3940,2013-2025,"country, state, municipality",,,,,ppm
+ppm,ppm_cow_farming,,,94,,https://sidra.ibge.gov.br/tabela/94,1974-2025,"country, state, municipality",,,,,ppm
+ppm,ppm_livestock_inventory,,,3939/c79/all,,https://sidra.ibge.gov.br/tabela/3939,1974-2025,"country, state, municipality",,,,,ppm
+ppm,ppm_sheep_farming,,,95,,https://sidra.ibge.gov.br/tabela/95,1974-2025,"country, state, municipality",,,,,ppm
 prodes,clouds,,,,https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip,https://terrabrasilis.dpi.inpe.br/downloads/,2025,municipality,,,prodes_amazonia_legal_2025_v20260408,20260408,prodes
 prodes,deforestation,,,,https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip,https://terrabrasilis.dpi.inpe.br/downloads/,2007-2025,municipality,,,prodes_amazonia_legal_2025_v20260408,20260408,prodes
 prodes,hydrography,,,,https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip,https://terrabrasilis.dpi.inpe.br/downloads/,2025,municipality,,,prodes_amazonia_legal_2025_v20260408,20260408,prodes
