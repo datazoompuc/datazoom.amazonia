@@ -153,7 +153,15 @@ load_dictionary <- function(dataset) {
   ## PPM ##
   #########
 
-
+  # FRAGILE: the codes below are copies of IBGE's own: the category ids of the
+  # classifications of tables 3939 (c79), 74 (c80) and 3940 (c654), and the
+  # variable ids 107 and 108 of tables 94 and 95, which have no classification.
+  # load_ppm() labels a column by matching its code against var_code, so a
+  # category IBGE adds has no row here and its column comes back without a label
+  # (not wrong, just unlabelled): 79366 ("Peixes", from 2024) was missing until
+  # 2026-10-22. Checked against the live classifications that day: it was the
+  # only gap. resolve_ppm.R repeats that check on every run, from the committed
+  # source of this file, and reports a missing row; nothing else notices.
   if (dataset == "ppm_animal_origin_production") {
     harmonization_dat <- tibble::tribble(
       ~var_code, ~var_pt, ~var_eng, ~unit_value, ~unit_quantity, ~available_period,
@@ -227,6 +235,7 @@ load_dictionary <- function(dataset) {
       32889, "Ostras, vieiras e mexilhoes", "Oysters, scallops and mussels", "1K BRL", "Kg", NA,
       32890, "Sementes de moluscos", "Mollusc Seeds", "1K BRL", "1K", NA,
       32891, "Outros produtos (ra, jacare, siri, caranguejo, lagosta, etc)", "Other products (ra, alligator, crab, crab, lobster, etc.)", "1K BRL", "None", NA,
+      79366, "Peixes", "Fish", "1K BRL", "Kg", NA,
       0, "Total", "Total", "1K BRL", "None", NA
     )
   }

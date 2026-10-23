@@ -67,6 +67,13 @@ FRAGILITY_SOURCES <- list(
   # R/baci.R's tags are about that dictionary.
   list(changed_prefix = "baci_dic", r_path = file.path("R", "baci.R"), label = "R/baci.R", treat_fn = "load_baci()"),
   list(changed_prefix = "ips", r_path = file.path("R", "ips.R"), label = "R/ips.R", treat_fn = "load_ips()"),
+  # ppm's treatment code is load_ppm() (R/ppm.R) plus the SIDRA request
+  # sidra_download() (R/download.R) builds for it, so one row per file, as for
+  # terraclimate below.
+  list(changed_prefix = "ppm", r_path = file.path("R", "ppm.R"), label = "R/ppm.R", treat_fn = "load_ppm()"),
+  list(changed_prefix = "ppm", r_path = file.path("R", "download.R"), label = "R/download.R", treat_fn = "sidra_download()"),
+  # the labels load_ppm() attaches come from load_dictionary()'s PPM section
+  list(changed_prefix = "ppm", r_path = file.path("R", "dictionary.R"), label = "R/dictionary.R", treat_fn = "load_dictionary()"),
   list(changed_prefix = "seeg", r_path = file.path("R", "seeg.R"), label = "R/seeg.R", treat_fn = "load_seeg()"),
   # terraclimate's treatment code lives in two files: load_climate() (R/climate.R)
   # and the NCSS request external_download() builds (R/download.R). The loop in
