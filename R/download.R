@@ -27,6 +27,15 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
 
   param$sidra_code <- sidra_code
   param$year <- year
+  # FRAGILE: classific = "all" (the default) makes sidrar::get_sidra() scrape
+  # IBGE's HTML description of the table (apisidra.ibge.gov.br/desctabapi.aspx
+  # ?c=<table>) to learn its classification ids. That page is behind a
+  # Cloudflare bot challenge (HTTP 403) from some networks, and then the caller
+  # gets a bare "Error in Download." (the reason sidrar captured is dropped
+  # below). PAM spells the classification out in the manifest ("5457/c782/all")
+  # for that reason; ppm, pevs, pibmunic, cempre, censoagro and population
+  # still pass "all" and all failed this way, on 2026-10-21, from the machine
+  # PAM was investigated on.
   param$classific <- classific
   param$category <- category
 
@@ -288,6 +297,43 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
       } # End of if Meso
     } # End of if Uf
   } # End of If - Download at the Municipality Level
+}
+
+# The parts of a manifest sidra_code for sidra_download(): "74/c80/all" ->
+# table 74, classification "c80", category list("all"); a bare "94" (a table
+# with no classification) -> classific and category NULL. The grammar is also
+# read by the actions/ resolvers (resolve_pam.R's pam_parse_code(), resolve_ppm.R's
+# ppm_parse_code()): those scripts never load the package, so each keeps its own
+# parser, and each resolver's test (test-pam-resolver.R, test-ppm-resolver.R)
+# fails if its parser disagrees with this one.
+sidra_code_parts <- function(code) {
+  parts <- strsplit(code, "/", fixed = TRUE)[[1]]
+  classified <- length(parts) > 1
+  list(
+    table = as.numeric(parts[1]),
+    classific = if (classified) parts[2] else NULL,
+    category = if (classified) list(parts[3]) else NULL
+  )
+}
+
+# The manifest dataset of `source` that a SIDRA table NUMBER stands for, or NULL
+# when there is none. This is what lets a table given as a number
+# (load_pam(dataset = 1612), load_ppm(dataset = 94)) mean the same as its
+# dataset name: a table number is the dataset that reads that table WHOLE. When
+# several datasets read it -- PAM has one per crop on tables 1612 and 1613, next
+# to temporary_crops and permanent_crops, which read every category -- only the
+# whole-table one counts (a code whose category is "all", or that has none), and
+# if even those are not exactly one the number stands for nothing.
+sidra_dataset_of_table <- function(source, table) {
+  rows <- datasets_link(source = source)
+  parts <- strsplit(rows$sidra_code, "/", fixed = TRUE)
+  tables <- vapply(parts, function(p) p[1], character(1))
+  whole_table <- vapply(parts, function(p) length(p) == 1 || identical(p[3], "all"), logical(1))
+  reads <- !is.na(tables) & tables == as.character(table)
+
+  hit <- rows$dataset[reads]
+  if (length(hit) > 1) hit <- rows$dataset[reads & whole_table]
+  if (length(hit) == 1) hit else NULL
 }
 
 # ---------------------------------------------------------------------------

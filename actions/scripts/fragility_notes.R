@@ -68,6 +68,11 @@ FRAGILITY_SOURCES <- list(
   list(changed_prefix = "baci_dic", r_path = file.path("R", "baci.R"), label = "R/baci.R", treat_fn = "load_baci()"),
   list(changed_prefix = "ips", r_path = file.path("R", "ips.R"), label = "R/ips.R", treat_fn = "load_ips()"),
   list(changed_prefix = "seeg", r_path = file.path("R", "seeg.R"), label = "R/seeg.R", treat_fn = "load_seeg()"),
+  # pam's treatment code is load_pam() (R/pam.R) plus the SIDRA request
+  # sidra_download() (R/download.R) builds for it, so one row per file, as
+  # for terraclimate below.
+  list(changed_prefix = "pam", r_path = file.path("R", "pam.R"), label = "R/pam.R", treat_fn = "load_pam()"),
+  list(changed_prefix = "pam", r_path = file.path("R", "download.R"), label = "R/download.R", treat_fn = "sidra_download()"),
   # terraclimate's treatment code lives in two files: load_climate() (R/climate.R)
   # and the NCSS request external_download() builds (R/download.R). The loop in
   # build_manifest.R reads ONE file per row, so there is one row per file; a
