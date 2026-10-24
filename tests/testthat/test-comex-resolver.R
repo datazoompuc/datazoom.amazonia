@@ -384,14 +384,22 @@ test_that("the manifest is the single source of truth for the dictionary URLs: R
   # (b) behaviorally: what load_trade_dic() reads is exactly what the manifest
   # lookup returns, for each dictionary -- a made-up manifest drives it.
   seen <- character(0)
+  # load_trade_dic() downloads to a temp file and reads it from there, so the
+  # URL it was given shows up in download.file(), not in read_delim().
+  download_spy <- function(url, destfile, ...) {
+    seen <<- c(seen, url)
+    invisible(0L)
+  }
   read_spy <- function(file, ...) {
-    seen <<- c(seen, file)
     tibble::tibble(co_sh4 = "0101", no_sh4_por = "a", no_sh4_ing = "b")
   }
   lookup <- function(source, dataset, ...) paste0("manifest://", source, "/", dataset)
   load_with <- function(type, dataset_url_fn = lookup) {
     testthat::with_mocked_bindings(
-      testthat::with_mocked_bindings(load_trade_dic(type), read_delim = read_spy, .package = "readr"),
+      testthat::with_mocked_bindings(
+        testthat::with_mocked_bindings(load_trade_dic(type), read_delim = read_spy, .package = "readr"),
+        download.file = download_spy, .package = "utils"
+      ),
       dataset_url = dataset_url_fn, .package = "datazoom.amazonia"
     )
   }
