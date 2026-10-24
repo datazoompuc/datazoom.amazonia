@@ -179,7 +179,7 @@ seeg,seeg_farming,,,,https://seeg.eco.br/wp-content/uploads/2025/12/Dados-munici
 seeg,seeg_industry,,,,https://seeg.eco.br/wp-content/uploads/2025/12/Dados-municipais-resumido-CO2e-GWP-AR5-13.0.xlsx,https://seeg.eco.br/dados/,1970-2024,"country, state, municipality",,,,13.0,seeg
 seeg,seeg_land,,,,https://seeg.eco.br/wp-content/uploads/2025/12/Dados-municipais-resumido-CO2e-GWP-AR5-13.0.xlsx,https://seeg.eco.br/dados/,1970-2024,"country, state, municipality",,,,13.0,seeg
 seeg,seeg_residuals,,,,https://seeg.eco.br/wp-content/uploads/2025/12/Dados-municipais-resumido-CO2e-GWP-AR5-13.0.xlsx,https://seeg.eco.br/dados/,1970-2024,"country, state, municipality",,,,13.0,seeg
-sigmine,sigmine_active,,,,https://dadosabertos.anm.gov.br/SIGMINE/BRASIL.zip,https://dadosabertos.anm.gov.br/,,"state, municipality",,,,,
+sigmine,sigmine_active,,,,https://dadosabertos.anm.gov.br/SIGMINE/PROCESSOS_MINERARIOS/BRASIL.zip,https://dadosabertos.anm.gov.br/,,"state, municipality",,,,,
 sigmine,sigmine_inactive,,,,https://dadosabertos.anm.gov.br/SIGMINE/PROCESSOS_MINERARIOS/PROCESSOS_INATIVOS.zip,https://dadosabertos.anm.gov.br/,,"state, municipality",,,,,
 terraclimate,climatic_water_deficit,,,,http://thredds.northwestknowledge.net:8080/thredds/ncss,https://www.climatologylab.org/terraclimate.html,1950-2025,municipality,,,,,terraclimate
 terraclimate,max_temperature,,,,http://thredds.northwestknowledge.net:8080/thredds/ncss,https://www.climatologylab.org/terraclimate.html,1950-2025,municipality,,,,,terraclimate
