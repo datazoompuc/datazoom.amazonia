@@ -88,7 +88,11 @@ BACI_DIC_REQUIRED <- c("CO_SH6", "NO_SH6_POR", "NO_SH6_ING")
 
 # Verify the dictionary and return its manifest row, or stop() with the reason.
 # `rows` = the manifest rows with survey == "baci_dic" this resolver owns.
-resolve_baci_dictionary <- function(rows) {
+# Not named resolve_*: build_manifest.R registers every top-level resolve_*
+# function as a resolver of its own (as resolve_baci_dictionary it ran every week
+# with no rows, a real GET for nothing, and was reported as FAILED). This one is
+# only ever called from resolve_baci(); test-resolver-registry.R keeps it so.
+baci_check_dictionary <- function(rows) {
   # Redirects are not followed: a 3xx would be the host saying the layout moved.
   h <- curl::new_handle(timeout = 30, connecttimeout = 15, followlocation = FALSE)
   curl::handle_setheaders(h, Range = "bytes=0-4095")
@@ -233,7 +237,7 @@ resolve_baci <- function(rows) {
   # reaches the report/issue via the `partial_failures` attribute.
   dic_rows <- if (is.null(rows)) rows else rows[rows$survey == "baci_dic", ]
   if (!is.null(dic_rows) && nrow(dic_rows) > 0) {
-    dic <- tryCatch(resolve_baci_dictionary(dic_rows), error = function(e) e)
+    dic <- tryCatch(baci_check_dictionary(dic_rows), error = function(e) e)
     if (inherits(dic, "error")) {
       attr(result, "partial_failures") <- paste0("baci_dic/product_codes: ", conditionMessage(dic))
     } else {

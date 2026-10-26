@@ -94,13 +94,13 @@ with_world <- function(world, expr) {
 }
 dictionary_message <- function(dictionary) {
   tryCatch(
-    with_world(fake_world(dictionary), resolve_baci_dictionary(dic_rows)),
+    with_world(fake_world(dictionary), baci_check_dictionary(dic_rows)),
     error = function(e) conditionMessage(e)
   )
 }
 
 test_that("a real dictionary resolves to its manifest row on balanca.mdic.gov.br, with no available_time", {
-  out <- with_world(fake_world(), resolve_baci_dictionary(dic_rows))
+  out <- with_world(fake_world(), baci_check_dictionary(dic_rows))
 
   expect_equal(out$survey, "baci_dic")
   expect_equal(out$dataset, "product_codes")
@@ -111,7 +111,7 @@ test_that("a real dictionary resolves to its manifest row on balanca.mdic.gov.br
 })
 
 test_that("columns load_baci_dic() does not select may come and go; the ones it selects may not", {
-  expect_no_error(with_world(fake_world(csv_response(drop = c("CO_SH4", "NO_SEC_ING"))), resolve_baci_dictionary(dic_rows)))
+  expect_no_error(with_world(fake_world(csv_response(drop = c("CO_SH4", "NO_SEC_ING"))), baci_check_dictionary(dic_rows)))
 
   msg <- dictionary_message(csv_response(drop = "NO_SH6_ING"))
   expect_match(msg, "no longer carries the columns R/baci.R's load_baci_dic() selects", fixed = TRUE)
