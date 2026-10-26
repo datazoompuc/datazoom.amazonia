@@ -94,6 +94,9 @@ is_known_base_row_dataset <- function(s, d) {
 # investigation had found (file 266, Collection 10) -- verified structurally
 # compatible before accepting (see resolve_mapbiomas.R's header).
 KNOWN_POST_CAPTURE_DELTAS <- c(
+  # 2026-10: sigmine_active url; the old SIGMINE/BRASIL.zip is a 404 now
+  # (see test-datasets_link.R, delta #14).
+  "sigmine\rsigmine_active\rNA\rNA\rurl",
   "mapbiomas\rmapbiomas_cover\rmunicipality\rNA\rurl",
   "mapbiomas\rmapbiomas_cover\rmunicipality\rNA\rdocs_url",
   "mapbiomas\rmapbiomas_cover\rmunicipality\rNA\rsheet",
@@ -442,5 +445,6 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 42
     }
   }
 
-  expect_equal(delta, 42)
+  # +1 from the sigmine_active url move (delta #14, test-datasets_link.R).
+  expect_equal(delta, 43)
 })

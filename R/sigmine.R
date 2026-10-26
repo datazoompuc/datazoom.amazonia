@@ -1,12 +1,14 @@
 #' @title SIGMINE - Mining Geographic Information System
 #'
-#' @description Loads information the mines being explored legally in Brazil, including their location, status, product being mined and area in square meters.
+#' @description Loads the registry of mining processes maintained by Brazil's National Mining Agency (ANM). Each record is a polygon. \code{"sigmine_active"} covers active processes in any phase (research authorizations, mining concessions, licensing, among others), not only mines in operation; \code{"sigmine_inactive"} covers processes that are no longer active.
 #'
 #' @param dataset A dataset name ("sigmine_active" or "sigmine_inactive"). Note that "sigmine_inactive" has fewer columns available than "sigmine_active" (no mineral, company, phase, last event, or state information at the source) -- this reflects what ANM publishes for closed/inactive processes, not a limitation of this function.
 #' @inheritParams load_baci
-#' @param geo_level A \code{string} that defines the geographic level of the data. Can be "state" or "municipality".
+#' @param geo_level A \code{string} that defines the geographic level of the data. Can be "state" or "municipality". With "state" (the default) there is no aggregation and no spatial join: the function returns one row per polygon, with the state reported at the source. With "municipality" each process is assigned to the municipality that contains the centroid of its polygon, and the result has one row per process and no geometry. Ignored when \code{raw_data = TRUE}.
 #'
-#' @return A \code{tibble}.
+#' @details With \code{raw_data = TRUE} the function returns the ANM shapefile as published (an \code{sf} object), with only the column names cleaned; \code{geo_level} and \code{language} are ignored. With \code{raw_data = FALSE} the columns are renamed according to \code{language}, the area is converted from hectares (\code{area_ha}) to square meters (\code{area_m2}) and, for "sigmine_active", fields registered as "DADO NAO CADASTRADO" at the source become \code{NA}.
+#'
+#' @return An \code{sf} object (one row per polygon, with a \code{geometry} column) when \code{raw_data = TRUE} or \code{geo_level = "state"}; a \code{tibble} without geometry (one row per process) when \code{geo_level = "municipality"}. At the municipality level, \code{area_m2} is the area of the polygon kept for each process, not the sum of all its polygons, and processes whose centroid falls outside every municipality are kept with missing municipality fields.
 #'
 #'
 #' @examplesIf interactive()
@@ -33,6 +35,12 @@
 #'   raw_data = FALSE,
 #'   geo_level = "municipality",
 #'   language = "pt"
+#' )
+#'
+#' # download the raw ANM shapefile for the inactive processes
+#' mining_inactive_raw <- load_sigmine(
+#'   dataset = "sigmine_inactive",
+#'   raw_data = TRUE
 #' )
 #'
 #' @export
