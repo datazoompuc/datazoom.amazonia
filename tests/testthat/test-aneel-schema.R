@@ -57,17 +57,17 @@ test_that("energy_generation's mda_*/num_coord_* columns are parsed to numeric, 
   dat <- load_aneel(dataset = "energy_generation", language = "pt")
 
   numeric_cols <- c(
-    "mda_potencia_outorgada_kw", "mda_potencia_fiscalizada_kw",
-    "mda_garantia_fisica_kw", "num_coord_n_empreendimento", "num_coord_e_empreendimento"
+    "potencia_outorgada_kw", "potencia_fiscalizada_kw",
+    "garantia_fisica_kw", "latitude_decimal", "longitude_decimal"
   )
   for (col in numeric_cols) {
     expect_true(is.numeric(dat[[col]]), info = col)
   }
 
-  expect_equal(dat$mda_potencia_outorgada_kw, c(1400, 100000.5))
-  expect_equal(dat$mda_garantia_fisica_kw, c(0, 1234.56))
-  expect_equal(dat$num_coord_n_empreendimento, c(-20.12479858, -29.06475))
-  expect_equal(dat$num_coord_e_empreendimento, c(-43.8702025, -51.55555))
+  expect_equal(dat$potencia_outorgada_kw, c(1400, 100000.5))
+  expect_equal(dat$garantia_fisica_kw, c(0, 1234.56))
+  expect_equal(dat$latitude_decimal, c(-20.12479858, -29.06475))
+  expect_equal(dat$longitude_decimal, c(-43.8702025, -51.55555))
 })
 
 test_that("an already-numeric mda_* column (fread's own auto-parse) survives the cleaning step unchanged", {
@@ -77,7 +77,7 @@ test_that("an already-numeric mda_* column (fread's own auto-parse) survives the
   )
 
   dat <- load_aneel(dataset = "energy_generation", language = "pt")
-  expect_equal(dat$mda_potencia_fiscalizada_kw, c(1400, 100000))
+  expect_equal(dat$potencia_fiscalizada_kw, c(1400, 100000))
 })
 
 test_that("energy_generation's eng rename map maps mda_*/num_coord_* to the expected English names", {
@@ -90,8 +90,8 @@ test_that("energy_generation's eng rename map maps mda_*/num_coord_* to the expe
   expect_equal(dat$granted_power_kw, c(1400, 100000.5))
   expect_equal(dat$fiscalized_power_kw, c(1400, 100000))
   expect_equal(dat$physical_guarantee_kw, c(0, 1234.56))
-  expect_equal(dat$business_north_coordinate, c(-20.12479858, -29.06475))
-  expect_equal(dat$business_east_coordinate, c(-43.8702025, -51.55555))
+  expect_equal(dat$latitude_dd, c(-20.12479858, -29.06475))
+  expect_equal(dat$longitude_dd, c(-43.8702025, -51.55555))
 })
 
 test_that("energy_enterprises_distributed's own numeric cleaning still passes after being pulled out of the dataset-specific branch", {
@@ -146,10 +146,10 @@ test_that("energy_development_budget's vlr_* columns are parsed to numeric, not 
   # this test can check the numeric-cleaning step in isolation.
   dat <- load_aneel(dataset = "energy_development_budget", year = 2023, language = "pt")
 
-  expect_true(is.numeric(dat$vlr_desconto))
-  expect_true(is.numeric(dat$vlr_cobranca))
-  expect_equal(dat$vlr_desconto, c(59643, 1234.56))
-  expect_equal(dat$vlr_cobranca, c(189225, NA_real_))
+  expect_true(is.numeric(dat$valor_desconto))
+  expect_true(is.numeric(dat$valor_cobranca))
+  expect_equal(dat$valor_desconto, c(59643, 1234.56))
+  expect_equal(dat$valor_cobranca, c(189225, NA_real_))
 })
 
 test_that("energy_development_budget's eng rename map maps vlr_*/num_ano/etc to the expected English names", {
@@ -174,8 +174,8 @@ test_that("energy_development_budget's eng rename map maps vlr_*/num_ano/etc to 
   dat <- load_aneel(dataset = "energy_development_budget", year = 2023, language = "eng")
   expect_equal(dat$discount_value, c(59643, 1234.56))
   expect_equal(dat$charge_value, c(189225, NA_real_))
-  expect_equal(dat$reference_year, c(2023L, 2023L))
-  expect_equal(dat$agent_cnpj, c("40551996000148", "24222394000190"))
+  expect_equal(dat$year, c(2023L, 2023L))
+  expect_equal(dat$cnpj, c("40551996000148", "24222394000190"))
 })
 
 # energy_development_budget's dictionary used to have 17 "tipo_de_despesa"
@@ -211,11 +211,11 @@ test_that("energy_development_budget's dictionary translates dsc_grupo_tarifario
   dat_pt <- load_aneel(dataset = "energy_development_budget", year = 2023, language = "pt")
   dat_eng <- load_aneel(dataset = "energy_development_budget", year = 2023, language = "eng")
 
-  expect_equal(dat_pt$dsc_grupo_tarifario, c("rede_basica", "rede_basica"))
-  expect_equal(dat_eng$tariff_group_description, c("basic_network", "basic_network"))
+  expect_equal(dat_pt$grupo_tarifario, c("rede_basica", "rede_basica"))
+  expect_equal(dat_eng$tariff_group, c("basic_network", "basic_network"))
   # idc_* values pass through raw -- no dictionary entries exist for them
-  expect_equal(dat_eng$consumer_class_indicator, c(9L, 10L))
-  expect_equal(dat_eng$type_indicator, c(7L, 8L))
+  expect_equal(dat_eng$consumer_class, c(9L, 10L))
+  expect_equal(dat_eng$type, c(7L, 8L))
 })
 
 # energy_generation's dictionary (R/dictionary.R) used to key its ~variable
@@ -241,7 +241,7 @@ test_that("energy_generation's dictionary recode actually translates raw ANEEL c
   # Only the "eng" harmonization map renames sig_tipo_geracao ->
   # generation_type (see R/aneel.R) -- "pt" keeps the original column name,
   # just with the dictionary-translated value.
-  expect_equal(dat_pt$sig_tipo_geracao, c("pequena_central_hidreletrica", "usina_hidreletrica"))
+  expect_equal(dat_pt$tipo_geracao, c("pequena_central_hidreletrica", "usina_hidreletrica"))
   expect_equal(dat_eng$generation_type, c("small_hydroelectric_center", "hydroelectric_power_plant"))
   expect_false(any(dat_eng$generation_type %in% c("PCH", "UHE")))
 })
