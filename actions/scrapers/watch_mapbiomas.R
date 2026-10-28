@@ -121,7 +121,14 @@ mb_strategy_row_block <- function(html) {
 ## own terms. This keeps Strategy 3 focused on actual download links.
 
 mb_strategy_proximity <- function(html, window_chars = 300) {
-  href_matches <- gregexpr('href="[^"]+"', html)[[1]]
+  # perl = TRUE, not the default TRE engine: the positions found here are fed
+  # to substr(), which counts characters, and on Windows TRE counts a character
+  # outside the Basic Multilingual Plane (an emoji) as TWO. The live page has
+  # one, so every later position was off by one: each url came out as
+  # `ref="https://...xlsx"` and each label began mid-tag (measured 2026-10-28:
+  # 85 junk candidates, a duplicate identity, exit code 20). Linux was unaffected,
+  # which is why CI never saw it.
+  href_matches <- gregexpr('href="[^"]+"', html, perl = TRUE)[[1]]
   if (href_matches[1] == -1) return(list())
   href_lens <- attr(href_matches, "match.length")
   out <- list()
@@ -155,7 +162,7 @@ mb_strategy_proximity <- function(html, window_chars = 300) {
 ## June's page did, right in the link's own description text.
 
 mb_strategy_doi <- function(html) {
-  doi_matches <- gregexpr("10\\.58053/MapBiomas/[A-Za-z0-9]+", html)[[1]]
+  doi_matches <- gregexpr("10\\.58053/MapBiomas/[A-Za-z0-9]+", html, perl = TRUE)[[1]] # perl: positions for substr(), see Strategy 3
   if (doi_matches[1] == -1) return(list())
   doi_lens <- attr(doi_matches, "match.length")
   dois <- unique(mapply(function(p, l) substr(html, p, p + l - 1), doi_matches, doi_lens))
