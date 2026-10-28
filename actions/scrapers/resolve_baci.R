@@ -51,97 +51,16 @@
 #    headroom over the ~1-2s measured live) so even the worst case shrinks
 #    further without touching the success path's cost.
 #
-# 2026-10-19: this resolver also owns the manifest row baci_dic/product_codes,
-# the product-code dictionary R/baci.R's load_baci_dic() joins BACI's product
-# codes with. That table is not CEPII's: it is Brazil's COMEX dictionary
-# NCM_SH.csv, on the ministry's balanca host. Its row used to point at
-# balanca.economia.gov.br with an EMPTY resolver, so nothing watched it, and
-# when that host's TLS certificate expired (2026-10-03) load_baci() began to
-# stop -- after downloading CEPII's 2.4 GB zip -- with a certificate error
-# (issue #353). The same file is served, byte-identical (same MD5), by
-# balanca.mdic.gov.br, the host the ministry's open-data page links; that is
-# where the row points now. Everything about that host (the 200/206
-# text/plain Joomla placeholder a wrong path gets, the incomplete TLS chain,
-# the dictionary's columns and Latin-1 encoding) is measured and explained in
-# actions/scrapers/resolve_comex.R's header on the update-comex branch; this
-# resolver only checks what load_baci_dic() needs of it, once per run:
-# one ranged GET that must come back `text/csv` (a status code proves
-# nothing there) with the raw columns CO_SH6, NO_SH6_POR, NO_SH6_ING.
-#
-# A dictionary problem is reported as a PARTIAL failure (see resolve_epe.R /
-# build_manifest.R): the HS92 row above still gets merged, because a broken
-# dictionary must not freeze CEPII's own version stamp, and the baci_dic row is
-# simply left as it was. Known and accepted: until a CI step makes the runner
-# trust balanca.mdic.gov.br's missing intermediate CA (added on the
-# update-comex branch), this part reports "cannot verify the TLS chain" on an
-# ubuntu runner every week. NOTE on duplication: the host below is a second
-# copy of resolve_comex.R's COMEX_HOST, and the dictionary check a smaller copy
-# of its own -- kept separate on purpose so this fix does not depend on that
-# unmerged branch. Once both are on master, fold the baci_dic row into
-# resolve_comex.R's dictionary logic (comex_dic/hs_codes is this same file) and
-# delete this block.
-
-BACI_DIC_URL <- "https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM_SH.csv"
-BACI_DIC_DOCS_URL <- "https://www.gov.br/mdic/pt-br/assuntos/comercio-exterior/estatisticas/base-de-dados-bruta"
-# Raw columns R/baci.R's load_baci_dic() selects (before clean_names()).
-BACI_DIC_REQUIRED <- c("CO_SH6", "NO_SH6_POR", "NO_SH6_ING")
-
-# Verify the dictionary and return its manifest row, or stop() with the reason.
-# `rows` = the manifest rows with survey == "baci_dic" this resolver owns.
-# Not named resolve_*: build_manifest.R registers every top-level resolve_*
-# function as a resolver of its own (as resolve_baci_dictionary it ran every week
-# with no rows, a real GET for nothing, and was reported as FAILED). This one is
-# only ever called from resolve_baci(); test-resolver-registry.R keeps it so.
-baci_check_dictionary <- function(rows) {
-  # Redirects are not followed: a 3xx would be the host saying the layout moved.
-  h <- curl::new_handle(timeout = 30, connecttimeout = 15, followlocation = FALSE)
-  curl::handle_setheaders(h, Range = "bytes=0-4095")
-
-  resp <- tryCatch(curl::curl_fetch_memory(BACI_DIC_URL, handle = h), error = function(e) e)
-  if (inherits(resp, "error")) {
-    msg <- conditionMessage(resp)
-    reason <- if (grepl("certificate has expired|CERT_EXPIRED|certificate expired", msg, ignore.case = TRUE)) {
-      "the server's TLS certificate has expired"
-    } else if (grepl("issuer certificate|UNTRUSTED|unable to verify|incomplete", msg, ignore.case = TRUE)) {
-      paste0(
-        "this runner cannot verify the server's TLS chain: the server omits its intermediate CA ",
-        "('AC SERPRO AR46 OV TLS CA 2025', http://secure.globalsign.com/cacert/acserproar46ovtlsca2025.crt), ",
-        "which Windows and browsers fetch on their own but OpenSSL does not -- add it to the runner's ",
-        "trust store, never turn verification off"
-      )
-    } else {
-      "no HTTP response (DNS, connection, timeout or TLS failure)"
-    }
-    stop("could not reach ", BACI_DIC_URL, " -- ", reason, ". curl said: ", msg)
-  }
-
-  headers <- tryCatch(curl::parse_headers_list(resp$headers), error = function(e) list())
-  ctype <- headers[["content-type"]]
-  ctype <- if (is.null(ctype)) "" else ctype
-  if (!(resp$status_code %in% c(200L, 206L)) || !grepl("^text/csv", ctype, ignore.case = TRUE)) {
-    stop(
-      "no real CSV (text/csv) at ", BACI_DIC_URL, " -- HTTP ", resp$status_code, ", content-type '", ctype,
-      "' (a missing path on that host answers with a text/plain placeholder, not a 404)."
-    )
-  }
-
-  # First line of the (partial) body: the quoted, ';'-separated header row.
-  body <- iconv(rawToChar(resp$content[resp$content != as.raw(0)]), from = "UTF-8", to = "UTF-8", sub = "?")
-  columns <- toupper(trimws(gsub('"', "", strsplit(sub("[\r\n].*$", "", body), ";", fixed = TRUE)[[1]], fixed = TRUE)))
-  missing_cols <- setdiff(BACI_DIC_REQUIRED, columns)
-  if (length(missing_cols) > 0) {
-    stop(
-      "the dictionary at ", BACI_DIC_URL, " no longer carries the columns R/baci.R's load_baci_dic() ",
-      "selects -- missing ", paste(missing_cols, collapse = ", "), ". Fix R/baci.R before publishing it."
-    )
-  }
-
-  tibble::tibble(
-    survey = rows$survey, dataset = rows$dataset,
-    geo_level = rows$geo_level, year = rows$year,
-    url = BACI_DIC_URL, docs_url = BACI_DIC_DOCS_URL
-  )
-}
+# 2026-10-28: this resolver no longer owns the product-code dictionary. From
+# 2026-10-19 it also checked the manifest row baci_dic/product_codes -- Brazil's
+# COMEX dictionary NCM_SH.csv, which R/baci.R's load_baci_dic() joins BACI's
+# product codes with -- but that is the very file resolve_comex.R already checks
+# as comex_dic/hs_codes (the two rows had the same URL; this check was a smaller
+# copy of that one, written while resolve_comex.R was not on master yet).
+# load_baci_dic() now reads comex_dic/hs_codes, the duplicate row and the copy of
+# the check are gone, and resolve_comex.R's COMEX_DICTIONARIES$hs_codes$baci_required
+# keeps guarding the columns load_baci_dic() selects. The only thing left here is
+# CEPII's own archive.
 
 resolve_baci <- function(rows) {
   if (!requireNamespace("curl", quietly = TRUE)) {
@@ -222,7 +141,7 @@ resolve_baci <- function(rows) {
   years <- as.integer(sub(".*_Y([0-9]{4})_V.*", "\\1", data_files))
   available_time <- paste(min(years), max(years), sep = "-")
 
-  result <- tibble::tibble(
+  tibble::tibble(
     survey = "baci", dataset = "HS92",
     geo_level = NA_character_, year = NA_character_,
     url = url,
@@ -230,23 +149,4 @@ resolve_baci <- function(rows) {
     version = found_stamp,
     available_time = available_time
   )
-
-  ## -- the product-code dictionary row (see this file's 2026-10-19 note) ----
-  # Only if the manifest hands us that row. A failure here is partial: HS92
-  # above is still returned, the baci_dic row is left untouched, and the reason
-  # reaches the report/issue via the `partial_failures` attribute.
-  dic_rows <- if (is.null(rows)) rows else rows[rows$survey == "baci_dic", ]
-  if (!is.null(dic_rows) && nrow(dic_rows) > 0) {
-    dic <- tryCatch(baci_check_dictionary(dic_rows), error = function(e) e)
-    if (inherits(dic, "error")) {
-      attr(result, "partial_failures") <- paste0("baci_dic/product_codes: ", conditionMessage(dic))
-    } else {
-      # bind_rows() NA-pads each side's missing columns; NA means "leave the
-      # cell alone" downstream, so HS92's docs_url and the dictionary's
-      # archive_file/version/available_time stay as they are.
-      result <- dplyr::bind_rows(result, dic)
-    }
-  }
-
-  result
 }

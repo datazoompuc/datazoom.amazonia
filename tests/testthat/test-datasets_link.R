@@ -101,6 +101,10 @@
 #      and the row is now owned by the baci resolver (resolve_baci.R). Still
 #      one new row, only its expected url changes; docs_url and resolver are
 #      not columns of this fixture.
+#      Update 2026-10-28: the row is gone again. It was the same file as
+#      comex_dic/hs_codes (delta #16: same URL), so load_baci_dic() now reads
+#      that row and resolve_comex.R checks it; the fixture below no longer adds
+#      a baci_dic row, and the net delta against the pre-audit manifest is zero.
 #  12. 2026-09-14: resolve_ips.R stopped being detect-only -- all 8 IPS
 #      rows' url moved off the manifest's old Google Drive link (confirmed
 #      owned by a personal gmail account, not Datazoom, not in Datazoom's
@@ -145,9 +149,9 @@
 #      not be fixed without a package release when the old host's certificate
 #      expired; they now live in the manifest, owned by the comex resolver
 #      (see resolve_comex.R's header, point 8), under their own survey like
-#      baci_dic (delta #11) so check_params() does not accept them as
-#      datasets of load_br_trade(). Same as delta #11 and #14's new rows: a
-#      new row, not a changed cell. available_time stays blank (no years);
+#      baci_dic did (delta #11, since removed) so check_params() does not
+#      accept them as datasets of load_br_trade(). Same as delta #14's new
+#      rows: a new row, not a changed cell. available_time stays blank (no years);
 #      docs_url and resolver are not columns of this fixture.
 #
 # The fixture was captured right before normalization. Row order is not
@@ -275,13 +279,8 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
       available_geo = "municipality",
       url = "https://data.mapbiomas.org/api/access/datafile/310?format=original"
     ),
-    # Delta #11 -- see file header. Genuinely new row, not a value change.
-    tibble::tibble(
-      survey = "baci_dic", dataset = "product_codes",
-      sidra_code = NA_character_, available_time = NA_character_,
-      available_geo = NA_character_,
-      url = "https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM_SH.csv"
-    ),
+    # (Delta #11's baci_dic/product_codes row was removed 2026-10-28 -- see the
+    # file header: the dictionary is comex_dic/hs_codes, delta #16 below.)
     # Delta #14 -- see file header. Genuinely new rows, not value changes.
     tibble::tibble(
       survey = "deter", dataset = c("deter_pantanal", "deter_non_forest"),

@@ -155,20 +155,21 @@ load_baci_dic <- function(language) {
 
   # This table is Brazilian COMEX's own product-code dictionary (NCM_SH.csv on
   # the ministry's balanca host, balanca.mdic.gov.br since 2026-10-19), not
-  # part of CEPII's BACI archive itself -- kept in the manifest under its own
-  # survey/dataset ("baci_dic"/"product_codes") rather than under "baci" so it
-  # doesn't pass check_params()'s dataset validation for load_baci() as if it
-  # were an actual BACI dataset. Reading it via dataset_url() (never a
-  # literal) is what lets a host change be fixed through the manifest alone,
-  # for installed versions too. Its row is owned by resolve_baci.R, which
-  # re-checks it every run (see that file's 2026-10-19 note); until then the
-  # row had no resolver, so nothing noticed the old host's TLS certificate
-  # expire (2026-10-03) and load_baci() stopped here, after the multi-GB
-  # download (issue #353).
-  url <- dataset_url(source = "baci_dic", dataset = "product_codes")
+  # part of CEPII's BACI archive itself -- so it is not a "baci" dataset
+  # (check_params() would accept it as one for load_baci()) but the manifest's
+  # comex_dic/hs_codes row, the very file R/comex.R's load_trade_dic("hs")
+  # reads. Until 2026-10-28 it had a duplicate row of its own,
+  # baci_dic/product_codes, owned by resolve_baci.R: two rows for one file.
+  # Reading it via dataset_url() (never a literal) is what lets a host change be
+  # fixed through the manifest alone, for installed versions too. Its row is
+  # owned by resolve_comex.R, which re-checks it every run, including the
+  # columns selected below; until 2026-10-19 nothing did, so nothing noticed the
+  # old host's TLS certificate expire (2026-10-03) and load_baci() stopped here,
+  # after the multi-GB download (issue #353).
+  url <- dataset_url(source = "comex_dic", dataset = "hs_codes")
   if (is.na(url)) {
     stop(
-      "No download URL found for source 'baci_dic', dataset 'product_codes' -- ",
+      "No download URL found for source 'comex_dic', dataset 'hs_codes' -- ",
       "the manifest has no such row (an outdated manifest or package snapshot?)."
     )
   }
@@ -202,9 +203,9 @@ load_baci_dic <- function(language) {
   # under a misleading name ("Column `product_eng` doesn't exist" -- the same
   # message the server's placeholder gets, see below), and a renamed
   # no_sh6_por under language = "eng" would vanish without any error at all.
-  # The real guard is resolve_baci.R's BACI_DIC_REQUIRED check of the live
-  # header, once per run. That resolver also guards two things nothing here
-  # can: the file is Latin-1, not UTF-8 (verified at the byte level
+  # The real guard is resolve_comex.R's COMEX_DICTIONARIES$hs_codes$baci_required
+  # check of the live header, once per run. That resolver also guards two things
+  # nothing here can: the file is Latin-1, not UTF-8 (verified at the byte level
   # 2026-10-18; hence the Latin1 locale above), and a path that no longer
   # exists does not 404 -- the host answers 200/206 with a text/plain Joomla
   # placeholder, which read_delim() parses into a one-column table.

@@ -289,8 +289,9 @@ load_trade_dic <- function(type) {
   # read_delim() parses into a one-column table, and the select() further down
   # then fails with "Column `co_sh4` doesn't exist" (measured 2026-10-19).
   # resolve_comex.R rejects such a URL before it is ever published; that is the
-  # only guard. NCM_SH.csv is also the manifest's baci_dic/product_codes row
-  # (R/baci.R), which is a separate row and is not covered by that resolver.
+  # only guard. NCM_SH.csv (the hs_codes row) is also what R/baci.R's
+  # load_baci_dic() reads, through this same row since 2026-10-28; the same
+  # resolver checks the columns that function selects too.
   final <- dataset_url(source = "comex_dic", dataset = dic_dataset)
   if (is.na(final)) {
     stop(

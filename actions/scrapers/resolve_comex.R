@@ -99,7 +99,7 @@
 #    load_trade_dic(), which no resolver touched and which reach users only with
 #    a new package version: when the old host's certificate expired, the manifest
 #    could be fixed for everyone at once but the dictionaries could not. They are
-#    now rows of survey "comex_dic" -- a survey of its own, like baci_dic, because
+#    now rows of survey "comex_dic" -- a survey of its own, because
 #    check_params() validates a dataset against every row of its survey, so
 #    dictionary rows under "comex" would pass as datasets of load_br_trade() and
 #    crash later -- named hs_codes (NCM_SH.csv, the Harmonized System table used
@@ -112,9 +112,18 @@
 #    columns load_trade_dic() selects (COMEX_DICTIONARIES$required, read from
 #    the live headers 2026-10-19: CO_NCM / NO_NCM_POR / NO_NCM_ING in NCM.csv,
 #    CO_SH4 / NO_SH4_POR / NO_SH4_ING in NCM_SH.csv). They have no years, so
-#    their available_time stays empty. NOT covered: baci_dic, which is the
-#    same NCM_SH.csv file under another survey (R/baci.R reads it), still on
-#    the old host and deliberately left alone here -- tracked in its own issue.
+#    their available_time stays empty.
+#
+#    hs_codes is ALSO the product dictionary R/baci.R's load_baci_dic() reads.
+#    Until 2026-10-28 that loader had a duplicate row for the same file,
+#    baci_dic/product_codes, owned by resolve_baci.R (with its own copy of the
+#    host and of this probe, written when this resolver was not on master yet);
+#    both are gone, and the one row is checked here. The columns that loader
+#    selects (CO_SH6 / NO_SH6_POR / NO_SH6_ING, read from the live header
+#    2026-10-28) are not the ones load_trade_dic() selects, so they are a
+#    second list on hs_codes, COMEX_DICTIONARIES$hs_codes$baci_required,
+#    checked the same way: without it nothing would notice a rename of them
+#    any more.
 #
 # Emits one row per manifest row it owns (every real dataset, never NA), with
 # `url` (the `$year$` template on COMEX_HOST for the yearly datasets, the plain
@@ -141,12 +150,17 @@ COMEX_DATASETS <- list(
 
 # The two product dictionaries load_br_trade() joins its data with (R/comex.R's
 # load_trade_dic()). One file each, no years, under tabelas/. They live in the
-# manifest as survey "comex_dic" -- its own survey, like baci_dic -- so they
+# manifest as survey "comex_dic" -- its own survey -- so they
 # cannot pass check_params()'s dataset validation for load_br_trade() as if
 # they were datasets of it. Required: the raw columns load_trade_dic() selects.
+# baci_required (hs_codes only): the raw columns R/baci.R's load_baci_dic()
+# selects from the same file, which it reads through this same row.
 COMEX_DICTIONARY_SURVEY <- "comex_dic"
 COMEX_DICTIONARIES <- list(
-  hs_codes = list(path = "tabelas/NCM_SH.csv", required = c("CO_SH4", "NO_SH4_POR", "NO_SH4_ING")),
+  hs_codes = list(
+    path = "tabelas/NCM_SH.csv", required = c("CO_SH4", "NO_SH4_POR", "NO_SH4_ING"),
+    baci_required = c("CO_SH6", "NO_SH6_POR", "NO_SH6_ING")
+  ),
   ncm_codes = list(path = "tabelas/NCM.csv", required = c("CO_NCM", "NO_NCM_POR", "NO_NCM_ING"))
 )
 
@@ -275,6 +289,14 @@ resolve_comex <- function(rows) {
         ". Fix R/comex.R's column handling before publishing it."
       )
     }
+    missing_baci <- setdiff(spec$baci_required, p$columns) # NULL for a dictionary BACI does not read
+    if (length(missing_baci) > 0) {
+      stop(
+        "resolve_comex(): dictionary '", dataset, "' at ", url, " no longer carries the columns ",
+        "R/baci.R's load_baci_dic() selects -- missing ", paste(missing_baci, collapse = ", "),
+        ". Fix R/baci.R's column handling before publishing it."
+      )
+    }
   }
 
   ranges <- list()
@@ -320,8 +342,7 @@ resolve_comex <- function(rows) {
   }
 
   # One output row per input row, in the same order. The dictionaries have no
-  # years, so their available_time is NA -- "leave it alone" (SKILL.md), same
-  # as the blank cell baci_dic carries.
+  # years, so their available_time is NA -- "leave it alone" (SKILL.md).
   tibble::tibble(
     survey = rows$survey,
     dataset = rows$dataset,
