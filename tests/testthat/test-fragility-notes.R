@@ -44,15 +44,20 @@ tagged_sources <- list(
   list(r_path = file.path(pkg_root, "R", "epe.R"), label = "R/epe.R", min_tags = 3),
   list(r_path = file.path(pkg_root, "R", "prodes.R"), label = "R/prodes.R", min_tags = 4),
   list(r_path = file.path(pkg_root, "R", "baci.R"), label = "R/baci.R", min_tags = 3),
+  # Added 2026-10-21 alongside PAM's two FRAGILITY_SOURCES rows: pam.R has 3
+  # (the hardcoded SIDRA table ids, the label-derived column renames, the six
+  # named IBGE variable ids) and R/download.R gained a second tag, counted in
+  # its entry below (sidra_download()'s classific = "all" default).
+  list(r_path = file.path(pkg_root, "R", "pam.R"), label = "R/pam.R", min_tags = 3),
   # Added 2026-10-19 alongside TerraClimate's two FRAGILITY_SOURCES rows (its
   # treatment code spans two files): climate.R has 3 (the hard-coded bounding
   # boxes, the whole-calendar-year time window, the layer naming the pivot
   # relies on) and download.R has 1 (the file-name pattern with its embedded
   # start year). R/download.R is shared by every source: its tags reach a PR
-  # body only through a FRAGILITY_SOURCES row pointing at it, and today that
-  # is TerraClimate's alone.
+  # body only through a FRAGILITY_SOURCES row pointing at it, and today those
+  # are TerraClimate's and PAM's (2 tags as of 2026-10-21).
   list(r_path = file.path(pkg_root, "R", "climate.R"), label = "R/climate.R", min_tags = 3),
-  list(r_path = file.path(pkg_root, "R", "download.R"), label = "R/download.R", min_tags = 1),
+  list(r_path = file.path(pkg_root, "R", "download.R"), label = "R/download.R", min_tags = 2),
   # Added 2026-10-21 for the certificate fallback (R/balanca_tls.R): 2 tags, the
   # host name its pattern accepts and the hard-coded copy of the certificates it
   # trusts. It is wired to the "comex_dic" and "baci_dic" rows in FRAGILITY_SOURCES.
