@@ -78,8 +78,29 @@ jobs:
       # then fails with a message naming this exact problem, like any
       # single-resolver failure -- and no other resolver depends on this step.
       - name: Trust SERPRO's intermediate CA (balanca.mdic.gov.br omits it)
+        id: serpro
         uses: ./.github/actions/trust-serpro-intermediate
+        with:
+          # Also rewrite the chain bundled for R users when the live intermediate
+          # is not in it (the step below opens the pull request). This is the one
+          # caller with write permissions, and it runs weekly.
+          refresh-bundled-chain: "true"
         continue-on-error: true
+
+      # The bundled chain (inst/extdata/tls/balanca-serpro-chain.pem, used by
+      # R/balanca_tls.R) no longer matches what the host presents: a pull request
+      # to review instead of a warning annotation nobody reads. Its own branch and
+      # add-paths, so it never mixes with the manifest PR below; run right here,
+      # while the working tree holds nothing else. Re-runs update the same PR.
+      - name: Open PR to refresh the bundled SERPRO chain
+        if: steps.serpro.outputs.chain-stale == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "chore(tls): refresh the SERPRO chain bundled for R users"
+          title: "TLS: refresh the SERPRO chain bundled for R users"
+          body-path: ${{ steps.serpro.outputs.pr-body-path }}
+          branch: serpro-chain-refresh
+          add-paths: inst/extdata/tls/balanca-serpro-chain.pem
 
       - name: Run build_manifest.R
         id: build

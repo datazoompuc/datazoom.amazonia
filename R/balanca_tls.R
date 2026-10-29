@@ -73,12 +73,21 @@ is_balanca_url <- function(url) {
 # as it looks the intermediate up itself; macOS was not tested). Guards, and
 # their limits: tests/testthat/test-balanca-tls.R fails
 # 90 days BEFORE either certificate expires (it cannot see an early
-# replacement); the CI action .github/actions/trust-serpro-intermediate warns
-# when the live intermediate is not in the PEM (only when update-manifest.yaml
-# runs, weekly, and only if someone reads the warning). To refresh: download the
-# issuer from the "CA Issuers" URL in the live certificate (openssl x509 -noout
-# -text), convert it to PEM, replace the second block of the PEM and update the
-# dates in its header comment.
+# replacement); the CI action .github/actions/trust-serpro-intermediate compares
+# the live intermediate with the PEM whenever update-manifest.yaml runs (weekly)
+# and, when it is missing, rewrites the PEM and the workflow opens a pull request
+# for it: review and merge that (the prose of this note then needs a touch).
+# Limits: it only sees the problem while the server still does not send its
+# intermediate (once the host verifies as presented, nothing is compared); it
+# does not rewrite a chain that leads to a root the PEM does not carry (that
+# stays a warning); and the weekly run is the only caller that opens the PR.
+# By hand: download the issuer from the "CA Issuers" URL in the live certificate
+# (openssl x509 -noout -text), convert it to PEM, replace the second block of
+# the PEM and update the dates in its header comment.
+# Seen from one machine on 2026-10-28: the host now presents a Let's Encrypt
+# certificate (CN=*.mdic.gov.br, valid to 2027-01-21) with a full chain that
+# verifies on OpenSSL, so this fallback is dormant until the ministry goes back
+# to a certificate whose intermediate it does not send.
 balanca_chain_file <- function() {
   system.file("extdata", "tls", "balanca-serpro-chain.pem", package = "datazoom.amazonia")
 }

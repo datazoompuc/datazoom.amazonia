@@ -12,12 +12,19 @@
 #   always is); that is safe only because of this check, never because of where
 #   the file came from. TLS verification is never turned off anywhere.
 #
-# The expected issuer name is NOT part of the boundary. It used to be a hard
-# failure, which meant a legitimate rotation of SERPRO's intermediate stopped CI
-# until someone edited a string, defeating the purpose of reading the AIA at all.
+# The issuer's NAME is not part of the boundary. It used to be a hard failure,
+# which meant a legitimate rotation of SERPRO's intermediate stopped CI until
+# someone edited a string, defeating the purpose of reading the AIA at all.
 # Anything that passes the check above is, by construction, a CA that a root we
-# already trust vouched for AS THE ISSUER OF THIS HOST'S CERTIFICATE. A change of
-# name is only reported (a warning on the run), so that a person sees it.
+# already trust vouched for AS THE ISSUER OF THIS HOST'S CERTIFICATE. What a
+# rotation DOES leave behind is the copy of the chain bundled for R users
+# (inst/extdata/tls/balanca-serpro-chain.pem), which this runner no longer needs
+# but R users on Linux do: step 5 below compares it with what was found and, when
+# the calling workflow asks (TRUST_REFRESH), has refresh-bundled-chain.sh rewrite
+# it so that the workflow can open a pull request. A different name needs no check
+# of its own -- a different name is a different certificate, so it is not in the
+# bundle -- and a hard-coded "expected name" would be a second copy of what the
+# bundled file already says, going stale together with it.
 #
 # Environment (all optional; the defaults are what the GitHub runner needs; the
 # overrides exist so this script can be exercised locally and against a fake
@@ -29,7 +36,8 @@
 #   TRUST_UPDATE    command that rebuilds the store         [update-ca-certificates]
 #   TRUST_SUDO      prefix for the two commands above       [sudo]
 #   TRUST_SHIPPED   chain bundled with the R package        [$GITHUB_WORKSPACE/inst/extdata/tls/balanca-serpro-chain.pem]
-#   TRUST_EXPECTED  issuer name last seen (warning only)    [AC SERPRO AR46 OV TLS CA 2025]
+#   TRUST_REFRESH   true: rewrite TRUST_SHIPPED if it lacks the intermediate found, and set the
+#                   step outputs chain-stale / pr-body-path   [false: only a warning]
 #   TRUST_MAX_HOPS  longest chain of AIA downloads allowed  [4]
 #   TRUST_CHECK_URL URL fetched at the end to report success [https://<host>/balanca/manual/Manual.pdf]
 set -euo pipefail
@@ -41,7 +49,10 @@ install_dir="${TRUST_DIR:-/usr/local/share/ca-certificates}"
 update_cmd="${TRUST_UPDATE:-update-ca-certificates}"
 sudo_cmd="${TRUST_SUDO-sudo}"
 shipped="${TRUST_SHIPPED:-${GITHUB_WORKSPACE:-.}/inst/extdata/tls/balanca-serpro-chain.pem}"
-expected_subject="${TRUST_EXPECTED:-AC SERPRO AR46 OV TLS CA 2025}"
+case "${TRUST_REFRESH:-false}" in
+  true | 1 | yes) refresh=1 ;;
+  *) refresh=0 ;;
+esac
 max_hops="${TRUST_MAX_HOPS:-4}"
 check_url="${TRUST_CHECK_URL:-https://$host/balanca/manual/Manual.pdf}"
 
@@ -126,32 +137,54 @@ if ! out="$(verifies "$work/pool.pem")"; then
 fi
 echo "verified: leaf <- $(printf '%s\n' "${downloaded[@]}" | wc -l) downloaded issuer(s) <- a root in $roots (signatures, dates, serverAuth, host name)."
 
-# 5. A name change is reported, never fatal (see the header).
-first_subject="$(openssl x509 -in "${downloaded[0]}" -noout -subject)"
-case "$first_subject" in
-  *"$expected_subject"*) ;;
-  *) echo "::warning::$host's issuer is now '$first_subject', not '$expected_subject' as last seen. It verified against the system roots, so it is installed; if SERPRO has rotated its intermediate, also update inst/extdata/tls/balanca-serpro-chain.pem (the copy shipped to R users) and the name in this script." ;;
-esac
-
-# 6. Is the copy of the chain that R users get (R/balanca_tls.R) still current?
-#    This runner now heals itself, which would otherwise hide the answer.
+# 5. Is the copy of the chain that R users get (R/balanca_tls.R) still current?
+#    This runner now heals itself, which would otherwise hide the answer. When it
+#    is not, the calling workflow can ask (TRUST_REFRESH) for the file to be
+#    rewritten here, in its workspace, and then opens a pull request for it:
+#    a change of name is just one more way of not being in the file, and the
+#    names, old and new, go into the warning and into the pull request.
+chain_stale=0
 if [ -s "$shipped" ]; then
   mkdir "$work/shipped"
   awk -v dir="$work/shipped" '/-----BEGIN CERTIFICATE-----/{n++; on=1} on{print > (dir "/s" n ".pem")} /-----END CERTIFICATE-----/{on=0}' "$shipped"
   : >"$work/shipped_fps.txt"
+  bundled_names=""
   for f in "$work"/shipped/s*.pem; do
-    if [ -s "$f" ]; then fingerprint "$f" >>"$work/shipped_fps.txt"; fi
+    if [ -s "$f" ]; then
+      fingerprint "$f" >>"$work/shipped_fps.txt"
+      if [ "$(openssl x509 -in "$f" -noout -subject_hash)" != "$(openssl x509 -in "$f" -noout -issuer_hash)" ]; then
+        bundled_names="$bundled_names $(openssl x509 -in "$f" -noout -subject)"
+      fi
+    fi
   done
   for f in "${downloaded[@]}"; do
     if ! grep -qxF "$(fingerprint "$f")" "$work/shipped_fps.txt"; then
-      echo "::warning::the intermediate $host presents today ($(openssl x509 -in "$f" -noout -subject), sha256 $(fingerprint "$f")) is NOT in inst/extdata/tls/balanca-serpro-chain.pem, the chain bundled for R users. load_br_trade() and load_baci() on Linux will fail once the system store stops working for them -- replace the bundled intermediate."
+      chain_stale=1
+      echo "::warning::the intermediate $host presents today ($(openssl x509 -in "$f" -noout -subject), sha256 $(fingerprint "$f")) is NOT in inst/extdata/tls/balanca-serpro-chain.pem, the chain bundled for R users (its intermediate:${bundled_names:- none}). load_br_trade() and load_baci() on Linux will fail once the system store stops working for them -- replace the bundled intermediate."
     fi
   done
 else
   echo "::notice::$shipped not found; skipping the comparison with the chain bundled for R users."
 fi
 
-# 7. Install, then rebuild the store (update-ca-certificates wants *.crt in PEM).
+if [ "$chain_stale" = 1 ] && [ "$refresh" = 1 ]; then
+  body="${RUNNER_TEMP:-${TMPDIR:-/tmp}}/serpro-chain-pr-body.md"
+  rc=0
+  REFRESH_BODY="$body" bash "$(dirname "${BASH_SOURCE[0]}")/refresh-bundled-chain.sh" "$shipped" "$work/leaf.pem" "$host" "${downloaded[@]}" || rc=$?
+  if [ "$rc" = 0 ]; then
+    echo "::notice::inst/extdata/tls/balanca-serpro-chain.pem was rewritten in this workspace; the workflow opens a pull request for it."
+    if [ -n "${GITHUB_OUTPUT:-}" ]; then
+      {
+        echo "chain-stale=true"
+        echo "pr-body-path=$body"
+      } >>"$GITHUB_OUTPUT"
+    fi
+  else
+    echo "::warning::the bundled chain could not be refreshed automatically (exit $rc, see above); a person has to update inst/extdata/tls/balanca-serpro-chain.pem."
+  fi
+fi
+
+# 6. Install, then rebuild the store (update-ca-certificates wants *.crt in PEM).
 i=0
 for f in "${downloaded[@]}"; do
   i=$((i + 1))
@@ -159,7 +192,7 @@ for f in "${downloaded[@]}"; do
 done
 $sudo_cmd $update_cmd
 
-# 8. Informational only: after this the host verifies unless the server's own
+# 7. Informational only: after this the host verifies unless the server's own
 #    certificate has a problem, which curl's error then says.
 if curl --fail --silent --show-error --head --max-time 30 "$check_url" >/dev/null; then
   echo "$host now verifies."

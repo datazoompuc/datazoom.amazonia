@@ -25,11 +25,19 @@ description: >
 # is what makes it safe. Until 2026-10-21 this step downloaded one hard-coded
 # URL and refused any certificate whose name was not exactly the one expected;
 # a rotation of SERPRO's intermediate would then have stopped CI until someone
-# edited a string. The name is now only reported (a warning), the URL is read
-# from the certificate, and the script also warns when the intermediate it found
-# is not the one bundled for R users in inst/extdata/tls/balanca-serpro-chain.pem
-# -- because a CI that heals itself would otherwise hide that the package's own
-# copy has gone stale.
+# edited a string. The URL is now read from the certificate, and the script also
+# compares the intermediate it found with the one bundled for R users in
+# inst/extdata/tls/balanca-serpro-chain.pem -- because a CI that heals itself
+# would otherwise hide that the package's own copy has gone stale. When it has,
+# the script warns; and when the caller sets `refresh-bundled-chain: true`
+# (update-manifest.yaml, weekly) it also rewrites that file (refresh-bundled-
+# chain.sh, next to it: root(s) kept, the new intermediate in, accepted only if
+# the new file verifies the live host by itself) and exposes `chain-stale` and
+# `pr-body-path`, so the workflow can open a pull request instead of leaving the
+# warning for nobody to read. The two check workflows do not pass the input: they
+# have no write permission, and one pull request a week is enough. If the host's
+# chain now leads to a root the bundle does not carry, nothing is rewritten and
+# the warning stays: that needs a person.
 #
 # THIS STEP DOES NOT HELP A USER. It only patches the trust store of the runner
 # it runs on, for the length of the job. Since 2026-10-21 R/balanca_tls.R gives
@@ -49,9 +57,31 @@ description: >
 # a checkout first (a local action lives in the repository). test-comex-resolver.R
 # checks the wiring and the safety properties.
 
+inputs:
+  refresh-bundled-chain:
+    description: >
+      'true': when the intermediate the server presents is not in the chain bundled
+      for R users (inst/extdata/tls/balanca-serpro-chain.pem), rewrite that file in
+      the workspace and set the outputs below, so that the CALLER can open a pull
+      request. The caller's job needs contents: write and pull-requests: write
+      (update-manifest.yaml has them). Default 'false': a warning annotation only.
+    required: false
+    default: "false"
+
+outputs:
+  chain-stale:
+    description: "'true' if the bundled chain was rewritten in the workspace (empty otherwise)"
+    value: ${{ steps.trust.outputs.chain-stale }}
+  pr-body-path:
+    description: Path of a file holding the pull request description (set with chain-stale)
+    value: ${{ steps.trust.outputs.pr-body-path }}
+
 runs:
   using: composite
   steps:
-    - name: Find, verify and trust the missing intermediate certificate(s)
+    - id: trust
+      name: Find, verify and trust the missing intermediate certificate(s)
       shell: bash
+      env:
+        TRUST_REFRESH: ${{ inputs.refresh-bundled-chain }}
       run: bash "${{ github.action_path }}/trust-intermediate.sh"
