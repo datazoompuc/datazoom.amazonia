@@ -42,6 +42,9 @@ source(file.path(actions_dir, "scripts", "fragility_notes.R"), local = TRUE)
 tagged_sources <- list(
   list(r_path = file.path(pkg_root, "R", "mapbiomas.R"), label = "R/mapbiomas.R", min_tags = 8),
   list(r_path = file.path(pkg_root, "R", "epe.R"), label = "R/epe.R", min_tags = 3),
+  # Added 2026-10-29 with resolve_imazon.R: the single Google Drive file, and the
+  # raw column names (Front_2020 included) R/imazon.R renames.
+  list(r_path = file.path(pkg_root, "R", "imazon.R"), label = "R/imazon.R", min_tags = 2),
   list(r_path = file.path(pkg_root, "R", "prodes.R"), label = "R/prodes.R", min_tags = 4),
   list(r_path = file.path(pkg_root, "R", "baci.R"), label = "R/baci.R", min_tags = 3),
   # Added 2026-10-19 alongside TerraClimate's two FRAGILITY_SOURCES rows (its

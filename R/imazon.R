@@ -51,6 +51,14 @@ load_imazon <- function(dataset = "imazon_shp", raw_data = FALSE, language = "en
   ## Downloading Data ##
   ######################
 
+  # FRAGILE: the data are ONE file on Google Drive (the manifest's imazon_shp url,
+  # read with googledrive, no sign-in): "imazon.rds", a Datazoom conversion of
+  # Imazon's Fronteiras_Amazonia_2020.shp, uploaded 2022-06-20 to a
+  # contributor's personal Drive. Imazon does not publish it (no official copy was
+  # found, 2026-10-29), so nothing upstream will ever tell us it moved; if that
+  # account is closed or the sharing changed, this stops for every user.
+  # resolve_imazon.R re-reads the file every week (md5 against Drive's, the
+  # columns below) and reports a replacement through the manifest's `version`.
   dat <- external_download(
     dataset = param$dataset,
     source = param$source
@@ -80,6 +88,14 @@ load_imazon <- function(dataset = "imazon_shp", raw_data = FALSE, language = "en
   ## Harmonizing Variable Names ##
   ################################
 
+  # FRAGILE: the five raw columns the file carries -- CD_GEOCMU, NM_MUNICIP, Area, UF
+  # and Front_2020 -- are named here and used above. Front_2020 is the file's
+  # vintage written as a literal, not derived from anything: a file with Front_2023
+  # would stop rename() (loudly), and one that added it beside Front_2020 would pass
+  # it through unrenamed (silently). resolve_imazon.R fails on either, every week
+  # (its IMAZON_COLUMNS / IMAZON_LOADER_FRONT are a copy of these names, held equal
+  # by tests/testthat/test-imazon-resolver.R); adopting a newer vintage means making
+  # this rename version-aware first.
   if (param$language == "eng") {
     dat_mod <- dat %>%
       dplyr::rename(

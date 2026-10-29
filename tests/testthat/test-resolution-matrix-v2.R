@@ -121,6 +121,13 @@ KNOWN_POST_CAPTURE_DELTAS <- c(
   "epe\renergy_state_panel\rNA\rNA\ravailable_time",
   "epe\renergy_state_panel\rNA\rNA\rsheet",
   "epe\renergy_state_panel\rNA\rNA\rresolver",
+  # 2026-10-29: imazon_shp onboarded onto the resolver framework
+  # (actions/scrapers/resolve_imazon.R's header). url and available_time are
+  # unchanged (the resolver confirms them); the row is now owned by the resolver
+  # (`resolver`) and records the md5 of the Drive file it verified (`version`).
+  # Neither is a datasets_link() column, so only this per-field matrix sees them.
+  "imazon\rimazon_shp\rNA\rNA\rresolver",
+  "imazon\rimazon_shp\rNA\rNA\rversion",
   # 2026-09-08 (PRODES/BACI resolver audit): PRODES' docs_url was pointing
   # at a dashboard app, not the real downloads landing page -- fixed for
   # all 6 PRODES rows (see test-datasets_link.R delta #11).
