@@ -24,3 +24,4 @@ vignettes/*.pdf
 
 # Local Claude Code tooling (skills, etc.) -- not part of the shipped package
 .claude/
+Claude outputs/
