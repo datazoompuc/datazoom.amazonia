@@ -1,6 +1,7 @@
 source,item_key,dataset,geo_level,verdict,reason,checked_at
 prodes,20260408,(all),,pass,,2026-10-19T10:36:17Z
-epe,consumer/industrial_energy_consumption,consumer/industrial_energy_consumption,,pass,,2026-10-19T10:34:43Z
-epe,national_energy_balance,national_energy_balance,,pass,,2026-10-05T12:06:14Z
-epe,energy_state_panel,energy_state_panel,,pass,,2026-10-05T12:06:14Z
-ips,2023_dc7f4721ef,(all),,pass,,2026-10-19T10:34:43Z
+prodes,20261019,(all),,pass,,2026-10-26T10:50:24Z
+epe,consumer/industrial_energy_consumption,consumer/industrial_energy_consumption,,pass,,2026-10-26T10:49:58Z
+epe,national_energy_balance,national_energy_balance,,pass,,2026-10-26T10:49:58Z
+epe,energy_state_panel,energy_state_panel,,pass,,2026-10-26T10:49:58Z
+ips,2023_dc7f4721ef,(all),,pass,,2026-10-26T10:49:59Z
