@@ -265,7 +265,8 @@ test_that("a variable IBGE adds to a table fails that row, naming it; percentage
     "table 74 now declares variable(s) 9999 that load_ppm('ppm_animal_origin_production') does not name",
     fixed = TRUE
   )
-  expect_match(attr(out, "partial_failures"), "unnamed na_v<category> columns", fixed = TRUE)
+  expect_match(attr(out, "partial_failures"), "unnamed v<id>_v<category> columns", fixed = TRUE)
+  expect_match(attr(out, "partial_failures"), "ppm_animal_origin_production_variables entry of R/dictionary.R", fixed = TRUE)
 
   # 1000215 ("... percentual do total geral", unit %) is declared on 74 and 3940 and never trips the check
   expect_null(attr(run(), "partial_failures"))
@@ -602,27 +603,14 @@ test_that("every committed PPM row is verifiable: owned by the resolver, one tab
   expect_false(anyNA(lapply(manifest_rows$available_time, parse_years)))
 })
 
-test_that("PPM_NAMED_VARIABLES is the list of ids R/ppm.R's case_when() blocks name, dataset by dataset", {
-  ppm_src <- readLines(file.path(pkg_root, "R", "ppm.R"), warn = FALSE)
-  start <- grep("## Translate Variable Names ##", ppm_src, fixed = TRUE)
-  end <- grep("## Create Long Format Data ##", ppm_src, fixed = TRUE)
-  expect_length(start, 1)
-  expect_length(end, 1)
-  section <- ppm_src[(start + 1):(end - 1)]
-  section <- section[!grepl("^\\s*#", section)]
-
-  block_start <- grep("if \\(param\\$dataset == \"ppm_[a-z_]+\"\\)", section)
-  expect_length(block_start, 5)
-  found <- list()
-  for (k in seq_along(block_start)) {
-    block <- section[block_start[k]:(c(block_start, length(section) + 1)[k + 1] - 1)]
-    dataset <- sub(".*\"(ppm_[a-z_]+)\".*", "\\1", block[1])
-    ids <- regmatches(block, gregexpr("variavel_codigo == \"[0-9]+\"", block))
-    found[[dataset]] <- sort(unique(sub(".*\"([0-9]+)\"", "\\1", unlist(ids))))
-  }
-  expect_setequal(names(found), names(PPM_NAMED_VARIABLES))
-  for (dataset in names(found)) {
-    expect_equal(found[[dataset]], sort(PPM_NAMED_VARIABLES[[dataset]]), info = dataset)
+test_that("PPM_NAMED_VARIABLES is, dataset by dataset, the var_code column of the \"<dataset>_variables\" entry load_ppm() names its variables from", {
+  # This script runs without the package, so the resolver keeps a copy of the ids; the entries are the one place
+  # load_ppm() reads them from (they used to be five case_when() blocks this test had to read as text).
+  skip_if_not(exists("load_dictionary", mode = "function"), "package code not loaded")
+  expect_setequal(names(PPM_NAMED_VARIABLES), manifest_rows$dataset)
+  for (dataset in names(PPM_NAMED_VARIABLES)) {
+    dic <- load_dictionary(paste0(dataset, "_variables"))
+    expect_equal(sort(as.character(dic$var_code)), sort(PPM_NAMED_VARIABLES[[dataset]]), info = dataset)
   }
 })
 

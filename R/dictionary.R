@@ -240,6 +240,59 @@ load_dictionary <- function(dataset) {
     )
   }
 
+  # The names load_ppm() gives each dataset's variables: IBGE's variable id -> the
+  # stem of the column name, in each language (translate_sidra_variables(),
+  # below). One entry per dataset, keyed "<dataset>_variables", next to the
+  # PRODUCT dictionary of the same dataset above (which has the key "<dataset>"
+  # and is a different table: its var_code is a category, or for tables 94 and 95
+  # the variable itself, and var_pt / var_eng are labels, with units; here they
+  # are column-name stems, without).
+  # FRAGILE: each entry names exactly the ids its table reports -- 105 (table
+  # 3939), 108 (95), 107 (94), 106 and 215 (74), 4146 and 215 (3940) -- checked
+  # against IBGE's metadata and the data itself on 2026-10-22. Until the
+  # dictionary replaced a case_when() with no default in R/ppm.R, any other id
+  # became NA and ended up in a column called na_v<category code> (the bug
+  # load_pam() had with 2313). An id missing here now becomes v<id> and warns, but
+  # still needs a real name added here. resolve_ppm.R re-checks the declared
+  # variables on every run against PPM_NAMED_VARIABLES, a copy of these ids that
+  # tests/testthat/test-ppm-resolver.R keeps equal to them.
+  if (dataset == "ppm_livestock_inventory_variables") {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~var_pt, ~var_eng,
+      105, "num", "num" # Efetivo dos rebanhos
+    )
+  }
+
+  if (dataset == "ppm_sheep_farming_variables") {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~var_pt, ~var_eng,
+      108, "num", "num" # Ovinos tosquiados
+    )
+  }
+
+  if (dataset == "ppm_cow_farming_variables") {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~var_pt, ~var_eng,
+      107, "num", "num" # Vacas ordenhadas
+    )
+  }
+
+  if (dataset == "ppm_animal_origin_production_variables") {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~var_pt, ~var_eng,
+      106, "quant", "quant", # Producao de origem animal
+      215, "valor", "value" # Valor da producao
+    )
+  }
+
+  if (dataset == "ppm_aquaculture_variables") {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~var_pt, ~var_eng,
+      4146, "quant", "quant", # Producao da aquicultura
+      215, "valor", "value" # Valor da producao
+    )
+  }
+
   #######
   # PAM #
   #######
@@ -1012,4 +1065,50 @@ load_dictionary <- function(dataset) {
   ############
 
   return(harmonization_dat)
+}
+
+# Names the variable column of a SIDRA table from IBGE's variable code
+# (`variavel_codigo`): the step load_pam() and load_ppm() share. The names come
+# from a "<...>_variables" entry of load_dictionary() instead of a hand-written
+# case_when(), so that an id nobody has named can never silently become NA: it
+# becomes "v<id>" (never equal to a real name, which never starts with "v" + a
+# number) and the call warns, naming the id and IBGE's own name for it. This is
+# the pattern load_pam() got in 2026-10 after table 1613's variable 2313 came
+# back as an unnamed na_v<crop> column for every permanent crop.
+#
+# `dat` has `variavel_codigo` and `variavel` (IBGE's own name, as text) -- both
+# character, as they are after janitor::clean_names() and the accent stripping
+# in the loaders. `dictionary` is the load_dictionary() key; `language` "pt" or
+# "eng"; `caller` and `columns` only word the warning (the column names the
+# fallback produces depend on the loader's pivot).
+#
+# FRAGILE: nothing here knows which ids a table reports; the entry does. A new
+# loader needs its own "..._variables" entry, and the resolver of that source
+# (actions/scrapers/resolve_<source>.R) should compare the table's declared
+# variables with it, as resolve_pam.R and resolve_ppm.R do.
+#' @noRd
+translate_sidra_variables <- function(dat, dictionary, language, caller, columns = "v<id>_<category code>") {
+  dic <- load_dictionary(dictionary)
+  name_column <- if (language == "pt") "var_pt" else "var_eng"
+  # (as.character(100000) is "1e+05": format() with scientific = FALSE keeps a long id as written)
+  codes <- if (is.numeric(dic$var_code)) format(dic$var_code, scientific = FALSE, trim = TRUE) else as.character(dic$var_code)
+  names_by_code <- stats::setNames(as.character(dic[[name_column]]), codes)
+
+  named <- unname(names_by_code[as.character(dat$variavel_codigo)])
+  unnamed <- is.na(named)
+
+  if (any(unnamed)) {
+    missing <- unique(data.frame(code = dat$variavel_codigo[unnamed], ibge = dat$variavel[unnamed]))
+    warning(
+      "IBGE variable(s) with no name in ", caller, ": ",
+      paste0(missing$code, " (", missing$ibge, ")", collapse = ", "),
+      ". Their columns are called ", columns, ". Please report it at ",
+      "https://github.com/datazoompuc/datazoom.amazonia/issues so it can be named.",
+      call. = FALSE
+    )
+    named[unnamed] <- paste0("v", dat$variavel_codigo[unnamed])
+  }
+
+  dat$variavel <- named
+  dat
 }

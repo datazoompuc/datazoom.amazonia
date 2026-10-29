@@ -187,121 +187,20 @@ load_ppm <- function(dataset, raw_data = FALSE,
   ## Translate Variable Names ##
   ##############################
 
-  ## Cattle Number
-
   # FRAGILE: each dataset names only the IBGE variable ids its table reports --
-  # 105 (3939), 108 (95), 107 (94), 106 and 215 (74), 4146 and 215 (3940) -- and
-  # case_when() has no default, so any other id would become NA and end up in a
-  # column called na_v<category code> (the bug load_pam() had with 2313 until
-  # 2026-10-21). Checked against IBGE's metadata and the data itself on
-  # 2026-10-22: these are every variable the five tables report.
-  # resolve_ppm.R re-checks that on every run (PPM_NAMED_VARIABLES there is a
-  # copy of this list; tests/testthat/test-ppm-resolver.R fails if they differ).
-  if (param$dataset == "ppm_livestock_inventory") {
-    if (language == "pt") {
-      dat <- dat %>% dplyr::mutate(
-        variavel = dplyr::case_when(
-          (variavel_codigo == "105") ~ "num"
-        ) # Efetivo dos Rebanhos
-      )
-    }
-
-    if (language == "eng") {
-      dat <- dat %>% dplyr::mutate(
-        variavel = dplyr::case_when(
-          (variavel_codigo == "105") ~ "num"
-        ) # Efetivo dos Rebanhos
-      )
-    }
-  }
-
-  ## Sheep Farm
-
-  if (param$dataset == "ppm_sheep_farming") {
-    if (language == "pt") {
-      dat <- dat %>% dplyr::mutate(
-        variavel = dplyr::case_when(
-          (variavel_codigo == "108") ~ "num"
-        ) # Ovinos Tosquiados
-      )
-    }
-
-    if (language == "eng") {
-      dat <- dat %>% dplyr::mutate(
-        variavel = dplyr::case_when(
-          (variavel_codigo == "108") ~ "num"
-        ) # Ovinos Tosquiados
-      )
-    }
-  }
-
-  ## Animal Origin Production
-
-  if (param$dataset == "ppm_animal_origin_production") {
-    if (language == "pt") {
-      dat <- dat %>%
-        dplyr::mutate(
-          variavel = dplyr::case_when(
-            (variavel_codigo == "106") ~ "quant", # Producao de origem animal
-            (variavel_codigo == "215") ~ "valor", # Valor da producao
-          )
-        )
-    }
-
-    if (language == "eng") {
-      dat <- dat %>%
-        dplyr::mutate(
-          variavel = dplyr::case_when(
-            (variavel_codigo == "106") ~ "quant", # Producao de origem animal
-            (variavel_codigo == "215") ~ "value", # Valor da producao
-          )
-        )
-    }
-  }
-
-  ## Milked Cows
-
-  if (param$dataset == "ppm_cow_farming") {
-    if (language == "pt") {
-      dat <- dat %>% dplyr::mutate(
-        variavel = dplyr::case_when(
-          (variavel_codigo == "107") ~ "num"
-        ) # Vacas ordenhadas
-      )
-    }
-
-    if (language == "eng") {
-      dat <- dat %>% dplyr::mutate(
-        variavel = dplyr::case_when(
-          (variavel_codigo == "107") ~ "num"
-        ) # Vacas ordenhadas
-      )
-    }
-  }
-
-  ## Water Origin Production
-
-  if (param$dataset == "ppm_aquaculture") {
-    if (language == "pt") {
-      dat <- dat %>%
-        dplyr::mutate(
-          variavel = dplyr::case_when(
-            (variavel_codigo == "4146") ~ "quant", # Producao da aquicultura
-            (variavel_codigo == "215") ~ "valor", # Valor da producao
-          )
-        )
-    }
-
-    if (language == "eng") {
-      dat <- dat %>%
-        dplyr::mutate(
-          variavel = dplyr::case_when(
-            (variavel_codigo == "4146") ~ "quant", # Producao da aquicultura
-            (variavel_codigo == "215") ~ "value", # Valor da producao
-          )
-        )
-    }
-  }
+  # 105 (3939), 108 (95), 107 (94), 106 and 215 (74), 4146 and 215 (3940) -- in
+  # its own "<dataset>_variables" entry of load_dictionary() (R/dictionary.R).
+  # Until that entry replaced a case_when() with no default, any other id would
+  # have become NA and ended up in a column called na_v<category code> (the bug
+  # load_pam() had with 2313 until 2026-10-21); now it becomes v<id> and warns.
+  # Checked against IBGE's metadata and the data itself on 2026-10-22: these are
+  # every variable the five tables report. resolve_ppm.R re-checks that on every
+  # run (PPM_NAMED_VARIABLES there is a copy of the entries' ids;
+  # tests/testthat/test-ppm-resolver.R fails if they differ).
+  dat <- translate_sidra_variables(
+    dat, paste0(param$dataset, "_variables"), language, "load_ppm()",
+    columns = "v<id>_v<category code>"
+  )
 
 
   #############################

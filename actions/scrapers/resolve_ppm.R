@@ -60,12 +60,13 @@
 #      ("Peixes") is published only from 2024; as these datasets read the whole
 #      table, the union of the categories is the answer.
 #
-#   4. THE case_when() GAP load_pam() HAD DOES NOT EXIST HERE. R/ppm.R names
+#   4. THE case_when() GAP load_pam() HAD DOES NOT EXIST HERE. load_ppm() names
+#      (the "<dataset>_variables" entries of load_dictionary(), R/dictionary.R)
 #      105 (3939), 108 (95), 107 (94), 106 and 215 (74), 4146 and 215 (3940). The
 #      metadata declares exactly those (plus "... - percentual do total geral"
 #      variables, 1000215, which sidrar's "allxp" never requests) and the data
 #      returns exactly those. This resolver re-checks it on every run
-#      (PPM_NAMED_VARIABLES, kept equal to R/ppm.R's by
+#      (PPM_NAMED_VARIABLES, kept equal to those entries by
 #      tests/testthat/test-ppm-resolver.R): a variable IBGE adds to a table is
 #      reported as a failure of that row, before it can reach a user as an
 #      unnamed na_v<category> column.
@@ -146,8 +147,10 @@ PPM_UNPUBLISHED <- c("...", "..")
 
 PPM_GEO_LEVELS <- c(country = "N1", region = "N2", state = "N3", municipality = "N6")
 
-# dataset -> the IBGE variable ids R/ppm.R's case_when() names for it. A copy of
-# that list: tests/testthat/test-ppm-resolver.R fails if the two ever differ.
+# dataset -> the IBGE variable ids load_ppm() names for it: the var_code column of
+# its "<dataset>_variables" entry of load_dictionary() (R/dictionary.R). A copy
+# (this script runs without the package): tests/testthat/test-ppm-resolver.R
+# fails if the two ever differ.
 PPM_NAMED_VARIABLES <- list(
   ppm_livestock_inventory = "105",
   ppm_sheep_farming = "108",
@@ -494,16 +497,16 @@ ppm_check_row <- function(code, dataset, available_geo, checked, dictionary) {
 
   named <- PPM_NAMED_VARIABLES[[dataset]]
   if (is.null(named)) {
-    return(row_fail(sprintf("dataset %s has no entry in PPM_NAMED_VARIABLES -- add the variable ids R/ppm.R names for it", dataset)))
+    return(row_fail(sprintf("dataset %s has no entry in PPM_NAMED_VARIABLES -- add the variable ids its %s_variables entry of R/dictionary.R names", dataset, dataset)))
   }
   unnamed <- setdiff(tab$variables, named)
   if (length(unnamed) > 0) {
     return(row_fail(sprintf(
       paste(
-        "table %s now declares variable(s) %s that load_ppm('%s') does not name (R/ppm.R's case_when() has no",
-        "default, so they would come out as unnamed na_v<category> columns); name them there and in PPM_NAMED_VARIABLES"
+        "table %s now declares variable(s) %s that load_ppm('%s') does not name (it would return them as",
+        "unnamed v<id>_v<category> columns, with a warning); name them in the %s_variables entry of R/dictionary.R and in PPM_NAMED_VARIABLES"
       ),
-      parsed$table, paste(unnamed, collapse = ", "), dataset
+      parsed$table, paste(unnamed, collapse = ", "), dataset, dataset
     )))
   }
 
