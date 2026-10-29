@@ -1,58 +1,87 @@
 name: Trust SERPRO's intermediate CA
 description: >
-  Adds the intermediate certificate that balanca.mdic.gov.br (COMEX) fails to
-  send to the runner's TLS trust store, after checking it. TLS verification is
-  never disabled.
+  Adds the intermediate certificate(s) that balanca.mdic.gov.br (COMEX) fails to
+  send to the runner's TLS trust store, found from the AIA URL in the server's
+  own certificate and accepted only if the whole chain verifies against the
+  runner's own roots. TLS verification is never disabled.
 
 # balanca.mdic.gov.br (COMEX) sends only its leaf TLS certificate, not the
-# intermediate CA that issued it ("AC SERPRO AR46 OV TLS CA 2025"). Windows and
-# browsers fetch a missing intermediate themselves (AIA); OpenSSL, which R's
-# curl uses on an Ubuntu runner, does not, so without this step every download
-# from that host stops with "unable to get local issuer certificate".
-# Reproduced 2026-10-17 with libcurl+OpenSSL and a Mozilla CA bundle, and fixed
-# by adding exactly this certificate (actions/scrapers/resolve_comex.R's
-# header, point 2). Of the 22 hosts the manifest points at, only the two
-# balanca.* hosts have this problem (same scan, 2026-10-18) -- SEEG's CI
-# failure is a WAF 403, not TLS, so this step does nothing for it, and it does
-# nothing for balanca.economia.gov.br either (that host's certificate is
-# expired, and it is a different CA).
+# intermediate CA that issued it ("AC SERPRO AR46 OV TLS CA 2025" today).
+# Windows and browsers fetch a missing intermediate themselves (AIA); OpenSSL,
+# which R's curl uses on an Ubuntu runner, does not, so without this step every
+# download from that host stops with "unable to get local issuer certificate".
+# Reproduced 2026-10-17 and again 2026-10-21 (libcurl+OpenSSL with the stock
+# Ubuntu 22.04/24.04 ca-certificates bundles, none of which contains it).
+# Of the 22 hosts the manifest points at, only the two balanca.* hosts have this
+# problem (scan of 2026-10-18); this step does nothing for balanca.economia.gov.br
+# (expired certificate, a different CA) or for SEEG (a WAF 403, not TLS).
 #
-# What it does is what a browser does: download the intermediate from the AIA
-# URL in the server's own certificate, REFUSE it unless it is the expected CA
-# and chains to a root the runner already trusts (that signature, not the
-# plain-http download, is what makes it safe), then add it to the trust store.
-# Verification stays ON for everything; nothing is disabled.
+# WHAT THE SCRIPT DOES (trust-intermediate.sh, next to this file -- read its
+# header): reads the certificate the server presents, follows the AIA "CA
+# Issuers" URL(s) in it like a browser (up to 4 hops), and installs what it
+# downloaded ONLY if leaf <- downloaded certificate(s) <- a root in
+# /etc/ssl/certs/ca-certificates.crt verifies, including signatures, dates,
+# serverAuth purpose and the host name. That check, not the plain-http download,
+# is what makes it safe. Until 2026-10-21 this step downloaded one hard-coded
+# URL and refused any certificate whose name was not exactly the one expected;
+# a rotation of SERPRO's intermediate would then have stopped CI until someone
+# edited a string. The URL is now read from the certificate, and the script also
+# compares the intermediate it found with the one bundled for R users in
+# inst/extdata/tls/balanca-serpro-chain.pem -- because a CI that heals itself
+# would otherwise hide that the package's own copy has gone stale. When it has,
+# the script warns; and when the caller sets `refresh-bundled-chain: true`
+# (update-manifest.yaml, weekly) it also rewrites that file (refresh-bundled-
+# chain.sh, next to it: root(s) kept, the new intermediate in, accepted only if
+# the new file verifies the live host by itself) and exposes `chain-stale` and
+# `pr-body-path`, so the workflow can open a pull request instead of leaving the
+# warning for nobody to read. The two check workflows do not pass the input: they
+# have no write permission, and one pull request a week is enough. If the host's
+# chain now leads to a root the bundle does not carry, nothing is rewritten and
+# the warning stays: that needs a person.
+#
+# THIS STEP DOES NOT HELP A USER. It only patches the trust store of the runner
+# it runs on, for the length of the job. Since 2026-10-21 R/balanca_tls.R gives
+# load_br_trade() and load_baci() their own certificate-error fallback, so R
+# code no longer needs this step to read balanca.mdic.gov.br. Callers that still
+# need it are those whose code talks to the host with its own curl calls: the
+# manifest resolvers (update-manifest.yaml). The two check workflows
+# (check-load-br-trade.yaml and the load_br_trade job of check-dz-amazonia.yaml)
+# keep it for now, but while it is there they no longer test what a user
+# experiences -- the runner trusts the host regardless of the R fallback. Drop it
+# from them once the fallback has been seen to work on a real runner.
 #
 # Callers should set `continue-on-error: true`: if a check or the download
 # fails, only the COMEX downloads are affected, and their own error message
 # names this exact problem. Used by update-manifest.yaml, check-load-br-trade.yaml
-# and check-dz-amazonia.yaml (the last only for the load_br_trade job); add it
-# to a job only when that job's R code downloads from balanca.mdic.gov.br.
-# test-comex-resolver.R checks the wiring.
+# and check-dz-amazonia.yaml (the last only for the load_br_trade job). It needs
+# a checkout first (a local action lives in the repository). test-comex-resolver.R
+# checks the wiring and the safety properties.
+
+inputs:
+  refresh-bundled-chain:
+    description: >
+      'true': when the intermediate the server presents is not in the chain bundled
+      for R users (inst/extdata/tls/balanca-serpro-chain.pem), rewrite that file in
+      the workspace and set the outputs below, so that the CALLER can open a pull
+      request. The caller's job needs contents: write and pull-requests: write
+      (update-manifest.yaml has them). Default 'false': a warning annotation only.
+    required: false
+    default: "false"
+
+outputs:
+  chain-stale:
+    description: "'true' if the bundled chain was rewritten in the workspace (empty otherwise)"
+    value: ${{ steps.trust.outputs.chain-stale }}
+  pr-body-path:
+    description: Path of a file holding the pull request description (set with chain-stale)
+    value: ${{ steps.trust.outputs.pr-body-path }}
 
 runs:
   using: composite
   steps:
-    - name: Download, check and trust the intermediate certificate
+    - id: trust
+      name: Find, verify and trust the missing intermediate certificate(s)
       shell: bash
-      run: |
-        set -euo pipefail
-        crt_url="http://secure.globalsign.com/cacert/acserproar46ovtlsca2025.crt"
-        workdir="$(mktemp -d)"
-        curl --fail --silent --show-error --location --max-time 30 --output "$workdir/intermediate.der" "$crt_url"
-        openssl x509 -inform DER -in "$workdir/intermediate.der" -out "$workdir/intermediate.pem"
-        subject="$(openssl x509 -in "$workdir/intermediate.pem" -noout -subject)"
-        case "$subject" in
-          *"AC SERPRO AR46 OV TLS CA 2025"*) ;;
-          *) echo "::warning::unexpected certificate at $crt_url ($subject) -- not trusting it"; exit 1 ;;
-        esac
-        openssl verify -CAfile /etc/ssl/certs/ca-certificates.crt "$workdir/intermediate.pem"
-        sudo cp "$workdir/intermediate.pem" /usr/local/share/ca-certificates/serpro-ac-ar46-ov-tls-ca-2025.crt
-        sudo update-ca-certificates
-        # Informational only: after this, the host verifies unless its own
-        # (leaf) certificate has a problem -- which the curl error says.
-        if curl --fail --silent --show-error --head --max-time 30 https://balanca.mdic.gov.br/balanca/manual/Manual.pdf > /dev/null; then
-          echo "balanca.mdic.gov.br now verifies."
-        else
-          echo "::warning::balanca.mdic.gov.br still does not verify after installing the intermediate -- see the curl error above (e.g. an expired leaf certificate)."
-        fi
+      env:
+        TRUST_REFRESH: ${{ inputs.refresh-bundled-chain }}
+      run: bash "${{ github.action_path }}/trust-intermediate.sh"
