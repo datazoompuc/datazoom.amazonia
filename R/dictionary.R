@@ -235,6 +235,33 @@ load_dictionary <- function(dataset) {
   # PAM #
   #######
 
+  # The names load_pam() gives its variables: IBGE's variable id -> the stem of
+  # the column name, in each language (translate_sidra_variables(), below). Not
+  # a product dictionary like the entries that follow: var_pt / var_eng are
+  # column-name stems, not labels, and there are no units. ONE list for all seven
+  # PAM tables, as before; the key ends in "_variables" so it can never collide
+  # with a product key (temporary_crops, ...).
+  # FRAGILE: these seven ids are every variable the seven PAM tables report,
+  # checked against IBGE's metadata and the data itself on 2026-10-21. 2313
+  # ("Area destinada a colheita", table 1613) was missing until then, so every
+  # permanent-crop dataset returned it as an unnamed na_v<crop> column; it
+  # carries the same figure as 8331 for the same crop, so it takes 8331's name.
+  # An id missing here becomes v<id> and warns, but still needs a real name added
+  # here. resolve_pam.R tells us ahead of time that IBGE added one: it re-checks
+  # each table's declared variables against PAM_NAMED_VARIABLES, a copy of this
+  # column that tests/testthat/test-pam-resolver.R keeps equal to it.
+  if (dataset == "pam_variables") {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~var_pt, ~var_eng,
+      109, "area_plantada", "planted_area", # Area plantada
+      112, "rend_medio", "avg_yield", # Rendimento medio da producao
+      214, "quant", "quant", # Quantidade produzida
+      215, "valor", "value", # Valor da producao
+      216, "area_colhida", "harvested_area", # Area colhida
+      8331, "area_plantada_dest_colheita", "planted_to_harvest_area", # Area plantada ou destinada a colheita
+      2313, "area_plantada_dest_colheita", "planted_to_harvest_area" # Area destinada a colheita (table 1613, same figure as 8331)
+    )
+  }
 
   if (dataset == "temporary_crops") {
     harmonization_dat <- tibble::tribble(
@@ -1003,4 +1030,50 @@ load_dictionary <- function(dataset) {
   ############
 
   return(harmonization_dat)
+}
+
+# Names the variable column of a SIDRA table from IBGE's variable code
+# (`variavel_codigo`): the step load_pam() and load_ppm() share. The names come
+# from a "<...>_variables" entry of load_dictionary() instead of a hand-written
+# case_when(), so that an id nobody has named can never silently become NA: it
+# becomes "v<id>" (never equal to a real name, which never starts with "v" + a
+# number) and the call warns, naming the id and IBGE's own name for it. This is
+# the pattern load_pam() got in 2026-10 after table 1613's variable 2313 came
+# back as an unnamed na_v<crop> column for every permanent crop.
+#
+# `dat` has `variavel_codigo` and `variavel` (IBGE's own name, as text) -- both
+# character, as they are after janitor::clean_names() and the accent stripping
+# in the loaders. `dictionary` is the load_dictionary() key; `language` "pt" or
+# "eng"; `caller` and `columns` only word the warning (the column names the
+# fallback produces depend on the loader's pivot).
+#
+# FRAGILE: nothing here knows which ids a table reports; the entry does. A new
+# loader needs its own "..._variables" entry, and the resolver of that source
+# (actions/scrapers/resolve_<source>.R) should compare the table's declared
+# variables with it, as resolve_pam.R and resolve_ppm.R do.
+#' @noRd
+translate_sidra_variables <- function(dat, dictionary, language, caller, columns = "v<id>_<category code>") {
+  dic <- load_dictionary(dictionary)
+  name_column <- if (language == "pt") "var_pt" else "var_eng"
+  # (as.character(100000) is "1e+05": format() with scientific = FALSE keeps a long id as written)
+  codes <- if (is.numeric(dic$var_code)) format(dic$var_code, scientific = FALSE, trim = TRUE) else as.character(dic$var_code)
+  names_by_code <- stats::setNames(as.character(dic[[name_column]]), codes)
+
+  named <- unname(names_by_code[as.character(dat$variavel_codigo)])
+  unnamed <- is.na(named)
+
+  if (any(unnamed)) {
+    missing <- unique(data.frame(code = dat$variavel_codigo[unnamed], ibge = dat$variavel[unnamed]))
+    warning(
+      "IBGE variable(s) with no name in ", caller, ": ",
+      paste0(missing$code, " (", missing$ibge, ")", collapse = ", "),
+      ". Their columns are called ", columns, ". Please report it at ",
+      "https://github.com/datazoompuc/datazoom.amazonia/issues so it can be named.",
+      call. = FALSE
+    )
+    named[unnamed] <- paste0("v", dat$variavel_codigo[unnamed])
+  }
+
+  dat$variavel <- named
+  dat
 }

@@ -52,6 +52,19 @@ load_pam <- function(dataset, raw_data = FALSE,
   param$language <- language
   param$raw_data <- raw_data
 
+  # A SIDRA table given as a number ("You can also use SIDRA codes") means the
+  # manifest dataset that reads that table whole: load_pam(dataset = 1612) is
+  # load_pam(dataset = "temporary_crops"), 1613 is "permanent_crops", 5457
+  # "all_crops", and 839, 1000, 1001 and 1002 are "corn", "peanut", "potato" and
+  # "beans" -- with the same classification, treatment and checks. Only a
+  # number the manifest does not know keeps the old request below (sidra_download()'s
+  # defaults, raw data only).
+
+  if (is.numeric(param$dataset)) {
+    known <- sidra_dataset_of_table("pam", param$dataset)
+    if (!is.null(known)) param$dataset <- known
+  }
+
   # check if dataset, geo_level, and time_period are supported
 
   check_params(param)
@@ -59,22 +72,30 @@ load_pam <- function(dataset, raw_data = FALSE,
   # Extracting sidra info in the form code/classific/category
 
   if (!is.numeric(param$dataset)) {
-    sidra_info <- datasets_link() %>%
+    parts <- datasets_link() %>%
       dplyr::filter(dataset == param$dataset) %>%
-      dplyr::select(sidra_code) %>%
-      unlist() %>%
-      stringr::str_split("/") %>%
-      unlist()
+      dplyr::pull(sidra_code) %>%
+      sidra_code_parts()
+
+    param$code <- parts$table
+    param$classific <- parts$classific
+    param$category <- parts$category
   } else {
     param$code <- param$dataset
+    param$classific <- "all"
+    param$category <- "all"
   }
-
-  param$code <- sidra_info[1]
-  param$classific <- sidra_info[2]
-  param$category <- sidra_info[3]
 
   ## Dataset
 
+  # FRAGILE: the SIDRA table ids hardcoded here and in the renames below
+  # (1612 temporary crops, 1613 permanent crops, 5457 all crops, 839/1000/
+  # 1001/1002 the four multi-harvest tables) are copies of the table in the
+  # manifest's sidra_code. resolve_pam.R checks that the manifest's code still
+  # exists in IBGE's table, not that it is still one of these ids: a row moved
+  # to another table matches no branch, the renames never run, and the
+  # select(-"produto_das_lavouras") further down fails. 1612 and 1613 also
+  # overwrite param$dataset, which is what load_dictionary() looks up.
   if (param$code == 1612) { ## This is a subset of all crops
     param$data_name <- "Temporary Crops (Lavouras Temporarias)"
     param$dataset <- "temporary_crops"
@@ -107,7 +128,7 @@ load_pam <- function(dataset, raw_data = FALSE,
       sidra_download(
         sidra_code = param$code,
         classific = param$classific,
-        category = list(param$category),
+        category = param$category,
         year = year_num,
         geo_level = param$geo_level
       )
@@ -172,6 +193,12 @@ load_pam <- function(dataset, raw_data = FALSE,
 
   ## Change Variable Names for Common Across Datasets
 
+  # FRAGILE: these column names are IBGE's classification labels ("Produto das
+  # lavouras temporarias" for c81, "... permanentes" for c82, "... temporarias
+  # e permanentes" for c782) after janitor::clean_names() and the accent
+  # stripping above. If IBGE rewords a label, rename() stops with "Can't
+  # rename columns that don't exist" -- loudly, but only after the whole
+  # download.
   if (param$code == 5457) {
     dat <- dat %>%
       dplyr::rename(
@@ -199,29 +226,19 @@ load_pam <- function(dataset, raw_data = FALSE,
 
   ## Translation
 
-  if (language == "pt") {
-    dat <- dat %>%
-      dplyr::mutate(variavel = dplyr::case_when(
-        (variavel_codigo == "112") ~ "rend_medio", # Rendimento medio da producao
-        (variavel_codigo == "214") ~ "quant", # Quantidade produzida
-        (variavel_codigo == "215") ~ "valor", # Valor da producao
-        (variavel_codigo == "216") ~ "area_colhida", # Area colhida
-        (variavel_codigo == "8331") ~ "area_plantada_dest_colheita", # Area plantada ou destinada a colheita,
-        (variavel_codigo == "109") ~ "area_plantada" # Area plantada,
-      ))
-  }
-
-  if (language == "eng") {
-    dat <- dat %>%
-      dplyr::mutate(variavel = dplyr::case_when(
-        (variavel_codigo == "112") ~ "avg_yield", # Rendimento medio da producao
-        (variavel_codigo == "214") ~ "quant", # Quantidade produzida
-        (variavel_codigo == "215") ~ "value", # Valor da producao
-        (variavel_codigo == "216") ~ "harvested_area", # Area colhida
-        (variavel_codigo == "8331") ~ "planted_to_harvest_area", # Area plantada ou destinada a colheita
-        (variavel_codigo == "109") ~ "planted_area" # Area plantada,
-      ))
-  }
+  # FRAGILE: the names come from the "pam_variables" entry of load_dictionary()
+  # (R/dictionary.R): the seven ids the seven PAM tables report (112, 214, 215,
+  # 216, 109, 8331, 2313), checked against IBGE's metadata and the data itself
+  # on 2026-10-21. An id that entry does not list becomes v<id> and warns (it
+  # used to be NA, an unnamed na_v<crop> column, for table 1613's 2313), but it
+  # still needs a real name added there. resolve_pam.R tells us ahead of time
+  # that IBGE added one: it re-checks each table's declared variables against
+  # PAM_NAMED_VARIABLES, a copy of that entry's ids that
+  # tests/testthat/test-pam-resolver.R keeps equal to it.
+  dat <- translate_sidra_variables(
+    dat, "pam_variables", language, "load_pam()",
+    columns = "v<id>_v<crop code>"
+  )
 
 
   #############################

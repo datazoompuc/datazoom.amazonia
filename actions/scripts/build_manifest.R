@@ -123,6 +123,7 @@ source(file.path(repo_root, "actions", "scripts", "site_inventory.R"))
 source(file.path(repo_root, "actions", "scripts", "fragility_notes.R"))
 source(file.path(repo_root, "actions", "scripts", "mapbiomas_resolver_cache.R"))
 source(file.path(repo_root, "actions", "scripts", "zip_remote_listing.R"))
+source(file.path(repo_root, "actions", "scripts", "sidra_api.R"))
 source(file.path(repo_root, "actions", "scripts", "resolver_alert_cache.R"))
 
 MANIFEST_PATH <- file.path(repo_root, "inst", "extdata", "manifest", "v1", "datasets_link.csv")
