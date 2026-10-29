@@ -97,6 +97,25 @@ test_that("proximity strategy skips doi.org hrefs (owned exclusively by the DOI 
   expect_false(any(grepl("doi\\.org", urls, ignore.case = TRUE)))
 })
 
+test_that("the position-based strategies (3 and 4) are not thrown off by an emoji earlier in the page", {
+  # The live page has one emoji. On Windows R's default regex engine counts it as
+  # two where substr() counts one, so every position after it was shifted by one:
+  # the proximity urls came out as `ref="https://...xlsx"` (85 junk rows, a
+  # duplicate identity, exit code 20 in build_manifest.R). Linux does not shift,
+  # so this test only fails on a build that does.
+  emoji <- "\U0001F600"
+  html <- paste0(
+    "<p>", emoji, emoji, " Coleção 11 </p>",
+    '<a href="https://x.org/a.xlsx">baixar</a> <a href="https://x.org/b.xlsx">baixar</a> ',
+    "10.58053/MapBiomas/ABC123"
+  )
+  Encoding(html) <- "UTF-8"
+
+  urls <- vapply(mb_strategy_proximity(html), function(h) h$url, character(1))
+  expect_equal(urls, c("https://x.org/a.xlsx", "https://x.org/b.xlsx"))
+  expect_equal(vapply(mb_strategy_doi(html), function(h) h$label, character(1)), "DOI 10.58053/MapBiomas/ABC123")
+})
+
 ## ============================================================ ##
 ## normalize_link_url()                                          ##
 ## ============================================================ ##
