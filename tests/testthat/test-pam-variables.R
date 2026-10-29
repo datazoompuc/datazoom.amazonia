@@ -211,3 +211,17 @@ test_that("load_pam(dataset = <table number>) returns exactly what load_pam(data
     }
   }
 })
+
+
+test_that("the \"pam_variables\" dictionary holds exactly the names load_pam() has always used, in both languages, and every id the tables report", {
+  dic <- load_dictionary("pam_variables")
+  codes <- as.character(dic$var_code)
+
+  expect_setequal(codes, names(LABELS$eng))
+  expect_equal(stats::setNames(dic$var_eng, codes)[names(LABELS$eng)], LABELS$eng)
+  expect_equal(stats::setNames(dic$var_pt, codes)[names(LABELS$pt)], LABELS$pt)
+
+  # every variable the seven tables report (their metadata, checked live 2026-10-21) has a name
+  reported <- unique(unlist(lapply(PAM_TABLE_VARIABLES, names)))
+  expect_true(all(reported %in% codes), info = paste(setdiff(reported, codes), collapse = ", "))
+})

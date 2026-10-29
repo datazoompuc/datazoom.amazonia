@@ -115,13 +115,14 @@
 #      request), refreshed on every run and left alone when the metadata
 #      reports anything but a table page.
 #
-#   8. VARIABLE IDS. R/pam.R's Translation step names seven IBGE variable ids --
-#      112, 214, 215, 216, 109, 8331 and 2313 -- and the seven tables declare
+#   8. VARIABLE IDS. load_pam() names seven IBGE variable ids (the "pam_variables"
+#      entry of load_dictionary(), R/dictionary.R) -- 112, 214, 215, 216, 109,
+#      8331 and 2313 -- and the seven tables declare
 #      exactly those (plus "... - percentual do total geral" twins, unit "%",
 #      which sidrar's "allxp" never requests; 2313 is table 1613's "area
 #      destinada a colheita", the one that used to come back as an unnamed
-#      na_v<crop> column). PAM_NAMED_VARIABLES is a copy of that list, kept
-#      equal to R/pam.R's by tests/testthat/test-pam-resolver.R, and every run
+#      na_v<crop> column). PAM_NAMED_VARIABLES is a copy of that entry's ids,
+#      kept equal to it by tests/testthat/test-pam-resolver.R, and every run
 #      checks that each table still declares nothing else: a variable IBGE adds
 #      is reported, naming it and IBGE's name for it, before it reaches a user as
 #      a v<id>_v<crop> column with a warning. It fails the TABLE (all its rows are
@@ -201,11 +202,13 @@
 # stays FALSE: these two ids are known to be enough for PAM's 7 tables).
 PAM_COVERAGE_VARIABLES <- c("215", "214")
 
-# The IBGE variable ids R/pam.R's Translation step names (its case_when(), in
-# both languages): 112 yield, 214 quantity, 215 value, 216 harvested area, 109
-# planted area, 8331 planted-or-destined-to-harvest area (table 5457) and 2313
-# destined-to-harvest area (table 1613). A copy of that list:
-# tests/testthat/test-pam-resolver.R fails if the two ever differ.
+# The IBGE variable ids load_pam() names: the "pam_variables" entry of
+# load_dictionary() (R/dictionary.R), in both languages. 112 yield, 214
+# quantity, 215 value, 216 harvested area, 109 planted area, 8331
+# planted-or-destined-to-harvest area (table 5457) and 2313 destined-to-harvest
+# area (table 1613). A copy of that entry's var_code column (this script runs
+# without the package): tests/testthat/test-pam-resolver.R fails if the two
+# ever differ.
 PAM_NAMED_VARIABLES <- c("112", "214", "215", "216", "109", "8331", "2313")
 
 # "1613/c82/45981" -> list(table = "1613", classific = "c82", category =
@@ -235,8 +238,8 @@ pam_check_table <- function(table) {
   if (nrow(unnamed) > 0) {
     return(list(problem = sprintf(
       paste(
-        "table %s now declares variable(s) %s that load_pam() does not name (R/pam.R's Translation step",
-        "would return them as unnamed v<id>_v<crop> columns, with a warning); name them there and in PAM_NAMED_VARIABLES"
+        "table %s now declares variable(s) %s that load_pam() does not name (it would return them as",
+        "unnamed v<id>_v<crop> columns, with a warning); name them in the pam_variables entry of R/dictionary.R and in PAM_NAMED_VARIABLES"
       ),
       table, paste0(unnamed$id, " (", unnamed$nome, ")", collapse = ", ")
     )))

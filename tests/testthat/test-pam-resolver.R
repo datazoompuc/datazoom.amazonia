@@ -264,22 +264,12 @@ test_that("a variable IBGE adds to a table fails that table's rows, naming it; p
   expect_null(attr(run(), "partial_failures"))
 })
 
-test_that("PAM_NAMED_VARIABLES is the list of ids R/pam.R's Translation step names, in both languages", {
-  pam_src <- readLines(file.path(pkg_root, "R", "pam.R"), warn = FALSE)
-  start <- grep("## Translation", pam_src, fixed = TRUE)
-  end <- grep("## Create Long Format Data ##", pam_src, fixed = TRUE)
-  expect_length(start, 1)
-  expect_length(end, 1)
-  section <- pam_src[(start + 1):(end - 1)]
-  section <- section[!grepl("^\\s*#", section)]
-
-  per_language <- list(pt = section[grep("language == \"pt\"", section):(grep("language == \"eng\"", section) - 1)],
-                       eng = section[grep("language == \"eng\"", section):length(section)])
-  for (language in names(per_language)) {
-    ids <- regmatches(per_language[[language]], gregexpr("variavel_codigo == \"[0-9]+\"", per_language[[language]]))
-    ids <- sort(unique(sub(".*\"([0-9]+)\"", "\\1", unlist(ids))))
-    expect_equal(ids, sort(PAM_NAMED_VARIABLES), info = language)
-  }
+test_that("PAM_NAMED_VARIABLES is the var_code column of the \"pam_variables\" entry load_pam() names its variables from", {
+  # This script runs without the package, so the resolver keeps a copy of the ids; the entry is the one place
+  # load_pam() reads them from (it used to be a case_when() this test had to read as text).
+  skip_if_not(exists("load_dictionary", mode = "function"), "package code not loaded")
+  dic <- load_dictionary("pam_variables")
+  expect_equal(sort(as.character(dic$var_code)), sort(PAM_NAMED_VARIABLES))
 })
 
 # ---- per-row failures -------------------------------------------------------
