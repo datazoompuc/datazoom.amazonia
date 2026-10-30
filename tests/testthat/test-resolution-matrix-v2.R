@@ -306,6 +306,22 @@ KNOWN_POST_CAPTURE_DELTAS <- c(
   post_capture_key("pam", pam_datasets, NA, NA, "docs_url")
 )
 
+# 2026-10-22: PPM onboarding (see test-datasets_link.R's delta #19 and
+# resolve_ppm.R's header). Built from the captured matrix itself rather than
+# listed key by key: 18 cells on 5 unkeyed rows -- resolver, available_time and
+# docs_url on every row (the survey-wide page became each row's own table page),
+# sidra_code on the 3 tables that have a classification. The SET of changed cells
+# does not move when the resolver refreshes available_time again.
+ppm_datasets <- unique(matrix$dataset[matrix$survey == "ppm"])
+ppm_classified <- c("ppm_animal_origin_production", "ppm_aquaculture", "ppm_livestock_inventory")
+KNOWN_POST_CAPTURE_DELTAS <- c(
+  KNOWN_POST_CAPTURE_DELTAS,
+  post_capture_key("ppm", ppm_datasets, NA, NA, "resolver"),
+  post_capture_key("ppm", ppm_datasets, NA, NA, "available_time"),
+  post_capture_key("ppm", ppm_datasets, NA, NA, "docs_url"),
+  post_capture_key("ppm", ppm_classified, NA, NA, "sidra_code")
+)
+
 test_that("every real-key entry in resolution_matrix_keyed.rds resolves byte-identically after the migration, except 5 known post-capture deltas", {
   real_rows <- matrix[!(is.na(matrix$geo_level) & is.na(matrix$year) & mapply(is_known_base_row_dataset, matrix$survey, matrix$dataset)), ]
   expect_gt(nrow(real_rows), 0)
@@ -427,6 +443,23 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 42
   expect_equal(sum(pam_new$sidra_code != pam_old$sidra_code), 7)
   new_snap <- new_snap[new_snap$survey != "pam", ]
   old_snap <- old_snap[old_snap$survey != "pam", ]
+
+  # ppm: 3 sidra_code cells and 5 available_time cells (delta #19, 2026-10-22,
+  # test-datasets_link.R) are asserted there and the rows set aside before the
+  # comparison, so the shared cell count below keeps meaning what its comment
+  # says. Everything else about them must be unchanged.
+  ppm_new <- new_snap[new_snap$survey == "ppm", ]
+  ppm_old <- old_snap[old_snap$survey == "ppm", ]
+  expect_equal(nrow(ppm_new), 5)
+  expect_setequal(ppm_new$dataset, ppm_old$dataset)
+  ppm_new <- ppm_new[order(ppm_new$dataset), ]
+  ppm_old <- ppm_old[order(ppm_old$dataset), ]
+  for (col in setdiff(names(ppm_old), c("sidra_code", "available_time"))) {
+    expect_equal(ppm_new[[col]], ppm_old[[col]], info = paste("ppm column", col))
+  }
+  expect_equal(sum(ppm_new$sidra_code != ppm_old$sidra_code), 3)
+  new_snap <- new_snap[new_snap$survey != "ppm", ]
+  old_snap <- old_snap[old_snap$survey != "ppm", ]
 
   # sigmine/sigmine_inactive is a genuinely NEW row (delta #14,
   # test-datasets_link.R) -- same treatment as baci_dic above: assert it

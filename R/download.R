@@ -86,7 +86,7 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
   ## Load Data ##
   ###############
 
-  get_sidra_safe <- purrr::safely(sidrar::get_sidra)
+  get_sidra_safe <- purrr::safely(sidra_get_table)
 
 
   if (param$geo_reg %in% c("Brazil", "Region", "State")) {
@@ -297,6 +297,47 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
       } # End of if Meso
     } # End of if Uf
   } # End of If - Download at the Municipality Level
+}
+
+# sidrar::get_sidra(), except that `classific = NULL` means "this table has no
+# classification" (PPM's tables 94 and 95) and is answered without sidrar's
+# table lookup.
+#
+# FRAGILE: sidrar::get_sidra() cannot be told a table has no classification.
+# For classific = NULL or "all" it scrapes IBGE's HTML description of the table
+# (apisidra.ibge.gov.br/desctabapi.aspx?c=<table>) to learn the classification
+# ids, and that page is behind a Cloudflare bot challenge (HTTP 403) from some
+# networks -- even for a table with nothing to find. So for classific = NULL
+# this builds the request sidrar would have built and hands it over through
+# get_sidra(api = ), which skips the lookup:
+# /t/<table>/<geo>/p/<period>/v/allxp/f/a/h/y/d/s, the same path (n1/1 for
+# Brazil, n3/all for states, n6/in%20n3%20<uf> for a state's municipalities,
+# n8/n9 for meso/micro-regions) and the same response parsing. It stays correct only while that path layout
+# does; a table that does have a classification must not take this route (IBGE
+# answers HTTP 200 with only the "Total" slice -- 2 rows instead of 7 for table
+# 74, checked 2026-10-22 -- not an error), which is why resolve_ppm.R checks
+# that the manifest's code and the table agree. Every other caller passes a
+# classification or "all" and is untouched.
+sidra_get_table <- function(x, geo, period, geo.filter = NULL, classific = "all", category = "all") {
+  if (!is.null(classific)) {
+    return(sidrar::get_sidra(
+      x = x, geo = geo, period = period, geo.filter = geo.filter,
+      classific = classific, category = category
+    ))
+  }
+
+  geo_code <- c(Brazil = "n1", Region = "n2", State = "n3", City = "n6")[[geo]]
+  filter_code <- c(State = "n3", MesoRegion = "n8", MicroRegion = "n9")
+
+  path_geo <- if (geo == "Brazil") {
+    "n1/1"
+  } else if (is.null(geo.filter)) {
+    paste0(geo_code, "/all")
+  } else {
+    paste0(geo_code, "/in%20", filter_code[[names(geo.filter)]], "%20", paste(geo.filter[[1]], collapse = ","))
+  }
+
+  sidrar::get_sidra(api = paste0("/t/", x, "/", path_geo, "/p/", period, "/v/allxp/f/a/h/y/d/s"))
 }
 
 # The parts of a manifest sidra_code for sidra_download(): "74/c80/all" ->

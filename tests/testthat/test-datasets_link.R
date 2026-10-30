@@ -336,6 +336,31 @@ fixture <- fixture %>%
     available_time = dplyr::if_else(survey == "terraclimate", "1950-2025", available_time)
   )
 
+# Delta #19 -- ppm (2026-10-22; see actions/scrapers/resolve_ppm.R's header).
+# Two kinds of change, both on existing rows:
+#   * sidra_code: the three tables that have a classification now spell it out
+#     ("74" -> "74/c80/all", "3940" -> "3940/c654/all", "3939" -> "3939/c79/all").
+#     Tables 94 and 95 have none and stay bare, which now MEANS "no
+#     classification". sidrar builds the same request either way, but for
+#     classific = "all" (what a bare code used to get) it first scrapes an IBGE
+#     HTML page that sits behind a bot challenge, and load_ppm() failed for all
+#     five datasets with "Error in Download." where that page was challenged.
+#   * available_time: refreshed from IBGE's own data (every end year 2023 ->
+#     2025). Not pinned value by value -- resolve_ppm.R rewrites it every year --
+#     but by the test further down. The golden comparison below blanks ppm's
+#     available_time on both sides.
+# docs_url (each row's own SIDRA table page) and resolver were populated too (not
+# datasets_link() columns).
+fixture <- fixture %>%
+  dplyr::mutate(
+    sidra_code = dplyr::case_when(
+      survey == "ppm" & dataset == "ppm_animal_origin_production" ~ "74/c80/all",
+      survey == "ppm" & dataset == "ppm_aquaculture" ~ "3940/c654/all",
+      survey == "ppm" & dataset == "ppm_livestock_inventory" ~ "3939/c79/all",
+      TRUE ~ sidra_code
+    )
+  )
+
 # Delta #14 -- sigmine (2026-10). sigmine_inactive is a genuinely new row, and
 # both sigmine rows now declare available_geo "state, municipality" (the
 # geo_level choices load_sigmine() actually supports). See R/sigmine.R.
@@ -398,6 +423,9 @@ test_that("datasets_link() matches the golden fixture (schema normalization is a
   # pam's available_time is asserted on its own in the next test (delta #18).
   actual$available_time[actual$survey == "pam"] <- NA_character_
   expected$available_time[expected$survey == "pam"] <- NA_character_
+  # ppm's available_time is asserted on its own in the next test (delta #19).
+  actual$available_time[actual$survey == "ppm"] <- NA_character_
+  expected$available_time[expected$survey == "ppm"] <- NA_character_
 
   expect_equal(actual, expected)
 })
@@ -412,6 +440,7 @@ test_that("pam's available_time follows IBGE's coverage: same start years, end y
 
   first_year <- function(x) as.integer(sub("-.*", "", x))
   last_year <- function(x) as.integer(sub(".*-", "", x))
+
   is_annatto <- old$dataset == "annatto_seeds"
   ended_1987 <- old$dataset %in% c("alfafa", "cashew", "forage_cane", "rubber_liquid_latex")
 
@@ -424,6 +453,25 @@ test_that("pam's available_time follows IBGE's coverage: same start years, end y
   expect_equal(new$available_time[ended_1987], old$available_time[ended_1987])
   expect_true(all(last_year(new$available_time[!ended_1987]) >= 2024))
   expect_true(all(last_year(old$available_time[!ended_1987]) == 2023))
+})
+
+test_that("ppm's available_time follows IBGE's coverage: same start years, end years brought up to date (delta #19)", {
+  old <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds"))
+  old <- old[old$survey == "ppm", ]
+  new <- datasets_link(source = "ppm")
+  expect_equal(nrow(new), 5)
+  expect_setequal(new$dataset, old$dataset)
+  new <- new[match(old$dataset, new$dataset), ]
+
+  first_year <- function(x) as.integer(sub("-.*", "", x))
+  last_year <- function(x) as.integer(sub(".*-", "", x))
+
+  # IBGE's tables start where the manifest said (1974; aquaculture 2013) ...
+  expect_equal(first_year(new$available_time), first_year(old$available_time))
+  expect_equal(first_year(new$available_time[new$dataset == "ppm_aquaculture"]), 2013)
+  # ... and the old ranges were two editions behind
+  expect_true(all(last_year(old$available_time) == 2023))
+  expect_true(all(last_year(new$available_time) >= 2025))
 })
 
 test_that("the duplicated pam/permanent_crops row stays fixed", {

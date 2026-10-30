@@ -153,7 +153,15 @@ load_dictionary <- function(dataset) {
   ## PPM ##
   #########
 
-
+  # FRAGILE: the codes below are copies of IBGE's own: the category ids of the
+  # classifications of tables 3939 (c79), 74 (c80) and 3940 (c654), and the
+  # variable ids 107 and 108 of tables 94 and 95, which have no classification.
+  # load_ppm() labels a column by matching its code against var_code, so a
+  # category IBGE adds has no row here and its column comes back without a label
+  # (not wrong, just unlabelled): 79366 ("Peixes", from 2024) was missing until
+  # 2026-10-22. Checked against the live classifications that day: it was the
+  # only gap. resolve_ppm.R repeats that check on every run, from the committed
+  # source of this file, and reports a missing row; nothing else notices.
   if (dataset == "ppm_animal_origin_production") {
     harmonization_dat <- tibble::tribble(
       ~var_code, ~var_pt, ~var_eng, ~unit_value, ~unit_quantity, ~available_period,
@@ -227,7 +235,61 @@ load_dictionary <- function(dataset) {
       32889, "Ostras, vieiras e mexilhoes", "Oysters, scallops and mussels", "1K BRL", "Kg", NA,
       32890, "Sementes de moluscos", "Mollusc Seeds", "1K BRL", "1K", NA,
       32891, "Outros produtos (ra, jacare, siri, caranguejo, lagosta, etc)", "Other products (ra, alligator, crab, crab, lobster, etc.)", "1K BRL", "None", NA,
+      79366, "Peixes", "Fish", "1K BRL", "Kg", NA,
       0, "Total", "Total", "1K BRL", "None", NA
+    )
+  }
+
+  # The names load_ppm() gives each dataset's variables: IBGE's variable id -> the
+  # stem of the column name, in each language (translate_sidra_variables(),
+  # below). One entry per dataset, keyed "<dataset>_variables", next to the
+  # PRODUCT dictionary of the same dataset above (which has the key "<dataset>"
+  # and is a different table: its var_code is a category, or for tables 94 and 95
+  # the variable itself, and var_pt / var_eng are labels, with units; here they
+  # are column-name stems, without).
+  # FRAGILE: each entry names exactly the ids its table reports -- 105 (table
+  # 3939), 108 (95), 107 (94), 106 and 215 (74), 4146 and 215 (3940) -- checked
+  # against IBGE's metadata and the data itself on 2026-10-22. Until the
+  # dictionary replaced a case_when() with no default in R/ppm.R, any other id
+  # became NA and ended up in a column called na_v<category code> (the bug
+  # load_pam() had with 2313). An id missing here now becomes v<id> and warns, but
+  # still needs a real name added here. resolve_ppm.R re-checks the declared
+  # variables on every run against PPM_NAMED_VARIABLES, a copy of these ids that
+  # tests/testthat/test-ppm-resolver.R keeps equal to them.
+  if (dataset == "ppm_livestock_inventory_variables") {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~var_pt, ~var_eng,
+      105, "num", "num" # Efetivo dos rebanhos
+    )
+  }
+
+  if (dataset == "ppm_sheep_farming_variables") {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~var_pt, ~var_eng,
+      108, "num", "num" # Ovinos tosquiados
+    )
+  }
+
+  if (dataset == "ppm_cow_farming_variables") {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~var_pt, ~var_eng,
+      107, "num", "num" # Vacas ordenhadas
+    )
+  }
+
+  if (dataset == "ppm_animal_origin_production_variables") {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~var_pt, ~var_eng,
+      106, "quant", "quant", # Producao de origem animal
+      215, "valor", "value" # Valor da producao
+    )
+  }
+
+  if (dataset == "ppm_aquaculture_variables") {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~var_pt, ~var_eng,
+      4146, "quant", "quant", # Producao da aquicultura
+      215, "valor", "value" # Valor da producao
     )
   }
 
