@@ -153,7 +153,15 @@ load_dictionary <- function(dataset) {
   ## PPM ##
   #########
 
-
+  # FRAGILE: the codes below are copies of IBGE's own: the category ids of the
+  # classifications of tables 3939 (c79), 74 (c80) and 3940 (c654), and the
+  # variable ids 107 and 108 of tables 94 and 95, which have no classification.
+  # load_ppm() labels a column by matching its code against var_code, so a
+  # category IBGE adds has no row here and its column comes back without a label
+  # (not wrong, just unlabelled): 79366 ("Peixes", from 2024) was missing until
+  # 2026-10-22. Checked against the live classifications that day: it was the
+  # only gap. resolve_ppm.R repeats that check on every run, from the committed
+  # source of this file, and reports a missing row; nothing else notices.
   if (dataset == "ppm_animal_origin_production") {
     harmonization_dat <- tibble::tribble(
       ~var_code, ~var_pt, ~var_eng, ~unit_value, ~unit_quantity, ~available_period,
@@ -227,7 +235,61 @@ load_dictionary <- function(dataset) {
       32889, "Ostras, vieiras e mexilhoes", "Oysters, scallops and mussels", "1K BRL", "Kg", NA,
       32890, "Sementes de moluscos", "Mollusc Seeds", "1K BRL", "1K", NA,
       32891, "Outros produtos (ra, jacare, siri, caranguejo, lagosta, etc)", "Other products (ra, alligator, crab, crab, lobster, etc.)", "1K BRL", "None", NA,
+      79366, "Peixes", "Fish", "1K BRL", "Kg", NA,
       0, "Total", "Total", "1K BRL", "None", NA
+    )
+  }
+
+  # The names load_ppm() gives each dataset's variables: IBGE's variable id -> the
+  # stem of the column name, in each language (translate_sidra_variables(),
+  # below). One entry per dataset, keyed "<dataset>_variables", next to the
+  # PRODUCT dictionary of the same dataset above (which has the key "<dataset>"
+  # and is a different table: its var_code is a category, or for tables 94 and 95
+  # the variable itself, and var_pt / var_eng are labels, with units; here they
+  # are column-name stems, without).
+  # FRAGILE: each entry names exactly the ids its table reports -- 105 (table
+  # 3939), 108 (95), 107 (94), 106 and 215 (74), 4146 and 215 (3940) -- checked
+  # against IBGE's metadata and the data itself on 2026-10-22. Until the
+  # dictionary replaced a case_when() with no default in R/ppm.R, any other id
+  # became NA and ended up in a column called na_v<category code> (the bug
+  # load_pam() had with 2313). An id missing here now becomes v<id> and warns, but
+  # still needs a real name added here. resolve_ppm.R re-checks the declared
+  # variables on every run against PPM_NAMED_VARIABLES, a copy of these ids that
+  # tests/testthat/test-ppm-resolver.R keeps equal to them.
+  if (dataset == "ppm_livestock_inventory_variables") {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~var_pt, ~var_eng,
+      105, "num", "num" # Efetivo dos rebanhos
+    )
+  }
+
+  if (dataset == "ppm_sheep_farming_variables") {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~var_pt, ~var_eng,
+      108, "num", "num" # Ovinos tosquiados
+    )
+  }
+
+  if (dataset == "ppm_cow_farming_variables") {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~var_pt, ~var_eng,
+      107, "num", "num" # Vacas ordenhadas
+    )
+  }
+
+  if (dataset == "ppm_animal_origin_production_variables") {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~var_pt, ~var_eng,
+      106, "quant", "quant", # Producao de origem animal
+      215, "valor", "value" # Valor da producao
+    )
+  }
+
+  if (dataset == "ppm_aquaculture_variables") {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~var_pt, ~var_eng,
+      4146, "quant", "quant", # Producao da aquicultura
+      215, "valor", "value" # Valor da producao
     )
   }
 
@@ -235,6 +297,33 @@ load_dictionary <- function(dataset) {
   # PAM #
   #######
 
+  # The names load_pam() gives its variables: IBGE's variable id -> the stem of
+  # the column name, in each language (translate_sidra_variables(), below). Not
+  # a product dictionary like the entries that follow: var_pt / var_eng are
+  # column-name stems, not labels, and there are no units. ONE list for all seven
+  # PAM tables, as before; the key ends in "_variables" so it can never collide
+  # with a product key (temporary_crops, ...).
+  # FRAGILE: these seven ids are every variable the seven PAM tables report,
+  # checked against IBGE's metadata and the data itself on 2026-10-21. 2313
+  # ("Area destinada a colheita", table 1613) was missing until then, so every
+  # permanent-crop dataset returned it as an unnamed na_v<crop> column; it
+  # carries the same figure as 8331 for the same crop, so it takes 8331's name.
+  # An id missing here becomes v<id> and warns, but still needs a real name added
+  # here. resolve_pam.R tells us ahead of time that IBGE added one: it re-checks
+  # each table's declared variables against PAM_NAMED_VARIABLES, a copy of this
+  # column that tests/testthat/test-pam-resolver.R keeps equal to it.
+  if (dataset == "pam_variables") {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~var_pt, ~var_eng,
+      109, "area_plantada", "planted_area", # Area plantada
+      112, "rend_medio", "avg_yield", # Rendimento medio da producao
+      214, "quant", "quant", # Quantidade produzida
+      215, "valor", "value", # Valor da producao
+      216, "area_colhida", "harvested_area", # Area colhida
+      8331, "area_plantada_dest_colheita", "planted_to_harvest_area", # Area plantada ou destinada a colheita
+      2313, "area_plantada_dest_colheita", "planted_to_harvest_area" # Area destinada a colheita (table 1613, same figure as 8331)
+    )
+  }
 
   if (dataset == "temporary_crops") {
     harmonization_dat <- tibble::tribble(
@@ -854,7 +943,19 @@ load_dictionary <- function(dataset) {
     # consumer_class_indicator/type_indicator (see R/aneel.R).
     harmonization_dat <- tibble::tribble(
       ~variable, ~var_code, ~label_pt, ~label_eng,
-      "dsc_grupo_tarifario", "Rede Basica", "rede_basica", "basic_network"
+      "dsc_grupo_tarifario", "Rede Basica", "rede_basica", "basic_network",
+      "nom_mes", "Janeiro", "janeiro", "january",
+      "nom_mes", "Fevereiro", "fevereiro", "february",
+      "nom_mes", "Marco", "marco", "march",
+      "nom_mes", "Abril", "abril", "april",
+      "nom_mes", "Maio", "maio", "may",
+      "nom_mes", "Junho", "junho", "june",
+      "nom_mes", "Julho", "julho", "july",
+      "nom_mes", "Agosto", "agosto", "august",
+      "nom_mes", "Setembro", "setembro", "september",
+      "nom_mes", "Outubro", "outubro", "october",
+      "nom_mes", "Novembro", "novembro", "november",
+      "nom_mes", "Dezembro", "dezembro", "december"
     )
   }
 
@@ -940,7 +1041,7 @@ load_dictionary <- function(dataset) {
       "dsc_fase_usina", "Construcao nao iniciada", "construcao_nao_iniciada", "construction_not_started",
       "dsc_fase_usina", "Construcao", "em_construcao", "in_construction",
       "dsc_origem_combustivel", "Solar", "solar", "solar",
-      "dsc_origem_combustivel", "Hidrica", "hidrica", "hydric",
+      "dsc_origem_combustivel", "Hidrica", "hidrica", "hydro",
       "dsc_origem_combustivel", "Fossil", "fossil", "fossil",
       "dsc_origem_combustivel", "Biomassa", "biomassa", "biomass",
       "dsc_origem_combustivel", "Eolica", "eolica", "wind",
@@ -962,7 +1063,7 @@ load_dictionary <- function(dataset) {
       "dsc_tipo_outorga", "Concessao", "concessao", "concession",
       "dsc_tipo_outorga", "Autorizacao", "autorizacao", "authorization",
       "nom_fonte_combustivel", "Radiacao solar", "radiacao_solar", "solar_radiation",
-      "nom_fonte_combustivel", "Potencial hidraulico", "potecial_hidraulico", "hydraulic_potential",
+      "nom_fonte_combustivel", "Potencial hidraulico", "potencial_hidraulico", "hydraulic_potential",
       "nom_fonte_combustivel", "Oleo Diesel", "oleo_diesel", "diesel",
       "nom_fonte_combustivel", "Residuos Florestais", "residuos_florestais", "forest_residue",
       "nom_fonte_combustivel", "Cinetica do vento", "cinetica_do_vento", "wind_kinetics",
@@ -990,7 +1091,7 @@ load_dictionary <- function(dataset) {
       "nom_fonte_combustivel", "Calor de Processo - GN", "calor_de_processo_gn", "process_heat_gn",
       "nom_fonte_combustivel", "Calor de Processo - CM", "calor_de_processo_cm", "process_heat_cm",
       "nom_fonte_combustivel", "Biogas - Floresta", "biogas_floresta", "biogas_forest",
-      "nom_fonte_combustivel", "Gas de Alto Forno - PE", "gas_de_alto_forno_pe", "blast_funace_gas_pe",
+      "nom_fonte_combustivel", "Gas de Alto Forno - PE", "gas_de_alto_forno_pe", "blast_furnace_gas_pe",
       "nom_fonte_combustivel", "Etanol", "etanol", "ethanol",
       "idc_geracao_qualificada", "-", NA, NA,
       "idc_geracao_qualificada", "Nao", "0", "0",
@@ -1003,4 +1104,50 @@ load_dictionary <- function(dataset) {
   ############
 
   return(harmonization_dat)
+}
+
+# Names the variable column of a SIDRA table from IBGE's variable code
+# (`variavel_codigo`): the step load_pam() and load_ppm() share. The names come
+# from a "<...>_variables" entry of load_dictionary() instead of a hand-written
+# case_when(), so that an id nobody has named can never silently become NA: it
+# becomes "v<id>" (never equal to a real name, which never starts with "v" + a
+# number) and the call warns, naming the id and IBGE's own name for it. This is
+# the pattern load_pam() got in 2026-10 after table 1613's variable 2313 came
+# back as an unnamed na_v<crop> column for every permanent crop.
+#
+# `dat` has `variavel_codigo` and `variavel` (IBGE's own name, as text) -- both
+# character, as they are after janitor::clean_names() and the accent stripping
+# in the loaders. `dictionary` is the load_dictionary() key; `language` "pt" or
+# "eng"; `caller` and `columns` only word the warning (the column names the
+# fallback produces depend on the loader's pivot).
+#
+# FRAGILE: nothing here knows which ids a table reports; the entry does. A new
+# loader needs its own "..._variables" entry, and the resolver of that source
+# (actions/scrapers/resolve_<source>.R) should compare the table's declared
+# variables with it, as resolve_pam.R and resolve_ppm.R do.
+#' @noRd
+translate_sidra_variables <- function(dat, dictionary, language, caller, columns = "v<id>_<category code>") {
+  dic <- load_dictionary(dictionary)
+  name_column <- if (language == "pt") "var_pt" else "var_eng"
+  # (as.character(100000) is "1e+05": format() with scientific = FALSE keeps a long id as written)
+  codes <- if (is.numeric(dic$var_code)) format(dic$var_code, scientific = FALSE, trim = TRUE) else as.character(dic$var_code)
+  names_by_code <- stats::setNames(as.character(dic[[name_column]]), codes)
+
+  named <- unname(names_by_code[as.character(dat$variavel_codigo)])
+  unnamed <- is.na(named)
+
+  if (any(unnamed)) {
+    missing <- unique(data.frame(code = dat$variavel_codigo[unnamed], ibge = dat$variavel[unnamed]))
+    warning(
+      "IBGE variable(s) with no name in ", caller, ": ",
+      paste0(missing$code, " (", missing$ibge, ")", collapse = ", "),
+      ". Their columns are called ", columns, ". Please report it at ",
+      "https://github.com/datazoompuc/datazoom.amazonia/issues so it can be named.",
+      call. = FALSE
+    )
+    named[unnamed] <- paste0("v", dat$variavel_codigo[unnamed])
+  }
+
+  dat$variavel <- named
+  dat
 }

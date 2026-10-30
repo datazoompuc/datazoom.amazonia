@@ -49,7 +49,8 @@
 # Two other things changed the same general period but are deliberately NOT
 # part of the "16 cells" count below: (a) 2026-09-08 (PRODES/BACI resolver
 # audit, delta #11 in test-datasets_link.R), a brand-new row, baci_dic/
-# product_codes, was added to the manifest; (b) 2026-09-14 (delta #12), IPS's
+# product_codes, was added to the manifest (and removed again 2026-10-28, when
+# load_baci_dic() moved to comex_dic/hs_codes); (b) 2026-09-14 (delta #12), IPS's
 # version field changed alongside its url, but version isn't one of
 # datasets_link()'s 6 output columns. Neither fits "same rows, different
 # values in an existing output column" the way the 16 do, so (a) is asserted
@@ -289,6 +290,46 @@ post_capture_key <- function(s, d, g, y, f) {
   paste(s, d, ifelse(is.na(g), "NA", g), ifelse(is.na(y), "NA", y), f, sep = "\r")
 }
 
+# 2026-10-21: PAM onboarding (see test-datasets_link.R's delta #18 and
+# resolve_pam.R's header). Built from the captured matrix itself rather than
+# listed key by key: 161 cells on 79 unkeyed rows -- resolver on every row,
+# sidra_code on the 7 whole-table rows (classific "all" -> the explicit
+# classification id), and available_time on every row except the 4 series that
+# ended in 1987, which IBGE's coverage left exactly as they were. The SET of
+# changed cells does not move when the resolver refreshes available_time again.
+# 2026-10-22: + docs_url on every row (79 more cells) -- the survey page
+# https://sidra.ibge.gov.br/pesquisa/pam/tabelas, bot-challenged (HTTP 403) so
+# nothing could verify it, became each row's own table page
+# https://sidra.ibge.gov.br/tabela/<table> (7 pages for 79 rows, HTTP 200, taken
+# from the metadata by resolve_pam.R). 240 cells in all. docs_url is not a
+# datasets_link() column, so only this per-field matrix sees it.
+pam_datasets <- unique(matrix$dataset[matrix$survey == "pam"])
+pam_whole_table <- c("all_crops", "temporary_crops", "permanent_crops", "beans", "corn", "peanut", "potato")
+pam_unchanged_time <- c("alfafa", "cashew", "forage_cane", "rubber_liquid_latex")
+KNOWN_POST_CAPTURE_DELTAS <- c(
+  KNOWN_POST_CAPTURE_DELTAS,
+  post_capture_key("pam", pam_datasets, NA, NA, "resolver"),
+  post_capture_key("pam", pam_whole_table, NA, NA, "sidra_code"),
+  post_capture_key("pam", setdiff(pam_datasets, pam_unchanged_time), NA, NA, "available_time"),
+  post_capture_key("pam", pam_datasets, NA, NA, "docs_url")
+)
+
+# 2026-10-22: PPM onboarding (see test-datasets_link.R's delta #19 and
+# resolve_ppm.R's header). Built from the captured matrix itself rather than
+# listed key by key: 18 cells on 5 unkeyed rows -- resolver, available_time and
+# docs_url on every row (the survey-wide page became each row's own table page),
+# sidra_code on the 3 tables that have a classification. The SET of changed cells
+# does not move when the resolver refreshes available_time again.
+ppm_datasets <- unique(matrix$dataset[matrix$survey == "ppm"])
+ppm_classified <- c("ppm_animal_origin_production", "ppm_aquaculture", "ppm_livestock_inventory")
+KNOWN_POST_CAPTURE_DELTAS <- c(
+  KNOWN_POST_CAPTURE_DELTAS,
+  post_capture_key("ppm", ppm_datasets, NA, NA, "resolver"),
+  post_capture_key("ppm", ppm_datasets, NA, NA, "available_time"),
+  post_capture_key("ppm", ppm_datasets, NA, NA, "docs_url"),
+  post_capture_key("ppm", ppm_classified, NA, NA, "sidra_code")
+)
+
 test_that("every real-key entry in resolution_matrix_keyed.rds resolves byte-identically after the migration, except 5 known post-capture deltas", {
   real_rows <- matrix[!(is.na(matrix$geo_level) & is.na(matrix$year) & mapply(is_known_base_row_dataset, matrix$survey, matrix$dataset)), ]
   expect_gt(nrow(real_rows), 0)
@@ -381,28 +422,55 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 42
   new_snap <- new_snap[new_snap$survey != "terraclimate", ]
   old_snap <- old_snap[old_snap$survey != "terraclimate", ]
 
-  # baci_dic/product_codes is a genuinely NEW row (delta #11,
-  # test-datasets_link.R) -- a new row, not a changed cell on an existing
-  # one, so it doesn't fit "same rows, different values" the way the other
-  # 8 cells do. Assert it separately, then exclude it before the row-for-row
-  # comparison below.
-  new_baci_dic <- new_snap[new_snap$survey == "baci_dic", ]
-  expect_equal(nrow(new_baci_dic), 1)
-  expect_equal(new_baci_dic$dataset, "product_codes")
-  # url moved to balanca.mdic.gov.br 2026-10-19 (issue #353; the old host's TLS
-  # certificate expired) -- same file, still one new row.
-  expect_equal(new_baci_dic$url, "https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM_SH.csv")
-  new_snap <- new_snap[new_snap$survey != "baci_dic", ]
+  # baci_dic/product_codes was a genuinely NEW row for a while (delta #11,
+  # test-datasets_link.R) and was removed again 2026-10-28: load_baci_dic()
+  # reads comex_dic/hs_codes, the same file (set aside below with the other
+  # comex_dic row). Nothing to set aside any more -- assert it stays gone.
+  expect_false("baci_dic" %in% new_snap$survey)
+
+  # pam: 7 sidra_code cells and 75 available_time cells (delta #18, 2026-10-21,
+  # test-datasets_link.R) are asserted there and the rows set aside before the
+  # comparison, so the shared cell count below keeps meaning what its comment
+  # says. Everything else about them must be unchanged.
+  pam_new <- new_snap[new_snap$survey == "pam", ]
+  pam_old <- old_snap[old_snap$survey == "pam", ]
+  expect_equal(nrow(pam_new), 79)
+  expect_setequal(pam_new$dataset, pam_old$dataset)
+  pam_new <- pam_new[order(pam_new$dataset), ]
+  pam_old <- pam_old[order(pam_old$dataset), ]
+  for (col in setdiff(names(pam_old), c("sidra_code", "available_time"))) {
+    expect_equal(pam_new[[col]], pam_old[[col]], info = paste("pam column", col))
+  }
+  expect_equal(sum(pam_new$sidra_code != pam_old$sidra_code), 7)
+  new_snap <- new_snap[new_snap$survey != "pam", ]
+  old_snap <- old_snap[old_snap$survey != "pam", ]
+
+  # ppm: 3 sidra_code cells and 5 available_time cells (delta #19, 2026-10-22,
+  # test-datasets_link.R) are asserted there and the rows set aside before the
+  # comparison, so the shared cell count below keeps meaning what its comment
+  # says. Everything else about them must be unchanged.
+  ppm_new <- new_snap[new_snap$survey == "ppm", ]
+  ppm_old <- old_snap[old_snap$survey == "ppm", ]
+  expect_equal(nrow(ppm_new), 5)
+  expect_setequal(ppm_new$dataset, ppm_old$dataset)
+  ppm_new <- ppm_new[order(ppm_new$dataset), ]
+  ppm_old <- ppm_old[order(ppm_old$dataset), ]
+  for (col in setdiff(names(ppm_old), c("sidra_code", "available_time"))) {
+    expect_equal(ppm_new[[col]], ppm_old[[col]], info = paste("ppm column", col))
+  }
+  expect_equal(sum(ppm_new$sidra_code != ppm_old$sidra_code), 3)
+  new_snap <- new_snap[new_snap$survey != "ppm", ]
+  old_snap <- old_snap[old_snap$survey != "ppm", ]
 
   # sigmine/sigmine_inactive is a genuinely NEW row (delta #14,
-  # test-datasets_link.R) -- same treatment as baci_dic above: assert it
-  # separately, then exclude it from the row-for-row comparison.
+  # test-datasets_link.R): assert it separately, then exclude it from the
+  # row-for-row comparison.
   new_sig_inactive <- new_snap[new_snap$survey == "sigmine" & new_snap$dataset == "sigmine_inactive", ]
   expect_equal(nrow(new_sig_inactive), 1)
   expect_equal(new_sig_inactive$url, "https://dadosabertos.anm.gov.br/SIGMINE/PROCESSOS_MINERARIOS/PROCESSOS_INATIVOS.zip")
   new_snap <- new_snap[!(new_snap$survey == "sigmine" & new_snap$dataset == "sigmine_inactive"), ]
   # deter_pantanal and deter_non_forest are genuinely NEW rows too (delta
-  # #14, test-datasets_link.R) -- same treatment as baci_dic above.
+  # #14, test-datasets_link.R) -- same treatment as sigmine_inactive above.
   new_deter <- new_snap[new_snap$survey == "deter" & new_snap$dataset %in% c("deter_pantanal", "deter_non_forest"), ]
   expect_setequal(new_deter$dataset, c("deter_pantanal", "deter_non_forest"))
   expect_equal(

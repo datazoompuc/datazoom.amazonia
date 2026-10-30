@@ -48,10 +48,14 @@ RAW_DATA_BY_DS <- list(
 # livestock_production: só aceita geo_level = "municipality"
 # mapbiomas_transition: "biome" é muito menor que "municipality"
 # mapbiomas_mining: "indigenous_land" é menor que "municipality"
+# ppm_cow_farming: tabela 94 não tem classificação e vai por sidra_get_table()
+#   (R/download.R); em "municipality" cobre também o ramo "City" dessa rota (~10 s).
+#   O ramo "State" dela segue coberto por ppm_sheep_farming (tabela 95).
 GEO_LEVEL_BY_DS <- list(
   livestock_production                  = "municipality",
   mapbiomas_transition                  = "biome",
-  mapbiomas_mining                      = "indigenous_land"
+  mapbiomas_mining                      = "indigenous_land",
+  ppm_cow_farming                       = "municipality"
 )
 
 
@@ -124,7 +128,15 @@ datasets_by_fn <- list(
     "mapbiomas_water",
     "mapbiomas_fire"
   ),
-  load_pam = "all_crops",
+  # um dataset por ramo de R/pam.R: all_crops (tabela 5457), soybean (1612, uma
+  # lavoura temporária), banana (1613, permanente) e corn (839, tabela com mais
+  # de uma safra)
+  load_pam = c(
+    "all_crops",
+    "soybean",
+    "banana",
+    "corn"
+  ),
   load_pevs = c(
     "pevs_forest_crops",
     "pevs_silviculture",

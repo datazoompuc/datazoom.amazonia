@@ -101,6 +101,10 @@
 #      and the row is now owned by the baci resolver (resolve_baci.R). Still
 #      one new row, only its expected url changes; docs_url and resolver are
 #      not columns of this fixture.
+#      Update 2026-10-28: the row is gone again. It was the same file as
+#      comex_dic/hs_codes (delta #16: same URL), so load_baci_dic() now reads
+#      that row and resolve_comex.R checks it; the fixture below no longer adds
+#      a baci_dic row, and the net delta against the pre-audit manifest is zero.
 #  12. 2026-09-14: resolve_ips.R stopped being detect-only -- all 8 IPS
 #      rows' url moved off the manifest's old Google Drive link (confirmed
 #      owned by a personal gmail account, not Datazoom, not in Datazoom's
@@ -145,9 +149,9 @@
 #      not be fixed without a package release when the old host's certificate
 #      expired; they now live in the manifest, owned by the comex resolver
 #      (see resolve_comex.R's header, point 8), under their own survey like
-#      baci_dic (delta #11) so check_params() does not accept them as
-#      datasets of load_br_trade(). Same as delta #11 and #14's new rows: a
-#      new row, not a changed cell. available_time stays blank (no years);
+#      baci_dic did (delta #11, since removed) so check_params() does not
+#      accept them as datasets of load_br_trade(). Same as delta #14's new
+#      rows: a new row, not a changed cell. available_time stays blank (no years);
 #      docs_url and resolver are not columns of this fixture.
 #
 # The fixture was captured right before normalization. Row order is not
@@ -275,13 +279,8 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
       available_geo = "municipality",
       url = "https://data.mapbiomas.org/api/access/datafile/310?format=original"
     ),
-    # Delta #11 -- see file header. Genuinely new row, not a value change.
-    tibble::tibble(
-      survey = "baci_dic", dataset = "product_codes",
-      sidra_code = NA_character_, available_time = NA_character_,
-      available_geo = NA_character_,
-      url = "https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM_SH.csv"
-    ),
+    # (Delta #11's baci_dic/product_codes row was removed 2026-10-28 -- see the
+    # file header: the dictionary is comex_dic/hs_codes, delta #16 below.)
     # Delta #14 -- see file header. Genuinely new rows, not value changes.
     tibble::tibble(
       survey = "deter", dataset = c("deter_pantanal", "deter_non_forest"),
@@ -336,6 +335,31 @@ fixture <- fixture %>%
     available_time = dplyr::if_else(survey == "terraclimate", "1950-2025", available_time)
   )
 
+# Delta #19 -- ppm (2026-10-22; see actions/scrapers/resolve_ppm.R's header).
+# Two kinds of change, both on existing rows:
+#   * sidra_code: the three tables that have a classification now spell it out
+#     ("74" -> "74/c80/all", "3940" -> "3940/c654/all", "3939" -> "3939/c79/all").
+#     Tables 94 and 95 have none and stay bare, which now MEANS "no
+#     classification". sidrar builds the same request either way, but for
+#     classific = "all" (what a bare code used to get) it first scrapes an IBGE
+#     HTML page that sits behind a bot challenge, and load_ppm() failed for all
+#     five datasets with "Error in Download." where that page was challenged.
+#   * available_time: refreshed from IBGE's own data (every end year 2023 ->
+#     2025). Not pinned value by value -- resolve_ppm.R rewrites it every year --
+#     but by the test further down. The golden comparison below blanks ppm's
+#     available_time on both sides.
+# docs_url (each row's own SIDRA table page) and resolver were populated too (not
+# datasets_link() columns).
+fixture <- fixture %>%
+  dplyr::mutate(
+    sidra_code = dplyr::case_when(
+      survey == "ppm" & dataset == "ppm_animal_origin_production" ~ "74/c80/all",
+      survey == "ppm" & dataset == "ppm_aquaculture" ~ "3940/c654/all",
+      survey == "ppm" & dataset == "ppm_livestock_inventory" ~ "3939/c79/all",
+      TRUE ~ sidra_code
+    )
+  )
+
 # Delta #14 -- sigmine (2026-10). sigmine_inactive is a genuinely new row, and
 # both sigmine rows now declare available_geo "state, municipality" (the
 # geo_level choices load_sigmine() actually supports). See R/sigmine.R.
@@ -355,6 +379,35 @@ fixture <- fixture %>%
     )
   )
 
+# Delta #18 -- pam (2026-10-21; see actions/scrapers/resolve_pam.R's header).
+# Two kinds of change, both on existing rows:
+#   * sidra_code: the 7 rows that read a whole table ("5457/all/all" etc.) now
+#     spell the classification out ("5457/c782/all"). sidrar builds the same
+#     request either way, but for "all" it first scrapes an IBGE HTML page
+#     that sits behind a bot challenge, and load_pam("all_crops") failed with
+#     "Error in Download." where the page was challenged. Pinned below.
+#   * available_time: refreshed from IBGE's own data (75 of 79 rows). Not
+#     pinned value by value -- resolve_pam.R rewrites it every year -- but by
+#     the test further down: start years unchanged except annatto_seeds (1981
+#     -> 1988, what IBGE publishes), alfafa/cashew/forage_cane/
+#     rubber_liquid_latex still ending in 1987, every other end year >= 2024.
+#     The golden comparison below blanks pam's available_time on both sides.
+# resolver was populated too, and (2026-10-22) docs_url moved from the survey
+# page to each row's own table page (neither is a datasets_link() column).
+fixture <- fixture %>%
+  dplyr::mutate(
+    sidra_code = dplyr::case_when(
+      survey == "pam" & dataset == "all_crops" ~ "5457/c782/all",
+      survey == "pam" & dataset == "temporary_crops" ~ "1612/c81/all",
+      survey == "pam" & dataset == "permanent_crops" ~ "1613/c82/all",
+      survey == "pam" & dataset == "beans" ~ "1002/c81/all",
+      survey == "pam" & dataset == "corn" ~ "839/c81/all",
+      survey == "pam" & dataset == "peanut" ~ "1000/c81/all",
+      survey == "pam" & dataset == "potato" ~ "1001/c81/all",
+      TRUE ~ sidra_code
+    )
+  )
+
 test_that("datasets_link() returns the exact pre-normalization column set and order", {
   expect_equal(
     names(datasets_link()),
@@ -366,7 +419,58 @@ test_that("datasets_link() matches the golden fixture (schema normalization is a
   actual <- datasets_link() %>% dplyr::arrange(survey, dataset)
   expected <- fixture %>% dplyr::arrange(survey, dataset)
 
+  # pam's available_time is asserted on its own in the next test (delta #18).
+  actual$available_time[actual$survey == "pam"] <- NA_character_
+  expected$available_time[expected$survey == "pam"] <- NA_character_
+  # ppm's available_time is asserted on its own in the next test (delta #19).
+  actual$available_time[actual$survey == "ppm"] <- NA_character_
+  expected$available_time[expected$survey == "ppm"] <- NA_character_
+
   expect_equal(actual, expected)
+})
+
+test_that("pam's available_time follows IBGE's coverage: same start years, end years brought up to date (delta #18)", {
+  old <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds"))
+  old <- old[old$survey == "pam", ]
+  new <- datasets_link(source = "pam")
+  expect_equal(nrow(new), 79)
+  expect_setequal(new$dataset, old$dataset)
+  new <- new[match(old$dataset, new$dataset), ]
+
+  first_year <- function(x) as.integer(sub("-.*", "", x))
+  last_year <- function(x) as.integer(sub(".*-", "", x))
+
+  is_annatto <- old$dataset == "annatto_seeds"
+  ended_1987 <- old$dataset %in% c("alfafa", "cashew", "forage_cane", "rubber_liquid_latex")
+
+  # IBGE publishes annatto from 1988, not 1981 (resolve_pam.R header, point 2)
+  expect_equal(first_year(old$available_time[is_annatto]), 1981)
+  expect_equal(first_year(new$available_time[is_annatto]), 1988)
+  expect_equal(first_year(new$available_time[!is_annatto]), first_year(old$available_time[!is_annatto]))
+
+  # series that ended in 1987 still do; everything else reaches at least the 2024 edition
+  expect_equal(new$available_time[ended_1987], old$available_time[ended_1987])
+  expect_true(all(last_year(new$available_time[!ended_1987]) >= 2024))
+  expect_true(all(last_year(old$available_time[!ended_1987]) == 2023))
+})
+
+test_that("ppm's available_time follows IBGE's coverage: same start years, end years brought up to date (delta #19)", {
+  old <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds"))
+  old <- old[old$survey == "ppm", ]
+  new <- datasets_link(source = "ppm")
+  expect_equal(nrow(new), 5)
+  expect_setequal(new$dataset, old$dataset)
+  new <- new[match(old$dataset, new$dataset), ]
+
+  first_year <- function(x) as.integer(sub("-.*", "", x))
+  last_year <- function(x) as.integer(sub(".*-", "", x))
+
+  # IBGE's tables start where the manifest said (1974; aquaculture 2013) ...
+  expect_equal(first_year(new$available_time), first_year(old$available_time))
+  expect_equal(first_year(new$available_time[new$dataset == "ppm_aquaculture"]), 2013)
+  # ... and the old ranges were two editions behind
+  expect_true(all(last_year(old$available_time) == 2023))
+  expect_true(all(last_year(new$available_time) >= 2025))
 })
 
 test_that("the duplicated pam/permanent_crops row stays fixed", {

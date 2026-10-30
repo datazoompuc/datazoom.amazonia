@@ -95,7 +95,7 @@ if (param$dataset == "energy_development_budget") {
         skip_rows = skip
       )
 
-      if (!"year" %in% names(df_y)) {
+      if (!any(c("year", "ano", "num_ano") %in% tolower(names(df_y)))) {
         df_y$year <- y
       }
 
@@ -110,8 +110,7 @@ if (param$dataset == "energy_development_budget") {
     )
 
     if (param$dataset == "energy_development_budget" &&
-        !"year" %in% names(dat) &&
-        !"ano" %in% names(dat)) {
+        !any(c("year", "ano", "num_ano") %in% tolower(names(dat)))) {
       dat$year <- param$year
     }
   }
@@ -151,7 +150,7 @@ if (param$dataset == "energy_development_budget") {
           dsc_modalidade_habilitado == "Geracao na propria UC" ~ "Microgera\u00e7\u00e3o ou Minigera\u00e7\u00e3o distribu\u00edda",
           dsc_modalidade_habilitado == "Auto consumo remoto"   ~ "Autoconsumo remoto",
           dsc_modalidade_habilitado == "Compartilhada"         ~ "Gera\u00e7\u00e3o compartilhada",
-          dsc_modalidade_habilitado == "Condom\u00ednio"      ~ "Condom\u00ednio",
+          dsc_modalidade_habilitado %in% c("Condom\u00ednio", "Condominio") ~ "Condom\u00ednio",
           TRUE                                                 ~ "Indefinido"
         )
       )
@@ -232,6 +231,75 @@ if (param$dataset == "energy_development_budget") {
   # "%d/%m/%Y" format this block assumed was also wrong for that column.
 
   ################################
+  ## Dataset-Specific Cleaning  ##
+  ################################
+
+  if (param$dataset == "energy_generation") {
+    cols_drop <- c("dat_geracao_conjunto_dados", "ide_nucleo_ceg", "cod_ceg", "nom_fonte_combustivel")
+    dat <- dat %>% dplyr::select(-dplyr::any_of(cols_drop))
+
+    dat <- dat %>%
+      dplyr::rename_with(dplyr::recode,
+        "nom_empreendimento" = "empreendimento",
+        "sig_uf_principal" = "uf",
+        "sig_tipo_geracao" = "tipo_geracao",
+        "dsc_fase_usina" = "fase",
+        "dsc_origem_combustivel" = "origem",
+        "dsc_fonte_combustivel" = "fonte",
+        "dsc_tipo_outorga" = "tipo",
+        "nom_sub_tipo_outorga" = "tipo_de_atuacao",
+        "dat_entrada_operacao" = "entrada_em_operacao",
+        "mda_potencia_outorgada_kw" = "potencia_outorgada_kw",
+        "mda_potencia_fiscalizada_kw" = "potencia_fiscalizada_kw",
+        "mda_garantia_fisica_kw" = "garantia_fisica_kw",
+        "idc_geracao_qualificada" = "geracao_qualificada",
+        "num_coord_n_empreendimento" = "latitude_decimal",
+        "num_coord_e_empreendimento" = "longitude_decimal",
+        "dat_inicio_vigencia" = "inicio_vigencia",
+        "dat_fim_vigencia" = "fim_vigencia",
+        "dsc_propri_regime_pariticipacao" = "proprietario_regime_de_exploracao",
+        "dsc_proprietario_regime_exploracao" = "proprietario_regime_de_exploracao",
+        "dsc_sub_bacia" = "sub_bacia",
+        "dsc_muninicpios" = "municipios",
+        "dsc_mun_empreendimento" = "municipios"
+      )
+
+    date_cols <- c("entrada_em_operacao", "inicio_vigencia", "fim_vigencia")
+    dat <- dat %>%
+      dplyr::mutate(
+        dplyr::across(dplyr::any_of(date_cols), as.Date)
+      )
+
+    if ("geracao_qualificada" %in% names(dat)) {
+      dat$geracao_qualificada <- as.integer(dat$geracao_qualificada)
+    }
+  }
+
+  if (param$dataset == "energy_development_budget") {
+    dat <- dat %>% dplyr::select(-dplyr::any_of("dat_geracao_conjunto_dados"))
+    if ("num_ano" %in% names(dat) && "year" %in% names(dat)) {
+      dat <- dat %>% dplyr::select(-dplyr::any_of("year"))
+    }
+
+    dat <- dat %>%
+      dplyr::rename_with(dplyr::recode,
+        "num_ano" = "ano",
+        "nom_mes" = "mes",
+        "nom_agente" = "agente",
+        "num_cnpj" = "cnpj",
+        "dsc_grupo_tarifario" = "grupo_tarifario",
+        "idc_classe_consumidor" = "classe_consumidor",
+        "idc_tipo" = "tipo",
+        "vlr_desconto" = "valor_desconto",
+        "vlr_cobranca" = "valor_cobranca"
+      )
+
+    if ("cnpj" %in% names(dat)) {
+      dat$cnpj <- stringr::str_pad(as.character(dat$cnpj), width = 14, side = "left", pad = "0")
+    }
+  }
+
+  ################################
   ## Harmonizing Variable Names ##
   ################################
 
@@ -246,59 +314,74 @@ if (param$dataset == "energy_development_budget") {
         "potencia_outorgada_k_w" = "potencia_outorgada_kw",
         "potencia_fiscalizada_k_w" = "potencia_fiscalizada_kw",
         "garantia_fisica_k_w" = "garantia_fisica_kw",
-        "estado" = "sig_uf"
+        "estado" = "sig_uf",
+        # energy_enterprises_distributed clean Portuguese names
+        "nom_empreendimento" = "empreendimento",
+        "sig_uf" = "uf",
+        "nom_municipio" = "municipio",
+        "nom_regiao" = "regiao",
+        "nom_agente" = "agente",
+        "num_cnpj_distribuidora" = "cnpj_distribuidora",
+        "dsc_classe_consumo" = "classe_consumo",
+        "dsc_sub_grupo_tarifario" = "subgrupo_tarifario",
+        "sig_tipo_consumidor" = "tipo_consumidor",
+        "num_cpfcnpj" = "cpf_cnpj",
+        "nom_titular_empreendimento" = "titular_empreendimento",
+        "cod_empreendimento" = "codigo_empreendimento",
+        "dsc_modalidade_habilitado" = "modalidade_descricao",
+        "sig_modalidade_empreendimento" = "modalidade",
+        "sig_tipo_geracao" = "tipo_geracao",
+        "dsc_fonte_geracao" = "fonte_geracao",
+        "dsc_porte" = "porte",
+        "mda_potencia_instalada_kw" = "potencia_instalada_kw",
+        "num_coord_n_empreendimento" = "latitude_decimal",
+        "num_coord_e_empreendimento" = "longitude_decimal",
+        "nom_sub_estacao" = "subestacao",
+        "num_coord_n_sub" = "latitude_subestacao",
+        "num_coord_e_sub" = "longitude_subestacao",
+        "anm_periodo_referencia" = "periodo_referencia",
+        "dth_atualiza_cadastral_empreend" = "data_atualizacao_cadastral"
       )
   }
 
   # FRAGILE: exact upstream column names expected in English harmonization.
   # If ANEEL changes database attribute names, recode silently leaves columns in Portuguese.
-  #
-  # Several keys below used to be short/generic names ("fonte", "fase",
-  # "origem", "tipo", "tipo_de_atuacao", "combustivel_final",
-  # "geracao_qualificada", "inicio_vigencia", "fim_vigencia",
-  # "proprietario_regime_de_exploracao", "sub_bacia", "municipio_s",
-  # "entrada_em_operacao") that never matched any real column name after
-  # janitor::clean_names() -- same root cause, and largely the same wrong
-  # names, as R/dictionary.R's energy_generation ~variable mismatch fixed
-  # 2026-09-21 (see NEWS.md). Fixed here by pointing each key at the real
-  # column, keeping the original target name where one was already chosen.
-  # "fonte" = "source" had no real column to reassign to (sig_tipo_geracao
-  # is already "generation_type" below) and is left as dead weight.
-  # "tipo_de_despesa" = "type_of_expense" used to be here too, for the same
-  # reason -- removed 2026-09-21 alongside R/dictionary.R's matching
-  # ~variable rows once it was confirmed (live, and against a locally saved
-  # copy of the current resource) that energy_development_budget's real
-  # data has no expense-by-category dimension at all; see NEWS.md.
   if (param$language == "eng") {
     dat_mod <- dat %>%
       dplyr::rename_with(dplyr::recode,
-        "ano" = "year",
-        "soma_de_valor" = "value",
-        "participacao" = "share_of_total",
+        # energy_generation & clean names
         "empreendimento" = "venture",
         "uf" = "state",
+        "tipo_geracao" = "generation_type",
         "fonte" = "source",
-        "dsc_fase_usina" = "stage",
-        "dsc_origem_combustivel" = "origin",
-        "dsc_fonte_combustivel" = "type",
-        "dsc_tipo_outorga" = "type_of_permission",
-        "nom_fonte_combustivel" = "final_fuel",
-        "dat_entrada_operacao" = "operation_start",
-        "potencia_outorgada_k_w" = "granted_power_kw",
-        "potencia_fiscalizada_k_w" = "fiscalized_power_kw",
-        "garantia_fisica_k_w" = "physical_guarantee_kw",
-        "mda_potencia_outorgada_kw" = "granted_power_kw",
-        "mda_potencia_fiscalizada_kw" = "fiscalized_power_kw",
-        "mda_garantia_fisica_kw" = "physical_guarantee_kw",
-        "idc_geracao_qualificada" = "qualified_generation",
+        "fase" = "stage",
+        "origem" = "origin",
+        "tipo" = "type",
+        "tipo_de_atuacao" = "type_of_permission",
+        "entrada_em_operacao" = "operation_start",
+        "potencia_outorgada_kw" = "granted_power_kw",
+        "potencia_fiscalizada_kw" = "fiscalized_power_kw",
+        "garantia_fisica_kw" = "physical_guarantee_kw",
+        "geracao_qualificada" = "qualified_generation",
         "latitude_decimal" = "latitude_dd",
         "longitude_decimal" = "longitude_dd",
-        "dat_inicio_vigencia" = "validity_start",
-        "dat_fim_vigencia" = "validity_end",
-        "dsc_propri_regime_pariticipacao" = "owner_or_exploration_regime",
-        "dsc_sub_bacia" = "sub_basin",
-        "dsc_muninicpios" = "municipalities",
-        "dat_geracao_conjunto_dados" = "generation_date",
+        "inicio_vigencia" = "validity_start",
+        "fim_vigencia" = "validity_end",
+        "proprietario_regime_de_exploracao" = "owner_or_exploration_regime",
+        "sub_bacia" = "sub_basin",
+        "municipios" = "municipalities",
+        # energy_development_budget clean names
+        "ano" = "year",
+        "mes" = "month",
+        "agente" = "agent",
+        "cnpj" = "cnpj",
+        "grupo_tarifario" = "tariff_group",
+        "classe_consumidor" = "consumer_class",
+        "valor_desconto" = "discount_value",
+        "valor_cobranca" = "charge_value",
+        # Raw / distributed generation fallbacks
+        "soma_de_valor" = "value",
+        "participacao" = "share_of_total",
         "anm_periodo_referencia" = "reference_period",
         "num_cnpj_distribuidora" = "distributor_cnpj",
         "sig_agente" = "sig_agent",
@@ -311,6 +394,7 @@ if (param$dataset == "energy_development_budget") {
         "dsc_classe_consumo" = "consumption_class_description",
         "cod_sub_grupo_tarifario" = "tariff_subgroup_code",
         "dsc_sub_grupo_tarifario" = "tariff_subgroup_description",
+        "cod_ufibge" = "ibge_state_code",
         "cod_u_fibge" = "ibge_state_code",
         "sig_uf" = "state",
         "cod_regiao" = "region_code",

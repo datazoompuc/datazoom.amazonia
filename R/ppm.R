@@ -56,22 +56,47 @@ load_ppm <- function(dataset, raw_data = FALSE,
   param$language <- language
   param$raw_data <- raw_data
 
-  if (!is.numeric(param$dataset)) {
-    param$code <- datasets_link() %>%
-      dplyr::filter(dataset == param$dataset) %>%
-      dplyr::select(sidra_code) %>%
-      unlist() %>%
-      as.numeric()
-  } else {
-    param$code <- param$dataset
+  # A SIDRA table given as a number ("You can also use SIDRA codes") means the
+  # manifest dataset that reads that table: load_ppm(dataset = 94) is
+  # load_ppm(dataset = "ppm_cow_farming"), with the same classification, the
+  # same treatment and the same checks. Only a number the manifest does not know
+  # keeps the old behaviour below (sidra_download()'s defaults, raw data only).
+
+  if (is.numeric(param$dataset)) {
+    known <- sidra_dataset_of_table("ppm", param$dataset)
+    if (!is.null(known)) param$dataset <- known
   }
 
   # check if dataset, geo_level, and time_period are supported
 
   check_params(param)
 
+  # The manifest's sidra_code is "<table>" for a table with no classification
+  # (94, 95) and "<table>/c<classification>/all" for the others
+  # (e.g. "74/c80/all"); see actions/scrapers/resolve_ppm.R.
+
+  if (!is.numeric(param$dataset)) {
+    parts <- datasets_link() %>%
+      dplyr::filter(dataset == param$dataset) %>%
+      dplyr::pull(sidra_code) %>%
+      sidra_code_parts()
+
+    param$code <- parts$table
+    param$classific <- parts$classific
+    param$category <- parts$category
+  } else {
+    param$code <- param$dataset
+    param$classific <- "all"
+    param$category <- "all"
+  }
+
   ## Dataset
 
+  # FRAGILE: the SIDRA table ids hardcoded here (94, 95, 3939, 74, 3940) are
+  # copies of the table in the manifest's sidra_code; resolve_ppm.R checks that
+  # the manifest's code still exists in IBGE's table and has the classification
+  # it says (none for 94 and 95), not that it is still one of these ids. The
+  # datasets are told apart below by name, not by table.
   if (param$code == 94) {
     param$data_name <- "Cow Farming (Vacas ordenhadas - Cabecas)"
   }
@@ -98,7 +123,13 @@ load_ppm <- function(dataset, raw_data = FALSE,
   dat <- as.list(as.character(param$time_period)) %>%
     purrr::map(function(year_num) {
       # suppressMessages(
-      sidra_download(sidra_code = param$code, year = year_num, geo_level = param$geo_level)
+      sidra_download(
+        sidra_code = param$code,
+        classific = param$classific,
+        category = param$category,
+        year = year_num,
+        geo_level = param$geo_level
+      )
       # )
     }) %>%
     dplyr::bind_rows() %>%
@@ -156,113 +187,20 @@ load_ppm <- function(dataset, raw_data = FALSE,
   ## Translate Variable Names ##
   ##############################
 
-  ## Cattle Number
-
-  if (param$dataset == "ppm_livestock_inventory") {
-    if (language == "pt") {
-      dat <- dat %>% dplyr::mutate(
-        variavel = dplyr::case_when(
-          (variavel_codigo == "105") ~ "num"
-        ) # Efetivo dos Rebanhos
-      )
-    }
-
-    if (language == "eng") {
-      dat <- dat %>% dplyr::mutate(
-        variavel = dplyr::case_when(
-          (variavel_codigo == "105") ~ "num"
-        ) # Efetivo dos Rebanhos
-      )
-    }
-  }
-
-  ## Sheep Farm
-
-  if (param$dataset == "ppm_sheep_farming") {
-    if (language == "pt") {
-      dat <- dat %>% dplyr::mutate(
-        variavel = dplyr::case_when(
-          (variavel_codigo == "108") ~ "num"
-        ) # Ovinos Tosquiados
-      )
-    }
-
-    if (language == "eng") {
-      dat <- dat %>% dplyr::mutate(
-        variavel = dplyr::case_when(
-          (variavel_codigo == "108") ~ "num"
-        ) # Ovinos Tosquiados
-      )
-    }
-  }
-
-  ## Animal Origin Production
-
-  if (param$dataset == "ppm_animal_origin_production") {
-    if (language == "pt") {
-      dat <- dat %>%
-        dplyr::mutate(
-          variavel = dplyr::case_when(
-            (variavel_codigo == "106") ~ "quant", # Producao de origem animal
-            (variavel_codigo == "215") ~ "valor", # Valor da producao
-          )
-        )
-    }
-
-    if (language == "eng") {
-      dat <- dat %>%
-        dplyr::mutate(
-          variavel = dplyr::case_when(
-            (variavel_codigo == "106") ~ "quant", # Producao de origem animal
-            (variavel_codigo == "215") ~ "value", # Valor da producao
-          )
-        )
-    }
-  }
-
-  ## Milked Cows
-
-  if (param$dataset == "ppm_cow_farming") {
-    if (language == "pt") {
-      dat <- dat %>% dplyr::mutate(
-        variavel = dplyr::case_when(
-          (variavel_codigo == "107") ~ "num"
-        ) # Vacas ordenhadas
-      )
-    }
-
-    if (language == "eng") {
-      dat <- dat %>% dplyr::mutate(
-        variavel = dplyr::case_when(
-          (variavel_codigo == "107") ~ "num"
-        ) # Vacas ordenhadas
-      )
-    }
-  }
-
-  ## Water Origin Production
-
-  if (param$dataset == "ppm_aquaculture") {
-    if (language == "pt") {
-      dat <- dat %>%
-        dplyr::mutate(
-          variavel = dplyr::case_when(
-            (variavel_codigo == "4146") ~ "quant", # Producao da aquicultura
-            (variavel_codigo == "215") ~ "valor", # Valor da producao
-          )
-        )
-    }
-
-    if (language == "eng") {
-      dat <- dat %>%
-        dplyr::mutate(
-          variavel = dplyr::case_when(
-            (variavel_codigo == "4146") ~ "quant", # Producao da aquicultura
-            (variavel_codigo == "215") ~ "value", # Valor da producao
-          )
-        )
-    }
-  }
+  # FRAGILE: each dataset names only the IBGE variable ids its table reports --
+  # 105 (3939), 108 (95), 107 (94), 106 and 215 (74), 4146 and 215 (3940) -- in
+  # its own "<dataset>_variables" entry of load_dictionary() (R/dictionary.R).
+  # Until that entry replaced a case_when() with no default, any other id would
+  # have become NA and ended up in a column called na_v<category code> (the bug
+  # load_pam() had with 2313 until 2026-10-21); now it becomes v<id> and warns.
+  # Checked against IBGE's metadata and the data itself on 2026-10-22: these are
+  # every variable the five tables report. resolve_ppm.R re-checks that on every
+  # run (PPM_NAMED_VARIABLES there is a copy of the entries' ids;
+  # tests/testthat/test-ppm-resolver.R fails if they differ).
+  dat <- translate_sidra_variables(
+    dat, paste0(param$dataset, "_variables"), language, "load_ppm()",
+    columns = "v<id>_v<category code>"
+  )
 
 
   #############################
@@ -275,6 +213,14 @@ load_ppm <- function(dataset, raw_data = FALSE,
 
   ## Cattle Number
 
+  # FRAGILE: names_from uses columns that are IBGE's classification labels after
+  # janitor::clean_names() ("Tipo de rebanho (Codigo)" -> tipo_de_rebanho_codigo,
+  # "Tipo de produto de origem animal (Codigo)", "Tipo de produto da
+  # aquicultura (Codigo)"); the origin-animal pivot also selects the column RANGE
+  # variavel:tipo_de_produto_de_origem_animal_codigo, so it depends on sidrar's
+  # column order. If IBGE rewords a label or sidrar reorders columns, pivot_wider()
+  # stops with a missing-column error (loud) or, for the range, pivots on the
+  # wrong columns (not).
   if (param$dataset == "ppm_livestock_inventory") {
     dat <- dat %>%
       dplyr::select(-"unidade_de_medida") %>%

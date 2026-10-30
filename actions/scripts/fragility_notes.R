@@ -63,18 +63,42 @@ FRAGILITY_SOURCES <- list(
   list(changed_prefix = "imazon", r_path = file.path("R", "imazon.R"), label = "R/imazon.R", treat_fn = "load_imazon()"),
   list(changed_prefix = "prodes", r_path = file.path("R", "prodes.R"), label = "R/prodes.R", treat_fn = "load_prodes()"),
   list(changed_prefix = "baci", r_path = file.path("R", "baci.R"), label = "R/baci.R", treat_fn = "load_baci()"),
-  # The dictionary's manifest row is its own survey ("baci_dic"); build_manifest.R
-  # matches `survey\r` exactly, so "baci" above never fires for it, yet two of
-  # R/baci.R's tags are about that dictionary.
-  list(changed_prefix = "baci_dic", r_path = file.path("R", "baci.R"), label = "R/baci.R", treat_fn = "load_baci()"),
+  # The dictionary load_baci_dic() reads is a comex_dic row (hs_codes, shared
+  # with load_br_trade(); it had a row of its own, "baci_dic", until 2026-10-28);
+  # build_manifest.R matches `survey\r` exactly, so "baci" above never fires for
+  # it, yet two of R/baci.R's tags are about that dictionary. Any comex_dic change
+  # lists them, including a change to ncm_codes, which BACI does not read:
+  # harmless, and cheaper than touching build_manifest.R's matching.
+  list(changed_prefix = "comex_dic", r_path = file.path("R", "baci.R"), label = "R/baci.R", treat_fn = "load_baci()"),
   list(changed_prefix = "ips", r_path = file.path("R", "ips.R"), label = "R/ips.R", treat_fn = "load_ips()"),
+  # ppm's treatment code is load_ppm() (R/ppm.R) plus the SIDRA request
+  # sidra_download() (R/download.R) builds for it, so one row per file, as for
+  # terraclimate below.
+  list(changed_prefix = "ppm", r_path = file.path("R", "ppm.R"), label = "R/ppm.R", treat_fn = "load_ppm()"),
+  list(changed_prefix = "ppm", r_path = file.path("R", "download.R"), label = "R/download.R", treat_fn = "sidra_download()"),
+  # the labels load_ppm() attaches come from load_dictionary()'s PPM section
+  list(changed_prefix = "ppm", r_path = file.path("R", "dictionary.R"), label = "R/dictionary.R", treat_fn = "load_dictionary()"),
   list(changed_prefix = "seeg", r_path = file.path("R", "seeg.R"), label = "R/seeg.R", treat_fn = "load_seeg()"),
+  # pam's treatment code is load_pam() (R/pam.R) plus the SIDRA request
+  # sidra_download() (R/download.R) builds for it, so one row per file, as
+  # for terraclimate below.
+  list(changed_prefix = "pam", r_path = file.path("R", "pam.R"), label = "R/pam.R", treat_fn = "load_pam()"),
+  list(changed_prefix = "pam", r_path = file.path("R", "download.R"), label = "R/download.R", treat_fn = "sidra_download()"),
   # terraclimate's treatment code lives in two files: load_climate() (R/climate.R)
   # and the NCSS request external_download() builds (R/download.R). The loop in
   # build_manifest.R reads ONE file per row, so there is one row per file; a
   # changed terraclimate row lists the tags of both.
   list(changed_prefix = "terraclimate", r_path = file.path("R", "climate.R"), label = "R/climate.R", treat_fn = "load_climate()"),
   list(changed_prefix = "terraclimate", r_path = file.path("R", "download.R"), label = "R/download.R", treat_fn = "external_download()"),
+  # The certificate fallback for balanca.mdic.gov.br (R/balanca_tls.R) has two
+  # notes: the host name it applies to, and the hard-coded certificates it trusts.
+  # They matter when a row on that host changes, so they ride on the dictionary
+  # rows ("comex_dic", "baci_dic"): those change rarely, and resolve_comex.R
+  # moves the "comex" data rows and these together when the host changes. The
+  # "comex" rows themselves are left out on purpose -- their available_time moves
+  # every month and the note would be noise.
+  list(changed_prefix = "comex_dic", r_path = file.path("R", "balanca_tls.R"), label = "R/balanca_tls.R", treat_fn = "balanca_with_fallback()"),
+  list(changed_prefix = "baci_dic", r_path = file.path("R", "balanca_tls.R"), label = "R/balanca_tls.R", treat_fn = "balanca_with_fallback()"),
   list(changed_prefix = "aneel", r_path = file.path("R", "aneel.R"), label = "R/aneel.R", treat_fn = "load_aneel()"),
   list(changed_prefix = "deter", r_path = file.path("R", "deter.R"), label = "R/deter.R", treat_fn = "load_deter()"),
   list(changed_prefix = "comex", r_path = file.path("R", "comex.R"), label = "R/comex.R", treat_fn = "load_br_trade()"),

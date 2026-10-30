@@ -27,6 +27,15 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
 
   param$sidra_code <- sidra_code
   param$year <- year
+  # FRAGILE: classific = "all" (the default) makes sidrar::get_sidra() scrape
+  # IBGE's HTML description of the table (apisidra.ibge.gov.br/desctabapi.aspx
+  # ?c=<table>) to learn its classification ids. That page is behind a
+  # Cloudflare bot challenge (HTTP 403) from some networks, and then the caller
+  # gets a bare "Error in Download." (the reason sidrar captured is dropped
+  # below). PAM spells the classification out in the manifest ("5457/c782/all")
+  # for that reason; ppm, pevs, pibmunic, cempre, censoagro and population
+  # still pass "all" and all failed this way, on 2026-10-21, from the machine
+  # PAM was investigated on.
   param$classific <- classific
   param$category <- category
 
@@ -77,7 +86,7 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
   ## Load Data ##
   ###############
 
-  get_sidra_safe <- purrr::safely(sidrar::get_sidra)
+  get_sidra_safe <- purrr::safely(sidra_get_table)
 
 
   if (param$geo_reg %in% c("Brazil", "Region", "State")) {
@@ -290,6 +299,84 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
   } # End of If - Download at the Municipality Level
 }
 
+# sidrar::get_sidra(), except that `classific = NULL` means "this table has no
+# classification" (PPM's tables 94 and 95) and is answered without sidrar's
+# table lookup.
+#
+# FRAGILE: sidrar::get_sidra() cannot be told a table has no classification.
+# For classific = NULL or "all" it scrapes IBGE's HTML description of the table
+# (apisidra.ibge.gov.br/desctabapi.aspx?c=<table>) to learn the classification
+# ids, and that page is behind a Cloudflare bot challenge (HTTP 403) from some
+# networks -- even for a table with nothing to find. So for classific = NULL
+# this builds the request sidrar would have built and hands it over through
+# get_sidra(api = ), which skips the lookup:
+# /t/<table>/<geo>/p/<period>/v/allxp/f/a/h/y/d/s, the same path (n1/1 for
+# Brazil, n3/all for states, n6/in%20n3%20<uf> for a state's municipalities,
+# n8/n9 for meso/micro-regions) and the same response parsing. It stays correct only while that path layout
+# does; a table that does have a classification must not take this route (IBGE
+# answers HTTP 200 with only the "Total" slice -- 2 rows instead of 7 for table
+# 74, checked 2026-10-22 -- not an error), which is why resolve_ppm.R checks
+# that the manifest's code and the table agree. Every other caller passes a
+# classification or "all" and is untouched.
+sidra_get_table <- function(x, geo, period, geo.filter = NULL, classific = "all", category = "all") {
+  if (!is.null(classific)) {
+    return(sidrar::get_sidra(
+      x = x, geo = geo, period = period, geo.filter = geo.filter,
+      classific = classific, category = category
+    ))
+  }
+
+  geo_code <- c(Brazil = "n1", Region = "n2", State = "n3", City = "n6")[[geo]]
+  filter_code <- c(State = "n3", MesoRegion = "n8", MicroRegion = "n9")
+
+  path_geo <- if (geo == "Brazil") {
+    "n1/1"
+  } else if (is.null(geo.filter)) {
+    paste0(geo_code, "/all")
+  } else {
+    paste0(geo_code, "/in%20", filter_code[[names(geo.filter)]], "%20", paste(geo.filter[[1]], collapse = ","))
+  }
+
+  sidrar::get_sidra(api = paste0("/t/", x, "/", path_geo, "/p/", period, "/v/allxp/f/a/h/y/d/s"))
+}
+
+# The parts of a manifest sidra_code for sidra_download(): "74/c80/all" ->
+# table 74, classification "c80", category list("all"); a bare "94" (a table
+# with no classification) -> classific and category NULL. The grammar is also
+# read by the actions/ resolvers (resolve_pam.R's pam_parse_code(), resolve_ppm.R's
+# ppm_parse_code()): those scripts never load the package, so each keeps its own
+# parser, and each resolver's test (test-pam-resolver.R, test-ppm-resolver.R)
+# fails if its parser disagrees with this one.
+sidra_code_parts <- function(code) {
+  parts <- strsplit(code, "/", fixed = TRUE)[[1]]
+  classified <- length(parts) > 1
+  list(
+    table = as.numeric(parts[1]),
+    classific = if (classified) parts[2] else NULL,
+    category = if (classified) list(parts[3]) else NULL
+  )
+}
+
+# The manifest dataset of `source` that a SIDRA table NUMBER stands for, or NULL
+# when there is none. This is what lets a table given as a number
+# (load_pam(dataset = 1612), load_ppm(dataset = 94)) mean the same as its
+# dataset name: a table number is the dataset that reads that table WHOLE. When
+# several datasets read it -- PAM has one per crop on tables 1612 and 1613, next
+# to temporary_crops and permanent_crops, which read every category -- only the
+# whole-table one counts (a code whose category is "all", or that has none), and
+# if even those are not exactly one the number stands for nothing.
+sidra_dataset_of_table <- function(source, table) {
+  rows <- datasets_link(source = source)
+  parts <- strsplit(rows$sidra_code, "/", fixed = TRUE)
+  tables <- vapply(parts, function(p) p[1], character(1))
+  whole_table <- vapply(parts, function(p) length(p) == 1 || identical(p[3], "all"), logical(1))
+  reads <- !is.na(tables) & tables == as.character(table)
+
+  hit <- rows$dataset[reads]
+  if (length(hit) > 1) hit <- rows$dataset[reads & whole_table]
+  if (length(hit) == 1) hit else NULL
+}
+
 # ---------------------------------------------------------------------------
 # Session-scoped download + parse cache
 #
@@ -380,7 +467,9 @@ parsed_cache_eligible <- function(source, file_extension) {
 #' @noRd
 perform_download <- function(path, temp, download_method, source, quiet = TRUE) {
   if (download_method == "standard") {
-    utils::download.file(url = path, destfile = temp, mode = "wb")
+    # Same call as ever for every host; balanca.mdic.gov.br (COMEX) alone gets
+    # a certificate-error fallback -- see R/balanca_tls.R.
+    balanca_download_file(path, temp)
   }
   if (download_method == "curl") {
     # This function's own caller (external_download()) already restores

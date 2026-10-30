@@ -123,6 +123,7 @@ source(file.path(repo_root, "actions", "scripts", "site_inventory.R"))
 source(file.path(repo_root, "actions", "scripts", "fragility_notes.R"))
 source(file.path(repo_root, "actions", "scripts", "mapbiomas_resolver_cache.R"))
 source(file.path(repo_root, "actions", "scripts", "zip_remote_listing.R"))
+source(file.path(repo_root, "actions", "scripts", "sidra_api.R"))
 source(file.path(repo_root, "actions", "scripts", "resolver_alert_cache.R"))
 
 MANIFEST_PATH <- file.path(repo_root, "inst", "extdata", "manifest", "v1", "datasets_link.csv")
@@ -305,8 +306,24 @@ for (src in names(registry)) {
     next
   }
   if (!is.data.frame(result) || nrow(result) == 0) {
-    cat("FAILED: resolver returned no rows\n")
-    resolver_failed[[src]] <- "resolver returned an empty/invalid result"
+    if (nrow(owned_rows) == 0) {
+      # Nothing was handed to it: no manifest row names this source in
+      # `resolver`. That is a registration problem (an internal helper that
+      # happens to be named resolve_<x>(), or a blanked `resolver` column), not
+      # a source that answered with nothing -- say so, or the reader goes and
+      # checks the source's host (see test-resolver-registry.R).
+      cat("FAILED: no manifest row has resolver =", src, "\n")
+      resolver_failed[[src]] <- sprintf(
+        paste0(
+          "no manifest row has resolver = '%s', so resolve_%s() was given no rows (is it an internal ",
+          "helper that should not be named resolve_*? to switch a resolver off on purpose, use --skip %s)"
+        ),
+        src, src, src
+      )
+    } else {
+      cat("FAILED: resolver returned no rows\n")
+      resolver_failed[[src]] <- "resolver returned an empty/invalid result"
+    }
     next
   }
 
