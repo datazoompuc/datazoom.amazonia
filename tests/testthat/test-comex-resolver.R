@@ -323,6 +323,24 @@ test_that("a dictionary missing a column load_trade_dic() selects stops, naming 
   expect_equal(run(fake_comex(drop = list(hs_codes = "NO_SEC_ING")), rows = dictionary_rows)$dataset, comex_dictionaries)
 })
 
+test_that("hs_codes is also R/baci.R's dictionary: a missing column load_baci_dic() selects stops, naming it", {
+  # NCM_SH.csv has the SH4 columns load_trade_dic() selects AND the SH6 ones
+  # load_baci_dic() selects; until 2026-10-28 a separate baci_dic row (resolve_baci.R)
+  # was the only thing checking the latter.
+  msg <- error_message(fake_comex(drop = list(hs_codes = "NO_SH6_ING")), rows = dictionary_rows)
+  expect_match(msg, "dictionary 'hs_codes'", fixed = TRUE)
+  expect_match(msg, "R/baci.R's load_baci_dic() selects", fixed = TRUE)
+  expect_match(msg, "missing NO_SH6_ING", fixed = TRUE)
+
+  msg <- error_message(fake_comex(drop = list(hs_codes = c("CO_SH6", "NO_SH6_POR"))), rows = dictionary_rows)
+  expect_match(msg, "missing CO_SH6, NO_SH6_POR", fixed = TRUE)
+
+  # the other dictionary is not BACI's: its own CO_SH6 column is free to go
+  expect_equal(run(fake_comex(drop = list(ncm_codes = "CO_SH6")), rows = dictionary_rows)$dataset, comex_dictionaries)
+  # and only hs_codes carries the second list
+  expect_null(COMEX_DICTIONARIES$ncm_codes$baci_required)
+})
+
 test_that("a row under the wrong survey is refused: a dictionary under 'comex' would pass as a dataset of load_br_trade()", {
   wrong <- all_rows[all_rows$dataset %in% c("export_mun", "hs_codes"), ]
   wrong$survey <- c("comex_dic", "comex") # swapped
@@ -413,6 +431,60 @@ test_that("the manifest is the single source of truth for the dictionary URLs: R
     fixed = TRUE
   )
   expect_error(load_with("cuci"), "unknown dictionary type 'cuci'", fixed = TRUE)
+})
+
+test_that("R/baci.R's load_baci_dic() reads this same hs_codes row, hard-codes no URL, and selects what the resolver checks", {
+  # It used to read a duplicate row of its own, baci_dic/product_codes (same URL,
+  # owned by resolve_baci.R). Two rows for one file are two things to keep in sync.
+  baci_src <- file.path(pkg_root, "R", "baci.R")
+  skip_if_not(file.exists(baci_src), "R/baci.R not present")
+
+  # (a) statically: no URL in the code (comments may cite examples), the one
+  # manifest lookup is this row, and every column the resolver checks on
+  # load_baci_dic()'s behalf is one R/baci.R actually names
+  code <- readLines(baci_src, warn = FALSE)
+  code <- code[!grepl("^\\s*#", code) & !grepl("^#'", code)]
+  expect_false(any(grepl("https?://", code)), info = "R/baci.R's code must not contain a URL literal")
+  expect_true(any(grepl('dataset_url(source = "comex_dic", dataset = "hs_codes")', code, fixed = TRUE)))
+  expect_false(any(grepl("[\"']baci_dic[\"']", code)), info = "the duplicate baci_dic row is gone; nothing may read it")
+  src <- tolower(paste(code, collapse = "\n"))
+  for (col in COMEX_DICTIONARIES$hs_codes$baci_required) {
+    expect_true(
+      grepl(paste0("\\b", tolower(col), "\\b"), src),
+      info = paste(col, "is required by resolve_comex.R for load_baci_dic() but R/baci.R never selects it")
+    )
+  }
+
+  skip_if_not(exists("load_baci_dic", mode = "function"), "package code not loaded")
+
+  # (b) behaviorally: what load_baci_dic() reads is exactly what the manifest
+  # lookup returns -- a made-up manifest drives it
+  seen <- character(0)
+  read_spy <- function(file, ...) {
+    seen <<- c(seen, file)
+    tibble::tibble(co_sh6 = "010110", no_sh6_por = "Cavalos", no_sh6_ing = "Horses")
+  }
+  load_with <- function(dataset_url_fn) {
+    testthat::with_mocked_bindings(
+      testthat::with_mocked_bindings(suppressMessages(load_baci_dic(language = "eng")), read_delim = read_spy, .package = "readr"),
+      dataset_url = dataset_url_fn, .package = "datazoom.amazonia"
+    )
+  }
+  out <- load_with(function(source, dataset, ...) paste0("manifest://", source, "/", dataset))
+  expect_equal(seen, "manifest://comex_dic/hs_codes")
+  expect_equal(names(out), c("product_code", "product"))
+  expect_equal(out$product, "Horses")
+
+  # (c) the committed manifest supplies it (setup.R forces the local snapshot):
+  # the very file load_trade_dic("hs") reads
+  expect_equal(dataset_url(source = "comex_dic", dataset = "hs_codes"), paste0(COMEX_BD, "tabelas/NCM_SH.csv"))
+
+  # (d) a manifest without the row fails with a clear message, not read_delim(NA)
+  expect_error(
+    load_with(function(source, dataset, ...) NA_character_),
+    "No download URL found for source 'comex_dic', dataset 'hs_codes'",
+    fixed = TRUE
+  )
 })
 
 test_that("the committed manifest rows agree with what the resolver owns and emits", {

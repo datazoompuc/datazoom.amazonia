@@ -49,7 +49,8 @@
 # Two other things changed the same general period but are deliberately NOT
 # part of the "16 cells" count below: (a) 2026-09-08 (PRODES/BACI resolver
 # audit, delta #11 in test-datasets_link.R), a brand-new row, baci_dic/
-# product_codes, was added to the manifest; (b) 2026-09-14 (delta #12), IPS's
+# product_codes, was added to the manifest (and removed again 2026-10-28, when
+# load_baci_dic() moved to comex_dic/hs_codes); (b) 2026-09-14 (delta #12), IPS's
 # version field changed alongside its url, but version isn't one of
 # datasets_link()'s 6 output columns. Neither fits "same rows, different
 # values in an existing output column" the way the 16 do, so (a) is asserted
@@ -414,18 +415,11 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 42
   new_snap <- new_snap[new_snap$survey != "terraclimate", ]
   old_snap <- old_snap[old_snap$survey != "terraclimate", ]
 
-  # baci_dic/product_codes is a genuinely NEW row (delta #11,
-  # test-datasets_link.R) -- a new row, not a changed cell on an existing
-  # one, so it doesn't fit "same rows, different values" the way the other
-  # 8 cells do. Assert it separately, then exclude it before the row-for-row
-  # comparison below.
-  new_baci_dic <- new_snap[new_snap$survey == "baci_dic", ]
-  expect_equal(nrow(new_baci_dic), 1)
-  expect_equal(new_baci_dic$dataset, "product_codes")
-  # url moved to balanca.mdic.gov.br 2026-10-19 (issue #353; the old host's TLS
-  # certificate expired) -- same file, still one new row.
-  expect_equal(new_baci_dic$url, "https://balanca.mdic.gov.br/balanca/bd/tabelas/NCM_SH.csv")
-  new_snap <- new_snap[new_snap$survey != "baci_dic", ]
+  # baci_dic/product_codes was a genuinely NEW row for a while (delta #11,
+  # test-datasets_link.R) and was removed again 2026-10-28: load_baci_dic()
+  # reads comex_dic/hs_codes, the same file (set aside below with the other
+  # comex_dic row). Nothing to set aside any more -- assert it stays gone.
+  expect_false("baci_dic" %in% new_snap$survey)
 
   # pam: 7 sidra_code cells and 75 available_time cells (delta #18, 2026-10-21,
   # test-datasets_link.R) are asserted there and the rows set aside before the
@@ -462,14 +456,14 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 42
   old_snap <- old_snap[old_snap$survey != "ppm", ]
 
   # sigmine/sigmine_inactive is a genuinely NEW row (delta #14,
-  # test-datasets_link.R) -- same treatment as baci_dic above: assert it
-  # separately, then exclude it from the row-for-row comparison.
+  # test-datasets_link.R): assert it separately, then exclude it from the
+  # row-for-row comparison.
   new_sig_inactive <- new_snap[new_snap$survey == "sigmine" & new_snap$dataset == "sigmine_inactive", ]
   expect_equal(nrow(new_sig_inactive), 1)
   expect_equal(new_sig_inactive$url, "https://dadosabertos.anm.gov.br/SIGMINE/PROCESSOS_MINERARIOS/PROCESSOS_INATIVOS.zip")
   new_snap <- new_snap[!(new_snap$survey == "sigmine" & new_snap$dataset == "sigmine_inactive"), ]
   # deter_pantanal and deter_non_forest are genuinely NEW rows too (delta
-  # #14, test-datasets_link.R) -- same treatment as baci_dic above.
+  # #14, test-datasets_link.R) -- same treatment as sigmine_inactive above.
   new_deter <- new_snap[new_snap$survey == "deter" & new_snap$dataset %in% c("deter_pantanal", "deter_non_forest"), ]
   expect_setequal(new_deter$dataset, c("deter_pantanal", "deter_non_forest"))
   expect_equal(

@@ -62,10 +62,13 @@ FRAGILITY_SOURCES <- list(
   list(changed_prefix = "epe", r_path = file.path("R", "epe.R"), label = "R/epe.R", treat_fn = "epe_energy_state_panel_treat()"),
   list(changed_prefix = "prodes", r_path = file.path("R", "prodes.R"), label = "R/prodes.R", treat_fn = "load_prodes()"),
   list(changed_prefix = "baci", r_path = file.path("R", "baci.R"), label = "R/baci.R", treat_fn = "load_baci()"),
-  # The dictionary's manifest row is its own survey ("baci_dic"); build_manifest.R
-  # matches `survey\r` exactly, so "baci" above never fires for it, yet two of
-  # R/baci.R's tags are about that dictionary.
-  list(changed_prefix = "baci_dic", r_path = file.path("R", "baci.R"), label = "R/baci.R", treat_fn = "load_baci()"),
+  # The dictionary load_baci_dic() reads is a comex_dic row (hs_codes, shared
+  # with load_br_trade(); it had a row of its own, "baci_dic", until 2026-10-28);
+  # build_manifest.R matches `survey\r` exactly, so "baci" above never fires for
+  # it, yet two of R/baci.R's tags are about that dictionary. Any comex_dic change
+  # lists them, including a change to ncm_codes, which BACI does not read:
+  # harmless, and cheaper than touching build_manifest.R's matching.
+  list(changed_prefix = "comex_dic", r_path = file.path("R", "baci.R"), label = "R/baci.R", treat_fn = "load_baci()"),
   list(changed_prefix = "ips", r_path = file.path("R", "ips.R"), label = "R/ips.R", treat_fn = "load_ips()"),
   # ppm's treatment code is load_ppm() (R/ppm.R) plus the SIDRA request
   # sidra_download() (R/download.R) builds for it, so one row per file, as for
