@@ -364,11 +364,17 @@ fixture <- fixture %>%
 # Delta #14 -- sigmine (2026-10). sigmine_inactive is a genuinely new row, and
 # both sigmine rows now declare available_geo "state, municipality" (the
 # geo_level choices load_sigmine() actually supports). See R/sigmine.R.
+# The sigmine_active url also moved: the ANM retired SIGMINE/BRASIL.zip (404)
+# and now serves the file at SIGMINE/PROCESSOS_MINERARIOS/BRASIL.zip.
 fixture <- fixture %>%
   dplyr::mutate(
     available_geo = dplyr::if_else(
       survey == "sigmine" & dataset == "sigmine_active",
       "state, municipality", available_geo
+    ),
+    url = dplyr::if_else(
+      survey == "sigmine" & dataset == "sigmine_active",
+      "https://dadosabertos.anm.gov.br/SIGMINE/PROCESSOS_MINERARIOS/BRASIL.zip", url
     )
   ) %>%
   dplyr::bind_rows(
