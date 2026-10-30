@@ -15,60 +15,36 @@ knitr::opts_chunk$set(
 ```
 ## Overview
 
-[Imazon](https://imazon.org.br/) (Instituto do Homem e Meio Ambiente da Amazônia - Institute of Man and Environment of the Amazon) is an independent Brazilian research organization that produces its own deforestation monitoring and analysis. 
+[Imazon](https://imazon.org.br/) (Instituto do Homem e Meio Ambiente da Amazônia - Institute of Man and Environment of the Amazon) is an independent Brazilian research organization that runs its own deforestation monitoring. Its **SAD** (*Sistema de Alerta de Desmatamento*, Deforestation Alert System) maps, month by month, the forest that was cleared or degraded in the Legal Amazon.
 
 This dataset provides:
 
-- **Municipality-level deforestation pressure classification**: Risk assessment of deforestation threat
-- **Pressure categories**: Three-level classification system (0, 1, 2, 3) representing deforestation pressure intensity
-- **Geographic coverage**: Municipalities in the Legal Amazon region
-- **Municipal boundaries**: Provided as spatial features (shapefile format)
-- **Policy-relevant indicator**: Used in environmental monitoring and policy assessments
-
-Imazon's deforestation pressure index helps identify which municipalities face high deforestation risk, valuable for targeted conservation, enforcement, and development planning.
+- **Monthly alerts by municipality**: the area, in square kilometers, that SAD detected in each municipality and month
+- **Two kinds of alert**: deforestation (clear-cutting) and forest degradation (fire and selective logging)
+- **Coverage**: municipalities of the Legal Amazon, from 2008 on
+- **IBGE municipality code**: added by the package, since Imazon publishes municipalities by name and state only
 
 ### Data Source
 
-Imazon's classification is based on:
-- Deforestation monitoring using satellite imagery
-- Analysis of deforestation trends and drivers
-- Risk assessment methodology to classify municipalities
-- Regular updates as monitoring data accumulates
+The data come from the files behind Imazon's own SAD dashboard, [dashboards.imazongeo.org.br/sad](https://dashboards.imazongeo.org.br/sad/). They are the dashboard's data feed, not a documented API: Imazon can change them without notice, and the package checks them every week.
 
 For more information, visit [Imazon Official Website](https://imazon.org.br/).
 
 ***
 
-## Available Dataset
+## Available Datasets
 
-### **imazon_shp (Imazon Municipality Pressure Index)**
-
-Municipality-level deforestation pressure classification with spatial geometries.
+### **sad_deforestation (Deforestation alerts)**
 
 - **Geographic unit**: Brazilian municipalities
-- **Coverage**: Legal Amazon municipalities
-- **Variables**: Municipality name, state, deforestation pressure category (0-3)
-- **Data format**: Shapefile / Simple Features (SF) spatial objects
-- **Update frequency**: Periodic updates as Imazon releases new assessments
-- **Use cases**:
-  - Identify high-risk deforestation municipalities
-  - Target conservation resources to threatened areas
-  - Analyze geographic patterns of deforestation pressure
-  - Environmental risk assessment
-  - Monitoring enforcement effectiveness
-  - Correlate pressure with socioeconomic variables
+- **Period**: 2008 to the current year (the current year is partial)
+- **Variable**: area of forest cleared, in km²
 
-***
+### **sad_degradation (Forest degradation alerts)**
 
-## Deforestation Pressure Categories
-
-Imazon's three-level classification system:
-| Category | Pressure Level | Description |
-|----------|---|---|
-| 0 | No/Low Pressure | Minimal deforestation threat |
-| 1 | Moderate Pressure | Some deforestation risk |
-| 2 | High Pressure | Significant deforestation threat |
-| 3 | Very High Pressure | Severe/Critical deforestation risk |
+- **Geographic unit**: Brazilian municipalities
+- **Period**: 2008 to 2024, and 2026 (Imazon publishes no degradation alerts for 2025)
+- **Variable**: area of forest degraded by fire or selective logging, in km²
 
 ***
 
@@ -76,26 +52,35 @@ Imazon's three-level classification system:
 
 ### 1. **dataset**
 
-Only one dataset is available:
+There is no default; choose one:
 
 ```r
-dataset = "imazon_shp"  # Imazon municipality pressure classification
+dataset = "sad_deforestation"  # deforestation alerts
+dataset = "sad_degradation"    # forest degradation alerts
 ```
 
 ### 2. **raw_data**
 
 Controls whether to download the original data or the processed/cleaned version.
 
-- `TRUE`: Returns raw shapefile data exactly as provided by Imazon
-- `FALSE`: Returns treated data with standardized English variable names, consistent formatting, and SF object structure
+- `TRUE`: Returns the rows exactly as Imazon publishes them (one per month, municipality and satellite sensor; columns `ALERTA`, `MES`, `ANO`, `SENSOR`, `ESTADO`, `MUNICIPIO` and `AREAKM2`), for the years in `time_period`
+- `FALSE`: Returns one row per municipality and month, the sensors' areas added up, with the IBGE municipality code and standardized variable names
 
 ```r
 raw_data = FALSE  # logical
 ```
 
-### 3. **language**
+### 3. **time_period**
 
-Output language for variable names and documentation.
+The years to return, in the format YYYY. Any vector of years, such as `2010:2012`. By default (`NULL`) every year is returned.
+
+```r
+time_period = 2020:2024  # numeric
+```
+
+### 4. **language**
+
+Output language for variable names.
 
 - `"pt"`: Portuguese
 - `"eng"`: English
@@ -106,46 +91,64 @@ language = "eng"  # character string
 
 ***
 
+## Variables (treated data)
+
+| `language = "eng"` | `language = "pt"` | Description |
+|---|---|---|
+| `year` | `ano` | Year |
+| `month` | `mes` | Month (1-12) |
+| `municipality_code` | `cod_municipio` | IBGE municipality code |
+| `municipality` | `municipio` | Municipality name |
+| `state` | `uf` | State (two-letter abbreviation) |
+| `area` | `area` | Area of the alerts, in km² |
+
+***
+
 ## Examples
 
 ```{r eval=FALSE}
-# download treated Imazon deforestation pressure data
+# download treated Imazon deforestation alerts, by municipality and month
 data <- load_imazon(
+  dataset = "sad_deforestation",
   raw_data = FALSE,
+  time_period = 2020:2024,
   language = "eng"
 )
+
+# deforested area per year and state
+aggregate(area ~ year + state, data = data, FUN = sum)
 ```
 
 ## Data Notes
 
-### Data Format
+### What a row is
 
-- **Shapefile format**: Returned as Simple Features (SF) spatial objects
-- **Geometric representation**: Municipality polygons with pressure classification
-- **Attributes**: Municipality name, state, pressure category
+- A municipality-month with no alert has **no row**: a missing row means no alert, not missing data
+- When several satellite sensors report in the same municipality and month, their areas are different alert polygons, so the treated data adds them up
+- Rows are ordered by year, month, state and municipality
 
-### Pressure Categories
+### IBGE municipality codes
 
-The 0-3 scale represents Imazon's assessment of deforestation risk:
-- Based on historical deforestation trends
-- Current forest cover
-- Accessibility and economic drivers
-- Human pressure factors
+`municipality_code` is found by matching Imazon's municipality name and state with the package's `municipalities` table (accents, case and punctuation are ignored). All municipalities of the deforestation alerts match. A few names in the degradation alerts are listed by Imazon under another state (for example Machadinho D'Oeste under MT, when it is in RO); they are not guessed, so their rows are kept with `NA` as the code and the function warns, saying how much area is affected (0.06% of the degradation alerts' area, when checked).
 
 ### Important Limitations
 
-1. **Static classification**: This is a classification/index, not time-series deforestation data
-2. **Methodology may change**: Imazon's methodology for calculating pressure may be updated
-3. **Subjective risk assessment**: Classification involves judgment in addition to objective metrics
-4. **Not current alerts**: This is not real-time detection like DETER; it's a classification product
-5. **Municipal-level only**: Finer spatial resolution not available
+1. **Alerts, not official figures**: SAD is Imazon's own detection, and its numbers differ from those of PRODES (annual) and DETER (daily alerts), both by INPE
+2. **Partial current year**: the latest months are the ones Imazon has published so far
+3. **Degradation gap**: the degradation alerts have no 2025
+4. **Unofficial interface**: the files are the dashboard's data feed; if Imazon changes it, the function may need updating
+5. **Municipal level only**: the alert polygons themselves are not available through this function
+
+### Replaces `imazon_shp`
+
+Until version 1.2.0 `load_imazon()` returned `"imazon_shp"`, a 0 to 3 classification of the municipalities by deforestation pressure (2020), read from a file on a personal Google Drive. Imazon does not publish that classification, so it was removed; SAD is a different kind of data (monthly areas, not a pressure class).
 
 ### Using with Other Datasets
 
 This dataset works well in combination with:
-- **DETER**: Compare pressure classification with actual recent deforestation
-- **DEGRAD**: Correlate pressure with degradation patterns
-- **CEMPRE**: Analyze relationship between employment and deforestation pressure
-- **COMEX**: Examine trade patterns in high-pressure vs low-pressure areas
+- **PRODES** and **DETER**: Compare Imazon's alerts with INPE's deforestation figures
+- **DEGRAD**: Compare degradation alerts with INPE's degradation mapping
+- **CEMPRE**: Analyze relationship between employment and deforestation
+- **COMEX**: Examine trade patterns in high-deforestation vs low-deforestation areas
 
 ***

@@ -117,7 +117,7 @@ datasets_by_fn <- list(
                  "collected_fines"
   ),
   load_iema = "iema",
-  load_imazon = "imazon_shp",
+  load_imazon = c("sad_deforestation", "sad_degradation"),
   load_ips = "all",
   load_mapbiomas = c(
     # "mapbiomas_cover",                    # arquivo ~578MB causa OOM no runner (opções: runner pago com mais RAM ou n_max em load_mapbiomas)

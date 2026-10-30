@@ -2,29 +2,52 @@
 % Please edit documentation in R/imazon.R
 \name{load_imazon}
 \alias{load_imazon}
-\title{IMAZON - Deforestation pressure by municipality}
+\title{IMAZON - Deforestation and forest degradation alerts by municipality (SAD)}
 \usage{
-load_imazon(dataset = "imazon_shp", raw_data = FALSE, language = "eng")
+load_imazon(dataset, raw_data = FALSE, time_period = NULL, language = "eng")
 }
 \arguments{
-\item{dataset}{There is one dataset available ("imazon_shp")}
+\item{dataset}{A dataset name ("sad_deforestation" or "sad_degradation") with the
+deforestation or the forest degradation alerts, respectively.}
 
-\item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
+\item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.
+With \code{TRUE}, the rows are exactly as Imazon publishes them (one per month, municipality and satellite sensor), for the years in \code{time_period}.}
+
+\item{time_period}{A \code{numeric} indicating for which years the data will be loaded, in the format YYYY.
+Can be any vector of numbers, such as 2010:2012. By default (\code{NULL}) every year is returned.}
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.}
 }
 \value{
-A \code{tibble}.
+A \code{tibble} with one row per municipality and month in which an alert was
+detected: the year, the month, the municipality's IBGE code, its name and state, and the
+area of the alerts in square kilometers (summed over the satellite sensors that reported it).
+A municipality-month with no alert has no row.
 }
 \description{
-Loads data categorizing each municipality by the level of deforestation pressure it faces
+Loads Imazon's SAD (Sistema de Alerta de Desmatamento): the area of
+forest cleared (deforestation) or degraded (fire, selective logging) that Imazon's
+satellite monitoring detected in each municipality of the Legal Amazon, month by
+month, since 2008. Published by Imazon at \url{https://dashboards.imazongeo.org.br/sad/}.
+}
+\details{
+Imazon publishes municipalities by name and state only, so the IBGE code
+(\code{municipality_code}) is added here by matching them with the package's
+\code{municipalities} table. A name Imazon writes with a state the table does not have
+for it (a few in the degradation alerts) keeps \code{NA} as its code, with a warning.
+
+This replaces the data \code{load_imazon()} returned until version 1.2.0
+("imazon_shp", a 0 to 3 classification of the municipalities, 2020), which was a file
+Datazoom kept in a private Google Drive and not something Imazon publishes.
 }
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###
-# download treated Imazon deforestation pressure data
+# download treated Imazon deforestation alerts, by municipality and month
 data <- load_imazon(
+  dataset = "sad_deforestation",
   raw_data = FALSE,
+  time_period = 2020:2024,
   language = "eng"
 )
 \dontshow{\}) # examplesIf}
