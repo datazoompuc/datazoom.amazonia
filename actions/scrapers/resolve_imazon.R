@@ -1,133 +1,157 @@
 # actions/scrapers/resolve_imazon.R
 #
-# imazon/imazon_shp has no upstream to follow, so this resolver does not look for
-# a newer file: it checks that the one file load_imazon() reads is still there,
-# is still the file it was, and still has the shape R/imazon.R relies on.
+# Imazon's SAD (Sistema de Alerta de Desmatamento), the monthly forest-loss
+# monitoring of the Amazon, published on Imazon's own dashboard:
+#   https://dashboards.imazongeo.org.br/sad/
+# load_imazon() reads two files from it, one per dataset:
+#   sad_deforestation  .../sad/api/sad/desmatamento/municipios.csv
+#   sad_degradation    .../sad/api/sad/degradacao/municipios.csv
+# CSV: ALERTA, MES, ANO, SENSOR, ESTADO, MUNICIPIO, AREAKM2 -- one row per month,
+# municipality (name and state, no IBGE code) and satellite sensor, area in square
+# kilometers, 2008 to the latest month. Deforestation: ~36,000 rows, 1.9 MB;
+# degradation (fire, selective logging): ~7,200 rows, 0.4 MB, with whole years
+# missing (nothing for 2025 on 2026-10-30). Behind them, the dashboard has a
+# /periodo endpoint: {"ano_min":2008,"ano_max":2026,"mes_max":8}.
 #
-# WHAT THE FILE IS (checked 2026-10-29). `url` is a Google Drive link to
-# "imazon.rds": a gzip-compressed R object, 20,342,788 bytes, created and last
-# modified 2022-06-20, shared to anyone with the link, owned by the Google
-# account "luizguilherme.lopesm" -- the address of Luiz Guilherme Lopes Moussatche,
-# who wrote load_imazon() the same day (git history: commits 45729fb and 2997055,
-# June 2022, "creating function to scrape the imazon dataset from DataZoom's google
-# drive"; the owner field is Drive's, the identification is an inference from the
-# address and the date). The first version of that function read
-# C:\...\DataZoom\IMAZON\Fronteiras_Amazonia\Fronteiras_Amazonia_2020.shp from
-# his own machine; the .rds is that shapefile saved as an R object and uploaded.
-# So it is a Datazoom conversion of a file Imazon gave Datazoom, not a file
-# Imazon publishes. It is a 772-row `sf` (the 772 municipalities of the 2020
-# Legal Amazon), five attribute columns -- CD_GEOCMU, NM_MUNICIP, Area, UF and
-# Front_2020 -- plus the geometry, in SIRGAS 2000.
+# WHERE THIS CAME FROM (2026-10-30). load_imazon() used to read "imazon.rds" from a
+# contributor's personal Google Drive: a Datazoom conversion of a 2020 shapefile
+# ("Fronteiras_Amazonia_2020", column Front_2020, municipalities scored 0 to 3).
+# The first onboarding of this source (commit 8130f34) could only verify that file,
+# because no official copy was found. Looking again, on the portal (imazongeo.org.br)
+# and behind its dashboards: nothing Imazon publishes is that product.
+#   - SAD (dashboards.imazongeo.org.br/sad): deforestation and degradation alerts, by
+#     municipality among others, CSV/GeoJSON/shapefile. USED HERE.
+#   - Ameaca e Pressao (/ap): deforestation on and around protected areas; its unit is
+#     the Indigenous Land or conservation unit, not the municipality; no 0-3 score.
+#   - PrevisIA (previsia.org.br): a raster, one GeoTIFF a year, of the predicted
+#     probability of deforestation in the next 12 months (values 0 to 0.26 on a ~1 km
+#     grid); no municipal table, and a continuous probability, not a class.
+#   - FloreSer: secondary vegetation (regrowth) by municipality and year, built on
+#     MapBiomas land cover: a different subject.
+#   - Simex: selective logging monitoring (infographics, a dashboard, a map); no
+#     municipal table found.
+# So this is a DIFFERENT PRODUCT, not a new source for the same one: monthly forest
+# loss by municipality instead of a 2020 snapshot score. See NEWS.md.
 #
-# NO OFFICIAL COPY WAS FOUND, so unlike resolve_ips.R (whose personal Drive
-# upload had the publisher's own copy to be replaced by) there is nothing to
-# switch to. imazon.org.br and imazongeo.org.br list SAD, Simex, FloreSer,
-# PrevisIA and "Ameaca e Pressao em Areas Protegidas" (a ranking of protected
-# areas, not of municipalities, no 0-3 scale, no shapefile download); searches
-# for "Fronteiras_Amazonia_2020" and "Front_2020" return nothing. Note what the
-# names say: the file is "Fronteiras da Amazonia" (frontiers), its column is
-# Front_2020 -- "deforestation pressure" is the package's reading of it
-# (R/imazon.R, the vignette), and the vignette's "periodic updates as Imazon
-# releases new assessments" has no source I could find. If Imazon publishes a
-# newer vintage, nothing here will find it; what this resolver does catch is the
-# Drive file being replaced (below).
+# WHY THESE TWO FILES AND NOT THE S3 BUCKET. The dashboard also publishes, on
+# imazongeo3-web.s3.sa-east-1.amazonaws.com/dashboard/sad/, alert-level CSV and
+# GeoJSON files (591,619 deforestation alerts, 25 MB). Their municipality field is
+# blank for 99.4% of the area: it is the dashboard's server that assigns alerts to
+# municipalities. The /api/sad CSVs are that assignment, already summed by month,
+# municipality and sensor, and their yearly totals equal the S3 files' to the
+# square kilometer in every year 2008-2026 (checked 2026-10-30) -- i.e. nothing is
+# dropped. The cost: they are the
+# dashboard's own data feed, not a documented API, so Imazon can change them without
+# notice. That is what this resolver watches.
 #
-# WHAT IS CHECKED, EVERY RUN, through the same call load_imazon() makes
-# (googledrive::drive_download() on the manifest's url, no sign-in):
-#   1. Drive still knows the file: not trashed, not unshared, md5 on record.
-#   2. The download is intact: its md5 is the one Drive reports.
-#   3. It reads: readRDS() gives an `sf` object (imazon_check_object()).
-#   4. It has what R/imazon.R reads: CD_GEOCMU (numeric once coerced), NM_MUNICIP,
-#      Area, UF, and the column R/imazon.R renames, Front_2020 -- with values 0 to
-#      3 and no NA. A file that carries a different Front_<year>, or one in
-#      addition to Front_2020, is a new vintage: R/imazon.R's literal rename
-#      would break (or, for an additional one, silently leave it unrenamed), so
-#      it is a failure, not a value to adopt -- the loader has to become
-#      version-aware first.
-# It emits `available_time` (the year in the Front_<year> column, which the manifest
-# used to state by hand) and `version` = the file's md5. `url` is echoed (it is the
-# one just verified); `docs_url` stays empty, there is no official page to point at.
-# `version` is what makes a replaced file visible: if the owner uploads another
-# file over this one, the md5 changes and the weekly run opens a PR for it.
+# WHAT IS CHECKED, EVERY RUN, for each dataset the manifest has (resolve_imazon() never
+# trusts a file because it answered):
+#   1. /periodo answers JSON with ano_min <= ano_max and a month 1-12;
+#   2. the CSV answers 200 and is text/csv, without a redirect;
+#   3. its header has the columns load_imazon() reads (ANO, MES, ESTADO, MUNICIPIO,
+#      AREAKM2, plus ALERTA, SENSOR), and it has rows (>= 1,000);
+#   4. its values are what the loader assumes: ALERTA is this dataset's own word, month
+#      1-12, state one of the nine Legal Amazon ones, a municipality name, area a
+#      number >= 0, no NA, no row repeated; the yearly totals are below 100,000 km2
+#      (a change of unit to hectares would be 100 times that);
+#   5. its latest year is the dashboard's ano_max, or the year before (a feed that has
+#      stopped for more than a year is stale), and not after mes_max.
+# It emits `available_time` from the years the file really has -- the manifest's was
+# typed by hand, and the degradation file has gaps ("2008-2024, 2026"). `url` is
+# echoed; nothing else is owned. A dataset that fails is a partial failure: the other
+# one is still refreshed.
 #
-# Needs googledrive (a Suggests of the package, installed by the workflow) and, for
-# the structure check, nothing but base R: an sf object is recognised by its
-# classes, so sf is not loaded.
+# NOT checked here: that the municipality names match the IBGE table the loader joins
+# them with (that needs the package; R/imazon.R warns when some do not).
 #
-# The risk this does NOT remove: the file lives in one person's Google account.
-# If that account is closed, or the sharing changed, this fails (loudly) and so
-# does load_imazon() for users; moving the file somewhere Datazoom owns is
-# the real fix and is not something a resolver can do.
+# Needs curl and jsonlite (CI-only, like the other resolvers).
 
-# The raw columns R/imazon.R reads (before its rename), and the vintage column it
-# renames. A copy: tests/testthat/test-imazon-resolver.R fails if R/imazon.R and
-# these ever differ.
-IMAZON_COLUMNS <- c("CD_GEOCMU", "NM_MUNICIP", "Area", "UF")
-IMAZON_LOADER_FRONT <- "Front_2020"
-IMAZON_FRONT_PATTERN <- "^Front_[0-9]{4}$"
-IMAZON_PRESSURE_LEVELS <- 0:3
+IMAZON_API <- "https://dashboards.imazongeo.org.br/sad/api/sad"
+IMAZON_PERIOD_URL <- paste0(IMAZON_API, "/periodo")
 
-# A value from Drive's metadata, or "?" when Drive did not send it (a note in the log, nothing more).
-imazon_or <- function(x) if (is.null(x) || length(x) == 0L) "?" else as.character(x)
+# dataset -> the word its ALERTA column carries. A copy of what R/imazon.R reads:
+# tests/testthat/test-imazon-resolver.R fails if they differ.
+IMAZON_DATASETS <- list(
+  sad_deforestation = "desmatamento",
+  sad_degradation = "degradacao"
+)
+IMAZON_COLUMNS <- c("ALERTA", "MES", "ANO", "SENSOR", "ESTADO", "MUNICIPIO", "AREAKM2")
+IMAZON_STATES <- c("AC", "AM", "AP", "MA", "MT", "PA", "RO", "RR", "TO")
+IMAZON_MIN_ROWS <- 1000L
+IMAZON_MAX_YEAR_KM2 <- 100000
 
-# The file id in a Google Drive link ("...uc?export=download&id=<id>"), NA if none.
-imazon_drive_id <- function(url) {
-  if (!is.character(url) || length(url) != 1L || is.na(url) || !grepl("^https://(docs|drive)\\.google\\.com/", url)) {
+# 2008, 2009, 2010, 2012 -> "2008-2010, 2012": the grammar parse_years() reads.
+imazon_years_to_available_time <- function(years) {
+  years <- sort(unique(as.integer(years)))
+  if (length(years) == 0L) {
     return(NA_character_)
   }
-  hit <- regmatches(url, regexec("[?&]id=([A-Za-z0-9_-]+)", url))[[1]]
-  if (length(hit) == 2L) hit[2] else NA_character_
+  ends <- c(which(diff(years) != 1L), length(years))
+  starts <- c(1L, utils::head(ends, -1L) + 1L)
+  paste(mapply(function(s, e) if (s == e) as.character(years[s]) else paste(years[s], years[e], sep = "-"), starts, ends), collapse = ", ")
 }
 
-# What is wrong with the object the .rds holds, as readable sentences (character(0)
-# when nothing is), and the vintage year found. Pure: no network, no sf needed.
-imazon_check_object <- function(x, loader_front = IMAZON_LOADER_FRONT) {
-  problems <- character(0)
-  if (!inherits(x, "sf")) {
-    return(list(
-      problem = sprintf("the .rds does not hold an sf object (it holds class %s)", paste(class(x), collapse = "/")),
-      year = NA_integer_
-    ))
+# /periodo's JSON -> list(problem, ano_min, ano_max, mes_max).
+imazon_parse_period <- function(text) {
+  p <- tryCatch(jsonlite::fromJSON(text), error = function(e) NULL)
+  fail <- function(why) list(problem = why, ano_min = NA_integer_, ano_max = NA_integer_, mes_max = NA_integer_)
+  if (!is.list(p) || !all(c("ano_min", "ano_max", "mes_max") %in% names(p))) {
+    return(fail("it is not JSON with ano_min, ano_max and mes_max"))
   }
-  geometry <- attr(x, "sf_column")
-  if (is.null(geometry) || !geometry %in% names(x) || !inherits(x[[geometry]], "sfc")) {
-    problems <- c(problems, "it has no geometry column")
+  v <- suppressWarnings(as.integer(unlist(p[c("ano_min", "ano_max", "mes_max")])))
+  if (anyNA(v) || v[1] > v[2] || !v[3] %in% 1:12) {
+    return(fail(paste0("its values are not a period: ", paste(names(p), unlist(p), sep = "=", collapse = ", "))))
   }
-  if (nrow(x) == 0L) problems <- c(problems, "it has no rows")
+  list(problem = character(0), ano_min = v[1], ano_max = v[2], mes_max = v[3])
+}
 
-  missing <- setdiff(c(IMAZON_COLUMNS, loader_front), names(x))
+# What is wrong with a dataset's CSV (text), as sentences (character(0): nothing),
+# and the years it has. Pure: no network.
+imazon_check_csv <- function(text, alert, period) {
+  x <- tryCatch(utils::read.csv(text = text, stringsAsFactors = FALSE, na.strings = c("NA", "")), error = function(e) NULL)
+  if (is.null(x) || ncol(x) < 2) {
+    return(list(problem = "it is not a CSV", years = integer(0), rows = 0L, last_month = NA_integer_))
+  }
+  missing <- setdiff(IMAZON_COLUMNS, names(x))
   if (length(missing) > 0) {
-    problems <- c(problems, sprintf("columns that R/imazon.R reads are missing: %s", paste(missing, collapse = ", ")))
+    return(list(problem = sprintf("columns that load_imazon() reads are missing: %s", paste(missing, collapse = ", ")), years = integer(0), rows = nrow(x), last_month = NA_integer_))
   }
 
-  fronts <- grep(IMAZON_FRONT_PATTERN, names(x), value = TRUE)
-  year <- NA_integer_
-  if (length(fronts) == 0L) {
-    problems <- c(problems, "it has no Front_<year> column")
-  } else if (!identical(fronts, loader_front)) {
-    problems <- c(problems, sprintf(
-      paste(
-        "it carries %s where R/imazon.R renames only %s -- a newer vintage; load_imazon() must become",
-        "version-aware (it would break, or leave the new column unrenamed) before this file is adopted"
-      ),
-      paste(fronts, collapse = ", "), loader_front
-    ))
+  problems <- character(0)
+  if (nrow(x) < IMAZON_MIN_ROWS) {
+    problems <- c(problems, sprintf("it has %d rows (fewer than %d)", nrow(x), IMAZON_MIN_ROWS))
   }
-  if (loader_front %in% fronts) {
-    year <- as.integer(sub("^Front_", "", loader_front))
-    level <- suppressWarnings(as.numeric(as.character(x[[loader_front]])))
-    if (anyNA(level) || !all(level %in% IMAZON_PRESSURE_LEVELS)) {
-      problems <- c(problems, sprintf(
-        "%s has values other than %s (or NA): %s", loader_front, paste(range(IMAZON_PRESSURE_LEVELS), collapse = " to "),
-        paste(utils::head(unique(as.character(x[[loader_front]][is.na(level) | !(level %in% IMAZON_PRESSURE_LEVELS)])), 5), collapse = ", ")
-      ))
+  area <- suppressWarnings(as.numeric(x$AREAKM2))
+  month <- suppressWarnings(as.integer(x$MES))
+  year <- suppressWarnings(as.integer(x$ANO))
+  if (anyNA(area) || any(area < 0)) problems <- c(problems, "AREAKM2 has NA, negative or non-numeric values")
+  if (anyNA(month) || !all(month %in% 1:12)) problems <- c(problems, "MES has values that are not months 1-12")
+  if (anyNA(year)) problems <- c(problems, "ANO has non-numeric values")
+  if (!all(x$ALERTA %in% alert)) problems <- c(problems, sprintf("ALERTA is not always '%s' (found: %s)", alert, paste(utils::head(setdiff(unique(x$ALERTA), alert), 3), collapse = ", ")))
+  if (anyNA(x$MUNICIPIO) || !all(nzchar(trimws(x$MUNICIPIO)))) problems <- c(problems, "MUNICIPIO has blank names")
+  odd_states <- setdiff(unique(x$ESTADO), IMAZON_STATES)
+  if (length(odd_states) > 0) problems <- c(problems, sprintf("ESTADO has values that are not Legal Amazon states: %s", paste(utils::head(odd_states, 5), collapse = ", ")))
+  if (anyDuplicated(x[c("ALERTA", "MES", "ANO", "SENSOR", "ESTADO", "MUNICIPIO")]) > 0) problems <- c(problems, "some month/municipality/sensor rows are repeated")
+
+  if (!anyNA(year) && !anyNA(area)) {
+    yearly <- tapply(area, year, sum)
+    if (any(yearly > IMAZON_MAX_YEAR_KM2)) {
+      problems <- c(problems, sprintf("a year's total is %s km2 (more than %s: a different unit?)", format(round(max(yearly)), big.mark = ","), format(IMAZON_MAX_YEAR_KM2, big.mark = ",")))
+    }
+    if (!is.na(period$ano_max)) {
+      if (max(year) > period$ano_max || max(year) < period$ano_max - 1L) {
+        problems <- c(problems, sprintf("its latest year is %d, the dashboard's period ends in %d", max(year), period$ano_max))
+      }
+      if (max(year) == period$ano_max && !anyNA(month) && max(month[year == max(year)]) > period$mes_max) {
+        problems <- c(problems, sprintf("it has %d/%d, after the dashboard's last month (%d/%d)", max(year), max(month[year == max(year)]), period$ano_max, period$mes_max))
+      }
     }
   }
-  if ("CD_GEOCMU" %in% names(x) && anyNA(suppressWarnings(as.numeric(as.character(x[["CD_GEOCMU"]]))))) {
-    problems <- c(problems, "CD_GEOCMU has values that are not numbers (R/imazon.R converts them with as.numeric())")
-  }
 
-  list(problem = problems, year = year)
+  list(
+    problem = problems, years = sort(unique(year[!is.na(year)])), rows = nrow(x),
+    last_month = if (anyNA(year) || anyNA(month) || length(year) == 0L) NA_integer_ else max(month[year == max(year)])
+  )
 }
 
 resolve_imazon <- function(rows) {
@@ -137,71 +161,98 @@ resolve_imazon <- function(rows) {
       "cannot tell which datasets to update. Check the resolver column."
     )
   }
-  if (!requireNamespace("googledrive", quietly = TRUE)) {
-    stop("resolve_imazon() needs the 'googledrive' package (a Suggests of the package; load_imazon() needs it too).")
+  if (!requireNamespace("curl", quietly = TRUE)) {
+    stop("resolve_imazon() needs the 'curl' package (CI-only; not a package Import).")
+  }
+  if (!requireNamespace("jsonlite", quietly = TRUE)) {
+    stop("resolve_imazon() needs the 'jsonlite' package (CI-only; not a package Import).")
   }
 
-  verified <- list()
-  for (url in unique(rows$url)) {
-    id <- imazon_drive_id(url)
-    if (is.na(id)) {
-      stop("resolve_imazon(): the manifest url is not a Google Drive link with an id: ", url)
-    }
-
-    # No sign-in: the file is shared with anyone who has the link, which is how
-    # load_imazon() reads it (and check_all_loads.R, which does the same).
-    googledrive::drive_deauth()
-
-    meta <- tryCatch(
-      googledrive::drive_get(googledrive::as_id(id)),
-      error = function(e) stop("resolve_imazon(): Drive does not give the metadata of file ", id, " -- deleted, no longer shared, or Drive is down: ", conditionMessage(e), call. = FALSE)
+  # A redirect is not followed: Imazon moving these files would answer with one.
+  fetch <- function(url) {
+    resp <- tryCatch(
+      curl::curl_fetch_memory(url, handle = curl::new_handle(timeout = 120, connecttimeout = 20, followlocation = FALSE)),
+      error = function(e) e
     )
-    resource <- meta$drive_resource[[1]]
-    if (isTRUE(resource$trashed)) {
-      stop("resolve_imazon(): file ", id, " is in Drive's trash.")
+    if (inherits(resp, "error")) {
+      return(list(error = paste0("no HTTP response (", conditionMessage(resp), ")")))
     }
-    drive_md5 <- resource$md5Checksum
-    if (is.null(drive_md5) || !nzchar(drive_md5)) {
-      stop("resolve_imazon(): Drive reports no md5 checksum for file ", id, " -- not a stored file any more?")
-    }
-    message(sprintf(
-      "resolve_imazon(): Drive file '%s', %s bytes, modified %s, owner %s, md5 %s",
-      imazon_or(resource$name), imazon_or(resource$size), imazon_or(resource$modifiedTime),
-      imazon_or(resource$owners[[1]]$displayName), drive_md5
-    ))
+    headers <- tryCatch(curl::parse_headers_list(resp$headers), error = function(e) list())
+    type <- headers[["content-type"]]
+    list(status = resp$status_code, type = if (is.null(type)) "" else type, body = resp$content)
+  }
+  text_of <- function(raw) {
+    txt <- rawToChar(raw[raw != as.raw(0)])
+    Encoding(txt) <- "UTF-8"
+    txt
+  }
 
-    # the call load_imazon() makes (R/download.R, download_method "googledrive")
-    tmp <- tempfile(fileext = ".rds")
-    on.exit(unlink(tmp), add = TRUE)
-    tryCatch(
-      googledrive::drive_download(url, path = tmp, overwrite = TRUE),
-      error = function(e) stop("resolve_imazon(): downloading ", url, " failed: ", conditionMessage(e), call. = FALSE)
-    )
-    if (!file.exists(tmp) || file.size(tmp) == 0) {
-      stop("resolve_imazon(): downloading ", url, " produced no file.")
+  resp <- fetch(IMAZON_PERIOD_URL)
+  if (!is.null(resp$error) || resp$status != 200L) {
+    stop("resolve_imazon(): ", IMAZON_PERIOD_URL, " -- ", if (!is.null(resp$error)) resp$error else paste0("HTTP ", resp$status), ". The dashboard's data feed may have moved.")
+  }
+  period <- imazon_parse_period(text_of(resp$body))
+  if (length(period$problem) > 0) {
+    stop("resolve_imazon(): ", IMAZON_PERIOD_URL, " answered something unexpected: ", period$problem, ".")
+  }
+
+  results <- list()
+  failures <- character(0)
+  for (dataset in unique(rows$dataset)) {
+    fail <- function(why) failures <<- c(failures, sprintf("imazon/%s: %s", dataset, why))
+    alert <- IMAZON_DATASETS[[dataset]]
+    if (is.null(alert)) {
+      fail(sprintf("resolve_imazon() only knows %s", paste(names(IMAZON_DATASETS), collapse = ", ")))
+      next
     }
-    downloaded_md5 <- unname(tools::md5sum(tmp))
-    if (!identical(downloaded_md5, drive_md5)) {
-      stop("resolve_imazon(): the downloaded file's md5 (", downloaded_md5, ") is not the one Drive reports (", drive_md5, ") -- a partial or altered download.")
+    urls <- unique(rows$url[rows$dataset == dataset])
+    if (length(urls) != 1L || is.na(urls)) {
+      fail("its manifest rows do not agree on one url")
+      next
     }
 
-    x <- tryCatch(readRDS(tmp), error = function(e) stop("resolve_imazon(): the downloaded file is not readable by readRDS(): ", conditionMessage(e), call. = FALSE))
-    check <- imazon_check_object(x)
+    resp <- fetch(urls)
+    if (!is.null(resp$error)) {
+      fail(paste0(urls, " -- ", resp$error))
+      next
+    }
+    if (resp$status != 200L) {
+      fail(sprintf("%s -- HTTP %s (a redirect or an error: the file may have moved)", urls, resp$status))
+      next
+    }
+    if (!grepl("^text/csv", resp$type, ignore.case = TRUE)) {
+      fail(sprintf("%s -- content-type '%s', not text/csv", urls, resp$type))
+      next
+    }
+    check <- imazon_check_csv(text_of(resp$body), alert, period)
     if (length(check$problem) > 0) {
-      stop("resolve_imazon(): ", url, " no longer has the shape load_imazon() relies on -- ", paste(check$problem, collapse = "; "), ".")
+      fail(sprintf("%s no longer has the shape load_imazon() relies on -- %s", urls, paste(check$problem, collapse = "; ")))
+      next
     }
-    verified[[url]] <- list(version = drive_md5, available_time = as.character(check$year))
+
+    message(sprintf(
+      "resolve_imazon(): %s ok -- %d rows, %s, latest month %d/%d",
+      dataset, check$rows, imazon_years_to_available_time(check$years), max(check$years), check$last_month
+    ))
+    results[[dataset]] <- imazon_years_to_available_time(check$years)
   }
 
-  # One output row per input row, echoing each row's own keys (the manifest rows are
-  # self-sufficient, see resolve_ips.R).
-  tibble::tibble(
-    survey = rows$survey,
-    dataset = rows$dataset,
-    geo_level = rows$geo_level,
-    year = rows$year,
-    url = rows$url,
-    available_time = vapply(rows$url, function(u) verified[[u]]$available_time, character(1), USE.NAMES = FALSE),
-    version = vapply(rows$url, function(u) verified[[u]]$version, character(1), USE.NAMES = FALSE)
+  if (length(results) == 0) {
+    stop("resolve_imazon(): every dataset failed -- ", paste(failures, collapse = " | "))
+  }
+
+  # One output row per owned row of a dataset that checked out, echoing its own keys.
+  ok <- rows$dataset %in% names(results)
+  out <- tibble::tibble(
+    survey = rows$survey[ok],
+    dataset = rows$dataset[ok],
+    geo_level = rows$geo_level[ok],
+    year = rows$year[ok],
+    url = rows$url[ok],
+    available_time = unname(unlist(results[rows$dataset[ok]]))
   )
+  if (length(failures) > 0) {
+    attr(out, "partial_failures") <- failures
+  }
+  out
 }

@@ -758,9 +758,6 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       file_extension <- ".csv"
     }
   }
-  if (source == "imazon") {
-    file_extension <- ".rds"
-  }
   if (source == "aneel") {
     if (dataset == "energy_enterprises_distributed") {
       # empreendimento-geracao-distribuida.zip is a real zip archive -- unlike
@@ -841,7 +838,7 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     download_method <- "standard" # works for most functions
     quiet <- TRUE
 
-    if (source %in% c("iema", "imazon")) {
+    if (source == "iema") {
       download_method <- "googledrive"
     }
     if (source == "aneel") {

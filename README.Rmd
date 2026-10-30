@@ -74,7 +74,7 @@ include_vignette <- function(f) {
 | **[PRODES](#prodes)** | _Yearly deforestation_ |
 | **[DETER](#deter)** | _Alerts on forest cover changes_ |
 | **[DEGRAD](#degrad)** | _Forest degradation_ |
-| **[Imazon](#imazon)** | _Deforestation pressure in the Amazon_ |
+| **[Imazon](#imazon)** | _Monthly deforestation and degradation alerts_ |
 
 </td><td>
 

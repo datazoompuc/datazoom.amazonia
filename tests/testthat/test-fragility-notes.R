@@ -42,9 +42,11 @@ source(file.path(actions_dir, "scripts", "fragility_notes.R"), local = TRUE)
 tagged_sources <- list(
   list(r_path = file.path(pkg_root, "R", "mapbiomas.R"), label = "R/mapbiomas.R", min_tags = 8),
   list(r_path = file.path(pkg_root, "R", "epe.R"), label = "R/epe.R", min_tags = 3),
-  # Added 2026-10-29 with resolve_imazon.R: the single Google Drive file, and the
-  # raw column names (Front_2020 included) R/imazon.R renames.
-  list(r_path = file.path(pkg_root, "R", "imazon.R"), label = "R/imazon.R", min_tags = 2),
+  # Added 2026-10-29 with resolve_imazon.R, rewritten 2026-10-30 when load_imazon()
+  # moved off Google Drive: imazon.R has 3 (the undocumented dashboard feed itself,
+  # the raw column names and value semantics the summary relies on, and the
+  # name + state join to the IBGE table).
+  list(r_path = file.path(pkg_root, "R", "imazon.R"), label = "R/imazon.R", min_tags = 3),
   list(r_path = file.path(pkg_root, "R", "prodes.R"), label = "R/prodes.R", min_tags = 4),
   list(r_path = file.path(pkg_root, "R", "baci.R"), label = "R/baci.R", min_tags = 3),
   # Added 2026-10-21 alongside PAM's two FRAGILITY_SOURCES rows: pam.R has 3
