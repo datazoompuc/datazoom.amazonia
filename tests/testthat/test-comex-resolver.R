@@ -462,15 +462,53 @@ test_that("the CI wiring that lets a Linux runner verify balanca.mdic.gov.br is 
 
   action <- yaml::read_yaml(action_path)
   expect_equal(action$runs$using, "composite")
-  scripts <- vapply(action$runs$steps, function(s) {
+  steps_run <- vapply(action$runs$steps, function(s) {
     expect_equal(s$shell, "bash") # every composite `run` step must name its shell
     s$run
   }, character(1))
-  script <- paste(scripts, collapse = "\n")
-  # the safety properties, in the script itself
-  expect_match(script, "AC SERPRO AR46 OV TLS CA 2025", fixed = TRUE) # refuses any other certificate
-  expect_match(script, "openssl verify -CAfile /etc/ssl/certs/ca-certificates.crt", fixed = TRUE) # must chain to a root already trusted
-  expect_false(grepl("--insecure|curl[^\n]* -k |ssl_verifypeer|verify=False|NODE_TLS_REJECT_UNAUTHORIZED|GIT_SSL_NO_VERIFY", script))
+  # The action is a thin wrapper; the logic (and the safety properties below)
+  # live in trust-intermediate.sh next to it.
+  expect_equal(steps_run, 'bash "${{ github.action_path }}/trust-intermediate.sh"')
+  script_path <- file.path(dirname(action_path), "trust-intermediate.sh")
+  expect_true(file.exists(script_path))
+  script <- paste(readLines(script_path, warn = FALSE), collapse = "\n")
+  # -- the issuer is found from the certificate the server presents, like a browser
+  #    does, not from a URL written in this repository (the rotation-proofing)
+  expect_match(script, "CA Issuers - URI", fixed = TRUE)
+  expect_false(grepl("acserproar46ovtlsca2025|secure.globalsign.com", sub("^(#[^\n]*\n)+", "", script)), info = "no hard-coded issuer URL in the code")
+  expect_match(script, "refusing a non-http(s) AIA URL", fixed = TRUE)
+  # -- THE security boundary: the whole chain must verify against the system's roots only,
+  #    with host name and server purpose, before anything is installed
+  expect_match(script, 'openssl verify -CAfile "$roots" -no-CApath', fixed = TRUE)
+  expect_match(script, "-purpose sslserver -verify_hostname", fixed = TRUE)
+  expect_match(script, "/etc/ssl/certs/ca-certificates.crt", fixed = TRUE)
+  i_check <- regexpr('fail "the certificate chain for', script, fixed = TRUE)[1]
+  i_install <- regexpr("$sudo_cmd cp", script, fixed = TRUE)[1]
+  expect_true(i_check > 0 && i_install > i_check, info = "the verification must come before the install")
+  # -- the issuer's NAME is never enforced (a legitimate rotation must not stop CI) and is written nowhere in
+  #    the code: the bundled file is the only copy of it, so nothing can go stale together with that file
+  without_comments <- function(text) paste(sub("^\\s*#.*$", "", strsplit(text, "\n")[[1]]), collapse = "\n")
+  expect_false(grepl("TRUST_EXPECTED|expected_subject|first_subject|AC SERPRO", without_comments(script)))
+  # -- it compares what it found with the chain bundled for R users, and a mismatch is reported, never fatal
+  expect_match(script, "inst/extdata/tls/balanca-serpro-chain.pem", fixed = TRUE)
+  stale_block <- regmatches(script, regexpr("(?s)# 5\\. Is the copy of the chain.*?# 6\\. Install", script, perl = TRUE))
+  expect_length(stale_block, 1)
+  expect_match(stale_block, "::warning::", fixed = TRUE)
+  expect_false(grepl("(?m)^\\s*(exit|fail)\\b", without_comments(stale_block), perl = TRUE))
+  # -- the refresh of that file is its own script, asked for by the caller, and under the same rules
+  refresh_path <- file.path(dirname(action_path), "refresh-bundled-chain.sh")
+  expect_true(file.exists(refresh_path))
+  refresh <- paste(readLines(refresh_path, warn = FALSE), collapse = "\n")
+  expect_match(script, "refresh-bundled-chain.sh", fixed = TRUE)
+  expect_match(script, "TRUST_REFRESH", fixed = TRUE)
+  expect_false(grepl("acserproar46ovtlsca2025|secure.globalsign.com", without_comments(refresh)), info = "no hard-coded issuer URL in the refresh either")
+  # it writes the file only after the regenerated bundle has verified the host by itself, as the only trust store
+  i_verify <- regexpr("openssl verify -CAfile \"$work/new_body.pem\" -no-CApath -purpose sslserver -verify_hostname \"$host\"", refresh, fixed = TRUE)[1]
+  i_write <- regexpr('cp "$work/new.pem" "$bundle"', refresh, fixed = TRUE)[1]
+  expect_true(i_verify > 0 && i_write > i_verify, info = "the regenerated bundle must verify the host before it replaces the file")
+  # -- and never switches verification off, in the scripts or the action
+  code_only <- without_comments(paste(script, refresh, steps_run, sep = "\n"))
+  expect_false(grepl("--insecure|curl[^\n]* -k |ssl_verifypeer|verify=False|NODE_TLS_REJECT_UNAUTHORIZED|GIT_SSL_NO_VERIFY|-no-verify|verify_return_error.*false", code_only))
 
   step_ref <- "./.github/actions/trust-serpro-intermediate"
   wired <- list(
@@ -501,4 +539,50 @@ test_that("the CI wiring that lets a Linux runner verify balanca.mdic.gov.br is 
   matrix_step <- yaml::read_yaml(file.path(pkg_root, ".github", "workflows", "check-dz-amazonia.yaml"))$jobs[["check-downloads"]]$steps
   matrix_step <- Filter(function(s) identical(s$uses, step_ref), matrix_step)[[1]]
   expect_equal(matrix_step$`if`, "matrix.fn == 'load_br_trade'")
+})
+
+test_that("a stale bundled chain becomes a pull request in the weekly run -- and only there, which is where the write permissions are", {
+  # trust-intermediate.sh used to leave a ::warning:: annotation, which nobody reads. The weekly update-manifest.yaml run
+  # now asks (refresh-bundled-chain) for inst/extdata/tls/balanca-serpro-chain.pem to be rewritten and opens a PR for it.
+  skip_if_not_installed("yaml")
+  action_path <- file.path(pkg_root, ".github", "actions", "trust-serpro-intermediate", "action.yml")
+  skip_if_not(file.exists(action_path), ".github/ not present (stripped build)")
+  step_ref <- "./.github/actions/trust-serpro-intermediate"
+  workflow <- function(name) yaml::read_yaml(file.path(pkg_root, ".github", "workflows", name))
+
+  # the action: an input that is off unless asked for, and the two outputs the caller needs
+  action <- yaml::read_yaml(action_path)
+  expect_equal(action$inputs$`refresh-bundled-chain`$default, "false")
+  expect_setequal(names(action$outputs), c("chain-stale", "pr-body-path"))
+  expect_equal(action$runs$steps[[1]]$id, "trust") # the outputs are read from this step's
+  expect_equal(action$runs$steps[[1]]$env$TRUST_REFRESH, "${{ inputs.refresh-bundled-chain }}")
+  expect_equal(action$outputs$`chain-stale`$value, "${{ steps.trust.outputs.chain-stale }}")
+
+  # the weekly run: asks for it, and opens the PR right after, for that one file, on a branch of its own
+  um <- workflow("update-manifest.yaml")
+  expect_equal(um$permissions$contents, "write")
+  expect_equal(um$permissions$`pull-requests`, "write")
+  steps <- um$jobs[["refresh-manifest"]]$steps
+  i_trust <- which(vapply(steps, function(s) identical(s$uses, step_ref), logical(1)))
+  expect_length(i_trust, 1)
+  expect_equal(steps[[i_trust]]$`with`$`refresh-bundled-chain`, "true")
+  expect_equal(steps[[i_trust]]$id, "serpro")
+  pr <- steps[[i_trust + 1]]
+  expect_equal(pr$uses, "peter-evans/create-pull-request@v6") # the same action, and version, as the manifest PR
+  expect_equal(pr$`if`, "steps.serpro.outputs.chain-stale == 'true'")
+  expect_equal(pr$with$`add-paths`, "inst/extdata/tls/balanca-serpro-chain.pem") # nothing else can end up in it
+  expect_equal(pr$with$`body-path`, "${{ steps.serpro.outputs.pr-body-path }}")
+  expect_false(pr$with$branch == "manifest-refresh-review") # never mixed with the manifest refresh
+  # that PR is made before anything else touches the working tree
+  i_build <- which(vapply(steps, function(s) identical(s$name, "Run build_manifest.R"), logical(1)))
+  expect_lt(i_trust + 1, i_build)
+
+  # the check workflows have no write permission and do not ask: they keep the annotation
+  for (wf_name in c("check-load-br-trade.yaml", "check-dz-amazonia.yaml")) {
+    wf <- workflow(wf_name)
+    expect_null(wf$permissions, info = wf_name)
+    job <- wf$jobs[[1]]
+    use <- Filter(function(s) identical(s$uses, step_ref), job$steps)[[1]]
+    expect_null(use$with, info = wf_name)
+  }
 })

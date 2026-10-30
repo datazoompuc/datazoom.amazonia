@@ -297,6 +297,33 @@ load_dictionary <- function(dataset) {
   # PAM #
   #######
 
+  # The names load_pam() gives its variables: IBGE's variable id -> the stem of
+  # the column name, in each language (translate_sidra_variables(), below). Not
+  # a product dictionary like the entries that follow: var_pt / var_eng are
+  # column-name stems, not labels, and there are no units. ONE list for all seven
+  # PAM tables, as before; the key ends in "_variables" so it can never collide
+  # with a product key (temporary_crops, ...).
+  # FRAGILE: these seven ids are every variable the seven PAM tables report,
+  # checked against IBGE's metadata and the data itself on 2026-10-21. 2313
+  # ("Area destinada a colheita", table 1613) was missing until then, so every
+  # permanent-crop dataset returned it as an unnamed na_v<crop> column; it
+  # carries the same figure as 8331 for the same crop, so it takes 8331's name.
+  # An id missing here becomes v<id> and warns, but still needs a real name added
+  # here. resolve_pam.R tells us ahead of time that IBGE added one: it re-checks
+  # each table's declared variables against PAM_NAMED_VARIABLES, a copy of this
+  # column that tests/testthat/test-pam-resolver.R keeps equal to it.
+  if (dataset == "pam_variables") {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~var_pt, ~var_eng,
+      109, "area_plantada", "planted_area", # Area plantada
+      112, "rend_medio", "avg_yield", # Rendimento medio da producao
+      214, "quant", "quant", # Quantidade produzida
+      215, "valor", "value", # Valor da producao
+      216, "area_colhida", "harvested_area", # Area colhida
+      8331, "area_plantada_dest_colheita", "planted_to_harvest_area", # Area plantada ou destinada a colheita
+      2313, "area_plantada_dest_colheita", "planted_to_harvest_area" # Area destinada a colheita (table 1613, same figure as 8331)
+    )
+  }
 
   if (dataset == "temporary_crops") {
     harmonization_dat <- tibble::tribble(
@@ -916,7 +943,19 @@ load_dictionary <- function(dataset) {
     # consumer_class_indicator/type_indicator (see R/aneel.R).
     harmonization_dat <- tibble::tribble(
       ~variable, ~var_code, ~label_pt, ~label_eng,
-      "dsc_grupo_tarifario", "Rede Basica", "rede_basica", "basic_network"
+      "dsc_grupo_tarifario", "Rede Basica", "rede_basica", "basic_network",
+      "nom_mes", "Janeiro", "janeiro", "january",
+      "nom_mes", "Fevereiro", "fevereiro", "february",
+      "nom_mes", "Marco", "marco", "march",
+      "nom_mes", "Abril", "abril", "april",
+      "nom_mes", "Maio", "maio", "may",
+      "nom_mes", "Junho", "junho", "june",
+      "nom_mes", "Julho", "julho", "july",
+      "nom_mes", "Agosto", "agosto", "august",
+      "nom_mes", "Setembro", "setembro", "september",
+      "nom_mes", "Outubro", "outubro", "october",
+      "nom_mes", "Novembro", "novembro", "november",
+      "nom_mes", "Dezembro", "dezembro", "december"
     )
   }
 
@@ -1002,7 +1041,7 @@ load_dictionary <- function(dataset) {
       "dsc_fase_usina", "Construcao nao iniciada", "construcao_nao_iniciada", "construction_not_started",
       "dsc_fase_usina", "Construcao", "em_construcao", "in_construction",
       "dsc_origem_combustivel", "Solar", "solar", "solar",
-      "dsc_origem_combustivel", "Hidrica", "hidrica", "hydric",
+      "dsc_origem_combustivel", "Hidrica", "hidrica", "hydro",
       "dsc_origem_combustivel", "Fossil", "fossil", "fossil",
       "dsc_origem_combustivel", "Biomassa", "biomassa", "biomass",
       "dsc_origem_combustivel", "Eolica", "eolica", "wind",
@@ -1024,7 +1063,7 @@ load_dictionary <- function(dataset) {
       "dsc_tipo_outorga", "Concessao", "concessao", "concession",
       "dsc_tipo_outorga", "Autorizacao", "autorizacao", "authorization",
       "nom_fonte_combustivel", "Radiacao solar", "radiacao_solar", "solar_radiation",
-      "nom_fonte_combustivel", "Potencial hidraulico", "potecial_hidraulico", "hydraulic_potential",
+      "nom_fonte_combustivel", "Potencial hidraulico", "potencial_hidraulico", "hydraulic_potential",
       "nom_fonte_combustivel", "Oleo Diesel", "oleo_diesel", "diesel",
       "nom_fonte_combustivel", "Residuos Florestais", "residuos_florestais", "forest_residue",
       "nom_fonte_combustivel", "Cinetica do vento", "cinetica_do_vento", "wind_kinetics",
@@ -1052,7 +1091,7 @@ load_dictionary <- function(dataset) {
       "nom_fonte_combustivel", "Calor de Processo - GN", "calor_de_processo_gn", "process_heat_gn",
       "nom_fonte_combustivel", "Calor de Processo - CM", "calor_de_processo_cm", "process_heat_cm",
       "nom_fonte_combustivel", "Biogas - Floresta", "biogas_floresta", "biogas_forest",
-      "nom_fonte_combustivel", "Gas de Alto Forno - PE", "gas_de_alto_forno_pe", "blast_funace_gas_pe",
+      "nom_fonte_combustivel", "Gas de Alto Forno - PE", "gas_de_alto_forno_pe", "blast_furnace_gas_pe",
       "nom_fonte_combustivel", "Etanol", "etanol", "ethanol",
       "idc_geracao_qualificada", "-", NA, NA,
       "idc_geracao_qualificada", "Nao", "0", "0",

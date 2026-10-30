@@ -380,6 +380,35 @@ fixture <- fixture %>%
     )
   )
 
+# Delta #18 -- pam (2026-10-21; see actions/scrapers/resolve_pam.R's header).
+# Two kinds of change, both on existing rows:
+#   * sidra_code: the 7 rows that read a whole table ("5457/all/all" etc.) now
+#     spell the classification out ("5457/c782/all"). sidrar builds the same
+#     request either way, but for "all" it first scrapes an IBGE HTML page
+#     that sits behind a bot challenge, and load_pam("all_crops") failed with
+#     "Error in Download." where the page was challenged. Pinned below.
+#   * available_time: refreshed from IBGE's own data (75 of 79 rows). Not
+#     pinned value by value -- resolve_pam.R rewrites it every year -- but by
+#     the test further down: start years unchanged except annatto_seeds (1981
+#     -> 1988, what IBGE publishes), alfafa/cashew/forage_cane/
+#     rubber_liquid_latex still ending in 1987, every other end year >= 2024.
+#     The golden comparison below blanks pam's available_time on both sides.
+# resolver was populated too, and (2026-10-22) docs_url moved from the survey
+# page to each row's own table page (neither is a datasets_link() column).
+fixture <- fixture %>%
+  dplyr::mutate(
+    sidra_code = dplyr::case_when(
+      survey == "pam" & dataset == "all_crops" ~ "5457/c782/all",
+      survey == "pam" & dataset == "temporary_crops" ~ "1612/c81/all",
+      survey == "pam" & dataset == "permanent_crops" ~ "1613/c82/all",
+      survey == "pam" & dataset == "beans" ~ "1002/c81/all",
+      survey == "pam" & dataset == "corn" ~ "839/c81/all",
+      survey == "pam" & dataset == "peanut" ~ "1000/c81/all",
+      survey == "pam" & dataset == "potato" ~ "1001/c81/all",
+      TRUE ~ sidra_code
+    )
+  )
+
 test_that("datasets_link() returns the exact pre-normalization column set and order", {
   expect_equal(
     names(datasets_link()),
@@ -391,11 +420,39 @@ test_that("datasets_link() matches the golden fixture (schema normalization is a
   actual <- datasets_link() %>% dplyr::arrange(survey, dataset)
   expected <- fixture %>% dplyr::arrange(survey, dataset)
 
+  # pam's available_time is asserted on its own in the next test (delta #18).
+  actual$available_time[actual$survey == "pam"] <- NA_character_
+  expected$available_time[expected$survey == "pam"] <- NA_character_
   # ppm's available_time is asserted on its own in the next test (delta #19).
   actual$available_time[actual$survey == "ppm"] <- NA_character_
   expected$available_time[expected$survey == "ppm"] <- NA_character_
 
   expect_equal(actual, expected)
+})
+
+test_that("pam's available_time follows IBGE's coverage: same start years, end years brought up to date (delta #18)", {
+  old <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds"))
+  old <- old[old$survey == "pam", ]
+  new <- datasets_link(source = "pam")
+  expect_equal(nrow(new), 79)
+  expect_setequal(new$dataset, old$dataset)
+  new <- new[match(old$dataset, new$dataset), ]
+
+  first_year <- function(x) as.integer(sub("-.*", "", x))
+  last_year <- function(x) as.integer(sub(".*-", "", x))
+
+  is_annatto <- old$dataset == "annatto_seeds"
+  ended_1987 <- old$dataset %in% c("alfafa", "cashew", "forage_cane", "rubber_liquid_latex")
+
+  # IBGE publishes annatto from 1988, not 1981 (resolve_pam.R header, point 2)
+  expect_equal(first_year(old$available_time[is_annatto]), 1981)
+  expect_equal(first_year(new$available_time[is_annatto]), 1988)
+  expect_equal(first_year(new$available_time[!is_annatto]), first_year(old$available_time[!is_annatto]))
+
+  # series that ended in 1987 still do; everything else reaches at least the 2024 edition
+  expect_equal(new$available_time[ended_1987], old$available_time[ended_1987])
+  expect_true(all(last_year(new$available_time[!ended_1987]) >= 2024))
+  expect_true(all(last_year(old$available_time[!ended_1987]) == 2023))
 })
 
 test_that("ppm's available_time follows IBGE's coverage: same start years, end years brought up to date (delta #19)", {
