@@ -323,6 +323,17 @@ KNOWN_POST_CAPTURE_DELTAS <- c(
   post_capture_key("ppm", ppm_classified, NA, NA, "sidra_code")
 )
 
+# 2026-10-30: PIB Municipal onboarding (see test-datasets_link.R's delta #21 and
+# resolve_pibmunic.R's header): 3 cells on the one unkeyed row -- resolver,
+# available_time ("2002-2021" -> "2002-2023") and docs_url (the survey page became the
+# table's own page). sidra_code is unchanged: the bare "5938" stays, and now means "no
+# classification". docs_url is not a datasets_link() column, so only this per-field
+# matrix sees it.
+KNOWN_POST_CAPTURE_DELTAS <- c(
+  KNOWN_POST_CAPTURE_DELTAS,
+  post_capture_key("pibmunic", "pibmunic", NA, NA, c("resolver", "available_time", "docs_url"))
+)
+
 test_that("every real-key entry in resolution_matrix_keyed.rds resolves byte-identically after the migration, except 5 known post-capture deltas", {
   real_rows <- matrix[!(is.na(matrix$geo_level) & is.na(matrix$year) & mapply(is_known_base_row_dataset, matrix$survey, matrix$dataset)), ]
   expect_gt(nrow(real_rows), 0)
@@ -454,6 +465,20 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 42
   expect_equal(sum(ppm_new$sidra_code != ppm_old$sidra_code), 3)
   new_snap <- new_snap[new_snap$survey != "ppm", ]
   old_snap <- old_snap[old_snap$survey != "ppm", ]
+
+  # pibmunic: 1 available_time cell (delta #21, 2026-10-30, test-datasets_link.R) is
+  # asserted there and the row set aside before the comparison, for the same reason.
+  # Everything else about it must be unchanged -- sidra_code included.
+  pib_new <- new_snap[new_snap$survey == "pibmunic", ]
+  pib_old <- old_snap[old_snap$survey == "pibmunic", ]
+  expect_equal(nrow(pib_new), 1)
+  expect_equal(pib_new$dataset, pib_old$dataset)
+  for (col in setdiff(names(pib_old), "available_time")) {
+    expect_equal(pib_new[[col]], pib_old[[col]], info = paste("pibmunic column", col))
+  }
+  expect_false(identical(pib_new$available_time, pib_old$available_time))
+  new_snap <- new_snap[new_snap$survey != "pibmunic", ]
+  old_snap <- old_snap[old_snap$survey != "pibmunic", ]
 
   # sigmine/sigmine_inactive is a genuinely NEW row (delta #14,
   # test-datasets_link.R): assert it separately, then exclude it from the

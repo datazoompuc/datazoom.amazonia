@@ -360,6 +360,17 @@ fixture <- fixture %>%
     )
   )
 
+# Delta #21 -- pibmunic (2026-10-30; see actions/scrapers/resolve_pibmunic.R's
+# header). One change to an existing row that datasets_link() shows:
+#   * available_time: refreshed from IBGE's own data ("2002-2021" -> "2002-2023").
+#     Not pinned value by value -- resolve_pibmunic.R rewrites it every year -- but
+#     by the test further down. The golden comparison below blanks pibmunic's
+#     available_time on both sides.
+# sidra_code stays the bare table number "5938": a bare code now MEANS "this table has
+# no classification" (load_pibmunic() sends the request without one), which the
+# resolver checks. docs_url (the survey page -> the table's own page) and resolver
+# were populated too (not datasets_link() columns).
+
 # Delta #14 -- sigmine (2026-10). sigmine_inactive is a genuinely new row, and
 # both sigmine rows now declare available_geo "state, municipality" (the
 # geo_level choices load_sigmine() actually supports). See R/sigmine.R.
@@ -419,6 +430,9 @@ test_that("datasets_link() matches the golden fixture (schema normalization is a
   actual <- datasets_link() %>% dplyr::arrange(survey, dataset)
   expected <- fixture %>% dplyr::arrange(survey, dataset)
 
+  # pibmunic's available_time is asserted on its own in the test after pam's (delta #21).
+  actual$available_time[actual$survey == "pibmunic"] <- NA_character_
+  expected$available_time[expected$survey == "pibmunic"] <- NA_character_
   # pam's available_time is asserted on its own in the next test (delta #18).
   actual$available_time[actual$survey == "pam"] <- NA_character_
   expected$available_time[expected$survey == "pam"] <- NA_character_
@@ -452,6 +466,25 @@ test_that("pam's available_time follows IBGE's coverage: same start years, end y
   expect_equal(new$available_time[ended_1987], old$available_time[ended_1987])
   expect_true(all(last_year(new$available_time[!ended_1987]) >= 2024))
   expect_true(all(last_year(old$available_time[!ended_1987]) == 2023))
+})
+
+test_that("pibmunic's available_time follows IBGE's coverage: same start year, end year brought up to date (delta #21)", {
+  old <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds"))
+  old <- old[old$survey == "pibmunic", ]
+  new <- datasets_link(source = "pibmunic")
+  expect_equal(nrow(new), 1)
+  expect_setequal(new$dataset, old$dataset)
+
+  first_year <- function(x) as.integer(sub("-.*", "", x))
+  last_year <- function(x) as.integer(sub(".*-", "", x))
+
+  # IBGE's table starts where the manifest said (2002), and the old range was two editions behind
+  expect_equal(first_year(new$available_time), first_year(old$available_time))
+  expect_equal(first_year(new$available_time), 2002)
+  expect_equal(last_year(old$available_time), 2021)
+  expect_gte(last_year(new$available_time), 2023)
+  # and the bare table number is still what it was
+  expect_equal(new$sidra_code, old$sidra_code)
 })
 
 test_that("ppm's available_time follows IBGE's coverage: same start years, end years brought up to date (delta #19)", {

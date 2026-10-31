@@ -49,6 +49,11 @@ tagged_sources <- list(
   # named IBGE variable ids) and R/download.R gained a second tag, counted in
   # its entry below (sidra_download()'s classific = "all" default).
   list(r_path = file.path(pkg_root, "R", "pam.R"), label = "R/pam.R", min_tags = 3),
+  # Added 2026-10-30 alongside pibmunic's two FRAGILITY_SOURCES rows: pibmunic.R has
+  # 3 (the bare sidra_code that means "no classification", the label-derived
+  # geographic columns, the label matching by variable id); R/download.R's tags
+  # are the ones already counted in its entry below.
+  list(r_path = file.path(pkg_root, "R", "pibmunic.R"), label = "R/pibmunic.R", min_tags = 3),
   # Added 2026-10-22 alongside PPM's two FRAGILITY_SOURCES rows: ppm.R has 3
   # (the hardcoded SIDRA table ids, the IBGE variable ids each dataset names, the
   # classification-label columns the pivots use) and R/download.R gained a second

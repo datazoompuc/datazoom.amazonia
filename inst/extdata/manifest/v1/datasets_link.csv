@@ -159,7 +159,7 @@ pam,yerba_mate,,,1613/c82/2729,,https://sidra.ibge.gov.br/tabela/1613,1981-2025,
 pevs,pevs_forest_crops,,,289,,https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019,1986-2023,"country, state, municipality, region",,,,,
 pevs,pevs_silviculture,,,291,,https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019,1986-2023,"country, state, municipality, region",,,,,
 pevs,pevs_silviculture_area,,,5930,,https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019,2013-2023,"country, state, municipality, region",,,,,
-pibmunic,pibmunic,,,5938,,https://sidra.ibge.gov.br/pesquisa/pib-munic/tabelas,2002-2021,"country, state, municipality",,,,,
+pibmunic,pibmunic,,,5938,,https://sidra.ibge.gov.br/tabela/5938,2002-2023,"country, state, municipality",,,,,pibmunic
 population,population,,,6579,,https://sidra.ibge.gov.br/pesquisa/estimapop/tabelas,2001-2021,"country, state, municipality",,,,,
 ppm,ppm_animal_origin_production,,,74/c80/all,,https://sidra.ibge.gov.br/tabela/74,1974-2025,"country, state, municipality",,,,,ppm
 ppm,ppm_aquaculture,,,3940/c654/all,,https://sidra.ibge.gov.br/tabela/3940,2013-2025,"country, state, municipality",,,,,ppm
