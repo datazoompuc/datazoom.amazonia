@@ -307,6 +307,20 @@ KNOWN_POST_CAPTURE_DELTAS <- c(
   post_capture_key("pam", pam_datasets, NA, NA, "docs_url")
 )
 
+# 2026-10-31: PEVS onboarding (see test-datasets_link.R's delta #22 and
+# resolve_pevs.R's header). Built from the captured matrix itself: 12 cells on 3 unkeyed
+# rows -- resolver, sidra_code (the classification spelled out), available_time (end year
+# 2023 -> 2025) and docs_url (the survey page became each row's own table page). The SET
+# of changed cells does not move when the resolver refreshes available_time again.
+pevs_datasets <- unique(matrix$dataset[matrix$survey == "pevs"])
+KNOWN_POST_CAPTURE_DELTAS <- c(
+  KNOWN_POST_CAPTURE_DELTAS,
+  post_capture_key("pevs", pevs_datasets, NA, NA, "resolver"),
+  post_capture_key("pevs", pevs_datasets, NA, NA, "sidra_code"),
+  post_capture_key("pevs", pevs_datasets, NA, NA, "available_time"),
+  post_capture_key("pevs", pevs_datasets, NA, NA, "docs_url")
+)
+
 # 2026-10-22: PPM onboarding (see test-datasets_link.R's delta #19 and
 # resolve_ppm.R's header). Built from the captured matrix itself rather than
 # listed key by key: 18 cells on 5 unkeyed rows -- resolver, available_time and
@@ -437,6 +451,23 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 42
   expect_equal(sum(pam_new$sidra_code != pam_old$sidra_code), 7)
   new_snap <- new_snap[new_snap$survey != "pam", ]
   old_snap <- old_snap[old_snap$survey != "pam", ]
+
+  # pevs: 3 sidra_code cells and 3 available_time cells (delta #22, 2026-10-31,
+  # test-datasets_link.R) are asserted there and the rows set aside before the
+  # comparison, for the same reason. Everything else about them must be unchanged.
+  pevs_new <- new_snap[new_snap$survey == "pevs", ]
+  pevs_old <- old_snap[old_snap$survey == "pevs", ]
+  expect_equal(nrow(pevs_new), 3)
+  expect_setequal(pevs_new$dataset, pevs_old$dataset)
+  pevs_new <- pevs_new[order(pevs_new$dataset), ]
+  pevs_old <- pevs_old[order(pevs_old$dataset), ]
+  for (col in setdiff(names(pevs_old), c("sidra_code", "available_time"))) {
+    expect_equal(pevs_new[[col]], pevs_old[[col]], info = paste("pevs column", col))
+  }
+  expect_equal(sum(pevs_new$sidra_code != pevs_old$sidra_code), 3)
+  expect_equal(sum(pevs_new$available_time != pevs_old$available_time), 3)
+  new_snap <- new_snap[new_snap$survey != "pevs", ]
+  old_snap <- old_snap[old_snap$survey != "pevs", ]
 
   # ppm: 3 sidra_code cells and 5 available_time cells (delta #19, 2026-10-22,
   # test-datasets_link.R) are asserted there and the rows set aside before the

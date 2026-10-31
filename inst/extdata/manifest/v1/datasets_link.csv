@@ -156,9 +156,9 @@ pam,walnut,,,1613/c82/2740,,https://sidra.ibge.gov.br/tabela/1613,1974-2025,"cou
 pam,watermelon,,,1612/c81/2709,,https://sidra.ibge.gov.br/tabela/1612,1974-2025,"country, state, municipality",,,,,pam
 pam,wheat,,,1612/c81/2716,,https://sidra.ibge.gov.br/tabela/1612,1974-2025,"country, state, municipality",,,,,pam
 pam,yerba_mate,,,1613/c82/2729,,https://sidra.ibge.gov.br/tabela/1613,1981-2025,"country, state, municipality",,,,,pam
-pevs,pevs_forest_crops,,,289,,https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019,1986-2023,"country, state, municipality, region",,,,,
-pevs,pevs_silviculture,,,291,,https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019,1986-2023,"country, state, municipality, region",,,,,
-pevs,pevs_silviculture_area,,,5930,,https://sidra.ibge.gov.br/pesquisa/pevs/tabelas/brasil/2019,2013-2023,"country, state, municipality, region",,,,,
+pevs,pevs_forest_crops,,,289/c193/all,,https://sidra.ibge.gov.br/tabela/289,1986-2025,"country, state, municipality, region",,,,,pevs
+pevs,pevs_silviculture,,,291/c194/all,,https://sidra.ibge.gov.br/tabela/291,1986-2025,"country, state, municipality, region",,,,,pevs
+pevs,pevs_silviculture_area,,,5930/c734/all,,https://sidra.ibge.gov.br/tabela/5930,2013-2025,"country, state, municipality, region",,,,,pevs
 pibmunic,pibmunic,,,5938,,https://sidra.ibge.gov.br/pesquisa/pib-munic/tabelas,2002-2021,"country, state, municipality",,,,,
 population,population,,,6579,,https://sidra.ibge.gov.br/pesquisa/estimapop/tabelas,2001-2021,"country, state, municipality",,,,,
 ppm,ppm_animal_origin_production,,,74/c80/all,,https://sidra.ibge.gov.br/tabela/74,1974-2025,"country, state, municipality",,,,,ppm

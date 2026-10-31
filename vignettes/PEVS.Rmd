@@ -50,7 +50,7 @@ For more information, visit [IBGE Agriculture Statistics](https://www.ibge.gov.b
 Production data from forest crop plantations (timber and non-timber products).
 
 - **Coverage**: All Brazilian forest crops and related products
-- **Time period**: 1986 to 2019
+- **Time period**: 1986 to 2025
 - **Geographic levels**: Country, Region, State, Municipality
 - **Key variables**: Quantity produced, value of production, by product type
 - **Products included**: Eucalyptus, pine, other timber species, charcoal, resins, turpentine, cork
@@ -66,7 +66,7 @@ Production data from forest crop plantations (timber and non-timber products).
 Data on silviculture activities including afforestation, reforestation, and forest management.
 
 - **Coverage**: All silviculture operations across Brazil
-- **Time period**: 1986 to 2019
+- **Time period**: 1986 to 2025
 - **Geographic levels**: Country, Region, State, Municipality
 - **Key variables**: Quantity and value of silviculture products, area under management
 - **Activities tracked**: Timber production, forest management, conservation activities
@@ -82,7 +82,7 @@ Data on silviculture activities including afforestation, reforestation, and fore
 Total existing area used for silviculture operations, disaggregated by forest species.
 
 - **Coverage**: All silviculture land areas in Brazil
-- **Time period**: 2013 to 2019 (limited historical coverage)
+- **Time period**: 2013 to 2025 (limited historical coverage)
 - **Geographic levels**: Country, Region, State, Municipality
 - **Key variables**: Total area by species (hectares), area by type of forest operation
 - **Species tracked**: Eucalyptus, pine, acacia, other species
@@ -104,9 +104,9 @@ Total existing area used for silviculture operations, disaggregated by forest sp
 Selects which forestry dataset to download.
 
 ```r
-dataset = "pevs_forest_crops"       # Forest crop production (1986-2019)
-dataset = "pevs_silviculture"       # Silviculture production (1986-2019)
-dataset = "pevs_silviculture_area"  # Silviculture land area (2013-2019)
+dataset = "pevs_forest_crops"       # Forest crop production (1986-2025)
+dataset = "pevs_silviculture"       # Silviculture production (1986-2025)
+dataset = "pevs_silviculture_area"  # Silviculture land area (2013-2025)
 ```
 
 ### 2. **raw_data**
@@ -141,9 +141,11 @@ Defines which year(s) to download.
 
 | Dataset | Available Years |
 |---------|-----------------|
-| `pevs_forest_crops` | 1986-2019 |
-| `pevs_silviculture` | 1986-2019 |
-| `pevs_silviculture_area` | 2013-2019 |
+| `pevs_forest_crops` | 1986-2025 |
+| `pevs_silviculture` | 1986-2025 |
+| `pevs_silviculture_area` | 2013-2025 |
+
+For 2025 IBGE reports products it did not report before (as of 2026-10-31: ten more fruits, nuts and oilseeds in `pevs_forest_crops`, and, in the two silviculture datasets, the species acacia negra, cedro australiano, mogno africano and teca, apart from "other species"), so those years have columns the earlier years do not.
 
 ```r
 time_period = 2019              # single year

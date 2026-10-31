@@ -54,6 +54,12 @@ tagged_sources <- list(
   # classification-label columns the pivots use) and R/download.R gained a second
   # tag, counted in its entry below (sidra_get_table()'s no-classification route).
   list(r_path = file.path(pkg_root, "R", "ppm.R"), label = "R/ppm.R", min_tags = 3),
+  # Added 2026-10-31 alongside PEVS's three FRAGILITY_SOURCES rows: pevs.R has 3 (the
+  # hardcoded SIDRA table ids, the label-derived column names and pivot range, the
+  # variable ids each dataset names); R/download.R's tags are the ones already counted
+  # in its entry below and R/dictionary.R's the ones in its entry (the PEVS variables
+  # note is one of them).
+  list(r_path = file.path(pkg_root, "R", "pevs.R"), label = "R/pevs.R", min_tags = 3),
   # R/dictionary.R holds every source's dictionary: 2 tags as of 2026-10-22, the
   # ANEEL one (the ~variable column names) and the PPM section's (its codes are
   # copies of IBGE's classifications), the latter wired into PPM's

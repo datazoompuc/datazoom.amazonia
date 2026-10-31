@@ -379,6 +379,29 @@ fixture <- fixture %>%
     )
   )
 
+# Delta #22 -- pevs (2026-10-31; see actions/scrapers/resolve_pevs.R's header).
+# Two kinds of change, both on existing rows:
+#   * sidra_code: the three rows read a whole table ("289" etc.) and now spell the
+#     classification out ("289/c193/all"). sidrar builds the same request either
+#     way, but for "all" it first scrapes an IBGE HTML page that sits behind a bot
+#     challenge, and load_pevs() failed with "Error in Download." where the page was
+#     challenged. Pinned below.
+#   * available_time: refreshed from IBGE's own data (all three end in 2025, not
+#     2023). Not pinned value by value -- resolve_pevs.R rewrites it every year -- but
+#     by the test further down. The golden comparison below blanks pevs's
+#     available_time on both sides.
+# docs_url (the survey page -> each row's own table page) and resolver were populated
+# too (not datasets_link() columns).
+fixture <- fixture %>%
+  dplyr::mutate(
+    sidra_code = dplyr::case_when(
+      survey == "pevs" & dataset == "pevs_forest_crops" ~ "289/c193/all",
+      survey == "pevs" & dataset == "pevs_silviculture" ~ "291/c194/all",
+      survey == "pevs" & dataset == "pevs_silviculture_area" ~ "5930/c734/all",
+      TRUE ~ sidra_code
+    )
+  )
+
 # Delta #18 -- pam (2026-10-21; see actions/scrapers/resolve_pam.R's header).
 # Two kinds of change, both on existing rows:
 #   * sidra_code: the 7 rows that read a whole table ("5457/all/all" etc.) now
@@ -422,6 +445,9 @@ test_that("datasets_link() matches the golden fixture (schema normalization is a
   # pam's available_time is asserted on its own in the next test (delta #18).
   actual$available_time[actual$survey == "pam"] <- NA_character_
   expected$available_time[expected$survey == "pam"] <- NA_character_
+  # pevs's available_time is asserted on its own in the test after the duplicated-row one (delta #22).
+  actual$available_time[actual$survey == "pevs"] <- NA_character_
+  expected$available_time[expected$survey == "pevs"] <- NA_character_
   # ppm's available_time is asserted on its own in the next test (delta #19).
   actual$available_time[actual$survey == "ppm"] <- NA_character_
   expected$available_time[expected$survey == "ppm"] <- NA_character_
@@ -475,6 +501,25 @@ test_that("ppm's available_time follows IBGE's coverage: same start years, end y
 
 test_that("the duplicated pam/permanent_crops row stays fixed", {
   expect_equal(nrow(datasets_link(dataset = "permanent_crops")), 1)
+})
+
+test_that("pevs's available_time follows IBGE's coverage: same start years, end years brought up to date (delta #22)", {
+  old <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds"))
+  old <- old[old$survey == "pevs", ]
+  new <- datasets_link(source = "pevs")
+  expect_equal(nrow(new), 3)
+  expect_setequal(new$dataset, old$dataset)
+  new <- new[match(old$dataset, new$dataset), ]
+
+  first_year <- function(x) as.integer(sub("-.*", "", x))
+  last_year <- function(x) as.integer(sub(".*-", "", x))
+
+  # IBGE's tables start where the manifest said (1986; silviculture area 2013) ...
+  expect_equal(first_year(new$available_time), first_year(old$available_time))
+  expect_equal(first_year(new$available_time[new$dataset == "pevs_silviculture_area"]), 2013)
+  # ... and the old ranges were two editions behind
+  expect_true(all(last_year(old$available_time) == 2023))
+  expect_true(all(last_year(new$available_time) >= 2025))
 })
 
 test_that("filtering by source narrows correctly", {
