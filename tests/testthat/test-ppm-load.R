@@ -101,7 +101,9 @@ test_that("sidra_dataset_of_table() finds the dataset by its table, and only whe
   expect_null(sidra_dataset_of_table("ppm", 1613)) # PAM's table
   expect_null(sidra_dataset_of_table("ppm", 9)) # 9 is not a prefix of 94
   expect_null(sidra_dataset_of_table("pam", 94))
-  expect_equal(sidra_dataset_of_table("pam", 1613), NULL) # shared by 39 PAM datasets: ambiguous
+  # shared by 39 PAM datasets, but only permanent_crops reads the table whole
+  # ("1613/c82/all"), and a table number means that one (test-pam-load.R)
+  expect_equal(sidra_dataset_of_table("pam", 1613), "permanent_crops")
 })
 
 test_that("sidra_code_parts() splits a manifest code into what sidra_download() takes", {

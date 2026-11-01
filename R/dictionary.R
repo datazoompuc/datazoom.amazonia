@@ -89,6 +89,19 @@ load_dictionary <- function(dataset) {
       3452, "Angico (casca)", "Angico (shell)", "1K BRL", "Tons", NA, NA,
       3453, "Barbatimao (casca)", "Barbatimao (bark)", "1K BRL", "Tons", NA, NA,
       3454, "Tanantes (Outros)", "Tanants (Others)", "1K BRL", "Tons", NA, NA,
+
+      ## Categories IBGE added for 2025 (checked against table 289's classification on 2026-10-31)
+
+      83410, "Baru ou Cumaru (amendoa)", "Baru or Cumaru (almond)", "1K BRL", "Tons", NA, NA,
+      83411, "Buriti (fruto)", "Buriti (Fruit)", "1K BRL", "Tons", NA, NA,
+      83412, "Caja (fruto)", "Caja (Fruit)", "1K BRL", "Tons", NA, NA,
+      83413, "Cupuacu (fruto)", "Cupuacu (Fruit)", "1K BRL", "Tons", NA, NA,
+      83414, "Jucara (fruto)", "Jucara (Fruit)", "1K BRL", "Tons", NA, NA,
+      83415, "Macauba (fruto)", "Macauba (Fruit)", "1K BRL", "Tons", NA, NA,
+      83416, "Pupunha (fruto)", "Pupunha (Fruit)", "1K BRL", "Tons", NA, NA,
+      83417, "Tucuma ou Tucum (fruto)", "Tucuma or Tucum (Fruit)", "1K BRL", "Tons", NA, NA,
+      83418, "Andiroba (amendoa)", "Andiroba (almond)", "1K BRL", "Tons", NA, NA,
+      83419, "Murumuru", "Murumuru", "1K BRL", "Tons", NA, NA,
       0, "Total", "Total", "1K BRL", "None", NA, NA
     )
   }
@@ -131,6 +144,26 @@ load_dictionary <- function(dataset) {
       3461, "Acacia Negra (Casca)", "Black Acacia (Bark)", "1K BRL", "Tons", NA, NA,
       3462, "Eucalipto (Folha)", "Eucalyptus (Leaf)", "1K BRL", "Tons", NA, NA,
       3463, "Resina", "Resin", "1K BRL", "Tons", NA, NA,
+
+      ## Categories IBGE added for 2025 (checked against table 291's classification on 2026-10-31):
+      ## the four species it now reports apart from "other species", for charcoal, firewood and round wood
+
+      83420, "Carvao Vegetal de Acacia Negra", "Black Acacia Charcoal", "1K BRL", "Tons", NA, NA,
+      83421, "Carvao Vegetal de Cedro Australiano", "Australian Cedar Charcoal", "1K BRL", "Tons", NA, NA,
+      83422, "Carvao Vegetal de Mogno Africano", "African Mahogany Charcoal", "1K BRL", "Tons", NA, NA,
+      83423, "Carvao Vegetal de Teca", "Teak Charcoal", "1K BRL", "Tons", NA, NA,
+      83424, "Lenha de Acacia Negra", "Black Acacia Firewood", "1K BRL", "Cubic Meters", NA, NA,
+      83425, "Lenha de Cedro Australiano", "Australian Cedar Firewood", "1K BRL", "Cubic Meters", NA, NA,
+      83426, "Lenha de Mogno Africano", "African Mahogany Firewood", "1K BRL", "Cubic Meters", NA, NA,
+      83427, "Lenha de Teca", "Teak Firewood", "1K BRL", "Cubic Meters", NA, NA,
+      83428, "Madeira em Tora de Acacia Negra para Papel e Celulose", "Black Acacia Log Wood for Pulp and Paper", "1K BRL", "Cubic Meters", NA, NA,
+      83429, "Madeira em Tora de Cedro Australiano para Papel e Celulose", "Australian Cedar Log Wood for Pulp and Paper", "1K BRL", "Cubic Meters", NA, NA,
+      83430, "Madeira em Tora de Mogno Africano para Papel e Celulose", "African Mahogany Log Wood for Pulp and Paper", "1K BRL", "Cubic Meters", NA, NA,
+      83431, "Madeira em Tora de Teca para Papel e Celulose", "Teak Log Wood for Pulp and Paper", "1K BRL", "Cubic Meters", NA, NA,
+      83432, "Madeira em Tora de Acacia Negra para Outras Finalidades", "Black Acacia Log Wood for Other Purposes", "1K BRL", "Cubic Meters", NA, NA,
+      83433, "Madeira em Tora de Cedro Australiano para Outras Finalidades", "Australian Cedar Log Wood for Other Purposes", "1K BRL", "Cubic Meters", NA, NA,
+      83434, "Madeira em Tora de Mogno Africano para Outras Finalidades", "African Mahogany Log Wood for Other Purposes", "1K BRL", "Cubic Meters", NA, NA,
+      83435, "Madeira em Tora de Teca para Outras Finalidades", "Teak Log Wood for Other Purposes", "1K BRL", "Cubic Meters", NA, NA,
       0, "Total", "Total", "1K BRL", "None", "None", NA
     )
   }
@@ -144,7 +177,52 @@ load_dictionary <- function(dataset) {
       39326, "Eucalipto", "Eucalyptus", NA, "Hectares", NA, NA,
       39327, "Pinus", "pine", NA, "Hectares", NA, NA,
       39328, "Outras Especies", "Other Species", NA, "Hectares", NA, NA,
+
+      ## Categories IBGE added for 2025 (checked against table 5930's classification on 2026-10-31)
+
+      83436, "Acacia Negra", "Black Acacia", NA, "Hectares", NA, NA,
+      83437, "Cedro Australiano", "Australian Cedar", NA, "Hectares", NA, NA,
+      83438, "Mogno Africano", "African Mahogany", NA, "Hectares", NA, NA,
+      83439, "Teca", "Teak", NA, "Hectares", NA, NA,
       0, "Total", "Total", "1K BRL", "None", "None", NA
+    )
+  }
+
+  # The names load_pevs() gives each dataset's variables: IBGE's variable id -> the
+  # stem of the column name, in each language (translate_sidra_variables(),
+  # below). One entry per dataset, keyed "<dataset>_variables", next to the
+  # PRODUCT dictionary of the same dataset above (which has the key "<dataset>"
+  # and is a different table: its var_code is a category and var_pt / var_eng are
+  # labels, with units; here they are column-name stems, without).
+  # FRAGILE: each entry names exactly the ids its table reports -- 144 and 145
+  # (table 289), 142 and 143 (291), 6549 (5930) -- checked against IBGE's metadata
+  # and the data itself on 2026-10-31. Until this entry replaced the two
+  # case_when() blocks in R/pevs.R, which had no default, any other id became NA and
+  # ended up in a column called na_v<category code> (the bug load_pam() had with
+  # 2313). An id missing here now becomes v<id> and warns, but still needs a real
+  # name added here. resolve_pevs.R re-checks the declared variables on every run
+  # against PEVS_NAMED_VARIABLES, a copy of these ids that
+  # tests/testthat/test-pevs-resolver.R keeps equal to them.
+  if (dataset == "pevs_forest_crops_variables") {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~var_pt, ~var_eng,
+      144, "quant", "quant", # Quantidade produzida na extracao vegetal
+      145, "valor", "value" # Valor da producao na extracao vegetal
+    )
+  }
+
+  if (dataset == "pevs_silviculture_variables") {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~var_pt, ~var_eng,
+      142, "quant", "quant", # Quantidade produzida na silvicultura
+      143, "valor", "value" # Valor da producao na silvicultura
+    )
+  }
+
+  if (dataset == "pevs_silviculture_area_variables") {
+    harmonization_dat <- tibble::tribble(
+      ~var_code, ~var_pt, ~var_eng,
+      6549, "area", "area" # Area total existente em 31/12 dos efetivos da silvicultura
     )
   }
 
