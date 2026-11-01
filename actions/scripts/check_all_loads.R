@@ -35,7 +35,7 @@ TIME_PERIOD_BY_FN <- list(
   load_degrad    = c(2009, 2010, 2016),
   load_ips       = 2023,
   load_censoagro = 2017,
-  load_pibmunic  = 2021   # max disponível no SIDRA é 2021
+  load_pibmunic  = 2021   # último ano com todas as variáveis (valor adicionado por atividade, impostos); o SIDRA tem 2022 e 2023 só com PIB e participações (resolve_pibmunic.R, ponto 3)
 )
 
 # Overrides de raw_data por dataset

@@ -44,18 +44,43 @@ load_pibmunic <- function(dataset = "pibmunic", raw_data = FALSE,
   param$language <- language
   param$raw_data <- raw_data
 
+  # A SIDRA table given as a number ("You can also use SIDRA codes") means the
+  # manifest dataset that reads that table: load_pibmunic(dataset = 5938) is
+  # load_pibmunic(dataset = "pibmunic"), with the same request, the same
+  # treatment and the same checks. Only a number the manifest does not know
+  # keeps the old behaviour below (sidra_download()'s defaults, no checks).
+
+  if (is.numeric(param$dataset)) {
+    known <- sidra_dataset_of_table("pibmunic", param$dataset)
+    if (!is.null(known)) param$dataset <- known
+  }
+
   # check if dataset, geo_level, and time_period are supported
 
   check_params(param)
 
+  # FRAGILE: the manifest's sidra_code is the bare table number ("5938"), and a
+  # bare code MEANS "this table has no classification": sidra_download() then
+  # sends the request without one (sidra_get_table(), R/download.R), which skips
+  # the IBGE HTML page sidrar scrapes for classific = "all" -- a page behind a
+  # Cloudflare bot challenge (HTTP 403) from some networks, where load_pibmunic()
+  # failed with "Error in Download.". If IBGE gave table 5938 a classification,
+  # that request would still succeed (HTTP 200) but return only the "Total" slice,
+  # silently; resolve_pibmunic.R checks the manifest's code against the table's
+  # metadata every week for exactly that.
   if (!is.numeric(param$dataset)) {
-    param$code <- datasets_link() %>%
+    parts <- datasets_link() %>%
       dplyr::filter(dataset == param$dataset) %>%
-      dplyr::select(sidra_code) %>%
-      unlist() %>%
-      as.numeric()
+      dplyr::pull(sidra_code) %>%
+      sidra_code_parts()
+
+    param$code <- parts$table
+    param$classific <- parts$classific
+    param$category <- parts$category
   } else {
     param$code <- param$dataset
+    param$classific <- "all"
+    param$category <- "all"
   }
 
   ##############
@@ -70,6 +95,8 @@ load_pibmunic <- function(dataset = "pibmunic", raw_data = FALSE,
       # suppressMessages(
       sidra_download(
         sidra_code = param$code,
+        classific = param$classific,
+        category = param$category,
         year = year_num,
         geo_level = param$geo_level
       )
@@ -107,6 +134,12 @@ load_pibmunic <- function(dataset = "pibmunic", raw_data = FALSE,
   ## Create Geographical Unit Identifier ##
   #########################################
 
+  # FRAGILE: the geographic columns are named here as sidrar labels them in
+  # IBGE's response and janitor::clean_names() writes them -- brasil,
+  # unidade_da_federacao(_codigo), municipio(_codigo) -- along with the other
+  # label-derived names selected above (nivel_territorial*, ano_codigo,
+  # unidade_de_medida*, variavel*). A label IBGE renames stops this with an
+  # "object not found" error; nothing checks it ahead of time.
   if (geo_level == "country") {
     dat$geo_id <- dat$brasil
     dat <- dplyr::select(dat, -"brasil_codigo", -"brasil")
@@ -181,6 +214,14 @@ load_pibmunic <- function(dataset = "pibmunic", raw_data = FALSE,
 
   ## Load Dictionary
 
+  # FRAGILE: a column gets its label by tidyr::matches(<var_code>), a regular
+  # expression on the column's name, which ends in "_v<variable id>". It only
+  # works because no id of the "pibmunic" dictionary is the tail of another
+  # except 571/570 inside 6571/6570, where the longer id comes later in the
+  # dictionary and so overwrites the shorter one's label. A variable IBGE adds to
+  # table 5938 has no label (resolve_pibmunic.R reports it); one whose id
+  # contains an existing id would take that id's label, and a reordering of the
+  # dictionary would swap 571/6571 and 570/6570.
   dic <- load_dictionary(param$dataset)
 
   types <- as.character(dic$var_code)

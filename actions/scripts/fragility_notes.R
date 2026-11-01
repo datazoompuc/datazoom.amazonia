@@ -77,6 +77,12 @@ FRAGILITY_SOURCES <- list(
   list(changed_prefix = "ppm", r_path = file.path("R", "download.R"), label = "R/download.R", treat_fn = "sidra_download()"),
   # the labels load_ppm() attaches come from load_dictionary()'s PPM section
   list(changed_prefix = "ppm", r_path = file.path("R", "dictionary.R"), label = "R/dictionary.R", treat_fn = "load_dictionary()"),
+  # pibmunic's treatment code is load_pibmunic() (R/pibmunic.R) plus the SIDRA
+  # request sidra_download() (R/download.R) builds for it, so one row per file, as
+  # for ppm above. (The labels come from load_dictionary()'s pibmunic section, which
+  # carries no tag of its own: the one that concerns it is in R/pibmunic.R.)
+  list(changed_prefix = "pibmunic", r_path = file.path("R", "pibmunic.R"), label = "R/pibmunic.R", treat_fn = "load_pibmunic()"),
+  list(changed_prefix = "pibmunic", r_path = file.path("R", "download.R"), label = "R/download.R", treat_fn = "sidra_download()"),
   list(changed_prefix = "seeg", r_path = file.path("R", "seeg.R"), label = "R/seeg.R", treat_fn = "load_seeg()"),
   # pam's treatment code is load_pam() (R/pam.R) plus the SIDRA request
   # sidra_download() (R/download.R) builds for it, so one row per file, as

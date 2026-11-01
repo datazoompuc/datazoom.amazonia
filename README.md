@@ -3348,7 +3348,8 @@ Complete municipal GDP statistics with sectoral detail.
 - **Sectors included**: Agriculture, industry, services, public
   administration
 - **Measurement**: Brazilian Real (R\$) at current prices
-- **Time period**: Varies by year; typically 2002 onwards
+- **Time period**: 2002 to 2023 (see “Data Coverage”: 2022 and 2023 have
+  fewer variables)
 - **Use cases**:
   - Identify richest and poorest municipalities
   - Analyze regional economic disparities
@@ -3480,6 +3481,13 @@ minus subsidies - Additional detail depends on specific IBGE release
 
 - **All municipalities**: Includes all 5,570+ Brazilian municipalities
 - **Time lag**: Data typically released 2+ years after reference year
+- **2022 and 2023 have fewer variables**: as of 2026-10-30, IBGE’s table
+  has, for these two years, only GDP at current prices and its shares in
+  the GDP of larger areas (Brazil, region, state, meso- and
+  micro-region). Taxes and value added, in total and by activity, and
+  their shares stop at 2021. With `time_period = 2022:2023` the result
+  has only those columns; with a range that also includes earlier years
+  the other columns are `NA` for 2022 and 2023
 - **Revisions**: IBGE periodically revises historical data
 
 ### Important Limitations

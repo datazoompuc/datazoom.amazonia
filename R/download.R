@@ -33,9 +33,11 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
   # Cloudflare bot challenge (HTTP 403) from some networks, and then the caller
   # gets a bare "Error in Download." (the reason sidrar captured is dropped
   # below). PAM spells the classification out in the manifest ("5457/c782/all")
-  # for that reason; ppm, pevs, pibmunic, cempre, censoagro and population
-  # still pass "all" and all failed this way, on 2026-10-21, from the machine
-  # PAM was investigated on.
+  # for that reason, and so do PPM and PIB municipal now (a table with no
+  # classification -- PPM's 94 and 95, pibmunic's 5938 -- sends none, see
+  # sidra_get_table()); pevs, cempre, censoagro and population still pass "all".
+  # On 2026-10-21 ppm, pevs, pibmunic, cempre, censoagro and population all
+  # failed this way, from the machine PAM was investigated on.
   param$classific <- classific
   param$category <- category
 
@@ -300,7 +302,7 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
 }
 
 # sidrar::get_sidra(), except that `classific = NULL` means "this table has no
-# classification" (PPM's tables 94 and 95) and is answered without sidrar's
+# classification" (PPM's tables 94 and 95, PIB municipal's 5938) and is answered without sidrar's
 # table lookup.
 #
 # FRAGILE: sidrar::get_sidra() cannot be told a table has no classification.
@@ -315,9 +317,9 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
 # n8/n9 for meso/micro-regions) and the same response parsing. It stays correct only while that path layout
 # does; a table that does have a classification must not take this route (IBGE
 # answers HTTP 200 with only the "Total" slice -- 2 rows instead of 7 for table
-# 74, checked 2026-10-22 -- not an error), which is why resolve_ppm.R checks
-# that the manifest's code and the table agree. Every other caller passes a
-# classification or "all" and is untouched.
+# 74, checked 2026-10-22 -- not an error), which is why resolve_ppm.R and
+# resolve_pibmunic.R check that the manifest's code and the table agree. Every
+# other caller passes a classification or "all" and is untouched.
 sidra_get_table <- function(x, geo, period, geo.filter = NULL, classific = "all", category = "all") {
   if (!is.null(classific)) {
     return(sidrar::get_sidra(
@@ -344,9 +346,10 @@ sidra_get_table <- function(x, geo, period, geo.filter = NULL, classific = "all"
 # table 74, classification "c80", category list("all"); a bare "94" (a table
 # with no classification) -> classific and category NULL. The grammar is also
 # read by the actions/ resolvers (resolve_pam.R's pam_parse_code(), resolve_ppm.R's
-# ppm_parse_code()): those scripts never load the package, so each keeps its own
-# parser, and each resolver's test (test-pam-resolver.R, test-ppm-resolver.R)
-# fails if its parser disagrees with this one.
+# ppm_parse_code(), resolve_pibmunic.R's pibmunic_parse_code()): those scripts never
+# load the package, so each keeps its own parser, and each resolver's test
+# (test-pam-resolver.R, test-ppm-resolver.R, test-pibmunic-resolver.R) fails if its
+# parser disagrees with this one.
 sidra_code_parts <- function(code) {
   parts <- strsplit(code, "/", fixed = TRUE)[[1]]
   classified <- length(parts) > 1
