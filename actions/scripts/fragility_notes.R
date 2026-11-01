@@ -60,6 +60,7 @@ collect_fragility_notes <- function(r_path, label) {
 FRAGILITY_SOURCES <- list(
   list(changed_prefix = "mapbiomas", r_path = file.path("R", "mapbiomas.R"), label = "R/mapbiomas.R", treat_fn = "mapbiomas_treat()"),
   list(changed_prefix = "epe", r_path = file.path("R", "epe.R"), label = "R/epe.R", treat_fn = "epe_energy_state_panel_treat()"),
+  list(changed_prefix = "imazon", r_path = file.path("R", "imazon.R"), label = "R/imazon.R", treat_fn = "load_imazon()"),
   list(changed_prefix = "prodes", r_path = file.path("R", "prodes.R"), label = "R/prodes.R", treat_fn = "load_prodes()"),
   list(changed_prefix = "baci", r_path = file.path("R", "baci.R"), label = "R/baci.R", treat_fn = "load_baci()"),
   # The dictionary load_baci_dic() reads is a comex_dic row (hs_codes, shared

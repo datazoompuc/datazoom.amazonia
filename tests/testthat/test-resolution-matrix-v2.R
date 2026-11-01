@@ -122,6 +122,14 @@ KNOWN_POST_CAPTURE_DELTAS <- c(
   "epe\renergy_state_panel\rNA\rNA\ravailable_time",
   "epe\renergy_state_panel\rNA\rNA\rsheet",
   "epe\renergy_state_panel\rNA\rNA\rresolver",
+  # 2026-10-30: imazon_shp is gone. It was a 0-3 classification of the municipalities
+  # read from a file on a personal Google Drive; load_imazon() now returns Imazon's
+  # SAD alerts, read from Imazon's own dashboard, as two other datasets
+  # (sad_deforestation, sad_degradation -- delta #20, test-datasets_link.R). The three
+  # fields the capture holds for the old dataset resolve to NA now.
+  "imazon\rimazon_shp\rNA\rNA\rurl",
+  "imazon\rimazon_shp\rNA\rNA\ravailable_time",
+  "imazon\rimazon_shp\rNA\rNA\ravailable_geo",
   # 2026-09-08 (PRODES/BACI resolver audit): PRODES' docs_url was pointing
   # at a dashboard app, not the real downloads landing page -- fixed for
   # all 6 PRODES rows (see test-datasets_link.R delta #11).
@@ -489,6 +497,15 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 42
     ))
   )
   new_snap <- new_snap[new_snap$survey != "comex_dic", ]
+
+  # imazon: one dataset out, two others in (delta #20, 2026-10-30, test-datasets_link.R).
+  # Neither is a changed cell on a row both snapshots have, so both sides are set aside
+  # and the count below stays 42; the three cells the capture holds for imazon_shp are
+  # in KNOWN_POST_CAPTURE_DELTAS for the per-field test above.
+  expect_equal(old_snap$dataset[old_snap$survey == "imazon"], "imazon_shp")
+  expect_setequal(new_snap$dataset[new_snap$survey == "imazon"], c("sad_deforestation", "sad_degradation"))
+  old_snap <- old_snap[old_snap$survey != "imazon", ]
+  new_snap <- new_snap[new_snap$survey != "imazon", ]
 
   expect_equal(nrow(old_snap), nrow(new_snap))
   expect_setequal(names(old_snap), names(new_snap))

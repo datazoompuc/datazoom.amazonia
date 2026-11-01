@@ -408,6 +408,29 @@ fixture <- fixture %>%
     )
   )
 
+# Delta #20 -- imazon (2026-10-30; see actions/scrapers/resolve_imazon.R's header).
+# imazon_shp -- a 0-to-3 classification of the municipalities, read from a file on
+# a personal Google Drive -- is gone, and load_imazon() now returns Imazon's SAD
+# alerts, read from the CSV files behind Imazon's own dashboard: two genuinely new
+# rows (like delta #14's and #16's), not changed cells. available_time ("2008-2026";
+# "2008-2024, 2026" for the degradation alerts, which have no 2025) is written by
+# resolve_imazon.R from the dashboard's own list of periods, so the golden
+# comparison below blanks it on both sides and the test after it asserts it.
+# docs_url and resolver were populated too (not datasets_link() columns).
+fixture <- fixture %>%
+  dplyr::filter(!(survey == "imazon" & dataset == "imazon_shp")) %>%
+  dplyr::bind_rows(
+    tibble::tibble(
+      survey = "imazon", dataset = c("sad_deforestation", "sad_degradation"),
+      sidra_code = NA_character_, available_time = NA_character_,
+      available_geo = "municipality",
+      url = c(
+        "https://dashboards.imazongeo.org.br/sad/api/sad/desmatamento/municipios.csv",
+        "https://dashboards.imazongeo.org.br/sad/api/sad/degradacao/municipios.csv"
+      )
+    )
+  )
+
 test_that("datasets_link() returns the exact pre-normalization column set and order", {
   expect_equal(
     names(datasets_link()),
@@ -425,6 +448,10 @@ test_that("datasets_link() matches the golden fixture (schema normalization is a
   # ppm's available_time is asserted on its own in the next test (delta #19).
   actual$available_time[actual$survey == "ppm"] <- NA_character_
   expected$available_time[expected$survey == "ppm"] <- NA_character_
+
+  # imazon's available_time is asserted on its own in the test after ppm's (delta #20).
+  actual$available_time[actual$survey == "imazon"] <- NA_character_
+  expected$available_time[expected$survey == "imazon"] <- NA_character_
 
   expect_equal(actual, expected)
 })
@@ -471,6 +498,20 @@ test_that("ppm's available_time follows IBGE's coverage: same start years, end y
   # ... and the old ranges were two editions behind
   expect_true(all(last_year(old$available_time) == 2023))
   expect_true(all(last_year(new$available_time) >= 2025))
+})
+
+test_that("imazon's two SAD datasets start in 2008 and reach at least 2025; imazon_shp is gone (delta #20)", {
+  new <- datasets_link(source = "imazon")
+  expect_setequal(new$dataset, c("sad_deforestation", "sad_degradation"))
+  expect_false("imazon_shp" %in% datasets_link()$dataset)
+
+  first_year <- function(x) as.integer(sub("-.*", "", x))
+  last_year <- function(x) as.integer(sub(".*(-|, )", "", x))
+
+  expect_equal(first_year(new$available_time), c(2008L, 2008L))
+  expect_true(all(last_year(new$available_time) >= 2025))
+  expect_equal(unique(new$available_geo), "municipality")
+  expect_true(all(is.na(new$sidra_code)))
 })
 
 test_that("the duplicated pam/permanent_crops row stays fixed", {
