@@ -6,9 +6,9 @@
 #' @inheritParams load_baci
 #' @param geo_level A \code{string} that defines the geographic level of the data. Can be "state" or "municipality". With "state" (the default) there is no aggregation and no spatial join: the function returns one row per polygon, with the state reported at the source. With "municipality" each process is assigned to the municipality that contains the centroid of its polygon, and the result has one row per process and no geometry. Ignored when \code{raw_data = TRUE}.
 #'
-#' @details With \code{raw_data = TRUE} the function returns the ANM shapefile as published (an \code{sf} object), with only the column names cleaned; \code{geo_level} and \code{language} are ignored. With \code{raw_data = FALSE} the columns are renamed according to \code{language}, the area is converted from hectares (\code{area_ha}) to square meters (\code{area_m2}) and, for "sigmine_active", fields registered as "DADO NAO CADASTRADO" at the source become \code{NA}.
+#' @details With \code{raw_data = TRUE} the function returns the ANM shapefile as published (an \code{sf} object), with only the column names cleaned; \code{geo_level} and \code{language} are ignored. With \code{raw_data = FALSE} the columns are renamed according to \code{language}, the area is converted from hectares (\code{area_ha}) to square meters (\code{area_m2}) and, for "sigmine_active", fields registered as "DADO NAO CADASTRADO" at the source become \code{NA}. The process description column (\code{ds_processo} in the ANM file) is returned as \code{process_description} when \code{language = "eng"} and as \code{descricao_processo} when \code{language = "pt"}. A process can appear in more than one polygon of the ANM file: in the October 2026 data, 4,028 of the 261,025 active processes (1.5%) and 7,447 of the 652,652 inactive ones (1.1%) have more than one polygon. With \code{geo_level = "state"} every polygon is a row; with \code{"municipality"} only the first polygon of each process is kept (see Value).
 #'
-#' @return An \code{sf} object (one row per polygon, with a \code{geometry} column) when \code{raw_data = TRUE} or \code{geo_level = "state"}; a \code{tibble} without geometry (one row per process) when \code{geo_level = "municipality"}. At the municipality level, \code{area_m2} is the area of the polygon kept for each process, not the sum of all its polygons, and processes whose centroid falls outside every municipality are kept with missing municipality fields.
+#' @return An \code{sf} object (one row per polygon, with a \code{geometry} column) when \code{raw_data = TRUE} or \code{geo_level = "state"}; a \code{tibble} without geometry (one row per process) when \code{geo_level = "municipality"}. At the municipality level, \code{area_m2} is the area of the polygon kept for each process, not the sum of all its polygons, and processes whose centroid falls outside every municipality are kept with missing municipality fields. Because only the first polygon is kept, the total area of the active processes is understated by about 1.2% (the area of the other polygons of the same process is dropped), and in the October 2026 data 2,691 of the 261,025 active processes (about 1%) have a missing municipality.
 #'
 #'
 #' @examplesIf interactive()
@@ -129,6 +129,7 @@ load_sigmine <- function(dataset = "sigmine_active",
 
     if (language == "pt") {
       names(a)[names(a) == "ult_evento"] <- "ultimo_evento"
+      names(a)[names(a) == "ds_processo"] <- "descricao_processo"
       names(a)[names(a) == "nome"]       <- "empresa"
       names(a)[names(a) == "subs"]       <- "mineral"
       names(a)[names(a) == "uso"]        <- "uso"
@@ -148,6 +149,7 @@ load_sigmine <- function(dataset = "sigmine_active",
       names(a)[names(a) == "uf"]         <- "state"
       names(a)[names(a) == "ano"]        <- "year"
       names(a)[names(a) == "processo"]   <- "process"
+      names(a)[names(a) == "ds_processo"] <- "process_description"
       names(a)[names(a) == "id"]         <- "id"
       names(a)[names(a) == "fase"]       <- "phase"
       names(a)[names(a) == "nome"]       <- "company"

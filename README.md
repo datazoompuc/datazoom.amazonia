@@ -4391,8 +4391,8 @@ phase.
 - **Geographic levels**: National coverage with state and municipality
   identification.
 - **Variables**: process, number, year, area, id, phase, last event,
-  company, mineral, use, state and `ds_processo`, plus the polygon (see
-  “Data Structure”).
+  company, mineral, use, state and process description, plus the polygon
+  (see “Data Structure”).
 - **Missing values**: Fields registered as “DADO NÃO CADASTRADO” at the
   source (company, mineral, use and state) become `NA` in the treated
   data.
@@ -4495,7 +4495,7 @@ from the source is in parentheses):
 | `mineral` (`subs`) | Substance |
 | `use` (`uso`) | Registered use |
 | `state` (`uf`) | State |
-| `ds_processo` | Process description field from the ANM file (not translated) |
+| `process_description` (`ds_processo`) | Process description field from the ANM file |
 | `geometry` | Polygon (only at `geo_level = "state"`) |
 
 At `geo_level = "municipality"` there is no `geometry`, and the table
@@ -4503,6 +4503,17 @@ adds the municipality, state, and region codes and names
 (`municipality_code`, `municipality`, `state_code`, `state`,
 `state_name`, `region_code`, `region_name`). Here `state` comes from the
 matched municipality.
+
+A process can appear in more than one polygon in the ANM file (in the
+October 2026 data, 4,028 of the 261,025 active processes, 1.5%, and
+7,447 of the 652,652 inactive ones, 1.1%). At `geo_level = "state"` each
+polygon is a row. At `geo_level = "municipality"` the function assigns
+each polygon to the municipality that contains its centroid and keeps
+only the first polygon of each process, so `area_m2` is the area of that
+polygon, not of the whole process: for the active data the total area is
+understated by about 1.2%. Processes whose centroid falls outside every
+municipality keep missing municipality fields (2,691 of the 261,025
+active processes, about 1%).
 
 Treated `sigmine_inactive`: `process`, `number`, `year`, `area_m2`,
 `id`, `process_description` and `geometry`.
