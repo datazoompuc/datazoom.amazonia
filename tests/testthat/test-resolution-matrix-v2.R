@@ -351,6 +351,17 @@ KNOWN_POST_CAPTURE_DELTAS <- c(
   post_capture_key("pibmunic", "pibmunic", NA, NA, c("resolver", "available_time", "docs_url"))
 )
 
+# 2026-11-01: resolvers now refresh available_time on these rows (see
+# test-datasets_link.R's delta #23). Every value was read from the source file.
+KNOWN_POST_CAPTURE_DELTAS <- c(
+  KNOWN_POST_CAPTURE_DELTAS,
+  post_capture_key("aneel", "energy_generation", NA, NA, "available_time"),
+  post_capture_key("epe", "consumer_energy_consumption", c("region", "state", "subsystem"), NA, "available_time"),
+  post_capture_key("epe", "industrial_energy_consumption", c("region", "state", "subsystem"), NA, "available_time"),
+  post_capture_key("mapbiomas", "mapbiomas_mining", "municipality", NA, "available_time"),
+  post_capture_key("mapbiomas", "mapbiomas_water", c("biome", "municipality"), NA, "available_time")
+)
+
 test_that("every real-key entry in resolution_matrix_keyed.rds resolves byte-identically after the migration, except 5 known post-capture deltas", {
   real_rows <- matrix[!(is.na(matrix$geo_level) & is.na(matrix$year) & mapply(is_known_base_row_dataset, matrix$survey, matrix$dataset)), ]
   expect_gt(nrow(real_rows), 0)
@@ -395,7 +406,7 @@ test_that("every former base-row query now stops -- the guard has no gap", {
   expect_equal(still_works, character(0))
 })
 
-test_that("datasets_link() keeps the same rows/columns and differs in exactly 42 cells (see test-datasets_link.R deltas #8-#15)", {
+test_that("the collapsed table keeps the same rows/columns and differs in exactly 48 cells (see test-datasets_link.R deltas #8-#23)", {
   # 33 as of delta #14, + 1 for sigmine_active's available_geo (2026-10,
   # NA -> "state, municipality", same delta #14 -- the assertion was bumped to
   # 34 for it but this comment wasn't, so #354's merge rebuilt 41 off the 33
@@ -423,7 +434,10 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 42
   # test either, since docs_url isn't one of datasets_link()'s 6 output
   # columns (nor is version, IPS's and SEEG's other changed field).
   old_snap <- readRDS(test_path("fixtures", "datasets_link_pre_baserow_deletion.rds"))
-  new_snap <- datasets_link()
+  # The collapsed table, one line per dataset: what this snapshot captured.
+  # datasets_link() itself now splits a few datasets into one line per row
+  # (delta #23, pinned in test-datasets_link.R).
+  new_snap <- effective_table()[, names(old_snap)]
 
   # terraclimate: the 14 rows' available_time cells (delta #17, 2026-10-19,
   # test-datasets_link.R) are asserted on their own and the rows set aside
@@ -570,5 +584,8 @@ test_that("datasets_link() keeps the same rows/columns and differs in exactly 42
   }
 
   # +1 from the sigmine_active url move (delta #14, test-datasets_link.R).
-  expect_equal(delta, 43)
+  # +5 available_time cells from delta #23: mapbiomas_mining and mapbiomas_water
+  # (their rows now disagree, so the collapse is NA), both EPE consumption
+  # datasets and aneel/energy_generation.
+  expect_equal(delta, 48)
 })

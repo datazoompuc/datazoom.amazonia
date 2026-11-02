@@ -127,6 +127,29 @@
 
 `%||%` <- function(x, y) if (is.null(x)) y else x
 
+# Pure: a sheet's header -> the sorted years named in it. Covers the wide shapes
+# seen live on 2026-11-01: plain year columns ("1985") and transition windows
+# ("p1985_1986", "p2000_2010"). Empty for a long sheet, whose years are in a
+# `year` column instead (see mapbiomas_sheet_years()).
+mapbiomas_years_from_header <- function(header) {
+  wide <- grep("^p?[0-9]{4}(_[0-9]{4})?$", trimws(header), value = TRUE)
+  sort(unique(as.integer(unlist(regmatches(wide, gregexpr("[0-9]{4}", wide))))))
+}
+
+# The sorted years of one sheet of the workbook at `path`, given its header. Only
+# a long sheet (WATER_CITY_ANNUAL) needs its rows read.
+mapbiomas_sheet_years <- function(path, sheet, header) {
+  years <- mapbiomas_years_from_header(header)
+  year_col <- which(tolower(trimws(header)) == "year")
+  if (length(years) > 0 || length(year_col) != 1) {
+    return(years)
+  }
+  col_types <- rep("skip", length(header))
+  col_types[year_col] <- "numeric"
+  values <- readxl::read_excel(path, sheet = sheet, col_types = col_types)[[1]]
+  sort(unique(as.integer(values[!is.na(values)])))
+}
+
 resolve_mapbiomas <- function(rows) {
   if (!requireNamespace("jsonlite", quietly = TRUE) ||
       !requireNamespace("curl", quietly = TRUE) ||
@@ -348,7 +371,15 @@ resolve_mapbiomas <- function(rows) {
       return(NULL)
     }
 
-    list(sheet = hit[1], header = header)
+    # mapbiomas_treat() pivots on these same columns, so a sheet without them
+    # couldn't be loaded anyway, and it would leave available_time unknown.
+    years <- mapbiomas_sheet_years(temp, hit[1], header)
+    if (length(years) == 0) {
+      layout_reason <<- sprintf("sheet %s has no year columns or year column", hit[1])
+      return(NULL)
+    }
+
+    list(sheet = hit[1], header = header, available_time = sidra_api_years_to_available_time(years))
   }
 
   # "Collection 10.1" / "Coleção 11" -- Dataverse titles this dataset's own
@@ -424,13 +455,17 @@ resolve_mapbiomas <- function(rows) {
           NULL
         }
 
-        if (!is.null(hit)) {
+        # A pass recorded before the cache held available_time falls through to
+        # one real check below. Only winners ever reach this (the walk returns
+        # on the first pass), so the ~180 cached fails are never re-downloaded.
+        if (!is.null(hit) && (identical(hit$verdict, "fail") || !is.na(hit$available_time))) {
           if (identical(hit$verdict, "fail")) next
           return(tibble::tibble(
             survey = "mapbiomas", dataset = dataset,
             geo_level = geo_levels, year = NA_character_,
             url = dv_access_url(f$id), version = cols[i],
-            sheet = hit$sheet, docs_url = dv_doi_url(gid)
+            sheet = hit$sheet, docs_url = dv_doi_url(gid),
+            available_time = hit$available_time
           ))
         }
 
@@ -444,7 +479,8 @@ resolve_mapbiomas <- function(rows) {
             # Recorded for the informational side-channel only (see
             # build_manifest.R's new-failed-file Slack ping). Never read by
             # cache_lookup(), never a change signal in the cache diff.
-            reason = if (is.null(layout)) layout_reason else NA_character_
+            reason = if (is.null(layout)) layout_reason else NA_character_,
+            available_time = if (is.null(layout)) NA_character_ else layout$available_time
           )
         }
 
@@ -453,11 +489,35 @@ resolve_mapbiomas <- function(rows) {
           survey = "mapbiomas", dataset = dataset,
           geo_level = geo_levels, year = NA_character_,
           url = dv_access_url(f$id), version = cols[i],
-          sheet = layout$sheet, docs_url = dv_doi_url(gid)
+          sheet = layout$sheet, docs_url = dv_doi_url(gid),
+          available_time = layout$available_time
         ))
       }
     }
     NULL
+  }
+
+  # Re-reads available_time from the file a row already points at, changing
+  # nothing else on it. Same download settings as dv_file_layout(), and the same
+  # rule: a failure throws, and never reads as "this file has no years".
+  refresh_committed_years <- function(dataset, geo_level) {
+    row <- rows[rows$dataset == dataset & (rows$geo_level %in% geo_level), ]
+    if (nrow(row) != 1) {
+      stop("expected one manifest row, found ", nrow(row))
+    }
+    temp <- tempfile(fileext = ".xlsx")
+    on.exit(unlink(temp), add = TRUE)
+    curl::curl_download(row$url, temp, quiet = TRUE, handle = curl::new_handle(timeout = 1000))
+    header <- names(readxl::read_excel(temp, sheet = row$sheet, n_max = 0))
+    years <- mapbiomas_sheet_years(temp, row$sheet, header)
+    if (length(years) == 0) {
+      stop("sheet ", row$sheet, " has no year columns or year column")
+    }
+    tibble::tibble(
+      survey = "mapbiomas", dataset = dataset,
+      geo_level = geo_level, year = NA_character_,
+      available_time = sidra_api_years_to_available_time(years)
+    )
   }
 
   # See the file header for what's deliberately NOT in this list
@@ -554,6 +614,18 @@ resolve_mapbiomas <- function(rows) {
         NULL
       }
     )
+    # No candidate qualified, so nothing new to point at -- but the file the row
+    # already uses can still report its years. mapbiomas_fire lands here: its
+    # search has returned no fire dataset for a while (checked live 2026-11-01).
+    if (is.null(res) && !any(startsWith(config_failures, paste0(cfg_label, ": ")))) {
+      res <- tryCatch(
+        refresh_committed_years(cfg$dataset, cfg$geo_levels),
+        error = function(e) {
+          config_failures <<- c(config_failures, paste0(cfg_label, ": could not read available_time: ", conditionMessage(e)))
+          NULL
+        }
+      )
+    }
     if (!is.null(res)) {
       key <- paste(cfg$dataset, paste(cfg$geo_levels, collapse = "+"), sep = "__")
       out[[key]] <- res

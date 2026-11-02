@@ -1125,20 +1125,37 @@ datasets_link <- function(source = NULL, dataset = NULL, url = FALSE) {
   # It now lives in inst/extdata/manifest/v1/datasets_link.csv (see
   # R/manifest.R), refreshed by a scheduled GitHub Action and fetched at
   # runtime with a silent fallback to the packaged snapshot. This function
-  # keeps its original signature and return shape -- effective_table() drops
-  # every geo_level/year override row, so exactly one row per (survey,
-  # dataset) -- its own self-sufficient base row -- is ever visible here, in
-  # the original 6 columns and order (with "link" now named "url" -- no call
-  # site ever depended on that literal name; see R/manifest.R). Every
-  # existing call site is unaffected.
+  # keeps its original signature. Normally it returns one line per (survey,
+  # dataset), the collapsed row from effective_table(), with geo_level NA. A
+  # dataset whose rows genuinely cover different years (e.g. mapbiomas_mining,
+  # where municipality reaches 2023 and indigenous_land 2022) has no single
+  # correct available_time, so it returns one line per row instead, each with
+  # its own geo_level and values.
 
   survey <- geo_level <- year <- NULL
   sidra_code <- available_time <- available_geo <- NULL
 
-  link <- effective_table() %>%
-    dplyr::select(
-      survey, dataset, sidra_code, available_time, available_geo, url
-    )
+  columns <- c("survey", "dataset", "geo_level", "sidra_code", "available_time", "available_geo", "url")
+
+  collapsed <- effective_table()
+  rows <- link_table()
+  rows <- rows[!is.na(rows$dataset), ]
+
+  keys <- paste(rows$survey, rows$dataset, sep = "\r")
+  differs <- vapply(split(rows$available_time, keys), function(x) {
+    !agreed_value(x)$agree
+  }, logical(1))
+  differs <- names(differs)[differs]
+
+  collapsed_keys <- paste(collapsed$survey, collapsed$dataset, sep = "\r")
+  collapsed$geo_level <- NA_character_
+
+  link <- dplyr::bind_rows(
+    collapsed[!collapsed_keys %in% differs, columns],
+    rows[keys %in% differs, columns]
+  )
+  # back in the collapsed table's order, each dataset's lines staying together
+  link <- link[order(match(paste(link$survey, link$dataset, sep = "\r"), collapsed_keys)), ]
 
   if (!is.null(source)) {
     link <- link %>%

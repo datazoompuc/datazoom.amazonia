@@ -101,8 +101,8 @@ epe_energy_state_panel_treat <- function(raw) {
 #'   Petroleo"), not a synthetic reconstruction; a "tipo"/"type" column
 #'   (Fontes de Energia Primaria/Secundaria/Total) is included.
 #'   * "energy_state_panel" covers 2011-2025 (yearly), one row per state.
-#'   * "consumer_energy_consumption" and "industrial_energy_consumption" cover 2004-2025
-#'   (monthly).
+#'   * "consumer_energy_consumption" covers 2004 onward and "industrial_energy_consumption"
+#'   covers 2012 onward (monthly, including the current partial year).
 #' @param geo_level Geographical level: "state" or "subsystem". Only applies to
 #'   "consumer_energy_consumption" and "industrial_energy_consumption". "region" is not
 #'   currently supported for either dataset -- passing \code{geo_level = "region"} will fail

@@ -57,6 +57,34 @@
 # resolve_prodes.R's identical wiring for the same mechanism). 2026-10-12:
 # keyed on the block label alone for both verdicts, content failures only --
 # see the note at the alert_rec() loop below.
+#
+# 2026-11-01: the consumption block now refreshes available_time too, from the
+# DataExcel column of the sheets R/epe.R reads. VERIFIED LIVE that day: consumer
+# runs 2004-2026 and industrial 2012-2026, both through 2026-08 or 2026-09
+# depending on the sheet (the manifest said 2004-2025 for both). A partial
+# current year counts, because the loader returns its rows. The file declares a
+# corrupt count in xl/sharedStrings.xml that makes readxl abort, so this uses
+# openxlsx, the same as R/epe.R.
+
+# The sorted years in `sheets` of the consumption workbook at `path`. Stops if a
+# sheet lacks DataExcel, or if the sheets of one dataset disagree: every row of a
+# dataset carries one available_time, so there would be no right value to write.
+epe_consumption_years <- function(path, sheets) {
+  per_sheet <- lapply(sheets, function(sheet) {
+    dat <- openxlsx::read.xlsx(path, sheet = sheet, detectDates = TRUE)
+    if (!"DataExcel" %in% names(dat)) {
+      stop("sheet '", sheet, "' has no DataExcel column -- R/epe.R will need updating")
+    }
+    sort(unique(as.integer(format(as.Date(dat$DataExcel), "%Y"))))
+  })
+  if (length(unique(per_sheet)) != 1 || length(per_sheet[[1]]) == 0) {
+    stop(
+      "sheets disagree on years, or have none: ",
+      paste(sheets, vapply(per_sheet, function(y) paste(range(y), collapse = "-"), ""), collapse = "; ")
+    )
+  }
+  per_sheet[[1]]
+}
 
 resolve_epe <- function(rows) {
   if (is.null(rows) || nrow(rows) == 0) {
@@ -144,13 +172,46 @@ resolve_epe <- function(rows) {
       consumer_geo <- rows$geo_level[rows$dataset == "consumer_energy_consumption"]
       industrial_geo <- rows$geo_level[rows$dataset == "industrial_energy_consumption"]
 
+      # Years come from the sheets R/epe.R reads (the region rows have none, and
+      # take the same value: each dataset's rows must agree). A failure here
+      # still lets the url through, and is reported with the block's label.
+      consumo_file <- tempfile(fileext = ".xlsx")
+      on.exit(unlink(consumo_file), add = TRUE)
+      consumo_download <- tryCatch({
+        resp <- curl::curl_fetch_disk(url, consumo_file, handle = curl::new_handle(timeout = 1000, followlocation = TRUE))
+        if (resp$status_code != 200) stop("HTTP ", resp$status_code)
+        NULL
+      }, error = function(e) conditionMessage(e))
+      if (!is.null(consumo_download)) {
+        block_failures <- c(
+          block_failures,
+          paste0("consumer/industrial_energy_consumption: download failed for available_time -- ", consumo_download)
+        )
+      }
+      consumo_time <- function(dataset) {
+        if (!is.null(consumo_download)) return(NA_character_)
+        sheets <- rows$sheet[rows$dataset == dataset]
+        tryCatch(
+          sidra_api_years_to_available_time(epe_consumption_years(consumo_file, sheets[!is.na(sheets)])),
+          error = function(e) {
+            block_failures <<- c(
+              block_failures,
+              paste0("consumer/industrial_energy_consumption: ", dataset, ": ", conditionMessage(e))
+            )
+            NA_character_
+          }
+        )
+      }
+
       out$consumer <- tibble::tibble(
         survey = "epe", dataset = "consumer_energy_consumption",
-        geo_level = consumer_geo, year = NA_character_, url = url
+        geo_level = consumer_geo, year = NA_character_, url = url,
+        available_time = consumo_time("consumer_energy_consumption")
       )
       out$industrial <- tibble::tibble(
         survey = "epe", dataset = "industrial_energy_consumption",
-        geo_level = industrial_geo, year = NA_character_, url = url
+        geo_level = industrial_geo, year = NA_character_, url = url,
+        available_time = consumo_time("industrial_energy_consumption")
       )
     } else {
       block_failures <- c(
@@ -213,7 +274,7 @@ resolve_epe <- function(rows) {
         out$ben <- tibble::tibble(
           survey = "epe", dataset = "national_energy_balance",
           geo_level = NA_character_, year = NA_character_,
-          available_time = paste(min(years), max(years), sep = "-")
+          available_time = sidra_api_years_to_available_time(years)
         )
       } else if (isFALSE(cols_ok)) {
         block_failures <- c(
@@ -292,7 +353,7 @@ resolve_epe <- function(rows) {
         out$panel <- tibble::tibble(
           survey = "epe", dataset = "energy_state_panel",
           geo_level = NA_character_, year = NA_character_,
-          available_time = paste(min(years), max(years), sep = "-")
+          available_time = sidra_api_years_to_available_time(years)
         )
       } else if (isFALSE(cols_ok)) {
         block_failures <- c(

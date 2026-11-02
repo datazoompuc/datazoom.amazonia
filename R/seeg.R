@@ -78,7 +78,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
   recorte <- atividade_geral <- tipo_residuo <- tipo_emissao <- via_emissao <- NULL
   year <- Ano <- Valor <- value <- NULL
   sector <- emission_category <- emission_subcategory <- waste_stream <- general_activity <- NULL
-  emission_type <- emission_pathway <- emission_scope <- x1970 <- x2024 <- NULL
+  emission_type <- emission_pathway <- emission_scope <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -126,15 +126,10 @@ load_seeg <- function(dataset, raw_data = FALSE,
   # resolve_seeg.R's structural check before this became the manifest's
   # real url (actions/scrapers/resolve_seeg.R).
   #
-  # FRAGILE: every pivot_longer()/across() call below hardcodes the column
-  # range x1970:x2024. If a future upload adds a year (e.g. 2025), this
-  # range does NOT expand on its own -- tidyselect just excludes the new
-  # column from output silently, no error, so the new year's data would
-  # vanish from every sector's output. resolve_seeg.R's live year-field
-  # check (against the manifest's available_time) is the thing that's
-  # actually supposed to catch this drift and force a manual range update
-  # here -- this hardcoded range is only as safe as that check staying wired
-  # up.
+  # FRAGILE: every pivot_longer()/across() call below selects the year columns
+  # by name (x + four digits), so a year SEEG adds reaches the output without a
+  # code change -- resolve_seeg.R lists it in available_time at the same time.
+  # A year column named any other way would be left out with no error.
 
   sheet <- "Dados"
 
@@ -201,7 +196,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
         setor_de_emissao, categoria_emissora, sub_categoria_emissora,
         recorte, atividade_geral, emissao_remocao_bunker, estado
       ) %>%
-      dplyr::summarise(dplyr::across(x1970:x2024, \(x) sum(x, na.rm = FALSE)), .groups = "drop")
+      dplyr::summarise(dplyr::across(tidyselect::matches("^x[0-9]{4}$"), \(x) sum(x, na.rm = FALSE)), .groups = "drop")
   }
 
   if (param$geo_level == "country") {
@@ -210,7 +205,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
         setor_de_emissao, categoria_emissora, sub_categoria_emissora,
         recorte, atividade_geral, emissao_remocao_bunker
       ) %>%
-      dplyr::summarise(dplyr::across(x1970:x2024, \(x) sum(x, na.rm = FALSE)), .groups = "drop")
+      dplyr::summarise(dplyr::across(tidyselect::matches("^x[0-9]{4}$"), \(x) sum(x, na.rm = FALSE)), .groups = "drop")
   }
 
   if (param$dataset == "seeg" & param$raw_data) {
@@ -278,7 +273,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
     dat <- dat %>%
       dplyr::filter(setor_de_emissao == "Residuos") %>%
       tidyr::pivot_longer(
-        cols = x1970:x2024,
+        cols = tidyselect::matches("^x[0-9]{4}$"),
         names_to = "Ano",
         names_prefix = "x",
         values_to = "Valor"
@@ -306,7 +301,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
     dat <- dat %>%
       dplyr::filter(setor_de_emissao == "Residuos") %>%
       tidyr::pivot_longer(
-        cols = x1970:x2024,
+        cols = tidyselect::matches("^x[0-9]{4}$"),
         names_to = "Ano",
         names_prefix = "x",
         values_to = "Valor"
@@ -338,7 +333,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
     dat <- dat %>%
       dplyr::filter(setor_de_emissao == "Residuos") %>%
       tidyr::pivot_longer(
-        cols = x1970:x2024,
+        cols = tidyselect::matches("^x[0-9]{4}$"),
         names_to = "year",
         names_prefix = "x",
         values_to = "value"
@@ -368,7 +363,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
     dat <- dat %>%
       dplyr::filter(setor_de_emissao == "Residuos") %>%
       tidyr::pivot_longer(
-        cols = x1970:x2024,
+        cols = tidyselect::matches("^x[0-9]{4}$"),
         names_to = "year",
         names_prefix = "x",
         values_to = "value"
@@ -448,7 +443,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
     dat <- dat %>%
       dplyr::filter(setor_de_emissao == "Agropecuaria") %>%
       tidyr::pivot_longer(
-        cols = x1970:x2024,
+        cols = tidyselect::matches("^x[0-9]{4}$"),
         names_to = "Ano",
         names_prefix = "x",
         values_to = "Valor"
@@ -476,7 +471,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
     dat <- dat %>%
       dplyr::filter(setor_de_emissao == "Agropecuaria") %>%
       tidyr::pivot_longer(
-        cols = x1970:x2024,
+        cols = tidyselect::matches("^x[0-9]{4}$"),
         names_to = "Ano",
         names_prefix = "x",
         values_to = "Valor"
@@ -508,7 +503,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
     dat <- dat %>%
       dplyr::filter(setor_de_emissao == "Agropecuaria") %>%
       tidyr::pivot_longer(
-        cols = x1970:x2024,
+        cols = tidyselect::matches("^x[0-9]{4}$"),
         names_to = "year",
         names_prefix = "x",
         values_to = "value"
@@ -538,7 +533,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
     dat <- dat %>%
       dplyr::filter(setor_de_emissao == "Agropecuaria") %>%
       tidyr::pivot_longer(
-        cols = x1970:x2024,
+        cols = tidyselect::matches("^x[0-9]{4}$"),
         names_to = "year",
         names_prefix = "x",
         values_to = "value"
@@ -618,7 +613,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
     dat <- dat %>%
       dplyr::filter(setor_de_emissao == "Processos Industriais") %>%
       tidyr::pivot_longer(
-        cols = x1970:x2024,
+        cols = tidyselect::matches("^x[0-9]{4}$"),
         names_to = "Ano",
         names_prefix = "x",
         values_to = "Valor"
@@ -645,7 +640,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
     dat <- dat %>%
       dplyr::filter(setor_de_emissao == "Processos Industriais") %>%
       tidyr::pivot_longer(
-        cols = x1970:x2024,
+        cols = tidyselect::matches("^x[0-9]{4}$"),
         names_to = "Ano",
         names_prefix = "x",
         values_to = "Valor"
@@ -676,7 +671,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
     dat <- dat %>%
       dplyr::filter(setor_de_emissao == "Processos Industriais") %>%
       tidyr::pivot_longer(
-        cols = x1970:x2024,
+        cols = tidyselect::matches("^x[0-9]{4}$"),
         names_to = "year",
         names_prefix = "x",
         values_to = "value"
@@ -706,7 +701,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
     dat <- dat %>%
       dplyr::filter(setor_de_emissao == "Processos Industriais") %>%
       tidyr::pivot_longer(
-        cols = x1970:x2024,
+        cols = tidyselect::matches("^x[0-9]{4}$"),
         names_to = "year",
         names_prefix = "x",
         values_to = "value"
@@ -784,7 +779,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
     dat <- dat %>%
       dplyr::filter(setor_de_emissao == "Energia") %>%
       tidyr::pivot_longer(
-        cols = x1970:x2024,
+        cols = tidyselect::matches("^x[0-9]{4}$"),
         names_to = "Ano",
         names_prefix = "x",
         values_to = "Valor"
@@ -811,7 +806,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
     dat <- dat %>%
       dplyr::filter(setor_de_emissao == "Energia") %>%
       tidyr::pivot_longer(
-        cols = x1970:x2024,
+        cols = tidyselect::matches("^x[0-9]{4}$"),
         names_to = "Ano",
         names_prefix = "x",
         values_to = "Valor"
@@ -842,7 +837,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
     dat <- dat %>%
       dplyr::filter(setor_de_emissao == "Energia") %>%
       tidyr::pivot_longer(
-        cols = x1970:x2024,
+        cols = tidyselect::matches("^x[0-9]{4}$"),
         names_to = "year",
         names_prefix = "x",
         values_to = "value"
@@ -872,7 +867,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
     dat <- dat %>%
       dplyr::filter(setor_de_emissao == "Energia") %>%
       tidyr::pivot_longer(
-        cols = x1970:x2024,
+        cols = tidyselect::matches("^x[0-9]{4}$"),
         names_to = "year",
         names_prefix = "x",
         values_to = "value"
@@ -948,7 +943,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
     dat <- dat %>%
       dplyr::filter(setor_de_emissao == "Mudanca de Uso da Terra e Floresta") %>%
       tidyr::pivot_longer(
-        cols = x1970:x2024,
+        cols = tidyselect::matches("^x[0-9]{4}$"),
         names_to = "Ano",
         names_prefix = "x",
         values_to = "Valor"
@@ -975,7 +970,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
     dat <- dat %>%
       dplyr::filter(setor_de_emissao == "Mudanca de Uso da Terra e Floresta") %>%
       tidyr::pivot_longer(
-        cols = x1970:x2024,
+        cols = tidyselect::matches("^x[0-9]{4}$"),
         names_to = "Ano",
         names_prefix = "x",
         values_to = "Valor"
@@ -1006,7 +1001,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
     dat <- dat %>%
       dplyr::filter(setor_de_emissao == "Mudanca de Uso da Terra e Floresta") %>%
       tidyr::pivot_longer(
-        cols = x1970:x2024,
+        cols = tidyselect::matches("^x[0-9]{4}$"),
         names_to = "year",
         names_prefix = "x",
         values_to = "value"
@@ -1036,7 +1031,7 @@ load_seeg <- function(dataset, raw_data = FALSE,
     dat <- dat %>%
       dplyr::filter(setor_de_emissao == "Mudanca de Uso da Terra e Floresta") %>%
       tidyr::pivot_longer(
-        cols = x1970:x2024,
+        cols = tidyselect::matches("^x[0-9]{4}$"),
         names_to = "year",
         names_prefix = "x",
         values_to = "value"

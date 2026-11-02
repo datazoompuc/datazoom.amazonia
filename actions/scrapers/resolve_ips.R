@@ -150,10 +150,11 @@ resolve_ips <- function(rows) {
 
   # rows$year is NA for IPS's unkeyed rows -- the years this dataset
   # actually promises live in available_time, not `year`/`geo_level`.
-  expected_years <- tryCatch(
-    parse_years(dataset_meta("ips", unique(rows$dataset)[1], "available_time")),
-    error = function(e) integer(0)
-  )
+  # Read off `rows`, not through the package's dataset_meta()/parse_years():
+  # build_manifest.R never loads the package, so those calls always failed in CI
+  # and a tryCatch here turned that into "no years promised", disabling this
+  # check without a trace until 2026-11-01.
+  expected_years <- unlist(lapply(unique(rows$available_time), parse_available_time))
   missing_years <- setdiff(expected_years, years_found)
 
   if (length(missing_years) > 0) {

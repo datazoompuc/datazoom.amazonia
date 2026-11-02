@@ -138,14 +138,12 @@ load_ips <- function(dataset = "all", raw_data = FALSE,
 
   # removing years from column names to be able to match columns from different years
 
-  # FRAGILE: hardcoded year range. A tab added upstream outside 2012-2023
-  # (e.g. a future "2027" release) would have its year suffix silently NOT
-  # stripped from its column names, so those columns fail to align with the
-  # rest when bind_rows() stacks all years below -- no error, just columns
-  # that don't merge. Re-check this range whenever IPS_Amazonia's available
-  # years change (see resolve_ips.R, which derives available_time from the
-  # live workbook's own tabs).
-  strs_to_remove <- paste0("_", 2012:2023, collapse = "|")
+  # FRAGILE: strips any _20xx suffix, so a tab added upstream lines up with the
+  # rest when bind_rows() stacks all years below (resolve_ips.R lists its year
+  # in available_time from the live workbook's own tabs). A year suffix written
+  # any other way would stay in the column name, with no error, and that column
+  # would not merge.
+  strs_to_remove <- "_20[0-9]{2}"
 
   dat <- dat %>%
     purrr::map(

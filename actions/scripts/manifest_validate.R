@@ -97,16 +97,77 @@ VALIDATOR_META_COLS <- c("sidra_code", "available_time", "available_geo", "layer
 # callers, aneel.R and prodes.R, never target this dataset) -- if that ever
 # changes, that new call site needs a key, not a wider allowlist here.
 KNOWN_META_DISAGREEMENTS <- list(
-  list(survey = "mapbiomas", dataset = "mapbiomas_transition", field = "available_time")
+  list(survey = "mapbiomas", dataset = "mapbiomas_transition", field = "available_time"),
   # mapbiomas_transition/municipality is still sourced from the older
   # Collection-9 GCS file (1985-2023); its base/biome siblings moved to a
   # newer Dataverse file (1985-2024) -- see actions/scrapers/resolve_mapbiomas.R.
+  list(survey = "mapbiomas", dataset = "mapbiomas_mining", field = "available_time"),
+  # Collection 9's CITY_STATE_BIOME runs to 2023; Collection 8's IL sheet, the
+  # newest with one, runs to 2022 (both read live 2026-11-01).
+  list(survey = "mapbiomas", dataset = "mapbiomas_water", field = "available_time"),
+  # Collection 4's sheets run to 2024; the state row is pinned to Collection 2's
+  # file, which has no newer state-level sheet to move to.
+  list(survey = "mapbiomas", dataset = "mapbiomas_cover", field = "available_time")
+  # Agrees today, but municipality and indigenous_land come from different
+  # Dataverse datasets, so a release of one must not fail the whole run.
 )
 
 is_known_meta_disagreement <- function(survey, dataset, field) {
   any(vapply(KNOWN_META_DISAGREEMENTS, function(k) {
     identical(k$survey, survey) && identical(k$dataset, dataset) && identical(k$field, field)
   }, logical(1)))
+}
+
+# Parses the manifest's available_time grammar ("2005", "1974-2025",
+# "1974-1990, 1995-2025") into integer years. R/manifest.R's parse_years() is
+# the same thing for the package, but this code never loads the package: nothing
+# under actions/ can call it (see tests/testthat/test-resolver-standalone.R).
+parse_available_time <- function(x) {
+  if (length(x) == 0 || is.na(x) || !nzchar(x)) return(integer(0))
+  toks <- trimws(strsplit(x, ",")[[1]])
+  unlist(lapply(toks, function(tok) {
+    if (grepl("-", tok, fixed = TRUE)) {
+      b <- as.integer(trimws(strsplit(tok, "-", fixed = TRUE)[[1]]))
+      seq.int(b[1], b[2])
+    } else {
+      as.integer(tok)
+    }
+  }))
+}
+
+# Resolver-owned datasets whose available_time is deliberately not refreshed;
+# every other owned row must come back from its resolver with a value (see
+# available_time_not_refreshed() below). dataset = NA covers the whole survey.
+AVAILABLE_TIME_EXEMPT <- list(
+  list(survey = "degrad", dataset = NA_character_), # discontinued 2016, frozen
+  list(survey = "comex_dic", dataset = NA_character_), # dictionaries, no years
+  list(survey = "aneel", dataset = "energy_enterprises_distributed") # a current register, no years
+)
+
+is_available_time_exempt <- function(survey, dataset) {
+  any(vapply(AVAILABLE_TIME_EXEMPT, function(k) {
+    identical(k$survey, survey) && (is.na(k$dataset) || identical(k$dataset, dataset))
+  }, logical(1)))
+}
+
+# Labels of the owned, non-exempt rows this run did not refresh available_time
+# for: left out of `result`, or returned with it NA. Without this, a row a
+# resolver stopped covering just keeps its old value and looks fine.
+available_time_not_refreshed <- function(owned_rows, result) {
+  same_key <- function(a, b) (is.na(a) & is.na(b)) | (!is.na(a) & !is.na(b) & a == b)
+  missing <- character(0)
+  for (i in seq_len(nrow(owned_rows))) {
+    r <- owned_rows[i, ]
+    if (is_available_time_exempt(r$survey, r$dataset)) next
+    hit <- result$survey == r$survey & result$dataset == r$dataset &
+      same_key(result$geo_level, r$geo_level) & same_key(result$year, r$year)
+    has_value <- "available_time" %in% names(result) && any(!is.na(result$available_time[hit]))
+    if (!has_value) {
+      key <- c(r$geo_level, r$year)
+      missing <- c(missing, paste(c(r$survey, r$dataset, key[!is.na(key)]), collapse = "/"))
+    }
+  }
+  missing
 }
 
 validate_row_grouping <- function(candidate) {
@@ -205,19 +266,6 @@ validate_dataset_level_agreement <- function(candidate) {
 validate_key_completeness <- function(candidate) {
   errors <- character(0)
 
-  parse_years_local <- function(x) {
-    if (is.na(x) || !nzchar(x)) return(integer(0))
-    toks <- trimws(strsplit(x, ",")[[1]])
-    unlist(lapply(toks, function(tok) {
-      if (grepl("-", tok, fixed = TRUE)) {
-        b <- as.integer(trimws(strsplit(tok, "-", fixed = TRUE)[[1]]))
-        seq.int(b[1], b[2])
-      } else {
-        as.integer(tok)
-      }
-    }))
-  }
-
   agreed <- function(x) {
     vals <- unique(x[!is.na(x)])
     if (length(vals) == 1) vals else NA_character_
@@ -266,7 +314,7 @@ validate_key_completeness <- function(candidate) {
     if (has_year) {
       declared_raw <- agreed(rows$available_time)
       if (is.na(declared_raw)) next # disagreement reported elsewhere
-      declared <- parse_years_local(declared_raw)
+      declared <- parse_available_time(declared_raw)
       present <- as.integer(rows$year[!is.na(rows$year)])
       missing <- setdiff(declared, present)
       extra <- setdiff(present, declared)

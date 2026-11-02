@@ -11,6 +11,34 @@
 # API rather than derived from the existing rows) and must return a tibble
 # with key columns survey/dataset/geo_level/year plus any changed value
 # columns. It must stop() on any failure -- never return a partial result.
+#
+# available_time: energy_development_budget reads it off the year in each
+# resource's URL; energy_generation reads it from the CSV itself (see
+# aneel_generation_available_time()). energy_enterprises_distributed is a current
+# register with no time dimension, so its cell stays blank and it is listed in
+# manifest_validate.R's AVAILABLE_TIME_EXEMPT.
+
+# The first and last real years of DatEntradaOperacao in the SIGA CSV at `path`.
+# A window, not a year list: this is a register of plants by the date each entered
+# operation, and a year with no new plant is not missing data. Year 1900 is left
+# out because it is a placeholder, not a date (VERIFIED LIVE 2026-11-01: 2,371 of
+# 25,046 rows read 1900-01-03). The first year still reports what the file says,
+# typos included: that day it was 1901, from a plant called "North Shopping
+# Caruaru" dated 1901-12-04, and nothing here can tell a typo from an old plant.
+aneel_generation_available_time <- function(path) {
+  dat <- readr::read_delim(
+    path,
+    delim = ";", col_select = "DatEntradaOperacao",
+    col_types = readr::cols(.default = readr::col_character()),
+    progress = FALSE, show_col_types = FALSE
+  )
+  years <- suppressWarnings(as.integer(substr(dat$DatEntradaOperacao, 1, 4)))
+  years <- years[!is.na(years) & years > 1900L]
+  if (length(years) == 0) {
+    stop("no usable DatEntradaOperacao values")
+  }
+  paste(min(years), max(years), sep = "-")
+}
 
 resolve_aneel <- function(rows) {
   if (!requireNamespace("jsonlite", quietly = TRUE) || !requireNamespace("curl", quietly = TRUE)) {
@@ -62,7 +90,7 @@ resolve_aneel <- function(rows) {
     survey = "aneel", dataset = "energy_development_budget",
     geo_level = NA_character_, year = found_years,
     url = found_urls,
-    available_time = paste(min(as.integer(found_years)), max(as.integer(found_years)), sep = "-")
+    available_time = sidra_api_years_to_available_time(found_years)
   )
 
   ## -- energy_enterprises_distributed: single resource, no year in URL ----
@@ -91,10 +119,22 @@ resolve_aneel <- function(rows) {
     stop("resolve_aneel(): 'siga-empreendimentos-geracao.csv' resource not found in ANEEL SIGA package.")
   }
 
+  generation_url <- urls3[match_idx3[1]]
+  generation_file <- tempfile(fileext = ".csv")
+  on.exit(unlink(generation_file), add = TRUE)
+  generation_resp <- tryCatch(
+    curl::curl_fetch_disk(generation_url, generation_file, handle = curl::new_handle(timeout = 1000, followlocation = TRUE)),
+    error = function(e) stop("resolve_aneel(): download failed for ", generation_url, ": ", conditionMessage(e))
+  )
+  if (generation_resp$status_code != 200) {
+    stop("resolve_aneel(): HTTP ", generation_resp$status_code, " for ", generation_url)
+  }
+
   out$generation <- tibble::tibble(
     survey = "aneel", dataset = "energy_generation",
     geo_level = NA_character_, year = NA_character_,
-    url = urls3[match_idx3[1]]
+    url = generation_url,
+    available_time = aneel_generation_available_time(generation_file)
   )
 
   dplyr::bind_rows(out)

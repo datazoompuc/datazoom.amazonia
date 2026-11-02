@@ -55,6 +55,7 @@ Imports:
     utils,
     rlang
 Suggests:
+    foreign,
     jsonlite,
     knitr,
     rmarkdown,

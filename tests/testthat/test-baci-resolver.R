@@ -23,13 +23,15 @@ skip_if_not(
 )
 skip_if_not_installed("curl")
 
+source(file.path(actions_dir, "scripts", "sidra_api.R"), local = TRUE)
 source(file.path(actions_dir, "scrapers", "resolve_baci.R"), local = TRUE)
 
 # A stand-in for zip_remote_listing.R's zip_remote_entries(): names only (the
 # resolver only reads the entry names), with the stamp taken from the URL.
+zip_years <- 1995:1997
 zip_remote_entries <- function(url, ...) {
   stamp <- sub(".*_V([0-9]{6})\\.zip$", "\\1", url)
-  stats::setNames(vector("list", 3), sprintf("BACI_HS92_Y%d_V%s.csv", 1995:1997, stamp))
+  stats::setNames(vector("list", length(zip_years)), sprintf("BACI_HS92_Y%d_V%s.csv", zip_years, stamp))
 }
 
 baci_rows <- tibble::tibble(
@@ -69,6 +71,13 @@ test_that("resolve_baci() returns the HS92 row alone, its url, version, archive_
   # nothing but CEPII is ever contacted: the product dictionary is comex's row now
   expect_true(length(seen$urls) > 0)
   expect_true(all(grepl("^https://www\\.cepii\\.fr/", seen$urls)))
+})
+
+test_that("a year missing from the zip shows up as a gap, not inside a range", {
+  zip_years <<- c(1995, 1997)
+  on.exit(zip_years <<- 1995:1997)
+  out <- with_world(fake_world(), resolve_baci(baci_rows))
+  expect_equal(out$available_time, "1995, 1997")
 })
 
 test_that("with no stamp CEPII answers for, it stops instead of keeping a stale one", {

@@ -139,7 +139,7 @@ resolve_baci <- function(rows) {
   }
 
   years <- as.integer(sub(".*_Y([0-9]{4})_V.*", "\\1", data_files))
-  available_time <- paste(min(years), max(years), sep = "-")
+  available_time <- sidra_api_years_to_available_time(years)
 
   tibble::tibble(
     survey = "baci", dataset = "HS92",
