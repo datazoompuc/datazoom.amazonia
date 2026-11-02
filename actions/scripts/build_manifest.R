@@ -383,6 +383,15 @@ for (src in names(registry)) {
   }
 
   partial <- attr(result, "partial_failures")
+  # An owned row that came back without available_time keeps its old value and
+  # looks fine, so it is reported the same way as any other partial failure.
+  not_refreshed <- available_time_not_refreshed(owned_rows, result)
+  if (length(not_refreshed) > 0) {
+    partial <- c(partial, paste0(
+      "available_time was not refreshed for: ", paste(not_refreshed, collapse = ", "),
+      " (add it to the resolver, or to AVAILABLE_TIME_EXEMPT if it has no years)"
+    ))
+  }
   if (!is.null(partial) && length(partial) > 0) {
     cat("OK (", nrow(result), "row(s) touched) -- but with", length(partial), "partial failure(s):\n")
     cat(paste("   -", partial, collapse = "\n"), "\n")

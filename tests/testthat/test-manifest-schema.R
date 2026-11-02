@@ -180,7 +180,10 @@ test_that("every MANIFEST_META_COLS field agrees within each keyed dataset (one 
   # without a key today).
   meta_cols <- c("sidra_code", "available_time", "available_geo", "layer_name", "resolver")
   known_exceptions <- list(
-    list(survey = "mapbiomas", dataset = "mapbiomas_transition", field = "available_time")
+    list(survey = "mapbiomas", dataset = "mapbiomas_transition", field = "available_time"),
+    list(survey = "mapbiomas", dataset = "mapbiomas_mining", field = "available_time"),
+    list(survey = "mapbiomas", dataset = "mapbiomas_water", field = "available_time"),
+    list(survey = "mapbiomas", dataset = "mapbiomas_cover", field = "available_time")
   )
   is_known_exception <- function(s, d, f) {
     any(vapply(known_exceptions, function(k) {

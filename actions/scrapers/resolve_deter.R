@@ -55,12 +55,13 @@
 # finding the real .shp by pattern if the committed name isn't there,
 # rather than hard-failing -- see that file's own comment.
 #
-# available_time is for the same reason left untouched -- DETER's download
-# links carry no date/version stamp to read a coverage window off of,
-# unlike PRODES's year+stamp filenames. If TerraBrasilis ever exposes a
-# per-product "last updated" field in this API or another one, this
-# resolver should start reading available_time from it instead of leaving
-# it as a manually-maintained value.
+# available_time IS refreshed (2026-11-01): DETER's links carry no date stamp,
+# so each run downloads the package the loader reads and takes the years from
+# VIEW_DATE in its .dbf. VERIFIED LIVE that day: the 4 packages are about 25, 48,
+# 66 and 236 MB, 11 s in total, and the shapefile's dates match the manifest's
+# start years (2016, 2018, 2023, 2023). WFS is not used: its geoserver only
+# publishes deter_amz and deter_cerrado. A partial current year counts, because
+# the loader returns its rows. This does not check archive_file (see above).
 
 # 2026-10-08 (hardening, requested by Antonio): the primary slug match above
 # is exactly what let deter_cerrado's 2021 hardcoded URL go stale silently
@@ -97,6 +98,42 @@
 # (2) two datasets may never resolve to the same URL. The category field is
 # deliberately not used: it is "... - DETER (Avisos)" for every product.
 
+# The sorted years of VIEW_DATE in the .dbf at `path`.
+deter_years_from_dbf <- function(path) {
+  dat <- foreign::read.dbf(path, as.is = TRUE)
+  date_col <- names(dat)[tolower(names(dat)) == "view_date"]
+  if (length(date_col) != 1) {
+    stop("no VIEW_DATE field (fields: ", paste(names(dat), collapse = ", "), ")")
+  }
+  years <- sort(unique(as.integer(format(as.Date(dat[[date_col]]), "%Y"))))
+  if (length(years) == 0) {
+    stop("VIEW_DATE has no values")
+  }
+  years
+}
+
+# Downloads one DETER package and returns its available_time. Throws on any
+# failure, which the caller reports for that dataset alone. A package with
+# several .dbf files is a failure too: there is no telling which one R/deter.R
+# would read.
+deter_available_time <- function(url) {
+  dir <- tempfile("deter")
+  dir.create(dir)
+  on.exit(unlink(dir, recursive = TRUE), add = TRUE)
+  zip_path <- file.path(dir, "package.zip")
+
+  resp <- curl::curl_fetch_disk(url, zip_path, handle = curl::new_handle(timeout = 1000, followlocation = TRUE))
+  if (resp$status_code != 200) {
+    stop("HTTP ", resp$status_code, " for ", url)
+  }
+  dbf <- grep("\\.dbf$", utils::unzip(zip_path, list = TRUE)$Name, ignore.case = TRUE, value = TRUE)
+  if (length(dbf) != 1) {
+    stop("expected one .dbf in ", url, ", found ", length(dbf))
+  }
+  utils::unzip(zip_path, files = dbf, exdir = dir, junkpaths = TRUE)
+  sidra_api_years_to_available_time(deter_years_from_dbf(file.path(dir, basename(dbf))))
+}
+
 resolve_deter <- function(rows) {
   if (is.null(rows) || nrow(rows) == 0) {
     stop(
@@ -104,8 +141,9 @@ resolve_deter <- function(rows) {
       "cannot tell which datasets to update. Check the resolver column."
     )
   }
-  if (!requireNamespace("jsonlite", quietly = TRUE) || !requireNamespace("curl", quietly = TRUE)) {
-    stop("resolve_deter() needs the 'jsonlite' and 'curl' packages (CI-only; not package Imports).")
+  if (!requireNamespace("jsonlite", quietly = TRUE) || !requireNamespace("curl", quietly = TRUE) ||
+      !requireNamespace("foreign", quietly = TRUE)) {
+    stop("resolve_deter() needs the 'jsonlite', 'curl' and 'foreign' packages (CI-only; not package Imports).")
   }
 
   api_url <- "https://terrabrasilis.dpi.inpe.br/business/api/v1/download/all"
@@ -255,13 +293,29 @@ resolve_deter <- function(rows) {
     )
   }
 
+  # One package's failure leaves that row's years alone, not the others' (nor
+  # any url), and travels as a partial failure so an issue still opens.
+  year_failures <- character(0)
+  available_time <- vapply(seq_len(nrow(rows)), function(i) {
+    tryCatch(
+      deter_available_time(resolved_url[i]),
+      error = function(e) {
+        year_failures <<- c(year_failures, paste0(rows$dataset[i], ": could not read available_time: ", conditionMessage(e)))
+        NA_character_
+      }
+    )
+  }, character(1))
+
   out <- tibble::tibble(
     survey = "deter", dataset = rows$dataset,
     geo_level = rows$geo_level, year = rows$year,
-    url = resolved_url, resolver = "deter"
+    url = resolved_url, available_time = available_time, resolver = "deter"
   )
   if (length(fallback_notes) > 0) {
     attr(out, "fallback_notes") <- fallback_notes
+  }
+  if (length(year_failures) > 0) {
+    attr(out, "partial_failures") <- year_failures
   }
   out
 }

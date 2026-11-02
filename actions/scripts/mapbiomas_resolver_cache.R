@@ -48,7 +48,7 @@
 
 RESOLVER_CACHE_COLS <- c(
   "dataset", "geo_level", "file_id", "checksum",
-  "rules_fingerprint", "verdict", "sheet", "reason", "checked_at"
+  "rules_fingerprint", "verdict", "sheet", "reason", "available_time", "checked_at"
 )
 
 read_resolver_cache <- function(path) {
@@ -138,6 +138,7 @@ cache_lookup <- function(cache, dataset, geo_level, file_id, checksum, fingerpri
 cache_upsert <- function(cache, dataset, geo_level, file_id, checksum,
                           fingerprint, verdict, sheet,
                           reason = NA_character_,
+                          available_time = NA_character_,
                           checked_at = format(Sys.Date())) {
   g <- geo_level %||% NA_character_
   key_match <- cache$dataset == dataset &
@@ -153,7 +154,8 @@ cache_upsert <- function(cache, dataset, geo_level, file_id, checksum,
     dataset = dataset, geo_level = g, file_id = as.character(file_id),
     checksum = checksum, rules_fingerprint = fingerprint,
     verdict = verdict, sheet = sheet %||% NA_character_,
-    reason = reason %||% NA_character_, checked_at = checked_at
+    reason = reason %||% NA_character_,
+    available_time = available_time %||% NA_character_, checked_at = checked_at
   )
 
   if (any(key_match)) {

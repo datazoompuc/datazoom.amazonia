@@ -35,15 +35,20 @@ check_params <- function(param) {
   if (!is.null(param$time_period)) {
     # constructing vector of supported years
 
+    # unique(): a dataset whose rows cover different years comes back as one
+    # line per row (see datasets_link()), and any of them is supported
+
     supp_time_period_str <- datasets_link(source = param$source, dataset = param$dataset) %>%
-      purrr::pluck("available_time")
+      purrr::pluck("available_time") %>%
+      unique()
 
     # parse_years() is the one parser for the manifest's "available_time"
     # grammar (comma-separated years and/or ranges, e.g. "2003, 2007-2014")
     # -- see R/manifest.R. It replaces the split-by-comma/hyphen-then-eval
     # logic that used to live only here.
 
-    supp_time_period <- parse_years(supp_time_period_str)
+    supp_time_period <- unlist(lapply(supp_time_period_str, parse_years))
+    supp_time_period_str <- paste(supp_time_period_str, collapse = ", ")
 
 
     if (!all(param$time_period %in% supp_time_period)) {
@@ -62,6 +67,7 @@ check_params <- function(param) {
 
     supp_geo_level_str <- datasets_link(source = param$source, dataset = param$dataset) %>%
       purrr::pluck("available_geo") %>%
+      unique() %>%
       tolower()
 
     supp_geo_level <- supp_geo_level_str %>%

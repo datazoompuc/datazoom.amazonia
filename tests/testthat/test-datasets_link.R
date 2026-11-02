@@ -448,16 +448,94 @@ fixture <- fixture %>%
     )
   )
 
-test_that("datasets_link() returns the exact pre-normalization column set and order", {
+# Delta #23 -- available_time coverage (2026-11-01; see resolve_mapbiomas.R,
+# resolve_epe.R and resolve_aneel.R). Two changes:
+#   * A `geo_level` column, and one line per row for a dataset whose rows
+#     genuinely cover different years: mapbiomas_transition (which used to show
+#     NA), mapbiomas_mining and mapbiomas_water. Pinned by the tests below; the
+#     golden comparison leaves these three out.
+#   * available_time now refreshed by the resolvers for EPE's two consumption
+#     datasets and aneel/energy_generation. The golden comparison blanks them on
+#     both sides; the test further down pins what shouldn't move. Industrial's
+#     start changed from 2004 to 2012: the file has no earlier industrial rows.
+per_row_datasets <- c("mapbiomas_transition", "mapbiomas_mining", "mapbiomas_water")
+refreshed_datasets <- c("consumer_energy_consumption", "industrial_energy_consumption", "energy_generation")
+
+test_that("datasets_link() returns the pre-normalization columns plus geo_level", {
   expect_equal(
     names(datasets_link()),
-    c("survey", "dataset", "sidra_code", "available_time", "available_geo", "url")
+    c("survey", "dataset", "geo_level", "sidra_code", "available_time", "available_geo", "url")
   )
 })
 
-test_that("datasets_link() matches the golden fixture (schema normalization is a no-op beyond the two documented changes)", {
-  actual <- datasets_link() %>% dplyr::arrange(survey, dataset)
-  expected <- fixture %>% dplyr::arrange(survey, dataset)
+test_that("a dataset whose rows cover different years gets one correct line per row", {
+  expect_available_time <- function(dataset, expected) {
+    lines <- datasets_link(source = "mapbiomas", dataset = dataset)
+    for (geo in names(expected)) {
+      expect_equal(lines$available_time[lines$geo_level == geo], expected[[geo]], info = paste(dataset, geo))
+      expect_equal(lines$url[lines$geo_level == geo], dataset_url("mapbiomas", dataset, geo_level = geo), info = paste(dataset, geo))
+    }
+    expect_setequal(lines$geo_level, names(expected))
+  }
+  # start years and frozen rows only would still pass after a refresh, so these
+  # read each row's value from the manifest rather than pinning end years
+  for (d in per_row_datasets) {
+    geos <- link_table()$geo_level[link_table()$dataset == d]
+    expected <- stats::setNames(
+      lapply(geos, function(g) dataset_field("mapbiomas", d, "available_time", geo_level = g)),
+      geos
+    )
+    expect_gt(length(unique(unlist(expected))), 1)
+    expect_available_time(d, expected)
+  }
+
+  # the frozen files never move: these two are safe to pin
+  transition <- datasets_link(source = "mapbiomas", dataset = "mapbiomas_transition")
+  expect_equal(transition$available_time[transition$geo_level == "municipality"], "1985-2023")
+  water <- datasets_link(source = "mapbiomas", dataset = "mapbiomas_water")
+  expect_equal(water$available_time[water$geo_level == "state"], "1985-2022")
+})
+
+test_that("a dataset whose rows agree on available_time stays on one line, with no geo_level", {
+  for (d in c("mapbiomas_cover", "mapbiomas_irrigation")) {
+    line <- datasets_link(source = "mapbiomas", dataset = d)
+    expect_equal(nrow(line), 1, info = d)
+    expect_true(is.na(line$geo_level), info = d)
+    expect_false(is.na(line$available_time), info = d)
+  }
+  expect_equal(nrow(datasets_link(source = "epe", dataset = "consumer_energy_consumption")), 1)
+
+  # only those three datasets ever span several lines
+  all_lines <- datasets_link()
+  several <- unique(all_lines$dataset[duplicated(all_lines[, c("survey", "dataset")])])
+  expect_setequal(several, per_row_datasets)
+  # and each dataset's lines stay together
+  runs <- rle(paste(all_lines$survey, all_lines$dataset))
+  expect_equal(anyDuplicated(runs$values), 0)
+})
+
+test_that("refreshed available_time keeps the start years the source publishes (delta #23)", {
+  start_year <- function(x) as.integer(sub("-.*", "", x))
+  epe <- function(d) datasets_link(source = "epe", dataset = d)$available_time
+  expect_equal(start_year(epe("consumer_energy_consumption")), 2004L)
+  expect_equal(start_year(epe("industrial_energy_consumption")), 2012L)
+  expect_true(max(parse_years(epe("consumer_energy_consumption"))) >= 2026L)
+  expect_true(max(parse_years(epe("industrial_energy_consumption"))) >= 2026L)
+  expect_true(max(parse_years(datasets_link(source = "aneel", dataset = "energy_generation")$available_time)) >= 2026L)
+})
+
+test_that("datasets_link() matches the golden fixture (schema normalization is a no-op beyond the documented changes)", {
+  actual <- datasets_link() %>%
+    dplyr::filter(!dataset %in% per_row_datasets) %>%
+    dplyr::select(-geo_level) %>%
+    dplyr::arrange(survey, dataset)
+  expected <- fixture %>%
+    dplyr::filter(!dataset %in% per_row_datasets) %>%
+    dplyr::arrange(survey, dataset)
+
+  # Refreshed by the resolvers, see delta #23 and the test above.
+  actual$available_time[actual$dataset %in% refreshed_datasets] <- NA_character_
+  expected$available_time[expected$dataset %in% refreshed_datasets] <- NA_character_
 
   # pibmunic's available_time is asserted on its own in the test after pam's (delta #21).
   actual$available_time[actual$survey == "pibmunic"] <- NA_character_
@@ -613,31 +691,25 @@ test_that("SIDRA-sourced datasets have NA url -- their data comes from sidra_cod
   }
 })
 
-test_that("exactly the 4 MapBiomas datasets with genuinely disagreeing rows have a NA catalog url", {
-  # Pins delta #8 (see file header) explicitly: these 4 -- and ONLY these
-  # 4 -- have one geo_level deliberately pinned to a different Dataverse
-  # collection than its siblings (see resolve_mapbiomas.R), so their real
-  # manifest rows disagree on url and datasets_link()'s collapsed value is
-  # NA. A NA url here is not "we don't know the url" -- it's "ask for a
-  # specific geo_level with dataset_url()" (see test-fase4-metadata.R).
-  na_url_datasets <- c("mapbiomas_cover", "mapbiomas_mining", "mapbiomas_transition", "mapbiomas_water")
-  for (d in na_url_datasets) {
-    expect_true(
-      is.na(datasets_link(source = "mapbiomas", dataset = d, url = TRUE)),
-      info = paste(d, "expected NA url")
-    )
-  }
+test_that("only mapbiomas_cover, whose rows differ on url but not on years, has a NA catalog url", {
+  # Pins delta #8 (see file header): one geo_level is deliberately pinned to a
+  # different Dataverse collection than its siblings (see resolve_mapbiomas.R),
+  # so the rows disagree on url. mapbiomas_cover's rows agree on years, so it
+  # stays on one line and its collapsed url is NA -- not "we don't know the url"
+  # but "ask for a specific geo_level with dataset_url()" (see
+  # test-fase4-metadata.R). The other three datasets like it now get one line per
+  # row (delta #23), each with its own real url.
+  expect_true(is.na(datasets_link(source = "mapbiomas", dataset = "mapbiomas_cover", url = TRUE)))
 
-  # Every OTHER mapbiomas dataset must still have a real, non-NA url --
-  # confirming the NA-ness above is specific to those 4, not a blanket
-  # regression across the whole survey.
+  # Every OTHER mapbiomas dataset must have a real, non-NA url -- confirming the
+  # NA-ness above is specific, not a blanket regression across the whole survey.
   other_datasets <- setdiff(
     datasets_link(source = "mapbiomas")$dataset,
-    na_url_datasets
+    "mapbiomas_cover"
   )
   for (d in other_datasets) {
     expect_false(
-      is.na(datasets_link(source = "mapbiomas", dataset = d, url = TRUE)),
+      anyNA(datasets_link(source = "mapbiomas", dataset = d, url = TRUE)),
       label = paste(d, "url")
     )
   }

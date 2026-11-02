@@ -26,9 +26,28 @@ skip_if_not(
 skip_if_not_installed("jsonlite")
 skip_if_not_installed("curl")
 
+skip_if_not_installed("foreign")
+skip_if(Sys.which("zip") == "", "no zip utility to build the package fixture")
+
+source(file.path(actions_dir, "scripts", "sidra_api.R"), local = TRUE)
 source(file.path(actions_dir, "scrapers", "resolve_deter.R"), local = TRUE)
 
-api <- jsonlite::fromJSON(test_path("fixtures", "terrabrasilis_download_api_deter.json"), simplifyVector = FALSE)
+# A package shaped like the real ones: one .shp set with a .dbf holding VIEW_DATE.
+deter_package <- local({
+  dir <- tempfile("deter-fixture")
+  dir.create(dir)
+  dbf <- file.path(dir, "deter-public.dbf")
+  foreign::write.dbf(data.frame(VIEW_DATE = as.Date(c("2023-08-03", "2024-01-01", "2025-06-15", "2026-10-23"))), dbf)
+  zip_path <- file.path(dir, "package.zip")
+  utils::zip(zip_path, dbf, flags = "-jq")
+  zip_path
+})
+fetch_package <- function(url, path, handle = NULL, ...) {
+  file.copy(deter_package, path, overwrite = TRUE)
+  list(status_code = 200L)
+}
+
+api <-jsonlite::fromJSON(test_path("fixtures", "terrabrasilis_download_api_deter.json"), simplifyVector = FALSE)
 
 deter_rows <- tibble::tibble(
   survey = "deter",
@@ -50,11 +69,12 @@ expected_url <- stats::setNames(
 )
 
 # Run resolve_deter() against a fake API response.
-run_with_api <- function(entries, status = 200L, rows = deter_rows) {
+run_with_api <- function(entries, status = 200L, rows = deter_rows, fetch_disk = fetch_package) {
   body <- charToRaw(enc2utf8(as.character(jsonlite::toJSON(entries, auto_unbox = TRUE))))
   testthat::with_mocked_bindings(
     resolve_deter(rows),
     curl_fetch_memory = function(url, handle = NULL, ...) list(status_code = status, content = body),
+    curl_fetch_disk = fetch_disk,
     .package = "curl"
   )
 }
@@ -85,6 +105,43 @@ test_that("happy path: every known slug matches, no fallback, no message", {
   # nothing unusual happened, so nothing for build_manifest.R to put in the PR body
   expect_null(attr(res, "fallback_notes"))
   expect_null(attr(res, "partial_failures"))
+})
+
+test_that("available_time comes from each package's own VIEW_DATE", {
+  res <- run_with_api(api)
+  expect_equal(res$available_time, rep("2023-2026", nrow(deter_rows)))
+})
+
+test_that("one package failing costs only that row's years, and is reported", {
+  res <- run_with_api(api, fetch_disk = function(url, path, handle = NULL, ...) {
+    if (grepl("deter-pantanal", url, fixed = TRUE)) stop("Timeout was reached")
+    fetch_package(url, path, handle)
+  })
+
+  # every url still resolves, because the API answered
+  expect_equal(urls(res), expected_url)
+  expect_equal(is.na(res$available_time), res$dataset == "deter_pantanal")
+  expect_length(attr(res, "partial_failures"), 1)
+  expect_match(attr(res, "partial_failures"), "deter_pantanal: could not read available_time: Timeout", fixed = FALSE)
+})
+
+test_that("an HTTP error or a package without one .dbf is a failure, not a guess", {
+  res <- run_with_api(api[1:8], fetch_disk = function(url, path, handle = NULL, ...) list(status_code = 503L))
+  expect_true(all(is.na(res$available_time)))
+  expect_match(attr(res, "partial_failures")[1], "HTTP 503")
+
+  dir <- tempfile("no-dbf")
+  dir.create(dir)
+  txt <- file.path(dir, "readme.txt")
+  writeLines("x", txt)
+  no_dbf <- file.path(dir, "package.zip")
+  utils::zip(no_dbf, txt, flags = "-jq")
+  res <- run_with_api(api[1:8], fetch_disk = function(url, path, handle = NULL, ...) {
+    file.copy(no_dbf, path, overwrite = TRUE)
+    list(status_code = 200L)
+  })
+  expect_true(all(is.na(res$available_time)))
+  expect_match(attr(res, "partial_failures")[1], "expected one .dbf", fixed = TRUE)
 })
 
 test_that("a renamed slug is recovered by the keyword fallback, with a warning message", {
