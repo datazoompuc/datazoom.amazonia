@@ -1,0 +1,50 @@
+name: Check COMEX Updates
+
+on:
+  schedule:
+    # Segundas-feiras às 06:00 UTC (fora de horários concorrentes com outros workflows)
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+jobs:
+  check-comex:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release'
+          use-public-rspm: true
+
+      - name: System dependencies (sf/units/curl/xml2)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgdal-dev \
+            libgeos-dev \
+            libproj-dev \
+            libudunits2-dev \
+            gdal-bin \
+            proj-bin \
+            libcurl4-openssl-dev \
+            libssl-dev \
+            libxml2-dev
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            local::.
+          needs: check
+
+      # load_br_trade() baixa de balanca.mdic.gov.br, que omite o certificado CA intermediário:
+      # sem isso, OpenSSL no runner falha com "unable to get local issuer certificate".
+      - name: Trust SERPRO's intermediate CA (balanca.mdic.gov.br omits it)
+        uses: ./.github/actions/trust-serpro-intermediate
+        continue-on-error: true
+
+      - name: Check COMEX updates
+        run: |
+          Rscript --vanilla actions/scripts/check_comex_updates.R
