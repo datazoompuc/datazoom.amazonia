@@ -1,5 +1,7 @@
 # datazoom.amazonia (development version)
 
+  * Fixed: updated PRODES 2025 raster to revision `v20261019` (`prodes_amazonia_legal_2025_v20261019.zip`), maintaining resolution, grid orientation and raster legend codes.
+
   * Fixed: the years listed for several datasets were out of date and are now read from the source files, on every update of the links table. `"mapbiomas_mining"` reaches 2023 at the municipality level (it said 2022; indigenous land stays at 2022), and `"mapbiomas_water"` reaches 2024 at the municipality and biome levels (it said 2022; state stays at 2022). `load_epe()`'s `"consumer_energy_consumption"` and `"industrial_energy_consumption"` reach 2026, a partial year, and `"industrial_energy_consumption"` starts in 2012, not 2004: the source has no earlier industrial data. `load_aneel()`'s `"energy_generation"` covers plants dated up to 2026 (it said 2021).
 
   * Changed: `load_seeg()` and `load_ips()` now include a year the source adds without needing a package update. `load_seeg()` used to leave a new year out with no error. Output for the years available today is unchanged.
