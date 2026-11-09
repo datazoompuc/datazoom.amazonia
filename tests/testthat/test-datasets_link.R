@@ -192,7 +192,7 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
     ),
     url = ifelse(
       survey == "prodes",
-      "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20260408.zip",
+      "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20261019.zip",
       url
     ),
     url = ifelse(

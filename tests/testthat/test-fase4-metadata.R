@@ -18,7 +18,7 @@ test_that("PRODES layer_name matches the manifest's current resolved value", {
                "non_forest", "hydrography", "clouds")) {
     expect_equal(
       dataset_meta("prodes", ds, "layer_name"),
-      "prodes_amazonia_legal_2025_v20260408"
+      "prodes_amazonia_legal_2025_v20261019"
     )
   }
 })
