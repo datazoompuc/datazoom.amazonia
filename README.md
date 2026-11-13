@@ -1442,7 +1442,8 @@ impacts, fire management
       only
     - For `"mapbiomas_secondary_vegetation"`: `"municipality"` only
     - For `"mapbiomas_mining"`: `"indigenous_land"` or `"municipality"`
-    - For `"mapbiomas_irrigation"`: `"state"` or `"biome"`
+    - For `"mapbiomas_irrigation"`: `"state"` or `"biome"` (both
+      temporarily unavailable)
     - For `"mapbiomas_water"`: `"municipality"` or `"biome"` (`"state"`
       currently unavailable)
     - For `"mapbiomas_fire"`: `"state"` only

@@ -64,17 +64,24 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
 
   check_params(param)
 
-  # 2026-11-13: the municipality file (Collection 9, GCS) returns HTTP 403 and
-  # no newer collection publishes a municipality transition sheet. The
-  # manifest row is kept as is so a resolver or a human can restore it; only
-  # this geo_level is blocked, "biome" (Collection 10, Dataverse) still works.
-  if (param$dataset == "mapbiomas_transition" && param$geo_level == "municipality") {
-    stop(
-      "mapbiomas_transition at geo_level = \"municipality\" is temporarily unavailable: ",
-      "MapBiomas no longer serves the source file. ",
-      "Use geo_level = \"biome\" instead.",
-      call. = FALSE
-    )
+  # 2026-11-13: these files return HTTP 403 and no Dataverse collection
+  # publishes a substitute. Their manifest rows are kept as is so a resolver
+  # or a human can restore them; only these combinations are blocked.
+  unavailable <- list(
+    list(dataset = "mapbiomas_transition", geo_level = "municipality", hint = "Use geo_level = \"biome\" instead."),
+    list(dataset = "mapbiomas_water", geo_level = "state", hint = "Use geo_level = \"municipality\" or \"biome\" instead."),
+    list(dataset = "mapbiomas_irrigation", geo_level = c("state", "biome"), hint = "")
+  )
+  for (u in unavailable) {
+    if (param$dataset == u$dataset && param$geo_level %in% u$geo_level) {
+      stop(
+        trimws(paste0(
+          u$dataset, " at geo_level = \"", param$geo_level, "\" is temporarily unavailable: ",
+          "MapBiomas no longer serves the source file. ", u$hint
+        )),
+        call. = FALSE
+      )
+    }
   }
 
   # plucking sheet corresponding to each dataset/geo_level (one manifest row
