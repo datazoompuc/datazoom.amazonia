@@ -19,7 +19,8 @@ load_mapbiomas(
 \item{geo_level}{A \code{string} that defines the geographic level of the data
 \itemize{
 \item For dataset "mapbiomas_cover", can be "municipality" or "indigenous_land"
-\item For dataset "mapbiomas_transition", can be "municipality" or "biome" (faster download)
+\item For dataset "mapbiomas_transition", can only be "biome" ("municipality" is temporarily
+unavailable -- MapBiomas no longer serves the municipality file)
 \item For dataset "mapbiomas_deforestation_regeneration", can only be "municipality"
 \item For dataset "mapbiomas_secondary_vegetation", can only be "municipality"
 \item For dataset "mapbiomas_mining", can be "indigenous_land" or "municipality"

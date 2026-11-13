@@ -6,7 +6,8 @@
 #' @inheritParams load_baci
 #' @param geo_level A \code{string} that defines the geographic level of the data
 #'   * For dataset "mapbiomas_cover", can be "municipality" or "indigenous_land"
-#'   * For dataset "mapbiomas_transition", can be "municipality" or "biome" (faster download)
+#'   * For dataset "mapbiomas_transition", can only be "biome" ("municipality" is temporarily
+#'   unavailable -- MapBiomas no longer serves the municipality file)
 #'   * For dataset "mapbiomas_deforestation_regeneration", can only be "municipality"
 #'   * For dataset "mapbiomas_secondary_vegetation", can only be "municipality"
 #'   * For dataset "mapbiomas_mining", can be "indigenous_land" or "municipality"
@@ -62,6 +63,19 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
   # check if dataset and geo_level are supported
 
   check_params(param)
+
+  # 2026-11-13: the municipality file (Collection 9, GCS) returns HTTP 403 and
+  # no newer collection publishes a municipality transition sheet. The
+  # manifest row is kept as is so a resolver or a human can restore it; only
+  # this geo_level is blocked, "biome" (Collection 10, Dataverse) still works.
+  if (param$dataset == "mapbiomas_transition" && param$geo_level == "municipality") {
+    stop(
+      "mapbiomas_transition at geo_level = \"municipality\" is temporarily unavailable: ",
+      "MapBiomas no longer serves the source file. ",
+      "Use geo_level = \"biome\" instead.",
+      call. = FALSE
+    )
+  }
 
   # plucking sheet corresponding to each dataset/geo_level (one manifest row
   # per (dataset, geo_level) combination -- see
