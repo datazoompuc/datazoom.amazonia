@@ -30,10 +30,14 @@ GEO_LEVEL   <- "state"
 #   então c(2009, 2010, 2016) cruza os dois limites entre grupos numa só chamada
 #   (issue #350; sem a correção, esta chamada falha com "arguments have different crs")
 # load_ips: anos válidos são 2014, 2018, 2021, 2023 — usar o mais recente
+# load_population: a série está em quatro tabelas do SIDRA (R/population.R,
+#   population_special_tables): 793 (2007), 1378 (2010), 4714 (2022) e 6579 (estimativas,
+#   o resto); c(2007, 2010, 2021, 2022) pede cada uma delas uma vez
 # load_censoagro: Censo Agropecuário; anos disponíveis 1995, 2006, 2017 — usar o mais recente
 TIME_PERIOD_BY_FN <- list(
   load_degrad    = c(2009, 2010, 2016),
   load_ips       = 2023,
+  load_population = c(2007, 2010, 2021, 2022),
   load_censoagro = 2017,
   load_pibmunic  = 2021   # último ano com todas as variáveis (valor adicionado por atividade, impostos); o SIDRA tem 2022 e 2023 só com PIB e participações (resolve_pibmunic.R, ponto 3)
 )
