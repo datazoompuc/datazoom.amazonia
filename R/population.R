@@ -51,19 +51,41 @@ load_population <- function(dataset = "population", raw_data = FALSE,
   param$time_period <- time_period
   param$language <- language
 
-  if (!is.numeric(param$dataset)) {
-    param$code <- datasets_link() %>%
-      dplyr::filter(dataset == param$dataset) %>%
-      dplyr::select(sidra_code) %>%
-      unlist() %>%
-      as.numeric()
-  } else {
-    param$code <- param$dataset
+  # A SIDRA table given as a number ("You can also use SIDRA codes") means the
+  # manifest dataset that reads that table: load_population(dataset = 6579) is
+  # load_population(dataset = "population"), with the same requests, the same
+  # treatment and the same checks. Only a number the manifest does not know keeps
+  # the old behaviour below (sidra_download()'s defaults, no checks).
+
+  if (is.numeric(param$dataset)) {
+    known <- sidra_dataset_of_table("population", param$dataset)
+    if (!is.null(known)) param$dataset <- known
   }
 
   # check if dataset, geo_level, and time_period are supported
 
   check_params(param)
+
+  # The manifest's sidra_code is the bare table number ("6579"), and a bare code
+  # means "this table has no classification": sidra_download() then sends the
+  # request without one (sidra_get_table(), R/download.R) instead of letting sidrar
+  # scrape IBGE's description of the table, a page behind a bot challenge from some
+  # networks. See actions/scrapers/resolve_population.R.
+
+  if (!is.numeric(param$dataset)) {
+    parts <- datasets_link() %>%
+      dplyr::filter(dataset == param$dataset) %>%
+      dplyr::pull(sidra_code) %>%
+      sidra_code_parts()
+
+    param$code <- parts$table
+    param$classific <- parts$classific
+    param$category <- parts$category
+  } else {
+    param$code <- param$dataset
+    param$classific <- "all"
+    param$category <- "all"
+  }
 
   ##############
   ## Download ##
@@ -71,13 +93,30 @@ load_population <- function(dataset = "population", raw_data = FALSE,
 
   dat <- as.list(as.character(param$time_period)) %>%
     purrr::map(function(year_num) {
-      suppressWarnings(
+      request <- population_request(year_num, param$code, param$classific, param$category)
+
+      one_year <- suppressWarnings(
         sidra_download(
-          sidra_code = param$code,
+          sidra_code = request$table,
+          classific = request$classific,
+          category = request$category,
           year = year_num,
           geo_level = param$geo_level
         )
       )
+
+      # FRAGILE: the Censo 2022 table (4714) reports three variables -- the resident
+      # population (93), the area of the territorial unit (6318) and the population
+      # density (614) -- where the tables of 2007 and 2010 report only the population
+      # (93) and the estimates only 9324, so the other two are left out: they would
+      # become columns of 2022 alone, and the treatment below would pass them
+      # through under IBGE's own names. A table IBGE adds a variable to is not
+      # noticed here; resolve_population.R reports it.
+      if (identical(request$table, 4714)) {
+        one_year <- one_year[one_year$variavel_codigo == "93", ]
+      }
+
+      one_year
     }) %>%
     dplyr::bind_rows() %>%
     tibble::as_tibble()
@@ -146,6 +185,14 @@ load_population <- function(dataset = "population", raw_data = FALSE,
     ) %>%
     janitor::clean_names()
 
+  # FRAGILE: only the two variable ids of the tables above are renamed (93, the
+  # resident population of 2007, 2010 and 2022; 9324, the estimate of every other
+  # year), and only in English: the Portuguese names are IBGE's own, cleaned. A
+  # column recode() does not know passes through under IBGE's name instead of
+  # turning NA, so a variable IBGE adds is not lost, just not renamed;
+  # resolve_population.R reports it. The columns are named after sidrar's own labels
+  # ("Populacao residente (Codigo)" and so on) once janitor::clean_names() has
+  # written them.
   if (language == "eng") {
     dat <- dat %>%
       dplyr::rename_with(dplyr::recode,
@@ -160,4 +207,42 @@ load_population <- function(dataset = "population", raw_data = FALSE,
   ##########################
 
   return(dat)
+}
+
+# The years the estimates table (6579) has no value for, and the table of each:
+# the Contagem da Populacao of 2007 (793), the Censo Demografico of 2010 (1378)
+# and the Censo Demografico of 2022 (4714). Each is the resident population of the
+# year (variable 93) at the three levels load_population() offers, which is what
+# table 6579 holds, as variable 9324 and estimated, for every other year. The
+# requests are what the manifest's sidra_code would say if it could name more than
+# one table: a table with no classification (793, 4714) is sent with none, and table
+# 1378, which has four (situacao do domicilio, sexo, idade, condicao no domicilio), is
+# asked for the Total of the first (c1, category 0) -- the others, left out, are
+# answered with their Total too: Brazil's 190,755,799 of 2010.
+#
+# FRAGILE: this list is a copy of what IBGE publishes, and nothing in the manifest
+# says it. 2022 was missing from it until 2026-11-12, so load_population(time_period
+# = 2022) stopped with "Error in Download." (6579 has no 2022); 2023 is in neither
+# this list nor 6579, and is no year of the series. resolve_population.R checks every
+# run that each table below exists, has the classification the request assumes and a
+# value for its year, that 6579 does not also publish that year, and writes the
+# manifest's available_time from all of them (POPULATION_SPECIAL_TABLES there is a
+# copy of this list, kept equal by tests/testthat/test-population-resolver.R). A
+# census year IBGE adds -- 2032 -- is one more entry here and there.
+population_special_tables <- list(
+  `2007` = list(table = 793, classific = NULL, category = NULL),
+  `2010` = list(table = 1378, classific = "c1", category = list(0)),
+  `2022` = list(table = 4714, classific = NULL, category = NULL)
+)
+
+# What load_population() asks sidra_download() for in `year`: the table of the
+# manifest's code (6579) with its classification, or the special table of that
+# year. A table number the manifest does not know (any other `code`) is always
+# asked for as it is.
+population_request <- function(year, code, classific, category) {
+  special <- if (identical(code, 6579)) population_special_tables[[as.character(year)]] else NULL
+  if (!is.null(special)) {
+    return(special)
+  }
+  list(table = code, classific = classific, category = category)
 }

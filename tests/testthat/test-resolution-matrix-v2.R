@@ -286,6 +286,17 @@ post_capture_key <- function(s, d, g, y, f) {
   paste(s, d, ifelse(is.na(g), "NA", g), ifelse(is.na(y), "NA", y), f, sep = "\r")
 }
 
+# 2026-11-12: population onboarding (see test-datasets_link.R's delta #24 and
+# resolve_population.R's header): 3 cells on the one unkeyed row -- resolver,
+# available_time ("2001-2021" -> "2001-2022, 2024-2026": the 2022 census, three more
+# estimates) and docs_url (the survey page became the estimates table's own page).
+# sidra_code is unchanged: the bare "6579" stays, and now means "no classification".
+# docs_url is not a datasets_link() column, so only this per-field matrix sees it.
+KNOWN_POST_CAPTURE_DELTAS <- c(
+  KNOWN_POST_CAPTURE_DELTAS,
+  post_capture_key("population", "population", NA, NA, c("resolver", "available_time", "docs_url"))
+)
+
 # 2026-10-21: PAM onboarding (see test-datasets_link.R's delta #18 and
 # resolve_pam.R's header). Built from the captured matrix itself rather than
 # listed key by key: 161 cells on 79 unkeyed rows -- resolver on every row,
@@ -462,6 +473,20 @@ test_that("the collapsed table keeps the same rows/columns and differs in exactl
   # reads comex_dic/hs_codes, the same file (set aside below with the other
   # comex_dic row). Nothing to set aside any more -- assert it stays gone.
   expect_false("baci_dic" %in% new_snap$survey)
+
+  # population: 1 available_time cell (delta #24, 2026-11-12, test-datasets_link.R) is
+  # asserted there and the row set aside before the comparison, for the same reason.
+  # Everything else about it must be unchanged -- sidra_code included.
+  population_new <- new_snap[new_snap$survey == "population", ]
+  population_old <- old_snap[old_snap$survey == "population", ]
+  expect_equal(nrow(population_new), 1)
+  expect_equal(population_new$dataset, population_old$dataset)
+  for (col in setdiff(names(population_old), "available_time")) {
+    expect_equal(population_new[[col]], population_old[[col]], info = paste("population column", col))
+  }
+  expect_false(identical(population_new$available_time, population_old$available_time))
+  new_snap <- new_snap[new_snap$survey != "population", ]
+  old_snap <- old_snap[old_snap$survey != "population", ]
 
   # pam: 7 sidra_code cells and 75 available_time cells (delta #18, 2026-10-21,
   # test-datasets_link.R) are asserted there and the rows set aside before the
