@@ -2679,9 +2679,10 @@ Statistics). This dataset includes:
 
 - **Population estimates**: Official projections and estimates for
   non-census years
-- **Census data**: Actual population counts from census years (2007,
-  2010)
-- **Time coverage**: Data from 2001 to 2021 (with some gaps)
+- **Census data**: Actual population counts from the 2007 population
+  count and the 2010 and 2022 censuses
+- **Time coverage**: Data from 2001 to 2026, except 2023 (IBGE published
+  no estimate for it)
 - **Geographic detail**: Available at country, state, and municipality
   levels
 - **Regular updates**: Annual estimates published by IBGE
@@ -2694,12 +2695,13 @@ demographic trends, and supporting policy and development planning.
 
 ### Data Source and Methodology
 
-Population data comes from: - **Census years (2007, 2010)**: Actual
-population enumeration - **Estimation years (2001-2006, 2008-2009,
-2011-2021)**: IBGE official population projections based on census data
-and vital statistics - **Methodology**: Cohort-component methodology
-considering births, deaths, migration - **Updates**: Revised annually as
-new vital statistics data becomes available
+Population data comes from: - **Count and census years (2007, 2010,
+2022)**: Actual population enumeration - **Estimation years (2001-2006,
+2008-2009, 2011-2021, 2024-2026)**: IBGE official population projections
+based on census data and vital statistics - **Methodology**:
+Cohort-component methodology considering births, deaths, migration -
+**Updates**: Revised annually as new vital statistics data becomes
+available
 
 For more information, visit [IBGE Population
 Estimates](https://www.ibge.gov.br/en/statistics/social/population/).
@@ -2713,9 +2715,9 @@ Estimates](https://www.ibge.gov.br/en/statistics/social/population/).
 Official Brazilian population statistics and estimates.
 
 - **Coverage**: All Brazilian municipalities, states, and national level
-- **Time period**: 2001 to 2021
-- **Data types**: Census counts (2007, 2010) and official estimates
-  (other years)
+- **Time period**: 2001 to 2026 (no 2023)
+- **Data types**: Count and census results (2007, 2010, 2022) and
+  official estimates (other years)
 - **Geographic levels**: Country, State, Municipality
 - **Use cases**:
   - Calculate per capita indicators for all metrics
@@ -2731,13 +2733,18 @@ Official Brazilian population statistics and estimates.
 
 ### Census Years vs. Estimate Years
 
-| Year Type | Years                           | Nature                    |
-|-----------|---------------------------------|---------------------------|
-| Census    | 2007, 2010                      | Actual population count   |
-| Estimates | 2001-2006, 2008-2009, 2011-2021 | Official IBGE projections |
+| Year Type | Years | Nature |
+|----|----|----|
+| Count / census | 2007, 2010, 2022 | Actual population count |
+| Estimates | 2001-2006, 2008-2009, 2011-2021, 2024-2026 | Official IBGE projections |
 
 Census years provide actual counts; other years are official
-projections.
+projections. In the treated data the resident population of a count or
+census year is the column `population_v93`, and an estimate is
+`estimated_population_v9324` (`populacao_residente_v93` and
+`populacao_residente_estimada_v9324` with `language = "pt"`), so a
+series that crosses both kinds of year has one of the two empty in each
+row.
 
 ### Population Definition
 
@@ -2787,8 +2794,8 @@ geo_level = "municipality"  # character string
 
 Specifies which year(s) to download.
 
-**Available years**: 2001-2006, 2007 (census), 2008-2009, 2010 (census),
-2011-2021
+**Available years**: 2001-2006, 2007 (count), 2008-2009, 2010 (census),
+2011-2021, 2022 (census), 2024-2026 (there is no 2023)
 
 ``` r
 time_period = 2020              # single year
@@ -2862,7 +2869,8 @@ calculations.
 
 ### Census vs. Estimate Quality
 
-- **Census years (2007, 2010)**: High quality, actual counts
+- **Count and census years (2007, 2010, 2022)**: High quality, actual
+  counts
 - **Estimate years**: Official IBGE projections based on demographic
   models
 - **Estimates are less certain**: Especially for small geographic areas
