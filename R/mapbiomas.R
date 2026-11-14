@@ -6,7 +6,8 @@
 #' @inheritParams load_baci
 #' @param geo_level A \code{string} that defines the geographic level of the data
 #'   * For dataset "mapbiomas_cover", can be "municipality" or "indigenous_land"
-#'   * For dataset "mapbiomas_transition", can be "municipality" or "biome" (faster download)
+#'   * For dataset "mapbiomas_transition", can only be "biome" ("municipality" is temporarily
+#'   unavailable -- MapBiomas no longer serves the municipality file)
 #'   * For dataset "mapbiomas_deforestation_regeneration", can only be "municipality"
 #'   * For dataset "mapbiomas_secondary_vegetation", can only be "municipality"
 #'   * For dataset "mapbiomas_mining", can be "indigenous_land" or "municipality"
@@ -62,6 +63,26 @@ load_mapbiomas <- function(dataset, raw_data = FALSE, geo_level = "municipality"
   # check if dataset and geo_level are supported
 
   check_params(param)
+
+  # 2026-11-13: these files return HTTP 403 and no Dataverse collection
+  # publishes a substitute. Their manifest rows are kept as is so a resolver
+  # or a human can restore them; only these combinations are blocked.
+  unavailable <- list(
+    list(dataset = "mapbiomas_transition", geo_level = "municipality", hint = "Use geo_level = \"biome\" instead."),
+    list(dataset = "mapbiomas_water", geo_level = "state", hint = "Use geo_level = \"municipality\" or \"biome\" instead."),
+    list(dataset = "mapbiomas_irrigation", geo_level = c("state", "biome"), hint = "")
+  )
+  for (u in unavailable) {
+    if (param$dataset == u$dataset && param$geo_level %in% u$geo_level) {
+      stop(
+        trimws(paste0(
+          u$dataset, " at geo_level = \"", param$geo_level, "\" is temporarily unavailable: ",
+          "MapBiomas no longer serves the source file. ", u$hint
+        )),
+        call. = FALSE
+      )
+    }
+  }
 
   # plucking sheet corresponding to each dataset/geo_level (one manifest row
   # per (dataset, geo_level) combination -- see

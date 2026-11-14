@@ -1330,6 +1330,11 @@ urbanization patterns, forest conservation
 
 ### 2. Land Cover Transitions (`"mapbiomas_transition"`)
 
+**Note**: `geo_level = "municipality"` is temporarily unavailable – the
+municipality file (Collection 9) is no longer served by MapBiomas, and
+no newer collection publishes municipality-level transitions.
+`geo_level = "biome"` (Collection 10) still works.
+
 Year-to-year changes in land cover including: - **Deforestation**:
 Conversion from forest to other uses - **Reforestation**: Conversion to
 forest types - **Agricultural Transitions**: Changes between crop types
@@ -1414,7 +1419,8 @@ impacts, fire management
 1.  **dataset**: Eight possible choices (irrigation temporarily
     unavailable)
     - `"mapbiomas_cover"`: Land cover types
-    - `"mapbiomas_transition"`: Changes in land cover
+    - `"mapbiomas_transition"`: Changes in land cover (`"municipality"`
+      temporarily unavailable; biome works)
     - `"mapbiomas_deforestation_regeneration"`: Deforestation only (see
       note above – regeneration is a separate dataset)
     - `"mapbiomas_secondary_vegetation"`: Forest regeneration/regrowth
@@ -1430,13 +1436,14 @@ impacts, fire management
       analysis)
 3.  **geo_level**: Varies by dataset
     - For `"mapbiomas_cover"`: `"municipality"` or `"indigenous_land"`
-    - For `"mapbiomas_transition"`: `"municipality"` or `"biome"`
-      (faster)
+    - For `"mapbiomas_transition"`: `"biome"` only (`"municipality"`
+      temporarily unavailable)
     - For `"mapbiomas_deforestation_regeneration"`: `"municipality"`
       only
     - For `"mapbiomas_secondary_vegetation"`: `"municipality"` only
     - For `"mapbiomas_mining"`: `"indigenous_land"` or `"municipality"`
-    - For `"mapbiomas_irrigation"`: `"state"` or `"biome"`
+    - For `"mapbiomas_irrigation"`: `"state"` or `"biome"` (both
+      temporarily unavailable)
     - For `"mapbiomas_water"`: `"municipality"` or `"biome"` (`"state"`
       currently unavailable)
     - For `"mapbiomas_fire"`: `"state"` only
