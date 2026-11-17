@@ -1,5 +1,7 @@
 # datazoom.amazonia (development version)
 
+  * Added: `load_sigmine()`'s datasets (`"sigmine_active"` and `"sigmine_inactive"`) now record their process-year coverage in the links table (`1934-2026` and `1935-2026`), refreshed automatically from ANM's files alongside availability and column checks.
+
   * Changed: `load_mapbiomas()` now stops with a clear error for the combinations whose source file MapBiomas no longer serves, instead of failing on the download: `"mapbiomas_transition"` at `geo_level = "municipality"` (no newer collection publishes municipality-level transitions; `"biome"` still works), `"mapbiomas_water"` at `geo_level = "state"` (`"municipality"` and `"biome"` still work), and `"mapbiomas_irrigation"` at every level.
 
   * Fixed: updated PRODES 2025 raster to revision `v20261019` (`prodes_amazonia_legal_2025_v20261019.zip`), maintaining resolution, grid orientation and raster legend codes.

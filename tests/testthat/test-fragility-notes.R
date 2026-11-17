@@ -107,7 +107,12 @@ tagged_sources <- list(
   # last one was split in two when the dictionary URLs moved into the manifest
   # (the manifest-sourced URL and its fake-200 failure mode; the Latin-1
   # encoding and column names).
-  list(r_path = file.path(pkg_root, "R", "comex.R"), label = "R/comex.R", min_tags = 4)
+  list(r_path = file.path(pkg_root, "R", "comex.R"), label = "R/comex.R", min_tags = 4),
+  # Added 2026-11-17 alongside SIGMINE's FRAGILITY_SOURCES row: 3 tags
+  # (positional across(nome:uf, ...) + "DADO NAO CADASTRADO", Albers proj4 +
+  # first-polygon-per-process municipality matching, and hardcoded DBF column
+  # names).
+  list(r_path = file.path(pkg_root, "R", "sigmine.R"), label = "R/sigmine.R", min_tags = 3)
 )
 
 for (src in tagged_sources) {
