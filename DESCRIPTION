@@ -31,7 +31,8 @@ Description: Provides tools for downloading and processing data on the
     and MapBiomas. Data are cleaned and standardized for analysis at the
     municipality, state, and regional levels.
 License: MIT + file LICENSE
-URL: https://datazoom.com.br/amazonia/en/, https://github.com/datazoompuc/datazoom.amazonia
+URL: https://datazoom.com.br/datazoom.amazonia/, https://datazoom.com.br/amazonia/en/,
+    https://github.com/datazoompuc/datazoom.amazonia
 Depends: 
     R (>= 4.1.0)
 Imports:
