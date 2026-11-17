@@ -5258,7 +5258,13 @@ DataZoom is developed by a team at Pontifícia Universidade Católica do
 Rio de Janeiro (PUC-Rio), Department of Economics. Our official website
 is at: <https://datazoom.com.br/pt/>.
 
-Data Zoom also maintains [datazoom.saude](https://github.com/datazoompuc/datazoom.saude) (DATASUS public health microdata), [datazoom.social](https://github.com/datazoompuc/datazoom.social) (PNAD Contínua) and the Stata package [datazoom_social](https://github.com/datazoompuc/datazoom_social_Stata) (IBGE household surveys: PNAD, Census, POF, PME and others).
+Data Zoom also maintains
+[datazoom.saude](https://github.com/datazoompuc/datazoom.saude) (DATASUS
+public health microdata),
+[datazoom.social](https://github.com/datazoompuc/datazoom.social) (PNAD
+Contínua) and the Stata package
+[datazoom_social](https://github.com/datazoompuc/datazoom_social_Stata)
+(IBGE household surveys: PNAD, Census, POF, PME and others).
 
 To cite package `datazoom.amazonia` in publications use:
 
