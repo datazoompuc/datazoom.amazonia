@@ -21,3 +21,4 @@
 ^revdep$
 ^actions$
 ^\.claude$
+^CITATION\.cff$
