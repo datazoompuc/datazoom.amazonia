@@ -160,7 +160,7 @@ pevs,pevs_forest_crops,,,289/c193/all,,https://sidra.ibge.gov.br/tabela/289,1986
 pevs,pevs_silviculture,,,291/c194/all,,https://sidra.ibge.gov.br/tabela/291,1986-2025,"country, state, municipality, region",,,,,pevs
 pevs,pevs_silviculture_area,,,5930/c734/all,,https://sidra.ibge.gov.br/tabela/5930,2013-2025,"country, state, municipality, region",,,,,pevs
 pibmunic,pibmunic,,,5938,,https://sidra.ibge.gov.br/tabela/5938,2002-2023,"country, state, municipality",,,,,pibmunic
-population,population,,,6579,,https://sidra.ibge.gov.br/pesquisa/estimapop/tabelas,2001-2021,"country, state, municipality",,,,,
+population,population,,,6579,,https://sidra.ibge.gov.br/tabela/6579,"2001-2022, 2024-2026","country, state, municipality",,,,,population
 ppm,ppm_animal_origin_production,,,74/c80/all,,https://sidra.ibge.gov.br/tabela/74,1974-2025,"country, state, municipality",,,,,ppm
 ppm,ppm_aquaculture,,,3940/c654/all,,https://sidra.ibge.gov.br/tabela/3940,2013-2025,"country, state, municipality",,,,,ppm
 ppm,ppm_cow_farming,,,94,,https://sidra.ibge.gov.br/tabela/94,1974-2025,"country, state, municipality",,,,,ppm

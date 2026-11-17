@@ -321,6 +321,19 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
     )
   )
 
+# Delta #24 -- population (2026-11-12; see actions/scrapers/resolve_population.R's
+# header). One change to an existing row that datasets_link() shows:
+#   * available_time: refreshed from IBGE's own data and from the tables of the three
+#     years the estimates table does not have ("2001-2021" -> "2001-2022, 2024-2026":
+#     the 2022 census, and the estimates of 2024 to 2026; 2023 has no data). Not pinned
+#     value by value -- resolve_population.R rewrites it every year -- but by the test
+#     further down. The golden comparison below blanks population's available_time on
+#     both sides.
+# sidra_code stays the bare table number "6579": a bare code now MEANS "this table has
+# no classification" (load_population() sends the request without one), which the
+# resolver checks. docs_url (the survey page -> the table's own page) and resolver were
+# populated too (not datasets_link() columns).
+
 # Delta #17 -- terraclimate (2026-10-19). The 14 variables' available_time
 # moves from "1958-2022" -- TerraClimate v1.0's span, carried over unchanged
 # from the hard-coded table of the pre-manifest releases; the Climatology Lab
@@ -537,6 +550,9 @@ test_that("datasets_link() matches the golden fixture (schema normalization is a
   actual$available_time[actual$dataset %in% refreshed_datasets] <- NA_character_
   expected$available_time[expected$dataset %in% refreshed_datasets] <- NA_character_
 
+  # population's available_time is asserted on its own in the test after pevs's (delta #24).
+  actual$available_time[actual$survey == "population"] <- NA_character_
+  expected$available_time[expected$survey == "population"] <- NA_character_
   # pibmunic's available_time is asserted on its own in the test after pam's (delta #21).
   actual$available_time[actual$survey == "pibmunic"] <- NA_character_
   expected$available_time[expected$survey == "pibmunic"] <- NA_character_
@@ -637,6 +653,28 @@ test_that("pevs's available_time follows IBGE's coverage: same start years, end 
   # ... and the old ranges were two editions behind
   expect_true(all(last_year(old$available_time) == 2023))
   expect_true(all(last_year(new$available_time) >= 2025))
+})
+
+test_that("population's available_time follows IBGE's coverage: same start year, the 2022 census and the newer estimates added, 2023 a gap (delta #24)", {
+  old <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds"))
+  old <- old[old$survey == "population", ]
+  new <- datasets_link(source = "population")
+  expect_equal(nrow(new), 1)
+  expect_equal(new$dataset, old$dataset)
+
+  old_years <- parse_years(old$available_time)
+  new_years <- parse_years(new$available_time)
+  expect_equal(min(new_years), min(old_years))
+  expect_equal(min(new_years), 2001)
+  expect_equal(max(old_years), 2021)
+  # every year the manifest had is still there, 2007 and 2010 included, with the census of 2022 and the newer estimates
+  expect_true(all(old_years %in% new_years))
+  expect_true(all(c(2022, 2024) %in% new_years))
+  expect_gte(max(new_years), 2026)
+  # 2023 is no year of the series: no estimate was published, and the census came the year before
+  expect_false(2023 %in% new_years)
+  # and the bare table number is still what it was
+  expect_equal(new$sidra_code, old$sidra_code)
 })
 
 test_that("filtering by source narrows correctly", {

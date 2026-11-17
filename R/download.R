@@ -33,10 +33,10 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
   # Cloudflare bot challenge (HTTP 403) from some networks, and then the caller
   # gets a bare "Error in Download." (the reason sidrar captured is dropped
   # below). PAM spells the classification out in the manifest ("5457/c782/all")
-  # for that reason, and so do PPM and PIB municipal now (a table with no
-  # classification -- PPM's 94 and 95, pibmunic's 5938 -- sends none, see
-  # sidra_get_table()); pevs, cempre, censoagro and population still pass "all".
-  # On 2026-10-21 ppm, pevs, pibmunic, cempre, censoagro and population all
+  # for that reason, and so do PPM, PEVS and PIB municipal now (a table with no
+  # classification -- PPM's 94 and 95, pibmunic's 5938, population's 6579, 793 and
+  # 4714 -- sends none, see sidra_get_table()); cempre and censoagro still pass
+  # "all". On 2026-10-21 ppm, pevs, pibmunic, cempre, censoagro and population all
   # failed this way, from the machine PAM was investigated on.
   param$classific <- classific
   param$category <- category
@@ -54,17 +54,8 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
     param$geo_reg <- "City"
   }
 
-  ### SPECIAL CASES: POPULATION FOR YEARS 2007 AND 2010
-  ### CONTAGEM DA POPULACAO AND CENSO DEMOGRAFICO
-  if (param$sidra_code == 6579) {
-    if (year == 2007) param$sidra_code <- 793 # https://sidra.ibge.gov.br/tabela/793
-    if (year == 2010) {
-      param$sidra_code <- 1378 # https://sidra.ibge.gov.br/tabela/1378
-
-      param$classific <- "c1"
-      param$category <- list(0)
-    }
-  }
+  ### SPECIAL CASES: population's per-year tables (2007, 2010, 2022) are chosen by
+  ### load_population() (population_special_tables, R/population.R), not here.
   if (param$sidra_code == 6907) {
     param$classific <- c("c12443")
     param$category <- list(110056)
