@@ -1,5 +1,7 @@
 # datazoom.amazonia (development version)
 
+  * Changed: `load_mapbiomas()` now stops with a clear error for the combinations whose source file MapBiomas no longer serves, instead of failing on the download: `"mapbiomas_transition"` at `geo_level = "municipality"` (no newer collection publishes municipality-level transitions; `"biome"` still works), `"mapbiomas_water"` at `geo_level = "state"` (`"municipality"` and `"biome"` still work), and `"mapbiomas_irrigation"` at every level.
+
   * Fixed: updated PRODES 2025 raster to revision `v20261019` (`prodes_amazonia_legal_2025_v20261019.zip`), maintaining resolution, grid orientation and raster legend codes.
 
   * Fixed: the years listed for several datasets were out of date and are now read from the source files, on every update of the links table. `"mapbiomas_mining"` reaches 2023 at the municipality level (it said 2022; indigenous land stays at 2022), and `"mapbiomas_water"` reaches 2024 at the municipality and biome levels (it said 2022; state stays at 2022). `load_epe()`'s `"consumer_energy_consumption"` and `"industrial_energy_consumption"` reach 2026, a partial year, and `"industrial_energy_consumption"` starts in 2012, not 2004: the source has no earlier industrial data. `load_aneel()`'s `"energy_generation"` covers plants dated up to 2026 (it said 2021).
