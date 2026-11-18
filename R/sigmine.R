@@ -89,6 +89,9 @@ load_sigmine <- function(dataset = "sigmine_active",
   ######################################################
 
   if (dataset == "sigmine_active") {
+    # FRAGILE: positional across(nome:uf, ...) assumes BRASIL.dbf keeps the
+    # column sequence nome, subs, uso, uf (verified live 2026-11-17) and that
+    # ANM encodes missing attributes as "DADO NAO CADASTRADO".
     a <- dat %>%
       dplyr::mutate(dplyr::across(
         nome:uf,
@@ -111,6 +114,11 @@ load_sigmine <- function(dataset = "sigmine_active",
         sf::st_zm(drop = TRUE, what = "ZM") %>%
         sf::st_make_valid()
 
+      # FRAGILE: hand-transcribed IBGE Albers equal-area proj4 string (GRS80,
+      # central meridian -54, standard parallels -2/-22) used instead of a named
+      # EPSG code, and municipality attribution keeps only the first polygon per
+      # processo after computing the centroid in meters (multi-polygon processes
+      # drop secondary polygons' areas).
       operation_crs <- sf::st_crs("+proj=aea +lat_1=-2 +lat_2=-22 +lat_0=-12 +lon_0=-54 +x_0=5000000 +y_0=10000000 +ellps=GRS80 +units=m +no_defs")
 
       a_sf_proj     <- sf::st_transform(a_sf, operation_crs)
@@ -127,6 +135,10 @@ load_sigmine <- function(dataset = "sigmine_active",
         dplyr::select(-uf) # Remove a coluna uf nativa para evitar duplicidade com abbrev_state
     }
 
+    # FRAGILE: hardcodes the raw ANM shapefile column names (processo, numero,
+    # ano, area_ha, id, fase, ult_evento, nome, subs, uso, uf, ds_processo)
+    # verified live 2026-11-17 in BRASIL.dbf and PROCESSOS_INATIVOS.dbf; an
+    # upstream column rename would silently skip the rename maps below.
     if (language == "pt") {
       names(a)[names(a) == "ult_evento"] <- "ultimo_evento"
       names(a)[names(a) == "ds_processo"] <- "descricao_processo"
