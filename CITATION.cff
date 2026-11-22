@@ -1,0 +1,88 @@
+# CITATION.cff for the datazoom.amazonia R package.
+# Enables GitHub's "Cite this repository" button. Keep in sync with
+# DESCRIPTION when the version or authors change.
+cff-version: 1.2.0
+message: "If you use datazoom.amazonia in your research, please cite it as below."
+type: software
+title: "datazoom.amazonia: Simplify Access to Data from the Amazon Region"
+abstract: >-
+  R package to download and process data on the Brazilian Amazon from official
+  sources (IBGE, INPE, MapBiomas, IBAMA, ANEEL and others): deforestation and
+  land use (PRODES, DETER, DEGRAD, MapBiomas), emissions (SEEG), climate,
+  agricultural and livestock production (PAM, PPM, PEVS, Agricultural Census),
+  mining (SIGMINE), energy and foreign trade, cleaned and standardized at the
+  municipality, state and regional levels.
+authors:
+  - family-names: "Tavares Regadas"
+    given-names: "Laura"
+    affiliation: "Pontifical Catholic University of Rio de Janeiro (PUC-Rio)"
+  - family-names: "Gonzaga"
+    given-names: "Gustavo"
+    affiliation: "Pontifical Catholic University of Rio de Janeiro (PUC-Rio)"
+  - family-names: "Rigolon Veiga"
+    given-names: "Igor"
+    affiliation: "Pontifical Catholic University of Rio de Janeiro (PUC-Rio)"
+  - family-names: "Jardim"
+    given-names: "Guilherme"
+    affiliation: "Pontifical Catholic University of Rio de Janeiro (PUC-Rio)"
+  - family-names: "AC Barbosa"
+    given-names: "Daniel"
+    affiliation: "Pontifical Catholic University of Rio de Janeiro (PUC-Rio)"
+  - family-names: "Alcantara Duarte"
+    given-names: "Bruno"
+    affiliation: "Pontifical Catholic University of Rio de Janeiro (PUC-Rio)"
+  - family-names: "Didier"
+    given-names: "Fredie"
+    affiliation: "Pontifical Catholic University of Rio de Janeiro (PUC-Rio)"
+  - family-names: "Bruni"
+    given-names: "Tito"
+    affiliation: "Pontifical Catholic University of Rio de Janeiro (PUC-Rio)"
+  - family-names: "Lopes Moussatche"
+    given-names: "Luiz Guilherme"
+    affiliation: "Pontifical Catholic University of Rio de Janeiro (PUC-Rio)"
+  - family-names: "Aliende da Matta"
+    given-names: "Victor"
+    affiliation: "Pontifical Catholic University of Rio de Janeiro (PUC-Rio)"
+  - family-names: "Dutra Saraiva"
+    given-names: "Anna Carolina"
+    affiliation: "Pontifical Catholic University of Rio de Janeiro (PUC-Rio)"
+  - family-names: "Carvalho Brito"
+    given-names: "Arthur"
+    affiliation: "Pontifical Catholic University of Rio de Janeiro (PUC-Rio)"
+  - family-names: "de Lima Cavalcanti"
+    given-names: "Francisco"
+    affiliation: "Pontifical Catholic University of Rio de Janeiro (PUC-Rio)"
+  - family-names: "Mittelbach"
+    given-names: "Maria"
+    affiliation: "Pontifical Catholic University of Rio de Janeiro (PUC-Rio)"
+  - family-names: "de Moraes Nunes"
+    given-names: "Felipe"
+    affiliation: "Pontifical Catholic University of Rio de Janeiro (PUC-Rio)"
+  - family-names: "Santos P. Barbosa"
+    given-names: "Joao Paulo"
+    affiliation: "Pontifical Catholic University of Rio de Janeiro (PUC-Rio)"
+  - family-names: "Furlanetto Sieira"
+    given-names: "Bernardo"
+    affiliation: "Pontifical Catholic University of Rio de Janeiro (PUC-Rio)"
+  - name: "Data Zoom (PUC-Rio)"
+    email: "datazoom@econ.puc-rio.br"
+    website: "https://datazoom.com.br/"
+version: "1.2.0"
+date-released: "2026-07-03"
+license: MIT
+repository-code: "https://github.com/datazoompuc/datazoom.amazonia"
+repository-artifact: "https://CRAN.R-project.org/package=datazoom.amazonia"
+url: "https://datazoom.com.br/datazoom.amazonia/"
+keywords:
+  - R
+  - Amazon
+  - Legal Amazon
+  - Brazil
+  - deforestation
+  - PRODES
+  - DETER
+  - MapBiomas
+  - IBGE
+  - INPE
+  - environmental data
+  - open data
