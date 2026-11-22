@@ -1,17 +1,15 @@
-pandoc: 2.19.2
-pkgdown: 2.0.7
+pandoc: '3.10'
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   ANEEL: ANEEL.html
   BACI: BACI.html
   CEMPRE: CEMPRE.html
-  CIPO: CIPO.html
+  CENSOAGRO: CENSOAGRO.html
   COMEX: COMEX.html
-  DATASUS: DATASUS.html
   DEGRAD: DEGRAD.html
   DETER: DETER.html
   EPE: EPE.html
-  function_structure: function_structure.html
   GOOGLEDRIVE: GOOGLEDRIVE.html
   IBAMA: IBAMA.html
   IEMA: IEMA.html
@@ -28,5 +26,7 @@ articles:
   SEEG: SEEG.html
   SIGMINE: SIGMINE.html
   TERRACLIMATE: TERRACLIMATE.html
-last_built: 2023-04-24T00:16Z
-
+last_built: 2026-11-22T21:25Z
+urls:
+  reference: https://datazoom.com.br/datazoom.amazonia/reference
+  article: https://datazoom.com.br/datazoom.amazonia/articles
