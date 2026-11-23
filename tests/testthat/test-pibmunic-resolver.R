@@ -232,12 +232,12 @@ test_that("PIBMUNIC_NAMED_VARIABLES is the var_code column of the \"pibmunic\" e
   expect_equal(length(PIBMUNIC_NAMED_VARIABLES), 46)
 })
 
-test_that("the share variables (unit '%') are variables of the loader too: the check reads the data, not the metadata's non-percentage list", {
-  # sidra_api.R's metadata parser leaves every "%" variable out of `variables` (right for PAM and PPM,
-  # where "allxp" never asks for them); here 39 of the 46 are such variables, and the healthy run
-  # must still pass with no note
+test_that("the share variables (unit '%') are variables of the loader too: the metadata parser keeps them, and the check against the data passes with no note", {
+  # 39 of the 46 variables are shares with unit "%". sidra_api.R's metadata parser dropped every "%" variable
+  # until 2026-11-23 (so this said 7); it now leaves out only IBGE's "... - percentual do total geral" twins,
+  # and the healthy run passes with no note either way
   parsed <- sidra_api_parse_metadata(metadata_json(), "5938")
-  expect_equal(length(parsed$variables), 7)
+  expect_equal(length(parsed$variables), 46)
   out <- run(fake_ibge())
   expect_null(attr(out, "partial_failures"))
 })

@@ -77,9 +77,10 @@
 #      load_pibmunic() makes (every variable, "allxp") returns 46 variables for
 #      the table and the dictionary has those same 46: 7 values in thousands of
 #      reais (37, 543, 498, 513, 517, 6575, 525) and 39 shares ("Participacao ...",
-#      unit "%"), which sidra_api.R's metadata parser leaves out of `variables`
-#      because it drops every "%" -- so the data, not the metadata, is what is
-#      compared here. A variable IBGE adds comes back as an unlabelled column
+#      unit "%"), which sidra_api.R's metadata parser dropped from `variables`
+#      until 2026-11-23, when it learnt to leave out only the "... - percentual do
+#      total geral" twins -- so the data, the ground truth, is what is compared
+#      here. A variable IBGE adds comes back as an unlabelled column
 #      (nothing breaks, unlike PAM's old na_v<crop> columns), so it is a NOTE: the
 #      row's available_time is still refreshed, and the note travels with the other
 #      partial failures (exit 11, an issue) because a person has to write the IBGE

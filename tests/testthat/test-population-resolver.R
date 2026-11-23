@@ -68,7 +68,7 @@ metadata_json <- function(table, variables = NULL, classifications = NULL, level
     id = id, nome = paste("Tabela", table), URL = url, pesquisa = "Populacao",
     periodicidade = list(frequencia = "anual", inicio = min(spec$span), fim = max(spec$span)),
     nivelTerritorial = list(Administrativo = levels, Especial = list(), IBGE = list()),
-    variaveis = lapply(variables, function(v) list(id = as.integer(v), nome = paste("variavel", v), unidade = if (v == "1000093") "%" else "Pessoas")),
+    variaveis = lapply(variables, function(v) list(id = as.integer(v), nome = if (v == "1000093") "variavel 93 - percentual do total geral" else paste("variavel", v), unidade = if (v == "1000093") "%" else "Pessoas")),
     classificacoes = classifications
   ), auto_unbox = TRUE, null = "null"))
 }
