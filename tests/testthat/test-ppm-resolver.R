@@ -22,6 +22,10 @@ skip_if_not_installed("curl")
 skip_if_not_installed("jsonlite")
 
 resolver_env <- new.env()
+# the metadata lookup, coverage query and value coding PPM shares with the other SIDRA
+# resolvers (tested for itself in test-sidra-api.R), as build_manifest.R sources it before
+# the resolvers
+source(file.path(actions_dir, "scripts", "sidra_api.R"), local = resolver_env)
 source(file.path(actions_dir, "scrapers", "resolve_ppm.R"), local = resolver_env)
 list2env(as.list(resolver_env), environment())
 
@@ -81,7 +85,7 @@ metadata_json <- function(table, id = as.integer(table), levels = c("N1", "N2", 
     id = id, nome = paste("Tabela", table), URL = url, pesquisa = "Pesquisa da Pecuaria Municipal",
     periodicidade = list(frequencia = "anual", inicio = min(spec$span), fim = max(spec$span)),
     nivelTerritorial = list(Administrativo = levels, Especial = list(), IBGE = list()),
-    variaveis = lapply(seq_along(variables), function(i) list(id = as.integer(names(variables)[i]), nome = paste("variavel", names(variables)[i], if (variables[[i]] == "%") "percentual" else ""), unidade = variables[[i]])),
+    variaveis = lapply(seq_along(variables), function(i) list(id = as.integer(names(variables)[i]), nome = paste("variavel", names(variables)[i], if (variables[[i]] == "%") "- percentual do total geral" else ""), unidade = variables[[i]])),
     classificacoes = classifications
   ), auto_unbox = TRUE, null = "null"))
 }
@@ -541,44 +545,14 @@ test_that("the package's sidra_code_parts() (what load_ppm() uses) reads every c
   }
 })
 
-test_that("ppm_years_to_available_time writes the grammar parse_years() reads, gaps included", {
-  cases <- list(
-    list(c(2005L), "2005"),
-    list(1974:2025, "1974-2025"),
-    list(c(1974:1990, 1995:2025), "1974-1990, 1995-2025"),
-    list(c(2000L, 2002L), "2000, 2002"),
-    list(c(2025L, 1974L, 1974L, 1975L), "1974-1975, 2025")
-  )
-  for (case in cases) {
-    expect_equal(ppm_years_to_available_time(case[[1]]), case[[2]])
-    expect_equal(parse_years(ppm_years_to_available_time(case[[1]])), sort(unique(case[[1]])))
-  }
-  expect_true(is.na(ppm_years_to_available_time(integer(0))))
-})
-
-test_that("ppm_parse_coverage: '...' and '..' are unpublished; numbers, '-' and 'X' are published; with or without a category", {
-  values <- c("123", "-", "X", "...", "..", "0")
-  make <- function(classified) {
-    rows <- list(if (classified) HEADER_ROW else HEADER_ROW[setdiff(names(HEADER_ROW), c("D4C", "D4N"))])
-    for (i in seq_along(values)) {
-      rows[[i + 1]] <- c(list(V = values[i], D3C = as.character(2000 + i), D3N = "Ano"), if (classified) list(D4C = "7"))
-    }
-    as.character(jsonlite::toJSON(rows, auto_unbox = TRUE))
-  }
-
-  with_category <- ppm_parse_coverage(make(TRUE), classified = TRUE)
-  expect_equal(with_category$problem, character(0))
-  expect_equal(with_category$years[["7"]], c(2001L, 2002L, 2003L, 2006L)) # 123, -, X, 0
-
-  without <- ppm_parse_coverage(make(FALSE), classified = FALSE)
-  expect_equal(without$years[["(none)"]], c(2001L, 2002L, 2003L, 2006L))
-})
-
-test_that("ppm_snippet shows text, strips markup, and gives up on binary", {
-  expect_equal(ppm_snippet(raw(0)), "")
-  expect_equal(ppm_snippet(as.raw(c(0x50, 0x4b, 0x03, 0x04, 0x00, 0x01))), "")
-  expect_equal(ppm_snippet(charToRaw("<p>Tabela   99999:\nTabela invalida</p>")), "Tabela 99999: Tabela invalida")
-  expect_equal(nchar(ppm_snippet(charToRaw(strrep("a", 500)), n = 50)), 53)
+test_that("the resolver is built on sidra_api.R: it defines none of the helpers that file has (no second copy to drift)", {
+  # ppm_fetch(), ppm_parse_metadata(), ppm_parse_coverage(), ppm_snippet() and ppm_years_to_available_time() were this
+  # file's own copy of sidra_api.R's code until 2026-11-23; test-sidra-api.R tests the real ones
+  folded <- c("ppm_fetch", "ppm_parse_metadata", "ppm_parse_coverage", "ppm_snippet", "ppm_years_to_available_time")
+  expect_false(any(folded %in% ls(resolver_env)))
+  expect_false(any(grepl("^PPM_(METADATA_URL|COVERAGE_URL|UNPUBLISHED|GEO_LEVELS|TABLE_PAGE|USER_AGENT)", ls(resolver_env))))
+  # and the ones it uses are there
+  expect_true(all(c("sidra_api_check_table", "sidra_api_geo_problem", "sidra_api_row_years", "sidra_api_docs_url") %in% ls(resolver_env)))
 })
 
 # ---- the committed manifest and R/ppm.R -------------------------------------
@@ -599,7 +573,7 @@ test_that("every committed PPM row is verifiable: owned by the resolver, one tab
   # each row points at its own table's page
   expect_equal(manifest_rows$docs_url, paste0("https://sidra.ibge.gov.br/tabela/", tables))
   geo <- unique(trimws(unlist(strsplit(tolower(manifest_rows$available_geo), ","))))
-  expect_true(all(geo %in% names(PPM_GEO_LEVELS)))
+  expect_true(all(geo %in% names(SIDRA_API_GEO_LEVELS)))
   expect_false(anyNA(lapply(manifest_rows$available_time, parse_years)))
 })
 
