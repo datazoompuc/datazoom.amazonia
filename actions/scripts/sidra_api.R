@@ -137,7 +137,7 @@ sidra_api_fetch <- function(url, timeout_s = 120) {
 }
 
 # Pure: parses one table's /metadados JSON. Returns list(problem,
-# classifications, category_info, levels, variables, variable_info, url);
+# classifications, category_info, levels, variables, variable_info, url, name);
 # `problem` is character(0) when the description is usable. classifications is a
 # named list (classification id "80" -> its category ids), EMPTY for a table
 # without one; category_info has, per classification, a data frame of id, IBGE's
@@ -198,7 +198,9 @@ sidra_api_parse_metadata <- function(text, table) {
     levels = as.character(unlist(meta$nivelTerritorial, use.names = FALSE)),
     variables = variable_info$id,
     variable_info = variable_info,
-    url = if (is.character(meta$URL) && length(meta$URL) == 1) meta$URL else NA_character_
+    url = if (is.character(meta$URL) && length(meta$URL) == 1) meta$URL else NA_character_,
+    # IBGE's own name for the table: a closed series says so in it ("... - serie encerrada em 2021")
+    name = if (is.character(meta$nome) && length(meta$nome) == 1) meta$nome else NA_character_
   )
 }
 
@@ -233,7 +235,7 @@ sidra_api_parse_coverage <- function(text, classified) {
 
 # Checks ONE table: its metadata, then its coverage. Never throws. Returns
 # list(problem, classifications, category_info, levels, variables, variable_info,
-# url, years) with `problem` character(0) when both worked.
+# url, name, years) with `problem` character(0) when both worked.
 #
 #   preferred_variables   the variable that decides whether a year is published,
 #                         in order of preference: the first one the table declares
@@ -301,6 +303,7 @@ sidra_api_check_table <- function(table, preferred_variables, fall_back_to_first
     variables = meta$variables,
     variable_info = meta$variable_info,
     url = meta$url,
+    name = meta$name,
     years = cov$years
   )
 }

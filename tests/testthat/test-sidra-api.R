@@ -117,6 +117,7 @@ test_that("sidra_api_parse_metadata reads classifications, categories, levels, v
   expect_equal(parsed$variable_info$nome, c("Producao", "Valor da producao", "Participacao do valor da producao no valor da producao da unidade da federacao"))
   expect_equal(parsed$variable_info$unidade, c("Vide categorias", "Mil Reais", "%"))
   expect_equal(parsed$url, "https://sidra.ibge.gov.br/tabela/74")
+  expect_equal(parsed$name, "x") # IBGE's own name of the table: a closed series says so in it
 
   # a table with no classification at all (PPM's 94 and 95)
   none <- sidra_api_parse_metadata(as.character(jsonlite::toJSON(list(
@@ -126,6 +127,7 @@ test_that("sidra_api_parse_metadata reads classifications, categories, levels, v
   expect_length(none$classifications, 0)
   expect_equal(none$variables, "107")
   expect_true(is.na(none$url))
+  expect_true(is.na(none$name)) # no `nome` in the description: NA, not an error
 
   expect_match(sidra_api_parse_metadata("{}", "74")$problem, "not a SIDRA table description")
   expect_match(sidra_api_parse_metadata(sub("74", "75", meta, fixed = TRUE), "74")$problem, "the description is for table 75, not 74")
@@ -157,7 +159,7 @@ resp <- function(status, body = "") {
 }
 metadata <- function(table, variables, classified = TRUE, classifications = NULL) {
   as.character(jsonlite::toJSON(list(
-    id = as.integer(table), URL = paste0("https://sidra.ibge.gov.br/tabela/", table),
+    id = as.integer(table), nome = paste("Tabela", table), URL = paste0("https://sidra.ibge.gov.br/tabela/", table),
     nivelTerritorial = list(Administrativo = c("N1", "N3", "N6")),
     # a variable with unit "%" is, as IBGE has them, the "... - percentual do total geral" twin of another
     variaveis = lapply(names(variables), function(v) list(id = as.integer(v), nome = if (identical(variables[[v]], "%")) paste("v", v, "- percentual do total geral") else paste("v", v), unidade = variables[[v]])),
@@ -195,6 +197,7 @@ test_that("sidra_api_check_table asks the coverage query for the first preferred
   expect_equal(tab$variables, c("109", "214"))
   expect_equal(tab$levels, c("N1", "N3", "N6"))
   expect_equal(tab$url, "https://sidra.ibge.gov.br/tabela/77")
+  expect_equal(tab$name, "Tabela 77")
 
   seen <- new.env()
   check(serve(c(`215` = "Mil Reais", `214` = "Toneladas"), seen = seen), c("215", "214"))

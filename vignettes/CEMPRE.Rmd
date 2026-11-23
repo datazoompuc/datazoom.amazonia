@@ -23,10 +23,12 @@ The CEMPRE dataset is one of the most detailed sources of firm-level data in Bra
 
 The CEMPRE dataset includes:
 
-- **Time Period**: Annual data from 1985 to the most recent available year
+- **Time Period**: Annual data from 2006 to 2024 (IBGE publishes it in two tables, see the note below)
 - **Geographic Coverage**: All Brazilian states, regions, and municipalities
 - **Sectoral Detail**: Economic activities classified by CNAE (Classificação Nacional de Atividades Econômicas)
 - **Variables**: Number of establishments, total employment, average salary, payroll totals, and other firm characteristics
+
+**A break between 2021 and 2022.** IBGE publishes CEMPRE in two SIDRA tables with the same structure: table 6449 for 2006 to 2021, which it has closed, and table 9418 for 2022 onwards. `load_cempre()` reads each year from the table that has it, but the two do not join up: Brazil's number of companies and other organizations goes from 5.75 million in 2021 to 9.43 million in 2022, and the number of people employed from 55.3 to 62.7 million. A comparison across 2021 and 2022 is a comparison across two different series.
 
 ## Dataset Description
 

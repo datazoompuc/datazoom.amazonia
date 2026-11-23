@@ -32,6 +32,13 @@ A \code{tibble}.
 \description{
 Loads information on companies and other organizations and their respective formally constituted local units, registered with the CNPJ - National Register of Legal Entities.
 }
+\details{
+IBGE publishes this series in two SIDRA tables: table 6449 for 2006 to 2021, which it has
+closed ("serie encerrada em 2021"), and table 9418 for 2022 onwards. They have the same structure
+and \code{load_cempre()} reads the one that has each year, but the two do not join up: Brazil's
+number of companies goes from 5.75 million in 2021 to 9.43 million in 2022, so a comparison
+across 2021 and 2022 is a comparison across two series.
+}
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 ### DO NOT RUN ###

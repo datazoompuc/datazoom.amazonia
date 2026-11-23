@@ -63,6 +63,11 @@ tagged_sources <- list(
   # classification-label columns the pivots use) and R/download.R gained a second
   # tag, counted in its entry below (sidra_get_table()'s no-classification route).
   list(r_path = file.path(pkg_root, "R", "ppm.R"), label = "R/ppm.R", min_tags = 3),
+  # Added 2026-11-23 alongside cempre's two FRAGILITY_SOURCES rows: cempre.R has 4 (the two
+  # tables the series is in, the sector-by-variable suffix of a column's name, the sector list,
+  # the label-derived column names and pivot); R/download.R's tags are the ones already counted
+  # in its entry below.
+  list(r_path = file.path(pkg_root, "R", "cempre.R"), label = "R/cempre.R", min_tags = 4),
   # Added 2026-10-31 alongside PEVS's three FRAGILITY_SOURCES rows: pevs.R has 3 (the
   # hardcoded SIDRA table ids, the label-derived column names and pivot range, the
   # variable ids each dataset names); R/download.R's tags are the ones already counted
