@@ -106,19 +106,6 @@
 #      the IBGE name and an English gloss. Not checked: names, units and
 #      translations of existing rows (nothing reads the units; a few are rough).
 #
-# BUILT ON sidra_api.R (2026-11-23). This file used to carry its own copy of the metadata
-# lookup, the coverage query and the value coding (ppm_fetch(), ppm_parse_metadata(),
-# ppm_parse_coverage(), ppm_snippet(), ppm_years_to_available_time() and the constants
-# behind them): resolve_pam.R's code before it was extracted into actions/scripts/
-# sidra_api.R, which resolve_pam.R, resolve_pibmunic.R, resolve_pevs.R and
-# resolve_population.R use. The extraction was done for PAM only, so the two copies
-# stayed. It is gone: ppm_check_table() is sidra_api_check_table() with the options
-# PPM needs, and the levels, years and docs_url of a row come from sidra_api.R's
-# sidra_api_geo_problem(), sidra_api_row_years() and sidra_api_docs_url(). Behaviour is
-# the same (checked on the live tables when this was done); what is left
-# here is PPM's own: the grammar of its sidra_code, the variable ids load_ppm() names,
-# the dictionary check and the row logic.
-#
 # DIFFERENCES FROM resolve_pam.R
 #   * sidra_code: bare "<table>" or "<table>/c<n>/<category|all>" (PAM: always
 #     the latter). Whether the classification exists is verified both ways.
@@ -127,7 +114,7 @@
 #     groups by table (a sixth row on a shared table would just work), but every
 #     failure is reported per row.
 #   * The coverage query has no /c<n>/all part for a table without a
-#     classification; the first of 215 / the table's first variable.
+#     classification; the first of 215 / the first non-percentage variable.
 #   * Also checks the variable ids (point 4), returns docs_url (point 7) and
 #     compares R/dictionary.R with the classification (point 8; the extra
 #     argument `dictionary` is only there so tests can pass a fake).
@@ -145,10 +132,20 @@
 # Naming: build_manifest.R registers EVERY top-level binding called resolve_* (or
 # watch_*) as a resolver, so everything else in this file is ppm_* or PPM_*.
 
+PPM_METADATA_URL <- "https://servicodados.ibge.gov.br/api/v3/agregados/%s/metadados"
+
+# Brazil level, every year, one variable; with every category of the table's
+# one classification when it has one. sprintf(url, table, variable[, classification id]).
+PPM_COVERAGE_URL_CLASSIFIED <- "https://apisidra.ibge.gov.br/values/t/%s/n1/all/v/%s/p/all/c%s/all"
+PPM_COVERAGE_URL_PLAIN <- "https://apisidra.ibge.gov.br/values/t/%s/n1/all/v/%s/p/all"
+
 # The variable that decides whether a year is "published": this one where the
-# table declares it, otherwise its first variable (point 3; sidra_api_check_table()'s
-# fall_back_to_first).
+# table declares it, otherwise its first non-percentage variable (point 3).
 PPM_PREFERRED_VARIABLE <- "215"
+
+PPM_UNPUBLISHED <- c("...", "..")
+
+PPM_GEO_LEVELS <- c(country = "N1", region = "N2", state = "N3", municipality = "N6")
 
 # dataset -> the IBGE variable ids load_ppm() names for it: the var_code column of
 # its "<dataset>_variables" entry of load_dictionary() (R/dictionary.R). A copy
@@ -161,6 +158,10 @@ PPM_NAMED_VARIABLES <- list(
   ppm_cow_farming = "107",
   ppm_aquaculture = c("4146", "215")
 )
+
+PPM_TABLE_PAGE <- "^https://sidra\\.ibge\\.gov\\.br/tabela/[0-9]+$"
+
+PPM_USER_AGENT <- "datazoom.amazonia-manifest-resolver (+https://github.com/datazoompuc/datazoom.amazonia)"
 
 # "74/c80/all" -> list(table = "74", classific = "c80", category = "all");
 # "94" -> list(table = "94", classific = NA, category = NA); NULL when it is
@@ -180,13 +181,205 @@ ppm_parse_code <- function(code) {
   )
 }
 
-# Checks ONE table: its metadata, then its coverage (sidra_api.R: the value of production
-# (215) decides the years where the table declares it, else its first variable; a table
-# without a classification is fine, and then the coverage query has no /c<n>/all part).
-# Returns list(problem, classifications, category_info, levels, variables, variable_info,
-# url, years) with `problem` character(0) when both worked. Never throws.
+# Pure: sorted integer years -> the manifest's available_time grammar
+# ("2005", "1974-2025", "1974-1990, 1995-2025"), or NA when there are none.
+ppm_years_to_available_time <- function(years) {
+  years <- sort(unique(as.integer(years)))
+  if (length(years) == 0) {
+    return(NA_character_)
+  }
+  starts <- c(1L, which(diff(years) > 1L) + 1L)
+  ends <- c(starts[-1] - 1L, length(years))
+  ranges <- ifelse(
+    years[starts] == years[ends],
+    as.character(years[starts]),
+    sprintf("%d-%d", years[starts], years[ends])
+  )
+  paste(ranges, collapse = ", ")
+}
+
+# A short, single-line excerpt of the text of a response body, or "" when it is
+# empty or not text -- IBGE explains its 400s in one plain sentence, and a
+# Cloudflare challenge is an HTML page whose text ("Just a moment...") is what
+# matters, not its markup.
+ppm_snippet <- function(content, n = 160) {
+  if (length(content) == 0) {
+    return("")
+  }
+  head_bytes <- content[seq_len(min(length(content), 4000))]
+  if (any(head_bytes == as.raw(0))) {
+    return("")
+  }
+  txt <- rawToChar(head_bytes)
+  Encoding(txt) <- "UTF-8"
+  if (!validUTF8(txt)) {
+    return("")
+  }
+  txt <- gsub("(?s)<(script|style)[^>]*>.*?</\\1>", " ", txt, perl = TRUE)
+  txt <- gsub("<[^>]*>", " ", txt)
+  txt <- trimws(gsub("[[:space:]]+", " ", txt))
+  if (nchar(txt) > n) txt <- paste0(substr(txt, 1, n), "...")
+  txt
+}
+
+# One GET, redirects not followed (a redirect means the API moved -- worth a
+# loud failure, not a silent follow). Returns list(problem = character(0),
+# text = <body>) or list(problem = "<reason>"). Never throws: "could not
+# check" is a reason, never conflated with "checked and fine".
+ppm_fetch <- function(url, timeout_s = 120) {
+  h <- curl::new_handle(timeout = timeout_s, followlocation = FALSE, useragent = PPM_USER_AGENT)
+  resp <- tryCatch(
+    curl::curl_fetch_memory(url, handle = h),
+    error = function(e) e
+  )
+  if (inherits(resp, "error")) {
+    return(list(problem = sprintf("could not reach %s (%s)", url, conditionMessage(resp))))
+  }
+  if (resp$status_code != 200L) {
+    snippet <- ppm_snippet(resp$content)
+    return(list(problem = sprintf(
+      "%s answered HTTP %d%s", url, resp$status_code,
+      if (nzchar(snippet)) paste0(": ", snippet) else ""
+    )))
+  }
+  text <- rawToChar(resp$content)
+  Encoding(text) <- "UTF-8"
+  list(problem = character(0), text = text)
+}
+
+# Pure: parses one table's /metadados JSON. Returns list(problem,
+# classifications, levels, variables, url); `problem` is character(0) when the
+# description is usable. classifications is a named list (classification id
+# "80" -> its category ids), EMPTY for a table without one. variables are the
+# ids of the non-percentage variables, which is what sidrar's "allxp" returns.
+ppm_parse_metadata <- function(text, table) {
+  fail <- function(msg) list(problem = msg)
+
+  meta <- tryCatch(jsonlite::fromJSON(text, simplifyVector = FALSE), error = function(e) NULL)
+  if (!is.list(meta) || is.null(meta$id) || is.null(meta$variaveis)) {
+    snippet <- ppm_snippet(charToRaw(enc2utf8(text)), n = 80)
+    return(fail(sprintf(
+      "the response is not a SIDRA table description (no id/variaveis)%s",
+      if (nzchar(snippet)) paste0("; it starts with: ", snippet) else ""
+    )))
+  }
+  if (!identical(as.character(meta$id), as.character(table))) {
+    return(fail(sprintf("the description is for table %s, not %s", meta$id, table)))
+  }
+
+  classifications <- lapply(meta$classificacoes, function(cl) {
+    vapply(cl$categorias, function(ct) as.character(ct$id), character(1))
+  })
+  names(classifications) <- vapply(meta$classificacoes, function(cl) as.character(cl$id), character(1))
+
+  # id, IBGE's name and unit, for what a message should say about a category
+  # or variable (the dictionary check, point 8)
+  describe <- function(items) {
+    data.frame(
+      id = vapply(items, function(z) as.character(z$id), character(1)),
+      nome = vapply(items, function(z) if (is.null(z$nome)) NA_character_ else as.character(z$nome), character(1)),
+      unidade = vapply(items, function(z) if (is.null(z$unidade)) NA_character_ else as.character(z$unidade), character(1)),
+      stringsAsFactors = FALSE
+    )
+  }
+  category_info <- lapply(meta$classificacoes, function(cl) describe(cl$categorias))
+  names(category_info) <- names(classifications)
+
+  is_percent <- vapply(
+    meta$variaveis,
+    function(v) identical(v$unidade, "%") || grepl("percentual", if (is.null(v$nome)) "" else v$nome, ignore.case = TRUE),
+    logical(1)
+  )
+  variable_info <- describe(meta$variaveis)[!is_percent, , drop = FALSE]
+
+  list(
+    problem = character(0),
+    classifications = classifications,
+    category_info = category_info,
+    levels = as.character(unlist(meta$nivelTerritorial, use.names = FALSE)),
+    variables = variable_info$id,
+    variable_info = variable_info,
+    url = if (is.character(meta$URL) && length(meta$URL) == 1) meta$URL else NA_character_
+  )
+}
+
+# Pure: parses the coverage query. Returns list(problem, years) where years is
+# a named list: category id ("(none)" for a table without a classification) ->
+# sorted integer years with a published value (categories with none are
+# absent). The first element of IBGE's array is a header row naming each column,
+# which is how the layout is checked.
+ppm_parse_coverage <- function(text, classified) {
+  fail <- function(msg) list(problem = msg)
+
+  d <- tryCatch(jsonlite::fromJSON(text), error = function(e) NULL)
+  needed <- c("V", "D3C", "D3N", if (classified) "D4C")
+  if (!is.data.frame(d) || !all(needed %in% names(d))) {
+    return(fail(sprintf("the response is not a SIDRA value table (a JSON array with %s)", paste(needed, collapse = ", "))))
+  }
+  if (!identical(d$D3N[1], "Ano")) {
+    return(fail(sprintf("the third dimension is '%s', not 'Ano' -- the layout of the request changed", d$D3N[1])))
+  }
+  d <- d[-1, , drop = FALSE]
+  if (nrow(d) == 0) {
+    return(fail("the table returned no data rows at all"))
+  }
+  if (!all(grepl("^[0-9]{4}$", d$D3C))) {
+    return(fail("the period codes are not four-digit years (the table is not annual)"))
+  }
+  category <- if (classified) d$D4C else rep("(none)", nrow(d))
+  published <- !is.na(d$V) & !(d$V %in% PPM_UNPUBLISHED)
+  years <- lapply(split(as.integer(d$D3C[published]), category[published]), function(y) sort(unique(y)))
+  list(problem = character(0), years = years)
+}
+
+# Checks ONE table: its metadata, then its coverage. Returns list(problem,
+# classifications, levels, variables, url, years) with `problem` character(0)
+# when both worked. Never throws.
 ppm_check_table <- function(table) {
-  sidra_api_check_table(table, PPM_PREFERRED_VARIABLE, fall_back_to_first = TRUE, allow_no_classification = TRUE)
+  meta_got <- ppm_fetch(sprintf(PPM_METADATA_URL, table))
+  if (length(meta_got$problem) > 0) {
+    return(list(problem = meta_got$problem))
+  }
+  meta <- ppm_parse_metadata(meta_got$text, table)
+  if (length(meta$problem) > 0) {
+    return(list(problem = sprintf("metadata of table %s: %s", table, meta$problem)))
+  }
+  if (length(meta$classifications) > 1) {
+    return(list(problem = sprintf(
+      "table %s has %d classifications (%s); the coverage query here handles at most one",
+      table, length(meta$classifications), paste0("c", names(meta$classifications), collapse = ", ")
+    )))
+  }
+  if (length(meta$variables) == 0) {
+    return(list(problem = sprintf("table %s declares no variable to measure coverage with", table)))
+  }
+  variable <- if (PPM_PREFERRED_VARIABLE %in% meta$variables) PPM_PREFERRED_VARIABLE else meta$variables[1]
+
+  classified <- length(meta$classifications) == 1
+  cov_url <- if (classified) {
+    sprintf(PPM_COVERAGE_URL_CLASSIFIED, table, variable, names(meta$classifications))
+  } else {
+    sprintf(PPM_COVERAGE_URL_PLAIN, table, variable)
+  }
+  cov_got <- ppm_fetch(cov_url)
+  if (length(cov_got$problem) > 0) {
+    return(list(problem = cov_got$problem))
+  }
+  cov <- ppm_parse_coverage(cov_got$text, classified)
+  if (length(cov$problem) > 0) {
+    return(list(problem = sprintf("coverage of table %s: %s", table, cov$problem)))
+  }
+
+  list(
+    problem = character(0),
+    classifications = meta$classifications,
+    category_info = meta$category_info,
+    levels = meta$levels,
+    variables = meta$variables,
+    variable_info = meta$variable_info,
+    url = meta$url,
+    years = cov$years
+  )
 }
 
 # The shipped load_dictionary() (R/dictionary.R), read from the source file:
@@ -317,20 +510,34 @@ ppm_check_row <- function(code, dataset, available_geo, checked, dictionary) {
     )))
   }
 
-  geo_problem <- sidra_api_geo_problem(available_geo, tab$levels, parsed$table)
-  if (length(geo_problem) > 0) {
-    return(row_fail(geo_problem))
+  if (!is.na(available_geo)) {
+    wanted <- trimws(strsplit(tolower(available_geo), ",")[[1]])
+    unknown <- setdiff(wanted, names(PPM_GEO_LEVELS))
+    if (length(unknown) > 0) {
+      return(row_fail(sprintf("available_geo names '%s', which has no IBGE territorial level on record in PPM_GEO_LEVELS", paste(unknown, collapse = "', '"))))
+    }
+    missing_levels <- setdiff(PPM_GEO_LEVELS[wanted], tab$levels)
+    if (length(missing_levels) > 0) {
+      return(row_fail(sprintf(
+        "available_geo promises %s, but table %s's metadata has no territorial level %s",
+        available_geo, parsed$table, paste(missing_levels, collapse = ", ")
+      )))
+    }
   }
 
-  years <- sidra_api_row_years(tab, parsed$category)
+  years <- if (is.na(parsed$category) || parsed$category == "all") {
+    sort(unique(unlist(tab$years, use.names = FALSE)))
+  } else {
+    tab$years[[parsed$category]]
+  }
   if (length(years) == 0) {
     return(row_fail(sprintf("table %s resolves, but has no year with a published value at Brazil level", parsed$table)))
   }
 
   list(
     problem = character(0),
-    available_time = sidra_api_years_to_available_time(years),
-    docs_url = sidra_api_docs_url(tab),
+    available_time = ppm_years_to_available_time(years),
+    docs_url = if (!is.na(tab$url) && grepl(PPM_TABLE_PAGE, tab$url)) tab$url else NA_character_,
     note = ppm_dictionary_gaps(dataset, tab, dictionary, parsed$category)
   )
 }
@@ -369,7 +576,7 @@ resolve_ppm <- function(rows, dictionary = ppm_read_dictionary()) {
   for (t in tables) {
     if (length(checked[[t]]$problem) == 0) {
       all_years <- sort(unique(unlist(checked[[t]]$years, use.names = FALSE)))
-      message("resolve_ppm(): table ", t, " ok -- ", length(checked[[t]]$classifications), " classification(s), ", sidra_api_years_to_available_time(all_years))
+      message("resolve_ppm(): table ", t, " ok -- ", length(checked[[t]]$classifications), " classification(s), ", ppm_years_to_available_time(all_years))
     }
   }
 
