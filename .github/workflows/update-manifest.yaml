@@ -106,15 +106,22 @@ jobs:
         id: build
         run: |
           set +e
-          # seeg was previously skipped here: its resolver returned HTTP 403
-          # specifically from GitHub Actions runners (likely IP-range/WAF
-          # blocking on SEEG's side), confirmed by a live manual run of this
-          # workflow. Re-enabled -- if that block is still in place, this
-          # resolver alone failing does not block the other resolvers' PR
-          # (exit code 11/30 handling, see actions/scripts/build_manifest.R),
-          # it only opens an issue for seeg specifically. Re-add --skip seeg
-          # if that turns out to still be a weekly occurrence.
-          Rscript --vanilla actions/scripts/build_manifest.R
+          # seeg: its resolver returns HTTP 403 specifically from GitHub Actions
+          # runners (likely IP-range/WAF blocking on SEEG's side) -- issue #344,
+          # open weekly since 2026-09-28, confirmed still happening. Skipped here
+          # (2026-11-23, at Antonio's request) so the weekly run stops
+          # re-commenting the same known failure every Monday; remove once that
+          # block is fixed.
+          #
+          # NOT skipped: pam/ppm/pevs/pibmunic/population (and cempre once merged).
+          # Their shared verification step (sidra_api.R against
+          # servicodados.ibge.gov.br) had been timing out on every GitHub Actions
+          # run since ~2026-11-02 -- but the run of 2026-11-23 reached it fine for
+          # all five, so whatever was blocking it looks intermittent rather than a
+          # standing block, and skipping a resolver that currently works would
+          # just lose real refreshes for no current reason. If the timeout comes
+          # back on a future run, add --skip for whichever of them it hits.
+          Rscript --vanilla actions/scripts/build_manifest.R --skip seeg
           echo "exit_code=$?" >> "$GITHUB_OUTPUT"
 
       - name: Stage candidates onto the committed paths
