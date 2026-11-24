@@ -14,7 +14,14 @@
 #' whichever vocabulary the source used for that biome.
 #' @inheritParams load_baci
 #'
-#' @return A \code{sf} object.
+#' @return An \code{sf} object. For treated output, \code{area} is the area of
+#' the alert part inside that municipality. \code{alert_area} is the full area
+#' of the source alert, repeated for every municipality it reaches; these
+#' repeated values are not additive. When supplied by the source,
+#' \code{source_uuid} preserves its alert identifier. \code{alert_id} is a
+#' sequence used to group the output pieces in that function call. Alerts with
+#' no positive-area municipal intersection remain once with missing
+#' municipality fields and missing \code{area}.
 #'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
@@ -55,7 +62,7 @@ load_deter <- function(dataset, raw_data = FALSE,
   ###########################
 
   .data <- view_date <- name_muni <- code_muni <- sensor <- satellite <- abbrev_state <- NULL
-  uc <- classname <- path_row <- area <- quadrant <- geometry <- id_alerta <- NULL
+  uc <- classname <- path_row <- area <- alert_area <- areatotkm <- quadrant <- geometry <- id_alerta <- NULL
 
   #############################
   ## Define Basic Parameters ##
@@ -110,6 +117,9 @@ load_deter <- function(dataset, raw_data = FALSE,
   # recognizes exactly "class_name" vs "classname".
   if ("class_name" %in% names(dat) && !("classname" %in% names(dat))) {
     dat <- dplyr::rename(dat, classname = "class_name")
+  }
+  if ("uuid" %in% names(dat)) {
+    dat <- dplyr::rename(dat, source_uuid = "uuid")
   }
 
   # Loading municipal map data
@@ -167,7 +177,22 @@ load_deter <- function(dataset, raw_data = FALSE,
 
   # Changing crs of both data to the common crs chosen above
   dat$geometry <- sf::st_make_valid(sf::st_transform(dat$geometry, operation_crs))
-  geo_br$geom <- sf::st_transform(geo_br$geom, operation_crs)
+  geo_br$geom <- sf::st_make_valid(sf::st_transform(geo_br$geom, operation_crs))
+
+  # Preserve the full alert area before st_intersection() cuts it at
+  # municipality boundaries. Public source archives do not all include
+  # AREATOTKM; when present, it is the official full alert area in km^2.
+  # Otherwise measure the complete, repaired alert geometry in the same
+  # equal-area CRS used for the municipality pieces below.
+  geometry_area_m2 <- as.numeric(sf::st_area(dat$geometry))
+  if ("areatotkm" %in% names(dat)) {
+    source_area_m2 <- suppressWarnings(as.numeric(dat$areatotkm)) * 1e6
+    missing_source_area <- is.na(source_area_m2) | !is.finite(source_area_m2)
+    source_area_m2[missing_source_area] <- geometry_area_m2[missing_source_area]
+  } else {
+    source_area_m2 <- geometry_area_m2
+  }
+  dat$alert_area <- units::set_units(source_area_m2, "m^2")
 
   # Overlaps shapefiles
   sf::st_geometry(dat) <- dat$geometry
@@ -190,13 +215,29 @@ load_deter <- function(dataset, raw_data = FALSE,
   # suppressWarnings() also hides any CRS/topology warning
   # st_intersection() would otherwise raise here, not just the expected
   # "attributes are assumed to be constant" one.
-  dat <- suppressWarnings(sf::st_intersection(dat, geo_br)) %>%
+  intersections <- suppressWarnings(sf::st_intersection(dat, geo_br)) %>%
     dplyr::mutate(area = sf::st_area(.data$geometry))
+  intersections <- intersections[
+    !is.na(intersections$area) & intersections$area > units::set_units(0, "m^2"),
+  ]
+
+  # Keep an alert even when it has no positive-area municipal match. This
+  # makes the missing match visible instead of silently losing the alert.
+  matched_alerts <- unique(intersections$id_alerta)
+  unmatched <- dat[!dat$id_alerta %in% matched_alerts, ]
+  if (nrow(unmatched)) {
+    unmatched$name_muni <- geo_br$name_muni[NA_integer_]
+    unmatched$code_muni <- geo_br$code_muni[NA_integer_]
+    unmatched$abbrev_state <- geo_br$abbrev_state[NA_integer_]
+    unmatched$area <- units::set_units(rep(NA_real_, nrow(unmatched)), "m^2")
+    intersections <- rbind(intersections, unmatched)
+  }
+  dat <- intersections
 
   dat <- dat %>%
     dplyr::select(
       view_date, name_muni, code_muni, abbrev_state, classname,
-      area, geometry, id_alerta
+      area, alert_area, geometry, id_alerta, dplyr::any_of("source_uuid")
     )
 
   ###################
@@ -210,7 +251,8 @@ load_deter <- function(dataset, raw_data = FALSE,
         "municipio" = name_muni,
         "cod_municipio" = code_muni,
         "uf" = abbrev_state,
-        "tipo_de_alerta" = classname
+        "tipo_de_alerta" = classname,
+        "area_alerta" = alert_area
       )
   }
 

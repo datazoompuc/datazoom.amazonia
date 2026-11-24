@@ -958,8 +958,14 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
     }
     if (param$source == "ibama") {
       shp <- list.files(dir, pattern = "\\.shp$", full.names = TRUE, recursive = TRUE)
-      dat_sf <- sf::read_sf(shp[1], quiet = TRUE)
-      dat <- tibble::as_tibble(dat_sf)
+      if (length(shp) != 1) {
+        stop(
+          "The IBAMA embargo archive must contain exactly one shapefile; found ",
+          length(shp), ".",
+          call. = FALSE
+        )
+      }
+      dat <- sf::read_sf(shp[[1]], quiet = TRUE)
     }
     if (param$source == "baci") {
       # archive_file carries the same version stamp as the URL (e.g.
