@@ -15,6 +15,7 @@ abstract: >-
 authors:
   - family-names: "Tavares Regadas"
     given-names: "Laura"
+    orcid: "https://orcid.org/0009-0002-8107-1806"
     affiliation: "Pontifical Catholic University of Rio de Janeiro (PUC-Rio)"
   - family-names: "Gonzaga"
     given-names: "Gustavo"

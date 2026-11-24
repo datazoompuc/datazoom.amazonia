@@ -2,7 +2,7 @@ Package: datazoom.amazonia
 Title: Simplify Access to Data from the Amazon Region
 Version: 1.2.0.9001
 Authors@R: c(
-  person("Laura", "Tavares Regadas", email = "lauratregadas@gmail.com", role = c("aut", "cre")),
+  person("Laura", "Tavares Regadas", email = "lauratregadas@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0009-0002-8107-1806")),
   person(given = "DataZoom (PUC-Rio)", email = "datazoom@econ.puc-rio.br", role = "fnd"),
   person("Gustavo", "Gonzaga", email = "gonzaga@econ.puc-rio.br", role = "aut"),
   person("Igor", "Rigolon Veiga", email = "igor.rilave@hotmail.com", role = "aut"),
