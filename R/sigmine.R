@@ -1,14 +1,94 @@
+sigmine_municipality_intersection <- function(polygons, municipalities) {
+  if (is.na(sf::st_crs(polygons))) {
+    stop("The SIGMINE polygons do not have a defined CRS.", call. = FALSE)
+  }
+  if (is.na(sf::st_crs(municipalities))) {
+    stop("The municipal layer does not have a defined CRS.", call. = FALSE)
+  }
+
+  polygons <- polygons %>%
+    sf::st_zm(drop = TRUE, what = "ZM") %>%
+    sf::st_make_valid()
+  municipalities <- sf::st_make_valid(municipalities)
+
+  operation_crs <- sf::st_crs(
+    "+proj=aea +lat_1=-2 +lat_2=-22 +lat_0=-12 +lon_0=-54 +x_0=5000000 +y_0=10000000 +ellps=GRS80 +units=m +no_defs"
+  )
+  polygons <- sf::st_transform(polygons, operation_crs)
+  municipalities <- sf::st_transform(municipalities, operation_crs)
+
+  # A process may have multiple source polygons. Union them before overlay so
+  # a process-municipality pair is represented once and overlaps are not
+  # counted twice in the geometric intersection area.
+  process_id <- as.character(polygons$processo)
+  group_id <- process_id
+  missing_id <- is.na(group_id) | !nzchar(group_id)
+  group_id[missing_id] <- paste0(".source_row_", which(missing_id))
+  groups <- split(seq_len(nrow(polygons)), factor(group_id, levels = unique(group_id)))
+
+  processes <- lapply(groups, function(ix) {
+    process <- polygons[ix[1], ]
+    process$area_m2 <- if (all(is.na(polygons$area_m2[ix]))) {
+      NA_real_
+    } else {
+      sum(polygons$area_m2[ix], na.rm = TRUE)
+    }
+    process$source_polygon_count <- length(ix)
+    sf::st_geometry(process) <- sf::st_union(sf::st_geometry(polygons[ix, ]))
+    process
+  })
+  processes <- do.call(rbind, processes)
+  processes$.process_key <- names(groups)
+
+  municipality_columns <- c(
+    "code_muni", "name_muni", "code_state", "abbrev_state",
+    "name_state", "code_region", "name_region"
+  )
+  missing_municipality_columns <- setdiff(municipality_columns, names(municipalities))
+  if (length(missing_municipality_columns)) {
+    stop(
+      "The municipal layer is missing required columns: ",
+      paste(missing_municipality_columns, collapse = ", "),
+      call. = FALSE
+    )
+  }
+
+  intersections <- suppressWarnings(sf::st_intersection(
+    processes,
+    municipalities[, municipality_columns]
+  ))
+  intersections$intersection_area_m2 <- as.numeric(sf::st_area(intersections))
+  intersections <- intersections[intersections$intersection_area_m2 > 0, ]
+
+  # Keep processes with no positive-area match, as the previous output did,
+  # but make the missing municipality explicit.
+  matched <- unique(intersections$.process_key)
+  unmatched <- processes[!processes$.process_key %in% matched, ]
+  if (nrow(unmatched)) {
+    for (column in municipality_columns) {
+      unmatched[[column]] <- municipalities[[column]][NA_integer_]
+    }
+    unmatched$intersection_area_m2 <- NA_real_
+    intersections <- rbind(intersections, unmatched)
+  }
+
+  result <- sf::st_drop_geometry(intersections)
+  result$.process_key <- NULL
+  if ("uf" %in% names(result)) result$uf <- NULL
+  result
+}
+
 #' @title SIGMINE - Mining Geographic Information System
 #'
 #' @description Loads the registry of mining processes maintained by Brazil's National Mining Agency (ANM). Each record is a polygon. \code{"sigmine_active"} covers active processes in any phase (research authorizations, mining concessions, licensing, among others), not only mines in operation; \code{"sigmine_inactive"} covers processes that are no longer active.
 #'
 #' @param dataset A dataset name ("sigmine_active" or "sigmine_inactive"). Note that "sigmine_inactive" has fewer columns available than "sigmine_active" (no mineral, company, phase, last event, or state information at the source) -- this reflects what ANM publishes for closed/inactive processes, not a limitation of this function.
 #' @inheritParams load_baci
-#' @param geo_level A \code{string} that defines the geographic level of the data. Can be "state" or "municipality". With "state" (the default) there is no aggregation and no spatial join: the function returns one row per polygon, with the state reported at the source. With "municipality" each process is assigned to the municipality that contains the centroid of its polygon, and the result has one row per process and no geometry. Ignored when \code{raw_data = TRUE}.
+#' @param geo_level A \code{string} that defines the geographic level of the data. Can be "state" or "municipality". With "state" (the default) there is no aggregation and no spatial join: the function returns one row per polygon, with the state reported at the source. With "municipality" each process is associated with every municipality that has a positive-area intersection with its polygons, and the result has one row per process-municipality pair and no geometry. A process value is repeated in each municipality it reaches, so municipal values are not additive across municipalities. Ignored when \code{raw_data = TRUE}.
 #'
-#' @details With \code{raw_data = TRUE} the function returns the ANM shapefile as published (an \code{sf} object), with only the column names cleaned; \code{geo_level} and \code{language} are ignored. With \code{raw_data = FALSE} the columns are renamed according to \code{language}, the area is converted from hectares (\code{area_ha}) to square meters (\code{area_m2}) and, for "sigmine_active", fields registered as "DADO NAO CADASTRADO" at the source become \code{NA}. The process description column (\code{ds_processo} in the ANM file) is returned as \code{process_description} when \code{language = "eng"} and as \code{descricao_processo} when \code{language = "pt"}. A process can appear in more than one polygon of the ANM file: in the October 2026 data, 4,028 of the 261,025 active processes (1.5%) and 7,447 of the 652,652 inactive ones (1.1%) have more than one polygon. With \code{geo_level = "state"} every polygon is a row; with \code{"municipality"} only the first polygon of each process is kept (see Value).
+#' @details With \code{raw_data = TRUE} the function returns the ANM shapefile as published (an \code{sf} object), with only the column names cleaned; \code{geo_level} and \code{language} are ignored. With \code{raw_data = FALSE} the columns are renamed according to \code{language}, the area is converted from hectares (\code{area_ha}) to square meters (\code{area_m2}) and, for "sigmine_active", fields registered as "DADO NAO CADASTRADO" at the source become \code{NA}. The process description column (\code{ds_processo} in the ANM file) is returned as \code{process_description} when \code{language = "eng"} and as \code{descricao_processo} when \code{language = "pt"}. A process can appear in more than one polygon of the ANM file: in the October 2026 data, 4,028 of the 261,025 active processes (1.5%) and 7,447 of the 652,652 inactive ones (1.1%) have more than one polygon. At the municipality level, \code{area_m2} is the sum of the source polygon area values for the process and is repeated for each municipality reached. \code{intersection_area_m2} is a separate geometric measure: the area of the union of that process's polygons inside that municipality. It is not used to apportion source attributes such as production. Municipal rows are not additive when summed across municipalities.
 #'
-#' @return An \code{sf} object (one row per polygon, with a \code{geometry} column) when \code{raw_data = TRUE} or \code{geo_level = "state"}; a \code{tibble} without geometry (one row per process) when \code{geo_level = "municipality"}. At the municipality level, \code{area_m2} is the area of the polygon kept for each process, not the sum of all its polygons, and processes whose centroid falls outside every municipality are kept with missing municipality fields. Because only the first polygon is kept, the total area of the active processes is understated by about 1.2% (the area of the other polygons of the same process is dropped), and in the October 2026 data 2,691 of the 261,025 active processes (about 1%) have a missing municipality.
+#' @return An \code{sf} object (one row per polygon, with a \code{geometry} column) when \code{raw_data = TRUE} or \code{geo_level = "state"}; a \code{tibble} without geometry (one row per process-municipality pair) when \code{geo_level = "municipality"}. Processes without a positive-area intersection with a municipality are retained once with missing municipality fields.
 #'
 #'
 #' @examplesIf interactive()
@@ -100,31 +180,9 @@ load_sigmine <- function(dataset = "sigmine_active",
     a$area_ha <- a$area_ha * 10000
     names(a)[names(a) == "area_ha"] <- "area_m2"
 
-    #########################################
-    ## Municipality-level spatial matching ##
-    #########################################
-
     if (geo_level == "municipality") {
       munic_shp <- external_download(source = "internal", dataset = "geo_municipalities")
-
-      a_sf <- a %>%
-        sf::st_zm(drop = TRUE, what = "ZM") %>%
-        sf::st_make_valid()
-
-      operation_crs <- sf::st_crs("+proj=aea +lat_1=-2 +lat_2=-22 +lat_0=-12 +lon_0=-54 +x_0=5000000 +y_0=10000000 +ellps=GRS80 +units=m +no_defs")
-
-      a_sf_proj     <- sf::st_transform(a_sf, operation_crs)
-      munic_shp_proj <- sf::st_transform(munic_shp, operation_crs)
-
-      a_centroid <- sf::st_centroid(a_sf_proj)
-      a_munic <- sf::st_join(a_centroid, munic_shp_proj, join = sf::st_intersects)
-
-      a_munic <- a_munic %>%
-        dplyr::distinct(processo, .keep_all = TRUE)
-
-      a <- a_munic %>%
-        sf::st_drop_geometry() %>%
-        dplyr::select(-uf) # Remove a coluna uf nativa para evitar duplicidade com abbrev_state
+      a <- sigmine_municipality_intersection(a, munic_shp)
     }
 
     if (language == "pt") {
@@ -142,6 +200,8 @@ load_sigmine <- function(dataset = "sigmine_active",
         names(a)[names(a) == "name_state"]    <- "nome_uf"
         names(a)[names(a) == "code_region"]   <- "cod_regiao"
         names(a)[names(a) == "name_region"]   <- "nome_regiao"
+        names(a)[names(a) == "intersection_area_m2"] <- "area_intersecao_m2"
+        names(a)[names(a) == "source_polygon_count"] <- "numero_poligonais_origem"
       }
     } else if (language == "eng") {
       names(a)[names(a) == "numero"]     <- "number"
@@ -179,29 +239,7 @@ load_sigmine <- function(dataset = "sigmine_active",
 
     if (geo_level == "municipality") {
       munic_shp <- external_download(source = "internal", dataset = "geo_municipalities")
-
-      a_sf <- a %>%
-        sf::st_zm(drop = TRUE, what = "ZM") %>%
-        sf::st_make_valid()
-
-      operation_crs <- sf::st_crs("+proj=aea +lat_1=-2 +lat_2=-22 +lat_0=-12 +lon_0=-54 +x_0=5000000 +y_0=10000000 +ellps=GRS80 +units=m +no_defs")
-
-      a_sf_proj     <- sf::st_transform(a_sf, operation_crs)
-      munic_shp_proj <- sf::st_transform(munic_shp, operation_crs)
-
-      a_centroid <- sf::st_centroid(a_sf_proj)
-      a_munic <- sf::st_join(a_centroid, munic_shp_proj, join = sf::st_intersects)
-
-      a_munic <- a_munic %>%
-        dplyr::distinct(processo, .keep_all = TRUE)
-
-      a <- a_munic %>%
-        sf::st_drop_geometry()
-
-      # Remove a coluna 'uf' nativa (se existir) para evitar duplicidade com a vinda do IBGE ('abbrev_state')
-      if ("uf" %in% names(a)) {
-        a <- dplyr::select(a, -uf)
-      }
+      a <- sigmine_municipality_intersection(a, munic_shp)
     }
 
     if (language == "pt") {
@@ -214,6 +252,8 @@ load_sigmine <- function(dataset = "sigmine_active",
         names(a)[names(a) == "name_state"]    <- "nome_uf"
         names(a)[names(a) == "code_region"]   <- "cod_regiao"
         names(a)[names(a) == "name_region"]   <- "nome_regiao"
+        names(a)[names(a) == "intersection_area_m2"] <- "area_intersecao_m2"
+        names(a)[names(a) == "source_polygon_count"] <- "numero_poligonais_origem"
       }
     } else if (language == "eng") {
       names(a)[names(a) == "numero"]        <- "number"
