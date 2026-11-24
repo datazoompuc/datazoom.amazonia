@@ -681,6 +681,21 @@ with IBGE municipality geometries** (2019 version) to identify ALL
 municipalities that each DETER alert overlaps with. This creates a more
 complete and accurate geographic picture than the original raw data.
 
+Each output row is one alert-municipality intersection with positive
+area. The existing `area` column measures only the part of the alert
+inside that municipality. `alert_area` stores the alert’s full area
+before it is split and repeats that value in every municipality it
+reaches, so those values are **not additive across municipalities**. The
+source’s `AREATOTKM` value is used when present; otherwise the full
+geometry is measured in the equal-area CRS. Alerts with no positive-area
+municipal match remain once with municipality fields and `area` missing.
+If the source supplies a `uuid`, it is returned as `source_uuid`;
+`alert_id` is a sequence for grouping pieces in one call.
+
+The TerraBrasilis metadata describes `AREATOTKM` as the full area before
+intersection and `UUID` as an alert identifier ([DETER
+metadata](https://terrabrasilis.dpi.inpe.br/geonetwork/srv/eng/catalog.search#/metadata/f2153c4a-915b-48a6-8658-963bdce7366c)).
+
 **Important note on CRS metadata**: `load_deter()` reprojects internally
 to IBGE’s official equal-area projection for area calculations (Albers,
 SIRGAS 2000/GRS80, central meridian -54) before computing `area` and
@@ -1260,11 +1275,26 @@ different stages of environmental enforcement:
 
 ## Data Aggregation
 
-The function returns either: - **Raw Data**: Individual infraction
-records (original format) - **Aggregated Data**: Summary statistics for
-each time-location period, including: - Total number of infractions -
-Infractions sent to prosecution - Infractions with ongoing legal
-proceedings - Embargoed area totals - Fine totals and collection rates
+For `dataset = "embargoed_areas"`, treated output uses the IBAMA embargo
+polygons and intersects them with the package’s municipal boundary
+layer. The result has one row per embargo term and municipality with
+positive-area overlap. The source identifier `seq_tad` identifies the
+embargo term; when a term has multiple source polygons, those geometries
+are united before measuring the municipal overlap. The original
+`embargoed_area_amount` (reported by IBAMA in hectares) is repeated for
+every municipality reached and **must not be summed across
+municipalities**. `intersection_area_m2` measures the geometric part of
+that embargo inside each municipality. `source_polygon_count` records
+how many source features were combined for the term. Terms without a
+positive-area municipal match are kept once with missing municipality
+fields.
+
+This spatial association uses geometry; it can differ from the
+municipality name or code recorded on the IBAMA term. The official data
+dictionary describes `SEQ_TAD` as the primary key and
+`QTD_AREA_EMBARGADA` as the total area in hectares ([IBAMA data
+dictionary](https://servicos.ibama.gov.br/ctf/publico/areasembargadas/dicionarioEmbargos.php)).
+Fine datasets remain tabular records and are not spatially intersected.
 
 ------------------------------------------------------------------------
 
@@ -1288,6 +1318,10 @@ proceedings - Embargoed area totals - Fine totals and collection rates
 4.  **language**:
     - `"pt"`: Portuguese language labels and names
     - `"eng"`: English language
+5.  **geo_level**:
+    - `"municipality"`: for embargo polygons, identify every
+      municipality reached by each polygon. The fine datasets remain at
+      the municipality recorded in their source table.
 
 ------------------------------------------------------------------------
 
