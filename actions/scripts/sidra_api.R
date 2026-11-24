@@ -27,10 +27,13 @@
 #   * https://servicodados.ibge.gov.br/api/v3/agregados/<table>/metadados is a
 #     documented JSON API with no bot challenge. It gives the table's frequency
 #     and period, its territorial levels (N1 Brazil, N2 region, N3 state, N6
-#     municipality, N8/N9 meso/micro-region), its variables (with a unit: "%" for
-#     the "... - percentual do total geral" ones, which sidrar's "allxp" never
-#     requests), and each classification with every category's id, name and unit.
-#     It reports only the TABLE's period.
+#     municipality, N8/N9 meso/micro-region), its variables (each with a unit; a
+#     variable's "... - percentual do total geral" twin, unit "%", is the one kind
+#     sidrar's "allxp" never requests -- NOT every variable with unit "%": PIB
+#     municipal's 39 "Participacao ..." shares have it and are returned; checked
+#     2026-11-23 on 22 tables against the data, see sidra_api_parse_metadata()),
+#     and each classification with every category's id, name and unit. It reports
+#     only the TABLE's period.
 #   * https://apisidra.ibge.gov.br/values/t/<table>/n1/all/v/<var>/p/all[/c<cl>/all]
 #     returns every year (and category) at Brazil level in one call. A year IBGE
 #     does not publish is still a ROW, with the value "..." (not available) or
@@ -134,12 +137,22 @@ sidra_api_fetch <- function(url, timeout_s = 120) {
 }
 
 # Pure: parses one table's /metadados JSON. Returns list(problem,
-# classifications, category_info, levels, variables, variable_info, url);
+# classifications, category_info, levels, variables, variable_info, url, name);
 # `problem` is character(0) when the description is usable. classifications is a
 # named list (classification id "80" -> its category ids), EMPTY for a table
 # without one; category_info has, per classification, a data frame of id, IBGE's
-# name and unit; variables are the ids of the non-percentage variables, which is
-# what sidrar's "allxp" returns, and variable_info their id, name and unit.
+# name and unit; variables are the ids of every variable except the "... -
+# percentual do total geral" twins, which is what sidrar's "allxp" returns, and
+# variable_info their id, name and unit.
+#
+# A twin is recognised by that wording in its NAME, not by its unit. Until
+# 2026-11-23 any variable with unit "%" was dropped too, and that is wrong: table
+# 5938 (PIB municipal) declares 46 variables, 39 of them shares with unit "%"
+# ("Participacao do produto interno bruto ... no ... da unidade da federacao"), and
+# "allxp" returns all 46. Checked on 22 tables (CEMPRE's 6449 and 9418, PIB
+# municipal 5938, PEVS 289/291/5930, PPM 74/3940/3939/94/95, population 6579/793/
+# 1378/4714, PAM 1612/1613/5457/1002/839/1000/1001): the variables this returns are
+# exactly the variables of the data for 22 of 22; the old rule agreed for 21.
 sidra_api_parse_metadata <- function(text, table) {
   fail <- function(msg) list(problem = msg)
 
@@ -171,12 +184,12 @@ sidra_api_parse_metadata <- function(text, table) {
   category_info <- lapply(meta$classificacoes, function(cl) describe(cl$categorias))
   names(category_info) <- names(classifications)
 
-  is_percent <- vapply(
+  is_twin <- vapply(
     meta$variaveis,
-    function(v) identical(v$unidade, "%") || grepl("percentual", if (is.null(v$nome)) "" else v$nome, ignore.case = TRUE),
+    function(v) grepl("percentual do total geral", if (is.null(v$nome)) "" else v$nome, ignore.case = TRUE),
     logical(1)
   )
-  variable_info <- describe(meta$variaveis)[!is_percent, , drop = FALSE]
+  variable_info <- describe(meta$variaveis)[!is_twin, , drop = FALSE]
 
   list(
     problem = character(0),
@@ -185,7 +198,9 @@ sidra_api_parse_metadata <- function(text, table) {
     levels = as.character(unlist(meta$nivelTerritorial, use.names = FALSE)),
     variables = variable_info$id,
     variable_info = variable_info,
-    url = if (is.character(meta$URL) && length(meta$URL) == 1) meta$URL else NA_character_
+    url = if (is.character(meta$URL) && length(meta$URL) == 1) meta$URL else NA_character_,
+    # IBGE's own name for the table: a closed series says so in it ("... - serie encerrada em 2021")
+    name = if (is.character(meta$nome) && length(meta$nome) == 1) meta$nome else NA_character_
   )
 }
 
@@ -220,11 +235,11 @@ sidra_api_parse_coverage <- function(text, classified) {
 
 # Checks ONE table: its metadata, then its coverage. Never throws. Returns
 # list(problem, classifications, category_info, levels, variables, variable_info,
-# url, years) with `problem` character(0) when both worked.
+# url, name, years) with `problem` character(0) when both worked.
 #
 #   preferred_variables   the variable that decides whether a year is published,
 #                         in order of preference: the first one the table declares
-#   fall_back_to_first    use the table's first non-percentage variable when none
+#   fall_back_to_first    use the table's first variable (not a percentage twin) when none
 #                         of the preferred is declared (PPM) instead of failing
 #                         (PAM, whose two preferred ids are known to be enough)
 #   allow_no_classification  a table with no classification is fine (PPM's 94 and
@@ -288,6 +303,7 @@ sidra_api_check_table <- function(table, preferred_variables, fall_back_to_first
     variables = meta$variables,
     variable_info = meta$variable_info,
     url = meta$url,
+    name = meta$name,
     years = cov$years
   )
 }

@@ -101,6 +101,12 @@ FRAGILITY_SOURCES <- list(
   list(changed_prefix = "pevs", r_path = file.path("R", "pevs.R"), label = "R/pevs.R", treat_fn = "load_pevs()"),
   list(changed_prefix = "pevs", r_path = file.path("R", "download.R"), label = "R/download.R", treat_fn = "sidra_download()"),
   list(changed_prefix = "pevs", r_path = file.path("R", "dictionary.R"), label = "R/dictionary.R", treat_fn = "load_dictionary()"),
+  # cempre's treatment code is load_cempre() (R/cempre.R) plus the SIDRA request
+  # sidra_download() (R/download.R) builds for it, so one row per file, as for ppm
+  # above. (The labels come from load_dictionary()'s cempre section, which carries no
+  # tag of its own: the ones that concern it are in R/cempre.R.)
+  list(changed_prefix = "cempre", r_path = file.path("R", "cempre.R"), label = "R/cempre.R", treat_fn = "load_cempre()"),
+  list(changed_prefix = "cempre", r_path = file.path("R", "download.R"), label = "R/download.R", treat_fn = "sidra_download()"),
   # terraclimate's treatment code lives in two files: load_climate() (R/climate.R)
   # and the NCSS request external_download() builds (R/download.R). The loop in
   # build_manifest.R reads ONE file per row, so there is one row per file; a

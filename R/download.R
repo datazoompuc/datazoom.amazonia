@@ -35,9 +35,14 @@ sidra_download <- function(sidra_code = NULL, year, geo_level = "municipality",
   # below). PAM spells the classification out in the manifest ("5457/c782/all")
   # for that reason, and so do PPM, PEVS and PIB municipal now (a table with no
   # classification -- PPM's 94 and 95, pibmunic's 5938, population's 6579, 793 and
-  # 4714 -- sends none, see sidra_get_table()); cempre and censoagro still pass
-  # "all". On 2026-10-21 ppm, pevs, pibmunic, cempre, censoagro and population all
-  # failed this way, from the machine PAM was investigated on.
+  # 4714 -- sends none, see sidra_get_table()); censoagro still passes "all". On
+  # 2026-10-21 ppm, pevs, pibmunic, censoagro and population all failed this way,
+  # from the machine PAM was investigated on. cempre was wrongly listed among them
+  # at the time: load_cempre() has always named its classification and category
+  # directly, never sidra_download()'s default, so it never hit this bug (checked
+  # live 2026-11-23). Its manifest row was spelled out then too
+  # ("9418/c12762/117897"), for the resolver's own "a bare code means no
+  # classification" convention (see resolve_cempre.R), not because of this trap.
   param$classific <- classific
   param$category <- category
 

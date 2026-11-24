@@ -334,6 +334,25 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
 # resolver checks. docs_url (the survey page -> the table's own page) and resolver were
 # populated too (not datasets_link() columns).
 
+# Delta #25 -- cempre (2026-11-23; see actions/scrapers/resolve_cempre.R's header). Two
+# changes to the existing row, both shown by datasets_link():
+#   * sidra_code: "6449" -> "9418/c12762/117897". IBGE closed table 6449 with the 2021 data
+#     and publishes 2022 onwards in table 9418 (same name, same CNAE classification, same
+#     four variables); the manifest now names the open table, with the classification
+#     and the Total that load_cempre() sends, and load_cempre() asks the closed table for
+#     2006-2021 (cempre_closed_tables in R/cempre.R). Spelled out for the reason PPM's
+#     codes are: a bare code now MEANS "this table has no classification".
+#   * available_time: "2006-2020" -> "2006-2024", from IBGE's own data (the manifest had
+#     stopped at 2020 though 6449 has 2021, and 2022-2024 are in 9418). Not pinned value by
+#     value -- resolve_cempre.R rewrites it every year -- but by the test further down. The
+#     golden comparison below blanks cempre's available_time on both sides.
+# docs_url (the survey page, which answers HTTP 403 behind a bot challenge -> the open
+# table's own page) and resolver were populated too (not datasets_link() columns).
+fixture <- fixture %>%
+  dplyr::mutate(
+    sidra_code = dplyr::if_else(survey == "cempre", "9418/c12762/117897", sidra_code)
+  )
+
 # Delta #17 -- terraclimate (2026-10-19). The 14 variables' available_time
 # moves from "1958-2022" -- TerraClimate v1.0's span, carried over unchanged
 # from the hard-coded table of the pre-manifest releases; the Climatology Lab
@@ -550,6 +569,9 @@ test_that("datasets_link() matches the golden fixture (schema normalization is a
   actual$available_time[actual$dataset %in% refreshed_datasets] <- NA_character_
   expected$available_time[expected$dataset %in% refreshed_datasets] <- NA_character_
 
+  # cempre's available_time is asserted on its own in the test after population's (delta #25).
+  actual$available_time[actual$survey == "cempre"] <- NA_character_
+  expected$available_time[expected$survey == "cempre"] <- NA_character_
   # population's available_time is asserted on its own in the test after pevs's (delta #24).
   actual$available_time[actual$survey == "population"] <- NA_character_
   expected$available_time[expected$survey == "population"] <- NA_character_
@@ -675,6 +697,29 @@ test_that("population's available_time follows IBGE's coverage: same start year,
   expect_false(2023 %in% new_years)
   # and the bare table number is still what it was
   expect_equal(new$sidra_code, old$sidra_code)
+})
+
+test_that("cempre's available_time follows IBGE's coverage: same start year, 2021 from the closed table and 2022-2024 from its successor, no gap (delta #25)", {
+  old <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds"))
+  old <- old[old$survey == "cempre", ]
+  new <- datasets_link(source = "cempre")
+  expect_equal(nrow(new), 1)
+  expect_equal(new$dataset, old$dataset)
+
+  old_years <- parse_years(old$available_time)
+  new_years <- parse_years(new$available_time)
+  expect_equal(min(new_years), min(old_years))
+  expect_equal(min(new_years), 2006)
+  expect_equal(max(old_years), 2020)
+  # every year the manifest had is still there, with 2021 (table 6449's last) and 2022 onwards (table 9418)
+  expect_true(all(old_years %in% new_years))
+  expect_true(all(c(2021, 2022, 2024) %in% new_years))
+  expect_gte(max(new_years), 2024)
+  # no gap: the two tables join up year by year (their values do not -- see load_cempre()'s help)
+  expect_equal(new_years, seq(min(new_years), max(new_years)))
+  # the code now names the open table with the classification and the Total the loader sends
+  expect_equal(old$sidra_code, "6449")
+  expect_equal(new$sidra_code, "9418/c12762/117897")
 })
 
 test_that("filtering by source narrows correctly", {
