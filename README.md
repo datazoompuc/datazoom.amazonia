@@ -882,14 +882,30 @@ systems. Key points:
 ### Spatial Integration
 
 This package enhances the raw DEGRAD data by: - Intersecting DEGRAD
-spatial polygons with IBGE municipality boundaries (2019 version) -
-Providing municipality identification for each degradation event -
-Converting to Simple Features (SF) objects for spatial analysis
+spatial polygons with the package’s Legal Amazon municipal boundaries -
+Providing one row for each source polygon and municipality pair with
+positive-area overlap - Returning both the complete polygon area and the
+area of its piece inside each municipality - Keeping unmatched source
+polygons with missing municipality codes
 
-**Note on CRS**: `load_degrad()` reprojects internally to IBGE’s
-official equal-area projection for area calculations (Albers, SIRGAS
-2000/GRS80, central meridian -54) before computing `area` and overlaying
-municipality boundaries – not UTM zones.
+**Area fields**: `source_area_m2` is calculated from the complete source
+polygon before the municipal cut. It is repeated for every municipality
+reached, so values across municipal rows are **not additive**.
+`intersection_area_m2` measures the part inside that municipality. The
+existing `area` field remains an alias for `intersection_area_m2`.
+
+The source shapefiles do not provide a stable polygon identifier.
+`source_feature_id` is generated from the edition year and row position
+and is dependable only for the same source-file version and row order.
+If one source polygon creates multiple intersection fragments in the
+same municipality, those fragments are united;
+`intersection_fragment_count` records how many were combined.
+
+**Note on CRS**: `load_degrad()` harmonizes each edition to SIRGAS 2000
+(EPSG:4674), then reprojects the polygons and municipal boundaries to
+IBGE’s Brazil-wide Albers equal-area projection (GRS80; central meridian
+-54; standard parallels -2/-22) before measuring area. The resulting
+areas are in square metres.
 
 ------------------------------------------------------------------------
 
@@ -903,8 +919,9 @@ Detailed monitoring of forest degradation across the Legal Amazon.
 - **Time period**: 2007 onwards (but events within editions may vary)
 - **Spatial unit**: Polygons/spatial geometries with municipality
   identification
-- **Variables**: Event date/year, degradation type/cause, area,
-  municipality, state, edition
+- **Variables**: Edition year, degradation class, source feature
+  identifier, complete source area, municipal intersection area,
+  municipality and state codes
 - **Data format**: Simple Features (SF) spatial objects with geographic
   boundaries
 - **Use cases**:
@@ -979,7 +996,12 @@ The returned data is a Simple Features (SF) spatial object with:
 - **year**: Year when degradation was detected/event occurred
 - **degradation_type**: Type of degradation (logging, fire, agriculture,
   etc.)
-- **area_hectares**: Size of degradation event
+- **source_area_m2**: Area of the complete source polygon, repeated
+  across municipalities and not additive
+- **intersection_area_m2**: Geometric area of the polygon piece inside
+  the municipality; `area` retains this meaning
+- **source_feature_id**: Generated grouping key for one source row
+  within a specific edition file; not a permanent identifier
 - **municipality**: Name of affected municipality
 - **state**: Brazilian state
 - **edition**: Which DEGRAD edition this event appears in
