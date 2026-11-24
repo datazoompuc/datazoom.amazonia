@@ -6,7 +6,8 @@
 #'
 #' @param dataset A dataset name ("degrad").
 #' @inheritParams load_baci
-#' @return A \code{list} of tibbles (if \code{raw_data} = \code{TRUE}) or a tibble (if \code{raw_data} = \code{FALSE}).
+#' @details Treated data are intersected with Legal Amazon municipalities. The full source polygon area is calculated before the cut and returned as \code{source_area_m2}; it repeats for each municipality reached and is not additive. \code{intersection_area_m2} measures the piece inside a municipality, and the existing \code{area} column keeps that same clipped-area meaning. Because source files do not supply a stable polygon key, \code{source_feature_id} (or \code{id_poligono_fonte} in Portuguese) is generated from the edition year and row position; it is only stable while the source file and its row order remain unchanged. Fragments for a source feature within the same municipality are unioned into one row. Features without a positive-area municipal match are retained with missing municipality codes.
+#' @return A list of raw spatial layers when \code{raw_data = TRUE}, or an \code{sf} object when \code{raw_data = FALSE}. Treated output has one row per source polygon and municipality with positive-area overlap. \code{source_area_m2} (or \code{area_fonte_m2}) is the full polygon area, repeated across municipalities and therefore not additive; \code{intersection_area_m2} (or \code{area_intersecao_m2}, and the legacy \code{area} column) measures the part inside that municipality. The generated source feature identifier groups fragments from the same source row within the requested download; it is not a permanent source identifier.
 #'
 #'
 #' @examplesIf interactive()
@@ -115,6 +116,9 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
   # coordinates/municipality attribution for 2007-2014, not just the
   # previously-crashing cross-group combinations.
   harmonize_degrad_year_crs <- function(d) {
+    # DEGRAD editions do not include a stable feature identifier. This key
+    # groups pieces from the same original row for this downloaded edition.
+    d$source_feature_id <- paste0(as.character(d$year[1]), "_", seq_len(nrow(d)))
     if (is.na(sf::st_crs(d$geometry))) {
       d$geometry <- sf::st_set_crs(
         d$geometry,
@@ -218,22 +222,10 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
   sf::st_geometry(dat) <- dat$geometry
   sf::st_geometry(geo_amazon) <- geo_amazon$geom
 
-  # FRAGILE: a DEGRAD polygon overlapping a municipal boundary can be split
-  # into multiple output rows by st_intersection() below, the same way
-  # R/deter.R's municipality overlay can split one alert into several rows
-  # (see that file's own FRAGILE tag) -- there's no stable scar/alert id in
-  # the raw DEGRAD shapefiles to reassemble these by, and polygons touching
-  # no Legal Amazon municipality drop out altogether, so rows cannot be
-  # turned back into a polygon count. Measured 2026-10-16 on the current
-  # code: the 10 years hold 227,218 raw polygons and 231,453 output rows
-  # (+1.9% net; 2007: 44,012 -> 44,773). Which sliver rows exist depends on
-  # the projection and on the datum: against the original polyconic code the
-  # output differs by -14 to +6 rows per year (-30 over the 10 years, 0.013%),
-  # and the real datum shift of the SAD69-era polygons (see the tag above the
-  # download loop) changes it by -14 to +3 rows per year (-36 over the 10
-  # years; exactly 0 for 2015-2016).
-  dat <- suppressWarnings(sf::st_intersection(dat, geo_amazon)) %>%
-    dplyr::mutate(area = sf::st_area(.data$geometry))
+  # The source polygon is split at municipal borders. Keep its complete area
+  # separately, then union fragments by source feature and municipality so
+  # there is one row for each pair.
+  dat <- degrad_municipality_intersection(dat, geo_amazon)
 
   dat <- dat %>%
     dplyr::select(
@@ -256,8 +248,12 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
       dplyr::select(
         ano = year, linkcolumn, scene_id,
         cod_uf = code_state, cod_municipio = code_muni,
-        classe = class_name, pathrow, area, data = view_date,
-        julday, geometry
+        classe = class_name, pathrow, area,
+        id_poligono_fonte = source_feature_id,
+        area_fonte_m2 = source_area_m2,
+        area_intersecao_m2 = intersection_area_m2,
+        numero_fragmentos_intersecao = intersection_fragment_count,
+        data = view_date, julday, geometry
       ) %>%
       dplyr::arrange(ano, cod_municipio, classe)
   }
@@ -266,8 +262,10 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
     dat_mod <- dat %>%
       dplyr::select(year, linkcolumn, scene_id,
         state_code = code_state, municipality_code = code_muni,
-        class_name, pathrow, area, date = view_date,
-        julday, geometry
+        class_name, pathrow, area, source_feature_id,
+        source_area_m2, intersection_area_m2,
+        intersection_fragment_count,
+        date = view_date, julday, geometry
       ) %>%
       dplyr::arrange(year, municipality_code, class_name)
   }
@@ -277,4 +275,59 @@ load_degrad <- function(dataset = "degrad", raw_data = FALSE,
   ####################
 
   return(dat_mod)
+}
+
+# Overlay DEGRAD source polygons with Legal Amazon municipalities and return
+# one record per source-feature/municipality pair. The generated source key
+# is only stable for the same source file and row order.
+degrad_municipality_intersection <- function(polygons, municipalities) {
+  municipality_columns <- c(
+    "code_muni", "name_muni", "code_state", "abbrev_state", "name_state",
+    "code_region", "name_region"
+  )
+  if (is.na(sf::st_crs(polygons)) || is.na(sf::st_crs(municipalities))) {
+    stop("Both DEGRAD and municipal geometries must have a defined CRS.", call. = FALSE)
+  }
+
+  polygons$source_area_m2 <- sf::st_area(polygons$geometry)
+  sf::st_geometry(polygons) <- polygons$geometry
+  intersections <- suppressWarnings(sf::st_intersection(
+    polygons,
+    municipalities[, municipality_columns]
+  ))
+  intersections$intersection_area_m2 <- sf::st_area(intersections)
+  intersections <- intersections[
+    !is.na(intersections$intersection_area_m2) &
+      intersections$intersection_area_m2 > units::set_units(0, "m^2"),
+  ]
+  intersections$intersection_fragment_count <- integer(nrow(intersections))
+  intersections$area <- intersections$intersection_area_m2
+
+  if (nrow(intersections)) {
+    pair_key <- paste(intersections$source_feature_id, intersections$code_muni, sep = "\034")
+    groups <- split(seq_len(nrow(intersections)), factor(pair_key, levels = unique(pair_key)))
+    intersections <- lapply(groups, function(ix) {
+      feature <- intersections[ix[1], ]
+      sf::st_geometry(feature) <- sf::st_union(sf::st_geometry(intersections[ix, ]))
+      feature$intersection_fragment_count <- length(ix)
+      feature$intersection_area_m2 <- sf::st_area(feature)
+      feature$area <- feature$intersection_area_m2
+      feature
+    })
+    intersections <- do.call(rbind, intersections)
+  }
+
+  matched <- unique(intersections$source_feature_id)
+  unmatched <- polygons[!polygons$source_feature_id %in% matched, ]
+  if (nrow(unmatched)) {
+    for (column in municipality_columns) {
+      unmatched[[column]] <- municipalities[[column]][NA_integer_]
+    }
+    unmatched$intersection_area_m2 <- units::set_units(rep(NA_real_, nrow(unmatched)), "m^2")
+    unmatched$intersection_fragment_count <- 0L
+    unmatched$area <- unmatched$intersection_area_m2
+    intersections <- rbind(intersections, unmatched)
+  }
+
+  intersections
 }
