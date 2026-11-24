@@ -4527,22 +4527,29 @@ from the source is in parentheses):
 | `process_description` (`ds_processo`) | Process description field from the ANM file |
 | `geometry` | Polygon (only at `geo_level = "state"`) |
 
+At the municipality level, `area_m2` is the sum of the source area
+values for all polygons of that process. The result also includes
+`intersection_area_m2`, the unique area of the process geometry inside
+each municipality, and `source_polygon_count`, the number of source
+polygons represented by the process row. In Portuguese these added
+fields are `area_intersecao_m2` and `numero_poligonais_origem`.
+
 At `geo_level = "municipality"` there is no `geometry`, and the table
 adds the municipality, state, and region codes and names
 (`municipality_code`, `municipality`, `state_code`, `state`,
 `state_name`, `region_code`, `region_name`). Here `state` comes from the
-matched municipality.
+matched municipality. The table has one row per process-municipality
+pair.
 
 A process can appear in more than one polygon in the ANM file (in the
 October 2026 data, 4,028 of the 261,025 active processes, 1.5%, and
 7,447 of the 652,652 inactive ones, 1.1%). At `geo_level = "state"` each
-polygon is a row. At `geo_level = "municipality"` the function assigns
-each polygon to the municipality that contains its centroid and keeps
-only the first polygon of each process, so `area_m2` is the area of that
-polygon, not of the whole process: for the active data the total area is
-understated by about 1.2%. Processes whose centroid falls outside every
-municipality keep missing municipality fields (2,691 of the 261,025
-active processes, about 1%).
+polygon is a row. At `geo_level = "municipality"`, the source area
+values across all polygons of a process are summed into `area_m2` and
+repeated for each municipality reached. `intersection_area_m2` is a
+separate geometric measure: the unique part of the process footprint
+inside that municipality. Processes without a positive-area intersection
+are retained with missing municipality fields.
 
 Treated `sigmine_inactive`: `process`, `number`, `year`, `area_m2`,
 `id`, `process_description` and `geometry`.
@@ -4578,7 +4585,7 @@ mining_eng <- load_sigmine(
 ### Example 3: Active mining data by municipality
 
 ``` r
-# one row per process, assigned to the municipality of its centroid
+# one row per process-municipality pair reached by the polygon intersection
 mining_munic <- load_sigmine(
   dataset = "sigmine_active",
   raw_data = FALSE,
@@ -4647,8 +4654,8 @@ values available.
 
 SIGMINE is published by the ANM as polygons (some processes have more
 than one polygon), not as municipality totals. To return
-`geo_level = "municipality"`, each process is assigned to a single
-municipality in these steps:
+`geo_level = "municipality"`, the function associates a process with
+every municipality where its geometry has a positive-area intersection:
 
 1.  The polygons are made valid and their Z/M dimensions are dropped.
 2.  Both the mining polygons and the municipal boundaries (the package’s
@@ -4656,13 +4663,17 @@ municipality in these steps:
     Albers conic projection (SIRGAS 2000 / Brazil Albers,
     [EPSG:10857](https://epsg.io/10857)): standard parallels 2°S and
     22°S, central meridian 54°W, latitude of origin 12°S, false easting
-    5,000,000 m, false northing 10,000,000 m, GRS80 ellipsoid. Centroids
-    are computed in meters, because centroids computed on
-    longitude/latitude are distorted.
-3.  The centroid of each polygon is computed.
-4.  Each centroid is matched to the municipality that contains it. Then
-    only one row is kept for each `processo`: the first polygon found in
-    the ANM file.
+    5,000,000 m, false northing 10,000,000 m, GRS80 ellipsoid. Areas are
+    measured in square meters in this equal-area projection.
+3.  Polygons belonging to the same process are unioned. This avoids
+    counting overlapping source polygons twice when measuring the
+    geometry.
+4.  `st_intersection()` cuts the process geometry at municipal
+    boundaries. Only intersections with positive area are retained. A
+    touch along a shared boundary by itself does not create a
+    process-municipality row.
+5.  The area of each resulting piece is measured in square meters as
+    `intersection_area_m2`.
 
 The projection follows IBGE’s recommendation for area calculations
 (equal-area Albers projection, standard parallels 2°S and 22°S, origin
@@ -4670,20 +4681,23 @@ at 12°S and 54°W), described in the [BC250 technical
 documentation](https://geoftp.ibge.gov.br/cartas_e_mapas/bases_cartograficas_continuas/bc250/versao2023/informacoes_tecnicas/documentacao_tecnica__bc250_2023.pdf)
 (section “Cálculo de áreas e extensões”). The false easting and northing
 (5,000,000 m and 10,000,000 m) only shift the coordinates and do not
-affect areas or centroid positions.
+affect areas.
 
-The result is **one municipality per process**: a mining area that
-crosses municipal borders is not split, and it is counted in the
-municipality where its centroid falls. For very irregular polygons, the
-centroid can fall outside the polygon itself, and then the process may
-be assigned to a neighboring municipality. If the centroid falls outside
-every municipal polygon, the process is kept with missing (`NA`)
-municipality, state and region fields.
+The result has **one row per process-municipality pair**. A process that
+intersects three municipalities appears three times. A process without
+any positive-area municipal intersection is retained once with missing
+(`NA`) municipality, state and region fields.
 
 Two consequences to keep in mind:
 
-- For a process with several polygons, `area_m2` is the area of the
-  polygon that was kept, not the sum of all its polygons.
+- `area_m2` is the sum of the ANM source area values across all polygons
+  of the process. That full process value is repeated in each
+  municipality the process reaches. It is **not additive across
+  municipalities**: summing those rows would count the same process
+  value more than once.
+- `intersection_area_m2` measures the unique area of the process
+  geometry inside that municipality. This is not used to apportion
+  `area_m2` or another process attribute, such as production.
 - The result has no geometry, and the state column comes from the
   matched municipality, not from the source.
 
