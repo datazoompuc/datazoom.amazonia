@@ -12,13 +12,14 @@ load_prodes(
 )
 }
 \arguments{
-\item{dataset}{A dataset name. Can be one of "deforestation", "residual_deforestation", "native_vegetation", "hydrography", "non_forest", or "clouds".}
+\item{dataset}{A dataset name. Can be one of "deforestation", "deforestation_polygons", "residual_deforestation", "native_vegetation", "hydrography", "non_forest", or "clouds". "deforestation_polygons" returns the annual PRODES vector polygons since 2008, crossed with municipalities.}
 
 \item{raw_data}{A \code{boolean} setting the return of raw (\code{TRUE}) or processed (\code{FALSE}) data.}
 
 \item{time_period}{A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.
 \itemize{
 \item Between 2007 - 2025 for dataset "deforestation". Deforestation for 2007 includes all cumulative deforestation up to 2007. For other years, deforestation is incremental
+\item Between 2008 - 2025 for dataset "deforestation_polygons", which contains the annual vector polygons
 \item Between 2010 - 2025 for dataset "residual_deforestation"
 \item Only 2025 for all other datasets
 }}
@@ -26,7 +27,7 @@ load_prodes(
 \item{language}{A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.}
 }
 \value{
-A \code{tibble} with the selected data if raw_data is \code{FALSE}, and a \code{SpatRaster} is \code{TRUE}.
+A \code{tibble} with the selected data if raw_data is \code{FALSE}, and a \code{SpatRaster} for raster datasets or an \code{sf} object for \code{"deforestation_polygons"} if raw_data is \code{TRUE}. For \code{"deforestation_polygons"}, treated output has one row per PRODES polygon-municipality pair. The source polygon's full \code{area_km} value is repeated for every municipality reached and is therefore not additive across municipalities; \code{intersection_area_km2} separately reports the polygon area inside that municipality.
 }
 \description{
 Loads data on deforestation in the Legal Amazon region.

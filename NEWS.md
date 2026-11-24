@@ -1,5 +1,7 @@
 # datazoom.amazonia (development version)
 
+  * Added: `load_prodes(dataset = "deforestation_polygons")` loads the annual PRODES Legal Amazon vector polygons and associates each polygon with every municipality it reaches. The source area (`area_km`) is repeated across municipalities and is not additive; `intersection_area_km2` reports the polygon area within each municipality. The existing raster-based `dataset = "deforestation"` output is unchanged.
+
   * Changed: `load_sigmine(..., geo_level = "municipality")` now intersects process polygons with municipal boundaries and returns one row per process-municipality pair with positive-area overlap. All polygons for a process are unioned for the geometric overlay; `intersection_area_m2` reports the unique area within each municipality. The source `area_m2` values are summed across a process's polygons and the full process value is repeated for every municipality reached, so municipal rows are not additive. Processes with no positive-area match remain with missing municipality fields.
 
   * Changed: `load_mapbiomas()` now stops with a clear error for the combinations whose source file MapBiomas no longer serves, instead of failing on the download: `"mapbiomas_transition"` at `geo_level = "municipality"` (no newer collection publishes municipality-level transitions; `"biome"` still works), `"mapbiomas_water"` at `geo_level = "state"` (`"municipality"` and `"biome"` still work), and `"mapbiomas_irrigation"` at every level.

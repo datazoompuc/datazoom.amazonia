@@ -981,25 +981,37 @@ external_download <- function(dataset = NULL, source = NULL, year = NULL,
       names(dat) <- param$year
     }
     if (param$source == "prodes") {
-      # The raster by its exact name (the manifest's layer_name, which
-      # resolve_prodes.R checks against the .tif inside the zip), never a
-      # pattern: `dir` used to be the session's tempdir() when the cache was
-      # off, where terra writes its own spat_*.tif temp rasters. "*.tif"
-      # picked one left over from an earlier call up as a 2nd layer carrying
-      # the same name, and load_prodes() failed with "Can't transform a data
-      # frame with duplicate names" (confirmed 2026-10-20 in a real session).
-      # A terra::tmpFiles(remove = TRUE) used to sit here to clear those; it
-      # didn't (Windows won't delete a file still held open) and it deleted
-      # the temp files behind the user's own unrelated SpatRasters -- removed.
-      file <- file.path(dir, paste0(dataset_meta(param$source, param$dataset, "layer_name"), ".tif"))
-      if (!file.exists(file)) {
-        stop(
-          "The PRODES download does not contain the expected raster '", basename(file),
-          "'. Found: ", paste(list.files(dir, pattern = "\\.tif$"), collapse = ", "),
-          call. = FALSE
-        )
+      if (param$dataset == "deforestation_polygons") {
+        shp <- list.files(dir, pattern = "\\.shp$", full.names = TRUE, recursive = TRUE)
+        if (length(shp) != 1) {
+          stop(
+            "The PRODES vector archive must contain exactly one shapefile; found ",
+            length(shp), ".",
+            call. = FALSE
+          )
+        }
+        dat <- sf::read_sf(shp[[1]])
+      } else {
+        # The raster by its exact name (the manifest's layer_name, which
+        # resolve_prodes.R checks against the .tif inside the zip), never a
+        # pattern: `dir` used to be the session's tempdir() when the cache was
+        # off, where terra writes its own spat_*.tif temp rasters. "*.tif"
+        # picked one left over from an earlier call up as a 2nd layer carrying
+        # the same name, and load_prodes() failed with "Can't transform a data
+        # frame with duplicate names" (confirmed 2026-10-20 in a real session).
+        # A terra::tmpFiles(remove = TRUE) used to sit here to clear those; it
+        # didn't (Windows won't delete a file still held open) and it deleted
+        # the temp files behind the user's own unrelated SpatRasters -- removed.
+        file <- file.path(dir, paste0(dataset_meta(param$source, param$dataset, "layer_name"), ".tif"))
+        if (!file.exists(file)) {
+          stop(
+            "The PRODES download does not contain the expected raster '", basename(file),
+            "'. Found: ", paste(list.files(dir, pattern = "\\.tif$"), collapse = ", "),
+            call. = FALSE
+          )
+        }
+        dat <- terra::rast(file)
       }
-      dat <- terra::rast(file)
     }
     if (param$source == "aneel") {
       # energy_enterprises_distributed is the one aneel dataset that's a real

@@ -1,6 +1,6 @@
 # Session-scoped download + parse cache (R/download.R). SEEG (6 datasets),
-# IPS (8 datasets), and PRODES (6 datasets) each serve every dataset off one
-# identical file -- these tests exercise the cache generically via
+# IPS (8 datasets), and the 6 raster PRODES datasets each share one identical
+# file (the vector polygon dataset has its own archive) -- these tests exercise the cache generically via
 # file_cache_key()/parsed_cache_eligible()/external_download() itself,
 # using local file:// fixtures so nothing here touches the network.
 
