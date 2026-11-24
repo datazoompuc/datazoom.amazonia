@@ -23,6 +23,7 @@ source(file.path(actions_dir, "scrapers", "resolve_mapbiomas.R"), local = TRUE)
 source(file.path(actions_dir, "scrapers", "resolve_deter.R"), local = TRUE)
 source(file.path(actions_dir, "scrapers", "resolve_epe.R"), local = TRUE)
 source(file.path(actions_dir, "scrapers", "resolve_aneel.R"), local = TRUE)
+source(file.path(actions_dir, "scrapers", "resolve_sigmine.R"), local = TRUE)
 
 ## ---- MapBiomas ----
 
@@ -170,4 +171,67 @@ test_that("an ANEEL file with only placeholders is an error", {
   path <- write_siga(c("1900-01-03", ""))
   on.exit(unlink(path))
   expect_error(aneel_generation_available_time(path), "no usable")
+})
+
+## ---- SIGMINE ----
+
+sigmine_active_dbf <- function(years = c(1900L, 1934L, 2026L)) {
+  n <- length(years)
+  data.frame(
+    PROCESSO = rep("1/2020", n),
+    NUMERO = rep(1L, n),
+    ANO = years,
+    AREA_HA = rep(2.0, n),
+    ID = rep("1", n),
+    FASE = rep("AUTORIZACAO", n),
+    ULT_EVENTO = rep("EVENTO", n),
+    NOME = rep("EMPRESA", n),
+    SUBS = rep("OURO", n),
+    USO = rep("INDUSTRIAL", n),
+    UF = rep("PA", n),
+    DSProcesso = rep("000.001/2020", n),
+    stringsAsFactors = FALSE
+  )
+}
+
+sigmine_inactive_dbf <- function(years = c(1935L, 2026L)) {
+  n <- length(years)
+  data.frame(
+    PROCESSO = rep("2/1935", n),
+    NUMERO = rep(2L, n),
+    ANO = years,
+    AREA_HA = rep(1.5, n),
+    ID = rep("2", n),
+    DSProcesso = rep("000.002/1935", n),
+    stringsAsFactors = FALSE
+  )
+}
+
+test_that("SIGMINE's window skips placeholder years <= 1900 and computes min-max", {
+  p_active <- write_dbf(sigmine_active_dbf(c(1900L, 1934L, 2026L, 1980L)))
+  on.exit(unlink(p_active))
+  expect_equal(sigmine_dbf_years_and_check(p_active, "sigmine_active"), "1934-2026")
+
+  p_inactive <- write_dbf(sigmine_inactive_dbf(c(1935L, 2026L)))
+  on.exit(unlink(p_inactive), add = TRUE)
+  expect_equal(sigmine_dbf_years_and_check(p_inactive, "sigmine_inactive"), "1935-2026")
+})
+
+test_that("SIGMINE rejects missing columns, broken nome:uf slice, and empty usable years", {
+  bad_col <- sigmine_active_dbf(c(1934L, 2026L))
+  bad_col$DSProcesso <- NULL
+  p_bad_col <- write_dbf(bad_col)
+  on.exit(unlink(p_bad_col))
+  expect_error(sigmine_dbf_years_and_check(p_bad_col, "sigmine_active"), "missing required DBF column")
+
+  bad_slice <- sigmine_active_dbf(c(1934L, 2026L))
+  # Insert FASE between NOME and UF, breaking R/sigmine.R's across(nome:uf)
+  bad_slice <- bad_slice[, c("PROCESSO", "NUMERO", "ANO", "AREA_HA", "ID", "ULT_EVENTO", "NOME", "FASE", "SUBS", "USO", "UF", "DSProcesso")]
+  p_bad_slice <- write_dbf(bad_slice)
+  on.exit(unlink(p_bad_slice), add = TRUE)
+  expect_error(sigmine_dbf_years_and_check(p_bad_slice, "sigmine_active"), "positional slice nome:uf")
+
+  p_no_years <- write_dbf(sigmine_inactive_dbf(c(1900L, NA_integer_)))
+  on.exit(unlink(p_no_years), add = TRUE)
+  expect_error(sigmine_dbf_years_and_check(p_no_years, "sigmine_inactive"), "no usable ano")
 })

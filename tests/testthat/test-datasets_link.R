@@ -389,6 +389,13 @@ fixture <- fixture %>%
 # geo_level choices load_sigmine() actually supports). See R/sigmine.R.
 # The sigmine_active url also moved: the ANM retired SIGMINE/BRASIL.zip (404)
 # and now serves the file at SIGMINE/PROCESSOS_MINERARIOS/BRASIL.zip.
+#
+# Delta #25 -- sigmine onboarding (2026-11-17; see actions/scrapers/resolve_sigmine.R):
+# available_time is now populated from each shapefile's DBF `ANO` column
+# ("1934-2026" for sigmine_active, "1935-2026" for sigmine_inactive) and
+# refreshed by the resolver every run (blanked in the exact-match golden
+# comparison below and asserted on its own in the delta #25 test).
+# resolver was populated too (not a datasets_link() column).
 fixture <- fixture %>%
   dplyr::mutate(
     available_geo = dplyr::if_else(
@@ -565,6 +572,9 @@ test_that("datasets_link() matches the golden fixture (schema normalization is a
   # ppm's available_time is asserted on its own in the next test (delta #19).
   actual$available_time[actual$survey == "ppm"] <- NA_character_
   expected$available_time[expected$survey == "ppm"] <- NA_character_
+  # sigmine's available_time is asserted on its own in the delta #25 test.
+  actual$available_time[actual$survey == "sigmine"] <- NA_character_
+  expected$available_time[expected$survey == "sigmine"] <- NA_character_
 
   expect_equal(actual, expected)
 })
@@ -675,6 +685,22 @@ test_that("population's available_time follows IBGE's coverage: same start year,
   expect_false(2023 %in% new_years)
   # and the bare table number is still what it was
   expect_equal(new$sidra_code, old$sidra_code)
+})
+
+test_that("sigmine's available_time follows the ANM shapefiles' ANO range (delta #25)", {
+  sigmine <- datasets_link(source = "sigmine")
+  expect_setequal(sigmine$dataset, c("sigmine_active", "sigmine_inactive"))
+
+  first_year <- function(x) as.integer(sub("-.*", "", x))
+  last_year <- function(x) as.integer(sub(".*-", "", x))
+
+  active <- sigmine[sigmine$dataset == "sigmine_active", ]
+  inactive <- sigmine[sigmine$dataset == "sigmine_inactive", ]
+
+  expect_equal(first_year(active$available_time), 1934L)
+  expect_gte(last_year(active$available_time), 2026L)
+  expect_equal(first_year(inactive$available_time), 1935L)
+  expect_gte(last_year(inactive$available_time), 2026L)
 })
 
 test_that("filtering by source narrows correctly", {

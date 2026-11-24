@@ -171,7 +171,7 @@ datasets_by_fn <- list(
     "seeg_land",
     "seeg_residuals"
   ),
-  load_sigmine = "sigmine_active"
+  load_sigmine = c("sigmine_active", "sigmine_inactive")
 )
 
 # -- Helper -- #

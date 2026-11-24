@@ -126,5 +126,6 @@ FRAGILITY_SOURCES <- list(
   # changes both a comex and a comex_dic row lists the same notes twice;
   # harmless, and cheaper than touching build_manifest.R's matching.
   list(changed_prefix = "comex_dic", r_path = file.path("R", "comex.R"), label = "R/comex.R", treat_fn = "load_br_trade()"),
-  list(changed_prefix = "degrad", r_path = file.path("R", "degrad.R"), label = "R/degrad.R", treat_fn = "load_degrad()")
+  list(changed_prefix = "degrad", r_path = file.path("R", "degrad.R"), label = "R/degrad.R", treat_fn = "load_degrad()"),
+  list(changed_prefix = "sigmine", r_path = file.path("R", "sigmine.R"), label = "R/sigmine.R", treat_fn = "load_sigmine()")
 )
