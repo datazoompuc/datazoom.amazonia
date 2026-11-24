@@ -233,7 +233,42 @@ Clear-cut deforestation areas (complete forest loss).
   - Cumulative forest loss assessment
   - Municipality-level deforestation analysis
 
-### **2. residual_deforestation**
+### **2. deforestation_polygons**
+
+Annual vector polygons for Legal Amazon deforestation increments,
+available from 2008 onward. Unlike `deforestation`, this dataset uses
+the source polygons rather than estimating municipal areas from raster
+pixels.
+
+The source is TerraBrasilis’ [annual vector increment
+archive](https://terrabrasilis.dpi.inpe.br/downloads/); its metadata
+documents `uuid` as the polygon identifier and `area_km` as the source
+area in square kilometres ([PRODES vector
+metadata](https://terrabrasilis.dpi.inpe.br/geonetwork/srv/eng/catalog.search#/metadata/a5220c18-f7fa-4e3e-b39b-feeb3ccc4830)).
+
+``` r
+prodes_polygons <- load_prodes(
+  dataset = "deforestation_polygons",
+  time_period = 2025,
+  language = "eng"
+)
+```
+
+The treated result has one row for each PRODES polygon and municipality
+pair with a positive-area intersection. `uuid` is the source polygon
+identifier, `year` is its PRODES year, and `area_km` is the complete
+area reported for the source polygon. That complete value is repeated
+for every municipality the polygon reaches, so municipal rows are not
+additive. `intersection_area_km2` is reported separately and measures
+only the part of that polygon inside the municipality. The two area
+columns answer different questions.
+
+Use `raw_data = TRUE` to get the source vector polygons before
+municipality matching. This vector download is a separate option; the
+existing `deforestation` dataset continues to return its raster-based
+municipality estimates.
+
+### **3. residual_deforestation**
 
 Deforestation that was not captured in previous surveys (detected
 through improved methodology).
@@ -247,7 +282,7 @@ through improved methodology).
   - Correct for historical detection gaps
   - Full accounting of forest loss
 
-### **3. native_vegetation**
+### **4. native_vegetation**
 
 Remaining native forest and natural vegetation areas.
 
@@ -260,7 +295,7 @@ Remaining native forest and natural vegetation areas.
   - Identify conservation priority areas
   - Vegetation extent mapping
 
-### **4. hydrography**
+### **5. hydrography**
 
 Water bodies and hydrographic features.
 
@@ -272,7 +307,7 @@ Water bodies and hydrographic features.
   - Environmental impact assessment
   - Hydrology and water resource mapping
 
-### **5. non_forest**
+### **6. non_forest**
 
 Non-forest areas including savanna, grasslands, and other vegetation
 types.
@@ -286,7 +321,7 @@ types.
   - Natural vegetation assessment
   - Land-use classification
 
-### **6. clouds**
+### **7. clouds**
 
 Cloud cover in satellite imagery (data quality indicator).
 
