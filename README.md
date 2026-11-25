@@ -233,7 +233,42 @@ Clear-cut deforestation areas (complete forest loss).
   - Cumulative forest loss assessment
   - Municipality-level deforestation analysis
 
-### **2. residual_deforestation**
+### **2. deforestation_polygons**
+
+Annual vector polygons for Legal Amazon deforestation increments,
+available from 2008 onward. Unlike `deforestation`, this dataset uses
+the source polygons rather than estimating municipal areas from raster
+pixels.
+
+The source is TerraBrasilis’ [annual vector increment
+archive](https://terrabrasilis.dpi.inpe.br/downloads/); its metadata
+documents `uuid` as the polygon identifier and `area_km` as the source
+area in square kilometres ([PRODES vector
+metadata](https://terrabrasilis.dpi.inpe.br/geonetwork/srv/eng/catalog.search#/metadata/a5220c18-f7fa-4e3e-b39b-feeb3ccc4830)).
+
+``` r
+prodes_polygons <- load_prodes(
+  dataset = "deforestation_polygons",
+  time_period = 2025,
+  language = "eng"
+)
+```
+
+The treated result has one row for each PRODES polygon and municipality
+pair with a positive-area intersection. `uuid` is the source polygon
+identifier, `year` is its PRODES year, and `area_km` is the complete
+area reported for the source polygon. That complete value is repeated
+for every municipality the polygon reaches, so municipal rows are not
+additive. `intersection_area_km2` is reported separately and measures
+only the part of that polygon inside the municipality. The two area
+columns answer different questions.
+
+Use `raw_data = TRUE` to get the source vector polygons before
+municipality matching. This vector download is a separate option; the
+existing `deforestation` dataset continues to return its raster-based
+municipality estimates.
+
+### **3. residual_deforestation**
 
 Deforestation that was not captured in previous surveys (detected
 through improved methodology).
@@ -247,7 +282,7 @@ through improved methodology).
   - Correct for historical detection gaps
   - Full accounting of forest loss
 
-### **3. native_vegetation**
+### **4. native_vegetation**
 
 Remaining native forest and natural vegetation areas.
 
@@ -260,7 +295,7 @@ Remaining native forest and natural vegetation areas.
   - Identify conservation priority areas
   - Vegetation extent mapping
 
-### **4. hydrography**
+### **5. hydrography**
 
 Water bodies and hydrographic features.
 
@@ -272,7 +307,7 @@ Water bodies and hydrographic features.
   - Environmental impact assessment
   - Hydrology and water resource mapping
 
-### **5. non_forest**
+### **6. non_forest**
 
 Non-forest areas including savanna, grasslands, and other vegetation
 types.
@@ -286,7 +321,7 @@ types.
   - Natural vegetation assessment
   - Land-use classification
 
-### **6. clouds**
+### **7. clouds**
 
 Cloud cover in satellite imagery (data quality indicator).
 
@@ -646,6 +681,21 @@ with IBGE municipality geometries** (2019 version) to identify ALL
 municipalities that each DETER alert overlaps with. This creates a more
 complete and accurate geographic picture than the original raw data.
 
+Each output row is one alert-municipality intersection with positive
+area. The existing `area` column measures only the part of the alert
+inside that municipality. `alert_area` stores the alert’s full area
+before it is split and repeats that value in every municipality it
+reaches, so those values are **not additive across municipalities**. The
+source’s `AREATOTKM` value is used when present; otherwise the full
+geometry is measured in the equal-area CRS. Alerts with no positive-area
+municipal match remain once with municipality fields and `area` missing.
+If the source supplies a `uuid`, it is returned as `source_uuid`;
+`alert_id` is a sequence for grouping pieces in one call.
+
+The TerraBrasilis metadata describes `AREATOTKM` as the full area before
+intersection and `UUID` as an alert identifier ([DETER
+metadata](https://terrabrasilis.dpi.inpe.br/geonetwork/srv/eng/catalog.search#/metadata/f2153c4a-915b-48a6-8658-963bdce7366c)).
+
 **Important note on CRS metadata**: `load_deter()` reprojects internally
 to IBGE’s official equal-area projection for area calculations (Albers,
 SIRGAS 2000/GRS80, central meridian -54) before computing `area` and
@@ -832,14 +882,30 @@ systems. Key points:
 ### Spatial Integration
 
 This package enhances the raw DEGRAD data by: - Intersecting DEGRAD
-spatial polygons with IBGE municipality boundaries (2019 version) -
-Providing municipality identification for each degradation event -
-Converting to Simple Features (SF) objects for spatial analysis
+spatial polygons with the package’s Legal Amazon municipal boundaries -
+Providing one row for each source polygon and municipality pair with
+positive-area overlap - Returning both the complete polygon area and the
+area of its piece inside each municipality - Keeping unmatched source
+polygons with missing municipality codes
 
-**Note on CRS**: `load_degrad()` reprojects internally to IBGE’s
-official equal-area projection for area calculations (Albers, SIRGAS
-2000/GRS80, central meridian -54) before computing `area` and overlaying
-municipality boundaries – not UTM zones.
+**Area fields**: `source_area_m2` is calculated from the complete source
+polygon before the municipal cut. It is repeated for every municipality
+reached, so values across municipal rows are **not additive**.
+`intersection_area_m2` measures the part inside that municipality. The
+existing `area` field remains an alias for `intersection_area_m2`.
+
+The source shapefiles do not provide a stable polygon identifier.
+`source_feature_id` is generated from the edition year and row position
+and is dependable only for the same source-file version and row order.
+If one source polygon creates multiple intersection fragments in the
+same municipality, those fragments are united;
+`intersection_fragment_count` records how many were combined.
+
+**Note on CRS**: `load_degrad()` harmonizes each edition to SIRGAS 2000
+(EPSG:4674), then reprojects the polygons and municipal boundaries to
+IBGE’s Brazil-wide Albers equal-area projection (GRS80; central meridian
+-54; standard parallels -2/-22) before measuring area. The resulting
+areas are in square metres.
 
 ------------------------------------------------------------------------
 
@@ -853,8 +919,9 @@ Detailed monitoring of forest degradation across the Legal Amazon.
 - **Time period**: 2007 onwards (but events within editions may vary)
 - **Spatial unit**: Polygons/spatial geometries with municipality
   identification
-- **Variables**: Event date/year, degradation type/cause, area,
-  municipality, state, edition
+- **Variables**: Edition year, degradation class, source feature
+  identifier, complete source area, municipal intersection area,
+  municipality and state codes
 - **Data format**: Simple Features (SF) spatial objects with geographic
   boundaries
 - **Use cases**:
@@ -929,7 +996,12 @@ The returned data is a Simple Features (SF) spatial object with:
 - **year**: Year when degradation was detected/event occurred
 - **degradation_type**: Type of degradation (logging, fire, agriculture,
   etc.)
-- **area_hectares**: Size of degradation event
+- **source_area_m2**: Area of the complete source polygon, repeated
+  across municipalities and not additive
+- **intersection_area_m2**: Geometric area of the polygon piece inside
+  the municipality; `area` retains this meaning
+- **source_feature_id**: Generated grouping key for one source row
+  within a specific edition file; not a permanent identifier
 - **municipality**: Name of affected municipality
 - **state**: Brazilian state
 - **edition**: Which DEGRAD edition this event appears in
@@ -1225,11 +1297,26 @@ different stages of environmental enforcement:
 
 ## Data Aggregation
 
-The function returns either: - **Raw Data**: Individual infraction
-records (original format) - **Aggregated Data**: Summary statistics for
-each time-location period, including: - Total number of infractions -
-Infractions sent to prosecution - Infractions with ongoing legal
-proceedings - Embargoed area totals - Fine totals and collection rates
+For `dataset = "embargoed_areas"`, treated output uses the IBAMA embargo
+polygons and intersects them with the package’s municipal boundary
+layer. The result has one row per embargo term and municipality with
+positive-area overlap. The source identifier `seq_tad` identifies the
+embargo term; when a term has multiple source polygons, those geometries
+are united before measuring the municipal overlap. The original
+`embargoed_area_amount` (reported by IBAMA in hectares) is repeated for
+every municipality reached and **must not be summed across
+municipalities**. `intersection_area_m2` measures the geometric part of
+that embargo inside each municipality. `source_polygon_count` records
+how many source features were combined for the term. Terms without a
+positive-area municipal match are kept once with missing municipality
+fields.
+
+This spatial association uses geometry; it can differ from the
+municipality name or code recorded on the IBAMA term. The official data
+dictionary describes `SEQ_TAD` as the primary key and
+`QTD_AREA_EMBARGADA` as the total area in hectares ([IBAMA data
+dictionary](https://servicos.ibama.gov.br/ctf/publico/areasembargadas/dicionarioEmbargos.php)).
+Fine datasets remain tabular records and are not spatially intersected.
 
 ------------------------------------------------------------------------
 
@@ -1253,6 +1340,10 @@ proceedings - Embargoed area totals - Fine totals and collection rates
 4.  **language**:
     - `"pt"`: Portuguese language labels and names
     - `"eng"`: English language
+5.  **geo_level**:
+    - `"municipality"`: for embargo polygons, identify every
+      municipality reached by each polygon. The fine datasets remain at
+      the municipality recorded in their source table.
 
 ------------------------------------------------------------------------
 
@@ -4527,22 +4618,29 @@ from the source is in parentheses):
 | `process_description` (`ds_processo`) | Process description field from the ANM file |
 | `geometry` | Polygon (only at `geo_level = "state"`) |
 
+At the municipality level, `area_m2` is the sum of the source area
+values for all polygons of that process. The result also includes
+`intersection_area_m2`, the unique area of the process geometry inside
+each municipality, and `source_polygon_count`, the number of source
+polygons represented by the process row. In Portuguese these added
+fields are `area_intersecao_m2` and `numero_poligonais_origem`.
+
 At `geo_level = "municipality"` there is no `geometry`, and the table
 adds the municipality, state, and region codes and names
 (`municipality_code`, `municipality`, `state_code`, `state`,
 `state_name`, `region_code`, `region_name`). Here `state` comes from the
-matched municipality.
+matched municipality. The table has one row per process-municipality
+pair.
 
 A process can appear in more than one polygon in the ANM file (in the
 October 2026 data, 4,028 of the 261,025 active processes, 1.5%, and
 7,447 of the 652,652 inactive ones, 1.1%). At `geo_level = "state"` each
-polygon is a row. At `geo_level = "municipality"` the function assigns
-each polygon to the municipality that contains its centroid and keeps
-only the first polygon of each process, so `area_m2` is the area of that
-polygon, not of the whole process: for the active data the total area is
-understated by about 1.2%. Processes whose centroid falls outside every
-municipality keep missing municipality fields (2,691 of the 261,025
-active processes, about 1%).
+polygon is a row. At `geo_level = "municipality"`, the source area
+values across all polygons of a process are summed into `area_m2` and
+repeated for each municipality reached. `intersection_area_m2` is a
+separate geometric measure: the unique part of the process footprint
+inside that municipality. Processes without a positive-area intersection
+are retained with missing municipality fields.
 
 Treated `sigmine_inactive`: `process`, `number`, `year`, `area_m2`,
 `id`, `process_description` and `geometry`.
@@ -4578,7 +4676,7 @@ mining_eng <- load_sigmine(
 ### Example 3: Active mining data by municipality
 
 ``` r
-# one row per process, assigned to the municipality of its centroid
+# one row per process-municipality pair reached by the polygon intersection
 mining_munic <- load_sigmine(
   dataset = "sigmine_active",
   raw_data = FALSE,
@@ -4647,8 +4745,8 @@ values available.
 
 SIGMINE is published by the ANM as polygons (some processes have more
 than one polygon), not as municipality totals. To return
-`geo_level = "municipality"`, each process is assigned to a single
-municipality in these steps:
+`geo_level = "municipality"`, the function associates a process with
+every municipality where its geometry has a positive-area intersection:
 
 1.  The polygons are made valid and their Z/M dimensions are dropped.
 2.  Both the mining polygons and the municipal boundaries (the package’s
@@ -4656,13 +4754,17 @@ municipality in these steps:
     Albers conic projection (SIRGAS 2000 / Brazil Albers,
     [EPSG:10857](https://epsg.io/10857)): standard parallels 2°S and
     22°S, central meridian 54°W, latitude of origin 12°S, false easting
-    5,000,000 m, false northing 10,000,000 m, GRS80 ellipsoid. Centroids
-    are computed in meters, because centroids computed on
-    longitude/latitude are distorted.
-3.  The centroid of each polygon is computed.
-4.  Each centroid is matched to the municipality that contains it. Then
-    only one row is kept for each `processo`: the first polygon found in
-    the ANM file.
+    5,000,000 m, false northing 10,000,000 m, GRS80 ellipsoid. Areas are
+    measured in square meters in this equal-area projection.
+3.  Polygons belonging to the same process are unioned. This avoids
+    counting overlapping source polygons twice when measuring the
+    geometry.
+4.  `st_intersection()` cuts the process geometry at municipal
+    boundaries. Only intersections with positive area are retained. A
+    touch along a shared boundary by itself does not create a
+    process-municipality row.
+5.  The area of each resulting piece is measured in square meters as
+    `intersection_area_m2`.
 
 The projection follows IBGE’s recommendation for area calculations
 (equal-area Albers projection, standard parallels 2°S and 22°S, origin
@@ -4670,20 +4772,23 @@ at 12°S and 54°W), described in the [BC250 technical
 documentation](https://geoftp.ibge.gov.br/cartas_e_mapas/bases_cartograficas_continuas/bc250/versao2023/informacoes_tecnicas/documentacao_tecnica__bc250_2023.pdf)
 (section “Cálculo de áreas e extensões”). The false easting and northing
 (5,000,000 m and 10,000,000 m) only shift the coordinates and do not
-affect areas or centroid positions.
+affect areas.
 
-The result is **one municipality per process**: a mining area that
-crosses municipal borders is not split, and it is counted in the
-municipality where its centroid falls. For very irregular polygons, the
-centroid can fall outside the polygon itself, and then the process may
-be assigned to a neighboring municipality. If the centroid falls outside
-every municipal polygon, the process is kept with missing (`NA`)
-municipality, state and region fields.
+The result has **one row per process-municipality pair**. A process that
+intersects three municipalities appears three times. A process without
+any positive-area municipal intersection is retained once with missing
+(`NA`) municipality, state and region fields.
 
 Two consequences to keep in mind:
 
-- For a process with several polygons, `area_m2` is the area of the
-  polygon that was kept, not the sum of all its polygons.
+- `area_m2` is the sum of the ANM source area values across all polygons
+  of the process. That full process value is repeated in each
+  municipality the process reaches. It is **not additive across
+  municipalities**: summing those rows would count the same process
+  value more than once.
+- `intersection_area_m2` measures the unique area of the process
+  geometry inside that municipality. This is not used to apportion
+  `area_m2` or another process attribute, such as production.
 - The result has no geometry, and the state column comes from the
   matched municipality, not from the source.
 

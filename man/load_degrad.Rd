@@ -22,10 +22,13 @@ load_degrad(
 \item{language}{A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.}
 }
 \value{
-A \code{list} of tibbles (if \code{raw_data} = \code{TRUE}) or a tibble (if \code{raw_data} = \code{FALSE}).
+A list of raw spatial layers when \code{raw_data = TRUE}, or an \code{sf} object when \code{raw_data = FALSE}. Treated output has one row per source polygon and municipality with positive-area overlap. \code{source_area_m2} (or \code{area_fonte_m2}) is the full polygon area, repeated across municipalities and therefore not additive; \code{intersection_area_m2} (or \code{area_intersecao_m2}, and the legacy \code{area} column) measures the part inside that municipality. The generated source feature identifier groups fragments from the same source row within the requested download; it is not a permanent source identifier.
 }
 \description{
 Loads information on forest degradation in the Brazilian Amazon, replaced by DETER-B in December 2016.
+}
+\details{
+Treated data are intersected with Legal Amazon municipalities. The full source polygon area is calculated before the cut and returned as \code{source_area_m2}; it repeats for each municipality reached and is not additive. \code{intersection_area_m2} measures the piece inside a municipality, and the existing \code{area} column keeps that same clipped-area meaning. Because source files do not supply a stable polygon key, \code{source_feature_id} (or \code{id_poligono_fonte} in Portuguese) is generated from the edition year and row position; it is only stable while the source file and its row order remain unchanged. Fragments for a source feature within the same municipality are unioned into one row. Features without a positive-area municipal match are retained with missing municipality codes.
 }
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}

@@ -4,7 +4,8 @@
 \alias{load_ibama}
 \title{IBAMA - Brazilian Institute for the Environment and Renewable Natural Resources}
 \usage{
-load_ibama(dataset, raw_data = FALSE, states = "all", language = "eng")
+load_ibama(dataset, raw_data = FALSE, states = "all", language = "eng",
+  geo_level = "municipality")
 }
 \arguments{
 \item{dataset}{A dataset name ("embargoed_areas", "distributed_fines", or "collected_fines")}
@@ -14,12 +15,14 @@ load_ibama(dataset, raw_data = FALSE, states = "all", language = "eng")
 \item{states}{A \code{string} specifying for which states to download the data. It is "all" by default, but can be a single state such as "AC" or any vector such as c("AC", "AM"). Does not apply to the "embargoed_areas" dataset.}
 
 \item{language}{A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported.}
+
+\item{geo_level}{For \code{dataset = "embargoed_areas"}, use \code{"municipality"} to assign each embargo polygon to every municipality it intersects. Other datasets are already tabular and ignore this option.}
 }
 \value{
-A \code{tibble}.
+A \code{tibble}. For treated \code{"embargoed_areas"} data, there is one row per embargo-municipality pair with positive-area overlap. The source area value is repeated for each municipality and is not additive; \code{intersection_area_m2} is the geometric area inside that municipality.
 }
 \description{
-Loads information on environmental fines in the Amazon region
+Loads IBAMA environmental embargo polygons and fine records. Treated embargo polygons can be associated with every municipality they spatially intersect.
 }
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}

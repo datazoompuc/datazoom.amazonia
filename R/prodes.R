@@ -2,14 +2,15 @@
 #'
 #' @description Loads data on deforestation in the Legal Amazon region.
 #'
-#' @param dataset A dataset name. Can be one of "deforestation", "residual_deforestation", "native_vegetation", "hydrography", "non_forest", or "clouds".
+#' @param dataset A dataset name. Can be one of "deforestation", "deforestation_polygons", "residual_deforestation", "native_vegetation", "hydrography", "non_forest", or "clouds". "deforestation_polygons" returns the annual PRODES vector polygons since 2008, crossed with municipalities.
 #' @param time_period A \code{numeric} indicating for which years the data will be loaded, in the format YYYY. Can be any vector of numbers, such as 2010:2012.
 #'    * Between 2007 - 2025 for dataset "deforestation". Deforestation for 2007 includes all cumulative deforestation up to 2007. For other years, deforestation is incremental
+#'    * Between 2008 - 2025 for dataset "deforestation_polygons", which contains the annual vector polygons
 #'    * Between 2010 - 2025 for dataset "residual_deforestation"
 #'    * Only 2025 for all other datasets
 #' @inheritParams load_baci
 #'
-#' @return A \code{tibble} with the selected data if raw_data is \code{FALSE}, and a \code{SpatRaster} is \code{TRUE}.
+#' @return A \code{tibble} with the selected data if raw_data is \code{FALSE}, and a \code{SpatRaster} for raster datasets or an \code{sf} object for \code{"deforestation_polygons"} if raw_data is \code{TRUE}. For \code{"deforestation_polygons"}, treated output has one row per PRODES polygon-municipality pair. The source polygon's full \code{area_km} value is repeated for every municipality reached and is therefore not additive across municipalities; \code{intersection_area_km2} separately reports the polygon area inside that municipality.
 #'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
@@ -43,17 +44,26 @@
 
 load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
                         time_period = 2025, language = "eng") {
-  if (!requireNamespace("terra", quietly = TRUE)) {
-    stop(
-      "Package \"terra\" must be installed to use this function.",
-      call. = FALSE
-    )
-  }
-  if (!requireNamespace("units", quietly = TRUE)) {
-    stop(
-      "Package \"units\" must be installed to use this function.",
-      call. = FALSE
-    )
+  if (dataset == "deforestation_polygons") {
+    if (!requireNamespace("sf", quietly = TRUE)) {
+      stop(
+        "Package \"sf\" must be installed to use the PRODES vector dataset.",
+        call. = FALSE
+      )
+    }
+  } else {
+    if (!requireNamespace("terra", quietly = TRUE)) {
+      stop(
+        "Package \"terra\" must be installed to use this function.",
+        call. = FALSE
+      )
+    }
+    if (!requireNamespace("units", quietly = TRUE)) {
+      stop(
+        "Package \"units\" must be installed to use this function.",
+        call. = FALSE
+      )
+    }
   }
 
   ###########################
@@ -79,7 +89,7 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
   # year -- read from the manifest's available_time instead of hardcoding it,
   # so a PRODES year rollover does not require a code change here too.
 
-  if (!param$dataset %in% c("deforestation", "residual_deforestation")) {
+  if (!param$dataset %in% c("deforestation", "deforestation_polygons", "residual_deforestation")) {
     # single-year datasets -- available_time is dataset-wide here (all of
     # PRODES's datasets are unkeyed today), so this is the one legitimate
     # cross-row read: dataset_meta(), not dataset_field() with no key (see
@@ -108,6 +118,37 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
 
   if (param$raw_data) {
     return(dat)
+  }
+
+  if (param$dataset == "deforestation_polygons") {
+    years <- as.integer(param$time_period)
+    dat <- dat[dat$year %in% years, ]
+    munic <- external_download(
+      source = "internal",
+      dataset = "geo_municipalities"
+    )
+    amazon_codes <- as.character(datazoom.amazonia::municipalities$code_muni[
+      datazoom.amazonia::municipalities$legal_amazon == 1
+    ])
+    munic <- munic[as.character(munic$code_muni) %in% amazon_codes, ]
+    result <- prodes_polygon_municipality_intersection(dat, munic)
+
+    if (param$language == "pt") {
+      result <- dplyr::rename(
+        result,
+        cod_ibge = code_muni,
+        municipio = name_muni,
+        cod_uf = code_state,
+        uf = abbrev_state,
+        nome_uf = name_state,
+        cod_regiao = code_region,
+        regiao = name_region,
+        ano = year,
+        area_poligono_km2 = area_km,
+        area_intersecao_km2 = intersection_area_km2
+      )
+    }
+    return(result)
   }
 
   ######################
@@ -284,6 +325,74 @@ load_prodes <- function(dataset = "deforestation", raw_data = FALSE,
   #################
 
   return(dat_mod)
+}
+
+# Cross each source PRODES polygon with every municipality it reaches. The
+# original polygon area remains attached to each result row; the intersection
+# area is a separate measurement and does not apportion that source value.
+prodes_polygon_municipality_intersection <- function(polygons, municipalities) {
+  required_polygon_columns <- c("uuid", "year", "area_km")
+  missing_polygon_columns <- setdiff(required_polygon_columns, names(polygons))
+  if (length(missing_polygon_columns)) {
+    stop(
+      "The PRODES vector data is missing required columns: ",
+      paste(missing_polygon_columns, collapse = ", "),
+      call. = FALSE
+    )
+  }
+  feature_ids <- as.character(polygons$uuid)
+  if (anyNA(feature_ids) || any(!nzchar(trimws(feature_ids))) || anyDuplicated(feature_ids)) {
+    stop("The PRODES polygon UUIDs must be present and unique.", call. = FALSE)
+  }
+  if (is.na(sf::st_crs(polygons))) {
+    stop("The PRODES polygons do not have a defined CRS.", call. = FALSE)
+  }
+  if (is.na(sf::st_crs(municipalities))) {
+    stop("The municipal layer does not have a defined CRS.", call. = FALSE)
+  }
+
+  municipality_columns <- c(
+    "code_muni", "name_muni", "code_state", "abbrev_state",
+    "name_state", "code_region", "name_region"
+  )
+  missing_municipality_columns <- setdiff(municipality_columns, names(municipalities))
+  if (length(missing_municipality_columns)) {
+    stop(
+      "The municipal layer is missing required columns: ",
+      paste(missing_municipality_columns, collapse = ", "),
+      call. = FALSE
+    )
+  }
+
+  operation_crs <- sf::st_crs(
+    "+proj=aea +lat_1=-2 +lat_2=-22 +lat_0=-12 +lon_0=-54 +x_0=5000000 +y_0=10000000 +ellps=GRS80 +units=m +no_defs"
+  )
+  polygons <- polygons %>%
+    sf::st_zm(drop = TRUE, what = "ZM") %>%
+    sf::st_make_valid() %>%
+    sf::st_transform(operation_crs)
+  municipalities <- municipalities %>%
+    sf::st_make_valid() %>%
+    sf::st_transform(operation_crs)
+
+  intersections <- suppressWarnings(sf::st_intersection(
+    polygons,
+    municipalities[, municipality_columns]
+  ))
+  intersections$intersection_area_km2 <- as.numeric(sf::st_area(intersections)) / 1e6
+  intersections <- intersections[intersections$intersection_area_km2 > 0, ]
+
+  matched <- unique(intersections$uuid)
+  unmatched <- polygons[!polygons$uuid %in% matched, ]
+  if (nrow(unmatched)) {
+    for (column in municipality_columns) {
+      unmatched[[column]] <- municipalities[[column]][NA_integer_]
+    }
+    unmatched$intersection_area_km2 <- NA_real_
+    intersections <- rbind(intersections, unmatched)
+  }
+
+  sf::st_drop_geometry(intersections)
 }
 
 # ---- PRODES raster legend --------------------------------------------------

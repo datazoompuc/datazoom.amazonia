@@ -54,7 +54,7 @@ new_row_like_base <- function(m, ds, geo, sheet_val) {
 
 manifest <- manifest %>%
   mutate(layer_name = if_else(
-    survey == "prodes" & is.na(geo_level) & is.na(year),
+    survey == "prodes" & dataset != "deforestation_polygons" & is.na(geo_level) & is.na(year),
     "prodes_amazonia_legal_2023",
     layer_name
   ))

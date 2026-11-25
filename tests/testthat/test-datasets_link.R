@@ -191,7 +191,7 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
       available_time
     ),
     url = ifelse(
-      survey == "prodes",
+      survey == "prodes" & dataset != "deforestation_polygons",
       "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/raster/prodes_amazonia_legal_2025_v20261019.zip",
       url
     ),
@@ -241,12 +241,12 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
       TRUE ~ url
     ),
     available_time = ifelse(survey == "comex", "1997-2026", available_time),
-    available_time = ifelse(
-      survey == "prodes" & dataset == "deforestation", "2007-2025",
-      ifelse(
-        survey == "prodes" & dataset == "residual_deforestation", "2010-2025",
-        ifelse(survey == "prodes", "2025", available_time)
-      )
+    available_time = dplyr::case_when(
+      survey == "prodes" & dataset == "deforestation_polygons" ~ "2008-2025",
+      survey == "prodes" & dataset == "deforestation" ~ "2007-2025",
+      survey == "prodes" & dataset == "residual_deforestation" ~ "2010-2025",
+      survey == "prodes" ~ "2025",
+      TRUE ~ available_time
     ),
     available_time = ifelse(
       survey == "aneel" & dataset == "energy_development_budget",
@@ -318,6 +318,16 @@ fixture <- readRDS(test_path("fixtures", "datasets_link_pre_normalize.rds")) %>%
     available_time = dplyr::case_when(
       survey == "mapbiomas" & dataset == "mapbiomas_transition" ~ NA_character_,
       TRUE ~ available_time
+    )
+  ) %>%
+  dplyr::bind_rows(
+    # Added for municipal feature-level overlays, using the current official
+    # annual increment vector archive (separate from the existing raster rows).
+    tibble::tibble(
+      survey = "prodes", dataset = "deforestation_polygons",
+      sidra_code = NA_character_, available_time = "2008-2025",
+      available_geo = "municipality",
+      url = "https://terrabrasilis.dpi.inpe.br/download/dataset/legal-amz-prodes/vector/yearly_deforestation_amazonia_legal_v20261016.zip"
     )
   )
 

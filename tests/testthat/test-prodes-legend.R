@@ -21,8 +21,9 @@ test_that("prodes_raster_code() returns PRODES' encoding for every dataset", {
   expect_error(prodes_raster_code("not_a_dataset", 2025), "unknown PRODES dataset")
 })
 
-test_that("every manifest PRODES dataset has a code", {
-  for (ds in datasets_link(source = "prodes")$dataset) {
+test_that("every manifest PRODES raster dataset has a code", {
+  # The vector polygon dataset is not encoded as raster classes.
+  for (ds in setdiff(datasets_link(source = "prodes")$dataset, "deforestation_polygons")) {
     expect_length(prodes_raster_code(ds, 2025), 1)
   }
 })

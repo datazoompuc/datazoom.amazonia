@@ -41,10 +41,10 @@ manifest <- manifest %>%
     survey == "mapbiomas" & dataset == "mapbiomas_deforestation_regeneration" ~ "mapbiomas",
     survey == "mapbiomas" & dataset == "mapbiomas_mining" ~ "mapbiomas",
 
-    # PRODES: all 6 datasets share the one base link. Tagged even though
-    # resolve_prodes() currently always fails (see its file header) -- this
-    # makes the break visible on every run instead of silently doing nothing.
-    survey == "prodes" ~ "prodes",
+    # PRODES raster datasets share one base link and are refreshed by
+    # resolve_prodes(). The vector polygon archive has a separate endpoint
+    # and is not owned by that raster resolver.
+    survey == "prodes" & dataset != "deforestation_polygons" ~ "prodes",
 
     TRUE ~ resolver
   ))

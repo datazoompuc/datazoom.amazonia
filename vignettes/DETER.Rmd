@@ -122,6 +122,10 @@ The raw DETER data from INPE reports one alert/detection per row, with each row 
 
 This package provides an important enhancement: **spatial intersection with IBGE municipality geometries** (2019 version) to identify ALL municipalities that each DETER alert overlaps with. This creates a more complete and accurate geographic picture than the original raw data.
 
+Each output row is one alert-municipality intersection with positive area. The existing `area` column measures only the part of the alert inside that municipality. `alert_area` stores the alert's full area before it is split and repeats that value in every municipality it reaches, so those values are **not additive across municipalities**. The source's `AREATOTKM` value is used when present; otherwise the full geometry is measured in the equal-area CRS. Alerts with no positive-area municipal match remain once with municipality fields and `area` missing. If the source supplies a `uuid`, it is returned as `source_uuid`; `alert_id` is a sequence for grouping pieces in one call.
+
+The TerraBrasilis metadata describes `AREATOTKM` as the full area before intersection and `UUID` as an alert identifier ([DETER metadata](https://terrabrasilis.dpi.inpe.br/geonetwork/srv/eng/catalog.search#/metadata/f2153c4a-915b-48a6-8658-963bdce7366c)).
+
 **Important note on CRS metadata**: `load_deter()` reprojects internally to IBGE's official equal-area projection for area calculations (Albers, SIRGAS 2000/GRS80, central meridian -54) before computing `area` and overlaying municipality boundaries -- not UTM zones (see "Important Considerations" below for the exact parameters).
 
 ***

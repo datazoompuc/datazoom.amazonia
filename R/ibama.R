@@ -1,13 +1,15 @@
 #' @title IBAMA - Brazilian Institute for the Environment and Renewable Natural Resources
 #'
-#' @description Loads information on environmental fines in the Amazon region
+#' @description Loads IBAMA environmental embargo polygons and fine records. Treated embargo polygons can be associated with every municipality they spatially intersect.
 #'
 #' @param dataset A dataset name ("embargoed_areas", "distributed_fines", or "collected_fines")
 #' @inheritParams load_baci
 #' @param states A \code{string} specifying for which states to download the data. It is "all" by default, but can be a single state such as "AC" or any vector such as c("AC", "AM"). Does not apply to the "embargoed_areas" dataset.
 #' @param language A \code{string} that indicates in which language the data will be returned. Currently, only Portuguese ("pt") and English ("eng") are supported.
 #'
-#' @return A \code{tibble}.
+#' @param geo_level For \code{dataset = "embargoed_areas"}, use \code{"municipality"} to assign each embargo polygon to every municipality it intersects. Other datasets are already tabular and ignore this option.
+#'
+#' @return A \code{tibble}. For treated \code{"embargoed_areas"} data, there is one row per embargo-municipality pair with positive-area overlap. The source area value is repeated for each municipality and is not additive; \code{intersection_area_m2} is the geometric area inside that municipality.
 #'
 #' @examplesIf interactive()
 #' ### DO NOT RUN ###
@@ -31,7 +33,8 @@
 load_ibama <- function(dataset,
                        raw_data = FALSE,
                        states = "all",
-                       language = "eng") {
+                       language = "eng",
+                       geo_level = "municipality") {
   ##############################
   ## Binding Global Variables ##
   ##############################
@@ -67,6 +70,7 @@ load_ibama <- function(dataset,
   param$language <- language
   param$raw_data <- raw_data
   param$states <- states
+  param$geo_level <- geo_level
 
   # check if dataset is valid
 
@@ -89,20 +93,30 @@ load_ibama <- function(dataset,
 
   # Downloads each state separately
 
-  dat <- param$states %>%
-    purrr::imap(
-      function(uf, iteration) {
-        base::message(paste0("Downloading ", uf, " (", iteration, " out of ", length(param$states), ")"))
+  if (dataset == "embargoed_areas") {
+    # The embargo shapefile is a single national archive, not one archive per
+    # state. Download it once so the same national records are not repeated
+    # 27 times before the municipal overlay.
+    dat <- list(all = external_download(
+      source = param$source,
+      dataset = param$dataset,
+      state = "all"
+    ))
+  } else {
+    dat <- param$states %>%
+      purrr::imap(
+        function(uf, iteration) {
+          base::message(paste0("Downloading ", uf, " (", iteration, " out of ", length(param$states), ")"))
 
-        external_download(
-          source = param$source,
-          dataset = param$dataset,
-          state = uf
-        )
-      }
-    )
-
-  names(dat) <- param$states
+          external_download(
+            source = param$source,
+            dataset = param$dataset,
+            state = uf
+          )
+        }
+      )
+    names(dat) <- param$states
+  }
 
   ## Return Raw Data
 
@@ -124,9 +138,14 @@ load_ibama <- function(dataset,
       )
   }
 
-  dat <- dat %>%
-    dplyr::bind_rows() %>%
-    janitor::clean_names()
+  if (dataset == "embargoed_areas") {
+    dat <- dat[[1]] %>%
+      janitor::clean_names()
+  } else {
+    dat <- dat %>%
+      dplyr::bind_rows() %>%
+      janitor::clean_names()
+  }
 
   # data come without municipality codes, only their names. +so we turn everything lowercase and remove accents to try and match.
   dat <- dat %>%
@@ -229,6 +248,19 @@ load_ibama <- function(dataset,
         data_ult_alter_geom = as.Date(data_ult_alter_geom, "%d/%m/%y"),
         dplyr::across(dplyr::starts_with("qtd"), ~ gsub("[,]", ".", .x) %>% as.numeric())
       )
+
+    municipalities <- external_download(
+      source = "internal",
+      dataset = "geo_municipalities"
+    ) %>%
+      dplyr::left_join(
+        datazoom.amazonia::municipalities %>%
+          dplyr::select(code_muni, legal_amazon),
+        by = "code_muni"
+      )
+    dat <- ibama_embargo_municipality_intersection(dat, municipalities)
+    dat$uf <- dat$abbrev_state
+    dat$abbrev_state <- NULL
   }
 
   dat <- dat %>%
@@ -245,7 +277,9 @@ load_ibama <- function(dataset,
         dplyr::rename(
           municipio      = name_muni,
           cod_municipio  = code_muni,
-          amazonia_legal = legal_amazon
+          amazonia_legal = legal_amazon,
+          area_intersecao_m2 = intersection_area_m2,
+          numero_poligonais_origem = source_polygon_count
         ) %>%
         dplyr::relocate(c(municipio, cod_municipio, amazonia_legal), .before = uf)
     }
@@ -330,4 +364,69 @@ load_ibama <- function(dataset,
   ####################
 
   return(dat_mod)
+}
+
+# Associate each IBAMA embargo term with the municipalities its polygon
+# actually reaches. seq_tad is the source's primary key; a row key is used
+# only when that field is absent or missing.
+ibama_embargo_municipality_intersection <- function(embargoes, municipalities) {
+  if (!inherits(embargoes, "sf")) {
+    stop("The IBAMA embargo dataset must contain polygon geometries.", call. = FALSE)
+  }
+  if (is.na(sf::st_crs(embargoes)) || is.na(sf::st_crs(municipalities))) {
+    stop("Both IBAMA and municipal geometries must have a defined CRS.", call. = FALSE)
+  }
+
+  municipality_columns <- c("code_muni", "name_muni", "abbrev_state", "legal_amazon")
+  missing_columns <- setdiff(municipality_columns, names(municipalities))
+  if (length(missing_columns)) {
+    stop("The municipal layer is missing required columns: ",
+         paste(missing_columns, collapse = ", "), call. = FALSE)
+  }
+
+  operation_crs <- sf::st_crs(
+    "+proj=aea +lat_1=-2 +lat_2=-22 +lat_0=-12 +lon_0=-54 +x_0=5000000 +y_0=10000000 +ellps=GRS80 +units=m +no_defs"
+  )
+  embargoes <- sf::st_transform(sf::st_make_valid(embargoes), operation_crs)
+  municipalities <- sf::st_transform(sf::st_make_valid(municipalities), operation_crs)
+
+  key <- if ("seq_tad" %in% names(embargoes)) as.character(embargoes$seq_tad) else rep(NA_character_, nrow(embargoes))
+  missing_key <- is.na(key) | !nzchar(key)
+  key[missing_key] <- paste0(".source_row_", which(missing_key))
+  groups <- split(seq_len(nrow(embargoes)), factor(key, levels = unique(key)))
+
+  embargoes <- lapply(groups, function(ix) {
+    feature <- embargoes[ix[1], ]
+    sf::st_geometry(feature) <- sf::st_union(sf::st_geometry(embargoes[ix, ]))
+    feature$source_polygon_count <- length(ix)
+    feature
+  })
+  embargoes <- do.call(rbind, embargoes)
+  embargoes$.embargo_key <- names(groups)
+
+  # Replace the municipality previously matched by name with the municipality
+  # determined by the polygon overlay.
+  for (column in intersect(c("name_muni", "code_muni", "legal_amazon"), names(embargoes))) {
+    embargoes[[column]] <- NULL
+  }
+  if ("abbrev_state" %in% names(embargoes)) embargoes$abbrev_state <- NULL
+
+  intersections <- suppressWarnings(sf::st_intersection(
+    embargoes,
+    municipalities[, municipality_columns]
+  ))
+  intersections$intersection_area_m2 <- as.numeric(sf::st_area(intersections))
+  intersections <- intersections[is.finite(intersections$intersection_area_m2) & intersections$intersection_area_m2 > 0, ]
+
+  matched <- unique(intersections$.embargo_key)
+  unmatched <- embargoes[!embargoes$.embargo_key %in% matched, ]
+  if (nrow(unmatched)) {
+    for (column in municipality_columns) unmatched[[column]] <- municipalities[[column]][NA_integer_]
+    unmatched$intersection_area_m2 <- NA_real_
+    intersections <- rbind(intersections, unmatched)
+  }
+
+  intersections <- sf::st_drop_geometry(intersections)
+  intersections$.embargo_key <- NULL
+  intersections
 }

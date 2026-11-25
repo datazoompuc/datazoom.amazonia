@@ -21,7 +21,7 @@ whichever vocabulary the source used for that biome.}
 \item{language}{A \code{string} that indicates in which language the data will be returned. Portuguese ("pt") and English ("eng") are supported.}
 }
 \value{
-A \code{sf} object.
+A \code{sf} object. For treated output, \code{area} is the area of the alert part inside that municipality. \code{alert_area} is the full area of the source alert, repeated for every municipality it reaches; these repeated values are not additive. When supplied by the source, \code{source_uuid} preserves its alert identifier. \code{alert_id} is a sequence used to group the output pieces in that function call. Alerts with no positive-area municipal intersection remain once with missing municipality fields and missing \code{area}.
 }
 \description{
 Loads data on changes in forest cover and vegetation detected by DETER,
