@@ -171,39 +171,38 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># interactive()</span></span></span>
-<span class="r-in"><span><span class="co">### DO NOT RUN ###</span></span></span>
-<span class="r-in"><span><span class="co"># download treated active mining data in portuguese, by state</span></span></span>
-<span class="r-in"><span><span class="va">mining_active</span> <span class="op">&lt;-</span> <span class="fu">load_sigmine</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  dataset <span class="op">=</span> <span class="st">"sigmine_active"</span>,</span></span>
-<span class="r-in"><span>  raw_data <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>  geo_level <span class="op">=</span> <span class="st">"state"</span>,</span></span>
-<span class="r-in"><span>  language <span class="op">=</span> <span class="st">"pt"</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># download treated active mining data in portuguese, by municipality</span></span></span>
-<span class="r-in"><span><span class="va">mining_active_munic</span> <span class="op">&lt;-</span> <span class="fu">load_sigmine</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  dataset <span class="op">=</span> <span class="st">"sigmine_active"</span>,</span></span>
-<span class="r-in"><span>  raw_data <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>  geo_level <span class="op">=</span> <span class="st">"municipality"</span>,</span></span>
-<span class="r-in"><span>  language <span class="op">=</span> <span class="st">"pt"</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># download treated inactive (closed) mining data, by municipality</span></span></span>
-<span class="r-in"><span><span class="va">mining_inactive_munic</span> <span class="op">&lt;-</span> <span class="fu">load_sigmine</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  dataset <span class="op">=</span> <span class="st">"sigmine_inactive"</span>,</span></span>
-<span class="r-in"><span>  raw_data <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>  geo_level <span class="op">=</span> <span class="st">"municipality"</span>,</span></span>
-<span class="r-in"><span>  language <span class="op">=</span> <span class="st">"pt"</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># download the raw ANM shapefile for the inactive processes</span></span></span>
-<span class="r-in"><span><span class="va">mining_inactive_raw</span> <span class="op">&lt;-</span> <span class="fu">load_sigmine</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  dataset <span class="op">=</span> <span class="st">"sigmine_inactive"</span>,</span></span>
-<span class="r-in"><span>  raw_data <span class="op">=</span> <span class="cn">TRUE</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># interactive()</span></span>
+<span><span class="co">### DO NOT RUN ###</span></span>
+<span><span class="co"># download treated active mining data in portuguese, by state</span></span>
+<span><span class="va">mining_active</span> <span class="op">&lt;-</span> <span class="fu">load_sigmine</span><span class="op">(</span></span>
+<span>  dataset <span class="op">=</span> <span class="st">"sigmine_active"</span>,</span>
+<span>  raw_data <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  geo_level <span class="op">=</span> <span class="st">"state"</span>,</span>
+<span>  language <span class="op">=</span> <span class="st">"pt"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># download treated active mining data in portuguese, by municipality</span></span>
+<span><span class="va">mining_active_munic</span> <span class="op">&lt;-</span> <span class="fu">load_sigmine</span><span class="op">(</span></span>
+<span>  dataset <span class="op">=</span> <span class="st">"sigmine_active"</span>,</span>
+<span>  raw_data <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  geo_level <span class="op">=</span> <span class="st">"municipality"</span>,</span>
+<span>  language <span class="op">=</span> <span class="st">"pt"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># download treated inactive (closed) mining data, by municipality</span></span>
+<span><span class="va">mining_inactive_munic</span> <span class="op">&lt;-</span> <span class="fu">load_sigmine</span><span class="op">(</span></span>
+<span>  dataset <span class="op">=</span> <span class="st">"sigmine_inactive"</span>,</span>
+<span>  raw_data <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  geo_level <span class="op">=</span> <span class="st">"municipality"</span>,</span>
+<span>  language <span class="op">=</span> <span class="st">"pt"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># download the raw ANM shapefile for the inactive processes</span></span>
+<span><span class="va">mining_inactive_raw</span> <span class="op">&lt;-</span> <span class="fu">load_sigmine</span><span class="op">(</span></span>
+<span>  dataset <span class="op">=</span> <span class="st">"sigmine_inactive"</span>,</span>
+<span>  raw_data <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
     </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -213,7 +212,7 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Laura Tavares Regadas, DataZoom (PUC-Rio), Gustavo Gonzaga, Igor Rigolon Veiga, Guilherme Jardim, Daniel AC Barbosa, Bruno Alcantara Duarte, Fredie Didier, Tito Bruni, Luiz Guilherme Lopes Moussatche, Victor Aliende da Matta, Anna Carolina Dutra Saraiva, Arthur Carvalho Brito, Francisco de Lima Cavalcanti, Maria Mittelbach, Felipe de Moraes Nunes, Joao Paulo Santos P. Barbosa, Bernardo Furlanetto Sieira.</p>
+  <p></p><p>Developed by Laura Tavares Regadas, DataZoom (PUC-Rio), Gustavo Gonzaga.</p>
 </div>
 
 <div class="pkgdown">

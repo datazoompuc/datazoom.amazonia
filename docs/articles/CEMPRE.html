@@ -180,8 +180,8 @@ organizations operating in the country.</p>
 <p>The CEMPRE dataset includes:</p>
 <ul>
 <li>
-<strong>Time Period</strong>: Annual data from 1985 to the most
-recent available year</li>
+<strong>Time Period</strong>: Annual data from 2006 to 2024 (IBGE
+publishes it in two tables, see the note below)</li>
 <li>
 <strong>Geographic Coverage</strong>: All Brazilian states, regions,
 and municipalities</li>
@@ -193,6 +193,15 @@ CNAE (Classificação Nacional de Atividades Econômicas)</li>
 employment, average salary, payroll totals, and other firm
 characteristics</li>
 </ul>
+<p><strong>A break between 2021 and 2022.</strong> IBGE publishes CEMPRE
+in two SIDRA tables with the same structure: table 6449 for 2006 to
+2021, which it has closed, and table 9418 for 2022 onwards.
+<code><a href="../reference/load_cempre.html">load_cempre()</a></code> reads each year from the table that has it,
+but the two do not join up: Brazil’s number of companies and other
+organizations goes from 5.75 million in 2021 to 9.43 million in 2022,
+and the number of people employed from 55.3 to 62.7 million. A
+comparison across 2021 and 2022 is a comparison across two different
+series.</p>
 </div>
 <div class="section level2">
 <h2 id="dataset-description">Dataset Description<a class="anchor" aria-label="anchor" href="#dataset-description"></a>
@@ -324,7 +333,7 @@ economic sector (CNAE)</li>
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by Laura Tavares Regadas, DataZoom (PUC-Rio), Gustavo Gonzaga, Igor Rigolon Veiga, Guilherme Jardim, Daniel AC Barbosa, Bruno Alcantara Duarte, Fredie Didier, Tito Bruni, Luiz Guilherme Lopes Moussatche, Victor Aliende da Matta, Anna Carolina Dutra Saraiva, Arthur Carvalho Brito, Francisco de Lima Cavalcanti, Maria Mittelbach, Felipe de Moraes Nunes, Joao Paulo Santos P. Barbosa, Bernardo Furlanetto Sieira.</p>
+<p>Developed by Laura Tavares Regadas, DataZoom (PUC-Rio), Gustavo Gonzaga.</p>
 </div>
 
 <div class="pkgdown">
